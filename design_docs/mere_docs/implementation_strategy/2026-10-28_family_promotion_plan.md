@@ -57,9 +57,12 @@ each p2panda module integration keep their owner plans and must carry
 source-qualified receiving evidence. The refreshed
 [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
 scopes the remaining leaves, adapters and directories. Station Custody has moved.
-The 2026-11-04 refinement generalizes sites out of both Mere and Knot, groups
-Mora/CMUdict with Knot, and considers Pipit/Murm and Turquet/Cleromancy while
-preserving independent library crates and Turquet's real Turnstone consumer.
+The accepted 2026-11-04 direction is Gemot's shared site generator and serving
+domain out of Mere/Knot, then Mora/CMUdict into Knot, Pipit into Murm, and Turquet
+into Cleromancy. Libraries keep independent boundaries. Turnstone's richer daily
+sky implementation supplies Cleromancy's shared embeddable sky capability; both
+applications consume it while retaining their own presentation/interpretation.
+The source homes map and site-publication P12 own the detailed gates.
 Workshop destinations retain D16's separate checkpoint.
 
 ## Constraints
@@ -113,6 +116,11 @@ After the functional seams qualify, promote the resident and its custody impleme
 
 ## Progress
 
+- 2026-11-04: Mark accepted the generator and consolidation order. The generator
+  spans native formats and later Markdown/HTML targets; scripting remains a
+  follow-on design. Turnstone's sky embedding is a target, not current behavior.
+  Mark then clarified that its richer daily-sky implementation should be the
+  donor for the shared Cleromancy capability, preserving both consumers' behavior.
 - 2026-11-04: refined the source-home scope after Mark's site and small-repository
   review. The source homes map owns the recommendations and receiving gates;
   no Site, Mora, Pipit or Turquet source move has landed in this refinement.

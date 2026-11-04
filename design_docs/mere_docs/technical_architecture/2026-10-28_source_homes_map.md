@@ -113,10 +113,10 @@ owners. Qualification is Murm's transport consolidation plan, T7.
 | Slice | Current evidence | Next scope and done-condition |
 | --- | --- | --- |
 | `station-custody`, moved 2026-11-04 | Twelve unchanged Rust files now in `murm/crates/station-custody`, outside the default radio workspace. Signalman consumes that path; Mere's donor member, source files and three source-size exceptions are removed. | Murm owns this Retinue-specific custody adapter; Dramatis/Personae and Djinn retain credentials and grant policy. Scoped derivation, expiry, revocation, first-owner control, licenses and fixtures are unchanged. The standalone adapter and Signalman receiving pass; Mere's remaining workspace is checked separately. Physical qualification retains its prior scope. |
-| `crates/domain/site` and Knot's `knot-site` | The portable model is already editor-free. Knot still houses filesystem handling, immutable publication, protocol servers, resident handoff and submission adapters used beyond its editor. | Generalize the shared site domain from both repositories. Preferred repository home: Gemot, as an independent library with ordinary-site serving available without Moot membership. Knot keeps authoring UI and its application integration. Preserve V1 bytes, identities, submission consent and runtime boundaries; qualify Knot, Djinn and a Turnstone consumer. See the scope refinement below. |
+| `crates/domain/site` and Knot's `knot-site` | The portable model is already editor-free. Knot still houses filesystem handling, immutable publication, protocol servers, resident handoff and submission adapters used beyond its editor. | Accepted home: Gemot's shared static-site generator and serving library, with format writers and protocol bindings kept separate and ordinary sites available without Moot membership. Knot keeps authoring UI and its application integration. Preserve V1 bytes, identities, submission consent and runtime boundaries; qualify Knot, Djinn and a Turnstone consumer. See the scope refinement below. |
 | Mora repository, `crates/intel/mora-cmudict`, `reference-data` | Mora's application callers are Knot's editor and Readings. CMUdict's corpus/license and the validated lexical packs accompany them. Isocosm's CMUdict row is a patch-table entry, not an application dependency or call site. | Consolidate Mora and CMUdict as separate crates with Knot's lexical providers; include Reference Data in that leaf move. Preserve the no_std engine, corpus/license hashes and portable pack schema. A future second editor can motivate broader packaging. `mere-edit` already serves Knot and Isocosm and remains Mere's format-neutral application contract. |
-| Pipit repository | Actual voice-codec callers are Murm's Outrider (`voice`) and Signalman; the published package is `pipit` 0.2.0. | Recommended consolidation into Murm as a separate codec crate. Preserve frame/clip identities, malformed-input behavior, licenses and no_std/alloc profiles; qualify both consumers. Repository grouping adds no Retinue or GUI dependency to the codec. |
-| Turquet repository | Cleromancy uses 0.17.0; Turnstone's optional `sky` feature uses 0.13.0 in real surface/timeline code. The embedded geometry helper also lives in Turquet. | Consolidation beside Cleromancy is a repository-grouping option, retaining Turquet as an independent astronomy library directly usable by Turnstone. This is already a shared engine, so moving it cannot fold astronomy into Cleromancy's application/core API. Qualify both pinned API cohorts or explicitly migrate them together; preserve provenance, coefficient tables and verification fixtures. |
+| Pipit repository | Actual voice-codec callers are Murm's Outrider (`voice`) and Signalman; the published package is `pipit` 0.2.0. | Accepted consolidation into Murm as a separate codec crate, after Mora/CMUdict. Preserve frame/clip identities, malformed-input behavior, licenses and no_std/alloc profiles; qualify both consumers. Repository grouping adds no Retinue or GUI dependency to the codec. |
+| Turquet repository | Cleromancy uses 0.17.0; Turnstone's optional `sky` feature directly uses 0.13.0. Turnstone has the richer general daily timeline: named-zone day bounds, rise/set, transits and receipts. Cleromancy's UTC-day new-moon/dawn/dusk adapter has its own twilight policies. | After Pipit, consolidate Turquet beside Cleromancy as an independent astronomy library. Use Turnstone's daily-sky implementation as the donor for Cleromancy's shared embeddable sky library; both applications consume that implementation. Keep Turnstone's pane/navigation local and preserve Cleromancy's existing UTC/twilight behavior and interpretation layer. Qualify numerical policies, local days, provenance, persisted receipts and both applications before retiring their old integration paths. Preserve the embedded geometry helper, coefficient tables and verification fixtures. |
 | `modulus`, `tenant`, `conatus`, `nisus` | Modulus and Tenant have only Isocosm consumers. Seiche now optionally imports Conatus for GPU evaluation; Numen and Seiche still serve the graph toolkit. | Review Modulus/Tenant as a bounded games-wing slice. A bulk four-crate games-only move is stale: first qualify Seiche's GPU path and choose a portable engine owner for Conatus/Nisus. Preserve the host's shared device. Numen/Seiche remain platform components under this scope. |
 | `ports/dramatis` | A real packaged `dramatis-ui` binary, not an unused library; 1,464 Rust lines. It uses Cambium/Desktop, Mesquite, Taproot and Persona Picker. | Candidate Dramatis application root with a standalone producer/SDK gate and preserved packaging/profile behavior. Core Dramatis must remain free of GUI dependencies. Persona Picker stays reusable GUI code; Woodshed also consumes it. |
 | `ports/distillery/athanor`, `crates/distillery/alembic` | 5,222 and 738 Rust lines. The `workshop-destination` feature still imports Kernel/Pandect; graph destinations call Athanor validation and share a durable operation transaction. | D16 still applies. Separate Mere's graph-destination adapter from the graph-free workshop core, then move that core to Distillery after the W3 recovery/two-host gate. A Pandect feature must take admitted effects/injected checks rather than import agent-domain authority. Preserve operation ids, sealed contexts, transactions and recovery semantics. |
@@ -144,7 +144,7 @@ without acquiring an editor dependency. Knot retains draft editing, authoring
 controls and calls into the shared domain; editor origin does not establish
 ownership of the general service.
 
-Gemot is the recommended repository home for this domain, with its ordinary-site
+Gemot is the accepted repository home for this domain, with its ordinary-site
 library independent of the community-authority crate. Preserve the release-log
 plan's D2/D6: a personal site log works without Gemot membership or its optional
 Moot adapter. Repository location must not make every site a community. P2mere
@@ -155,13 +155,31 @@ The existing site-publication and release-log plans own behavior and receiving
 gates; this map refines their source-home scope rather than inventing another
 publication system.
 
-Separate library crates can share a consumer repository while retaining their
-public packages, licenses, feature profiles and dependency direction. Mora and
-Pipit fit that consolidation now. Turquet has a second real consumer, so a
-Cleromancy home remains a grouping recommendation requiring Turnstone receiving,
-not evidence that the engine belongs inside Cleromancy's application logic.
+Mark confirmed the direction: a static site generator in Gemot spanning Gemtext,
+Scroll, Markdown and HTML, with CSS, JavaScript and Lua as later possibilities;
+then Mora/CMUdict, Pipit, and Turquet. Content formats and transport protocols are
+separate axes. Existing native pages keep their bytes and metadata; new output
+writers must make unsupported features explicit. The site-publication plan's
+P12 owns this generator and extraction scope. CSS can be an emitted asset;
+JavaScript/Lua execution roles remain to be designed, rather than assumed by a
+source move.
+
+Separate library crates can share a consumer repository while retaining public
+packages, licenses, feature profiles and dependency direction. Mora/CMUdict go
+to Knot, Pipit to Murm, and Turquet to Cleromancy. Turnstone is intended to embed
+Cleromancy's shared sky capability instead of maintaining another integration.
+That embedding is not implemented today: `turnstone/src/sky_timeline.rs` and
+`sky_surface.rs` call Turquet directly, whereas `cleromancy/src/sky/turquet.rs`
+currently returns UTC-day new-moon and airless dawn/dusk facts. Mark clarified:
+Cleromancy should use Turnstone's richer implementation. Lift the general daily
+timeline, numerical policy and receipt machinery from Turnstone into the shared
+Cleromancy library, keeping browser pane/navigation code in Turnstone. Preserve
+Cleromancy's existing twilight policy and interpretation layer when adapting its
+consumer. The receiving cut must cover named-zone days, rise/set, transits,
+policies and source-bound receipts. Preserve historical V1 receipts at their
+recorded engine identity when migrating the live provider.
 Existing releases, immutable Git pins and historical evidence stay available
-through any later source move.
+through these source moves.
 
 Directory cleanup follows these cuts:
 

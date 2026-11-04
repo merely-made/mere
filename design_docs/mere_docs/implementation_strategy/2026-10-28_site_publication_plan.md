@@ -31,11 +31,27 @@ Receipts from this plan's runs go to `archive_docs/<date>/`, never into this
 plan (DOC_POLICY §8). Evidence that matters is a test in the repository or a
 line in Findings.
 
+## Decisions
+
+### site_publication D1: a shared static-site generator in Gemot (2026-11-04)
+
+**Outcome: new.** Mark:
+
+> A static site generator that works in each format/protocol… from gemtext to scroll to markdown to html (eventually css? Js? Hell, lua?) in gemot
+
+Gemot owns the shared generator and serving domain generalized from Mere and
+Knot. Format writers and protocol bindings are distinct; personal sites keep the
+optional-Moot rule. CSS, JavaScript and Lua are later extension possibilities,
+with execution roles still to be designed. P12 carries the implementation scope;
+this decision does not claim that those writers or runtimes already exist.
+
+Links: area publishing · plans P12 · summary shared static-site generation in Gemot across formats and protocols
+
 ## Constraints
 
 - **Source-home follow-up, 2026-11-04.** The [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#site-and-small-repository-scope-refinement-2026-11-04)
   scopes the shared site domain out of both Mere and Knot, including generic
-  serving and handoff. Gemot is the recommended repository home, with ordinary
+  serving and handoff. Gemot is the accepted repository home, with ordinary
   sites independent of Moot membership. The paths below describe current code
   until that separately qualified move lands; Knot retains authoring integration.
 - **Ownership.** `mere-site` owns the portable native-site profiles, page metadata, manifest validation and
@@ -273,6 +289,51 @@ Full retained history remains bounded; exceeding capacity refuses without prunin
   capacity, backwards time and concurrent stale commits cannot weaken memory.
 - Follow-ons: host adoption, protected local storage/backup policy, selective
   evidence retention/checkpoint handling, acquisition/discovery and device proof.
+
+### P12. Generalize the site generator into Gemot (2026-11-04)
+
+The accepted domain is static-site generation, publication and serving across
+native profiles and larger-web formats. Extract reusable model, snapshot,
+filesystem, serving and handoff code from both Mere and Knot into independent
+Gemot-hosted libraries. Knot keeps its draft editing and authoring controls;
+Mere/Turnstone keep browser and host integration. The ordinary-site library must
+build without the community-authority crate or a running editor/resident.
+
+Keep source formats, generated representations and delivery protocols as
+separate choices. Gemtext may be served over Gemini or Spartan; Scroll has its
+own metadata; Markdown is a content format; HTML has its own document and asset
+profile. Reuse existing parsers/writers and protocol implementations before
+adding another. Support native source preservation as well as explicit generated
+targets. A cross-format writer reports unsupported constructs and preserves
+provenance; its existence does not establish lossless conversion between every
+pair of formats.
+
+First retain existing Gemini, Scroll, Spartan and Micron behavior with its exact
+qualification limits, then add Markdown/HTML generation profiles and target-specific fixtures. Existing V1
+native snapshots, hashes and handoff records remain unchanged; a new profile
+uses an explicitly versioned contract rather than silently reinterpreting V1.
+Templates, output paths, limits and enabled targets are caller-selected. A build
+produces a checked immutable artifact; publishing and starting a listener remain
+explicit host actions. The site-log and optional Moot authority adapters continue
+to share content, holders and reader history under the release-log plan.
+
+CSS can be emitted assets in an HTML target. JavaScript and Lua remain later
+possibilities for templates, transforms or application behavior. Choose build,
+client or server execution separately and reuse the relevant existing engine;
+static generation does not itself grant persistent execution or network effects.
+
+Done when the shared library runs without Knot or Moot, Knot and Djinn use it,
+and a Turnstone consumer exercises the same publication/reader contract. Native
+byte/digest fixtures and explicit submission consent must still pass. Each new
+writer needs deterministic output, metadata/link/asset coverage and explicit
+unsupported-feature results; each protocol needs its own serving gate. A format
+writer passing tests does not qualify a listener or a runtime. Record source and
+license preservation and locked receiving cohorts before deleting either donor.
+Required receipts are those source comparisons, focused model/writer tests,
+offline/default and selected-feature checks, and actual consumer results, with a
+total retained-byte cap of **100 MB** per extraction lane. The generator's
+canonical plan follows its source into Gemot when that cut lands; governed
+hosting remains under Gemot's existing Moot publication plan.
 
 ## Open questions
 
