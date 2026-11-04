@@ -241,9 +241,9 @@ chartulary = { version = "0.3.0", git = "https://www.github.com/merely-made/eide
 # The legend/memorial view over journals and codicils; reservation only.
 hagiograph = { version = "0.0.1", git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 numen = { version = "0.2.1", path = "crates/conatus/numen" }
-esp = { version = "0.1.0", git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+esp = { version = "0.1.0", git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 # Fixture data is a dev-only supplier package; keep the runtime cohort unchanged.
-esp-testkit = { version = "0.1.0", git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+esp-testkit = { version = "0.1.0", git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 mora = "0.1.0"
 mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
@@ -289,8 +289,8 @@ graphshell-host = { version = "0.0.2", path = "crates/graphshell/graphshell-host
 # Family source convention (2026-10-15): every first-party row names its repository
 # by `branch = "main"` at the canonical URL; Cargo.lock pins the tested revision and
 # a repin is `cargo update -p knot-editor`. See the family composition brief.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", branch = "main" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", branch = "main" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "402eb28d2e02c41624ec573cff080a3b2f1feec5" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "402eb28d2e02c41624ec573cff080a3b2f1feec5" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -299,7 +299,7 @@ sporran = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.gi
 custody-wire = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 djinn-custodian = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The model-works port; first real consumer of the mesh host supervisor.
-distillery = { version = "0.0.1", git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+distillery = { version = "0.0.1", git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 # The places port: one port, two surfaces (murmur = conversation, moot =
 # community), composing gemot, commons, murm, and stickleback without owning
 # their authority. Founding reservation, no implementation. Package is
@@ -535,7 +535,7 @@ mien = { version = "0.0.1", git = "https://www.github.com/merely-made/gemot.git"
 
 # The personal-space compute mesh (resource-coordination M1): signed job ops
 # over the Standing-proven LogSync lane + the deterministic job board.
-mesh = { package = "mere-mesh", git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+mesh = { package = "mere-mesh", git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 # The host supervisor above the mesh (host lanes plan, gate H0): owns in-flight
 # jobs, their control handles, and the OS-facing condition/clock seams that
 # `mere-mesh` deliberately refuses to have.
@@ -692,7 +692,7 @@ cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 chirograph = { path = "crates/chirograph" }
 eidetic = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
-esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 mere-fetch = { path = "crates/system/fetch" }
 gemot = { git = "https://www.github.com/merely-made/gemot.git", rev = "3766de48777859d1571fef245c8c87a9e37df638" }
 graphshell = { path = "ports/graphshell" }
@@ -763,8 +763,8 @@ tinct = { path = "crates/cambium/tinct" }
 uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 
-distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
-mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
+mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 
 [patch.crates-io]
 # Published producer contracts share the host workspace's concrete types.
@@ -798,7 +798,7 @@ chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a
 commons-spine = { git = "https://www.github.com/merely-made/gemot.git", rev = "3766de48777859d1571fef245c8c87a9e37df638" }
 eidetic = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 finger-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 gemini-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 gemot = { git = "https://www.github.com/merely-made/gemot.git", rev = "3766de48777859d1571fef245c8c87a9e37df638" }
@@ -872,7 +872,7 @@ cubek-matmul = { path = "support/patches/cubek-matmul" }
 # let owner reclaim stop one admitted lease without dropping the protocol.
 # Remove when upstream provides equivalent control and passes the lifecycle
 # receipt, including reclaim and recovery.
-burn-remote = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+burn-remote = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.1" }
 genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.2" }
 # Livery/Buckram select published genet-taffy 0.16 directly. No Git patch is
@@ -938,7 +938,7 @@ chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a
 commons-spine = { git = "https://www.github.com/merely-made/gemot.git", rev = "3766de48777859d1571fef245c8c87a9e37df638" }
 eidetic = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 gemot = { git = "https://www.github.com/merely-made/gemot.git", rev = "3766de48777859d1571fef245c8c87a9e37df638" }
 luggage = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 mere-proofs = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
@@ -952,8 +952,8 @@ stickleback = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7
 # repins: the www form of each URL is the same repository under another source
 # key. Drop these tables once the Knot commit this lock holds names eidetic
 # aa94fe22 and esp f27bee8.
-distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
-mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
+mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 
 [patch."https://github.com/merely-made/eidetic.git"]
 chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
@@ -973,10 +973,10 @@ peer-facts = { version = "0.0.1", git = "https://www.github.com/merely-made/armi
 apparatus-core = { git = "https://www.github.com/merely-made/armillary.git", rev = "06340b08327b29c3485ecb0089bb5cafed20fd80" }
 
 [patch."https://github.com/merely-made/distillery.git"]
-esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
-esp-testkit = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
-distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
-mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "52a4ca1704889638d8acb89f392ccb7e3c458c96" }
+esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
+esp-testkit = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
+distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
+mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 
 [patch."https://github.com/merely-made/murm.git".mere-transport]
 git = "https://www.github.com/merely-made/murm.git"
