@@ -859,3 +859,20 @@ physical-device, independent-process/operator or other-platform acceptance.
 Compact receipts and transient helpers/logs fit the shared 100 MB cap.
 No isolated target, Cargo home, branch or worktree was created. The source
 commit identity is appended after publication.
+
+Published source: `6062243844229aa818032b8589b72c53a57e22db` (pushed main). Its 153 changed paths
+contain exactly H9's 148 Rust files, Cargo.lock, fifty exception removals
+and the three canonical docs. Both actual staged-blob guards pass; all four
+actual configured hooks pass. Source snapshot retains 295 exception records.
+The parallel lane's two new frozen-source fixture exceptions and receipt
+relocations remain outside this commit. Every prior receipt byte before the
+H9 section remains unchanged; qualified originals do not repeat prior tables.
+
+Integration checkpoint: parallel receipt relocation `4a8e17a888de5056b975e3ee0948a765f2df32ba`
+landed during the receipt-only commit. The staged-blob guard aborted that
+commit on HEAD drift. All 148 H9 Rust blobs and Cargo.lock remain identical
+to `606224384`; all fifty retired paths remain absent. The independent
+relocation inventory now has 288 exception records, without crediting its
+frozen evidence moves as source splits. Source moves/index guidance is
+preserved. Receipt publication repeats the full gates on this integrated
+HEAD; the source qualification and its immutable revision are unchanged.
