@@ -610,3 +610,123 @@ site and other-platform qualification keep their previous boundaries.
 The retained cap is 100 MB across H7. Compact summaries carry required evidence;
 owned transient scripts/logs are cleaned after publication. No isolated target,
 Cargo home, branch or worktree was required.
+
+### 2026-11-04: H8 selection
+
+Fifty new originals selected: Eidetic 5, Gemot 13, Woodshed 32. Baselines
+precede source edits. Compact summaries retained under the shared 100 MB cap;
+prior evidence and concurrent work remain intact.
+
+### 2026-11-04: H8 Eidetic five published
+
+`171f7892024c4af3897f5eb9e5e92f1fa1c5e930` is pushed. All originals and
+new modules fit (maximum 557), five exact exceptions retire and zero remain;
+imported patches stay excluded. Workspace baseline/post 746 pass/five ignore
+with identical inventory; Stickleback docs and full local/actual hooks pass.
+Review matches 194 bodies plus signatures/type fields, with no semantic or
+format-only difference after scope normalization. Owner evidence appends to
+`eidetic/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`.
+
+### 2026-11-04: H8 fifty additional originals published
+
+| Owner | Originals | New Rust files | Source commit | Exceptions left |
+|---|---:|---:|---|---:|
+| eidetic | 5 | 15 | `171f7892024c4af3897f5eb9e5e92f1fa1c5e930` | 0 |
+| gemot | 13 | 42 | `12ee625e11f8ac25322c1486144ec5a116b6c3f1` | 0 |
+| woodshed | 32 | 65 | `a113b659b0977a6eae9d5f25a2a07c1dc68cdef6` | 37 |
+
+All source commits are pushed main; each source checkout is clean and equals
+its remote-tracking main. Fifty distinct originals exceed 600 lines at their
+untouched baselines and do not repeat prior qualified originals. All fifty
+originals and all 122 extracted Rust files now fit 600 physical lines; every
+selected exception retires exactly once. No new exception or lint allow.
+
+Qualified originals (per-file before/after counts live in each owner receipt):
+
+**eidetic (5):**
+
+- `crates/stickleback/src/drop_io.rs`
+- `crates/stickleback/src/group_lane.rs`
+- `crates/stickleback/src/group_session.rs`
+- `crates/stickleback/src/processor.rs`
+- `crates/stickleback/src/store.rs`
+
+**gemot (13):**
+
+- `crates/commons/src/call.rs`
+- `crates/commons/src/chat.rs`
+- `crates/commons/src/encrypted.rs`
+- `crates/commons/src/lib.rs`
+- `crates/gemot/examples/author-offline-publication.rs`
+- `crates/gemot/src/moot/flora.rs`
+- `crates/gemot/src/moot/records/collection.rs`
+- `crates/gemot/src/moot/records/roster.rs`
+- `crates/gemot/src/moot/records/store.rs`
+- `crates/gemot/src/moot/service.rs`
+- `crates/gemot/src/moot/tulpa.rs`
+- `crates/gemot/src/moot/typed_authorization.rs`
+- `crates/mien/src/ledger.rs`
+
+**woodshed (32):**
+
+- `crates/woodshed-genet/src/audio/input_admission/tests.rs`
+- `crates/woodshed-genet/src/audio/loop_projection.rs`
+- `crates/woodshed-genet/src/audio/practice_clock.rs`
+- `crates/woodshed-genet/src/drive.rs`
+- `crates/woodshed-genet/src/leaves.rs`
+- `crates/woodshed-genet/src/main.rs`
+- `crates/woodshed-genet/src/midi.rs`
+- `crates/woodshed-genet/src/persona.rs`
+- `crates/woodshed-genet/src/persona_preservation_tests.rs`
+- `crates/woodshed-genet/src/scenario/mixed_looper.rs`
+- `crates/woodshed-genet/src/scenario/physical_audio.rs`
+- `crates/woodshed-genet/src/scenario/practice_clock.rs`
+- `crates/woodshed-genet/src/session.rs`
+- `crates/woodshed-genet/src/storage.rs`
+- `crates/woodshed-genet/src/sync.rs`
+- `crates/woodshed-genet/src/wav_export.rs`
+- `crates/woodshed-views/src/appearance.rs`
+- `crates/woodshed-views/src/fretboard_leaf.rs`
+- `crates/woodshed-views/src/stage/canvas_camera.rs`
+- `crates/woodshed-views/src/stage/context.rs`
+- `crates/woodshed-views/src/stage/contextual_navigation.rs`
+- `crates/woodshed-views/src/stage/looper.rs`
+- `crates/woodshed-views/src/stage/looper/recorder.rs`
+- `crates/woodshed-views/src/stage/music_editor.rs`
+- `crates/woodshed-views/src/stage/musical_context.rs`
+- `crates/woodshed-views/src/stage/practice_clock.rs`
+- `crates/woodshed-views/src/stage/rehearsal.rs`
+- `crates/woodshed-views/src/stage/related.rs`
+- `crates/woodshed-views/src/stage/relationship.rs`
+- `crates/woodshed-views/src/stage/settings.rs`
+- `crates/woodshed-views/src/theme.rs`
+- `crates/woodshed-views/src/workspace.rs`
+
+Owner evidence:
+
+- `eidetic/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`: native workspace baseline/post 746 pass, zero fail, five ignore; identical emitted inventories, Stickleback docs and full local/actual hooks pass. Imported patches remain excluded.
+- `gemot/design_docs/archive_docs/receipts/2026-11-04_source_splits_plan_receipts.md`: native workspace baseline/post 242 pass, zero fail, one ignore; identical emitted inventories, workspace docs and full local/actual hooks pass. Separate relay-worker custody commit `30be124` is preserved as an ancestor, changes none of the selected sources or Cargo inputs, and gains no new operator/relay qualification here.
+- `woodshed/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`: full root workspace baseline/post 1705 pass, one fail, eight ignore; matching emitted inventories and the same overview navigation/process-count assertion, actual 2 versus expected 3. That source is unselected; the assertion stays unchanged and the owning Stage plan carries the residual. Native/view docs and full local/actual hooks pass. Independent ports remain unselected.
+
+Move audits match 1,100 old/new function/constant bodies across the three
+owners, all signatures and type fields after scope/visibility normalization.
+Woodshed has six Rustfmt-only brace/semicolon differences; the other two have
+none. Literal/fixture bytes, generic bounds, public facades and cfg variants
+remain matched. Session worker test names stay reachable through narrow
+same-module includes, preserving their existing `--exact` launch strings.
+No test assertion is weakened and no ignore is added. Existing warning-level
+diagnostics remain; docs/compiler passes do not claim warning-free graphs.
+
+Each source commit contains only its recorded owned paths. H8 changes no
+Cargo manifest/lock, CI, tool release, hook configuration, CLAUDE, doctrine or
+product/platform qualification. Existing Mere device-pairing and stack-
+reduction WIP remains unstaged. Responsibility/fixture groups stay with their
+owners; headed, physical audio/MIDI, real-network, deployed and other-platform
+acceptance is not renewed.
+
+Retained cap: 100 MB across H8. Compact summaries and owning receipt history
+fit below 1 MB; transient logs/helpers stay below 1 MB before cleanup. Builds
+reuse approved repository targets with two jobs and one own Cargo lane. No
+isolated target, Cargo home, branch or worktree was created. Aggregate
+metadata and scoped configured hooks are checked on the three changed docs;
+actual commit repeats ceiling, Responsa and always-run dependency bans.

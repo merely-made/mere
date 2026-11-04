@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-04):** landed. H1-H7 complete, including three fifty-file source passes. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** landed. H1-H8 complete; H8 qualifies fifty additional source splits. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -215,6 +215,14 @@ Each comes back as a question before anything is written.
   and source and aggregate receipts are pushed. Total retained cap: 100 MB across H7;
   compact text only, stable approved Cargo targets, two jobs.
 
+- **H8. Fourth fifty-file source pass.** Mark's next batch selects Eidetic
+  five, Gemot thirteen and Woodshed thirty-two from clean main. Previously
+  qualified paths are excluded. Done when all originals/replacements fit,
+  fifty exact exceptions retire, baseline/post inventories agree, feature/docs
+  and full local/actual gates pass, and source plus aggregate receipts are
+  pushed. Existing failures and broader acceptance stay distinguished.
+  Retained cap: 100 MB across H8, compact summaries, stable targets, two jobs.
+
 ## Findings
 
 - 2026-11-04: H7 qualifies fifty additional originals across Knot 28, Mer3ly 12, Cleromancy 9 and Wavicle 1. Original/replacement files fit, fifty exact exceptions retire, and all four source commits are pushed. Baseline/post inventories agree; scoped feature/docs and local/actual commit hooks pass. Knot retains fourteen existing product/Windows full-suite failures and Cleromancy two product failures, carried into owner plans. The canonical LF fixture repair changes no golden Git bytes.
@@ -378,3 +386,22 @@ Each comes back as a question before anything is written.
 - 2026-11-04: H7 **22/50 published**. Cleromancy nine (`d9de7f2d`) joins Mer3ly twelve and Wavicle one. All nine original/child sources fit with zero exceptions; 147 default passes, the same two existing failures and one ignore, matching baseline inventory except the LF fixture repair; analytic eighteen, narrow-feature/docs and full/actual hooks pass. Product defects carry forward in the divination plan O7. Knot 28 is prepared and in post-refactor qualification.
 
 - 2026-11-04: H7 **50/50 landed**. Knot twenty-eight (`7e66a1df`) completes the source target, with 772 passes, the same fourteen failures and eight ignores, matching the complete baseline inventory. Optional CLI, offline/editor and retention-free/desktop checks, docs, explicit workspace Clippy and full/actual hooks pass. The signed-history fixture now follows its actual optional component without disabling other scenarios. Remaining exceptions in these owners: Knot eleven and Mer3ly nine; Cleromancy and Wavicle zero. All published original/new Rust files fit. The aggregate receipt lists all fifty paths and immutable source commits, preserving concurrent Mere work and owner evidence policies.
+
+- 2026-11-04: H8 starts at **0/50**: Eidetic five, Gemot thirteen and Woodshed thirty-two root-workspace originals. Existing Mere plan WIP and excluded ports remain with their owners.
+
+- 2026-11-04: H8 **5/50 published**. Eidetic's five remaining Stickleback originals (`171f7892`) reach zero owned exceptions, with matching 746-case native workspace inventories, public docs, structural review and full local/actual hooks. Gemot baseline passes; Woodshed baseline is running.
+
+- 2026-11-04: H8 **18/50 published**: Gemot thirteen (`12ee625e`)
+  joins Eidetic five. Zero Gemot exceptions remain; 242 native workspace
+  passes and one ignore match baseline, and docs/full local/actual hooks pass.
+  Concurrent relay custody ancestor `30be124` is preserved separately.
+
+- 2026-11-04: H8 **50/50 landed**: Woodshed thirty-two (`a113b659`)
+  completes the pass. Original/new Rust files fit, exact exceptions retire,
+  and 1705 passes, one existing overview failure and eight ignores match
+  baseline. The overview assertion carries forward in its Stage plan;
+  docs and full local/actual hooks pass. Published source checkouts are
+  clean. The aggregate records all fifty new originals, 122 children and
+  immutable source commits. Eidetic/Gemot have zero exceptions; Woodshed
+  retains 37. Existing Mere plan WIP, source fixtures and prior evidence
+  remain intact; physical, headed and platform acceptance stays separate.
