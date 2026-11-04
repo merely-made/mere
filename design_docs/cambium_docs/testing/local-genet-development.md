@@ -184,7 +184,7 @@ offline reconciliation: only the already-landed text and diagnostics edges above
 were missing, with no other package/version/source drift.
 
 The standalone web lock remains ignored by repository policy. Its exact tested
-bytes are archived as [graphshell-web-Cargo.lock.txt](receipts/generated-names/graphshell-web-Cargo.lock.txt)
+bytes are archived as [graphshell-web-Cargo.lock.txt](../../../../../testing/mere/design_docs/cambium_docs/testing/receipts/generated-names/graphshell-web-Cargo.lock.txt)
 with SHA-256 `f9aaf5929ecf9dc37157d641d09a17384b22d34bc7abbaafa16fa6614c264560`.
 Copy that file to `ports/graphshell/web/Cargo.lock` before reproducing the web gate.
 From the Code root, the commands are:

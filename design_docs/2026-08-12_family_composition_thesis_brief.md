@@ -520,7 +520,7 @@ code changes in this lane.
 
 #### R3 results (2026-09-20)
 
-[Receipt](mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md),
+[Receipt](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md),
 with sources, locks and logs. Real netfetcher (genet `5ae30cad`), real
 iroh-blobs 0.103, real ureq 3.4; loopback HTTP servers only, so no TLS, no WAN,
 and no Redshank, Turnstone or resident code in the loop.
@@ -559,9 +559,9 @@ owner-specific plan in Mere.
 
 ### First experiment results (2026-09-08)
 
-The [arena receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md),
-[execution receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/execution/R1_EXECUTION_RECEIPT.md)
-and [capture/custody receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/identity/R2_B_C_RECEIPT.md)
+The [arena receipt](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md),
+[execution receipt](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/execution/R1_EXECUTION_RECEIPT.md)
+and [capture/custody receipt](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/identity/R2_B_C_RECEIPT.md)
 preserve the disposable scripts, commands, source census and limitations.
 Both models were independently rerun after review. The arena fixture calls
 real `ScriptedDom`/`Pins` from Genet `ee0b314b3e9`; the other fixtures model
@@ -611,7 +611,7 @@ Existing owner plans remain the implementation homes.
 | S9 | Turnstone capture correlation | Integrate exact target and nonreused request identity into the actual capture path, with stale/duplicate/unsupported refusal; keep envelope and pixel-storage acceptance explicit | Committed `c5f991e`: action-to-host correlation, replacement-id alias and bulk teardown corrections; 5 production-module tests plus external Inker sanity pass, no-default library check passes. Weld adapter compile is blocked before Turnstone by pinned Welding/current local Grafting API mismatch; headed pixels and durable deposit remain open. 2026-09-09: the Weld blocker was Turnstone drift, not the pin; the adapter had been uncompiled since the P1 contract landed. Migrated to welding/grafting heads and merged to turnstone main; hosted capture returns `Unsupported` until Inker's `WeldSurface` grows a capture hook (P2), the S9 Weld-side wiring was deleted and will be reimplemented then. Mark ruled Chromium's process sandbox the default: turnstone `436e087` adds the Windows bootstrap client-DLL route (`sandbox_bootstrap_win` crate, `RunWinMain`), `Sandboxed` by default when launched through CEF's bootstrap and `UnsandboxedTrustedContent` on the direct executable route, with `TURNSTONE_WELD_SANDBOX` as an explicit override that refuses unsupported combinations; a headed sandboxed boot succeeded on a local CEF 151.3.24 bundle (`turnstone/design_docs/2026-08-03_turnstone_engine_adoption_plan.md`) |
 | S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Actual Muniment/redb probe: 3 pass, including reopen and stale-delete negative control; production writer/envelope integration remains open. 2026-09-09 ruling: a transactional read-then-write method on Muniment's `Backend` trait (redb and IndexedDB honor it, zip refuses); pricing in the orchestration scratch report, implementation lane launched 2026-09-09: `Backend::transact` landed on `slice/s10-custody-20260909` (`9ba9f790`) — honest for redb (one write transaction), memory (single mutex), and IndexedDB (one Readwrite transaction, wasm32 offline check-compiles); zip and the trait default both refuse with a typed `StoreError::NotTransactional`. The probe's scenarios pass as positive controls against the real backends (59 tests total); the apply-alone negative control is retained as a documented regression. Verified, not just read from source: redb's Windows `LockFile` is cross-process, held for the `Database` handle's whole lifetime (`design_docs/mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md`). Turnstone wiring and process-kill recovery remain open |
 
-The [actual custody-backend probe](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md)
+The [actual custody-backend probe](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md)
 uses Muniment/redb and BLAKE3: owner-specific transfer survives reopen, a
 rechecked collection refuses a later claim, and an atomic but stale delete
 batch demonstrably loses the newly claimed bytes. This selects a requirement
@@ -859,7 +859,7 @@ consumer.
 **Consumers:** Turnstone's live-page/tombstone/download reference classes.
 
 **Failure tests (exist, against real Muniment/redb):** the custody-backend
-receipt (`mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md`,
+receipt (`Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md`,
 `src/lib.rs` regression manifest) — 3 assertions pass: equal-bytes-one-blob
 with separate same-class owner references surviving reopen; a collection
 proposal refused when the adapter rechecks references at apply; and a

@@ -15,8 +15,8 @@
 - Mark ruled on history, stale leases, TOML 1.1, the fork's home and CLI
   commands on 2026-10-19 ([decisions](#decisions-2026-10-19)).
 - Durable history, memory budgets and crash behavior remain open.
-- Dated evidence is in the [evidence log](mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md),
-  with copied [receipts](mere_docs/testing/receipts/2026-10-19_retained_document/README.md).
+- Dated evidence is in the [evidence log](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md),
+  with copied [receipts](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/README.md).
 
 Use a retained document resource to inspect and revise authored data while
 preserving its text, comments, unknown content, and earlier revisions. The
@@ -194,7 +194,7 @@ noise of full. The cache mode shares 90 of 152 green nodes and remains
 available behind `--history`. On 2026-10-20, leases also reclaim reused PIDs
 and earlier boots, the fork lays out TOML 1.1 multiline inline tables, and
 Isocosm resolves on cargo 1.97.1. Details are in the
-[evidence log](mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md#isocosm-continuation--2026-10-19).
+[evidence log](../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md#isocosm-continuation--2026-10-19).
 
 ## Open decisions
 

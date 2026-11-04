@@ -982,7 +982,7 @@ focused context and whole-scope realization; drawing a small subset does not
 by itself qualify rendering the complete graph.
 
 A 2026-10-08 count of the stored
-`design_docs/inker_docs/testing/receipts/2026-10-07_current_browser_family/family-resolver.json`
+`Code/testing/mere/design_docs/inker_docs/testing/receipts/2026-10-07_current_browser_family/family-resolver.json`
 fixture found 1,564 packages, 1,564 resolver nodes and 6,538 `deps` entries.
 This is an available resolver workload, not a fresh selected-build graph or a
 count of compile units. Its verbose Cargo JSON is 8,185,829 bytes; that is not

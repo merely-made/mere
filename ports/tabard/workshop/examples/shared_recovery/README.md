@@ -111,7 +111,7 @@ No server, adapter, build, test or browser was launched while authoring the fixt
 
 ## Accepted R6 evidence
 
-The [compact browser R6 receipt](../../../../../design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md)
+The [compact browser R6 receipt](../../../../../../../testing/mere/design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md)
 records actual Genet `5618326d` / Mere `4682ba99` / Netrender `c74b7cb` /
 provider `2eae624` code, reused compiled R4 Wasm/glue and unchanged R5 package,
 with a separately sealed R6 ownership driver. All twelve complete raw/PNG images,

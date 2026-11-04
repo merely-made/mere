@@ -48,7 +48,7 @@ both the root and the epoch.
 Verified 2026-10-14 on the Renoir: 336 native host tests, 513 Graphshell, 5
 WebGL portable, 28 Netrender; Chrome WebGL2, Auto without WebGPU, Firefox and
 SwiftShader pass 32 viewer controls, native Vulkan WebGPU 26. Receipt:
-`testing/receipts/browser_presentation_20261013/presentation/integration-20261014/`.
+`Code/testing/mere/testing/receipts/browser_presentation_20261013/presentation/integration-20261014/`.
 
 **Limits, closed 2026-10-15.** The 125% scale gap was fixed by aligning
 composition: browser WebGPU presents the same portable scene as WebGL2, so
@@ -58,7 +58,7 @@ fork `276b4664`, Netrender `5fbc7b2ba`); per-route viewer artifacts loaded by
 `mount.js`, with Classic Vello an opt-out in the suppliers (Netrender
 `f4f9c0d87`, Genet `ae3d9f5d972`); and Mark's ruling amending R157's Wasm cap
 to 3,460,300 B. Final gzip6: WebGPU 3,359,673, WebGL2 3,322,091, both passing.
-Receipts: `testing/receipts/browser_presentation_20261013/presentation/limits-followup-20261014/`.
+Receipts: `Code/testing/mere/testing/receipts/browser_presentation_20261013/presentation/limits-followup-20261014/`.
 Recorded options, not tasks: slim Genet's recent browser-capture work in the
 viewer, align genet-parley onto one read-fonts. Human assistive-technology and
 asynchronous browser WebGPU device replacement remain separate gates.

@@ -42,6 +42,272 @@
       "sha256": "263b6aa3a02c3562f3e99373513e5e98a93ca1b587fc1f4a61859a3f6d96afb2",
       "git_blob": "c187a690a33fecb3ebaf230d8ca20251666fd669",
       "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/README.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/README.md",
+      "sha256": "f108d34dc0555ea38f0d0b8e74e047c3f11fb266830935e133240f5a201c0b72",
+      "git_blob": "deb8a770b5930fdd35f78a4aba9c00e03bab5282",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md",
+      "sha256": "21dd2c9c426122eb254edd45a3b3ee4abe56f4023617744f05e72f82c86efbc2",
+      "git_blob": "423b6073ab1a105a24bb1d37f07e568017ab5a44",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/git-only-integration-r3/README.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/git-only-integration-r3/README.md",
+      "sha256": "ec5d82b5a546aace566ae3dc4097237d964b7d511d464365870a692ca4d3fb4c",
+      "git_blob": "5740ce834b22b500968d1e5a489683c79f4b21f6",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/native-shared-r2/README.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/native-shared-r2/README.md",
+      "sha256": "7421d4b33092766666502e2597ab21caa5653cca7a228e492bacddb23e10c1f0",
+      "git_blob": "ce9ec9983d8ba57088b000b880dae9570e9b7fe8",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/performance-analysis.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/performance-analysis.md",
+      "sha256": "d4c740f9faf09a4184dc79d571f6c2cc295b89120a348e01c3f49b452df78b13",
+      "git_blob": "01e70f72cdd7d67aa7c11f0217f215aaec5b0b78",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/native_image_atlas_20261010/README.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/README.md",
+      "sha256": "5cf2d0dc061ddc5347ef0cb86accc1ee24950ee220ec260a8c608602b0868095",
+      "git_blob": "61e67f7a80e7b3e46ece007793bd448dea4ab62a",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "cambium_docs/testing/receipts/native_image_atlas_20261010/original_reset_analysis.md",
+      "destination": "Code/testing/mere/design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/original_reset_analysis.md",
+      "sha256": "7e82d18c84b2cc11141e654b6c38f27b1a739b604130740a02b00dbc66598747",
+      "git_blob": "e364a655b75c7c9467accd2cbe4e677e4c153abb",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "inker_docs/testing/receipts/2026-10-07_current_browser_family/README.md",
+      "destination": "Code/testing/mere/design_docs/inker_docs/testing/receipts/2026-10-07_current_browser_family/README.md",
+      "sha256": "1331dfd62e7548877c4a889471a35c3e1e961f08e16e67d145876e789d012500",
+      "git_blob": "f96143f836afde9e3fa43f868c84e500befeab46",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-11_producer_gates/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-11_producer_gates/README.md",
+      "sha256": "72e185e86ca466475a695e2756fb22a57129ff6e83f42e370be5f86b114cecfb",
+      "git_blob": "64cdae4646b9f161471ac0a69db23a4959551478",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-15_netrender_adoption/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-15_netrender_adoption/README.md",
+      "sha256": "f836e388c193f1fa990366f6d92c755c070a7d2596235eb92ba6fd61e1e9b46f",
+      "git_blob": "c9d908d2c9336133d5766345c9d649792798ec56",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md",
+      "sha256": "665ee701a7cda40bc406326455d69d23b7e31034d7856444bafa19b2cb4a35c9",
+      "git_blob": "1bca75b397d60fb3889249c31302415fccc8c879",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md",
+      "sha256": "2eff78705a430f16be42cbf75c155585ac980933dd79277143ee62ba81f283ed",
+      "git_blob": "2a880ea0c7f86f563b184848f9bd7cea52da4392",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/execution/R1_EXECUTION_RECEIPT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/execution/R1_EXECUTION_RECEIPT.md",
+      "sha256": "baee50068003a0084bc3c945c7e4e82b694cfdbaf9bcbcb14032105faaf958ed",
+      "git_blob": "3a013f1d3adc3f1b2c732a013fd65803ec9f3c82",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/identity/R2_B_C_RECEIPT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/identity/R2_B_C_RECEIPT.md",
+      "sha256": "e044ecc8be383cb3458ebee529b4ba45045b712b1570d4b5c4f57d847aa502a7",
+      "git_blob": "b7c5f193684d0a7f195900e412c6370c08f05ca1",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md",
+      "sha256": "cd2f5a11fa4c4fafb8afd287e93181b62476c12c795c2b4d9f31ff5cb8cfe61c",
+      "git_blob": "2dc9d93485911338c217492fa1384d42fb14a207",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+      "sha256": "91f0e9454818fc5340f40e9a625350969bc5711846ed5c12188e17e3a92c304b",
+      "git_blob": "a3404d8963373a522506503de0e42e8f2b34b7ba",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+      "sha256": "eb19a4c804ce32cbf40a90128b070d3f81e76df7adc8966e07daec7b38ca977c",
+      "git_blob": "968e87b77ae68f274691d7b82a8def8d268bedc4",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-11_vello_releases/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-11_vello_releases/README.md",
+      "sha256": "2cdb8d1cbb44b08153deabc0d2d231270c6b0ded7d890a4a6b0e362a9e2529e3",
+      "git_blob": "f9ad1d8683023ac004f45a32b90c1b9b927632c9",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-12_coupling_effects/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-12_coupling_effects/README.md",
+      "sha256": "906c78827a3b0e50aa54e1c7c6d1563528f1d3ba3960055094421ad95f48ccf5",
+      "git_blob": "8d740bf41c4ae71a06cdffc7dbf4ee8acc382e13",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-14_c1_resident_divination/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-14_c1_resident_divination/README.md",
+      "sha256": "7940cfe0664ab6246415b5cac83386e673f643874ad6624b310cd004aae3945a",
+      "git_blob": "7bc43bef4529860f5afce383d44e2be48b43d52d",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/README.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/README.md",
+      "sha256": "09fd5fcf04cf956c5b83cd91b8d06f12ea1f72625210a1434ccdcdeec2a55842",
+      "git_blob": "642d82f0492a7ca1848e4181ff71dc7c866f1ded",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md",
+      "sha256": "a0b2ad7401b40e42d347ad79e422dc51a76b6e827b187b3666122ad906987bdd",
+      "git_blob": "00f656cd7d3a84b39f1610e23fc3c54a32c77818",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/pack-author-workflow-20261017/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/pack-author-workflow-20261017/REPORT.md",
+      "sha256": "b85b9b7325958f15e51a67a653c8aa1f36fdf3f781d91d0af470e69eb0c77c1e",
+      "git_blob": "8abe0c2e777fadd14f3802476b6942f8d4fa0834",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/redox-document-20261013/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/redox-document-20261013/REPORT.md",
+      "sha256": "63910c610544edd8060cd1615ed54c3ce0d142553f3d9f38d0258b2623eb6d99",
+      "git_blob": "9f68adbd9cadd51bdae16e0cd8b054f667d01730",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/retained-document-20261016/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/retained-document-20261016/REPORT.md",
+      "sha256": "e5f430891f0891c2b961c7cc16355626afad190260abfc86759f9a0c2d27e802",
+      "git_blob": "3f8ab006a52e5b732dedfecac04bef4c52a9903d",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/retained-document-20261016/SYNTAX.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/retained-document-20261016/SYNTAX.md",
+      "sha256": "e8c506d1a9f6542f4638c3d2ff09023b75ba1996d62e06c36fb4e228ce6925ef",
+      "git_blob": "efd8499b75d162597df6be4e71b91258073739f0",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/retained-dom-batch-20261016/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/retained-dom-batch-20261016/REPORT.md",
+      "sha256": "97675ac22366faa4404aeebf7b547bd6ca446bbb03be1033f4277f899c806cc7",
+      "git_blob": "eb61ba1bf6c505abf3c06c2aeb1e8135eaa6da80",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/retained-lowering-profile-20261016/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/retained-lowering-profile-20261016/REPORT.md",
+      "sha256": "6052c47ccd28aaaff6edde2bf65cfd5d097eb2614280258aceb7f4901e6eb3fa",
+      "git_blob": "7d07d76f8461c8d8cb85db0f961e95a48b724825",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/retained-parser-20261015/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/retained-parser-20261015/REPORT.md",
+      "sha256": "a728770ff26ef3f5971b600254441259f5b5db317dd43e937c28ca9f74393088",
+      "git_blob": "d367d3a11b9b7e445b96f4cedfedb6ca3e0455b3",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/REPORT.md",
+      "sha256": "ad30da6925d115418bd60682a2b07318b6dfa6000c0c2d19c73a8898a5846c9b",
+      "git_blob": "252aad0b84d347e6b5d52a9888dc2f4da305bf9c",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/core/REVIEW.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/core/REVIEW.md",
+      "sha256": "dbff92198fcb55ff51c21dbf6be2ea936749111558f385a4b8e8d3f5b4c02c70",
+      "git_blob": "94603c1bf297c1868350345a6b321ce46730fe92",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/isocosm/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/isocosm/REPORT.md",
+      "sha256": "1d9ce69a48d14aaa48aa659e262596b37e25b78b567e9c5efa2f671714e8e63d",
+      "git_blob": "2aee03b0f50306a2547ee92425052e783c48ed20",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/knot/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/knot/REPORT.md",
+      "sha256": "dac2bd8d4a9a4c89feeb71599331cd3f40096b5378d2fd71b85831c4efa42001",
+      "git_blob": "ee72cc39b2aeed73475050fa1f1e3dbc01563528",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-dedup-20261018/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-dedup-20261018/REPORT.md",
+      "sha256": "0724df9e4bcdedbbdea1149f68a73e663bebe9e75e9861766076308279debeae",
+      "git_blob": "97440ce1dd530e2b88760d4e26afa43c4fa3db4a",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-dedup-20261018/knot/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-dedup-20261018/knot/REPORT.md",
+      "sha256": "149a33310d015ed1a332097c5b0981e831c832f34925e4fa4181dc83e0fbcd4d",
+      "git_blob": "c8f7e6fbd6431315f0437a7f3daef9f772c2ac50",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/REPORT.md",
+      "sha256": "a4611022d93aa5d343c66a166b0b51c53b9dd80e2ae8b2d32a3435b5b633dbc0",
+      "git_blob": "5d1253c72be9f3c00e8da1f60b674ac5a457a547",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/isocosm/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/isocosm/REPORT.md",
+      "sha256": "414fb847f62bf217c0707ed94f34769683e496337181623ad55474a8f5197cbc",
+      "git_blob": "cca6e9d0a9633ae897da9cb1dd8dd0440e6685fe",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
+    },
+    {
+      "source": "mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/knot/REPORT.md",
+      "destination": "Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/knot/REPORT.md",
+      "sha256": "fcd37553d2815b7fc4de469f140c78b15a525dea90275dc5a29bb6f37940d23b",
+      "git_blob": "590a1ab8268cb3acec52c8ac921a2509595b5ca7",
+      "source_commit": "b5b1db636180511b91d4bba65798211a84b2e15e"
     }
   ]
 }

@@ -302,6 +302,7 @@ their live tools and open repair conditions have a maintained home.
 ## Progress
 
 - 2026-11-04: adopted the approved dialog-cancellation carry and VDIP whole archive, relocated qualified evidence and executable inputs with their path repairs, and preserved remaining mixed-packet owner holds. Manifests and qualification limits are in `Code/testing/mere/closure-audit/`.
+- 2026-11-04: continued with 55 frozen receipt groups (1,618 tracked files), preserving checkout and canonical Git forms where they differ. Current Mere navigation and two Genet references now use the external homes. Existing browser-family and stack-pillar manifest discrepancies remain disclosed; no historical tools were run. Seven ignored local Cargo inputs remain untouched at their old paths. Instrument renewal/Q465, four cross-importing link-model verifiers, P7 server, ownership-repair output and active owner packets remain held for their actual harness or ownership work; the complete disposition and locator are `Code/testing/mere/closure-audit/batch-06-support-review.json` and `Code/testing/mere/receipt-relocation-2026-11-04/batch-06-reader.md`.
 
 - 2026-11-04: aligned the renderer pins and tracked locks with Netrender `6364e5d9` and Vello `b4a53486`; focused graph and Sprigging checks are recorded in the archived receipt.
 

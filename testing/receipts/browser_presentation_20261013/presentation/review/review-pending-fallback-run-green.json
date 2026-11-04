@@ -1,8 +1,0 @@
-{
-  "result": "pass",
-  "controls": [
-    "pending fallback cancellation removes replacement canvas",
-    "reconnect owns one canvas"
-  ],
-  "errors": []
-}

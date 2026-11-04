@@ -128,7 +128,7 @@ def receipt_relocations() -> tuple[set[str], list[str], list[str]]:
             source, destination = item.get("source", ""), item.get("destination", "")
             source_path, destination_path = Path(source), Path(destination)
             valid = (
-                source.startswith("mere_docs/testing/") and source.endswith(".md")
+                re.fullmatch(r"[a-z0-9_]+_docs/testing/(?:receipts/)?[^\\]+\.md", source)
                 and destination.startswith("Code/testing/mere/")
                 and source_path.name == destination_path.name
                 and not any(part in {".", ".."} for part in source.split("/") + destination.split("/"))

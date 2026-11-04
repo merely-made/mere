@@ -11,7 +11,7 @@ The research, probes and rulings stay there; this plan owns the work.
 substrate per persona), the [engine profile boundary plan](../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md)
 (a session's profile binding is persona, session or graph scoped), the
 [net-media plan](../../archive_docs/2026-10-28/2026-05-26_net_media_plan.md) (the likely second consumer), and
-the [R3 receipt](../testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md).
+the [R3 receipt](../../../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md).
 Cross-repo: `woodshed/design_docs/2026-11-03_listening_annotation_port_plan.md`
 and `turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` gate 1.
 

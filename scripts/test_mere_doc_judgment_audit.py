@@ -39,7 +39,8 @@ Fixture.
 
 class ReceiptCoverage(unittest.TestCase):
     def audit_fixture(self, *, legacy=None, include_second=True, relocated=False,
-                      register=True, corrupt=False, destination=None, unavailable=False):
+                      register=True, corrupt=False, destination=None, unavailable=False,
+                      source="mere_docs/testing/receipt.md"):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             docs = root / "design_docs"
@@ -60,7 +61,6 @@ class ReceiptCoverage(unittest.TestCase):
                 batch += "\n" + record("b/README.md")
             relocations = root / "receipt-relocations.json"
             if relocated:
-                source = "mere_docs/testing/receipt.md"
                 batch += "\n" + record(source)
                 target = root / "testing/mere/receipt.md"
                 target.parent.mkdir(parents=True)
@@ -112,6 +112,20 @@ class ReceiptCoverage(unittest.TestCase):
     def test_relocation_cannot_escape_evidence_root(self):
         result = self.audit_fixture(relocated=True, destination="Code/testing/mere/../../../receipt.md")
         self.assertTrue(any("invalid or duplicate" in error for error in result["errors"]))
+
+    def test_receipt_namespace_accepts_other_owners_and_nested_packets(self):
+        result = self.audit_fixture(relocated=True,
+                                    source="cambium_docs/testing/receipts/device/receipt.md")
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["inactive_supplemental_records"],
+                         ["cambium_docs/testing/receipts/device/receipt.md"])
+
+    def test_relocation_cannot_hide_active_plans_or_governance(self):
+        for source in ("mere_docs/implementation_strategy/receipt.md", "DOC_POLICY.md",
+                       "mere_docs/testing/../implementation_strategy/receipt.md"):
+            with self.subTest(source=source):
+                result = self.audit_fixture(relocated=True, source=source)
+                self.assertTrue(any("invalid or duplicate" in error for error in result["errors"]))
 
     def test_missing_local_evidence_is_reported_without_rewriting_history(self):
         result = self.audit_fixture(relocated=True, unavailable=True)

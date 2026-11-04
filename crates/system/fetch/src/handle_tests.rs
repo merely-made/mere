@@ -6,7 +6,7 @@
 
 //! The handle against a real local server, called the way a decoder calls it.
 //! Moved in from the R3-A probe
-//! (`design_docs/mere_docs/testing/receipts/2026-09-20_resource_resolution_probes`).
+//! (`Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-20_resource_resolution_probes`).
 
 use std::{
     io::{Read, Write},

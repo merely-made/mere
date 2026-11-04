@@ -176,7 +176,7 @@ non-dynamic advection hold and unsupported physical responses. Sampling still
 uses time zero. This replaces the missing evaluation API, not the missing
 stable field/coupling/occurrence provenance or applied-effect trace at that
 foundation checkpoint; the tracing continuation below supplies the next adapter.
-The [engine draft receipt](../testing/receipts/2026-10-12_coupling_effects/README.md)
+The [engine draft receipt](../../../../../testing/mere/design_docs/mere_docs/testing/receipts/2026-10-12_coupling_effects/README.md)
 records the original-executor trajectory comparison, the failing deduplication
 control, read-only query checks, runnable real integration and its qualification
 boundaries. Membership, clocks, event execution and conflicting writers remain

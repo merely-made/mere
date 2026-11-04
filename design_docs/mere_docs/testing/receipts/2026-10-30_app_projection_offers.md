@@ -3,7 +3,7 @@
 Source base: Mere `59d87099c`, after fetching and incorporating documentation-only
 upstream changes over the qualified code base `56fbdc2e4`. This extends the reviewed custody/projection feature boundary.
 The source hashes, commands, resource caps and verified log SHA-256 values are in
-[qualification.json](../../../../support/receipts/app-projection-offers-20261030/qualification.json).
+[qualification.json](../../../../../../testing/mere/support/receipts/app-projection-offers-20261030/qualification.json).
 Supplier code was published in Mere `c3567c5ab`; the current supplier head is
 `46e339b118565c0b46c821fe741659cb302eae52`. Knot published its provider CLI
 baseline as `63ba1b9c61cb119053c7460abe497a3285b2fdba`. Retained supplier

@@ -71,8 +71,14 @@ The tool skips them, as it skips Retained licenses.
 
 | Path | Pinned by | Ruled |
 |---|---|---|
-| `design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` | `artifact-sha256.json` at its root and in `custody-backend/`, and the arena's run JSONs; its `.gitattributes` keeps the bytes so the digests survive checkout | 2026-10-06, ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md) |
-| `design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/original-control/tabard-patchless-atlas-repro.rs` | `tabard-patchless-atlas-repro-build.json` beside it, `source_sha256` verified against the retained bytes | Existing frozen-source rule, 2026-10-06 ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md); recorded 2026-10-10 |
+| `Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` | `artifact-sha256.json` at its root and in `custody-backend/`, and the arena's run JSONs; its `.gitattributes` keeps the bytes so the digests survive checkout | 2026-10-06, ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md) |
+| `Code/testing/mere/design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/original-control/tabard-patchless-atlas-repro.rs` | `tabard-patchless-atlas-repro-build.json` beside it; `source_sha256` matches the separately retained canonical Git-byte copy, while the Windows checkout form is also preserved | Existing frozen-source rule, 2026-10-06 ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md); recorded 2026-10-10 |
+
+These two frozen packets moved unchanged from their former `design_docs/` homes
+on 2026-11-04. The locator at
+`Code/testing/mere/receipt-relocation-2026-11-04/batch-06-reader.md` records the
+old roots, both byte forms and existing sealed-manifest discrepancies. The
+relocation does not change the historical license ruling or qualification.
 
 A receipt that does not pin its sources' bytes is not frozen evidence: its
 sources take the header like any other (so the 2026-09-20 resource resolution

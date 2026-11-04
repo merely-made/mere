@@ -1,9 +1,0 @@
-{
-  "result": "pass",
-  "controls": [
-    "gesture constructor refused",
-    "failed viewer construction releases context",
-    "failed viewer construction removes mirror"
-  ],
-  "errors": []
-}
