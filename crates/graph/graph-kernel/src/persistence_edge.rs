@@ -274,56 +274,6 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
     }
 }
 
-impl serde::Serialize for PersistedSemanticStatement {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        use serde::ser::SerializeStruct;
-
-        let human = serializer.is_human_readable();
-        let scoped = self.graph_scope != GraphScope::Default;
-        let fields = if human {
-            2 + usize::from(self.recognized_sub_kind.is_some())
-                + usize::from(self.label.is_some())
-                + usize::from(scoped)
-                + usize::from(self.provenance_iri.is_some())
-                + usize::from(self.asserted_at_ms.is_some())
-                + usize::from(self.first_asserted_ms.is_some() || self.asserted_at_ms.is_some())
-                + usize::from(self.withdrawn.is_some())
-                + usize::from(!self.basis.is_empty() || self.label.is_some())
-        } else {
-            10
-        };
-        // Positional serializers receive every field in the current shape.
-        let mut state = serializer.serialize_struct("PersistedSemanticStatement", fields)?;
-        state.serialize_field("statement_id", &self.statement_id)?;
-        state.serialize_field("predicate", &self.predicate)?;
-        if !human || self.recognized_sub_kind.is_some() {
-            state.serialize_field("recognized_sub_kind", &self.recognized_sub_kind)?;
-        }
-        if !human || self.label.is_some() {
-            state.serialize_field("label", &self.label)?;
-        }
-        if !human || scoped {
-            state.serialize_field("graph_scope", &self.graph_scope)?;
-        }
-        if !human || self.provenance_iri.is_some() {
-            state.serialize_field("provenance_iri", &self.provenance_iri)?;
-        }
-        if !human || self.asserted_at_ms.is_some() {
-            state.serialize_field("asserted_at_ms", &self.asserted_at_ms)?;
-        }
-        if !human || self.first_asserted_ms.is_some() || self.asserted_at_ms.is_some() {
-            state.serialize_field("first_asserted_ms", &self.first_asserted_ms)?;
-        }
-        if !human || self.withdrawn.is_some() {
-            state.serialize_field("withdrawn", &self.withdrawn)?;
-        }
-        if !human || !self.basis.is_empty() || self.label.is_some() {
-            state.serialize_field("basis", &self.basis)?;
-        }
-        state.end()
-    }
-}
-
 #[derive(
     Archive,
     Serialize,
@@ -590,165 +540,51 @@ pub struct PersistedEdge {
 
 impl PersistedEdge {
     pub fn retained_assertions(&self) -> &[PersistedSemanticStatement] {
-        self.assertions.as_deref().unwrap_or_else(|| self.semantic.as_ref()
-            .map(|data| data.statements.as_slice()).unwrap_or(&[]))
+        self.assertions.as_deref().unwrap_or_else(|| {
+            self.semantic
+                .as_ref()
+                .map(|data| data.statements.as_slice())
+                .unwrap_or(&[])
+        })
     }
     pub fn retained_assertions_mut(&mut self) -> &mut [PersistedSemanticStatement] {
         match self.assertions.as_mut() {
             Some(records) => records.as_mut_slice(),
-            None => self.semantic.as_mut().map(|data| data.statements.as_mut_slice()).unwrap_or(&mut []),
+            None => self
+                .semantic
+                .as_mut()
+                .map(|data| data.statements.as_mut_slice())
+                .unwrap_or(&mut []),
         }
     }
     pub fn has_legacy_assertion_data(&self) -> bool {
-        self.semantic.as_ref().is_some_and(|data| !data.statements.is_empty() || !data.sub_kinds.is_empty()
-            || data.predicate.is_some() || data.label.is_some())
-            || self.containment.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
-            || self.arrangement.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
-            || self.imported.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
-            || self.provenance.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
+        self.semantic.as_ref().is_some_and(|data| {
+            !data.statements.is_empty()
+                || !data.sub_kinds.is_empty()
+                || data.predicate.is_some()
+                || data.label.is_some()
+        }) || self
+            .containment
+            .as_ref()
+            .is_some_and(|data| !data.sub_kinds.is_empty())
+            || self
+                .arrangement
+                .as_ref()
+                .is_some_and(|data| !data.sub_kinds.is_empty())
+            || self
+                .imported
+                .as_ref()
+                .is_some_and(|data| !data.sub_kinds.is_empty())
+            || self
+                .provenance
+                .as_ref()
+                .is_some_and(|data| !data.sub_kinds.is_empty())
     }
 }
 
 #[cfg(test)]
-mod statement_serialization_tests {
-    use super::*;
+#[path = "persistence_edge/statement_serialization_tests.rs"]
+mod statement_serialization_tests;
 
-    fn cases() -> Vec<PersistedSemanticStatement> {
-        let plain = PersistedSemanticStatement {
-            statement_id: "held\nassertion".into(),
-            predicate: "urn:predicate:held".into(),
-            recognized_sub_kind: None,
-            label: None,
-            graph_scope: GraphScope::Default,
-            provenance_iri: Some("https://author.test/".into()),
-            asserted_at_ms: None,
-            first_asserted_ms: None,
-            withdrawn: None,
-            basis: Default::default(),
-        };
-        let mut legacy = plain.clone();
-        legacy.provenance_iri = None;
-        let mut marker = plain.clone();
-        marker.provenance_iri = Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
-        let mut rich = plain.clone();
-        rich.statement_id = String::new();
-        rich.recognized_sub_kind = Some(PersistedSemanticSubKind::Cites);
-        rich.label = Some(String::new());
-        rich.graph_scope = GraphScope::Custom("urn:graph:held".into());
-        rich.provenance_iri = Some(String::new());
-        rich.asserted_at_ms = Some(0);
-        rich.first_asserted_ms = Some(0);
-        rich.basis.note = Some(String::new());
-        vec![plain, legacy, marker, rich]
-    }
-
-    #[test]
-    fn statement_json_omits_absent_metadata_and_preserves_explicit_values() {
-        let cases = cases();
-        let plain = serde_json::to_value(&cases[0]).unwrap();
-        assert_eq!(plain.as_object().unwrap().len(), 3);
-        assert_eq!(plain["statement_id"], "held\nassertion");
-        assert_eq!(plain["provenance_iri"], "https://author.test/");
-        for absent in [
-            "recognized_sub_kind",
-            "label",
-            "graph_scope",
-            "asserted_at_ms",
-        ] {
-            assert!(plain.get(absent).is_none());
-        }
-        let legacy = serde_json::to_value(&cases[1]).unwrap();
-        assert!(legacy.get("provenance_iri").is_none());
-        assert_eq!(
-            serde_json::from_value::<PersistedSemanticStatement>(legacy).unwrap(),
-            cases[1]
-        );
-        let marker = serde_json::to_value(&cases[2]).unwrap();
-        assert_eq!(
-            marker["provenance_iri"],
-            crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
-        );
-        let rich = serde_json::to_value(&cases[3]).unwrap();
-        assert_eq!(rich.as_object().unwrap().len(), 9);
-        assert_eq!(rich["statement_id"], "");
-        assert_eq!(rich["label"], "");
-        assert_eq!(rich["provenance_iri"], "");
-        assert_eq!(rich["asserted_at_ms"], 0);
-        assert_eq!(rich["first_asserted_ms"], 0);
-        for value in cases {
-            let bytes = serde_json::to_vec(&value).unwrap();
-            assert_eq!(
-                serde_json::from_slice::<PersistedSemanticStatement>(&bytes).unwrap(),
-                value
-            );
-        }
-    }
-
-    #[test]
-    fn statement_binary_current_shape_round_trips() {
-        for value in cases() {
-            let bytes = postcard::to_allocvec(&value).unwrap();
-            assert_eq!(
-                postcard::from_bytes::<PersistedSemanticStatement>(&bytes).unwrap(),
-                value
-            );
-            let archive = rkyv::to_bytes::<rkyv::rancor::Error>(&value).unwrap();
-            assert_eq!(
-                rkyv::from_bytes::<PersistedSemanticStatement, rkyv::rancor::Error>(&archive)
-                    .unwrap(),
-                value
-            );
-        }
-    }
-
-    #[test]
-    fn legacy_postcard_sequence_is_not_a_supported_store_format() {
-        #[derive(serde::Serialize)]
-        struct Legacy {
-            statement_id: String,
-            predicate: String,
-            recognized_sub_kind: Option<PersistedSemanticSubKind>,
-            label: Option<String>,
-            graph_scope: GraphScope,
-            provenance_iri: Option<String>,
-            asserted_at_ms: Option<u64>,
-        }
-
-        let legacy = Legacy {
-            statement_id: "legacy-sequence".into(),
-            predicate: "urn:p".into(),
-            recognized_sub_kind: None,
-            label: None,
-            graph_scope: GraphScope::Default,
-            provenance_iri: Some("urn:source".into()),
-            asserted_at_ms: Some(42),
-        };
-        let bytes = postcard::to_allocvec(&legacy).unwrap();
-        assert!(postcard::from_bytes::<PersistedSemanticStatement>(&bytes).is_err());
-    }
-
-    #[test]
-    fn legacy_time_falls_back_only_when_first_time_is_absent() {
-        let legacy = serde_json::json!({
-            "statement_id": "legacy",
-            "predicate": "urn:p",
-            "asserted_at_ms": 42
-        });
-        let decoded: PersistedSemanticStatement = serde_json::from_value(legacy).unwrap();
-        assert_eq!(decoded.first_asserted_ms, Some(42));
-        assert_eq!(decoded.asserted_at_ms, Some(42));
-
-        let explicit_unknown = serde_json::json!({
-            "statement_id": "unknown-first",
-            "predicate": "urn:p",
-            "first_asserted_ms": null,
-            "asserted_at_ms": 42
-        });
-        let decoded: PersistedSemanticStatement = serde_json::from_value(explicit_unknown).unwrap();
-        assert_eq!(decoded.first_asserted_ms, None);
-        assert_eq!(decoded.asserted_at_ms, Some(42));
-        let encoded = serde_json::to_value(decoded).unwrap();
-        assert!(encoded.get("first_asserted_ms").is_some());
-        assert!(encoded["first_asserted_ms"].is_null());
-    }
-}
+#[path = "persistence_edge/serialization.rs"]
+mod serialization;

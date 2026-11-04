@@ -96,58 +96,6 @@ fn replay_preserves_the_pending_index_and_exact_recorded_claim() {
 }
 
 #[test]
-fn purge_prevents_arrival_derivation_and_source_navigation_keeps_original_ownership() {
-    let mut graph = Graph::new();
-    let source = kernel::graph::apply::add_node(
-        &mut graph,
-        None,
-        "https://example.org/source".into(),
-        Default::default(),
-    );
-    let original = graph.shown_resource_id(source).unwrap();
-    apply_link_statements(
-        &mut graph,
-        source,
-        &[statement("https://example.org/target", "cites")],
-    );
-    let mut purged = graph.clone();
-    let before = truth(&purged);
-    assert_eq!(purged.purge_pending_links(), 1);
-    assert_eq!(truth(&purged), before);
-    kernel::graph::apply::add_node(
-        &mut purged,
-        None,
-        "https://example.org/target".into(),
-        Default::default(),
-    );
-    assert_eq!(purged.resource_relations().count(), 0);
-
-    kernel::graph::apply::apply_graph_delta(
-        &mut graph,
-        kernel::graph::apply::GraphDelta::NavigateNode {
-            key: source,
-            url: "https://example.org/later".into(),
-        },
-    );
-    let current = graph.shown_resource_id(source).unwrap();
-    assert_ne!(current, original);
-    kernel::graph::apply::add_node(
-        &mut graph,
-        None,
-        "https://example.org/target".into(),
-        Default::default(),
-    );
-    let claims: Vec<_> = graph.resource_relations().collect();
-    assert_eq!(claims.len(), 1);
-    assert_eq!(claims[0].1, original);
-    assert_ne!(claims[0].1, current);
-    assert!(graph.pending_links().is_empty());
-    let before_truth = truth(&graph);
-    assert_eq!(graph.purge_pending_links(), 0);
-    assert_eq!(truth(&graph), before_truth);
-}
-
-#[test]
 fn a_resource_only_target_arrival_needs_no_appearance_and_duplicates_do_not_multiply() {
     let mut graph = Graph::new();
     let source = kernel::graph::apply::add_node(
@@ -613,3 +561,6 @@ fn navigation_to_an_already_held_target_admits_a_surface_owned_claim() {
     assert_eq!(truth(&graph), truth(&replay));
     assert_eq!(replay.pending_links().len(), 1);
 }
+
+#[path = "statements_pending_tests/custody.rs"]
+mod custody;

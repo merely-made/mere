@@ -730,3 +730,132 @@ reuse approved repository targets with two jobs and one own Cargo lane. No
 isolated target, Cargo home, branch or worktree was created. Aggregate
 metadata and scoped configured hooks are checked on the three changed docs;
 actual commit repeats ceiling, Responsa and always-run dependency bans.
+
+### 2026-11-04: H9 selection
+
+Baseline `380d9ce38f6759caf28ec615784927e2383c8eee`. Fifty new originals: graph 25
+(mere-kernel 19 and mere-rdf 6), pictograph canvas 25. Shared retained cap
+100 MB. Existing Mere plan WIP is excluded from the index. Selection was
+reviewed before edits; baseline packages/features are unchanged.
+
+| Original | Before | After |
+|---|---:|---:|
+| `crates/canvas/pictograph/src/canvas/physics_board.rs` | 980 | 449 |
+| `crates/canvas/pictograph/src/canvas/backdrop_surface.rs` | 793 | 179 |
+| `crates/canvas/pictograph/src/canvas/board_scene.rs` | 1025 | 586 |
+| `crates/canvas/pictograph/src/canvas/build_tests.rs` | 710 | 388 |
+| `crates/canvas/pictograph/src/canvas/cartography.rs` | 651 | 475 |
+| `crates/canvas/pictograph/src/canvas/cartography_scene.rs` | 1053 | 459 |
+| `crates/canvas/pictograph/src/canvas/dynamics_spec.rs` | 625 | 488 |
+| `crates/canvas/pictograph/src/canvas/edge_cells.rs` | 906 | 497 |
+| `crates/canvas/pictograph/src/canvas/fold_projection.rs` | 725 | 288 |
+| `crates/canvas/pictograph/src/canvas/frame.rs` | 1107 | 467 |
+| `crates/canvas/pictograph/src/canvas/input.rs` | 944 | 560 |
+| `crates/canvas/pictograph/src/canvas/lifecycle.rs` | 1119 | 568 |
+| `crates/canvas/pictograph/src/canvas/link_reading_tests.rs` | 692 | 531 |
+| `crates/canvas/pictograph/src/canvas/roles.rs` | 615 | 397 |
+| `crates/canvas/pictograph/src/canvas/scene_paint.rs` | 624 | 380 |
+| `crates/canvas/pictograph/src/canvas/selection.rs` | 750 | 517 |
+| `crates/canvas/pictograph/src/canvas/strategy.rs` | 640 | 531 |
+| `crates/canvas/pictograph/src/canvas/tests/arrangement_roles.rs` | 669 | 562 |
+| `crates/canvas/pictograph/src/canvas/tests/density_wander.rs` | 638 | 467 |
+| `crates/canvas/pictograph/src/canvas/tests/meaning.rs` | 905 | 511 |
+| `crates/canvas/pictograph/src/canvas/tests/relations.rs` | 672 | 521 |
+| `crates/canvas/pictograph/src/canvas/view.rs` | 658 | 485 |
+| `crates/canvas/pictograph/src/lib.rs` | 808 | 410 |
+| `crates/graph/graph-kernel/src/graph/assertion_write.rs` | 1166 | 568 |
+| `crates/graph/graph-kernel/src/graph/edge_data.rs` | 888 | 540 |
+| `crates/graph/graph-kernel/src/graph/edge_ops.rs` | 1273 | 566 |
+| `crates/graph/graph-kernel/src/graph/edge_taxonomy.rs` | 617 | 402 |
+| `crates/graph/graph-kernel/src/graph/journal.rs` | 1644 | 276 |
+| `crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs` | 3076 | 457 |
+| `crates/graph/graph-kernel/src/graph/mod.rs` | 932 | 480 |
+| `crates/graph/graph-kernel/src/graph/predicate_declarations.rs` | 793 | 349 |
+| `crates/graph/graph-kernel/src/graph/query.rs` | 1472 | 527 |
+| `crates/graph/graph-kernel/src/graph/resource.rs` | 701 | 417 |
+| `crates/graph/graph-kernel/src/graph/revert.rs` | 2382 | 578 |
+| `crates/graph/graph-kernel/src/graph/snapshot/checked.rs` | 719 | 506 |
+| `crates/graph/graph-kernel/src/graph/snapshot/from.rs` | 710 | 408 |
+| `crates/graph/graph-kernel/src/graph/snapshot/tests.rs` | 809 | 498 |
+| `crates/graph/graph-kernel/src/graph/tests/family_assertions.rs` | 926 | 478 |
+| `crates/graph/graph-kernel/src/graph/tests/nodes_and_edges.rs` | 769 | 591 |
+| `crates/graph/graph-kernel/src/graph/tests/snapshot_basic.rs` | 870 | 534 |
+| `crates/graph/graph-kernel/src/persistence_edge.rs` | 754 | 590 |
+| `crates/graph/graph-kernel/src/types.rs` | 894 | 584 |
+| `crates/graph/linked-data/src/ingest.rs` | 1203 | 579 |
+| `crates/graph/linked-data/src/ingest/tests.rs` | 1111 | 529 |
+| `crates/graph/linked-data/src/lib.rs` | 2236 | 580 |
+| `crates/graph/linked-data/src/query.rs` | 839 | 210 |
+| `crates/graph/linked-data/src/resource_metadata.rs` | 617 | 94 |
+| `crates/graph/linked-data/src/statements_pending_tests.rs` | 615 | 566 |
+| `crates/canvas/pictograph/src/canvas/tests/physics_catalog.rs` | 680 | 486 |
+| `crates/canvas/pictograph/src/canvas/tests/physics_form.rs` | 811 | 549 |
+
+H9 first baseline exits 101 before tests: spareval 0.2.9 has eight Digest
+trait errors because its MD5 0.11.0 and SHA 0.10 cohort disagree. Cached
+`cargo update -p md-5@0.11.0 --precise 0.10.6 --offline` succeeds. Cargo
+also moved cssparser-macros from Syn 3 to Syn 2; its exact original record
+was restored, then complete record comparison passed. Exactly one package
+record changes (MD5 version/checksum and its Digest edge); all retained
+package records and dependency selections are identical. No manifest or
+registry-source edit and no algorithm substitution. The compatible
+untouched-source baseline follows.
+
+H9 compatible untouched baseline: `cargo test -p mere-kernel -p mere-rdf
+-p pictograph --features mere-rdf/query,pictograph/canvas --locked
+--no-fail-fast -- --test-threads=1` passes: 1,309 passed, zero failed,
+22 existing ignores. Minimal no-default baselines also pass: mere-rdf (83, 0, 0);
+pictograph (15, 0, 0). All fifty selected Rust originals remain
+unchanged through these baselines.
+
+H9 first post-feature run: 1,309 passed, zero failed, 22 ignored, matching
+the complete 1,331 emitted test-name/outcome inventory after module-prefix
+normalization. The move audit matches 1,683 old/new function/constant
+bodies, all signatures and type fields, and included fixture hashes. Four
+Rustfmt-only brace/semicolon differences are `first_origin`,
+`families_equal_row_families_for_every_edge_shape`, `retained_assertions`
+and `has_legacy_assertion_data`. Private aliases are removed where only
+their child uses them, or gated by test for test-only consumers; existing
+public and restricted facade paths remain even if unused in this build.
+
+### 2026-11-04: H9 final qualification
+
+The final feature-enabled native run repeats 1,309 passes, zero failures and
+22 existing ignores. All 1,331 emitted test-name/outcome entries match the
+untouched compatible baseline after module-prefix normalization. Minimal
+no-default RDF (83) and Pictograph (15) inventories also match, with zero
+failures/ignores. The last edge-lookup move is included in this final run.
+
+`cargo clippy -p mere-kernel -p mere-rdf -p pictograph --features
+mere-rdf/query,pictograph/canvas --locked --all-targets` and the same
+package/feature `cargo doc --locked --no-deps` pass. `prek run --all-files`
+passes ceiling, Responsa, repository-wide Clippy and dependency bans.
+Existing warning-level diagnostics and unused restricted facade re-exports
+remain; no new lint allow, assertion relaxation or ignore is introduced.
+
+All fifty originals and 98 new Rust files fit; maximum 591 physical lines
+(`graph/tests/nodes_and_edges.rs`). The move audit matches 1,683 bodies, all
+signatures and type fields, and included fixture hashes; four brace/semicolon
+differences are Rustfmt-only. Visibility of the extracted public test module
+is retained, with its path attribute preceding the declaration. Public API
+paths, field records, generic bounds, graph authority, literals, arithmetic,
+serialization and canvas/runtime ownership remain intact.
+
+The shared checkout has a separate receipt-relocation lane in progress. Its
+frozen fixture rules, receipt moves, readers and index edits are preserved.
+The first full hook run reports 1,958 missing-file tag messages for those
+uncommitted relocations, then exits zero with every configured hook passed.
+Those moves gain no qualification or attribution from this batch. Partial
+index blobs carry only H9's fifty exception removals and Source moves/index
+paragraph edits; the other lane's changes remain outside this commit.
+Actual commit gates verify the expected staged paths/blobs before and after
+running all configured hooks. No persistent hook configuration changes.
+
+H9 changes no Cargo manifest, CI, tool tag, CLAUDE, doctrine, fixture bytes
+or product design. Its sole lockfile change is the documented compatible
+MD5 record; all retained package records remain unchanged. This is named
+native package/feature/software evidence, not renewed GPU, native-headed,
+physical-device, independent-process/operator or other-platform acceptance.
+Compact receipts and transient helpers/logs fit the shared 100 MB cap.
+No isolated target, Cargo home, branch or worktree was created. The source
+commit identity is appended after publication.

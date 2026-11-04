@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-04):** landed. H1-H8 complete; H8 qualifies fifty additional source splits. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** landed. H1-H9 complete; H9 qualifies fifty additional source splits. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -223,6 +223,15 @@ Each comes back as a question before anything is written.
   pushed. Existing failures and broader acceptance stay distinguished.
   Retained cap: 100 MB across H8, compact summaries, stable targets, two jobs.
 
+- **H9. Fifth fifty-file source pass.** Mere graph (25) and canvas (25)
+  originals qualify only after each original and child fits 600 lines, exact
+  exceptions retire, baseline/post and relevant feature/docs gates agree,
+  and configured local/actual hooks pass before publication. Preserve
+  literal/fixture bytes, public facades, type fields, graph authority and
+  canvas/runtime ownership. Retained cap: 100 MB across H9; compact summaries,
+  stable target, two jobs and one own Cargo lane. Existing failures and
+  physical/headed/platform qualification remain separately recorded.
+
 ## Findings
 
 - 2026-11-04: H7 qualifies fifty additional originals across Knot 28, Mer3ly 12, Cleromancy 9 and Wavicle 1. Original/replacement files fit, fifty exact exceptions retire, and all four source commits are pushed. Baseline/post inventories agree; scoped feature/docs and local/actual commit hooks pass. Knot retains fourteen existing product/Windows full-suite failures and Cleromancy two product failures, carried into owner plans. The canonical LF fixture repair changes no golden Git bytes.
@@ -405,3 +414,38 @@ Each comes back as a question before anything is written.
   immutable source commits. Eidetic/Gemot have zero exceptions; Woodshed
   retains 37. Existing Mere plan WIP, source fixtures and prior evidence
   remain intact; physical, headed and platform acceptance stays separate.
+
+- 2026-11-04: H9 starts **0/50**: mere-kernel 19, mere-rdf 6, pictograph
+  25, selected from unchanged sources. Existing device-pairing and stack-
+  reduction plan work is preserved; baselines precede source edits.
+
+- 2026-11-04: selection review replaces apply.rs and capture.rs with two
+  canvas physics fixture files before source edits. Their 1,246-line mutation
+  function and 753-line capture test need deliberate factoring in a later
+  pass. H9 now covers graph 25 and canvas 25 through whole method and fixture
+  groups; baseline package/feature scope is unchanged.
+
+- The Canvas field record stays in its existing home; its selected slot is
+  the PhysicsBoard implementation/fixtures, keeping field visibility intact.
+
+- 2026-11-04: H9 untouched query baseline is blocked by spareval 0.2.9
+  selecting MD5/digest 0.11 against SHA/digest 0.10. Under the receiving-
+  cohort repair ruling, MD5 is locked to compatible 0.10.6. Cargo also moved
+  an unrelated macro dependency; its exact original record was restored.
+  Every retained package record is unchanged before repeating the baseline;
+  no hash algorithm is replaced.
+
+- 2026-11-04: H9 fifty originals and all children fit. Whole method and
+  coherent fixture moves preserve bodies, signatures, type fields, included
+  bytes and cfg boundaries. Extracted public test modules retain their
+  original visibility after the path attribute. Feature-enabled native post
+  results match the compatible baseline; narrower and final gates follow.
+
+- 2026-11-04: H9 **50/50 landed**: nineteen mere-kernel, six mere-rdf
+  and twenty-five Pictograph originals, plus all 98 children, fit 600 lines.
+  Fifty exact exceptions retire. Compatible baseline/final feature-enabled
+  tests and both narrow configurations agree; package Clippy/docs and all
+  four configured full-repository hooks pass. A narrow MD5 lock repair
+  makes the existing query feature buildable. Concurrent receipt/archive
+  edits remain with their owner; this pass renews software qualification
+  for the named packages, with physical/headed/platform gates separate.

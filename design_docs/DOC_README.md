@@ -927,7 +927,8 @@ is historical evidence, not the current path or ownership inventory. For the wor
   bounds, type fields, signatures and facade visibility. Carry cfg conditions
   onto aliases as well as moved bodies. Give child modules explicit source-relative
   paths when the owner is loaded through `#[path]`; implicit lookup can bind a
-  different sibling file. Keep optional fixture imports inside the fixture
+  different sibling file. Retain the extracted module's visibility, with its
+  path attribute before the declaration. Keep optional fixture imports inside the fixture
   cohort gated by its actual component, leaving other tests available.
   Preserve subprocess test entry names when a harness launches them with
   `--exact`; same-module includes can hold cohesive fixture groups without
@@ -945,7 +946,7 @@ is historical evidence, not the current path or ownership inventory. For the wor
   full hook run: prek can report those concurrent changes as hook output.
   The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
   records the completed 25-repository rollout, receiving boundaries and
-  the completed H5-H8 source-split passes.
+  the H5-H9 source-split passes.
   Cargo-deny 0.20.2 always prefetches, including with `--frozen` or
   `--metadata-path`; cached metadata does not avoid its shared Cargo-cache
   lock. Keep graph inputs stable for a complete gate, and wait for other

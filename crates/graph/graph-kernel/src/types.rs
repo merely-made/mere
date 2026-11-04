@@ -155,102 +155,12 @@ pub struct AssertionMethod {
     pub version: Option<String>,
 }
 
-impl AssertionBasis {
-    /// L13 reason identity: method IRI without version plus sorted evidence
-    /// references. A plain explicit claim has the empty key.
-    pub fn same_reason_as(&self, other: &Self) -> bool {
-        if self.method.as_ref().map(|method| method.iri.as_str())
-            != other.method.as_ref().map(|method| method.iri.as_str())
-        {
-            return false;
-        }
-        let mut left = self.evidence.iter().map(String::as_str).collect::<Vec<_>>();
-        let mut right = other
-            .evidence
-            .iter()
-            .map(String::as_str)
-            .collect::<Vec<_>>();
-        left.sort_unstable();
-        right.sort_unstable();
-        left.dedup();
-        right.dedup();
-        left == right
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.note.is_none() && self.method.is_none() && self.evidence.is_empty()
-    }
-}
-
 static NEXT_LOCAL_STATEMENT_NONCE: AtomicU64 = AtomicU64::new(1);
 static STATEMENT_MINTER_SALT: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
 
-/// Seed the statement-id minter's per-process salt. The kernel's identity
-/// doctrine: OS randomness is native-only, wasm hosts supply theirs — a wasm
-/// host should call this once at boot with 64 host-random bits (unseeded wasm
-/// falls back to `0`, i.e. the pre-salt time+nonce behaviour, and loses the
-/// cross-device guarantee). Native self-seeds from `Uuid::new_v4()` on first
-/// mint; a later seed call is a no-op.
-pub fn seed_statement_minter(salt: u64) {
-    let _ = STATEMENT_MINTER_SALT.set(salt);
-}
-
-fn statement_minter_salt() -> u64 {
-    *STATEMENT_MINTER_SALT.get_or_init(|| {
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            let bytes = uuid::Uuid::new_v4();
-            u64::from_le_bytes(bytes.as_bytes()[..8].try_into().expect("8 bytes"))
-        }
-        #[cfg(target_arch = "wasm32")]
-        {
-            0
-        }
-    })
-}
-
-/// Mint a [`SemanticStatement`](crate::graph::SemanticStatement) id — the
-/// FEDERATION-SAFE story the petgraph-RDF plan's Phase 1 required (the fact
-/// handle reification, precise retract, snapshot migration, and federation
-/// tombstones point at):
-///
-/// `{unix_ms:012x}-{process_salt:016x}-{counter:016x}`
-///
-/// - Device-safe: two devices collide only on a 64-bit salt collision
-///   (2^-64 per process pair), independent of clocks and counters.
-/// - Time-sortable by prefix (12 hex ms digits reach year ~10889).
-/// - Opaque to consumers: dedup happens on statement CONTENT, never by
-///   parsing this id, so legacy `{ts:016x}-{nonce:016x}` ids already in
-///   snapshots remain valid handles forever.
-pub(crate) fn mint_local_statement_id() -> String {
-    let timestamp_ms = crate::time::unix_epoch_millis();
-    let salt = statement_minter_salt();
-    let nonce = NEXT_LOCAL_STATEMENT_NONCE.fetch_add(1, Ordering::Relaxed);
-    format!("{timestamp_ms:012x}-{salt:016x}-{nonce:016x}")
-}
-
 #[cfg(test)]
-mod minting_tests {
-    use super::*;
-
-    /// The minted id is device-safe in shape: time prefix + a non-zero
-    /// process salt (native self-seeds) + a monotonic counter, all distinct
-    /// across consecutive mints.
-    #[test]
-    fn statement_ids_carry_salt_and_stay_unique() {
-        let a = mint_local_statement_id();
-        let b = mint_local_statement_id();
-        assert_ne!(a, b);
-        let parts: Vec<&str> = a.split('-').collect();
-        assert_eq!(parts.len(), 3, "ts-salt-counter shape: {a}");
-        assert_eq!(parts[0].len(), 12);
-        assert_eq!(parts[1].len(), 16);
-        assert_eq!(parts[2].len(), 16);
-        assert_ne!(parts[1], "0000000000000000", "native salt self-seeds");
-        let b_parts: Vec<&str> = b.split('-').collect();
-        assert_eq!(parts[1], b_parts[1], "salt is per-process stable");
-    }
-}
+#[path = "types/minting_tests.rs"]
+mod minting_tests;
 
 #[derive(
     Debug,
@@ -496,13 +406,6 @@ pub enum ClassificationStatus {
     Imported,
 }
 
-impl ClassificationStatus {
-    /// Classifications used by ordinary selection, display and affirmative export.
-    pub fn is_affirmative(&self) -> bool {
-        matches!(self, Self::Accepted | Self::Verified | Self::Imported)
-    }
-}
-
 /// A single provenance-bearing classification record on a node.
 ///
 /// Multiple records can coexist; at most one should have `primary: true` per scheme.
@@ -550,84 +453,6 @@ pub struct NodeProperty {
     /// Optional assertion time in unix epoch milliseconds.
     #[serde(default)]
     pub asserted_at_ms: Option<u64>,
-}
-
-impl serde::Serialize for NodeProperty {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        use serde::ser::SerializeStruct;
-
-        let human = serializer.is_human_readable();
-        let scoped = self.graph_scope != GraphScope::Default;
-        let fields = if human {
-            3 + usize::from(self.datatype.is_some())
-                + usize::from(self.lang.is_some())
-                + usize::from(scoped)
-                + usize::from(self.provenance_iri.is_some())
-                + usize::from(self.asserted_at_ms.is_some())
-        } else {
-            8
-        };
-        // Positional codecs keep the complete legacy field order.
-        let mut state = serializer.serialize_struct("NodeProperty", fields)?;
-        state.serialize_field("statement_id", &self.statement_id)?;
-        state.serialize_field("predicate", &self.predicate)?;
-        state.serialize_field("value", &self.value)?;
-        if !human || self.datatype.is_some() {
-            state.serialize_field("datatype", &self.datatype)?;
-        }
-        if !human || self.lang.is_some() {
-            state.serialize_field("lang", &self.lang)?;
-        }
-        if !human || scoped {
-            state.serialize_field("graph_scope", &self.graph_scope)?;
-        }
-        if !human || self.provenance_iri.is_some() {
-            state.serialize_field("provenance_iri", &self.provenance_iri)?;
-        }
-        if !human || self.asserted_at_ms.is_some() {
-            state.serialize_field("asserted_at_ms", &self.asserted_at_ms)?;
-        }
-        state.end()
-    }
-}
-
-impl NodeProperty {
-    pub fn new(predicate: String, value: String) -> Self {
-        Self {
-            statement_id: mint_local_statement_id(),
-            predicate,
-            value,
-            datatype: None,
-            lang: None,
-            graph_scope: GraphScope::Default,
-            provenance_iri: None,
-            asserted_at_ms: None,
-        }
-    }
-
-    pub fn with_graph_scope(mut self, graph_scope: GraphScope) -> Self {
-        self.graph_scope = graph_scope;
-        self
-    }
-
-    pub fn with_metadata(
-        mut self,
-        provenance_iri: Option<String>,
-        asserted_at_ms: Option<u64>,
-    ) -> Self {
-        self.provenance_iri = provenance_iri;
-        self.asserted_at_ms = asserted_at_ms;
-        self
-    }
-
-    pub fn content_eq(&self, other: &Self) -> bool {
-        self.predicate == other.predicate
-            && self.value == other.value
-            && self.datatype == other.datatype
-            && self.lang == other.lang
-            && self.graph_scope == other.graph_scope
-            && self.provenance_iri == other.provenance_iri
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -697,60 +522,9 @@ pub struct ImageRef {
     pub height: u32,
 }
 
-impl ImageRef {
-    pub fn new(digest: [u8; 32], width: u32, height: u32) -> Self {
-        Self {
-            digest,
-            width,
-            height,
-        }
-    }
-
-    /// Lowercase hex of the digest — the `content/image/<hex>` blob-key suffix.
-    /// Matches `eidetic::Hash::to_hex` so a ref built from a saved blob's hash
-    /// reads that same blob back.
-    pub fn hex(&self) -> String {
-        use std::fmt::Write;
-        let mut out = String::with_capacity(64);
-        for byte in &self.digest {
-            let _ = write!(out, "{byte:02x}");
-        }
-        out
-    }
-}
-
 /// Serde helpers rendering a 32-byte digest as a hex string in JSON snapshots.
-mod digest_hex {
-    use serde::{Deserialize, Deserializer, Serializer, de::Error};
-
-    pub fn serialize<S: Serializer>(digest: &[u8; 32], serializer: S) -> Result<S::Ok, S::Error> {
-        use std::fmt::Write;
-        let mut hex = String::with_capacity(64);
-        for byte in digest {
-            let _ = write!(hex, "{byte:02x}");
-        }
-        serializer.serialize_str(&hex)
-    }
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<[u8; 32], D::Error> {
-        let hex = String::deserialize(deserializer)?;
-        let bytes = hex.as_bytes();
-        if bytes.len() != 64 {
-            return Err(D::Error::invalid_length(bytes.len(), &"64 hex characters"));
-        }
-        let nibble = |b: u8| -> Result<u8, D::Error> {
-            (b as char)
-                .to_digit(16)
-                .map(|d| d as u8)
-                .ok_or_else(|| D::Error::custom("digest is not valid hex"))
-        };
-        let mut out = [0u8; 32];
-        for (i, pair) in bytes.chunks_exact(2).enumerate() {
-            out[i] = (nibble(pair[0])? << 4) | nibble(pair[1])?;
-        }
-        Ok(out)
-    }
-}
+#[path = "types/digest_hex.rs"]
+mod digest_hex;
 
 // ---------------------------------------------------------------------------
 // Badge / tag presentation types (from badge.rs carve-out)
@@ -793,102 +567,18 @@ pub struct NodeTagPresentationState {
 }
 
 #[cfg(test)]
-mod property_serialization_tests {
-    use super::*;
+#[path = "types/property_serialization_tests.rs"]
+mod property_serialization_tests;
 
-    fn cases() -> Vec<NodeProperty> {
-        let mut plain = NodeProperty::new("urn:predicate:value".into(), "held value".into());
-        plain.statement_id = "held\nproperty".into();
-        plain.provenance_iri = Some("https://author.test/".into());
-        let mut legacy = plain.clone();
-        legacy.provenance_iri = None;
-        let mut marker = plain.clone();
-        marker.provenance_iri = Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
-        let mut rich = plain.clone();
-        rich.statement_id = String::new();
-        rich.datatype = Some("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString".into());
-        rich.lang = Some("fr".into());
-        rich.graph_scope = GraphScope::Custom("urn:graph:held".into());
-        rich.provenance_iri = Some(String::new());
-        rich.asserted_at_ms = Some(0);
-        let mut explicit = plain.clone();
-        explicit.datatype = Some("http://www.w3.org/2001/XMLSchema#string".into());
-        explicit.lang = Some(String::new());
-        vec![plain, legacy, marker, rich, explicit]
-    }
+#[path = "types/property.rs"]
+mod property;
 
-    #[test]
-    fn property_json_omits_absent_metadata_and_preserves_explicit_values() {
-        let cases = cases();
-        let plain = serde_json::to_value(&cases[0]).unwrap();
-        assert_eq!(plain.as_object().unwrap().len(), 4);
-        assert_eq!(plain["statement_id"], "held\nproperty");
-        assert_eq!(plain["provenance_iri"], "https://author.test/");
-        for absent in ["datatype", "lang", "graph_scope", "asserted_at_ms"] {
-            assert!(plain.get(absent).is_none());
-        }
-        let legacy = serde_json::to_value(&cases[1]).unwrap();
-        assert!(legacy.get("provenance_iri").is_none());
-        let decoded: NodeProperty = serde_json::from_value(legacy).unwrap();
-        assert_eq!(decoded, cases[1], "missing metadata keeps legacy defaults");
-        let marker = serde_json::to_value(&cases[2]).unwrap();
-        assert_eq!(
-            marker["provenance_iri"],
-            crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
-        );
-        let rich = serde_json::to_value(&cases[3]).unwrap();
-        assert_eq!(rich.as_object().unwrap().len(), 8);
-        assert_eq!(rich["statement_id"], "");
-        assert_eq!(rich["provenance_iri"], "");
-        assert_eq!(rich["asserted_at_ms"], 0);
-        assert_eq!(rich["lang"], "fr");
-        let explicit = serde_json::to_value(&cases[4]).unwrap();
-        assert_eq!(
-            explicit["datatype"],
-            "http://www.w3.org/2001/XMLSchema#string"
-        );
-        assert_eq!(explicit["lang"], "");
-        for value in cases {
-            let bytes = serde_json::to_vec(&value).unwrap();
-            assert_eq!(
-                serde_json::from_slice::<NodeProperty>(&bytes).unwrap(),
-                value
-            );
-        }
-    }
+#[path = "types/operations.rs"]
+mod operations;
 
-    #[test]
-    fn property_binary_bytes_match_the_complete_legacy_shape() {
-        #[derive(serde::Serialize)]
-        struct Complete<'a> {
-            statement_id: &'a String,
-            predicate: &'a String,
-            value: &'a String,
-            datatype: &'a Option<String>,
-            lang: &'a Option<String>,
-            graph_scope: &'a GraphScope,
-            provenance_iri: &'a Option<String>,
-            asserted_at_ms: &'a Option<u64>,
-        }
-        for value in cases() {
-            let old = Complete {
-                statement_id: &value.statement_id,
-                predicate: &value.predicate,
-                value: &value.value,
-                datatype: &value.datatype,
-                lang: &value.lang,
-                graph_scope: &value.graph_scope,
-                provenance_iri: &value.provenance_iri,
-                asserted_at_ms: &value.asserted_at_ms,
-            };
-            let bytes = postcard::to_allocvec(&value).unwrap();
-            assert_eq!(bytes, postcard::to_allocvec(&old).unwrap());
-            assert_eq!(postcard::from_bytes::<NodeProperty>(&bytes).unwrap(), value);
-            let archive = rkyv::to_bytes::<rkyv::rancor::Error>(&value).unwrap();
-            assert_eq!(
-                rkyv::from_bytes::<NodeProperty, rkyv::rancor::Error>(&archive).unwrap(),
-                value
-            );
-        }
-    }
-}
+#[path = "types/statement_identity.rs"]
+mod statement_identity;
+
+pub use statement_identity::seed_statement_minter;
+
+pub(crate) use statement_identity::mint_local_statement_id;

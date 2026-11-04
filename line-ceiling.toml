@@ -302,58 +302,6 @@ path = "crates/canvas/pictograph/src/canvas.rs"
 reason = "The canvas as a reusable, window-agnostic content-root — the graph's spatial presentation (build item 1D of the genet-as-host flip; S1 of the modular integration plan). Existing source-size debt; a responsibility split must preserve AffinityBlend, Drag, EmptyPress and existing module visibility."
 
 [[exception]]
-path = "crates/canvas/pictograph/src/canvas/backdrop_surface.rs"
-reason = "Independently embeddable realization of Scenomise's disclosed-data scenes. Existing source-size debt; a responsibility split must preserve SurfaceTheme, SurfaceFit, BackdropSurface and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/board_scene.rs"
-reason = "A board scene: what a host knows of a scene that is not a graph, painted where a [PhysicsBoard] holds its items. Existing source-size debt; a responsibility split must preserve BoardRect, BoardFootprint, BoardCard and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/build_tests.rs"
-reason = "Tests for build.rs (sample graph, simulation construction, relation-edge builders). Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/cartography.rs"
-reason = "Cartography geometry + per-node attribute reads/writes (color, shape, face, sprite, material, size, importance, height). Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/cartography_scene.rs"
-reason = "Cartography projection-request derivation. Existing source-size debt; a responsibility split must preserve CartographySceneOptions, CanvasStrategyProjection and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/dynamics_spec.rs"
-reason = "The dynamics spec over the canvas: its catalog of presets (G4a) and the binding that makes a spec the canvas's record (G4b1). Existing source-size debt; a responsibility split must preserve CanvasCatalog, BindError, BoundSources and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/edge_cells.rs"
-reason = "Canonical link appearance geometry for canvas display and picking. Existing source-size debt; a responsibility split must preserve LinkAppearanceSegment and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/fold_projection.rs"
-reason = "Root-canvas projection of one view-local [curation::FoldRecord]. Existing source-size debt; a responsibility split must preserve FoldBoundaryDirection, FoldTraversalDirection, FoldBoundaryBundle and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/frame.rs"
-reason = "The per-frame render step for Canvas. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/input.rs"
-reason = "Semantic input methods for Canvas — pointer events, wheel, modifier state, and navigation. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/lifecycle.rs"
-reason = "Construction, graph/physics lifecycle, and per-frame derived-state reconcile. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/link_reading_tests.rs"
-reason = "Link reading tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/physics_board.rs"
-reason = "A physics board: the catalog's laws over items that are not a graph. Existing source-size debt; a responsibility split must preserve BoardItem, PhysicsBoard and existing module visibility."
-
-[[exception]]
 path = "crates/canvas/pictograph/src/canvas/physics_catalog.rs"
 reason = "The physics catalog: laws × overlays, and the named profiles over them. Existing source-size debt; a responsibility split must preserve PhysicsLaw, OverlayRefusal, PhysicsOverlay and existing module visibility."
 
@@ -364,54 +312,6 @@ reason = "Arrangement and physics actions a host's controls apply to the canvas.
 [[exception]]
 path = "crates/canvas/pictograph/src/canvas/physics_form.rs"
 reason = "The Map's physics form: flat law, sources, overlays and profile; role, two-law mix, grouping, two-stage schedule and speed, as one model both hosts drive. Existing source-size debt; a responsibility split must preserve Slot, FieldId, Control and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/roles.rs"
-reason = "Arrangement roles on the canvas (dynamics grammar plan, G7). Existing source-size debt; a responsibility split must preserve StopReturn, ArrangementRoles and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/scene_paint.rs"
-reason = "Render a cartography [Projection] to a paint_list_api paint list — the canvas's host-agnostic scene underlay (the genet-as-host eval's \"Layer 1\"). Existing source-size debt; a responsibility split must preserve CanvasPaintList, Camera, ScenePaintStyle and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/selection.rs"
-reason = "Selection, tagging, semantic relations, and node-state setters. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/strategy.rs"
-reason = "Layout strategy, community detection, bridges, and affinity clustering. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/tests/arrangement_roles.rs"
-reason = "Arrangement roles through the canvas (dynamics grammar plan, G7): the arrangement brief's Spiral probe rerun on the canvas, the three scopes, drags, the pick and stop handoffs,. Existing source-size debt; a responsibility split must preserve Lcg and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/tests/density_wander.rs"
-reason = "The wander probe: what changes pass to pass under Density's repeated passes, and which formulations damp it. Existing source-size debt; a responsibility split must preserve Shared, Form, StopVariant and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/tests/meaning.rs"
-reason = "The channel registry and the Meaning channel (dynamics grammar plan, G2): every channel resolves by id, Group pull by cluster reads the partition Columns (by cluster) lays out,. Existing source-size debt; a responsibility split must preserve Reading and existing module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/tests/physics_catalog.rs"
-reason = "The physics catalog: every id builds, every label is plain, a switch does not move a body, and the choice survives a graph reconcile. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/tests/physics_form.rs"
-reason = "The physics composition form both hosts render: what it offers, what it reads back from the canvas's spec, what it refuses, and that an edit survives the round trip through the. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/tests/relations.rs"
-reason = "Link-key hit testing and compatibility behavior for exact directed filters. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/canvas/view.rs"
-reason = "Camera / viewport / orbit control and scope (curated-subset) lensing. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/canvas/pictograph/src/lib.rs"
-reason = "pictograph derives node faces: a content address in, a compact vector face out. Existing source-size debt; a responsibility split must preserve Symmetry, Form, Cell and existing module visibility."
 
 [[exception]]
 path = "crates/chirograph/src/lib.rs"
@@ -490,108 +390,8 @@ path = "crates/graph/graph-kernel/src/graph/apply.rs"
 reason = "Apply. Existing source-size debt; a responsibility split must preserve GraphDelta, GraphDeltaResult and existing module visibility."
 
 [[exception]]
-path = "crates/graph/graph-kernel/src/graph/assertion_write.rs"
-reason = "Placement of new assertions and exact access to already held handles. Existing source-size debt; a responsibility split must preserve StatementWriteError and existing module visibility."
-
-[[exception]]
 path = "crates/graph/graph-kernel/src/graph/capture.rs"
 reason = "Stable-id graph-delta capture/replay helpers. Existing source-size debt; a responsibility split must preserve CapturedDelta, GraphTableStats, ReplayAttribution and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/edge_data.rs"
-reason = "Per-family edge runtime data structs and semantic IRI mapping. Existing source-size debt; a responsibility split must preserve Traversal, EdgeMetrics, SemanticStatement and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/edge_ops.rs"
-reason = "Edge operations — assert, replay, dissolve, retract, traversal recording. Existing source-size debt; a responsibility split must preserve Retraction and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/edge_taxonomy.rs"
-reason = "Edge taxonomy types — families, kinds, and sub-kinds. Existing source-size debt; a responsibility split must preserve EdgeFamily, SemanticSubKind, ArrangementSubKind and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/journal.rs"
-reason = "The edit spine: mere's captured-delta stream over the substrate log. Existing source-size debt; a responsibility split must preserve AuthorKind, Author, AttributedDelta and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs"
-reason = "Explicit legacy replay. Existing source-size debt; a responsibility split must preserve LegacyAggregateMigrationNote, LegacyResourceOriginResolution, LegacyMigrationNote and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/mod.rs"
-reason = "Graph data structures for the spatial browser. Existing source-size debt; a responsibility split must preserve DissolvedTraversalRecord, RelationView, SemanticEdgeView and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/predicate_declarations.rs"
-reason = "Per-mere predicate nature, recorded as ordinary resource metadata. Existing source-size debt; a responsibility split must preserve PredicateDeclaration, PredicateDeclarations, PredicateDeclarationError and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/query.rs"
-reason = "Graph query + traversal — node / edge lookups, neighbor iteration, BFS / shortest-path / connected-components / SCC, and the derived-edge views (semantic / arrangement /. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/resource.rs"
-reason = "Resource identity beneath browsing surfaces. Existing source-size debt; a responsibility split must preserve ResourceNode and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/revert.rs"
-reason = "Reverting one change: the edits that put back what a change altered, leaving alone whatever changed after it. Existing source-size debt; a responsibility split must preserve Part, Revert, Touched and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/snapshot/checked.rs"
-reason = "Validate explicit resource columns and navigation indices before materializing a graph. Existing source-size debt; a responsibility split must preserve ResourceSnapshotError and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/snapshot/from.rs"
-reason = "Graph::from_snapshot — reconstruct the runtime graph from a persisted [GraphSnapshot]. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/snapshot/tests.rs"
-reason = "Snapshot tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/tests/family_assertions.rs"
-reason = "Exact-record controls for the former non-semantic edge families. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/tests/nodes_and_edges.rs"
-reason = "Node + edge CRUD, lifecycle, and iterator tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/tests/snapshot_basic.rs"
-reason = "Snapshot round-trip basics — graph, edges, edge types, semantic sub-kinds, favicon, thumbnail, UUID, duplicate-URL handling. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/persistence_edge.rs"
-reason = "Edge persistence types — family/sub-kind enums, per-family data structs, and the edge container. Existing source-size debt; a responsibility split must preserve PersistedEdgeFamily, PersistedSemanticSubKind, PersistedContainmentSubKind and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/types.rs"
-reason = "Portable leaf types used by the graph model and persistence schema. Existing source-size debt; a responsibility split must preserve FrameLayoutNodeId, SplitOrientation, DominantEdge and existing module visibility."
-
-[[exception]]
-path = "crates/graph/linked-data/src/ingest.rs"
-reason = "JSON-LD ingest (linked-data plan Phase 2): application/ld+json → a [GraphContribution]. Existing source-size debt; a responsibility split must preserve SubjectIdentity, NodeContribution, EdgeContribution and existing module visibility."
-
-[[exception]]
-path = "crates/graph/linked-data/src/ingest/tests.rs"
-reason = "Ingest tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/linked-data/src/lib.rs"
-reason = "linked-data JSON-LD bridge between the Mere graph [kernel] and linked data (linked-data plan,. Existing source-size debt; a responsibility split must preserve AssertionProjection and existing module visibility."
-
-[[exception]]
-path = "crates/graph/linked-data/src/query.rs"
-reason = "SPARQL query over the graph (the query feature). Existing source-size debt; a responsibility split must preserve QueryRows, ResourceQueryMembers and existing module visibility."
-
-[[exception]]
-path = "crates/graph/linked-data/src/resource_metadata.rs"
-reason = "RDF-profile metadata for each shared Resource, independent of its surfaces. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/graph/linked-data/src/statements_pending_tests.rs"
-reason = "Statements pending tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]
 path = "crates/graphshell/graphshell-client/src/core.rs"
