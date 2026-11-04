@@ -56,8 +56,11 @@ API and the direct Dramatis/Ostiary clients. The remaining domain moves and
 each p2panda module integration keep their owner plans and must carry
 source-qualified receiving evidence. The refreshed
 [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
-scopes the remaining leaves, adapters and directories. Station Custody is the
-next ready move; workshop destinations retain D16's separate checkpoint.
+scopes the remaining leaves, adapters and directories. Station Custody has moved.
+The 2026-11-04 refinement generalizes sites out of both Mere and Knot, groups
+Mora/CMUdict with Knot, and considers Pipit/Murm and Turquet/Cleromancy while
+preserving independent library crates and Turquet's real Turnstone consumer.
+Workshop destinations retain D16's separate checkpoint.
 
 ## Constraints
 
@@ -110,6 +113,9 @@ After the functional seams qualify, promote the resident and its custody impleme
 
 ## Progress
 
+- 2026-11-04: refined the source-home scope after Mark's site and small-repository
+  review. The source homes map owns the recommendations and receiving gates;
+  no Site, Mora, Pipit or Turquet source move has landed in this refinement.
 - 2026-11-04: Station Custody moved to Murm's standalone
   `crates/station-custody` workspace. Its twelve Rust files retain their donor
   blobs; Signalman uses that local path. Mere's member/source removal leaves

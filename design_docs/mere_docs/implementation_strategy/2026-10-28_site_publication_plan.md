@@ -33,6 +33,11 @@ line in Findings.
 
 ## Constraints
 
+- **Source-home follow-up, 2026-11-04.** The [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#site-and-small-repository-scope-refinement-2026-11-04)
+  scopes the shared site domain out of both Mere and Knot, including generic
+  serving and handoff. Gemot is the recommended repository home, with ordinary
+  sites independent of Moot membership. The paths below describe current code
+  until that separately qualified move lands; Knot retains authoring integration.
 - **Ownership.** `mere-site` owns the portable native-site profiles, page metadata, manifest validation and
   `PublishedSnapshotV1` encoding and digest; its default build has no filesystem, listener, runtime, editor, identity or
   storage dependency. Optional `history` uses Eidetic's Muniment backend seam; optional `publication` composes Eidetic

@@ -160,8 +160,11 @@ Links: area dependencies · plans R1 · plans R3 · summary upstream wire compat
 - **Snapshot V1 unchanged.** A release names a `PublishedSnapshotV1` digest; it
   doesn't add fields to it. The schema version is never a release counter.
 - **Ownership.** Release record: Stickleback (mechanics) and `mere-site` (site
-  profile). The LogSync session is Stickleback's (consolidation ruling (b));
-  Murm hands it a stream. Carriage, discovery adapters, relays and route
+  profile). The extracted live LogSync session belongs to Murm's `murm-sync`
+  (transport consolidation T7); Stickleback retains admission and history.
+  The [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#site-and-small-repository-scope-refinement-2026-11-04)
+  scopes the general site domain out of both Mere and Knot; package names here
+  describe current code until that move qualifies. Carriage, discovery adapters, relays and route
   diagnostics: Murm. Holder lifecycle: Djinn (`armillary/crates/djinn`) with
   the resident's site and blob owners (`mere/ports/mere-resident`). Release
   intent and wording: Knot. Content capture and provenance: Turnstone's
