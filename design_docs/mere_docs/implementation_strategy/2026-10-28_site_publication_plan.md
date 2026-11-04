@@ -317,6 +317,13 @@ produces a checked immutable artifact; publishing and starting a listener remain
 explicit host actions. The site-log and optional Moot authority adapters continue
 to share content, holders and reader history under the release-log plan.
 
+Gemot's publication plan records a related governed namespace/agreed-work design
+candidate in its 2026-11-04 Findings:
+`gemot/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md`.
+The generator can supply immutable deliverables to that workflow. Review,
+publication selection, hosting consent, retention and settlement keep their
+existing separate owners; that community workflow is an optional consumer.
+
 CSS can be emitted assets in an HTML target. JavaScript and Lua remain later
 possibilities for templates, transforms or application behavior. Choose build,
 client or server execution separately and reuse the relevant existing engine;
