@@ -600,7 +600,7 @@ Existing owner plans remain the implementation homes.
 
 | Slice | Work and natural owner | Done-condition | Current state |
 |---|---|---|---|
-| S1 | Genet G5 replacement retention | Production text/fragment replacement preserves retained descendants, readback and reattachment; observer records remain correct; unpinning and repeated replacement reclaim nodes; focused and existing arena tests pass on an exact overlay | Committed `ec5421b7591`: 6 production, 37 existing source and 7 research tests pass; `genet/design_docs/receipts/2026-09-08_g5_s1/receipt.md` |
+| S1 | Genet G5 replacement retention | Production text/fragment replacement preserves retained descendants, readback and reattachment; observer records remain correct; unpinning and repeated replacement reclaim nodes; focused and existing arena tests pass on an exact overlay | Committed `ec5421b7591`: 6 production, 37 existing source and 7 research tests pass; `Code/testing/genet/design_docs/receipts/2026-09-08_g5_s1/receipt.md` |
 | S2 | Genet G5 root closure | Exercise retained wrappers, descendants, queued observer/range roots and shadow/template edges; distinguish store roots from backend roots, fix reproduced local defects, and record residual owner-document/adoption requirements | Store correction committed `c52ee06f53a`: directed template-owner roots and stale metadata retirement, 58 tests pass; narrow Boa retained-wrapper/readback/release probe also passes; other backend/root cases open |
 | S3 | Genet G5 handle representation | Compare viable all-target boundary identities against real raw-reflector/NodeId consumers; record rejection, exhaustion, memory/lookup cost and native/wasm feasibility; choose a bounded representation | Repinned research: 3 native debug tests and release model pass; wasm32 compiles only. 24/40 u64 remains a candidate; production raw handles still alias |
 | S4 | Genet G5 handle implementation | Implement the selected boundary, with foreign/stale refusal and exhaustion tests through the supported backends and compiled target configurations; retain a separate wasm residual if it is not executed | Open: discard unused parallel-handle sketch; migrate approximately 70 runtime conversions coherently with semantic NodeId, high-bit engine and wasm execution gates |
@@ -688,7 +688,7 @@ different arenas in release builds. Debug arena tags concealed that case."* —
 now scoped per-realm in that plan's continuation).
 
 **Failure tests (exist, model-level only):** the S3 handle-boundary runner
-(`genet/design_docs/receipts/2026-09-08_g5_s3_handle_boundary/receipt.md`) —
+(`Code/testing/genet/design_docs/receipts/2026-09-08_g5_s3_handle_boundary/receipt.md`) —
 3/3 native-debug tests against real `genet-scripted-dom` nodes; a native
 release run *reproducing* two arenas aliasing raw root `0`, which the modeled
 24/40 packed handle keeps distinct. This is receipt evidence of the defect,
