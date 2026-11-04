@@ -877,7 +877,7 @@ frozen evidence moves as source splits. Source moves/index guidance is
 preserved. Receipt publication repeats the full gates on this integrated
 HEAD; the source qualification and its immutable revision are unchanged.
 
-### 2026-11-04: H10 selection
+### 2026-11-04: H10 source qualification
 
 Baseline `8842ae62eb3d2546bc98ba3d0f32c2e57534ccdf`. Fifty new Rust originals;
 100 MB retained-byte cap across H10. Packages: cambium-rootstock, cambium, mere-overmap, mere-view, sprigging, tinct, chirograph, document-canvas, uxtree, mere-comms, mere-pageload.
@@ -991,3 +991,16 @@ all exit zero. The latter runs all four configured hooks: line ceiling,
 Responsa, repository-wide all-target Clippy and dependency bans. Actual
 commit hooks repeat the full run under before/after staged-blob guards;
 the immutable publication receipt records their result.
+
+Published H10 source: `090c4d2ac6740ae3a1c943ab525b62910fa43b0d` (pushed main).
+Exactly 183 changed paths contain 179 Rust files, the exception list and
+three canonical docs. Source commit repeats all four full configured hooks;
+every hook exits zero, and both actual staged-blob guards pass. Fifty new
+originals are qualified, without repeating prior receipt table entries.
+
+Retained H10 helper/log summaries total less than 3 MB before cleanup,
+within the 100 MB lane cap. The stable shared Mere Cargo target is reused;
+no isolated target, Cargo home or worktree is created. Device-pairing and
+stack-reduction plan WIP remain outside both publication commits. The
+receipt-only publication repeats the guarded actual full hooks against this
+source revision; prior receipt bytes before H10 are preserved verbatim.

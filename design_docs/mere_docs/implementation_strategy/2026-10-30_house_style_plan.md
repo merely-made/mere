@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-04):** in progress. H1-H9 complete; H10 qualifies fifty additional source splits, awaiting publication. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** H1-H10 complete. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -475,4 +475,11 @@ Each comes back as a question before anything is written.
   exceptions retire. Native inventories match 974 passes, zero failures and
   six ignores; both narrow inventories, embedding/all-feature checks,
   selected-package Clippy/docs, Responsa and all four full hooks pass.
-  Source publication and its immutable receipt are the remaining checkpoint.
+  Published source: `090c4d2ac6740ae3a1c943ab525b62910fa43b0d`; the canonical receipt records
+  matching source qualification and the guarded actual full hook results.
+
+- 2026-11-04: H10 **50/50 landed**, published as `090c4d2ac`.
+  The receipt lists all fifty before/after originals, all selected software
+  gates and the exact qualification revision. Concurrent published docs and
+  dirty device-pairing/stack-reduction plans are preserved. No isolated build
+  area, Cargo home or worktree is retained.
