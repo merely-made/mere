@@ -5,7 +5,7 @@ unpublished `crates/system/djinn-testkit` crate plus djinn's observation surface
 `resident-control-v1`, `--events-file`, `--log-filter`, `--installed`). H1 (isolated resident), H2 (walls) and H3 (versioned
 records with a verifier) landed, and the graceful stop with personal sync was fixed under ruling 11. H4 is partly met (the
 status route reports lock state and startup mode). Open: H4's other conditions, H5 (remote runs), H6 (load), the controls
-without recorded results, the audit's Q053 to Q055 and fork 7's missing ruling.
+without recorded results, the audit's Q053 and Q055 and fork 7's missing ruling. Q054's ordinary completed-finalization failures are repaired; publication limits remain explicit in Findings.
 
 **For:** one shared, tested way to run djinn residents under test: isolated, observed without scraping logs, stopped and
 restarted, held behind enforced walls around the installed resident, and recorded as receipts. It replaced the per-lane
@@ -91,20 +91,16 @@ result; the landing reports C1, C3, C4 and C5 only.
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-10-05_djinn_test_harness_plan.md:325-336,376-377`
 
-### Q053 to Q055. Boundary repairs (found by the 2026-10-16 audit, not repaired)
+### Q053 and Q055. Remaining boundary repairs from the 2026-10-16 audit
 Q053: the guard reads case-sensitive environment keys, while Windows process environments merge names without regard to
 case; lowercase aliases of `LOCALAPPDATA` and `SSH_AUTH_SOCK` pass the guard, and unknown variables are accepted despite the
 module's stronger wording (role and askpass helpers add variables on purpose, so a blanket allowlist must account for
-them). Q054: `Run::write` omits evidence whose hash read fails and ignores record and summary write errors, so a missing
-requested file yields a passed record with zero evidence and a record that cannot be published still prints a passed
-receipt and writes a passed summary; requested evidence, retained hashes, publication and outcome need one failure
-contract. Q055: a resident name is joined directly to the run directory, so an absolute name selects an outside root and
+them). Q055: a resident name is joined directly to the run directory, so an absolute name selects an outside root and
 `start` writes `lock.toml` there before the guard refuses. Further source candidates, not promoted to findings: assignment
 to the process job happens after spawn; plan and evidence names enter paths without component admission; the binary hash
 is taken at finalization, not launch.
 - Done when: (from the findings' repair directions) the same effective environment that will reach Windows, case aliases
-  included, is validated before spawning; a requested file that cannot be hashed or a record that cannot be written fails
-  the run and prints no passed receipt; root and name ownership and the complete start are validated before any pre-spawn
+  included, is validated before spawning; root and name ownership and the complete start are validated before any pre-spawn
   write; each repair has a regression.
 - Needs: -
 - Rulings: 8
@@ -121,8 +117,6 @@ is taken at finalization, not launch.
   "a locked resident restarted by the launcher comes back as ruled", and its gates ran the ignored `locked_restart`
   (whose control without a persisted lock fails) and `lock_agent` receipts on the harness. From:
   `archive_docs/2026-10-28/2026-10-05_djinn_test_harness_plan.md:305-315,417`; `archive_docs/2026-10-28/2026-10-05_vault_lock_plan.md:1176-1182,1937-1939`
-- Is Q054 repaired? The ownership repair plan says it was already repaired on main and verified in the L6 worktree (the
-  testkit tests passing), while this plan's 2026-10-16 audit entry lists it as not repaired. From: `2026-10-20_ownership_repair_plan.md:419,427-435`; `archive_docs/2026-10-28/2026-10-05_djinn_test_harness_plan.md:452-462`
 - Where do the other re-exec and transport helpers (the `mere_two_process` and `reservoir_two_process` patterns, the
   transport's killed-peer test) move to? Ruling 10 says "when touched" and names no home. From:
   `archive_docs/2026-10-28/2026-10-05_djinn_test_harness_plan.md:192-193,486`
@@ -143,7 +137,21 @@ is taken at finalization, not launch.
   relying on a log. Source: same file `:483-491`.
 - 2026-10-16: the Q053 to Q055 probes are public-API diagnostics against a freshly built testkit with empty installed-resident
   walls and generated decoys; they are not a repaired-harness gate or installed-resident acceptance. Source: same file `:471-481`.
+- 2026-11-03 status reconciliation: Q054's ordinary completed-finalization failures were repaired in main's ancestor
+  `0f91bbbdf643deae3f3f8e2fb81b4ce3df1d963e`. Requested-evidence hash/read errors and summary/receipt write errors fail
+  the returned receipt; `finish` asserts that outcome, and status printing follows the publication attempts. Source:
+  `crates/system/djinn-testkit/src/run.rs` (`finish_record`, `finish`, `write`), with missing-evidence, receipt-path and
+  summary-path collision regressions in `crates/system/djinn-testkit/tests/controls.rs`. The historical L6 receipt reports
+  14 passing tests (6 unit, 8 controls): `support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json`.
+  L6's `2e683fcfc2aeae164432fcc332835a3c5af01f55` is not an ancestor of current main, but its two source blobs match the
+  landed repair. This reconciliation inspected source, controls and history; it did not rerun the tests or qualify an
+  installed resident. The controls do not capture stdout or exercise simultaneous failures or interruption between writes.
+- Q054 publication limit: the summary is written before the receipt. If receipt publication fails, rewriting the summary
+  as failed is best effort; that retry can fail, and interruption between writes can leave a passed summary without a
+  receipt. Separate `std::fs::write` calls do not establish atomic paired publication or durable storage. These are
+  source-derived limits, not newly reproduced faults; the historical repair does not close them or Q053/Q055.
 
 ## Progress
 
 - 2026-10-28: cut from the djinn test harness plan; nothing new landed.
+- 2026-11-03: reconciled Q054's status with the landed repair and historical L6 evidence; remaining phases and rulings stay open.
