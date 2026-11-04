@@ -135,6 +135,20 @@ in that testing directory.
 A fresh origin fetch retained base `9b1df778`; `git diff --check` passed.
 `python3 scripts/mere_doc_audit.py` exited zero while reporting existing
 repository-wide findings, including unheaded owned sources; its full output is
-`current-final-light.log` beside the gate logs. The `line-ceiling`, `responsa`
-and `cargo-deny` executables were unavailable in this environment. Full
-workspace Clippy was not run for this dependency-only cut.
+`current-final-light.log` beside the gate logs.
+
+At Mere source `4e2b85765a8d042851ee382a9b285dada790f05b`, the declared
+`prek run line-ceiling` and `prek run responsa-check` hooks passed
+on the owned files using cached hook environments. The first `cargo clippy
+--locked --offline --all-targets` attempt timed out at 600 seconds; a warmed
+retry under the same caps passed. Both logged the unrelated app-host
+guest-projection build warning. The declared `cargo-deny --locked check bans`
+passed offline with official cargo-deny 0.20.2, after the initial attempt
+failed on an uncached locked `wasi 0.14.7+wasi-0.2.4` crate. The 18,219-byte
+crate was fetched and verified against its lockfile SHA-256
+`883478de20367e224c0090af9cf5f9fa85bed63a95c1abf3afc5c083ebc06e8c`. The upstream release archive was verified against the
+GitHub release metadata SHA-256
+`9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f`.
+The initial unavailable-crate failure and all retry logs are retained as
+`declared-*.log` and `deny-*.log` in the same testing directory. No lock or
+graph changes were needed.
