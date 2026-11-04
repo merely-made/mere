@@ -127,7 +127,7 @@ Items both plans defer with a trigger of their own: group calls, video, screen s
 ## Findings
 
 - 2026-11-01: Genet's WebRTC web APIs and WPT work have their own receiving
-  plan, `genet/design_docs/2026-11-01_webrtc_conformance_plan.md`, independent
+  plan, `genet/design_docs/2026-11-03_webrtc_conformance_plan.md`, independent
   of this plan's A1-A6 product gates. Q2 should consume that engine comparison
   as well as the existing data-carrier receipts. Generic RTC mechanisms now
   live in Murm's independent wire workspace and feed Genet's native host;
