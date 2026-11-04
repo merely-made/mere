@@ -923,6 +923,17 @@ is historical evidence, not the current path or ownership inventory. For the wor
 
 ## Working principles
 
+- **Source moves (2026-11-04):** preserve literal and fixture bytes, generic
+  bounds, type fields, signatures and facade visibility. Carry cfg conditions
+  onto aliases as well as moved bodies. Give child modules explicit source-relative
+  paths when the owner is loaded through `#[path]`; implicit lookup can bind a
+  different sibling file. Keep optional fixture imports inside the fixture
+  cohort gated by its actual component, leaving other tests available.
+  Copy a bounded source-notice comment
+  block, rather than everything before a blank line: SPDX may directly precede
+  code. Compare baseline/post test inventories and report existing failures
+  separately from the split qualification.
+
 - **Local hook scope (2026-11-03):** exclude imported hook projects with
   `.prekignore`; a root hook's file filter alone does not stop nested project
   discovery. Keep source-check exclusions and runner filters aligned. Set
@@ -931,7 +942,7 @@ is historical evidence, not the current path or ownership inventory. For the wor
   full hook run: prek can report those concurrent changes as hook output.
   The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
   records the completed 25-repository rollout, receiving boundaries and
-  the H5 and H6 source-split passes.
+  the completed H5-H7 source-split passes.
   Cargo-deny 0.20.2 always prefetches, including with `--frozen` or
   `--metadata-path`; cached metadata does not avoid its shared Cargo-cache
   lock. Keep graph inputs stable for a complete gate, and wait for other

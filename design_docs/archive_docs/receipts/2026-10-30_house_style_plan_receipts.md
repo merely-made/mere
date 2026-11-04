@@ -474,3 +474,139 @@ frozen/snapshot changes did not bypass a check or establish a faster path.
 This addendum corrects the run description. Its commit uses the ordinary
 configured runner, with the same three-doc selection and installed hooks
 unchanged.
+
+
+## 2026-11-03: H7 third fifty-file continuation
+
+Target: fifty additional originals, excluding H5, H6 and the earlier eight.
+Selected: Knot 28, Mer3ly 12, Cleromancy 9 and Wavicle 1. Initial count: 0/50.
+Owner: chat 01a19f86-cb71-7820-a6ac-aaec39d8bfd4. Owning plans carry software
+scopes and compact evidence under the shared 100 MB retained cap.
+
+### H7 Wavicle: one path
+
+Published: `4c384df20837ca5f098eba2cb337c03d4a3c1220`. Original: `tests/conformance.rs`. Evidence:
+`wavicle/design_docs/archive_docs/receipts/2026-07-15_wavpack_codec_plan_receipts.md`.
+Default/reader-only inventories match at 21/16 passed, encode-only/docs and
+full local/commit hooks pass. Zero codec exceptions remain. Tally: **1/50**.
+
+### 2026-11-03: H7 Mer3ly twelve published
+
+Commit `706014ffab08b1cbf37bc2a42c52a04d1154adf3` is pushed. Owner evidence: `mer3ly/docs/receipts/2026-11-03_source_splits_plan_receipts.md`. Site 110 and standalone repo-graph 43 tests match baseline; both native roots, graph Wasm compilation, docs and full local/actual commit hooks pass. Twelve distinct original exceptions retire.
+
+### 2026-11-04: H7 Cleromancy default comparison
+
+The nine prepared originals compile. Untouched default baseline: 146 passed,
+three failed, one ignored. Post-split exact Cargo-built executables: 147 passed,
+two failed, one ignored, with matching complete leaf-name inventory. The LF
+checkout repair makes shuffled-deck pass without changing its Git golden.
+Existing authoring-DOM and declared broker-route failures remain unchanged;
+no assertions are relaxed. Feature/docs/full-hook qualification is pending.
+
+### 2026-11-04: H7 Knot baseline and prepared moves
+
+Untouched workspace/peers baseline: 772 passed, 14 failed, eight ignored.
+Eight desktop cases cannot reach Readings/recipe controls; six legacy
+checkpoint/collection cases reach an explicit Unix-only storage replacement
+refusal on Windows. No selected Rust file changed during that run. All 28
+prepared originals/replacements now fit; staged semantic review matches 428
+changed bodies and all signatures/type fields, with only reviewed Rustfmt
+layout/import ordering differences. No paths qualify before post tests and
+full/actual hooks. Owner pointer: `knot-editor/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`; full compact evidence is outside Git under Code/testing/knot-editor/receipts.
+
+### 2026-11-04: H7 Cleromancy nine published
+
+Source `d9de7f2d3e239b86f4855c0aac1a551acfb20ef0` is pushed, with actual
+configured commit hooks passing and a clean source checkout. Nine original
+exceptions retire; every original/new module fits. Default leaf-name inventory
+matches, 147 pass/two pre-existing failures/one ignore; analytic natal 18/18,
+no-default-feature library check, doctests, docs and full local hooks pass.
+The expected JSON Git blob is unchanged, and .gitattributes fixes its Windows
+checkout newline policy. Product issues are carried once in divination O7.
+Owner pointer: `cleromancy/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`; complete compact evidence: `Code/testing/cleromancy/receipts/2026-11-03_source_splits_plan_receipts.md`, outside Git per divination D3.
+
+### 2026-11-04: H7 fifty additional originals published
+
+All fifty originals and every new Rust module fit 600 physical lines at the
+source commits below. Exactly fifty named exceptions retire. Publication
+ancestry is verified against origin/main; all four source checkouts are clean.
+Cargo manifests/locks, installed hook definitions, CI and CLAUDE.md are unchanged
+across each owner source pass. Concurrent Mere plan edits are preserved.
+
+| Owner | Published source | Originals | New Rust modules | Remaining exceptions |
+|---|---|---:|---:|---:|
+| wavicle | `4c384df20837ca5f098eba2cb337c03d4a3c1220` | 1 | 1 | 0 |
+| mer3ly | `706014ffab08b1cbf37bc2a42c52a04d1154adf3` | 12 | 35 | 9 |
+| cleromancy | `d9de7f2d3e239b86f4855c0aac1a551acfb20ef0` | 9 | 16 | 0 |
+| knot-editor | `7e66a1dfd644e74fea775d5782a4436ebc09ff95` | 28 | 47 | 11 |
+
+| Original | Baseline lines | Published lines |
+|---|---:|---:|
+| `wavicle/tests/conformance.rs` | 882 | 383 |
+| `mer3ly/crates/repo-graph/src/lib.rs` | 3664 | 427 |
+| `mer3ly/crates/repo-graph/src/portable.rs` | 622 | 420 |
+| `mer3ly/src/artifact.rs` | 2070 | 314 |
+| `mer3ly/src/devices.rs` | 624 | 529 |
+| `mer3ly/src/pages/devices.rs` | 1173 | 525 |
+| `mer3ly/src/pages/projects.rs` | 922 | 462 |
+| `mer3ly/src/pages/radio.rs` | 1028 | 579 |
+| `mer3ly/src/pages/repositories.rs` | 989 | 578 |
+| `mer3ly/src/repositories.rs` | 1574 | 568 |
+| `mer3ly/src/repository_history.rs` | 666 | 520 |
+| `mer3ly/src/retinue_traces.rs` | 680 | 425 |
+| `mer3ly/src/site.rs` | 716 | 477 |
+| `cleromancy/src/consultation/mod.rs` | 765 | 178 |
+| `cleromancy/src/host/mod.rs` | 662 | 245 |
+| `cleromancy/src/ui/native/appearance_tests.rs` | 1256 | 567 |
+| `cleromancy/src/ui/native/mod.rs` | 792 | 516 |
+| `cleromancy/src/ui/native/scenario_driver.rs` | 1611 | 544 |
+| `cleromancy/src/ui/resident.rs` | 1192 | 200 |
+| `cleromancy/src/ui/state.rs` | 1033 | 599 |
+| `cleromancy/src/ui/view/chart/natal.rs` | 806 | 220 |
+| `cleromancy/tests/natal.rs` | 763 | 499 |
+| `knot-editor/apps/desktop/src/composition/metre.rs` | 1124 | 511 |
+| `knot-editor/apps/desktop/src/composition/recipe/dynamics.rs` | 1145 | 595 |
+| `knot-editor/apps/desktop/src/documents.rs` | 1462 | 349 |
+| `knot-editor/apps/desktop/src/graph.rs` | 1214 | 309 |
+| `knot-editor/apps/desktop/src/link_workflow.rs` | 828 | 484 |
+| `knot-editor/apps/desktop/src/main.rs` | 768 | 393 |
+| `knot-editor/apps/desktop/src/preferences.rs` | 649 | 357 |
+| `knot-editor/apps/desktop/src/scenario.rs` | 637 | 267 |
+| `knot-editor/apps/desktop/src/theme_session.rs` | 607 | 529 |
+| `knot-editor/apps/desktop/src/workspace_commands.rs` | 738 | 490 |
+| `knot-editor/apps/desktop/tests/font_roles.rs` | 628 | 508 |
+| `knot-editor/apps/desktop/tests/scenario_lane.rs` | 707 | 489 |
+| `knot-editor/apps/desktop/tests/tabard_appearance.rs` | 883 | 563 |
+| `knot-editor/crates/knot-composition/src/wordnet_import.rs` | 946 | 336 |
+| `knot-editor/crates/knot-composition/tests/recipes.rs` | 721 | 538 |
+| `knot-editor/crates/knot-editor/src/bin/knot_endpoint.rs` | 953 | 581 |
+| `knot-editor/crates/knot-editor/src/clip_evidence.rs` | 615 | 505 |
+| `knot-editor/crates/knot-editor/src/embedding.rs` | 745 | 468 |
+| `knot-editor/crates/knot-editor/src/mark.rs` | 1126 | 428 |
+| `knot-editor/crates/knot-editor/src/mere_overlay.rs` | 655 | 281 |
+| `knot-editor/crates/knot-editor/src/publish.rs` | 965 | 575 |
+| `knot-editor/crates/knot-editor/src/publish_host.rs` | 1152 | 427 |
+| `knot-editor/crates/knot-editor/src/resident.rs` | 1224 | 154 |
+| `knot-editor/crates/knot-editor/src/rosette.rs` | 671 | 589 |
+| `knot-editor/crates/knot-editor/src/search.rs` | 1042 | 448 |
+| `knot-editor/crates/knot-editor/src/vault.rs` | 619 | 480 |
+| `knot-editor/crates/knot-editor/tests/checkpoint_confidentiality.rs` | 858 | 563 |
+| `knot-editor/crates/knot-file-catalog/src/lib.rs` | 907 | 440 |
+
+Owner evidence:
+
+- `wavicle/design_docs/archive_docs/receipts/2026-07-15_wavpack_codec_plan_receipts.md`: default 21 and reader-only 16 match baseline; encode/docs and full local/actual hooks pass. Pinned reference-decoder branches execute; fixtures are unchanged.
+- `mer3ly/docs/receipts/2026-11-03_source_splits_plan_receipts.md`: native site 110 and graph 43 match baseline; native roots, graph Wasm compile, docs and all configured local/actual hooks pass. Deployed/browser qualification stays separate.
+- `cleromancy/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md` points to `Code/testing/cleromancy/receipts/2026-11-03_source_splits_plan_receipts.md`, outside Git per divination D3. Default 147 pass/two existing failures/one ignore; baseline 146/three/one differs only by canonical LF fixture repair, with identical complete inventory. Analytic natal 18, narrow-feature/docs and full local/actual hooks pass. Product residuals carry once in divination O7.
+- `knot-editor/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md` points to `Code/testing/knot-editor/receipts/2026-11-03_source_splits_plan_receipts.md`, outside Git per its policy. Full workspace/peers baseline and post both have 772 pass/14 fail/eight ignore, matching inventories and failed identities. Eight cases concern unavailable desktop controls; six hit explicit Unix-only legacy checkpoint replacement refusal on Windows. Provider CLI 8, minimal editor and retention-free desktop checks, workspace docs, explicit workspace/all-target peer Clippy and full local/actual hooks pass. After the optional fixture guard repair, focused default scenarios preserve ten passes and the same two failures, with all twelve cases present. Warning-level lint diagnostics remain. O4 remains open for excluded standalone packages and its named receiving-round obligations.
+
+Source notices, literals, type fields, signatures, public facades, numerical
+values and fixture Git bytes are preserved. Reviewed responsibility factoring
+is recorded in owner receipts; no assertion is relaxed, and no lint allow or
+CI change is introduced. Source moves account for path-loaded parents and
+optional fixture cohorts. Headed, model, device, standalone-package, deployed
+site and other-platform qualification keep their previous boundaries.
+
+The retained cap is 100 MB across H7. Compact summaries carry required evidence;
+owned transient scripts/logs are cleaned after publication. No isolated target,
+Cargo home, branch or worktree was required.

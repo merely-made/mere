@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-03):** landed. H1-H6 complete, including both fifty-file source passes. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** landed. H1-H7 complete, including three fifty-file source passes. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -205,7 +205,19 @@ Each comes back as a question before anything is written.
   and their owner receipts and full local gates qualify them. Total retained
   cap: 100 MB across H6; compact text only.
 
+- **H7. Third fifty-file source pass.** Mark's "Next batch!" continues the
+  qualification rule for fifty new originals: Knot 28, Mer3ly 12,
+  Cleromancy 9 and Wavicle 1. Earlier qualified paths do not count again.
+  Owner plans preserve APIs, data, feature isolation and concurrent work.
+  Done when every original/replacement fits, fifty exceptions retire,
+  baseline/post inventories agree, moved-surface feature tests and full
+  local/commit gates pass, existing full-suite failures remain distinguished,
+  and source and aggregate receipts are pushed. Total retained cap: 100 MB across H7;
+  compact text only, stable approved Cargo targets, two jobs.
+
 ## Findings
+
+- 2026-11-04: H7 qualifies fifty additional originals across Knot 28, Mer3ly 12, Cleromancy 9 and Wavicle 1. Original/replacement files fit, fifty exact exceptions retire, and all four source commits are pushed. Baseline/post inventories agree; scoped feature/docs and local/actual commit hooks pass. Knot retains fourteen existing product/Windows full-suite failures and Cleromancy two product failures, carried into owner plans. The canonical LF fixture repair changes no golden Git bytes.
 
 - 2026-11-03: H6 qualifies fifty more originals: Eidetic fifteen and Woodshed thirty-five. All original/replacement files fit, fifty exact exceptions retire, and code is pushed. Baseline/post tests match (746 and 967); optional feature checks, docs and full gates pass. The existing MIDI-disabled diagnostics target gains its missing feature guard.
 
@@ -356,3 +368,13 @@ Each comes back as a question before anything is written.
 - 2026-11-03: H6 **27/50 published**. Woodshed S1 twelve (`297b162`, integrated with concurrent Redshank work in `d2f990c`) joins Eidetic fifteen. All 967 software cases pass post-refactor with serial execution, literal bytes are audited, and full local/commit hooks pass.
 
 - 2026-11-03: H6 **50/50 landed**. Woodshed S2/S3 twenty-three (`cf2b091`) completes the target with matching 967-case software tests, feature/docs checks and final full/commit gates. The aggregate receipt lists fifty unique additional paths and published commits. Five Eidetic and 69 Woodshed exceptions remain outside this pass. Concurrent Redshank and Mere plan work is preserved; compact receipts fit the 100 MB cap, with no isolated build area or worktree retained.
+
+- 2026-11-03: H7 starts at **0/50**: Knot 28, Mer3ly 12, Cleromancy 9 and Wavicle 1, selected from clean main. Mere's concurrent stack-reduction plan work is preserved.
+
+- 2026-11-03: H7 **1/50 published**: Wavicle's conformance source (`4c384df2`) fits with its encode child, reaches zero exceptions, and matches 21 default/16 reader-only cases with encode/docs and full local/commit gates.
+
+- 2026-11-03: H7 **13/50 published**: Mer3ly twelve (`706014ff`) joins Wavicle one. Native site/standalone graph tests match baseline, Wasm compile, docs and all local/actual hooks pass; nine non-Rust exceptions remain.
+
+- 2026-11-04: H7 **22/50 published**. Cleromancy nine (`d9de7f2d`) joins Mer3ly twelve and Wavicle one. All nine original/child sources fit with zero exceptions; 147 default passes, the same two existing failures and one ignore, matching baseline inventory except the LF fixture repair; analytic eighteen, narrow-feature/docs and full/actual hooks pass. Product defects carry forward in the divination plan O7. Knot 28 is prepared and in post-refactor qualification.
+
+- 2026-11-04: H7 **50/50 landed**. Knot twenty-eight (`7e66a1df`) completes the source target, with 772 passes, the same fourteen failures and eight ignores, matching the complete baseline inventory. Optional CLI, offline/editor and retention-free/desktop checks, docs, explicit workspace Clippy and full/actual hooks pass. The signed-history fixture now follows its actual optional component without disabling other scenarios. Remaining exceptions in these owners: Knot eleven and Mer3ly nine; Cleromancy and Wavicle zero. All published original/new Rust files fit. The aggregate receipt lists all fifty paths and immutable source commits, preserving concurrent Mere work and owner evidence policies.
