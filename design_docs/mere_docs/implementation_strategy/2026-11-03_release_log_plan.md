@@ -1,12 +1,13 @@
 # Release log: carrier-neutral sites, shares and clips
 
-**Status:** 2026-11-03: plan. Nothing implemented. Phases rescoped the same day
+**Status:** 2026-11-04: plan; sharing semantics refined in D9–D11 and R6.
+Nothing implemented by this plan. Phases rescoped 2026-11-03
 after a redundancy pass over Eidetic, Murm, Gemot, Dramatis, Armillary, Errand,
 Distillery and Mere (Findings, "Redundancy pass"). Design:
 [release_log_brief](../../2026-11-03_release_log_brief.md).
 
 **For:** one primitive, a release in a signed p2panda log, that a site, an
-unlisted share, a clip and a moot publication all use, carried over any Murm
+link share, a clip and a moot publication all use, carried over any Murm
 carrier and verified by a reader against an anchor it already holds. It closes
 the Beaker gaps the 2026-11-03 chat listed: a stable site address, seeding by
 holders while the author is offline, forks, link sharing, and the same features
@@ -32,6 +33,8 @@ Not here, and cited instead of repeated:
 - Knot's serving contract and first acceptance gate:
   `knot-editor/design_docs/2026-10-29_knot_writing_workspace_and_mesh.md`;
 - sleep hand-off and "last one out": [own-device serving brief](../../2026-10-29_own_device_serving_brief.md) §2.
+- cross-client application profiles, applets, extension-only smolweb retrieval
+  and contact/service trust: [portable application experience](../../2026-11-04_portable_application_experience_brief.md).
 
 Receipts from this plan's runs go to
 `archive_docs/receipts/2026-11-03_release_log_plan_receipts.md`, never into this
@@ -39,7 +42,7 @@ plan (DOC_POLICY §8).
 
 ## Decisions
 
-### release_log D1: write the brief and strategy, with lanes (2026-11-03)
+- **D1, write the brief and strategy, with lanes (2026-11-03):**
 
 **2026-11-03 · new.** Mark:
 
@@ -47,9 +50,9 @@ plan (DOC_POLICY §8).
 
 > the entire discussion seems quite relevant as context if you can
 
-Links: area publishing · draws on 2026-10-29_own_device_serving_brief · draws on 2026-10-28_site_publication_plan · draws on 2026-10-28_murm_runtime_plan · plans R1–R9 · summary one release primitive over every carrier, built in lanes
+Links: area publishing · plans release-log · summary one release primitive over every carrier, built in lanes
 
-### release_log D2: ordinary sites take either authority, author's choice (2026-11-03)
+- **D2, ordinary sites take either authority, author's choice (2026-11-03):**
 
 **2026-11-03 · new.** Asked whether an ordinary site's releases are vouched for
 by a site log, a solo Moot, or both with the author choosing, Mark chose both:
@@ -65,9 +68,9 @@ an author who moves a site from a log to a Moot. R2 keeps that to one reader
 history with two authority adapters, and the Moot's first selection names the
 log's last release.
 
-Links: area publishing · amends release_log D1 · plans R2 · summary ordinary sites use a site log or a solo Moot; one reader history, two authority adapters
+Links: area publishing · amends release-log D1 · plans release-log · summary ordinary sites use a site log or a solo Moot; one reader history, two authority adapters
 
-### release_log D3: three address tiers, unassociated first (2026-11-03)
+- **D3, three address tiers, unassociated first (2026-11-03):**
 
 **2026-11-03 · new.** Asked which key roots a site's address, Mark:
 
@@ -79,9 +82,9 @@ derived from a root as disposable personas, so a parent, business or
 organisation can manage permissions over identities it doesn't own. Root
 addresses stay available. Unassociated is the default.
 
-Links: area identity · plans R2 · plans R7 · summary root, associated and unassociated addresses; unassociated is the default and association is a layer above
+Links: area identity · plans release-log · summary root, associated and unassociated addresses; unassociated is the default and association is a layer above
 
-### release_log D4: an HTTP compatibility layer is required, and must not reveal the publisher (2026-11-03)
+- **D4, an HTTP compatibility layer is required, and must not reveal the publisher (2026-11-03):**
 
 **2026-11-03 · new.** Asked whether a read-only HTTP gateway is in scope, Mark
 chose "later, not now", adding:
@@ -91,9 +94,9 @@ chose "later, not now", adding:
 R9 holds it. It runs after holders and anonymity identities exist, and a
 publisher's own devices never serve HTTP on their own addresses.
 
-Links: area publishing · plans R9 · summary HTTP compatibility for mainstream browsers, after R5 and R7, never exposing the publisher's address
+Links: area publishing · plans release-log · summary HTTP compatibility for mainstream browsers, after R5 and R7, never exposing the publisher's address
 
-### release_log D5: tailor the p2panda fork, take from upstream as needed (2026-11-03)
+- **D5, tailor the p2panda fork, take from upstream as needed (2026-11-03):**
 
 **2026-11-03 · new.** On the fork posture R1 asked about, Mark:
 
@@ -104,20 +107,20 @@ pulls upstream work when it's wanted. Adopting a crate the family doesn't link
 yet adds a row to each root's patch table; that cost is accepted. R8 no longer
 waits.
 
-Links: area dependencies · plans R1 · plans R8 · summary keep and tailor the p2panda fork, merging upstream as needed
+Links: area dependencies · plans release-log · summary keep and tailor the p2panda fork, merging upstream as needed
 
-### release_log D6: the solo-Moot adapter is optional (2026-11-03)
+- **D6, the solo-Moot adapter is optional (2026-11-03):**
 
-**2026-11-03 · refines release_log D2.** Asked to confirm that the solo-Moot
+**2026-11-03 · refines release-log D2.** Asked to confirm that the solo-Moot
 path is an optional feature so the site-log path builds without Gemot, Mark:
 
 > agreed with the optional solo-moot of it; not every site's a community!
 
-Links: area publishing · amends release_log D2 · plans R2 · summary the solo-Moot adapter is a feature; the site-log path builds without Gemot
+Links: area publishing · amends release-log D2 · plans release-log · summary the solo-Moot adapter is a feature; the site-log path builds without Gemot
 
-### release_log D7: publish the fork as `p2mere-*` (2026-11-03)
+- **D7, publish the fork as `p2mere-*` (2026-11-03):**
 
-**2026-11-03 · refines release_log D5.** Told that tailoring the fork under
+**2026-11-03 · refines release-log D5.** Told that tailoring the fork under
 upstream names adds a patch row per adopted crate to every root, Mark asked:
 
 > So like, I should rename it and publish fork crates instead? And cherry pick from upstream on an ongoing basis, kinda like cambium/meristem?
@@ -135,9 +138,9 @@ unrelated Markdown-to-PDF crate), asked for better options and animals, then:
 library names unchanged) and Meristem's (a provenance ledger with selective
 upstream intake). R1 becomes the migration.
 
-Links: area dependencies · amends release_log D5 · plans R1 · summary rename and publish the p2panda fork as p2mere-*, keep library names, take upstream selectively with a ledger
+Links: area dependencies · amends release-log D5 · plans release-log · summary rename and publish the p2panda fork as p2mere-*, keep library names, take upstream selectively with a ledger
 
-### release_log D8: compatibility ranks below coherence across transports (2026-11-03)
+- **D8, compatibility ranks below coherence across transports (2026-11-03):**
 
 **2026-11-03 · new.** Mark:
 
@@ -149,7 +152,50 @@ over Reticulum, I2P, Tor and Noise/TCP, the carrier-neutral path wins. Tailored
 changes are additive where possible, so iroh peers still speak upstream's
 protocols.
 
-Links: area dependencies · plans R1 · plans R3 · summary upstream wire compatibility is kept where free; coherent use over non-iroh transports wins any conflict
+Links: area dependencies · plans release-log · summary upstream wire compatibility is kept where free; coherent use over non-iroh transports wins any conflict
+
+- **D9, the recipient controls their copy or access (2026-11-04):**
+
+**2026-11-04 · refines release-log D1.** Asked whether the default share should
+be a copy the recipient controls or ongoing access to the author's resource,
+Mark answered:
+
+> a copy/access they control. for ongoing access to the resource you yourself are working with, you need like co-op (realtime access to the host's mere) or for the datalake to be served to them as a moot or the relevant data as a static site. that's what intuitively makes sense to me, anyway
+
+Do not make a recipient's retained edition depend silently on continued access
+to the author's working state. Live co-op, governed exposure and site
+publication are explicit modes. An independently retained export and a replica
+that remains governed by a source namespace have different lifecycles.
+
+Links: area publishing · amends release-log D1 · plans release-log · summary recipient-controlled copies or access are the default; ongoing working-state access is explicit
+
+- **D10, create a portable link before a contact flow (2026-11-04):**
+
+**2026-11-04 · refines release-log D9.** Mark:
+
+> create a link, first and foremost. my contacts exist in tons of places, at the os level, with various services, and being able to share data across 'em to the correct address is valuable. so a portable link beats a contact flow.
+
+Copy link is the primary action. OS share sheets and service-specific delivery
+can use the link without requiring contact import. Portability does not imply
+public read access, bearer authority or permission to delegate a grant.
+
+Links: area publishing · amends release-log D9 · plans release-log · summary portable links precede contact selection; delivery does not determine access authority
+
+- **D11, constrain owned access, not somebody else's address (2026-11-04):**
+
+**2026-11-04 · refines release-log D10.** Mark:
+
+> if it's your resource and you're granting access to it, you can impose identity/distribution constraints. if you're just passing a reference or an address that the person then has, you don't control them being able to access that address, whoever controls that address does. i thus can't say, don't forward this in the latter case, but i can say only you can access my mere and see the site i've annotated here. if i export and serve my annotated site, annotations and all, then my choice is whether i'm serving it to one person (like sharing files in the beaker browser example) or if i'm broadly sharing it to a private subset of kin/kith/etc. or just public. can't take back a served resource, though you can certainly stop serving it.
+
+A named-recipient grant is not an unlisted bearer share. Forwarding its link
+does not confer the recipient's rights. An owner can stop serving and change
+future authorized access; independently retained plaintext cannot be erased by
+that act. A replica that remains within a synchronized domain follows that
+domain's separately specified retention rules. Willow is relevant lifecycle
+prior art, not an adoption decision; see the
+[experience brief](../../2026-11-04_portable_application_experience_brief.md#distributed-deletion-and-willow).
+
+Links: area publishing · amends release-log D10 · plans release-log · summary owned resources can restrict audience and delegation; references inherit source authority and independent copies are not remotely recalled
 
 ## Constraints
 
@@ -180,7 +226,9 @@ Links: area dependencies · plans R1 · plans R3 · summary upstream wire compat
   key-bearing name, or propagation-node peering, would be RNS-derived logic and
   lands inside retinue or outrider, never in `transport` or Stickleback.
 - **No injected web APIs.** Dynamic applications arrive as mods and
-  contributions.
+  contributions. The experience brief separates ordinary embedded pages from
+  a proposed explicitly admitted cooperative applet interface; it grants no
+  ambient web-page access to the host.
 - **Names.** "Transport" means Murm's `transport::Transport`; netfetcher and
   `script/wire` have their own traits of that name. Release types avoid the
   `Release*` names the family update plan's A4 uses for application updates
@@ -261,7 +309,8 @@ collection lineage is same-Moot only; cross-Moot lineage is Gemot P3).
   from any carrier. p2panda-net stays the native iroh path (`synced_space.rs`,
   `joined_space.rs`). Murm's `session_lane.rs` is the proven pattern for gated
   carriage off gossip. Stickleback's `object_stream.rs` caps an object at
-  64 KiB, so LogSync framing needs its own bound.
+  64 KiB, so LogSync framing needs its own bound. This moves catch-up sync,
+  not iroh gossip; Reticulum keeps its own announce/propagation mechanisms.
 - **Drops and blobs off iroh.** Murm runtime M12 owns drop carriage over iroh
   blobs and Retinue resources, with identical import reports across file, iroh
   and resource. Large content rides that: Retinue's `SegmentedSender` and
@@ -274,7 +323,16 @@ collection lineage is same-Moot only; cross-Moot lineage is Gemot P3).
   ruling says (`noise.rs`, "Deliberately not a Transport": it dials by address
   and owns no discovery). R4's resolver supplies the address, and services
   already receive Noise sessions as `TransportKind::Noise` through
-  `AcceptedSession`. Every route goes through `transport::security`.
+  `AcceptedSession`. Require each new release route to pass the selected
+  `transport::security` setup/admission profile. Do not infer that Graphshell's
+  WebRTC door already participates: qualifying its challenge/admission against
+  the shared setup gate remains a distinct check in the browser-carrier and
+  secure-sessions owner plans.
+
+The initial gap inventory also identifies the `ReticulumTransport` header's
+RNS 1.3.x claim against Retinue's reported RNS 1.5.7 baseline. Refresh that
+header against the selected supplier during Murm's carrier work; this plan
+does not repair the header or establish wire compatibility by inspection.
 
 - Done when: two in-process peers converge the same release log over
   `P2pandaTransport`, `ReticulumTransport` and Noise/TCP through the gate; a
@@ -335,16 +393,29 @@ Extend what exists:
 ### R6. Provider, frame and publisher contract
 
 Turnstone's engines emit clips as releases with provenance; Knot opens a
-release as a frame and publishes. Knot's named-recipient gate (publishing
-protocol O2, owned there) becomes an unlisted release with a capability
-address. "Share a folder" is an unlisted release of a blob manifest. No
-capability-address code exists; per-persona gating can use Gemot delegation
-(`moot/delegation.rs`, insigne certificates). Private collection encryption is
-Gemot P3.
+release as a frame and publishes. Per D9–D11, a portable link can identify a
+reference, an independently retained release, or access to an owned resource.
+Its audience and lifecycle are explicit; it is not universally a bearer
+capability. A folder share names a blob manifest. Knot's named-recipient gate
+(publishing protocol O2, owned there) stays identity-restricted rather than
+becoming an unlisted bearer release.
 
-- Done when: a Turnstone clip becomes a release, Knot opens and republishes it
-  with provenance intact, and a folder share opens by address for a second
-  persona and refuses for a third.
+Keep resource/edition identity, audience authority, delivery address and
+permitted delegation distinct. A link to someone else's site supplies no
+authority to restrict that site's readers. An exported annotated edition has
+its own publisher/audience choices and source provenance. Grant admission and
+encryption need concrete owners; Gemot delegation and private collection
+encryption (P3) cover governed cases, not automatically every ordinary share.
+No generic capability-address implementation is claimed here.
+
+- Done when: a Turnstone clip opens and republishes in Knot with provenance
+  intact; Copy link works without contact import; an ordinary reference keeps
+  its source authority; a named-recipient folder link opens for its admitted
+  persona and refuses a third persona even after forwarding; an explicitly
+  public or bearer share follows its selected audience instead; an independent
+  retained copy reopens after the publisher stops serving; edits create fork
+  lineage rather than inheriting the author's authority. Live access is
+  identified as such and does not promise offline retained-copy behavior.
 
 ### R7. Key tiers, anonymous identities and Tor
 
@@ -397,15 +468,22 @@ ordinary sites follow from the answer.
 
 Per D4, mainstream browsers read releases without the publisher's address
 being exposed. The publisher's own devices never serve HTTP on their own
-addresses. Two routes:
+addresses. This is a publisher-disclosure requirement with named observers,
+not a promise that no intermediary sees any address. Distinct from the
+experience brief's retrieval gateway, which fetches smolweb for an extension.
+Two publication routes:
 
 - **Onion HTTP.** A holder serves the release over HTTP as a Tor onion service.
-  Tor Browser is Firefox-based, so it reads the site with nobody on the path
-  seeing either address. Needs R7's Tor carrier.
+  Tor Browser can read it without a clearnet origin endpoint. Its route profile
+  must state the endpoint, first-hop and intermediary observations it protects
+  against; using an onion address does not establish universal anonymity.
+  Needs R7's Tor carrier.
 - **Clearnet holder.** A holder with its own public address (a rented host, a
   friend, an opted-in reader) serves HTTP and acquires releases from the
   publisher only over a relay or anonymous route. Chrome and Firefox read it;
-  the holder's address is public and the publisher's never is.
+  the holder's address is public. The selected route must withhold the
+  publisher's direct endpoint from the reader and holder; relays and local
+  network observers have their own explicitly stated visibility.
 
 Existing rules this phase has to answer:
 - Serving binds loopback only and "public exposure needs its own reviewed
@@ -421,9 +499,12 @@ Existing rules this phase has to answer:
   `parse/gemtext.rs`, `parse/scrolltext.rs`; Micron in Turnstone and retinue's
   NomadNet layer); the renderer is new.
 
-The browser can't verify the log, so the gateway states that it verified, using
-P10/P11's `EvidenceScope` vocabulary, and serves the release hash and evidence
-beside each page so a capable client can check them.
+An ordinary browser viewing translated HTML does not itself verify the log.
+The gateway states that it verified, using P10/P11's `EvidenceScope` vocabulary,
+and serves the release hash and original evidence beside each page so a
+capable client can check them. An extension's capable release reader may
+verify the original bytes locally; this does not authenticate arbitrary
+gateway-translated HTML as those bytes.
 
 - Needs: R5, R7.
 - Done when: a release opens in Tor Browser through an onion holder and in
@@ -456,6 +537,23 @@ so two or three run at a time. `fork`, `record`, `carriage`, `identity` and
 root's manifest, so it lands between other lanes' merges.
 
 ## Findings
+
+### Sharing and decision indexing, 2026-11-04
+
+The existing D1–D8 used headings and phase-name fields that Responsa did not
+parse. They now use its decision-entry form and mechanical `release-log`
+keyword, with the same numbers and owner words; D9–D11 follow in answer
+order. The plan's source references remain in its opening list rather than
+being misrepresented as decision keys. A current-manifest check alone had not
+proved these decisions were present; qualification also requires explicit
+lookup of the release-log entries.
+
+The [experience brief](../../2026-11-04_portable_application_experience_brief.md#distributed-deletion-and-willow)
+checks Willow's destructive namespace lifecycle against its data-model,
+Meadowcap and URI specifications. Those semantics do not follow from a grant
+or a precise reference alone, and no storage migration is selected here.
+
+### Carrier source snapshot, 2026-11-03
 
 - 2026-11-03: `ReticulumTransport` is the bilateral stream lane only; sync and
   blobs are iroh-only (`murm/native/crates/transport/src/reticulum_transport.rs`, header).
@@ -494,6 +592,10 @@ root's manifest, so it lands between other lanes' merges.
 
 ## Progress
 
+- 2026-11-04: D9–D11 record recipient control, link-first delivery and the
+  owner's authority boundary; R6 separates references, bearer/public releases
+  and identity-restricted grants. R9 distinguishes publication from retrieval
+  gateways and states route disclosure and verification limits. Design only.
 - 2026-11-03: plan written with the brief; decision D1 recorded.
 - 2026-11-03: D2 (both authorities), D3 (three address tiers) and D4 (HTTP
   compatibility without exposing the publisher) recorded; R9 added.

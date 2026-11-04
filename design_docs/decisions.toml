@@ -550,6 +550,89 @@ source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_
 title = ". Lane F starts now in an isolated Mere worktree,"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
+[decisions."release-log D1"]
+title = "write the brief and strategy, with lanes (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "one release primitive over every carrier, built in lanes"
+plans = ["release-log"]
+
+[decisions."release-log D2"]
+title = "ordinary sites take either authority, author's choice (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "ordinary sites use a site log or a solo Moot; one reader history, two authority adapters"
+amends = ["release-log D1"]
+plans = ["release-log"]
+
+[decisions."release-log D3"]
+title = "three address tiers, unassociated first (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "identity"
+summary = "root, associated and unassociated addresses; unassociated is the default and association is a layer above"
+plans = ["release-log"]
+
+[decisions."release-log D4"]
+title = "an HTTP compatibility layer is required, and must not reveal the publisher (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "HTTP compatibility for mainstream browsers, after R5 and R7, never exposing the publisher's address"
+plans = ["release-log"]
+
+[decisions."release-log D5"]
+title = "tailor the p2panda fork, take from upstream as needed (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "dependencies"
+summary = "keep and tailor the p2panda fork, merging upstream as needed"
+plans = ["release-log"]
+
+[decisions."release-log D6"]
+title = "the solo-Moot adapter is optional (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "the solo-Moot adapter is a feature; the site-log path builds without Gemot"
+amends = ["release-log D2"]
+plans = ["release-log"]
+
+[decisions."release-log D7"]
+title = "publish the fork as `p2mere-*` (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "dependencies"
+summary = "rename and publish the p2panda fork as p2mere-*, keep library names, take upstream selectively with a ledger"
+amends = ["release-log D5"]
+plans = ["release-log"]
+
+[decisions."release-log D8"]
+title = "compatibility ranks below coherence across transports (2026-11-03)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "dependencies"
+summary = "upstream wire compatibility is kept where free; coherent use over non-iroh transports wins any conflict"
+plans = ["release-log"]
+
+[decisions."release-log D9"]
+title = "the recipient controls their copy or access (2026-11-04)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "recipient-controlled copies or access are the default; ongoing working-state access is explicit"
+amends = ["release-log D1"]
+plans = ["release-log"]
+
+[decisions."release-log D10"]
+title = "create a portable link before a contact flow (2026-11-04)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "portable links precede contact selection; delivery does not determine access authority"
+amends = ["release-log D9"]
+plans = ["release-log"]
+
+[decisions."release-log D11"]
+title = "constrain owned access, not somebody else's address (2026-11-04)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "publishing"
+summary = "owned resources can restrict audience and delegation; references inherit source authority and independent copies are not remotely recalled"
+amends = ["release-log D10"]
+plans = ["release-log"]
+
 [decisions."stack-lift D1"]
 title = "the remote board's mapping lives in `graphshell-host`"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"

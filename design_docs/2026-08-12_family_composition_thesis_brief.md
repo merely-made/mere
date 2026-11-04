@@ -26,6 +26,10 @@ and [reference host plan](archive_docs/2026-10-28/2026-07-27_graphshell_referenc
 > datalake" framing is kept below as its history. For the current rulings, see
 > the [ambiance design](mere_docs/design/2026-09-23_ambiance_design.md) §2.
 
+The [portable application experience brief](2026-11-04_portable_application_experience_brief.md)
+records the 2026-11-04 client profiles, shareable applets, browser companion,
+gateway boundaries and link-first sharing direction built on this model.
+
 ## 1. The origin framing (Mark, 2026-08-12, verbatim)
 
 > i just look at it as, you can access your google drive in a bunch of apps.

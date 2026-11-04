@@ -8,6 +8,9 @@ against origin/main of Murm, Eidetic, Gemot, Knot, Turnstone and Mere the same
 day; corrections are in §6.
 **Status:** direction; rescoped 2026-11-03 after a redundancy pass (plan Findings). The implementation strategy is
 [release_log_plan](mere_docs/implementation_strategy/2026-11-03_release_log_plan.md).
+Refined 2026-11-04 by the [portable application experience](2026-11-04_portable_application_experience_brief.md):
+link-first sharing keeps references, owned grants and retained copies distinct;
+application profiles and retrieval gateways live there.
 **Anchors:**
 [own-device serving brief](2026-10-29_own_device_serving_brief.md) (Beaker's
 post-mortem, serving across your devices),
@@ -79,15 +82,17 @@ site, a shared folder, a clip and a moot publication:
 - **A release log** is rooted at a key. The header's sequence number and
   backlink order releases and expose rollback and equivocation, which is the
   thing `PublishedSnapshotV1.version` (a schema version) can't do.
-- **Seeding** is holding the log and its blobs. A holder can serve a release
-  but can't forge one, so own devices, friends and rented mirrors are all
-  holders.
+- **Seeding** combines retained release bytes with an admitted serving path
+  and advertised availability. A holder can serve a release but can't forge
+  one; caching alone does not opt a reader into serving.
 - **Forking** starts a new log whose first release names its source.
 - **Private sharing** seals the payload; a low-trust holder seeds ciphertext
   and only admitted readers open it. Stickleback's protected drops already have
   this shape.
-- **Unlisted sharing** ("share a folder") is a release whose address carries a
-  read capability.
+- **Link sharing** can pass a reference, name a release or grant access to an
+  owned resource. An unlisted bearer link is one possible mode; a
+  named-recipient grant remains identity-restricted. A folder's manifest does
+  not itself choose its audience (plan D9–D11, R6).
 - **A clip** is a small release with provenance from the engine that captured it.
 
 Carriers become routes to a release, not features of it. A reader trusts an
@@ -149,9 +154,9 @@ transport relay alone is not such a holder."
 
 | Relay | Who still sees your address |
 |---|---|
-| iroh relay, relay-only endpoint (`clear_ip_transports()` in iroh 1.4.1) | the relay operator, not the reader |
+| iroh relay, relay-only endpoint (`clear_ip_transports()` in iroh 1.4.1) | the relay operator; reader disclosure depends on the qualified endpoint/discovery configuration |
 | Reticulum transport node | the next hop on your path |
-| I2P tunnel or Tor onion | nobody on the path |
+| I2P tunnel or Tor onion | first-hop and other observations depend on the route profile; no universal anonymity claim |
 
 Holder pools store releases and acknowledge custody: enrolled own devices first,
 then friends, then rented hosts. A personal mesh is a private space whose members
@@ -166,9 +171,11 @@ Mark's point from the chat: Turnstone is the content provider. Its engines
 (Genet, the small-web lanes, Scry) capture things. Knot is an authoring frame
 and a publisher. That differs from Knot supplying panes to a host. In release
 terms, each content source emits releases with provenance, any frame can open
-them, and any publisher can release them. Knot's named-recipient gate
-(`knot-editor/design_docs/2026-11-02_publishing_protocol_plan.md`, O2) becomes
-an unlisted release to one reader.
+them, and an authorized publisher can release them. Knot's named-recipient
+gate (`knot-editor/design_docs/2026-11-02_publishing_protocol_plan.md`, O2)
+retains recipient-bound access; a portable link does not turn it into an
+unlisted bearer share. Independent exports and ongoing access to working
+state have different lifecycle terms (plan D9–D11).
 
 Static HTML sites fit the release format as content. Dynamic applications come
 through mods and contributions, which keeps the own-device serving brief's
@@ -187,8 +194,10 @@ ruling: "Native hosts and contributions, not injected web APIs."
   "transport-independent", with plain and protected variants. Murm runtime M12
   owns "Iroh and Retinue carriage of drops"; the release log rides that rather
   than adding a parallel envelope.
-- **Freshness is solved for governed sites, not ordinary ones.** P10 and P11
-  landed 2026-10-29 and 2026-10-30.
+- **Governed sites have portable authority verification and remembered
+  reader history.** P10 and P11 landed 2026-10-29 and 2026-10-30. They refuse
+  known rollback and scope the supplied history; a fresh disconnected reader
+  cannot prove it has the newest release from authenticity alone.
 - **Snapshot size vs Reticulum.** A snapshot V1 can encode to 24 MiB and one
   Retinue segment is 1,048,575 bytes, but retinue already moves multi-segment
   resources (`SegmentedSender`) and Stickleback already verifies chunks
@@ -207,9 +216,11 @@ ruling: "Native hosts and contributions, not injected web APIs."
   use keys with no root derivation, and association is added above when
   wanted. The current `knot://<root>` form is the root tier. The I2P plan's
   open identity fork is decided by this.
-- **Fork patch cost.** 22 build roots repeat the mark-ik/p2panda patch table.
-  Adopting p2panda-spaces adds a row everywhere. Upstreaming the seams or
-  publishing the fork under fork names would remove rows; neither is decided.
+- **Fork patch cost.** The original chat counted 22 roots; the plan's later
+  R1 inventory counted 20. Patch rows are a cost of retaining upstream package
+  names. D7 selects `p2mere-*` publication with unchanged library names and a
+  selective-upstream provenance ledger; it does not establish migration has
+  shipped.
 - **Spaces stability.** p2panda-spaces is the natural owner of group membership
   and key agreement under Gemot's governance meaning (the 2026-10-29 stack
   ownership audit says to evaluate it), but its API is unstable before v1.
@@ -222,11 +233,12 @@ ruling: "Native hosts and contributions, not injected web APIs."
   serves, but Chrome can't read Gemini any more than it could read `hyper://`.
   Mark ruled an HTTP compatibility layer "absolutely necessary", and added "if
   it exposes your ip, who would do it? not me" (plan decision D4). So a
-  publisher's devices never serve HTTP themselves. An onion holder reaches Tor
-  Browser, which is Firefox-based, with nobody seeing either address; a
-  clearnet holder reaches Chrome and Firefox and acquires releases from the
-  publisher only over a relay or anonymous route. The gateway, not the browser,
-  verifies, and says so. Plan phase R9.
+  publisher's devices never serve HTTP on their own public addresses. An onion
+  holder reaches Tor Browser; a clearnet holder reaches Chrome and Firefox.
+  R9 must qualify the selected publisher-to-holder route against named
+  observers, including intermediary visibility. In the ordinary HTML gateway
+  view, verification is the gateway's claim; a capable extension may instead
+  verify original release bytes and evidence locally. Plan phase R9.
 
 ## 8. What Beaker had, mapped onto releases
 
@@ -237,7 +249,7 @@ ruling: "Native hosts and contributions, not injected web APIs."
 | Seeding | holders hold the log and blobs; custody acknowledgements |
 | Version history | log sequence; Knot checkpoints locally |
 | Fork | a log whose first release names `fork_of` |
-| Share a folder | unlisted release with a capability address |
+| Share a folder | manifest release with an explicit public, bearer or identity-restricted audience |
 | Multi-writer | governed sites through Gemot; space-rooted logs if spaces is adopted |
 | Web app APIs | mods and contributions instead |
 | Homebase | Djinn resident as a holder |
