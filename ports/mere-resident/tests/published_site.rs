@@ -17,7 +17,7 @@ use std::net::TcpListener;
 use mere_resident::resident_blobs::ResidentBlobCustody;
 use mere_resident::resident_site::{GeminiListenerPolicyV1, PublishedSiteService, PublishedSiteStateV1};
 use mere_resident::settings::ResidentContentSettings;
-use knot_site::{PublishedSnapshotV1, Site, SiteFormat};
+use site_host::{PublishedSnapshotV1, Site, SiteFormat};
 use transport::BlobScope;
 
 fn scope(value: u8) -> BlobScope {

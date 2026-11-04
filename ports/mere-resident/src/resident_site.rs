@@ -7,7 +7,7 @@
 //! Djinn-owned lifetime for an explicitly handed-off Gemini publication.
 //!
 //! Knot selects a completed immutable snapshot and hands it off under the
-//! contract in `knot_site::handoff` (Knot's `knot_site` client). Djinn copies
+//! contract in `site_host::handoff` (Knot's `knot_site` client). Djinn copies
 //! the snapshot into its scoped blob custody, records only its digest and
 //! listener policy, and owns the listener afterwards. This module never opens a Knot site directory
 //! or a vault, and it deliberately has no governed-hosting interpretation.
@@ -31,9 +31,9 @@ use chirograph::{
 use ostiary::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
-use knot_site::Publication;
+use site_host::Publication;
 // Knot owns the handoff contract; this module owns the listener it hands to.
-pub use knot_site::handoff::{
+pub use site_host::handoff::{
     GeminiListenerPolicyV1, MAX_PUBLISHED_SITE_UPLOAD_CHUNK_BYTES, PUBLISHED_SITE_CHUNK_INTENT,
     PUBLISHED_SITE_COMMIT_INTENT, PUBLISHED_SITE_PREPARE_INTENT, PUBLISHED_SITE_REMOVE_INTENT,
     PUBLISHED_SITE_ROUTE, PUBLISHED_SITE_SESSION, PUBLISHED_SITE_STOP_INTENT,
@@ -1168,7 +1168,7 @@ mod tests {
     }
 
     async fn snapshot(root: &Path) -> PublishedSnapshotV1 {
-        let site = knot_site::Site::create_for(&root.join("site"), SiteFormat::Gemini).unwrap();
+        let site = site_host::Site::create_for(&root.join("site"), SiteFormat::Gemini).unwrap();
         site.publication().unwrap().to_snapshot_v1().unwrap()
     }
 
@@ -1503,7 +1503,7 @@ mod tests {
             .await
             .unwrap();
         let site =
-            knot_site::Site::create_for(&temp.path().join("scroll"), SiteFormat::Scroll).unwrap();
+            site_host::Site::create_for(&temp.path().join("scroll"), SiteFormat::Scroll).unwrap();
         assert!(
             service
                 .publish(

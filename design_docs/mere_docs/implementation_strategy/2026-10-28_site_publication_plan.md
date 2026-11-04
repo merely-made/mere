@@ -2,7 +2,7 @@
 
 **Status:** 2026-10-28: cut from `2026-10-20_shared_site_model_plan.md` and the section 13 part of
 `2026-08-22_djinn_family_resident_services_plan.md` (ordinary site serving and governed replication), archived in
-`archive_docs/2026-10-28/`. Landed: the portable model in `mere-site` (`crates/domain/site`) with snapshot V1 unchanged,
+`archive_docs/2026-10-28/`. Landed: the portable model in `mere-site` (now `gemot/crates/site-model`) with snapshot V1 unchanged,
 optional saved-site revision storage, the optional Moot publication binding (Gemini, Scroll and Micron first profiles),
 the Gemini, Scroll and Micron resident runtimes qualified through native processes, shared browser receiving, client
 limits for routed Errand and Micron consumers, the explicit-Submit rule, and the ordinary saved-snapshot Gemini service
@@ -51,10 +51,10 @@ Links: area publishing · plans P12 · summary shared static-site generation in 
 
 - **Source-home follow-up, 2026-11-04.** The [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#site-and-small-repository-scope-refinement-2026-11-04)
   scopes the shared site domain out of both Mere and Knot, including generic
-  serving and handoff. Gemot is the accepted repository home, with ordinary
-  sites independent of Moot membership. The paths below describe current code
-  until that separately qualified move lands; Knot retains authoring integration.
-- **Ownership.** `mere-site` owns the portable native-site profiles, page metadata, manifest validation and
+  serving and handoff. Gemot now receives the shared libraries, with ordinary
+  sites independent of Moot membership. Its site-extraction plan owns the shared
+  source and later format writers; Knot retains authoring integration.
+- **Ownership.** `gemot-site` owns the portable native-site profiles, page metadata, manifest validation and
   `PublishedSnapshotV1` encoding and digest; its default build has no filesystem, listener, runtime, editor, identity or
   storage dependency. Optional `history` uses Eidetic's Muniment backend seam; optional `publication` composes Eidetic
   typed retention and Gemot's signed contributions and collection authority. Knot keeps file access, drafts, templates,
@@ -290,57 +290,25 @@ Full retained history remains bounded; exceeding capacity refuses without prunin
 - Follow-ons: host adoption, protected local storage/backup policy, selective
   evidence retention/checkpoint handling, acquisition/discovery and device proof.
 
-### P12. Generalize the site generator into Gemot (2026-11-04)
+### P12. Shared native libraries received in Gemot (2026-11-04)
 
-The accepted domain is static-site generation, publication and serving across
-native profiles and larger-web formats. Extract reusable model, snapshot,
-filesystem, serving and handoff code from both Mere and Knot into independent
-Gemot-hosted libraries. Knot keeps its draft editing and authoring controls;
-Mere/Turnstone keep browser and host integration. The ordinary-site library must
-build without the community-authority crate or a running editor/resident.
+The portable model is now `gemot-site` and saved-file publication, listeners,
+submissions and resident handoff are `gemot-site-host`, both at Gemot `4492351`.
+Knot's editor/desktop and Mere's resident take these packages directly. Native
+V1 snapshots, hashes, metadata, history salts and handoff identifiers are
+unchanged. Both donor source copies and their moved size exceptions are removed.
 
-Keep source formats, generated representations and delivery protocols as
-separate choices. Gemtext may be served over Gemini or Spartan; Scroll has its
-own metadata; Markdown is a content format; HTML has its own document and asset
-profile. Reuse existing parsers/writers and protocol implementations before
-adding another. Support native source preservation as well as explicit generated
-targets. A cross-format writer reports unsupported constructs and preserves
-provenance; its existence does not establish lossless conversion between every
-pair of formats.
+The canonical shared-library and generation plan is now
+`gemot/design_docs/2026-11-04_site_extraction_plan.md`, with its receiving evidence.
+Its S3 owns later Markdown/HTML profiles, explicit unsupported-feature handling
+and the separately designed CSS/JavaScript/Lua possibilities. Formats and
+protocols remain separate choices; ordinary sites need no Moot membership.
+This Mere plan retains resident lifecycle, reader and browser adoption gates.
 
-First retain existing Gemini, Scroll, Spartan and Micron behavior with its exact
-qualification limits, then add Markdown/HTML generation profiles and target-specific fixtures. Existing V1
-native snapshots, hashes and handoff records remain unchanged; a new profile
-uses an explicitly versioned contract rather than silently reinterpreting V1.
-Templates, output paths, limits and enabled targets are caller-selected. A build
-produces a checked immutable artifact; publishing and starting a listener remain
-explicit host actions. The site-log and optional Moot authority adapters continue
-to share content, holders and reader history under the release-log plan.
-
-Gemot's publication plan records a related governed namespace/agreed-work design
-candidate in its 2026-11-04 Findings:
-`gemot/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md`.
-The generator can supply immutable deliverables to that workflow. Review,
-publication selection, hosting consent, retention and settlement keep their
-existing separate owners; that community workflow is an optional consumer.
-
-CSS can be emitted assets in an HTML target. JavaScript and Lua remain later
-possibilities for templates, transforms or application behavior. Choose build,
-client or server execution separately and reuse the relevant existing engine;
-static generation does not itself grant persistent execution or network effects.
-
-Done when the shared library runs without Knot or Moot, Knot and Djinn use it,
-and a Turnstone consumer exercises the same publication/reader contract. Native
-byte/digest fixtures and explicit submission consent must still pass. Each new
-writer needs deterministic output, metadata/link/asset coverage and explicit
-unsupported-feature results; each protocol needs its own serving gate. A format
-writer passing tests does not qualify a listener or a runtime. Record source and
-license preservation and locked receiving cohorts before deleting either donor.
-Required receipts are those source comparisons, focused model/writer tests,
-offline/default and selected-feature checks, and actual consumer results, with a
-total retained-byte cap of **100 MB** per extraction lane. The generator's
-canonical plan follows its source into Gemot when that cut lands; governed
-hosting remains under Gemot's existing Moot publication plan.
+Gemot's namespace/agreed-work candidate remains in its publication plan. The
+generator supplies immutable deliverables; community review, publication
+selection, hosting consent, verified retention and optional settlement keep
+their distinct owners. The native source cut does not implement that workflow.
 
 ## Open questions
 
@@ -361,12 +329,12 @@ hosting remains under Gemot's existing Moot publication plan.
 
 ## Findings
 
-- 2026-10-30: `crates/domain/site/src/publication/reader/history.rs` retains a
+- 2026-10-30: `gemot/crates/site-model/src/publication/reader/history.rs` retains a
   bounded full-evidence union plus trust identity, digest and evaluation-time
   high-water mark in one Muniment transaction. It imports into disposable Gemot
   stores, commits admitted authority before content verification, and compares
   both stored records before writing. Final read validation refuses a concurrent
-  observation. `crates/domain/site/tests/reader/remembered.rs` covers Redb-backed
+  observation. `gemot/crates/site-model/tests/reader/remembered.rs` covers Redb-backed
   process reopen, remembered replacement/withdrawal/revocation/conflict, invalid
   evidence and content, clock rollback, corrupt/incomplete state, transaction
   refusal/failure, capacity and stale writers. Re-export uses Gemot's existing
@@ -374,12 +342,12 @@ hosting remains under Gemot's existing Moot publication plan.
   adoption, pruning/checkpoint policy and protection against whole-store rollback
   remain open.
 
-- 2026-10-29: `crates/domain/site/src/publication/reader.rs` verifies provider
+- 2026-10-29: `gemot/crates/site-model/src/publication/reader.rs` verifies provider
   evidence using an independently configured founder and collection, Gemot native
   drop admission, shared collection selection and exact canonical snapshot bytes.
   Imports are disposable and never author reader membership. Success is limited
   to supplied history; withholding newer records and remembered rollback remain
-  outside this stateless API. `crates/domain/site/tests/reader.rs` exercises cold
+  outside this stateless API. `gemot/crates/site-model/tests/reader.rs` exercises cold
   child readers, B re-export after A drops, all three native profiles, replacement,
   withdrawal, membership revocation, expiry, wrong anchors, modified signed records
   under recomputed carrier integrity, missing authority, noncanonical/mismatched

@@ -1073,7 +1073,7 @@ mod tests {
         .unwrap();
         let mut store = MemoryBackend::new();
         let scroll =
-            knot_site::Site::create_for(&directory.path().join("scroll"), SiteFormat::Scroll)
+            site_host::Site::create_for(&directory.path().join("scroll"), SiteFormat::Scroll)
                 .unwrap()
                 .publication()
                 .unwrap()
@@ -1138,7 +1138,7 @@ mod tests {
         ));
 
         let gemini =
-            knot_site::Site::create_for(&directory.path().join("gemini"), SiteFormat::Gemini)
+            site_host::Site::create_for(&directory.path().join("gemini"), SiteFormat::Gemini)
                 .unwrap()
                 .publication()
                 .unwrap()

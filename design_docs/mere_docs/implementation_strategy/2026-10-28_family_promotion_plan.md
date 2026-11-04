@@ -116,6 +116,10 @@ After the functional seams qualify, promote the resident and its custody impleme
 
 ## Progress
 
+- 2026-11-04: shared native site model and host code moved to Gemot `4492351`;
+  Knot and Mere now consume those packages directly. The shared generation and
+  receiving plan lives in Gemot. Mora/CMUdict, Pipit and Turquet remain next,
+  in that order; the community namespace/agreed-work workflow remains in scope.
 - 2026-11-04: Mark accepted the generator and consolidation order. The generator
   spans native formats and later Markdown/HTML targets; scripting remains a
   follow-on design. Turnstone's sky embedding is a target, not current behavior.

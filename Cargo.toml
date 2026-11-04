@@ -24,7 +24,6 @@ members = [
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/personal-facts",
-    "crates/domain/site",
     "crates/platen/platen",
     "crates/fleece",
     "crates/intel/mora-cmudict",
@@ -490,7 +489,7 @@ forme = { package = "mere-forme", version = "0.2.0", path = "crates/forme/forme"
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
-site-model = { package = "mere-site", version = "0.1.0", path = "crates/domain/site" }
+site-model = { package = "gemot-site", version = "0.1.0", git = "https://www.github.com/merely-made/gemot.git", rev = "449235180618d33617c624f3d50018ebcaede9a6" }
 personal-facts = { package = "mere-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "06340b08327b29c3485ecb0089bb5cafed20fd80", default-features = false }
 eidetic = { version = "0.0.3", default-features = false, git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
@@ -675,7 +674,6 @@ undocumented_unsafe_blocks = "warn"
 too_many_lines = "warn"
 
 [patch."https://github.com/merely-made/mere.git"]
-mere-site = { path = "crates/domain/site" }
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://www.github.com/merely-made/gemot.git", rev = "3766de48777859d1571fef245c8c87a9e37df638" }
 mere-edit = { path = "crates/system/source-edit" }

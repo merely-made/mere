@@ -206,10 +206,6 @@ path = "crates/conatus/seiche/src/spec/tests.rs"
 reason = "The dynamics spec's receipts (G4a): every raw kind against its force, derive's refusals each with its positive control, and (with serde) the wire's version, strictness and round. Existing source-size debt; a responsibility split must preserve Catalog and existing module visibility."
 
 [[exception]]
-path = "crates/domain/site/tests/publication.rs"
-reason = "Publication. Existing source-size debt; a responsibility split must preserve Fixture and existing module visibility."
-
-[[exception]]
 path = "crates/fleece/src/clip.rs"
 reason = "Host-neutral clipping of selected and engine-generated content. Existing source-size debt; a responsibility split must preserve ClipFragment, ClipRect, ClipVisual and existing module visibility."
 

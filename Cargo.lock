@@ -6379,6 +6379,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "gemot-site"
+version = "0.1.0"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=449235180618d33617c624f3d50018ebcaede9a6#449235180618d33617c624f3d50018ebcaede9a6"
+dependencies = [
+ "blake3",
+ "eidetic",
+ "gemot",
+ "language-tags",
+ "muniment",
+ "personae",
+ "serde",
+ "serde_json",
+ "stickleback",
+ "time",
+]
+
+[[package]]
+name = "gemot-site-host"
+version = "0.0.1"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=449235180618d33617c624f3d50018ebcaede9a6#449235180618d33617c624f3d50018ebcaede9a6"
+dependencies = [
+ "blake3",
+ "gemini-protocol",
+ "gemot-site",
+ "getrandom 0.2.17",
+ "rcgen 0.13.2",
+ "retinue",
+ "rustls",
+ "scroll-protocol",
+ "serde",
+ "serde_json",
+ "spartan-protocol",
+ "tempfile",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "genawaiter"
 version = "0.99.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9285,27 +9323,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "knot-site"
-version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#112ae19e9062645846df7af116ad58f8d9f12bfd"
-dependencies = [
- "blake3",
- "gemini-protocol",
- "getrandom 0.2.17",
- "mere-site",
- "rcgen 0.13.2",
- "retinue",
- "rustls",
- "scroll-protocol",
- "serde",
- "serde_json",
- "spartan-protocol",
- "tempfile",
- "tokio",
- "url",
-]
-
-[[package]]
 name = "kqueue"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10502,6 +10519,8 @@ dependencies = [
  "gaz",
  "gemini-protocol",
  "gemot",
+ "gemot-site",
+ "gemot-site-host",
  "graphshell",
  "graphshell-client",
  "graphshell-endpoint",
@@ -10511,7 +10530,6 @@ dependencies = [
  "insigne",
  "iroh",
  "knot-editor",
- "knot-site",
  "libc",
  "light-file-dialog",
  "mere-facts",
@@ -10521,7 +10539,6 @@ dependencies = [
  "mere-p2panda-net",
  "mere-registry",
  "mere-resident",
- "mere-site",
  "mere-transport",
  "mere-view",
  "muniment",
@@ -10564,28 +10581,6 @@ dependencies = [
  "windows",
  "zbus",
  "zeroize",
-]
-
-[[package]]
-name = "mere-site"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "blake3",
- "eidetic",
- "gemot",
- "language-tags",
- "mere-proofs",
- "mien",
- "muniment",
- "personae",
- "pollster 0.4.0",
- "serde",
- "serde_json",
- "servitor",
- "stickleback",
- "tempfile",
- "time",
 ]
 
 [[package]]
