@@ -1,4 +1,10 @@
 Shared native sites (2026-11-04): `gemot-site` and `gemot-site-host` now live in
+
+Ordered source extractions (2026-11-04): Gemot sites, Knot Mora/CMUdict/Reference
+Data, Murm Pipit, and Cleromancy Turquet/shared daily Sky. The [source homes
+map](mere_docs/technical_architecture/2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
+records public receiving sources and their separate checks. Mere has 84 members;
+Gemot retains the wider writer and optional community-workflow scope.
 Gemot and are consumed directly by Knot and the resident. Native V1 contracts
 are preserved. Canonical source-cut/writer scope:
 `gemot/design_docs/2026-11-04_site_extraction_plan.md`; the site-publication plan
