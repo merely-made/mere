@@ -47,7 +47,7 @@ three history and two site-projection tests. Six standalone public-API
 diagnostics also passed while establishing one defect and two qualified
 boundary observations. These are not browser, renderer, wasm or user-archive
 receipts. No production code changed in this pass. The detailed record is
-`support/receipts/authority-success-audit/scenotime_review_receipt.json`.
+`Code/testing/mere/support/receipts/authority-success-audit/scenotime_review_receipt.json`.
 
 **Q069 / A068: structural validity does not establish wire round-trip
 validity.** `from_dense`, `validate` and trace construction accept nonfinite

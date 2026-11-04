@@ -1,3 +1,0 @@
-PASS initial queue control preserves zoom-in then zoom-out ordering
-PASS callback-queued event recursively overtakes the existing second queued event
-PASS single outer drain consumes the callback event instead of leaving it for a later drain

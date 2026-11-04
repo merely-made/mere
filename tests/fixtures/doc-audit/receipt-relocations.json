@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "receipts": [
+    {
+      "source": "mere_docs/testing/2026-08-31_flora_tulpa_standing_receipt.md",
+      "destination": "Code/testing/mere/receipts/relocated-summaries/2026-08-31_flora_tulpa_standing_receipt.md",
+      "sha256": "585cc04e347705a656971b6716bd333a31c97ae82f32228ca0f48c488f1222b6",
+      "git_blob": "ffa247cf1d276c9b73921f6e8bc9c130e143272a",
+      "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    },
+    {
+      "source": "mere_docs/testing/2026-09-25_mere_view_headed_receipt.md",
+      "destination": "Code/testing/mere/receipts/relocated-summaries/2026-09-25_mere_view_headed_receipt.md",
+      "sha256": "18b2340d6c769835171c0bf0280f4ac4fc2eef3e5aa436514ca8b2b42139caf1",
+      "git_blob": "41c87b04627f0e0cd48aa456b0b9ca0c512db73d",
+      "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    },
+    {
+      "source": "mere_docs/testing/2026-09-27_graphshell_controls_physics_receipt.md",
+      "destination": "Code/testing/mere/receipts/relocated-summaries/2026-09-27_graphshell_controls_physics_receipt.md",
+      "sha256": "6466a46133bf68b6e64e21e5f3fd57b4179bc4aa657dfa3fa18a3b994ab155e0",
+      "git_blob": "ad6c5f5e7b014b071127cc69d54b2ce8327cd3c4",
+      "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    },
+    {
+      "source": "mere_docs/testing/2026-09-27_graphshell_producer_receipt.md",
+      "destination": "Code/testing/mere/receipts/relocated-summaries/2026-09-27_graphshell_producer_receipt.md",
+      "sha256": "521677938ccc13b4dd4deaf719f480792ca3e2b15cde33d49d90a779808eec16",
+      "git_blob": "1b6b8d9625c7b2242536b27f36a6d3764e073992",
+      "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    },
+    {
+      "source": "mere_docs/testing/2026-09-29_apparatus_diagnostics_receipt.md",
+      "destination": "Code/testing/mere/receipts/relocated-summaries/2026-09-29_apparatus_diagnostics_receipt.md",
+      "sha256": "425b089a6afb3b309e17aee91602761953d4e22c367bce57c6de5ba8bb434b7b",
+      "git_blob": "5b3a7f18a05780b4706afc9cfe90130f7feddc55",
+      "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    },
+    {
+      "source": "mere_docs/testing/2026-09-30_pre4_allocator_diagnosis.md",
+      "destination": "Code/testing/mere/receipts/relocated-summaries/2026-09-30_pre4_allocator_diagnosis.md",
+      "sha256": "263b6aa3a02c3562f3e99373513e5e98a93ca1b587fc1f4a61859a3f6d96afb2",
+      "git_blob": "c187a690a33fecb3ebaf230d8ca20251666fd669",
+      "source_commit": "380d9ce38f6759caf28ec615784927e2383c8eee"
+    }
+  ]
+}

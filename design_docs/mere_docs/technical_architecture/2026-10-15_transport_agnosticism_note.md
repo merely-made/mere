@@ -435,7 +435,7 @@ At Mere `b567660d67c4d900f1d638345c89715e1f36c575`, all 24 files in
 This is a source-review checkpoint, not completion of the Mere audit or a
 headed/remote acceptance gate. No production code changed in this pass.
 The detailed findings, authority map, coverage and native diagnostics are in
-[`support/receipts/authority-success-audit`](../../../support/receipts/authority-success-audit/).
+[`Code/testing/mere/support/receipts/authority-success-audit`](../../../../../testing/mere/receipt-relocation-2026-11-04/authority-reader.md).
 
 - **Q056 / A052, message admission can contradict its reply.** The
   sans-I/O helper keeps Notochord's reply, then can replace an accepted
@@ -528,7 +528,7 @@ review. No production code changed; the earlier repair files were preserved.
 
 Eight bounded diagnostics using a freshly built client library passed while
 establishing five findings and three controls. Evidence is recorded in
-`support/receipts/authority-success-audit/client_review_receipt.json` and its
+`Code/testing/mere/support/receipts/authority-success-audit/client_review_receipt.json` and its
 referenced native probe receipt. These are public-API tests with generated,
 validated snapshots and encoded replies. They do not exercise a browser,
 network, installed resident or OS accessibility bridge. Existing package
@@ -599,7 +599,7 @@ recorded hashes. The package gates passed: 52 Chirograph unit tests and 37
 Sceno unit tests. Five additional public-API diagnostics passed while
 establishing two findings and qualifying chunk-check ownership. No production
 code changed. Evidence and preservation checks are in
-`support/receipts/authority-success-audit/chirograph_review_receipt.json`.
+`Code/testing/mere/support/receipts/authority-success-audit/chirograph_review_receipt.json`.
 
 - **Q067 / A064, capture and live presentation admission disagree.** Valid
   scene tables with absent-item bindings, duplicate bindings or a
@@ -660,4 +660,4 @@ resource-correlation findings. The all-feature client gate passes 91 tests,
 including these remote tests, and fails the existing exact-byte trace test
 (Q073), whose default-field reserialization changes are documented separately.
 Native results are recorded in
-the [audit receipt](../../../support/receipts/authority-success-audit/scenograph_review_receipt.json).
+the [audit receipt](../../../../../testing/mere/support/receipts/authority-success-audit/scenograph_review_receipt.json).

@@ -1,2 +1,0 @@
-# Preserve exact source and receipt bytes, including historical whitespace.
-* -text -whitespace

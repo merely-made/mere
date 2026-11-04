@@ -8,6 +8,7 @@ target/
 Cargo.lock
 !/Cargo.lock
 !/support/fixtures/armillary-consumer/Cargo.lock
+!/tests/fixtures/luggage-comparison/retained-source/support/luggage-comparison/Cargo.lock
 !/crates/script/app-host/guest/Cargo.lock
 !/ports/moot/examples/capsule-library/guest/Cargo.lock
 !/crates/script/document-host/guest/Cargo.lock

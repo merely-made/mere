@@ -9,6 +9,8 @@
 
 import hashlib
 import json
+import contextlib
+import io
 from pathlib import Path
 import tempfile
 import unittest
@@ -36,7 +38,8 @@ Fixture.
 
 
 class ReceiptCoverage(unittest.TestCase):
-    def audit_fixture(self, *, legacy=None, include_second=True):
+    def audit_fixture(self, *, legacy=None, include_second=True, relocated=False,
+                      register=True, corrupt=False, destination=None, unavailable=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             docs = root / "design_docs"
@@ -55,10 +58,26 @@ class ReceiptCoverage(unittest.TestCase):
             batch = record("a/README.md")
             if include_second:
                 batch += "\n" + record("b/README.md")
+            relocations = root / "receipt-relocations.json"
+            if relocated:
+                source = "mere_docs/testing/receipt.md"
+                batch += "\n" + record(source)
+                target = root / "testing/mere/receipt.md"
+                target.parent.mkdir(parents=True)
+                if not unavailable:
+                    target.write_bytes(b"changed" if corrupt else b"original")
+                if register:
+                    relocations.write_text(json.dumps({"schema_version": 1, "receipts": [{
+                        "source": source,
+                        "destination": destination or "Code/testing/mere/receipt.md",
+                        "sha256": hashlib.sha256(b"original").hexdigest(),
+                        "git_blob": "1" * 40, "source_commit": "2" * 40,
+                    }]}), encoding="utf-8")
             (ledger / "batch_1.md").write_text(batch, encoding="utf-8")
             with patch.multiple(judgment, DOCS=docs, LEDGER=ledger,
                                 SNAPSHOT=snapshot, CORRECTIONS=corrections,
                                 MOVED_OUT=moved,
+                                RECEIPT_RELOCATIONS=relocations, WORKSPACE=root,
                                 SNAPSHOT_SHA256=hashlib.sha256(snapshot.read_bytes()).hexdigest()):
                 return judgment.audit()
 
@@ -75,6 +94,38 @@ class ReceiptCoverage(unittest.TestCase):
         result = self.audit_fixture(include_second=False)
         self.assertEqual(result["missing_active_records"], ["b/README.md"])
         self.assertTrue(any("lacks D2 record" in error for error in result["errors"]))
+
+    def test_registered_receipt_remains_historical_without_editing_ledger(self):
+        result = self.audit_fixture(relocated=True)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["inactive_supplemental_records"], ["mere_docs/testing/receipt.md"])
+
+    def test_unregistered_receipt_still_reports_missing_record(self):
+        result = self.audit_fixture(relocated=True, register=False)
+        self.assertTrue(any("supplemental record is not active" in error for error in result["errors"]))
+
+    def test_changed_external_copy_is_not_accepted(self):
+        result = self.audit_fixture(relocated=True, corrupt=True)
+        self.assertTrue(any("digest mismatch" in error for error in result["errors"]))
+        self.assertEqual(result["registered_receipt_relocations"], [])
+
+    def test_relocation_cannot_escape_evidence_root(self):
+        result = self.audit_fixture(relocated=True, destination="Code/testing/mere/../../../receipt.md")
+        self.assertTrue(any("invalid or duplicate" in error for error in result["errors"]))
+
+    def test_missing_local_evidence_is_reported_without_rewriting_history(self):
+        result = self.audit_fixture(relocated=True, unavailable=True)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["unavailable_relocated_receipts"], ["mere_docs/testing/receipt.md"])
+
+    def test_text_output_exposes_missing_evidence(self):
+        result = self.audit_fixture(relocated=True, unavailable=True)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            judgment.print_text_report(result)
+        self.assertIn("Relocated receipts unavailable locally: 1", output.getvalue())
+        self.assertIn("unavailable receipt: mere_docs/testing/receipt.md", output.getvalue())
+        self.assertIn("Coverage is not artifact verification", output.getvalue())
 
 
 if __name__ == "__main__":

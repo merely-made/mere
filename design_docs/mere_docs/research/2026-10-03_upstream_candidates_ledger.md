@@ -294,7 +294,7 @@ So, for each item:
 - **What happens:** the full-source audit found eleven places in the copies
   carried under `support/patches/` where a test, gate, benchmark or
   validation reports success it did not check (register
-  `support/receipts/authority-success-audit/review_notes.json`, evidence in
+  `Code/testing/mere/support/receipts/authority-success-audit/review_notes.json`, evidence in
   each finding's `verification` receipt):
   - burn-remote Q427: the server-survival test's `finishes_within` swallows
     a failed read or value assertion and still reports completion.

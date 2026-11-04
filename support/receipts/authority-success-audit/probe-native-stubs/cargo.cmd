@@ -1,3 +1,0 @@
-@echo off
-echo AUDIT_CARGO_STUB_EXIT_%AUDIT_CARGO_EXIT%
-exit /b %AUDIT_CARGO_EXIT%

@@ -671,12 +671,12 @@ path = "crates/system/tabard/src/theme/registry.rs"
 reason = "Theme registry — [ThemeRegistry] keeps the derived token sets and the authored defs behind them, keyed by lowercased theme: id: built-ins first, then user themes, with resolution,. Existing source-size debt; a responsibility split must preserve GraphNodeChromeTheme, ThemeTokenSet, ThemeCapability and existing module visibility."
 
 [[exception]]
-path = "design_docs/cambium_docs/testing/receipts/component_catalog_narrow.html"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
+path = "crates/cambium/cambium/tests/fixtures/component_catalog_narrow.html"
+reason = "Byte-exact generated HTML golden relocated from the documentation receipts; edits belong in the catalog generator and explicit fixture writer, not a split of the captured document."
 
 [[exception]]
-path = "design_docs/cambium_docs/testing/receipts/component_catalog_regular.html"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
+path = "crates/cambium/cambium/tests/fixtures/component_catalog_regular.html"
+reason = "Byte-exact generated HTML golden relocated from the documentation receipts; edits belong in the catalog generator and explicit fixture writer, not a split of the captured document."
 
 [[exception]]
 path = "ports/distillery/athanor/src/workshop.rs"
@@ -1157,41 +1157,13 @@ path = "scripts/mere_doc_audit.py"
 reason = "Mere doc audit. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]
-path = "support/receipts/authority-success-audit/accessibility_authority_probe.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/accessibility_authority_v2_probe.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/community_portable_resource.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/opfs-browser-fixtures/probe.js"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/pelt_cli_dispatch_probe.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/pelt_workspace_owner_probe.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/registry-source-composition/mod_loader/loader/tests.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/retained_wgpu_probe.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
-path = "support/receipts/authority-success-audit/runtime_tuner_probe.rs"
-reason = "Frozen qualification harness retained for reproducible recorded evidence; preserve its captured inputs and procedure when splitting the live successor."
-
-[[exception]]
 path = "testing/moot-ocapn-coop/src/tests.rs"
 reason = "Src tests. Existing source-size debt; a responsibility split must preserve Queue, Fixture, RuntimePair and existing module visibility."
+
+[[exception]]
+path = "tests/fixtures/luggage-comparison/retained-source/crates/system/luggage/src/install.rs"
+reason = "Uncompiled historical source input bound by the 2026-10-12 comparison receipt hash; splitting or reformatting it would invalidate the retained provenance. Live source keeps its own size checks."
+
+[[exception]]
+path = "tests/fixtures/luggage-comparison/retained-source/crates/system/luggage/src/updater.rs"
+reason = "Uncompiled historical source input bound by the 2026-10-12 comparison receipt hash; splitting or reformatting it would invalidate the retained provenance. Live source keeps its own size checks."

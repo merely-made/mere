@@ -15,8 +15,8 @@
 > not the direction.
 >
 > This is the later half of a protocol pair: VGCP superseded VDIP on the same
-> day. Its predecessor is recovered beside it as
-> `2026-04-17_verse_distributed_index_protocol_v0_1.md`.
+> day. Its recovered predecessor was archived whole on 2026-11-04:
+> [VDIP v0.1](../../archive_docs/2026-11-04/2026-04-17_verse_distributed_index_protocol_v0_1.md).
 
 ---
 

@@ -316,7 +316,7 @@ The [independent fixture](../support/luggage-comparison/README.md) has its own
 lock and uses the approved shared Cargo target, one compiler job, no product
 runtime edits, no resident installation and no real vault. Its public TUF
 inputs carry pinned source and SHA-256 provenance. Durable evidence lives in
-[comparison receipts](../support/receipts/luggage-comparison/README.md).
+[comparison receipts](../../../testing/mere/receipt-relocation-2026-11-04/README.md#luggage-comparison).
 
 ### Trust: TUF versus the current signed feed
 

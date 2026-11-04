@@ -24,6 +24,8 @@ LEDGER = ROOT / "support" / "doc-audit" / "d2"
 SNAPSHOT = LEDGER / "snapshot_281_aggregate.json"
 CORRECTIONS = LEDGER / "legacy_corrections.json"
 MOVED_OUT = LEDGER / "moved_out.json"
+RECEIPT_RELOCATIONS = ROOT / "tests" / "fixtures" / "doc-audit" / "receipt-relocations.json"
+WORKSPACE = ROOT.parents[1]
 SNAPSHOT_SHA256 = "f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf"
 
 DOC_HEADER = re.compile(r"^##\s+`?(.+?\.md)`?\s*$", re.MULTILINE)
@@ -113,6 +115,42 @@ def parse_supplements() -> tuple[dict[str, dict[str, int | str]], list[str], int
     return records, errors, superseded
 
 
+def receipt_relocations() -> tuple[set[str], list[str], list[str]]:
+    """Keep historical judgments after recorded receipt moves, without editing D2."""
+    if not RECEIPT_RELOCATIONS.exists():
+        return set(), [], []
+    accepted, unavailable, errors = set(), [], []
+    try:
+        data = json.loads(RECEIPT_RELOCATIONS.read_text(encoding="utf-8"))
+        if data.get("schema_version") != 1 or not isinstance(data.get("receipts"), list):
+            raise ValueError("expected schema_version 1 and receipts list")
+        for item in data["receipts"]:
+            source, destination = item.get("source", ""), item.get("destination", "")
+            source_path, destination_path = Path(source), Path(destination)
+            valid = (
+                source.startswith("mere_docs/testing/") and source.endswith(".md")
+                and destination.startswith("Code/testing/mere/")
+                and source_path.name == destination_path.name
+                and not any(part in {".", ".."} for part in source.split("/") + destination.split("/"))
+                and "\\" not in source + destination
+                and re.fullmatch(r"[0-9a-f]{64}", item.get("sha256", ""))
+                and re.fullmatch(r"[0-9a-f]{40}", item.get("git_blob", ""))
+                and re.fullmatch(r"[0-9a-f]{40}", item.get("source_commit", ""))
+            )
+            if not valid or source in accepted:
+                raise ValueError(f"invalid or duplicate receipt relocation: {source}")
+            target = WORKSPACE / destination.removeprefix("Code/")
+            if target.is_file():
+                if hashlib.sha256(target.read_bytes()).hexdigest() != item["sha256"]:
+                    raise ValueError(f"relocated receipt digest mismatch: {source}")
+            else:
+                unavailable.append(source)
+            accepted.add(source)
+    except (ValueError, TypeError, AttributeError, OSError) as error:
+        errors.append(f"receipt relocation registry: {error}")
+    return accepted, unavailable, errors
+
+
 def audit() -> dict[str, object]:
     snapshot_bytes = SNAPSHOT.read_bytes()
     snapshot_hash = hashlib.sha256(snapshot_bytes).hexdigest()
@@ -159,9 +197,12 @@ def audit() -> dict[str, object]:
     archived_names = {path.name for path in (DOCS / "archive_docs").rglob("*.md")}
     # So does one whose document left this repository with its subject.
     moved_out = json.loads(MOVED_OUT.read_text(encoding="utf-8"))["moved"]
+    relocated_receipts, unavailable_receipts, relocation_errors = receipt_relocations()
+    errors.extend(relocation_errors)
     not_active = sorted(set(supplements) - set(active))
     inactive_supplements = [
-        path for path in not_active if Path(path).name in archived_names or path in moved_out
+        path for path in not_active
+        if Path(path).name in archived_names or path in moved_out or path in relocated_receipts
     ]
     unknown_supplements = [path for path in not_active if path not in inactive_supplements]
     # A batch record for a path the snapshot covers is a later judgment and
@@ -213,8 +254,29 @@ def audit() -> dict[str, object]:
         "missing_active_records": missing,
         "unknown_supplemental_records": unknown_supplements,
         "inactive_supplemental_records": inactive_supplements,
+        "registered_receipt_relocations": sorted(relocated_receipts),
+        "unavailable_relocated_receipts": unavailable_receipts,
         "errors": errors,
     }
+
+
+def print_text_report(report: dict[str, object]) -> None:
+    print(
+        "D2 coverage: "
+        f"{report['covered_active_docs']}/{report['active_docs']} active; "
+        f"{report['legacy_active_records']} legacy + "
+        f"{report['supplemental_records']} supplemental "
+        f"({report['superseded_legacy_records']} superseding legacy, "
+        f"{report['superseded_supplemental_records']} superseding earlier batches); "
+        f"{report['inactive_legacy_records']} inactive legacy, "
+        f"{len(report['inactive_supplemental_records'])} inactive supplemental"
+    )
+    unavailable = report["unavailable_relocated_receipts"]
+    print(f"Relocated receipts unavailable locally: {len(unavailable)}. Coverage is not artifact verification.")
+    for path in unavailable:
+        print(f"unavailable receipt: {path}")
+    for error in report["errors"]:
+        print(f"error: {error}")
 
 
 def main() -> int:
@@ -225,18 +287,7 @@ def main() -> int:
     if args.json:
         print(json.dumps(report, indent=2))
     else:
-        print(
-            "D2 coverage: "
-            f"{report['covered_active_docs']}/{report['active_docs']} active; "
-            f"{report['legacy_active_records']} legacy + "
-            f"{report['supplemental_records']} supplemental "
-            f"({report['superseded_legacy_records']} superseding legacy, "
-            f"{report['superseded_supplemental_records']} superseding earlier batches); "
-            f"{report['inactive_legacy_records']} inactive legacy, "
-            f"{len(report['inactive_supplemental_records'])} inactive supplemental"
-        )
-        for error in report["errors"]:
-            print(f"error: {error}")
+        print_text_report(report)
     return 1 if report["errors"] else 0
 
 

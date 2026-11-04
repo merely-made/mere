@@ -5,7 +5,7 @@
 **Scope:** turn the full-source audit's registers into repair work, one owner boundary at a
 time. The audit (its record is
 [2026-10-16_full_source_audit_plan.md](2026-10-16_full_source_audit_plan.md), its registers
-under [`support/receipts/authority-success-audit/`](../../../support/receipts/authority-success-audit/))
+under [`Code/testing/mere/support/receipts/authority-success-audit/`](../../../../../testing/mere/receipt-relocation-2026-11-04/authority-reader.md))
 left 441 documented findings unrepaired, 212 unconfirmed candidates and 1,382 authority
 entries that name two or more implementations of one responsibility. No plan owned their
 repair. The family promotion plan's boundary programme (execution, supervision, domain

@@ -18,9 +18,10 @@ ports/graphshell/web/fixtures/** text eol=lf
 ports/mere-resident/tests/fixtures/** text eol=lf
 # Snapshot JSON that castellan compares byte for byte (dramatis repo plan D32).
 
-# The Cambium component-catalog receipt test compares the live render against these
+# The Cambium component-catalog test compares the live render against these
 # captures byte for byte; autocrlf must not rewrite them on checkout (2026-09-03).
-design_docs/cambium_docs/testing/receipts/*.html text eol=lf
+crates/cambium/cambium/tests/fixtures/component_catalog_*.html text eol=lf
+tests/fixtures/luggage-comparison/** -text
 crates/cambium/cambium/examples/component_catalog.css text eol=lf
 
 # The Meaning receipt's arXiv corpus (CC0) is pinned by SHA-256 in its

@@ -11,18 +11,21 @@ are not the safety requirements for a future updater implementation.
 """
 import hashlib
 import json
+import argparse
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-RECEIPTS = REPO / "support/receipts/luggage-comparison"
-FIXTURES = Path(__file__).resolve().parent / "fixtures"
+INPUTS = REPO / "tests/fixtures/luggage-comparison"
+RECEIPTS = INPUTS / "receipts"
+FIXTURES = INPUTS / "public"
 
 
 def read(name):
     return json.loads((RECEIPTS / name).read_text(encoding="utf-8-sig"))
 
 
-def verify():
+def verify(source_snapshot=None):
+    source_root = REPO if source_snapshot is None else source_snapshot
     luggage, velo, tuf = [read(n + ".json") for n in ("luggage", "velopack", "tuf")]
     assert luggage["signed_download"] and luggage["fresh_process_stage"]["accepted"]
     assert luggage["artifact_only_tamper_refused"]
@@ -47,13 +50,16 @@ def verify():
         assert hashlib.sha256(data).hexdigest() == entry["sha256"], entry["path"]
         assert hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest() == entry["git_blob"], entry["path"]
     receipt = read("receipt.json")
-    assert hashlib.sha256((REPO / receipt["cargo_lock"]).read_bytes()).hexdigest() == receipt["cargo_lock_sha256"]
+    assert hashlib.sha256((source_root / receipt["cargo_lock"]).read_bytes()).hexdigest() == receipt["cargo_lock_sha256"], receipt["cargo_lock"]
     for entry in receipt["luggage_sources"]:
-        assert hashlib.sha256((REPO / entry["path"]).read_bytes()).hexdigest() == entry["sha256"], entry["path"]
+        assert hashlib.sha256((source_root / entry["path"]).read_bytes()).hexdigest() == entry["sha256"], entry["path"]
     for entry in receipt["evidence"]:
         assert hashlib.sha256((RECEIPTS / entry["path"]).read_bytes()).hexdigest() == entry["sha256"], entry["path"]
-    print("Recorded observations, evidence hashes and pinned public fixtures verified.")
+    scope = "current source" if source_snapshot is None else "explicit historical source snapshot"
+    print(f"Recorded observations, evidence hashes and pinned public fixtures verified against {scope}.")
 
 
 if __name__ == "__main__":
-    verify()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-snapshot", type=Path, help="verify dated source inputs; not current updater acceptance")
+    verify(parser.parse_args().source_snapshot)

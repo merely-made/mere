@@ -2,7 +2,7 @@
 
 **Status:** 2026-10-28: cut from `2026-10-16_full_source_audit_plan.md`, archived in `archive_docs/2026-10-28/`. The audit itself is done: the full-source read of Mere (A1) and the contained repairs (A2, 24 findings) landed in October 2026, and its two main reds closed on 2026-10-18. What is open is the remaining findings (441 in the dated register, pending reconciliation below), the 212 unconfirmed candidates, Q073, Q069 with its producers Q074 to Q079, the personae half of R4, R5's reading, and runtime qualification the audit never ran.
 
-**For:** routing. The findings live in `support/receipts/authority-success-audit/review_notes.json` (findings, 212 `candidates`, 23 `ruled_out`) with the ownership map in `authority_map.json` (A001 to A1536); the old plan held the dated log of how each was found. This plan owns no code. It assigns each finding id range to the owner plan that fits, keeps the audit's own open items, and records where the register and the tree now disagree. Opened by the audit's closeout, which called the repairs and wider runtime qualification "named followup work" with no owner or schedule.
+**For:** routing. The findings live in `Code/testing/mere/support/receipts/authority-success-audit/review_notes.json` (findings, 212 `candidates`, 23 `ruled_out`) with the ownership map in `Code/testing/mere/support/receipts/authority-success-audit/authority_map.json` (A001 to A1536); the old plan held the dated log of how each was found. This plan owns no code. It assigns each finding id range to the owner plan that fits, keeps the audit's own open items, and records where the register and the tree now disagree. Opened by the audit's closeout, which called the repairs and wider runtime qualification "named followup work" with no owner or schedule.
 Not here: the repairs themselves, which each owner plan takes into its own phases; the sibling repositories' plans where a crate moved with the family promotion (Eidetic, Armillary, ESP, Gemot, Errand); the audit's A2 sweep, landed.
 
 Receipts from this plan's runs go to `archive_docs/<date>/`, never into this
@@ -90,3 +90,5 @@ Actual GPU, custody, browser, model, broker and wallet runs were not made; the p
 
 - 2026-10-28: cut from the full-source audit plan; nothing new landed.
 - 2026-11-03: reconciled Q054's bounded repair status with the harness plan; no new code or register recount.
+
+- 2026-11-04 receipt-home repair: the frozen Q/A packet moved unchanged to `Code/testing/mere/support/receipts/authority-success-audit/`; its [reader map](../../../../../testing/mere/receipt-relocation-2026-11-04/authority-reader.md) preserves old-path lookup and qualification. No finding or candidate is closed by this move.

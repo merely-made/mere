@@ -1,1 +1,0 @@
-{"context_close":"rejected","browser_close":"rejected","recorded":{"released_at":"2026-10-17T21:59:39.771Z","browser_closed":true,"http_closed":true}}

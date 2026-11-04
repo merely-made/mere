@@ -247,6 +247,20 @@ S59 archived four plans (Eidetic browsing derivation, redb over OPFS feasibility
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:772-773`
 
+### L5. Receipt homes and executable inputs (2026-11-04)
+Frozen evidence moves to `Code/testing/mere/`; inputs used by current tests or
+verification tools stay in owner-specific `tests/fixtures/`. Every selected
+move preserves its source bytes and recorded qualification. Historical JSON,
+archived citations and one-shot procedures keep their captured paths; a separate
+reader map resolves them. Mixed renewal packets stay with their owner until
+their live tools and open repair conditions have a maintained home.
+- Done when: every selected file has a verified destination and provenance;
+  current readers, explicit writers, LF rules and size exceptions follow its
+  actual role; no open condition is lost and remaining owner holds are named.
+- Needs: the packet and fixture manifests under `Code/testing/mere/closure-audit/`;
+  the Instrument renewal harness and Q465 remain with Cambium presentation.
+- From: the standing receipt-home instruction and the 2026-11-04 closure approval.
+
 ## Open questions
 
 - **Genet's P2 hazard**: is it closed as moot (cambium has left genet and mere's copy carries `pointer.rs`) or kept open until a clean-checkout genet build is receipted? From: `archive_docs/2026-10-28/2026-08-22_license_sweep_plan.md:508-520`.
@@ -273,6 +287,9 @@ S59 archived four plans (Eidetic browsing derivation, redb over OPFS feasibility
 
 ## Findings
 
+- 2026-11-04: `scripts/mere_doc_judgment_audit.py` recognizes explicit hash-bound receipt moves from `tests/fixtures/doc-audit/receipt-relocations.json` without editing the sealed D2 ledger. Historical coverage and local artifact availability are separate: unavailable copies are listed in text and JSON, and an available copy with changed bytes is refused.
+- 2026-11-04: `support/luggage-comparison/verify.py` defaults to strict live-source verification; its explicit historical-source option checks the dated comparison against retained hash-matching inputs. This is retained evidence verification, not new updater execution. Component-catalog HTML remains an executable golden input, with its reader, explicit writer and LF rule in the Cambium fixture home; the existing golden mismatch remains independently reproduced and documented in its testing README.
+
 - 2026-11-04: Mere’s workspace and Graphshell web locks resolve the same Netrender and Vello renderer family as the Sprigging scene aliases. The standalone smoke and web manifests carry the renamed encoding and shader patches. This establishes the package and scene-type boundary, not whole-Mere runtime qualification.
 
 - 2026-10-07: the first build at each new genet revision stalls every cargo command on the machine for about fifteen minutes, because Cargo holds the package-cache lock while it checks out a git dependency; it is not a deadlock between an outer build and its nested guest builds. Each new test-binary path also raises a Windows Defender Firewall prompt that Mark clears by hand, a separate recurring cost (lattice 711-766).
@@ -283,6 +300,8 @@ S59 archived four plans (Eidetic browsing derivation, redb over OPFS feasibility
 - 2026-08-27: Cargo does not copy a workspace-root `LICENSE` into a member package (verified on retinue), which is why published crates ship SPDX and Exhibit A with no license text file (sweep 382-410).
 
 ## Progress
+
+- 2026-11-04: adopted the approved dialog-cancellation carry and VDIP whole archive, relocated qualified evidence and executable inputs with their path repairs, and preserved remaining mixed-packet owner holds. Manifests and qualification limits are in `Code/testing/mere/closure-audit/`.
 
 - 2026-11-04: aligned the renderer pins and tracked locks with Netrender `6364e5d9` and Vello `b4a53486`; focused graph and Sprigging checks are recorded in the archived receipt.
 

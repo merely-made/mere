@@ -41,10 +41,11 @@ For TUF:
 
 ```powershell
 cargo build --locked --manifest-path support/luggage-comparison/Cargo.toml --features tuf --bin tuf-comparison --target-dir C:/t/cargo-targets/mere --jobs 1
-C:/t/cargo-targets/mere/debug/tuf-comparison.exe C:/Users/mark_/Code/repos/mere/support/luggage-comparison/fixtures
+C:/t/cargo-targets/mere/debug/tuf-comparison.exe C:/Users/mark_/Code/repos/mere/tests/fixtures/luggage-comparison/public
 ```
 
-Public upstream fixtures are pinned and hashed in `fixtures/provenance.json`.
+Public upstream fixtures are pinned and hashed in
+`tests/fixtures/luggage-comparison/public/provenance.json` (repository-relative).
 They come from `awslabs/tough` revision
 `98d8eb8b2ce63515d9b4981c938ef6453c5b5771`, copyright Amazon.com, Inc. or its
 affiliates, under MIT OR Apache-2.0. The MIT license is retained alongside
@@ -59,6 +60,21 @@ Merely TUF deployment or proof of persisted rollback protection across boots.
 
 Results and limits are recorded in
 [the family update brief](../../design_docs/2026-07-22_auto-update_brief.md#2026-10-12-pre-adoption-comparison)
-and `support/receipts/luggage-comparison/`. Copy receipts before removing
+and the [historical packet reader](../../../../testing/mere/receipt-relocation-2026-11-04/README.md#luggage-comparison).
+The verifier's frozen JSON/log inputs live in `tests/fixtures/luggage-comparison/receipts/`;
+its public inputs and retained source snapshots share that fixture root.
+Copy receipts before removing
 marker-identified disposable tool/package output; never clear the shared
 Cargo target or another lane's files.
+
+For the dated comparison, from the repository root:
+
+```console
+python support/luggage-comparison/verify.py --source-snapshot tests/fixtures/luggage-comparison/retained-source
+```
+
+The explicit snapshot matches the original receipt's source hashes. Its
+provenance records the old Git revision and the two files originally hashed
+with Windows line endings. This verifies retained observations and inputs;
+it does not reproduce execution or qualify today's updater. Without that
+option, verification still checks the current source and refuses drift.
