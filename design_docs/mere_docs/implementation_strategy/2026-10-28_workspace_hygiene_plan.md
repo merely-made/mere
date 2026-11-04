@@ -273,6 +273,8 @@ S59 archived four plans (Eidetic browsing derivation, redb over OPFS feasibility
 
 ## Findings
 
+- 2026-11-04: Mere’s workspace and Graphshell web locks resolve the same Netrender and Vello renderer family as the Sprigging scene aliases. The standalone smoke and web manifests carry the renamed encoding and shader patches. This establishes the package and scene-type boundary, not whole-Mere runtime qualification.
+
 - 2026-10-07: the first build at each new genet revision stalls every cargo command on the machine for about fifteen minutes, because Cargo holds the package-cache lock while it checks out a git dependency; it is not a deadlock between an outer build and its nested guest builds. Each new test-binary path also raises a Windows Defender Firewall prompt that Mark clears by hand, a separate recurring cost (lattice 711-766).
 - 2026-10-05: wgpu 30 compares a `Device` by a per-instance id and each `RenderCore::boot` makes its own instance, so devices from two boots compare equal. `cambium-rootstock/src/producer/registry.rs` (`prepare`) detects a changed device with `!=`; recovery from a lost device would need it to compare identity (F16, seams 213-222).
 - 2026-10-05: on Windows winit delivers a frame on `WM_PAINT` and Win32 hands `WM_PAINT` to the first window needing paint, so an animating window starves another. Drawing from the idle turn is a Windows-only reading, not ruled; doing it everywhere would bypass Wayland's frame callbacks, under which a hidden surface's `Fifo` acquire can block (F18, seams 230-262).
@@ -281,6 +283,8 @@ S59 archived four plans (Eidetic browsing derivation, redb over OPFS feasibility
 - 2026-08-27: Cargo does not copy a workspace-root `LICENSE` into a member package (verified on retinue), which is why published crates ship SPDX and Exhibit A with no license text file (sweep 382-410).
 
 ## Progress
+
+- 2026-11-04: aligned the renderer pins and tracked locks with Netrender `6364e5d9` and Vello `b4a53486`; focused graph and Sprigging checks are recorded in the archived receipt.
 
 - 2026-10-28: cut from the crate consolidation, dependency currency, lattice sync, license sweep and crypto generation plans and the open cues of the stack seams plan; nothing new landed.
 
