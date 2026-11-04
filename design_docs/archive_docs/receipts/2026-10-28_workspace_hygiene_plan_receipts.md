@@ -109,3 +109,32 @@ Failed Muniment package inputs were preserved compactly in
 
 Retained compact receipts are under 1 MB of the 100 MB lane cap.
 `final-repositories.json` records the final repository and remote-main audit.
+
+
+## 2026-11-04: renderer family intake
+
+Mere base `9b1df7787699551c24ecbb9ead7136e4a9a4bff2`; Netrender
+`6364e5d9df6453af72e6742a63807ed74d4852c8`; Vello
+`b4a53486277ce37650f3803429cdc8a1d5551950`. Both tracked lock diffs
+change only the Netrender, paint-list, Vello and glifo cohort. The workspace
+and Graphshell web `cargo tree --locked --offline -i netrender-vello` checks
+passed with the same Classic provider. `cargo test --locked --offline -p
+sprigging -- --test-threads=1` passed 30 tests, with one ignored doctest. The
+earlier isolated Sprigging-to-Netrender Scene identity compile proof uses
+unchanged Sprigging sources and this same provider pair. These checks do not
+establish whole-Mere or browser runtime behavior.
+
+The gates ran under `machine-heavy.lock`, a 3 GiB memory cap, zero swap, CPU
+150%, one Cargo worker and a 600-second timeout. Commands and raw logs are in
+`Code/testing/mere-vello-cohort-20261104/current-gates.sh` and adjacent
+`current-*.log` files. The candidate patch SHA-256 is
+`ea1a2d08cc26cea84f16678f6bb12fd5c087aa3a540824796cc74851185603c0`; an
+independent package-record review is retained in `root-independent-graph-review.json`
+in that testing directory.
+
+A fresh origin fetch retained base `9b1df778`; `git diff --check` passed.
+`python3 scripts/mere_doc_audit.py` exited zero while reporting existing
+repository-wide findings, including unheaded owned sources; its full output is
+`current-final-light.log` beside the gate logs. The `line-ceiling`, `responsa`
+and `cargo-deny` executables were unavailable in this environment. Full
+workspace Clippy was not run for this dependency-only cut.
