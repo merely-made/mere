@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-04):** landed. H1-H9 complete; H9 qualifies fifty additional source splits. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** in progress. H1-H9 complete; H10 qualifies fifty additional source splits, awaiting publication. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -232,6 +232,16 @@ Each comes back as a question before anything is written.
   stable target, two jobs and one own Cargo lane. Existing failures and
   physical/headed/platform qualification remain separately recorded.
 
+- **H10. Sixth fifty-file source pass.** Cambium widgets, host/input, shared
+  views, document layout and three UI support originals. Done when all
+  originals/children fit 600 physical lines, exact exceptions retire,
+  baseline/post and relevant feature/docs inventories agree, and configured
+  full/actual hooks pass before publication. Keep field records, public
+  facades, callback ownership, model/runtime identities, literals, fixture
+  bytes and feature boundaries. Shared retained cap: 100 MB, compact
+  summaries, stable Mere target, two jobs, one own Cargo lane. Frozen goldens
+  and giant function factoring stay outside this pass.
+
 ## Findings
 
 - 2026-11-04: H7 qualifies fifty additional originals across Knot 28, Mer3ly 12, Cleromancy 9 and Wavicle 1. Original/replacement files fit, fifty exact exceptions retire, and all four source commits are pushed. Baseline/post inventories agree; scoped feature/docs and local/actual commit hooks pass. Knot retains fourteen existing product/Windows full-suite failures and Cleromancy two product failures, carried into owner plans. The canonical LF fixture repair changes no golden Git bytes.
@@ -449,3 +459,20 @@ Each comes back as a question before anything is written.
   makes the existing query feature buildable. Concurrent receipt/archive
   edits remain with their owner; this pass renews software qualification
   for the named packages, with physical/headed/platform gates separate.
+
+- 2026-11-04: H10 starts **0/50**, selected from unchanged sources across
+  eleven UI/library packages. Existing device-pairing and stack-reduction
+  plan WIP is preserved; baselines precede selected Rust edits.
+
+- 2026-11-04: H10 preparation fits all fifty originals and 129 children.
+  Whole public data groups retain their exports, field visibility and
+  serialization attributes; private host/context state remains in its
+  original records. Bodies, impl bounds, signatures, types and included
+  bytes are matched before final compiler qualification.
+
+- 2026-11-04: H10 **50/50 qualified** across eleven UI/library packages.
+  Fifty originals and 129 children fit (maximum 593 lines); fifty exact
+  exceptions retire. Native inventories match 974 passes, zero failures and
+  six ignores; both narrow inventories, embedding/all-feature checks,
+  selected-package Clippy/docs, Responsa and all four full hooks pass.
+  Source publication and its immutable receipt are the remaining checkpoint.

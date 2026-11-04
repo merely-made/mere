@@ -876,3 +876,118 @@ relocation inventory now has 288 exception records, without crediting its
 frozen evidence moves as source splits. Source moves/index guidance is
 preserved. Receipt publication repeats the full gates on this integrated
 HEAD; the source qualification and its immutable revision are unchanged.
+
+### 2026-11-04: H10 selection
+
+Baseline `8842ae62eb3d2546bc98ba3d0f32c2e57534ccdf`. Fifty new Rust originals;
+100 MB retained-byte cap across H10. Packages: cambium-rootstock, cambium, mere-overmap, mere-view, sprigging, tinct, chirograph, document-canvas, uxtree, mere-comms, mere-pageload.
+Features: `cambium/highlight,mere-overmap/resident,document-canvas/netrender`. Baselines precede source edits.
+
+| Original | Before | After |
+|---|---:|---:|
+| `crates/cambium/cambium-rootstock/src/accessibility_tests.rs` | 1016 | 457 |
+| `crates/cambium/cambium-rootstock/src/frame.rs` | 1405 | 539 |
+| `crates/cambium/cambium-rootstock/src/host.rs` | 2315 | 593 |
+| `crates/cambium/cambium-rootstock/src/input.rs` | 785 | 424 |
+| `crates/cambium/cambium-rootstock/src/lib.rs` | 1173 | 530 |
+| `crates/cambium/cambium-rootstock/src/multi_host_tests.rs` | 821 | 563 |
+| `crates/cambium/cambium-rootstock/src/owned_layout.rs` | 1522 | 549 |
+| `crates/cambium/cambium-rootstock/src/producer/registry.rs` | 1127 | 333 |
+| `crates/cambium/cambium-rootstock/src/producer/tests.rs` | 763 | 554 |
+| `crates/cambium/cambium/src/command_menu_bar.rs` | 831 | 452 |
+| `crates/cambium/cambium/src/command_surface.rs` | 851 | 524 |
+| `crates/cambium/cambium/src/component.rs` | 780 | 363 |
+| `crates/cambium/cambium/src/composition_scheduler.rs` | 685 | 419 |
+| `crates/cambium/cambium/src/disclosure.rs` | 1127 | 546 |
+| `crates/cambium/cambium/src/event_layer_tests.rs` | 739 | 555 |
+| `crates/cambium/cambium/src/fold_projection.rs` | 700 | 408 |
+| `crates/cambium/cambium/src/frisket.rs` | 1249 | 538 |
+| `crates/cambium/cambium/src/graph_canvas.rs` | 3542 | 428 |
+| `crates/cambium/cambium/src/opened_link.rs` | 711 | 522 |
+| `crates/cambium/cambium/src/reorderable_list.rs` | 754 | 532 |
+| `crates/cambium/cambium/src/retained_mount.rs` | 699 | 178 |
+| `crates/cambium/cambium/src/runner.rs` | 2385 | 544 |
+| `crates/cambium/cambium/src/scope_navigation/history.rs` | 928 | 520 |
+| `crates/cambium/cambium/src/surface.rs` | 875 | 477 |
+| `crates/cambium/cambium/src/tabs.rs` | 817 | 572 |
+| `crates/cambium/cambium/src/tests.rs` | 3760 | 399 |
+| `crates/cambium/cambium/src/workspace.rs` | 976 | 386 |
+| `crates/cambium/mere-overmap/src/materialization.rs` | 923 | 266 |
+| `crates/cambium/mere-overmap/src/route.rs` | 833 | 517 |
+| `crates/cambium/mere-overmap/src/route_session.rs` | 1612 | 99 |
+| `crates/cambium/mere-overmap/src/wire.rs` | 643 | 588 |
+| `crates/cambium/mere-view/examples/harness.rs` | 726 | 553 |
+| `crates/cambium/mere-view/src/tests.rs` | 2005 | 537 |
+| `crates/cambium/mere-view/src/tier.rs` | 934 | 524 |
+| `crates/cambium/mere-view/src/view.rs` | 1621 | 528 |
+| `crates/cambium/sprigging/src/glyphs.rs` | 952 | 535 |
+| `crates/cambium/sprigging/src/lib.rs` | 775 | 570 |
+| `crates/cambium/tinct/src/lib.rs` | 695 | 526 |
+| `crates/chirograph/src/lib.rs` | 2035 | 540 |
+| `crates/chirograph/src/titulus.rs` | 777 | 459 |
+| `crates/inker/document-canvas/src/layout.rs` | 1287 | 588 |
+| `crates/inker/document-canvas/src/layout/fold_tests.rs` | 692 | 487 |
+| `crates/inker/document-canvas/src/layout/tests.rs` | 1176 | 443 |
+| `crates/inker/document-canvas/src/paint_list.rs` | 713 | 365 |
+| `crates/inker/document-canvas/src/style_sheet.rs` | 732 | 496 |
+| `crates/inker/document-canvas/src/text.rs` | 898 | 422 |
+| `crates/inker/document-canvas/src/types.rs` | 681 | 460 |
+| `crates/forme/uxtree/src/lib.rs` | 917 | 521 |
+| `crates/shell/comms/src/tests.rs` | 639 | 515 |
+| `crates/system/page-load/src/lib.rs` | 610 | 497 |
+
+H10 untouched native baseline: 974 passed, zero failed, six existing
+ignores across the eleven named packages with the selected features.
+The giant catalog example and frozen HTML goldens are unselected; this
+run does not renew their separate explicit golden-comparison acceptance.
+Public DTO groups may move as whole records behind original exports;
+private runtime state and record fields retain their existing ownership.
+
+H10 narrow baselines pass: no-default mere-overmap 3/0/0, no-default
+document-canvas 86/0/0 (pass/fail/ignore). Rootstock no-default embedding
+all-target check and Mere-view all-feature/all-target check both exit zero.
+All fifty selected Rust files remain unchanged through these gates.
+
+H10 preparation audit: 2,351 old/new function/constant bodies, all
+signatures with original impl bounds, all type fields and three directly
+included fixtures match after scope/visibility normalization. Three
+Rustfmt-only bodies: `render_node`, `render_stack_with_tab_policy`, and
+`live_carrier_accepts_required_cards_and_unbound_optional_items`. Nested
+fixture impl parent identifiers use a different spelling from top-level
+impls; pairing both forms preserves the full bound/signature comparison.
+No assertions or ignores change.
+
+H10 post-split native tests: 974 passed, zero failed, six existing ignores.
+All 980 emitted test outcomes match baseline after module-prefix and doc-line
+normalization. Narrow feature inventories also match: Overmap 3/0/0 and
+Document-canvas 86/0/0. This is software qualification for the named packages;
+headed, physical and cross-platform acceptance remain their own gates.
+
+Fifty originals plus 129 extracted Rust children fit: 179 files, maximum
+593 physical lines (`cambium-rootstock/src/host.rs`). Nine public record
+facade groups retain all 69 type/alias exports. Private runtime fields stay
+with their original parents. Fifty exact exception records retire, 288 to
+238; every retained record is unchanged. No lockfile, manifest, CI, tool tag,
+CLAUDE.md, fixture bytes, assertion, ignore or lint allowance changes.
+
+The concurrent receipt-harness commit `3b1faaa42040594652fd45f5835a9192d14749c3`
+changes none of these selected Rust originals. Its canonical-index addition
+is preserved, separately from H10's source-move guidance and pass index.
+
+The later documentation-only commit
+`a9fa5c85c505ad035912911efd4fc0af80b67ab0` is fast-forward integrated before
+publication. Its portable-application brief, index entries and generated
+decision manifest are retained; it changes no selected Rust or graph input.
+
+Post-split Rootstock no-default embedding/all-target and Mere-view
+all-feature/all-target checks exit zero. Explicit Clippy for all eleven
+packages, selected features and all targets exits zero. Documentation for
+all eleven packages with those features and `--no-deps` exits zero.
+Compiler/Clippy/rustdoc warnings are reported; no suppression is added.
+
+Pre-publication full repository gates pass: `responsa regen --stage`,
+`responsa check`, `git diff --cached --check` and `prek run --all-files`
+all exit zero. The latter runs all four configured hooks: line ceiling,
+Responsa, repository-wide all-target Clippy and dependency bans. Actual
+commit hooks repeat the full run under before/after staged-blob guards;
+the immutable publication receipt records their result.

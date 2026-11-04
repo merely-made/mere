@@ -46,42 +46,6 @@ path = "crates/cambium/cambium-genet-winit-host/tests/scenario.rs"
 reason = "The scenario lane, driven headless: the harness stands in for the event loop, calling after_frame once per frame, then delivering the pointer the lane queued and running the. Existing source-size debt; a responsibility split must preserve App, Child, Logic and existing module visibility."
 
 [[exception]]
-path = "crates/cambium/cambium-rootstock/src/accessibility_tests.rs"
-reason = "Accessibility focus follows the runner, independently of hover restyling. Existing source-size debt; a responsibility split must preserve Child, Logic, FocusSample and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/frame.rs"
-reason = "The frame pipeline: retained layout, paint emission, presentation, and accessibility synchronization. Existing source-size debt; a responsibility split must preserve LeafFragmentAdmissionError, FrameTrace, SpriggingSource and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/host.rs"
-reason = "The host proper: lifecycle, state, hooks, and the application-facing context, with no event source of its own. Existing source-size debt; a responsibility split must preserve CloseRequest, CloseDisposition, Runner and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/input.rs"
-reason = "Pointer, keyboard, IME, and wheel routing. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/lib.rs"
-reason = "The stock a Cambium application host is grafted onto. Existing source-size debt; a responsibility split must preserve HostWindow, TitlebarInsets, Surface and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/multi_host_tests.rs"
-reason = "Stage 3's receipts (stack seams P2): two windows over one forest document, windowless. Existing source-size debt; a responsibility split must preserve App, Child, Logic and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/owned_layout.rs"
-reason = "Rootstock-owned retained Livery session over Cambium's externally owned DOM. Existing source-size debt; a responsibility split must preserve FocusedTextPaint, ScrollTarget, ScrollAlign and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/producer/registry.rs"
-reason = "Registry. Existing source-size debt; a responsibility split must preserve ProducerGpuRemapError, GpuBinding, Image and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium-rootstock/src/producer/tests.rs"
-reason = "Producer tests. Existing source-size debt; a responsibility split must preserve Producer, TestSurface and existing module visibility."
-
-[[exception]]
 path = "crates/cambium/cambium-winit-a11y/examples/e1b_two_sessions.rs"
 reason = "Experiment E1b's probe: one window, two retained Cambium sessions joined as AccessKit subtrees, for a person to walk with a screen reader (app composition brief §8, AC3, ruled. Existing source-size debt; a responsibility split must preserve Notes, Counter, NotesView and existing module visibility."
 
@@ -102,112 +66,8 @@ path = "crates/cambium/cambium/examples/component_catalog.rs"
 reason = "Cambium's executable component acceptance surface. Existing source-size debt; a responsibility split must preserve CatalogView, CatalogLogic, CatalogRunner and existing module visibility."
 
 [[exception]]
-path = "crates/cambium/cambium/src/command_menu_bar.rs"
-reason = "A desktop menubar over the same CommandItem tree as the palette and menus. Existing source-size debt; a responsibility split must preserve BarView, CommandMenuBarState and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/command_surface.rs"
-reason = "One command model rendered as a palette, picker, or context menu. Existing source-size debt; a responsibility split must preserve CommandItem, CommandState, CommandSurfaceKind and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/component.rs"
-reason = "A state-owning boundary for reusable Cambium controls. Existing source-size debt; a responsibility split must preserve ComponentView, Component, ComponentState and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/composition_scheduler.rs"
-reason = "Bounded, value-free input snapshots for retained composition scheduling. Existing source-size debt; a responsibility split must preserve CompositionCauseRef, MutationRecord, DependencyStamp and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/disclosure.rs"
-reason = "Shared disclosure behavior, plus accordion and recursive tree compositions. Existing source-size debt; a responsibility split must preserve DisclosureState, AccordionMode, AccordionConfig and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/event_layer_tests.rs"
-reason = "Cambium's click, key and focus listeners on the shared event layer (genet docs/2026-10-17_native_event_dispatch_plan.md, Phase 2). Existing source-size debt; a responsibility split must preserve Log, Recorder, Script and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/fold_projection.rs"
-reason = "A read-only, source-borrowing projection for collapsed source regions. Existing source-size debt; a responsibility split must preserve FoldRange, FoldProjectionSegment, FoldProjectionError and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/frisket.rs"
-reason = "Frisket: a pane frame — splits and tab-stacks — as one composition. Existing source-size debt; a responsibility split must preserve PaneView, Slot, SlotKind and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/graph_canvas.rs"
-reason = "A bounded, interactive viewport over Sprigging's shared graph canvas. Existing source-size debt; a responsibility split must preserve GraphCanvasNode, GraphCanvasNodeDrag, GraphCanvasNodeRegion and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/opened_link.rs"
-reason = "One opened-link surface for source-owned assertions. Existing source-size debt; a responsibility split must preserve LinkMemberAction, LinkMemberTarget, OpenedLinkEvent and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/reorderable_list.rs"
-reason = "Keyed pointer and keyboard reordering with application-owned persistence. Existing source-size debt; a responsibility split must preserve ReorderItem, ReorderMove, DragInput and existing module visibility."
-
-[[exception]]
 path = "crates/cambium/cambium/src/retained_composition/view.rs"
 reason = "View. Existing source-size debt; a responsibility split must preserve ComponentOperationSpan and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/retained_mount.rs"
-reason = "A host-owned retained runner mounted inline in a shared forest document. Existing source-size debt; a responsibility split must preserve RetainedMount, Owner, RetainedMountView and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/runner.rs"
-reason = "The Genet-native runner that owns app state and the retained view tree. Existing source-size debt; a responsibility split must preserve FocusExit, Walk, RunnerTree and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/scope_navigation/history.rs"
-reason = "Stemma-backed scope visits with mutable, view-only bookmarks. Existing source-size debt; a responsibility split must preserve ScopeValue, Lineage, Snapshot and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/surface.rs"
-reason = "Type erasure for retained product-owned Cambium runners. Existing source-size debt; a responsibility split must preserve SurfaceEffect, SurfaceViewport, ResolvedSurfaceEvent and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/tabs.rs"
-reason = "A tab strip: one strip of labelled tabs, one active — radio_group's one-of-N shape wearing the ARIA tabs pattern. Existing source-size debt; a responsibility split must preserve TabStripPolicy, TabStrip, TabAccentColors and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/tests.rs"
-reason = "End-to-end backend probe (Stage 1a). Existing source-size debt; a responsibility split must preserve TestView, Harness and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/cambium/src/workspace.rs"
-reason = "Workspace: a whole [workbench::Workspace] — the tiled frame plus the float layer — as one composition, for a host that owns the model and composites foreign content itself. Existing source-size debt; a responsibility split must preserve WorkspaceModel and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-overmap/src/materialization.rs"
-reason = "Ephemeral resident materialization. Existing source-size debt; a responsibility split must preserve GraphRead, MaterializationSource, MaterializedMere and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-overmap/src/route.rs"
-reason = "A mere's route as the mere view (reservoir plan V2b step 3, §7 items 35 and 37). Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-overmap/src/route_session.rs"
-reason = "Event-driven shared mere panel over one admitted endpoint. Existing source-size debt; a responsibility split must preserve Task, MereRouteSession and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-overmap/src/wire.rs"
-reason = "The wire vocabulary of a mere route (reservoir plan §7 items 31 to 37): the djinn.mere/v1/ projection names, the session item's and the sessions projection's intents and schemas,. Existing source-size debt; a responsibility split must preserve SessionGraphV1, PendingMergeV1, MergeChoiceV1 and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-view/examples/harness.rs"
-reason = "The mere view's headed harness (reservoir plan V2b, step 2). Existing source-size debt; a responsibility split must preserve Harness, Child, Logic and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-view/src/tests.rs"
-reason = "The view tree against Knot's requirements (reservoir plan V2b), as far as a tree can show them. Existing source-size debt; a responsibility split must preserve Host, Runner and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-view/src/tier.rs"
-reason = "The overmap tier: a mere's sessions and archives as nodes on the graph canvas itself, in a tier across its top, one level up from the graph. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/cambium/mere-view/src/view.rs"
-reason = "The view: a labelled region holding a bar, the sessions and the graph. Existing source-size debt; a responsibility split must preserve MereViewElement, MereViewRequest, MergeRequest and existing module visibility."
 
 [[exception]]
 path = "crates/cambium/mesquite/src/lane.rs"
@@ -274,18 +134,6 @@ path = "crates/cambium/scenes/scenotime/src/diff.rs"
 reason = "Diff. Existing source-size debt; a responsibility split must preserve SceneDiff, SceneOp, ApplyOutcome and existing module visibility."
 
 [[exception]]
-path = "crates/cambium/sprigging/src/glyphs.rs"
-reason = "First catalog leaves (tier-2 Path-A glyphs from the widget catalog, design_docs/archive_docs/2026-10-28/2026-07-08_chisel_widget_catalog.md): [GraphCanvas], [Meter], [Knob]. Existing source-size debt; a responsibility split must preserve GraphGlyphNode, GraphGlyphRelation, RelationLine and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/sprigging/src/lib.rs"
-reason = "Sprigging supplies retained custom-paint leaves for GUI hosts. Existing source-size debt; a responsibility split must preserve SizeHint, Size, PaintCx and existing module visibility."
-
-[[exception]]
-path = "crates/cambium/tinct/src/lib.rs"
-reason = "tinct Perceptual seed-to-palette derivation for the Merely family (Woodshed, Strophe, Mere). Existing source-size debt; a responsibility split must preserve Srgb, Seeds, Palette and existing module visibility."
-
-[[exception]]
 path = "crates/cambium/workbench/float.rs"
 reason = "The float layer: tiles presented outside the tiled tree, and the [Workspace] that holds both stations under one rule — every tile is in exactly one place. Existing source-size debt; a responsibility split must preserve RelativeRect, FloatSizeConstraints, FloatingTile and existing module visibility."
 
@@ -312,14 +160,6 @@ reason = "Arrangement and physics actions a host's controls apply to the canvas.
 [[exception]]
 path = "crates/canvas/pictograph/src/canvas/physics_form.rs"
 reason = "The Map's physics form: flat law, sources, overlays and profile; role, two-law mix, grouping, two-stage schedule and speed, as one model both hosts drive. Existing source-size debt; a responsibility split must preserve Slot, FieldId, Control and existing module visibility."
-
-[[exception]]
-path = "crates/chirograph/src/lib.rs"
-reason = "Chirograph — the projection contract, executed in duplicate. Existing source-size debt; a responsibility split must preserve ProtocolVersion, ProjectionSession, ProjectionRequest and existing module visibility."
-
-[[exception]]
-path = "crates/chirograph/src/titulus.rs"
-reason = "Titulus — the inscription that says what a thing is. Existing source-size debt; a responsibility split must preserve ContentHash, Sha256NamedInformation, PortableContentRefV1 and existing module visibility."
 
 [[exception]]
 path = "crates/conatus/conatus/src/resident/chunk.rs"
@@ -380,10 +220,6 @@ reason = "Crawl tests. Existing source-size debt; a responsibility split must pr
 [[exception]]
 path = "crates/fleece/src/eidetic_bridge.rs"
 reason = "Opt-in bridge from Fleece's caller-owned extraction output to Eidetic. Existing source-size debt; a responsibility split must preserve CaptureIdentity, CaptureDomMode, CaptureEvidenceV1 and existing module visibility."
-
-[[exception]]
-path = "crates/forme/uxtree/src/lib.rs"
-reason = "UxTree Portable a11y / automation tree for the mere browser. Existing source-size debt; a responsibility split must preserve UxTree and existing module visibility."
 
 [[exception]]
 path = "crates/graph/graph-kernel/src/graph/apply.rs"
@@ -454,34 +290,6 @@ path = "crates/graphshell/graphshell-host/src/webrtc_session.rs"
 reason = "The live half of the WebRTC door: the join sequence over a real channel, and the admitted session it produces. Existing source-size debt; a responsibility split must preserve HostedInvite, JoinConclusion, ServedJoin and existing module visibility."
 
 [[exception]]
-path = "crates/inker/document-canvas/src/layout.rs"
-reason = "Top-level document layout — dispatches per [Block] variant and stacks the resulting blocks vertically inside the viewport. Existing source-size debt; a responsibility split must preserve LaidOutDocument, DocumentLayouter and existing module visibility."
-
-[[exception]]
-path = "crates/inker/document-canvas/src/layout/fold_tests.rs"
-reason = "P1 fold-aware layout, asserted over the committed Micron probe pages and inline sources: skipped extents, reserved link identities, heading markers and fold and in-page regions,. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/inker/document-canvas/src/layout/tests.rs"
-reason = "Layout tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/inker/document-canvas/src/paint_list.rs"
-reason = "PaintList producer. Existing source-size debt; a responsibility split must preserve InkerPaintList, Builder and existing module visibility."
-
-[[exception]]
-path = "crates/inker/document-canvas/src/style_sheet.rs"
-reason = "Per-role document style sheet. Existing source-size debt; a responsibility split must preserve FontChoice, SizeSpec, WrapPolicy and existing module visibility."
-
-[[exception]]
-path = "crates/inker/document-canvas/src/text.rs"
-reason = "Inline-span flattening + parley wrapper. Existing source-size debt; a responsibility split must preserve TextBaseStyle, Adornments, Flattened and existing module visibility."
-
-[[exception]]
-path = "crates/inker/document-canvas/src/types.rs"
-reason = "Render-packet types. Existing source-size debt; a responsibility split must preserve DecodedImage, Viewport, Point and existing module visibility."
-
-[[exception]]
 path = "crates/inker/engines/scrying-engine/src/translation.rs"
 reason = "Type translations between inker surface-engine types and the scrying producer trait's vocabulary. Existing source-size debt; a responsibility split must preserve ScryingNativeFramePayload and existing module visibility."
 
@@ -546,10 +354,6 @@ path = "crates/platen/platen/src/workspace/session.rs"
 reason = "The host's scoped Forme editing session. Existing source-size debt; a responsibility split must preserve DropEffect, DropProposal, LayoutState and existing module visibility."
 
 [[exception]]
-path = "crates/shell/comms/src/tests.rs"
-reason = "Headless tests for the unified model, driven by [InMemoryAdapter] backends — no host, no network. Existing source-size debt; a responsibility split must preserve RouteEffects, RouteProbe, FailingAdapter and existing module visibility."
-
-[[exception]]
 path = "crates/system/djinn-testkit/src/resident.rs"
 reason = "One isolated djinn resident: its own roots and endpoints under the run, spawned through the guard into the run's job, ready by its pipes and its status route, and stopped by a. Existing source-size debt; a responsibility split must preserve Unlock, Live, Resident and existing module visibility."
 
@@ -596,10 +400,6 @@ reason = "The handle against a real local server, called the way a decoder calls
 [[exception]]
 path = "crates/system/fetch/src/lib.rs"
 reason = "Off-UI-thread fetching (S2.2b). Existing source-size debt; a responsibility split must preserve SmolwebSubmission, SubmissionAnswer, SubmissionOutcome and existing module visibility."
-
-[[exception]]
-path = "crates/system/page-load/src/lib.rs"
-reason = "Mere's fetch vocabulary and the sans-IO page load. Existing source-size debt; a responsibility split must preserve FetchRequestId, Fetched, FetchFailure and existing module visibility."
 
 [[exception]]
 path = "crates/system/pandect/src/arrangement_facets.rs"
