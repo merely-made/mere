@@ -457,3 +457,20 @@ This batch's owned Temp helper, state, audit script, logs and temporary hook
 are removed after publication. Stable approved repository Cargo targets
 were reused with two jobs. No isolated target, Cargo home or worktree was
 created or retained. Existing source and historical evidence are preserved.
+
+
+### H6 final-run clarification
+
+The aggregate is published at `16dd9d438`. The snapshot supplied to the
+checker contains 1,857 packages (9,954,469 bytes), generated with frozen,
+all-feature metadata; HEAD and Cargo/config inputs were verified.
+
+Correction to the optimization description above: cargo-deny 0.20.2 still
+prefetches unconditionally when given metadata. The supplied snapshot did
+not eliminate that phase. Its queued prefetch eventually completed after
+the shared cache lock cleared, and ceiling, Responsa and dependency bans
+all passed; Clippy correctly skipped the doc-only selection. The attempted
+frozen/snapshot changes did not bypass a check or establish a faster path.
+This addendum corrects the run description. Its commit uses the ordinary
+configured runner, with the same three-doc selection and installed hooks
+unchanged.

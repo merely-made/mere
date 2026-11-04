@@ -932,6 +932,10 @@ is historical evidence, not the current path or ownership inventory. For the wor
   The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
   records the completed 25-repository rollout, receiving boundaries and
   the H5 and H6 source-split passes.
+  Cargo-deny 0.20.2 always prefetches, including with `--frozen` or
+  `--metadata-path`; cached metadata does not avoid its shared Cargo-cache
+  lock. Keep graph inputs stable for a complete gate, and wait for other
+  receiving runs or coordinate a yield when authorized.
 
 - **Resolved Git identity (2026-10-28):** `cargo metadata --locked` can succeed
   while a lock record names an older revision than the package Cargo loads from
