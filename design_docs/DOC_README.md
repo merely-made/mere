@@ -931,7 +931,7 @@ is historical evidence, not the current path or ownership inventory. For the wor
   full hook run: prek can report those concurrent changes as hook output.
   The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
   records the completed 25-repository rollout, receiving boundaries and
-  H5's additional source-split pass.
+  the H5 and H6 source-split passes.
 
 - **Resolved Git identity (2026-10-28):** `cargo metadata --locked` can succeed
   while a lock record names an older revision than the package Cargo loads from

@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-03):** landed. H1-H5 complete; H5 qualifies 50 additional oversize files. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-03):** landed. H1-H6 complete, including both fifty-file source passes. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -196,7 +196,18 @@ Each comes back as a question before anything is written.
   are recorded as qualified in the appended H5 receipt. Retained cap stays
   100 MB across repositories, with compact evidence only.
 
+- **H6. Second fifty-file source pass.** Mark's "Another batch?" continues
+  the same qualification rule for fifty additional original paths. H5's
+  fifty and the earlier eight are excluded. Selected: Woodshed 35 and
+  Eidetic 15, with local plans, scoped tests, private/public/feature boundary
+  preservation, exact exception retirement and pushed commits. Done when
+  fifty new distinct originals and their replacement modules fit the ceiling
+  and their owner receipts and full local gates qualify them. Total retained
+  cap: 100 MB across H6; compact text only.
+
 ## Findings
+
+- 2026-11-03: H6 qualifies fifty more originals: Eidetic fifteen and Woodshed thirty-five. All original/replacement files fit, fifty exact exceptions retire, and code is pushed. Baseline/post tests match (746 and 967); optional feature checks, docs and full gates pass. The existing MIDI-disabled diagnostics target gains its missing feature guard.
 
 - 2026-11-03: H5 qualifies fifty additional paths across Smolweb (9), Dramatis (20), Netrender (12), Turquet (6) and Emblem (3). Every replacement module fits the ceiling, fifty exact exceptions are retired, and all implementations are pushed. The Windows adoption flush and native fixture exhaustiveness repairs are recorded separately from source moves; Netrender's existing full-suite compose pixel failure remains open at its unchanged threshold.
 
@@ -337,3 +348,11 @@ Each comes back as a question before anything is written.
 - 2026-11-03: H5 **44/50** published. Dramatis twenty (`e26b434`) and Netrender twelve (`2073c5050`) pass their recorded tests and full gates. Dramatis also repairs the baseline Windows adoption flush; Netrender retains its existing full-suite compose pixel failure at the original threshold. Emblem retains its extracted-file source notices at `0975e27`. Turquet six awaits its actual commit gate.
 
 - 2026-11-03: H5 **50/50 landed**. Turquet six (`9819053`) completes the target. All five source checkouts are clean and match pushed main; the aggregate receipt lists every original path and owning receipt. Source notices, fixtures and concurrent WIP are preserved. Compact receipts stay below 100 KB; no isolated build area or worktree is retained.
+
+- 2026-11-03: H6 starts at **0/50** additional qualified paths: Woodshed thirty-five and Eidetic fifteen, selected from clean main. The preceding fifty remain H5, and prior splits are excluded.
+
+- 2026-11-03: H6 **15/50 published**. Eidetic fifteen (`5b805a1`): original/child files fit, exceptions retire, 746 baseline/post cases, optional recall-example type checks, docs and full local/commit gates pass. Five Eidetic exceptions remain.
+
+- 2026-11-03: H6 **27/50 published**. Woodshed S1 twelve (`297b162`, integrated with concurrent Redshank work in `d2f990c`) joins Eidetic fifteen. All 967 software cases pass post-refactor with serial execution, literal bytes are audited, and full local/commit hooks pass.
+
+- 2026-11-03: H6 **50/50 landed**. Woodshed S2/S3 twenty-three (`cf2b091`) completes the target with matching 967-case software tests, feature/docs checks and final full/commit gates. The aggregate receipt lists fifty unique additional paths and published commits. Five Eidetic and 69 Woodshed exceptions remain outside this pass. Concurrent Redshank and Mere plan work is preserved; compact receipts fit the 100 MB cap, with no isolated build area or worktree retained.

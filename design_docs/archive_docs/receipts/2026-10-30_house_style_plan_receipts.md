@@ -341,3 +341,119 @@ pass's Temp helper, state, logs and temporary hook are removed after final
 publication. Builds reused stable approved `C:/t/cargo-targets/<repo>`
 directories with two jobs. No isolated target, Cargo home or worktree was
 created or retained; existing source, fixtures and historical evidence stay.
+
+## 2026-11-03: H6 second fifty-file continuation
+
+Target: fifty additional originals, excluding H5's fifty and the earlier
+eight. Owner: chat 01a19f86-cb71-7820-a6ac-aaec39d8bfd4. Selected: Woodshed
+35 and Eidetic 15. Initial count: 0/50. Same qualification rule and shared
+100 MB retained receipt cap; compact summaries, preserving original captures.
+Owner plans and receipts record each phase; published paths append here.
+
+### H6 Eidetic: fifteen paths
+
+Published: `5b805a1eb808b32f890feb2c7464ef6b2471a9dc`. Evidence:
+`eidetic/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`.
+
+- `crates/chartulary/src/commit.rs`
+- `crates/chartulary/src/spine.rs`
+- `crates/eidetic-core/src/browsing/page.rs`
+- `crates/eidetic-core/src/models/answer.rs`
+- `crates/eidetic-search/examples/eidetic-recall.rs`
+- `crates/eidetic-search/src/index.rs`
+- `crates/eidetic-search/tests/lexical_ngram_recall.rs`
+- `crates/luggage/src/install.rs`
+- `crates/luggage/src/updater.rs`
+- `crates/muniment/src/directory_backend.rs`
+- `crates/servitor/src/delegation.rs`
+- `crates/servitor/src/gate.rs`
+- `crates/servitor/src/run.rs`
+- `crates/stickleback/examples/inventory_compare/model.rs`
+- `crates/stickleback/src/drop.rs`
+
+Tally: **15/50** for H6.
+
+### H6 Woodshed S1: twelve paths
+
+Code: `297b162d888c3590e99bdaec6be21fc2487354d9`; published through clean integration `d2f990cf770a6fff2ccd321954010dd9d34c8b98`.
+Evidence: `woodshed/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`.
+
+- `crates/audio-primitives/src/alignment.rs`
+- `crates/audio-primitives/src/onset.rs`
+- `crates/hocket-model/src/history.rs`
+- `crates/hocket-project/src/handoff.rs`
+- `crates/hocket-recorder/src/host_policy.rs`
+- `crates/woodshedding/src/chord.rs`
+- `crates/woodshedding/src/exercise.rs`
+- `crates/woodshedding/src/fretboard.rs`
+- `crates/woodshedding/src/notation.rs`
+- `crates/woodshedding/src/progression.rs`
+- `crates/woodshedding/src/rehearsal.rs`
+- `crates/woodshedding/src/scale.rs`
+
+Tally: **27/50**. The concurrent Redshank note-layout change remains its
+owner's work. Root theory/DSP/history qualification preserves the original
+16 ms assertion; the recorded initial timing miss passes in the isolated
+and full serial reruns.
+
+
+### H6 Woodshed S2/S3: twenty-three paths
+
+Published: `cf2b09196adce374b65d401dfa7a2d0461e94b9c`. Evidence continues in the same Woodshed owner receipt.
+
+- `crates/woodshed-core/src/chord_approach.rs`
+- `crates/woodshed-core/src/comparison_disclosure.rs`
+- `crates/woodshed-core/src/history.rs`
+- `crates/woodshed-core/src/lib.rs`
+- `crates/woodshed-core/src/loop_capture.rs`
+- `crates/woodshed-core/src/loop_plan.rs`
+- `crates/woodshed-core/src/practice_clock.rs`
+- `crates/woodshed-core/src/session_overview.rs`
+- `crates/woodshed-core/src/stage_context.rs`
+- `crates/woodshed-core/src/storage.rs`
+- `crates/woodshed-graph/src/lib.rs`
+- `crates/woodshed-notation/src/lib.rs`
+- `crates/hocket-recorder/src/lib.rs`
+- `crates/hocket-views/src/leaves.rs`
+- `crates/hocket-views/src/surface.rs`
+- `crates/woodshed-audio/src/input.rs`
+- `crates/woodshed-audio/src/offline/song_export/tests.rs`
+- `crates/woodshed-audio/src/output_runtime.rs`
+- `crates/woodshed-audio/src/output_runtime/processor.rs`
+- `crates/woodshed-audio/src/output_runtime/tests.rs`
+- `crates/woodshed-audio/src/song.rs`
+- `crates/woodshed-instrument/src/midi.rs`
+- `crates/woodshed-instrument/src/midi/ble.rs`
+
+Tally: **50/50 for H6**, distinct from H5's fifty and the earlier eight.
+Woodshed's final 35/35 and Eidetic's 15/15 are pushed to main. Every original
+was over 600 lines at its recorded baseline; it and every replacement now
+fit. Fifty exact exceptions retire, leaving five in Eidetic and 69 in
+Woodshed. Root manifests/locks and source notices remain intact.
+
+Woodshed's 967-case baseline/post suite, default Windows BLE compilation,
+notation/audio/instrument no-default checks, public docs and full local/commit
+hooks pass. The initial MIDI-disabled integration-test failure is retained
+in its owner receipt alongside the missing guard repair and successful
+reruns. Operation/literal, function-signature, type-layout and facade-export
+review covers the final moves. Eidetic's 746 cases, optional recall-example
+type check, docs and full hooks are recorded in its owning receipt.
+These are software checks; physical-device, audio-quality, headed and
+other-platform acceptance remain under their existing owners.
+
+The aggregate docs commit scopes its per-command hook to its three changed
+docs, using the configured prek runner with ceiling, Responsa and dependency
+bans. The final run supplies cargo-deny with a freshly generated
+`cargo metadata --all-features --frozen` snapshot through `--metadata-path`,
+in an otherwise identical temporary runner config. This avoids cargo-deny's
+separate fetch while preserving the locked, all-feature graph and every bans
+check. Metadata bytes, HEAD and Cargo/config input hashes are verified again
+inside the hook. Clippy's normal source selector skips docs. This preserves concurrent
+unstaged Mere plan work without automatic stashing; installed hook config
+is unchanged. Responsa regeneration/check uses the staged snapshot.
+
+Only compact Markdown receipts remain, within H6's shared 100 MB cap.
+This batch's owned Temp helper, state, audit script, logs and temporary hook
+are removed after publication. Stable approved repository Cargo targets
+were reused with two jobs. No isolated target, Cargo home or worktree was
+created or retained. Existing source and historical evidence are preserved.
