@@ -777,7 +777,7 @@ event-shaped; fields and sympathetic influences retain the dynamics framing in
 ### P7 promoted-link qualification (2026-10-16)
 
 The [implementation plan](../../archive_docs/2026-10-28/2026-10-15_link_model_plan.md#p7-qualification-2026-10-16)
-and [receipt](../../../support/receipts/link-model-p7-20261016/receipt.json)
+and [receipt](../../../../../testing/mere/support/receipts/link-model-p7-20261016/receipt.json)
 record bounded Graphshell P7 on `6d53d4439`. Each freeze creates an independent
 Resource with the original stratum, endpoint references, exact directed assertion
 copies and explicit source revision availability. The immutable facet survives

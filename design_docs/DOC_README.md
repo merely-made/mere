@@ -1135,3 +1135,10 @@ Family promotion (2026-10-19): [Foundation family promotion](archive_docs/2026-1
 Mixed-source recall qualification (2026-10-21): the [resident inference plan](archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md#mixed-source-recall-qualification-2026-10-21) records actual published-index lexical/vector/fused explanations and Turnstone's passed four-source headed/cold receiving gate, with generated-reference and exact native-cut limits explicit.
 
 - [Djinn ownership receipt](mere_docs/testing/receipts/2026-10-30_djinn_ownership.md): independent application protocol/lifetime supplier, Mere composition and receiving qualification.
+
+Receipt harnesses (2026-11-04): [Instrument renewal tools](../support/instrument/README.md)
+and [link qualification tools](../support/link-model/README.md) have maintained
+source homes separate from frozen evidence. Both require explicit artifact/site
+inputs and fresh output paths for writers. The locator is
+`Code/testing/mere/receipt-relocation-2026-11-04/batch-07-reader.md`; the existing
+Instrument closure/runtime qualification and active owner work remain separate.

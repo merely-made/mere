@@ -1200,7 +1200,7 @@ lane covers frame/specimen separation, real mode/edit/undo controls, authored CS
 Save/reopen and narrow access. Shared status, stable action focus and admitted
 font fallbacks have portable/CPU checks. Source matrices, captures, failed
 preconditions and explicit runtime releases are preserved in the
-[Instrument qualification](../support/receipts/instrument_workspace_20261012/qualification.json).
+[Instrument qualification](../../../testing/mere/support/receipts/instrument_workspace_20261012/qualification.json).
 This qualifies the shared frame and these two consumers; cross-app domain
 actions and additional entry bindings still require their own actual receipts.
 

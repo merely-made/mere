@@ -248,8 +248,9 @@ S59 archived four plans (Eidetic browsing derivation, redb over OPFS feasibility
 - From: `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:772-773`
 
 ### L5. Receipt homes and executable inputs (2026-11-04)
-Frozen evidence moves to `Code/testing/mere/`; inputs used by current tests or
-verification tools stay in owner-specific `tests/fixtures/`. Every selected
+Frozen evidence moves to `Code/testing/mere/`; fixed inputs used by current tests
+stay in owner-specific `tests/fixtures/`. Artifact verifiers accept explicit
+external evidence roots rather than treating historical outputs as test fixtures. Every selected
 move preserves its source bytes and recorded qualification. Historical JSON,
 archived citations and one-shot procedures keep their captured paths; a separate
 reader map resolves them. Mixed renewal packets stay with their owner until
@@ -258,7 +259,8 @@ their live tools and open repair conditions have a maintained home.
   current readers, explicit writers, LF rules and size exceptions follow its
   actual role; no open condition is lost and remaining owner holds are named.
 - Needs: the packet and fixture manifests under `Code/testing/mere/closure-audit/`;
-  the Instrument renewal harness and Q465 remain with Cambium presentation.
+  maintained Instrument tools are in `support/instrument`, link tools in
+  `support/link-model`; Q465 runtime qualification remains with Cambium presentation.
 - From: the standing receipt-home instruction and the 2026-11-04 closure approval.
 
 ## Open questions
@@ -303,6 +305,7 @@ their live tools and open repair conditions have a maintained home.
 
 - 2026-11-04: adopted the approved dialog-cancellation carry and VDIP whole archive, relocated qualified evidence and executable inputs with their path repairs, and preserved remaining mixed-packet owner holds. Manifests and qualification limits are in `Code/testing/mere/closure-audit/`.
 - 2026-11-04: continued with 55 frozen receipt groups (1,618 tracked files), preserving checkout and canonical Git forms where they differ. Current Mere navigation and two Genet references now use the external homes. Existing browser-family and stack-pillar manifest discrepancies remain disclosed; no historical tools were run. Seven ignored local Cargo inputs remain untouched at their old paths. Instrument renewal/Q465, four cross-importing link-model verifiers, P7 server, ownership-repair output and active owner packets remain held for their actual harness or ownership work; the complete disposition and locator are `Code/testing/mere/closure-audit/batch-06-support-review.json` and `Code/testing/mere/receipt-relocation-2026-11-04/batch-06-reader.md`.
+- 2026-11-04: split the six Instrument renewal tools, four shared link verifiers and P7 server into maintained source homes with explicit paths and fresh-output guards. Close-failure controls are separate from a real browser closure receipt; Q465 is not declared fully qualified. The six unblocked packets move whole, including original tool bytes, to `Code/testing/mere/support/receipts/`. The ownership-repair packet and active owner work remain in place. Batch-07 records byte verification, import/path controls, current navigation and the remaining scope limits.
 
 - 2026-11-04: aligned the renderer pins and tracked locks with Netrender `6364e5d9` and Vello `b4a53486`; focused graph and Sprigging checks are recorded in the archived receipt.
 
