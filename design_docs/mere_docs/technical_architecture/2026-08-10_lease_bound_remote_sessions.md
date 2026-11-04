@@ -16,7 +16,7 @@ and reserves it before application authorization, so reclaim cannot miss a
 session between authorization and worker binding.
 
 **Related**:
-[`../testing/2026-08-10_burn_0_21_baseline.md`](../testing/2026-08-10_burn_0_21_baseline.md),
+[`../testing/2026-08-10_burn_0_21_baseline.md`](../../../../../testing/mere/receipts/relocated-summaries/README.md#2026-08-10_burn_0_21_baseline),
 [`2026-06-30_mesh_lease_scheduler_plan.md`](../../archive_docs/2026-08-09_completed_plans/2026-06-30_mesh_lease_scheduler_plan.md)
 
 M3 gave the mesh one non-negotiable rule: a device's owner can take their
