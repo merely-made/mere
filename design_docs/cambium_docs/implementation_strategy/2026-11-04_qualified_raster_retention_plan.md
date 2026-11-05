@@ -1,13 +1,11 @@
 # Qualified raster retention and native frame receiving
 
-**Status:** 2026-11-05: bounded R2/R3/R5/R6/R7 retain their exact local
-qualification cuts. R8 current-main receiving is active. Mere's 81e receiving
-cut passes 366 native tests, seven changed-example checks and both standalone
-wasm checks. Current-main forward receiving and publication are recorded
-separately below; Isocosm's actual-cohort gates remain pending. No COW or
-pooling is implemented. Complete CPU decomposition, actual GPU duration,
-consistent 60 Hz, broader physical/platform qualification, R4 and conditional
-Didgeridoo retain their scope.
+**Status:** 2026-11-05. R2–R7 retain their fixed-cut qualification. R8
+is complete. All four shared owners and Isocosm `da56ce39` are
+published, with current-cohort native, consumer build and C4 evidence.
+Fresh-query sharing, target pooling, complete CPU/GPU attribution and
+physical 60 Hz remain open. R4 and conditional C5 retain their separate
+scope.
 
 ## Direction and ownership
 
@@ -355,29 +353,28 @@ qualification limits live once in the linked receipt.
 
 ### R8. Integrate the qualified scene/raster source onto main
 
-**Status, 2026-11-05:** active. The Mere owner receiving cut on published
-base `81e39365d` is qualified for its executed native and wasm scope. The
-provider, Netrender and Genet prerequisites are published at the exact
-revisions recorded in the receipt. Mere publication and Isocosm actual-cohort
-receiving remain separate, unfinished R8 steps. Frozen R7 measurements keep
-their own source/SDK identities and do not establish current-main performance.
+**Status, 2026-11-05:** complete. Mere `ad6aaf60` and Isocosm
+`da56ce39` are verified on their remote main branches after separate
+owner and receiving gates. The shared owner check covers 366 native tests,
+seven changed examples and both standalone wasm roots, including the
+affected current-main Graphshell recheck. Isocosm consumes the qualified
+Mere code commit `ad6aaf60`. The documentation follow-up is based on
+`73dfe50a`.
 
-The owner cut passes 366 native tests with zero failures, ignored or filtered
-tests; seven changed examples are checked as four native and three real
-wasm32 targets. Graphshell-web's full default wasm library and Genet-web-smoke
-also pass their actual wasm checks. No Rust fixes were required. The root
-and each standalone workspace resolve the fixed source family through their
-own reviewed bridges; Cargo patches are not inherited across workspaces.
-Smoke's original no-lock state is restored after its bounded, root-seeded
-resolution/check. Graphshell's only additional adopted lock change reorders
-the same ten unused markers, preserving all 1,132 package records.
+The current Isocosm cohort passes 298 native tests and locked release
+checks for VTT, Eponym, Wing and Parry. Four headed C4 runs and four native
+replays agree on saved worlds. All eight decoded scene crops match the
+fresh within-cohort oracle.
 
-A subsequent fetched main advance preserves the staged task source and
-metadata; the affected Graphshell recheck after the nonoverlapping current-main forward advance passes. The owner
-receipt distinguishes the original 81e qualification from that affected
-current-main check. Until the remaining consumer gates and remote publication
-receipts exist, R8 remains active. Source/parse, executed tests, publication
-and consuming-pin adoption are reported separately.
+The native cut includes the restored 14-line `Runtime::synchronize_view`
+method, which adopts the accepted product section before presentation.
+The port contains 61 Rust paths. Resolver receipts identify the later
+consumer lock generations separately from the frozen C4 inputs.
+
+Physical refresh, GPU duration, wider platform qualification and
+ecological persistence require separate evidence. Explicit VTT and Eponym
+staging belongs to R4. C5 Didgeridoo remains conditional. The next planned experiment shares fresh query data and
+attributes more of the draw cost before choosing further resource changes.
 
 Preserve dirty canonical checkouts and every qualified baseline. Inventory
 exact source paths, current fetched main revisions, canonical working-byte
@@ -561,9 +558,13 @@ separately. R4 and conditional C5 remain unchanged.
 - 2026-11-05: the current-main Mere owner cut on 81e passes 366 native tests,
   seven exact changed-example checks and both actual standalone wasm roots,
   with original Smoke lock absence restored. The later nonoverlapping main
-  advance has a separately recorded affected Graphshell check. No current-main
-  headed performance, browser runtime or physical qualification is inferred;
-  Mere publication and Isocosm receiving keep R8 active.
+  advance has a separately recorded affected Graphshell check. The owner
+  publication is verified at `ad6aaf60`.
+
+- 2026-11-05: Isocosm `da56ce39` is verified on remote main after 298
+  native tests, four locked consumer builds, four C4 runs and replays,
+  and eight decoded scene crop checks. The shared and product receipts
+  bind the separate published inputs and observed results. R8 is complete.
 
 ## Frozen R2–R7 working source
 

@@ -1,16 +1,11 @@
 # Qualified raster retention — bounded native qualification
 
-**Status, 2026-11-05:** R2/R3/R5/R6/R7 retain bounded local qualification
-and their exact evidence cuts. R7 identifies a query/draw CPU target without
-an overall speedup claim; no COW or pooling is implemented. R8's Mere owner
-cut on 81e passes 366 native tests, seven changed-example checks and both
-standalone wasm checks. Current-main forward receiving, Mere publication and
-Isocosm actual-cohort qualification remain separately tracked below. R8 is
-active. Complete CPU decomposition, actual GPU duration, consistent 60 Hz,
-R4 and broader physical/platform qualification remain open. Earlier receipt
-sections retain their original cuts. The
+**Status, 2026-11-05:** R2–R7 retain their recorded experimental scope.
+R8 is complete. The four shared owners and Isocosm `da56ce39`
+are published with separate owner, native receiving, consumer build and C4
+receipts. The
 [owner plan](../../implementation_strategy/2026-11-04_qualified_raster_retention_plan.md)
-holds the accepted boundaries and active integration work.
+tracks the remaining performance and platform work.
 
 Retained evidence is under
 `Code/output/mesocosm-scene-composition/2026-11-04/raster-attribution/`.
@@ -1548,12 +1543,33 @@ it binds the owner gates, fixed supplier sources, reuse proof and both
 standalone wasm results. These paths use the same producer-preparation
 evidence root as the owner receipts above.
 
-At this qualification cut Mere publication is pending, and Isocosm's actual
-fixed-M consumer qualification has not run. R8 therefore remains active.
-The newly published Isocosm foreign-family baseline is preserved rather than
-replaced by an arbitrary cohort; source/name/namespace mergers and affected
-consumer gates remain explicit. New-main C4 saves and scene crops must use a
-fresh within-cohort oracle, not an assumed historical R7 hash. R4 VTT/Eponym
-staging, conditional Didgeridoo, query sharing, deeper draw attribution,
-complete CPU/GPU decomposition, physical input/display/AT evidence and
-consistent 60 Hz retain their existing qualification boundaries.
+Mere's verified `ad6aaf60` publication followed the owner-only cut.
+The Isocosm receiving gates and publication follow in their own receipt.
+
+## 2026-11-05 — R8 Isocosm current-cohort receiving and publication
+
+Isocosm `da56ce39c6288be32ae34747db08e6915c39cf81` is verified on remote main. The receiving base is
+`86d07fab` and the build uses the published M/G/N/P owner chain. The
+consumed Mere code is `ad6aaf60ef7fcf869eac6eb313f40064029fded9`. The documentation follow-up uses
+`73dfe50a` as its base.
+
+The current Isocosm cohort passes 298 native tests and locked release
+checks for VTT, Eponym, Wing and Parry. Four headed C4 runs and four native
+replays agree on saved worlds. All eight decoded scene crops match the
+fresh within-cohort oracle.
+
+The product receipt retains the exact consumer commands, release binary,
+native-save and crop identities, the restored Runtime prerequisite, the
+earlier 1,404-file runtime freeze and later lock generations.
+`isocosm/mesocosm/design_docs/archive_docs/receipts/2026-11-04_scene_composition_plan_receipts.md`
+
+The matrix ran with recorded external compiler and desktop contention.
+The observed GPU reports mark timestamp queries unsupported on the tested
+device. Physical refresh, GPU duration, wider platform qualification and
+ecological persistence require separate evidence. Explicit VTT and Eponym
+staging belongs to R4. C5 Didgeridoo remains conditional.
+
+The Isocosm publication receipt is
+`Code/output/mesocosm-scene-composition/2026-11-04/producer-preparation/integration/isocosm-current-qualification-01/publication.json`.
+Mere's owner publication is recorded separately in
+`Code/output/mesocosm-scene-composition/2026-11-04/producer-preparation/integration/mere-current-main-01/publication.json`.
