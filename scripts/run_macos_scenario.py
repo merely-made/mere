@@ -69,7 +69,10 @@ def main():
     arguments = options.args[1:] if options.args[:1] == ["--"] else options.args
     started = time.monotonic()
     timed_out = False
-    with tempfile.TemporaryDirectory(prefix="mesquite-native-") as scratch:
+    owned_pids = set()
+    remaining = []
+    scratch = tempfile.mkdtemp(prefix="mesquite-native-")
+    try:
         app = Path(scratch) / "MesquiteAcceptance.app"
         executable = app / "Contents/MacOS/product"
         executable.parent.mkdir(parents=True)
@@ -92,7 +95,25 @@ def main():
         command += [str(app), "--args", *arguments]
         launch = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         try:
-            stdout, stderr = launch.communicate(timeout=options.timeout)
+            # open -W can return before the app starts on macOS. Keep its
+            # bundle alive until the actual owned executable has exited.
+            while True:
+                listing = subprocess.check_output(["ps", "-axo", "pid=,command="], text=True)
+                remaining = []
+                for line in listing.splitlines():
+                    pid, _, process = line.strip().partition(" ")
+                    if owns_executable(process.lstrip(), executable):
+                        remaining.append(int(pid))
+                        owned_pids.add(int(pid))
+                elapsed = time.monotonic() - started
+                if owned_pids and not remaining and launch.poll() is not None:
+                    break
+                if not owned_pids and elapsed > 5 and launch.poll() is not None:
+                    break
+                if elapsed >= options.timeout:
+                    raise subprocess.TimeoutExpired(command, options.timeout)
+                time.sleep(0.05)
+            stdout, stderr = launch.communicate(timeout=3)
         except subprocess.TimeoutExpired:
             timed_out = True
             # Terminate only this runner's unique executable, not other apps.
@@ -103,6 +124,13 @@ def main():
                 process = process.lstrip()
                 if owns_executable(process, executable):
                     owned.append(int(pid))
+                    # Keep a bounded diagnostic before terminating only this app.
+                    with (output / ("timeout-" + pid + ".sample")).open("x") as sample:
+                        try:
+                            subprocess.run(["/usr/bin/sample", pid, "1", "1"], stdout=sample,
+                                           stderr=subprocess.STDOUT, timeout=3)
+                        except subprocess.TimeoutExpired:
+                            pass
                     try:
                         os.kill(int(pid), 15)
                     except ProcessLookupError:
@@ -117,9 +145,34 @@ def main():
                         pass
                 launch.terminate()
                 stdout, stderr = launch.communicate(timeout=3)
+            deadline = time.monotonic() + 3
+            while True:
+                listing = subprocess.check_output(["ps", "-axo", "pid=,command="], text=True)
+                remaining = [int(line.strip().partition(" ")[0]) for line in listing.splitlines()
+                             if owns_executable(line.strip().partition(" ")[2].lstrip(), executable)]
+                if not remaining:
+                    break
+                for pid in remaining:
+                    try:
+                        os.kill(pid, 9)
+                    except ProcessLookupError:
+                        pass
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("Owned native app remains alive; preserve its bundle: " + str(app))
+                time.sleep(0.05)
+    finally:
+        listing = subprocess.check_output(["ps", "-axo", "pid=,command="], text=True)
+        live = [line.strip() for line in listing.splitlines()
+                if owns_executable(line.strip().partition(" ")[2].lstrip(), executable)]
+        if not live:
+            shutil.rmtree(scratch)
+        (output / "bundle-release.json").write_text(json.dumps({
+            "removed": not live, "remaining": live,
+            "retained_bundle": str(app) if live else None}, indent=2) + "\n")
     (output / "launcher.log").write_text(stdout + stderr)
     result = receipt.read_text() if receipt.exists() else ""
-    success = not timed_out and launch.returncode == 0 and result.splitlines()[:1] == ["RESULT ok"]
+    success = (not timed_out and launch.returncode == 0 and bool(owned_pids)
+               and not remaining and result.splitlines()[:1] == ["RESULT ok"])
     observation = {
         "launch_method": "LaunchServices temporary application bundle",
         "launcher_exit": launch.returncode,
@@ -130,6 +183,8 @@ def main():
         "scenario_sha256": hashlib.sha256(scenario.read_bytes()).hexdigest(),
         "receipt": receipt.name if receipt.exists() else None,
         "captures": len(list(output.glob("*.png"))),
+        "owned_pids_observed": sorted(owned_pids),
+        "owned_pids_remaining": remaining,
     }
     (output / "process.json").write_text(json.dumps(observation, indent=2) + "\n")
     print(json.dumps(observation), flush=True)
