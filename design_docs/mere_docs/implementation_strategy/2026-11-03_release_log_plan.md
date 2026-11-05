@@ -209,21 +209,22 @@ Links: area publishing · amends release-log D10 · plans release-log · summary
   never replaces governed selection with a looser envelope (Knot mesh record).
 - **Snapshot V1 unchanged.** A release names a `PublishedSnapshotV1` digest; it
   doesn't add fields to it. The schema version is never a release counter.
-- **Ownership.** Release record: Stickleback (mechanics) and `mere-site` (site
-  profile). The extracted live LogSync session belongs to Murm's `murm-sync`
+- **Ownership.** Release record: Stickleback (mechanics) and Gemot's
+  `gemot-site` (`gemot/crates/site-model`, site profile; extracted from Mere and
+  Knot and qualified 2026-11-04, gemot `0324688`, mere `f9e8cea64`). The extracted live LogSync session belongs to Murm's `murm-sync`
   (transport consolidation T7); Stickleback retains admission and history.
   The [source homes map](../technical_architecture/2026-10-28_source_homes_map.md#site-and-small-repository-scope-refinement-2026-11-04)
-  scopes the general site domain out of both Mere and Knot; package names here
-  describe current code until that move qualifies. Carriage, discovery adapters, relays and route
+  scopes the general site domain out of both Mere and Knot. Carriage, discovery adapters, relays and route
   diagnostics: Murm. Holder lifecycle: Djinn (`armillary/crates/djinn`) with
   the resident's site and blob owners (`mere/ports/mere-resident`). Release
   intent and wording: Knot. Content capture and provenance: Turnstone's
   engines. Governance meaning and hosting promises: Gemot. Keys: Personae.
 - **Footprint.** The record, reader history and resolver core build with no
   carrier. Each carrier adapter is a default-off feature. Default builds compile
-  no C. Knot's offline profile stays carrier-free. `mere-site`'s `publication`
-  feature pulls Gemot, Personae and Stickleback, so the site-log adapter lives
-  outside it.
+  no C. Knot's offline profile stays carrier-free. The site model lives in the
+  Gemot repository, but its default build needs no Moot membership; the
+  `publication` feature pulls Gemot authority, Personae and Stickleback, so the
+  site-log adapter lives in `site-model`'s default features, outside it (D6).
 - **Hints are not authority.** Provider hints and announces route; the log
   decides. Advertising availability copies no content and grants nothing.
 - **Licence.** Reticulum adapters call retinue's API. Matching announces by a
@@ -284,7 +285,7 @@ Reuse:
 - Stickleback `processor.rs` `OperationPolicy::admit` (`:124`) for the release
   body's policy, `store.rs` `put_blob`/`get_blob` (blake3 `BlobRef`) for content.
 - Stickleback `drop.rs` `DropProtector` and protected drops for sealed payloads.
-- `mere-site` `publication/reader/history.rs` (`ReaderHistory`, P11): refactor it
+- `gemot-site` `publication/reader/history.rs` (`ReaderHistory`, P11): refactor it
   into one store with two adapters. Its compare-and-write, clock high-water
   mark, capacity bound and corrupt-state refusal carry over. The Gemot adapter
   is today's code behind the optional solo-Moot feature (D6); the site-log
@@ -292,7 +293,7 @@ Reuse:
 - Gemot `moot/records/collection.rs` (`authorized_collection`, `CollectionFork`)
   is the second adapter. A solo Moot is a Moot whose founder is the author;
   `constitution/mod.rs:11`'s founder-signed first rule needs no helper.
-- `mere-site` `history.rs` `SiteRevision.sequence` is a local checkpoint
+- `gemot-site` `history.rs` `SiteRevision.sequence` is a local checkpoint
   journal and stays separate from the log sequence.
 
 New: the release body, the site-log adapter, and log-to-Moot lineage (Gemot's
@@ -308,10 +309,11 @@ collection lineage is same-Moot only; cross-Moot lineage is Gemot P3).
 
 ### R3. Carriage over any carrier
 
-- **LogSync over a stream.** A Stickleback session that runs p2panda-sync's
-  `Protocol` over a framed bidirectional stream, so Murm can hand it a stream
-  from any carrier. p2panda-net stays the native iroh path (`synced_space.rs`,
-  `joined_space.rs`). Murm's `session_lane.rs` is the proven pattern for gated
+- **LogSync over a stream.** A `murm-sync` session (`murm/native/crates/sync`,
+  where T7 moved Stickleback's live sessions) that runs p2panda-sync's
+  `Protocol` over a framed bidirectional stream, so any carrier's stream can
+  feed it. p2panda-net stays the native iroh path (`murm-sync`'s
+  `synced_space.rs`, `joined_space.rs`). Murm's `session_lane.rs` is the proven pattern for gated
   carriage off gossip. Stickleback's `object_stream.rs` caps an object at
   64 KiB, so LogSync framing needs its own bound. This moves catch-up sync,
   not iroh gossip; Reticulum keeps its own announce/propagation mechanisms.
@@ -388,7 +390,12 @@ Extend what exists:
 - **Mesh holders:** Outrider's LXMF propagation nodes are a Reticulum
   store-and-forward holder; node peering isn't implemented.
 - **Pools:** relay and holder pools as one stack setting with a visible privacy
-  tier per route. New; only `relay_url` exists today.
+  tier per route. Gemot's
+  `moothold_docs/implementation_strategy/2026-11-03_moot_relay_pools_plan.md`
+  owns moot-operated relay pools (P0–P2 done, with an I2P host-location privacy
+  gate passed for Emissary 0.4.0 and i2pd 3.0.0) and keeps relaying separate
+  from content hosting. R5 adds the personal-mesh pool and the setting that
+  selects among pools; it doesn't build a second relay service.
 
 - Done when: the Knot mesh record's first acceptance gate passes in-process,
   once over iroh and once over a non-iroh carrier; publishing reports
@@ -503,9 +510,12 @@ Existing rules this phase has to answer:
   the model.
 - Errand "does not speak HTTP, on purpose" (`errand/src/lib.rs`). The HTTP
   server needs its own owner; Errand's `serve::Source` trait can feed it.
-- No small-web-to-HTML renderer exists. Parsers exist (Errand
+- Gemot's `site-model` `generate` now writes HTML, Gemtext, Scroll and
+  Markdown from one source (gemot `c218f90`), so a holder can serve HTML
+  generated at publication time for sites authored that way. Translating
+  arbitrary small-web pages to HTML is still new; parsers exist (Errand
   `parse/gemtext.rs`, `parse/scrolltext.rs`; Micron in Turnstone and retinue's
-  NomadNet layer); the renderer is new.
+  NomadNet layer).
 
 An ordinary browser viewing translated HTML does not itself verify the log.
 The gateway states that it verified, using P10/P11's `EvidenceScope` vocabulary,
@@ -531,17 +541,19 @@ repin.
 | Lane | Phases | Repos | Needs |
 |---|---|---|---|
 | fork | R1 | p2panda fork, then every root's manifest | — |
-| record | R2 | eidetic (Stickleback), mere (`mere-site`), gemot for the solo-Moot adapter | — |
-| carriage | R3, R4 resolver | murm (with retinue), eidetic | M12 in the murm runtime plan |
+| record | R2 | eidetic (Stickleback), gemot (`site-model`, and the solo-Moot adapter) | — |
+| carriage | R3, R4 resolver | murm (`murm-sync`, `transport`, retinue), eidetic | M12 in the murm runtime plan |
 | holder | R5 | mere (`mere-resident`), armillary (Djinn), murm | record, carriage |
 | frames | R4 grammar, R6 | turnstone, knot-editor | record |
 | identity | R7 | dramatis (Personae, insigne), murm, mere (fetch) | — |
-| spaces | R8 | gemot, eidetic | — |
+| spaces | R8 | gemot, eidetic | fork, plus an upstream intake |
 | gateway | R9 | a new HTTP owner, mere (`mere-resident`), armillary | holder, identity |
 
 Lanes cost about 30 GiB of build cache each against the shared 400 GiB budget,
-so two or three run at a time. `fork`, `record`, `carriage`, `identity` and
-`spaces` are independent of each other; the fork's last step touches every
+so two or three run at a time. `fork`, `record`, `carriage` and `identity` are
+independent of each other. `spaces` waits for the fork and an upstream intake:
+upstream integrated spaces into its high-level node crate on 2026-11-04, so
+evaluating the 2026-10-13 base would judge an older spaces; the fork's last step touches every
 root's manifest, so it lands between other lanes' merges.
 
 ## Findings
@@ -613,3 +625,7 @@ or a precise reference alone, and no storage migration is selected here.
 - 2026-11-03: D7 (publish the fork as `p2mere-*`) and D8 (coherence across
   transports outranks upstream compatibility) recorded; R1 reopened as the
   fork migration and given the `fork` lane.
+- 2026-11-05: references refreshed after the site extraction to Gemot and T7's
+  `murm-sync`; R5 cites Gemot's relay pools plan; R9 notes `site-model`'s HTML
+  generation; `spaces` now waits for the fork and an upstream intake. Wave 1
+  started: `fork` (R1, up to publishing), `record` (R2), `carriage` (R3).
