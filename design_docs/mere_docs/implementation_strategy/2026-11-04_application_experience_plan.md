@@ -613,14 +613,35 @@ an API being documented is not a passing receiving test.
       - dragging and wheeling the follower's canvas raised no refusal.
     - The `history` grant was made in the test copies for these runs.
   - Open:
-    - Product-level edits in a follower are refused by the host and reported
-      as an error; they are not yet hidden or disabled in the UI.
     - Follower documents, panes and retained content are unavailable rather
-      than read-only.
+      than read-only. Muniment's `IndexedDbBackend` has no read-only handle
+      to give them; one in eidetic would let the panes read and refuse saves.
     - A writer that reloads by itself can lose the lock to a follower polling
       for a vacancy.
     - The side panel as a follower was not inspected in this build.
     - Each refresh reopens the whole session.
+- 2026-11-05, P0 follower UI (Graphshell port; not qualified):
+  - A follower offers nothing that would store a change. It drops session
+    undo and redo, **Add an object**, link and assertion hiding, and
+    assertion withdrawal.
+  - Its details show address, title and tags as text, with **Copy link** and
+    **Open in this browser**.
+  - Its command menu says "Viewing only" and lists storing commands disabled
+    with that reason: domain-truth commands other than opening details, plus
+    saving projections or scenes and opening a codicil. It records no menu
+    choices.
+  - The same refusal guards each storing path behind those controls.
+  - The follower bar moved to the bottom of the page; at the top it covered
+    the document tools strip, including **Open details**.
+  - Checked: the Wasm build, and headed Chromium with a writer and a
+    follower, through the accessibility tree and page screenshots:
+    - the writer kept every control;
+    - the follower lacked them;
+    - the follower's details were read-only;
+    - its menu showed **New node**, undo, redo and **Save scene** disabled.
+  - Open: Firefox was not rerun. Projection editing opens in a follower, and
+    its saves are refused only when tried. The coupling editor's apply is
+    likewise refused, not hidden.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
