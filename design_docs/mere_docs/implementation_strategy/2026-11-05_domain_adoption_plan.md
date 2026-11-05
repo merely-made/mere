@@ -225,8 +225,24 @@ its data reaches a second device.
   derived from the persona, so its conversations can be claimed.
 - **O7. Optional vault protection is available to any domain (D6).** Mark
   confirmed on 2026-11-05 that any domain may add a vault key. Persona sealing
-  remains the base layer for persona-associated data. Vault creation, recovery,
-  unlock and delegation are open design questions.
+  remains the base layer for persona-associated data. Vault creation, recovery
+  and unlock are open design questions.
+
+  **Authority grants (Mark, 2026-11-05).** Use Meadowcap as the model for
+  scoped delegation. An owner can sign a grant naming a recipient, the
+  permitted operations and the covered resources. For example, a grant can
+  let an app read a particular Set in the music mere. If policy permits
+  onward delegation, each signed step can preserve or narrow its parent's
+  authority. The reservoir verifies the chain, the requesting recipient
+  and the requested operation and resource before honoring the grant.
+  [Meadowcap specification](https://willowprotocol.org/specs/meadowcap/)
+
+  Authorization and vault unlock are separate checks. The reservoir can
+  honor a valid grant through its admitted route when custody permits it
+  to open the data. The key stays in custody. Giving another device an
+  independently unlockable offline copy requires a separate decision
+  about key distribution and revocation. The grant format and enforcement
+  design remain open.
 
 ## Findings
 
