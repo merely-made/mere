@@ -1,7 +1,8 @@
 # Release log: carrier-neutral sites, shares and clips
 
-**Status:** 2026-11-04: plan; sharing semantics refined in D9–D11 and R6.
-Nothing implemented by this plan. Phases rescoped 2026-11-03
+**Status:** 2026-11-05: in progress. R2's first slice and R3's stream-sync
+slice landed; R1 is prepared and publishing (see Progress). Sharing semantics
+refined in D9–D11 and R6. Phases rescoped 2026-11-03
 after a redundancy pass over Eidetic, Murm, Gemot, Dramatis, Armillary, Errand,
 Distillery and Mere (Findings, "Redundancy pass"). Design:
 [release_log_brief](../../2026-11-03_release_log_brief.md).
@@ -610,6 +611,61 @@ or a precise reference alone, and no storage migration is selected here.
   small-web-to-HTML renderer exists. netfetcher's `Stores.transport` is the Tor
   fetch seam.
 
+### Wave 1, 2026-11-05
+
+- **R2 edition record.** Stickleback `stickleback::edition` (eidetic `4a5b446`,
+  `a7a1458`): `EditionBody` (kind, `ContentRef`, provenance, `fork_of`, advisory
+  hints, `SealedMarker`) as bounded canonical JSON, `EditionPolicy` on
+  `OperationPolicy::admit`, `verify_edition_chain` (signatures, body hashes,
+  contiguous sequence and backlinks from the key alone; `ForkedSequence`
+  surfaces as `Equivocation`), `EditionWriter` resuming from `author_head`,
+  portable evidence and `EditionChain::resolve_fork`. Rules chosen: `fork_of`
+  only at sequence 0; a Site edition must carry a snapshot reference.
+- **R2 reader history.** gemot-site (gemot `3ed2ba4`, `847b4af`):
+  `remembered.rs` is the one store (an `Authority` trait over P11's
+  compare-and-write, clock high-water mark, capacity bound and corrupt-state
+  refusal) in default features; `site_log.rs` is the site-log adapter;
+  `publication/reader/history.rs` is the Gemot adapter, unchanged on disk
+  (`site-reader/v1/…`; the site log uses `site-log/v1/…`). Default features
+  pull no Gemot authority, iroh, p2panda-net or Murm. Older evidence merges
+  into the remembered chain; rollback refuses only when the offered snapshot
+  belongs to an earlier edition than the merged head. Equivocation is caught
+  only when both branches are held; a cold reader holding one branch can't
+  tell it from the truth.
+- **R2 open.** Log-to-Moot lineage: `CollectionFork` holds a same-Moot
+  `CollectionVersion` parent, so a Moot's first selection naming a log's last
+  edition needs a new Gemot field or record, overlapping Gemot P3's cross-Moot
+  lineage. Untested: the Gemot adapter's rollback and equivocation refusals
+  beyond P10/P11's existing suites, corrupt-state refusal through the site-log
+  adapter, and `EditionPolicy` through `OperationProcessor` rather than `admit`.
+- **Pin cascade.** A Stickleback change moves eidetic, then murm (whose
+  `murm-sync` types appear in Gemot's API), then gemot's root workspace and
+  the separate `site-model` and `site-host` workspaces, which carry their own
+  locks and patch tables (murm `b6bedc30e21`).
+- **R3 stream sync.** murm `418d29a300e` (merged `b6ed4df6189`):
+  `murm-sync` `stream_sync.rs` runs p2panda-sync's `TopicLogSync` without live
+  mode over any framed stream (`stream_codec.rs`: 4-byte length plus CBOR,
+  length checked before buffering; frame ceiling 1 MiB default, 16 MiB hard
+  maximum; one deadline; received operations through `processor_accept`). The
+  messages are the ones p2panda-net sends (D8). `mere-transport`'s default-off
+  `sync-lane` feature adds `SyncLane`, which reserves from the setup gate, runs
+  native or Noise security, applies an owner `allow(peer)` rule and only then
+  syncs. It lives in `transport`, not `murm-sync`, because `transport` already
+  depends on `murm-sync` for the address book. Converges over memory, Noise on
+  loopback TCP, Reticulum and p2panda; `NoiseListener` stays outside
+  `Transport`. The `ReticulumTransport` header now cites RNS 1.5.7.
+- **R3 behaviour.** A forged operation ends the session (p2panda-sync verifies
+  signatures while decoding); a signed out-of-policy operation is declined and
+  the session continues. An operation over the frame ceiling fails the session,
+  so large content belongs on M12's resource carriage. Both ends must agree on
+  the topic beforehand; `TopicLogSync` doesn't exchange it. Received operations
+  pass a 4096-event backlog, and a slow `accept` reports `lagged`, which calls
+  for another round. The gate authorizes the carrier peer; edition authority is
+  the `OperationPolicy`'s. Over Reticulum the expected Noise key differs from
+  the destination identity, so it comes from whoever named the peer.
+- **R3 open.** The 24 MiB snapshot over Reticulum (M12's resource carriage),
+  the R4 resolver and gossip over non-iroh carriers.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -629,3 +685,11 @@ or a precise reference alone, and no storage migration is selected here.
   `murm-sync`; R5 cites Gemot's relay pools plan; R9 notes `site-model`'s HTML
   generation; `spaces` now waits for the fork and an upstream intake. Wave 1
   started: `fork` (R1, up to publishing), `record` (R2), `carriage` (R3).
+- 2026-11-05: wave 1. R2 first slice landed (eidetic `4a5b446`, `a7a1458`;
+  gemot `3ed2ba4`, `847b4af`; murm pin `b6bedc30e21`). R3 stream-sync slice
+  landed (murm `418d29a300e`, `b6ed4df6189`). R1: the fork moved to
+  `merely-made/p2mere` (the old `mark-ik/p2panda` URL redirects), branch
+  `p2mere` at `96d14386` renames eleven packages to `p2mere-*` 0.8.0 with
+  library names unchanged and adds `UPSTREAM.md`; the umbrella publishes as
+  `p2mere` (Mark's call). The umbrella's `tests/api.rs` hung for about ten
+  minutes in four tests and was not checked against the untouched tag.
