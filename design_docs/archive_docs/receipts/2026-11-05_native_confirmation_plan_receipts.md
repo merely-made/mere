@@ -44,3 +44,70 @@ O-PC, maintained target `C:\t\cargo-targets\mere`:
 These are source/host tests on Windows. Linux process integration, the new
 production resident, required local checks and a real desktop owner answer
 remain pending. No S-PC recovery prompt was reopened by these tests.
+
+## 2026-11-05: P1 Linux host and required checks
+
+Published source: `6f542e515aed71785ac3fee8aa9e90afca87e872`.
+Line ceiling, Responsa, `cargo clippy --locked --all-targets` and dependency bans
+all passed on O-PC. Unrelated shared documentation remained outside the commit.
+The explicit vendored path also carries the checked API with Mere when a native
+host receives it as a Git dependency; the root patch alone would not do that.
+
+T-PC, maintained `target` and `target/build`, two Cargo jobs:
+
+- Dialog library: **21 passed** on Linux, including the six command/result cases.
+- Application consent: **4 passed** over the actual local door and owner policy.
+- Native confirmation: **4 passed**, comprising three separate child-process
+  scenarios and their helper entry. Actual `SystemNativeIdentityUi` reaches a
+  synthetic KDialog executable. Backend failure writes no policy, explicit No
+  remains a refusal, and explicit Yes grants only the reviewed declaration.
+  The negative menu default and quoted application name survive the process
+  boundary. This fixture neither opens a real dialog nor grants actual authority.
+
+Before cleaning the temporary qualification patch, all eleven changed source/doc
+blobs matched the published commit exactly. T-PC then fast-forwarded to that
+commit with a clean checkout and unchanged lock. Its normal production resident
+build is separate from the test feature graph. Production hash/interoperability,
+real graphical consent and S-PC receiving remain pending.
+
+## 2026-11-05: replacement production packet and resume preflight
+
+T-PC's clean locked production build at the published source passed with features
+`cxf`, `default`, `personal-sync`; its forbidden-feature/artifact list is empty.
+The test graph's in-process custody and passphrase-FD features are absent. The
+locked graph remained unchanged throughout. Replacement resident: 84862976 bytes,
+SHA-256 `c5387a8854edfd3959f57fcb8b2cb9e71c75403fdba0584fb95775827d77174d`.
+The qualified CLI remains 7509544 bytes, SHA-256
+`23c66b92769a4f32b50e3a9e675afccd86fed9fef988c5bffef026128dd1205c`.
+
+The fresh exact-binary interoperability/no-wallet battery passes **10/10** in
+its unprivileged private user/mount namespace, exit zero. It verifies successful
+CLI use, lock/re-unlock, custody-loss refusal and wallet/persona absence at each
+named stage. Owned fixtures were removed. This is a synthetic runtime result,
+separate from personal adoption, confinement and real graphical consent.
+
+Private fleet records under `testing/dramatis/fleet-policy/s-pc-receiving`:
+
+- `resident-release-build-02.json`: SHA-256
+  `ecaf394f1f1cb6855422cdd8f41696cab918c437490c5290919309bd94405c05`.
+- `production-no-wallet-04.json`: SHA-256
+  `420dacec3c78b13eca2225f4ee31b0ff77dad12126cd62111cba5b59662b123d`.
+- `replacement-qualification-01.json`: SHA-256
+  `19c7264a6ace819864e4d78a013995930af40159a0dde5f9dde72d2b59e65b5b`.
+- `resume/candidate.json`: SHA-256
+  `3c494426892e98b4d1be3590443be8a084292242a4fab99aeb64b820718218e6`.
+
+Compressed delivery was streamed T-PC to O-PC to S-PC in at most 1 MiB controller
+buffers, with no persistent T/controller gzip copy. Both S inputs match exact
+length/hash. Reallocating the record reserve to 1500000 bytes includes private
+resume code/journals while preserving the total 160000000-byte peak cap; the
+controlling raw-pair window is 155472520 bytes. The Dramatis lane owns delivery,
+recovery and complete cross-host accounting.
+
+The reviewed existing-state resume driver has twelve passing synthetic safety
+checks. Its final source is
+`05e30295351bc540d63e9b27afeb088711734a0f48195c0173616a3ff9a4a8ab`;
+installed hash checks precede both native `--help` loaders and resident start.
+Actual noninteractive Windows PowerShell 5 `-VerifyOnly` passes against the
+staged S-PC packet without opening a window. Real target loaders, protected
+recovery inspection, native owner answer and personal receiving remain open.

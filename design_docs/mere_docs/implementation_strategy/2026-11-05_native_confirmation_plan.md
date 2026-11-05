@@ -98,7 +98,7 @@ human-response deadline.
 
 ## Retention
 
-UI receipts have a 200000-byte subcap within the fleet rollout's 1000000-byte
+UI receipts have a 200000-byte subcap within the fleet rollout's 1500000-byte
 record reserve; the shared receiving peak remains 160000000 bytes. Candidate,
 recovery and compressed delivery copies stay in that shared count. Reuse stable
 Cargo targets/build directories, preserve unrelated WIP, and remove only verified
@@ -119,3 +119,12 @@ generated delivery/cache files after their owners have exited.
 - 2026-11-05: reproduced the native backend defect and reviewed the rollback
   evidence. Shared dialog/host repair belongs to this lane; the existing
   auth-controls chat retains S-PC's single native recovery handoff.
+- 2026-11-05: P1 source qualification passed: Windows library/host tests,
+  Linux library/door/native-process integration and all required local hooks.
+  The published fix is `6f542e515`; T-PC's clean production build is in progress.
+  P2 installed-binary gates and P3 real owner admission remain open.
+- 2026-11-05: the clean production resident and unchanged CLI passed the exact
+  ten-check interoperability/no-wallet battery. Verified compressed inputs are
+  staged on S-PC by bounded streaming, with no T/controller archive copies.
+  The final resume driver and read-only PS5 preflight pass; native receiving,
+  target loader acceptance and real owner choice remain open in P3.

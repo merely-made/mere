@@ -645,6 +645,13 @@ summary = "owned resources can restrict audience and delegation; references inhe
 amends = ["release-log D10"]
 plans = ["release-log"]
 
+[decisions."release-log D12"]
+title = "forward secrecy where it fits, bounded durability elsewhere (2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "encryption"
+summary = "forward-secure conversations by default; durable shared data with bounded epoch retention"
+plans = ["release-log"]
+
 [decisions."stack-lift D1"]
 title = "the remote board's mapping lives in `graphshell-host`"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
