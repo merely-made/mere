@@ -1005,7 +1005,7 @@ stack-reduction plan WIP remain outside both publication commits. The
 receipt-only publication repeats the guarded actual full hooks against this
 source revision; prior receipt bytes before H10 are preserved verbatim.
 
-### 2026-11-04: H11 selection
+### 2026-11-04: H11 source qualification
 
 Baseline `263fe560956722a344a6e6fbac04c31e7cee8d98`; fifty new originals across 15 Mere packages. Retained-byte cap 100 MB across H11. One Cargo lane, two jobs, stable shared Mere target. Native and feature baselines precede selected Rust edits.
 
@@ -1149,3 +1149,17 @@ All four configured hooks pass: line ceiling, Responsa, configured all-target
 Clippy and dependency bans. Actual source/receipt commits repeat the full
 run under before/after staged-blob guards. The immutable publication receipt
 records their observed result; per-command hook selection is not persisted.
+
+Published H11 source: `a4f087c1ea00546afc1da4a9c0fc07c2a8f2b09f` (pushed main).
+Its 150 changed paths contain exactly 146 Rust files, the fifty exception
+removals and three canonical docs. All four actual source-commit hooks exit
+zero; both before/after staged-blob guards pass. Every prior receipt byte
+before H11 is preserved. The fifty original paths do not repeat prior
+source-qualification entries.
+
+The same guarded full run qualifies receipt publication. Compact H11
+helper/log/guard transients total 4689291 bytes before that final run,
+within the 100 MB cap; remove them after published-blob verification. The
+stable shared Mere target is reused. No isolated Cargo target, Cargo home or
+worktree is created or retained. Concurrent device-pairing and stack-reduction
+plan WIP remains outside both H11 publication commits.

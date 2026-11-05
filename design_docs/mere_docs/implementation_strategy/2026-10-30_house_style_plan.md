@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-04):** H1-H10 complete; H11 qualifies fifty more splits, awaiting publication. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** H1-H11 complete. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -502,4 +502,13 @@ Each comes back as a question before anything is written.
   its same single feed assertion failure (237/1/0), carried as an owner gate.
   Selected Clippy/docs and all four full repository hooks pass. Public
   facades, private state fields, impl bounds, macros and fixture bytes are
-  preserved. Source publication and its immutable receipt are next.
+  preserved. Published source: `a4f087c1ea00546afc1da4a9c0fc07c2a8f2b09f`; the
+  canonical receipt records the immutable qualification and guarded hooks.
+
+- 2026-11-04: H11 **50/50 landed**, source `a4f087c1e` pushed to main.
+  All fifty originals and 96 children fit; the receipt lists every before/
+  after path and the exact source revision. All native and narrow inventories
+  agree, including the named existing Nematic no-default feed failure.
+  Feature compilation, docs, selected Clippy and configured full/actual hooks
+  pass. Concurrent receiving/browser work and dirty plans are preserved;
+  no isolated build area, Cargo home or worktree is retained.
