@@ -23,6 +23,8 @@ pub enum Effect {
 
 #[derive(Clone, Debug, Default)]
 pub struct Snapshot {
+    /// A view that stores nothing: no control is offered, only the notice.
+    pub read_only: bool,
     pub editing: bool,
     pub dirty: bool,
     pub busy: bool,
@@ -48,6 +50,9 @@ impl WorkbenchEditor {
         !self.effects.is_empty()
     }
     fn permits(&self, effect: Effect) -> bool {
+        if self.snapshot.read_only {
+            return false;
+        }
         match effect {
             Effect::Unlock => !self.snapshot.busy && !self.snapshot.editing,
             Effect::Apply => !self.snapshot.busy && self.snapshot.editing,
@@ -67,6 +72,14 @@ impl WorkbenchEditor {
 pub fn view(editor: &WorkbenchEditor) -> Element {
     let s = &editor.snapshot;
     let mut controls = Vec::<Box<dyn AnyView<WorkbenchEditor, (), GenetCtx, GenetElement>>>::new();
+    if s.read_only {
+        controls.push(Box::new(el("p", s.notice.clone()).attr("role", "status")));
+        return Box::new(
+            el("div", controls)
+                .attr("class", "workbench-editor")
+                .attr("aria-label", "Forme layout controls"),
+        );
+    }
     let toggle = if s.editing {
         Effect::Apply
     } else {
@@ -176,5 +189,28 @@ mod tests {
         });
         editor.push(Effect::Apply);
         assert_eq!(editor.take_effect(), None);
+    }
+
+    #[test]
+    fn a_read_only_snapshot_permits_no_action() {
+        let mut editor = WorkbenchEditor::default();
+        editor.set_snapshot(Snapshot {
+            read_only: true,
+            editing: true,
+            can_undo: true,
+            visible: true,
+            ..Snapshot::default()
+        });
+        for effect in [
+            Effect::Unlock,
+            Effect::Apply,
+            Effect::Discard,
+            Effect::Undo,
+            Effect::Redo,
+            Effect::ToggleVisibility,
+        ] {
+            editor.push(effect);
+        }
+        assert!(!editor.has_effects());
     }
 }
