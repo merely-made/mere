@@ -793,6 +793,24 @@ or a precise reference alone, and no storage migration is selected here.
   untouched main and one on a too-long socket path in a worktree; stale
   `mere-p2panda-net` comments in isocosm and turnstone manifests.
 
+### Wave 3b, 2026-11-05
+
+- **R4 resolver.** Murm crate `murm-resolve` (murm `d73851580a6`) and gemot
+  `cd795b0`. The governed form is `knot://<moot id>.moot/<collection id>/<page>`:
+  `CollectionRef` is a pair and one Moot holds many collections, and a hash of
+  the pair as host would hide the Moot from the reader (lane's choice, not yet
+  Mark's). The address carries no founder; the reader supplies the one it trusts
+  through `ReaderTrust::for_address`. A holder answers held/not-held for a key
+  before sync, so one ALPN serves many logs; the reader admits only editions
+  signed by the address key, refuses hints that lead elsewhere and checks `@`
+  pins. Memory, Noise/TCP hints, p2panda (address-book topic tags; the reader
+  does not `subscribe`, which would announce what it reads) and Reticulum
+  (per-key ALPN, reader binds with `watch_alpns` and never announces) are tested
+  in-process. I2P and onion hints parse but have no adapter. Open: a wildcard
+  Reticulum watch needs announce-name filtering in retinue; a stale holder still
+  verifies, so the result is the newest edition the contacted holders had;
+  governed reads fetch Moot history separately before `verify_reader_evidence`.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -829,3 +847,6 @@ or a precise reference alone, and no storage migration is selected here.
 - 2026-11-05: `p2mere-*` 0.9.0 published (tag `p2mere-0.9.0`, `66904f86`):
   the upstream intake plus the store's SQLite decoupling. The family repin onto
   0.8 landed; moving it to 0.9 waits on Muniment's store-trait update.
+
+- 2026-11-05: wave 3b. R4 resolver landed (gemot `cd795b0`, murm
+  `d73851580a6`); the 0.9 move and D12 lanes are running.
