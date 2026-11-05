@@ -35,6 +35,10 @@ Not here, and cited instead of repeated:
 - sleep hand-off and "last one out": [own-device serving brief](../../2026-10-29_own_device_serving_brief.md) §2.
 - cross-client application profiles, applets, extension-only smolweb retrieval
   and contact/service trust: [portable application experience](../../2026-11-04_portable_application_experience_brief.md).
+- Copy link, the local browser companion and product receiving gates:
+  [application experience plan](2026-11-04_application_experience_plan.md).
+  Its S1 works with existing references; S2/S3 consume this plan's qualified
+  R2/R4/R6 mechanisms rather than introducing another release/share codec.
 
 Receipts from this plan's runs go to
 `archive_docs/receipts/2026-11-03_release_log_plan_receipts.md`, never into this
@@ -391,6 +395,10 @@ Extend what exists:
   "replication pending" until the configured holders acknowledge.
 
 ### R6. Provider, frame and publisher contract
+
+The application experience plan owns Copy link and browser/native receiving
+integration. This phase owns the release/share authority mechanism it consumes;
+it is not a prerequisite for copying an existing external reference.
 
 Turnstone's engines emit clips as releases with provenance; Knot opens a
 release as a frame and publishes. Per D9–D11, a portable link can identify a

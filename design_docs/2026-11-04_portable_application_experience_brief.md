@@ -11,6 +11,9 @@ owns the underlying composition model; the
 [release-log plan](mere_docs/implementation_strategy/2026-11-03_release_log_plan.md)
 owns release identity, verification, retention and carriage. This brief adds
 the user-facing contract across clients, rather than another transport plan.
+**Implementation:** the [application experience plan](mere_docs/implementation_strategy/2026-11-04_application_experience_plan.md)
+starts with portable references and the local browser companion, then gateway
+retrieval and selected owned-release links. Its phases remain unimplemented.
 
 ## 1. The application direction
 
@@ -324,5 +327,6 @@ as separate evidence.
 Open design work: the precise link grammar and bootstrap policy; gateway
 response/credential profile; applet packaging, ABI and upgrade/grant lifecycle;
 supported mobile host profiles; permission presentation; and measured graph
-workload bounds. The existing owner plans remain the implementation homes;
-this ordering does not declare their open phases complete.
+workload bounds. The application experience plan assigns the first integration
+cuts and acceptance gates; existing owner plans retain their mechanisms. This
+ordering does not declare their open phases complete.

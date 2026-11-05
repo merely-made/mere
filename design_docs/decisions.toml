@@ -17,6 +17,14 @@ area = "Stack"
 summary = "Private source and derived-state protection precede further workshop UI completion."
 draws_on = ["stack.1"]
 
+[decisions."application-experience D1"]
+title = "begin with link-first sharing and the browser companion (2026-11-04)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-04_application_experience_plan.md"
+area = "applications"
+summary = "begin with portable links and the browser companion using existing stack owners"
+draws_on = ["release-log D9", "release-log D10", "release-log D11"]
+plans = ["application-experience"]
+
 [decisions."cambium-composition D1"]
 title = "one flat owner table in the pane runner"
 source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
