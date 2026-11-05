@@ -951,6 +951,8 @@ is historical evidence, not the current path or ownership inventory. For the wor
   different sibling file. Retain the extracted module's visibility, with its
   path attribute before the declaration. Keep optional fixture imports inside the fixture
   cohort gated by its actual component, leaving other tests available.
+  Relative includes inside macros follow the invocation's physical file;
+  retain that directory depth when extracting fixture groups.
   Preserve subprocess test entry names when a harness launches them with
   `--exact`; same-module includes can hold cohesive fixture groups without
   changing their lexical module or executable worker identity.
@@ -969,7 +971,7 @@ is historical evidence, not the current path or ownership inventory. For the wor
   full hook run: prek can report those concurrent changes as hook output.
   The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
   records the completed 25-repository rollout, receiving boundaries and
-  the H5-H10 source-split passes.
+  the H5-H11 source-split passes.
   Cargo-deny 0.20.2 always prefetches, including with `--frozen` or
   `--metadata-path`; cached metadata does not avoid its shared Cargo-cache
   lock. Keep graph inputs stable for a complete gate, and wait for other

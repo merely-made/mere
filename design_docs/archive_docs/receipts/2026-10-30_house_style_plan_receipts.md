@@ -1004,3 +1004,148 @@ no isolated target, Cargo home or worktree is created. Device-pairing and
 stack-reduction plan WIP remain outside both publication commits. The
 receipt-only publication repeats the guarded actual full hooks against this
 source revision; prior receipt bytes before H10 are preserved verbatim.
+
+### 2026-11-04: H11 selection
+
+Baseline `263fe560956722a344a6e6fbac04c31e7cee8d98`; fifty new originals across 15 Mere packages. Retained-byte cap 100 MB across H11. One Cargo lane, two jobs, stable shared Mere target. Native and feature baselines precede selected Rust edits.
+
+Packages: `sceno`, `scenograph`, `scenomise`, `scenotime`, `conatus`, `nisus`, `seiche`, `mere-fleece`, `nematic`, `djinn-testkit`, `mere-lanes`, `mere-fetch`, `mere-registry`, `settings-wit`, `tabard`.
+
+Features: `scenograph/editor,scenograph/scripts,scenomise/authoring,scenomise/djot,seiche/serde,mere-fleece/crawl-graph,mere-fleece/clip,mere-fleece/eidetic-bridge,mere-fleece/article,mere-fleece/structured-data,mere-lanes/netfetch,mere-lanes/smolweb,mere-lanes/retained-clips,settings-wit/testkit`. The Conatus resident/Burn and Seiche GPU configurations receive compile checks; physical GPU/headed/cross-platform qualification is separate.
+
+Initial untouched native baseline: 1,368 passed, zero failed, twelve ignored.
+During feature checks another lane advances only the NetRender source cohort
+from `6364e5d9` to `b14e8452bf34e5b5006422bb6f53f4c2e0ab1820` in its lockfiles.
+Two offline launches stop before compiling because the new checkout is not
+cached. A locked receiving run fetches that published revision, then renews
+the native and all eight feature/narrow baselines before H11 Rust edits.
+The receiving lock SHA-256 is `e4533ac49757897090a1b34180e1ef311b8189163560242e6f2bbca7024adeb6`.
+Those foreign lockfile changes are not H11-owned and will not be swept up.
+
+All three feature builds and four of five narrow test runs pass. Nematic's
+no-default baseline has 237 passes and one existing failure:
+`feed::tests::an_entry_address_renders_the_entry_as_its_own_document` expects
+HTML body structure when the HTML fragment engine is disabled. Preserve its
+assertion and require the same post-split inventory; this source pass does
+not claim that optional-configuration product gate is passing.
+
+| Original | Before | After |
+|---|---:|---:|
+| `crates/cambium/scenes/sceno/src/score.rs` | 1043 | 312 |
+| `crates/cambium/scenes/scenograph/src/lib.rs` | 1197 | 508 |
+| `crates/cambium/scenes/scenograph/src/link.rs` | 659 | 407 |
+| `crates/cambium/scenes/scenograph/src/presentation.rs` | 1263 | 568 |
+| `crates/cambium/scenes/scenograph/src/presentation/editor.rs` | 640 | 484 |
+| `crates/cambium/scenes/scenomise/src/authoring.rs` | 854 | 503 |
+| `crates/cambium/scenes/scenomise/src/backdrops.rs` | 1231 | 474 |
+| `crates/cambium/scenes/scenomise/src/catalog.rs` | 976 | 474 |
+| `crates/cambium/scenes/scenomise/src/host_dataset.rs` | 754 | 571 |
+| `crates/cambium/scenes/scenomise/src/opened_link.rs` | 1308 | 573 |
+| `crates/cambium/scenes/scenomise/src/projection.rs` | 1472 | 344 |
+| `crates/cambium/scenes/scenomise/src/relax.rs` | 621 | 339 |
+| `crates/cambium/scenes/scenomise/src/solve.rs` | 868 | 390 |
+| `crates/cambium/scenes/scenotime/src/diff.rs` | 745 | 328 |
+| `crates/conatus/conatus/src/resident/chunk.rs` | 1023 | 522 |
+| `crates/conatus/conatus/src/world.rs` | 969 | 345 |
+| `crates/conatus/nisus/src/lib.rs` | 629 | 447 |
+| `crates/conatus/seiche/src/laws/gravity/diag.rs` | 1410 | 554 |
+| `crates/conatus/seiche/src/lib.rs` | 1062 | 593 |
+| `crates/conatus/seiche/src/runtime.rs` | 958 | 501 |
+| `crates/conatus/seiche/src/runtime/speed/tests.rs` | 769 | 573 |
+| `crates/conatus/seiche/src/scenes.rs` | 760 | 597 |
+| `crates/conatus/seiche/src/spec.rs` | 1139 | 551 |
+| `crates/conatus/seiche/src/spec/raw.rs` | 1110 | 584 |
+| `crates/conatus/seiche/src/spec/tests.rs` | 731 | 458 |
+| `crates/fleece/src/clip.rs` | 841 | 565 |
+| `crates/fleece/src/crawl/tests.rs` | 612 | 455 |
+| `crates/fleece/src/eidetic_bridge.rs` | 1504 | 544 |
+| `crates/nematic/nematic/src/html.rs` | 615 | 541 |
+| `crates/nematic/nematic/src/knot/djot.rs` | 636 | 446 |
+| `crates/nematic/nematic/src/micron/navigation.rs` | 618 | 137 |
+| `crates/nematic/nematic/src/micron/render.rs` | 608 | 503 |
+| `crates/nematic/nematic/src/micron/render/navigation_tests.rs` | 816 | 597 |
+| `crates/nematic/nematic/src/micron/syntax.rs` | 784 | 532 |
+| `crates/system/djinn-testkit/src/resident.rs` | 683 | 558 |
+| `crates/system/djinn-testkit/src/run.rs` | 643 | 595 |
+| `crates/system/document-lanes/src/reader.rs` | 1172 | 527 |
+| `crates/system/document-lanes/src/remote.rs` | 844 | 401 |
+| `crates/system/document-lanes/src/session/navigation_tests.rs` | 650 | 481 |
+| `crates/system/document-lanes/src/smolweb.rs` | 2189 | 470 |
+| `crates/system/document-lanes/src/smolweb/a11y.rs` | 1403 | 464 |
+| `crates/system/fetch/src/actor.rs` | 652 | 558 |
+| `crates/system/fetch/src/actor_tests.rs` | 1116 | 430 |
+| `crates/system/fetch/src/handle.rs` | 615 | 589 |
+| `crates/system/fetch/src/handle_tests.rs` | 799 | 499 |
+| `crates/system/fetch/src/lib.rs` | 1232 | 578 |
+| `crates/system/registry/src/mod_loader/loader/tests.rs` | 647 | 427 |
+| `crates/system/settings-wit/src/testkit.rs` | 612 | 516 |
+| `crates/system/tabard/src/lib.rs` | 993 | 547 |
+| `crates/system/tabard/src/theme/registry.rs` | 614 | 547 |
+
+All fifty originals and 96 extracted Rust children fit, 146 Rust files in
+all; the maximum is 597 physical lines (`seiche/src/scenes.rs`). Fifty exact
+exception records retire; every retained record is unchanged. Public record
+groups keep their existing root exports and serde attributes; private host,
+simulation, reader, fetch and fixture state fields stay with their parents.
+
+The final move audit matches 1,923 function/constant bodies, signatures with
+original impl bounds, all type fields, macro definitions and parameter-record
+macro invocations, and six directly included fixture files. Four Rustfmt-only
+bodies: `timeline_preserves_exact_parallel_antiparallel_and_legacy_references`,
+`a_cell_is_the_nearest_site_rule_made_visible`, `ensure_layout`, and
+`restyling_reflows_without_replacing_source_or_session_state`.
+
+Relative-include fixture macros retain their original physical call-site
+directory: the navigation-table tests and navigation-focus cohort use sibling
+source files with explicit paths. All new child module declarations use
+explicit source-relative paths. Shared helpers retain their original parent
+reach; unused private aliases are removed only after checking other source
+references. Field visibility, literals, assertions, ignores and lint allowances
+do not change.
+
+Post-split native results match all 1,380 target-specific emitted outcomes:
+1,368 passed, zero failed, twelve existing ignores. Normalization removes only
+moved module prefixes and rustdoc source locations; test target identity and
+outcomes are retained. This is software qualification, separate from headed,
+physical GPU and cross-platform acceptance.
+
+The renderer cohort is now independently committed as `8675407b1ab56ca843cca6b21ac685c14dfd8b1f`.
+Its receiving lock bytes match the pre-edit receiving baseline. H11 makes no
+manifest, lockfile, tool-tag, CI, doctrine or CLAUDE.md edits. Concurrent plan
+and link-model work remains outside H11's source and receipt publication.
+
+Post-feature inventories match every baseline target and outcome. The three
+all-target feature checks exit zero (Conatus all-features, Seiche GPU/serde,
+Fetch all-features). No-default test totals (pass/fail/ignore):
+
+| Package | Baseline | Post |
+|---|---|---|
+| Seiche | 209/0/10 | 209/0/10 |
+| Conatus | 0/0/0 | 0/0/0 |
+| Fetch | 23/0/0 | 23/0/0 |
+| Document lanes | 26/0/0 | 26/0/0 |
+| Nematic | 237/1/0 | 237/1/0 |
+
+The same single HTML-disabled feed failure remains outside the split's
+acceptance claim; its source, assertion and ignore state are untouched.
+Twenty-nine unused private aliases are removed after source-reference checks;
+public and restricted facades remain. Final formatting repeats the full move
+audit with the same 1,923 bodies and four formatting-only cases.
+
+Explicit all-target Clippy for the fifteen selected packages and feature set
+exits zero. Their documentation build and Conatus's additional all-feature
+documentation build both exit zero. Warnings are reported without adding
+suppression. New moved documentation resolves its links; existing private
+link warnings remain separate from source qualification.
+
+Main integrates the disjoint browser-companion commits through `7175647bb7a69f6bba8ded3f5621ed85a45dd448`
+before full gates. They change none of H11's selected source or receiving
+lock bytes. Exact exception retirement is 236 to 186, with all retained
+records preserved.
+
+Pre-publication full gates all exit zero: `responsa regen --stage`,
+`responsa check`, `git diff --cached --check` and `prek run --all-files`.
+All four configured hooks pass: line ceiling, Responsa, configured all-target
+Clippy and dependency bans. Actual source/receipt commits repeat the full
+run under before/after staged-blob guards. The immutable publication receipt
+records their observed result; per-command hook selection is not persisted.

@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-04):** H1-H10 complete. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-04):** H1-H10 complete; H11 qualifies fifty more splits, awaiting publication. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -241,6 +241,15 @@ Each comes back as a question before anything is written.
   bytes and feature boundaries. Shared retained cap: 100 MB, compact
   summaries, stable Mere target, two jobs, one own Cargo lane. Frozen goldens
   and giant function factoring stay outside this pass.
+
+- **H11. Seventh fifty-file source pass.** Scene authoring, simulation,
+  document lanes, fetch and support modules in Mere. Retained receipt cap:
+  100 MB across this lane; compact summaries, stable shared Mere target,
+  two Cargo jobs and one own Cargo run. Done when fifty new originals and
+  all children fit, exact exceptions retire, bodies/signatures/impl bounds,
+  public facades, fields, cfg boundaries and included bytes are preserved,
+  baseline/post inventories agree and full/actual hooks pass on publication.
+  GPU feature compilation is separate from physical GPU qualification.
 
 ## Findings
 
@@ -483,3 +492,14 @@ Each comes back as a question before anything is written.
   gates and the exact qualification revision. Concurrent published docs and
   dirty device-pairing/stack-reduction plans are preserved. No isolated build
   area, Cargo home or worktree is retained.
+
+- 2026-11-04: H11 starts **0/50**, from clean selected Rust files at `263fe560956722a344a6e6fbac04c31e7cee8d98`. Existing plan and link-model work is preserved; capture software baselines before source edits.
+
+- 2026-11-04: H11 **50/50 qualified** across fifteen Mere packages. Fifty
+  originals and 96 children fit, maximum 597 physical lines. Exact exceptions
+  retire from 236 to 186. Native results match 1,368 passes, zero failures and
+  twelve ignores. Feature inventories match; Nematic without HTML retains
+  its same single feed assertion failure (237/1/0), carried as an owner gate.
+  Selected Clippy/docs and all four full repository hooks pass. Public
+  facades, private state fields, impl bounds, macros and fixture bytes are
+  preserved. Source publication and its immutable receipt are next.

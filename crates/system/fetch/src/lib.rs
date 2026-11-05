@@ -313,367 +313,6 @@ pub use actor::{
     spawn_fetcher_with_admission, spawn_fetcher_with_policy,
 };
 
-// A write is only ever asked for through the actor.
-#[cfg(all(feature = "smolweb", feature = "actor"))]
-async fn submit_smolweb(
-    submission: SmolwebSubmission,
-    policy: ClientFetchPolicy,
-) -> Result<SubmissionAnswer, FetchFailure> {
-    policy.validate().map_err(FetchFailure::Failed)?;
-    if match &submission {
-        SmolwebSubmission::Titan { body, .. } | SmolwebSubmission::Spartan { body, .. } => {
-            body.len() > policy.max_submission_bytes
-        },
-    } {
-        return Err(FetchFailure::Failed(format!(
-            "submission exceeds the {}-byte cap",
-            policy.max_submission_bytes
-        )));
-    }
-
-    let (url, response) = match submission {
-        SmolwebSubmission::Titan {
-            url,
-            body,
-            mime,
-            token,
-            identity,
-        } => {
-            let options = policy
-                .smolweb_options(
-                    policy.max_submission_response_bytes,
-                    policy.timeout,
-                    body.len(),
-                )
-                .map_err(FetchFailure::Failed)?;
-            let parsed = url::Url::parse(&url)
-                .map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
-            if parsed.scheme() != "titan" {
-                return Err(FetchFailure::Failed(
-                    "Titan submission requires a titan:// URL".to_string(),
-                ));
-            }
-            let exchange = async {
-                match identity
-                    .as_ref()
-                    .filter(|identity| identity.applies_to(&parsed))
-                {
-                    Some(identity) => {
-                        errand::titan_upload_with_identity_and_options(
-                            &parsed,
-                            &body,
-                            &mime,
-                            token.as_deref(),
-                            identity.errand_view(),
-                            &options,
-                        )
-                        .await
-                    },
-                    None => {
-                        errand::titan_upload_with_options(
-                            &parsed,
-                            &body,
-                            &mime,
-                            token.as_deref(),
-                            &options,
-                        )
-                        .await
-                    },
-                }
-            };
-            let response = tokio::time::timeout(policy.timeout, exchange)
-                .await
-                .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
-                .map_err(|error| smolweb_transport_failure(&parsed, error))?;
-            (parsed, response)
-        },
-        SmolwebSubmission::Spartan { url, body } => {
-            let options = policy
-                .smolweb_options(
-                    policy.max_submission_response_bytes,
-                    policy.timeout,
-                    body.len(),
-                )
-                .map_err(FetchFailure::Failed)?;
-            let parsed = url::Url::parse(&url)
-                .map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
-            if parsed.scheme() != "spartan" {
-                return Err(FetchFailure::Failed(
-                    "Spartan submission requires a spartan:// URL".to_string(),
-                ));
-            }
-            let response = tokio::time::timeout(
-                policy.timeout,
-                errand::spartan_submit_with_options(&parsed, &body, &options),
-            )
-            .await
-            .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
-            .map_err(|error| smolweb_transport_failure(&parsed, error))?;
-            (parsed, response)
-        },
-    };
-    smolweb_submission_answer(&url, response)
-}
-
-#[cfg(all(feature = "smolweb", feature = "actor"))]
-fn smolweb_submission_answer(
-    request_url: &url::Url,
-    response: errand::Response,
-) -> Result<SubmissionAnswer, FetchFailure> {
-    match response.status {
-        errand::Status::Success => {
-            let content_type = smolweb_content_type(request_url, &response);
-            let bytes = response.body;
-            let body = String::from_utf8_lossy(&bytes).into_owned();
-            Ok(SubmissionAnswer::Success(Fetched {
-                content_type: Some(content_type),
-                content_disposition: None,
-                bytes,
-                body,
-            }))
-        },
-        errand::Status::Redirect => {
-            let target = request_url
-                .join(&response.meta)
-                .map_err(|error| FetchFailure::Failed(format!("bad redirect target: {error}")))?;
-            if request_url.scheme() == "spartan"
-                && (target.scheme() != "spartan"
-                    || target.host_str() != request_url.host_str()
-                    || target.port_or_known_default() != request_url.port_or_known_default())
-            {
-                return Err(FetchFailure::Failed(
-                    "Spartan redirect crossed its request origin".to_string(),
-                ));
-            }
-            Ok(SubmissionAnswer::Redirect(target.to_string()))
-        },
-        errand::Status::Input => Err(smolweb_input_failure(request_url, &response)),
-        errand::Status::CertRequired => Err(FetchFailure::ClientCertificateRequired {
-            url: request_url.to_string(),
-            prompt: response.meta,
-            code: response.raw_status,
-        }),
-        errand::Status::Failure => Err(FetchFailure::Failed(if response.meta.is_empty() {
-            "submission failed".to_string()
-        } else {
-            response.meta
-        })),
-    }
-}
-
-/// Fetch a page at the default page body cap ([`PAGE_BODY_CAP`]). The page-load and
-/// crawl paths use this; the script `net.fetch` path calls [`fetch_page_capped`] with
-/// a tighter ceiling. `pub(crate)` so the content actor reuses the routing.
-pub async fn fetch_page(url: &str) -> Result<Fetched, String> {
-    fetch_page_capped(url, PAGE_BODY_CAP).await
-}
-
-/// Fetch a page, routing by scheme: smolweb schemes go through [`errand`], every
-/// other (http(s)) address through netfetcher's WHATWG Fetch. `max_bytes` caps the
-/// body while acquiring it, including Errand's buffered protocol paths.
-pub async fn fetch_page_capped(url: &str, max_bytes: usize) -> Result<Fetched, String> {
-    fetch_page_with_policy(
-        url,
-        ClientFetchPolicy {
-            max_page_bytes: max_bytes,
-            ..ClientFetchPolicy::default()
-        },
-    )
-    .await
-}
-
-/// Fetch with host-selected budgets, including one whole-operation deadline.
-pub async fn fetch_page_with_policy(
-    url: &str,
-    policy: ClientFetchPolicy,
-) -> Result<Fetched, String> {
-    fetch_page_interactive_capped(
-        url,
-        policy.max_page_bytes,
-        None,
-        session_stores(),
-        policy,
-        |_, _, _| {},
-    )
-    .await
-    .map_err(|error| error.to_string())
-}
-
-/// Fetch one page while preserving protocol responses that require host
-/// participation. This is actor-facing: ordinary utility callers retain the
-/// terminal `Result<Fetched, String>` contract above.
-async fn fetch_page_interactive_capped<F>(
-    url: &str,
-    max_bytes: usize,
-    identity: Option<&GeminiClientIdentity>,
-    stores: &Stores,
-    policy: ClientFetchPolicy,
-    mut on_progress: F,
-) -> Result<Fetched, FetchFailure>
-where
-    F: FnMut(&url::Url, Option<&str>, &[u8]),
-{
-    policy.validate().map_err(FetchFailure::Failed)?;
-    preflight_read(url)?;
-    let operation = async {
-        #[cfg(not(feature = "smolweb"))]
-        let _ = (identity, &mut on_progress);
-        #[cfg(feature = "smolweb")]
-        if let Some(scheme) = scheme_of(url).and_then(errand::Scheme::parse) {
-            {
-                let log_url = url_without_query(url);
-                tracing::info!(url = %log_url, ?scheme, "smolweb fetch");
-                let mut streamed_bytes = 0_usize;
-                let result = smolweb_fetch(
-                    url,
-                    identity,
-                    max_bytes,
-                    policy,
-                    |response_url, content_type, bytes| {
-                        streamed_bytes = streamed_bytes.saturating_add(bytes.len());
-                        if streamed_bytes <= max_bytes {
-                            on_progress(response_url, content_type, bytes);
-                        }
-                    },
-                )
-                .await
-                .and_then(|fetched| {
-                    if fetched.bytes.len() > max_bytes {
-                        Err(FetchFailure::Failed(format!(
-                            "response exceeds the {max_bytes}-byte cap"
-                        )))
-                    } else {
-                        Ok(fetched)
-                    }
-                });
-                match &result {
-                    Ok(fetched) => tracing::info!(
-                        url = %log_url,
-                        content_type = ?fetched.content_type,
-                        bytes = fetched.bytes.len(),
-                        "smolweb ok",
-                    ),
-                    Err(error) => tracing::warn!(url = %log_url, %error, "smolweb failed"),
-                }
-                return result;
-            }
-        }
-        do_fetch_ua_with_context_observed(
-            url,
-            max_bytes,
-            None,
-            &stores
-                .context()
-                .with_redirect_limit(policy.max_http_redirects),
-            |response_url, content_type, bytes| {
-                on_progress(response_url, content_type, bytes);
-            },
-        )
-        .await
-        .map_err(FetchFailure::Failed)
-    };
-    tokio::time::timeout(policy.timeout, operation)
-        .await
-        .map_err(|_| FetchFailure::Failed(request_timeout_message(policy.timeout)))?
-}
-
-fn request_timeout_message(timeout: Duration) -> String {
-    format!("request timed out after {}ms", timeout.as_millis())
-}
-
-fn preflight_read(url: &str) -> Result<(), FetchFailure> {
-    let parsed =
-        url::Url::parse(url).map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
-    #[cfg(feature = "smolweb")]
-    if is_smolweb(url) {
-        if let Err(error) = admit_smolweb_read(&parsed) {
-            let log_url = url_without_query(url);
-            tracing::info!(url = %log_url, scheme = %parsed.scheme(), "smolweb fetch");
-            tracing::warn!(url = %log_url, %error, "smolweb failed");
-            return Err(error);
-        }
-        return Ok(());
-    }
-    if matches!(parsed.scheme(), "http" | "https") {
-        Ok(())
-    } else {
-        Err(FetchFailure::Failed(format!(
-            "unsupported fetch scheme: {}",
-            parsed.scheme()
-        )))
-    }
-}
-
-#[cfg(feature = "smolweb")]
-fn admit_smolweb_read(current: &url::Url) -> Result<(), FetchFailure> {
-    match current.scheme() {
-        "titan" => Err(FetchFailure::Failed(
-            "Titan uploads require explicit Submit".into(),
-        )),
-        "spartan" if current.query().is_some() => Err(FetchFailure::Failed(
-            "Spartan submissions require explicit Submit".into(),
-        )),
-        _ => Ok(()),
-    }
-}
-
-#[cfg(feature = "smolweb")]
-fn url_without_query(raw: &str) -> String {
-    url::Url::parse(raw)
-        .map(|mut parsed| {
-            // Diagnostic copy only: never retain URL credentials or Titan's
-            // upload parameters in a read-attempt trace.
-            let _ = parsed.set_password(None);
-            let _ = parsed.set_username("");
-            if parsed.scheme() == "titan"
-                && let Some((path, _)) = parsed.path().split_once(';')
-            {
-                let path = path.to_string();
-                parsed.set_path(&path);
-            }
-            parsed.set_query(None);
-            parsed.set_fragment(None);
-            parsed.to_string()
-        })
-        .unwrap_or_else(|_| "<invalid-url>".to_string())
-}
-
-/// Fetch a page without the browser session's cookie jar or other installed
-/// authenticated HTTP state. Effect providers use this path so resolving a
-/// transclusion cannot silently borrow the user's browsing authority.
-///
-/// Smolweb requests use errand's process-level trust store. A host that admits
-/// Gemini should install one explicitly with
-/// [`install_in_memory_smolweb_tofu`] or its own durable store.
-pub async fn fetch_page_anonymous_capped(url: &str, max_bytes: usize) -> Result<Fetched, String> {
-    fetch_page_anonymous_with_policy(
-        url,
-        ClientFetchPolicy {
-            max_page_bytes: max_bytes,
-            ..ClientFetchPolicy::default()
-        },
-    )
-    .await
-}
-
-pub async fn fetch_page_anonymous_with_policy(
-    url: &str,
-    policy: ClientFetchPolicy,
-) -> Result<Fetched, String> {
-    policy.validate()?;
-    preflight_read(url).map_err(|error| error.to_string())?;
-    if is_smolweb(url) {
-        return fetch_page_with_policy(url, policy).await;
-    }
-    let cx = netfetcher::FetchContext::permissive().with_redirect_limit(policy.max_http_redirects);
-    tokio::time::timeout(
-        policy.timeout,
-        do_fetch_ua_with_context(url, policy.max_page_bytes, None, &cx),
-    )
-    .await
-    .map_err(|_| request_timeout_message(policy.timeout))?
-}
-
 /// Pin Gemini certificates for the lifetime of this process. This is stronger
 /// than errand's permissive default, but it deliberately makes no restart
 /// durability claim; a host with durable trust state should install its own
@@ -717,182 +356,6 @@ pub async fn fetch_page_crawler_with_policy(
     )
     .await
     .map_err(|_| request_timeout_message(policy.timeout))?
-}
-
-/// Fetch a smolweb URL through [`errand`], following redirects up to
-/// the caller's redirect budget, and fold the response into a [`Fetched`] the nematic engines
-/// render. Input and certificate statuses stay typed so the host can continue
-/// the protocol conversation; terminal failures remain displayable prose.
-#[cfg(feature = "smolweb")]
-async fn smolweb_fetch<F>(
-    url: &str,
-    identity: Option<&GeminiClientIdentity>,
-    max_bytes: usize,
-    policy: ClientFetchPolicy,
-    mut on_progress: F,
-) -> Result<Fetched, FetchFailure>
-where
-    F: FnMut(&url::Url, Option<&str>, &[u8]),
-{
-    let (current, response) =
-        smolweb_fetch_response(url, identity, max_bytes, policy, &mut on_progress).await?;
-    let content_type = smolweb_content_type(&current, &response);
-    let bytes = response.body;
-    let body = String::from_utf8_lossy(&bytes).into_owned();
-    Ok(Fetched {
-        content_type: Some(content_type),
-        content_disposition: None,
-        bytes,
-        body,
-    })
-}
-
-/// Fetch a successful smolweb response without decoding its body. Page loads
-/// and binary subresources share redirect, timeout, certificate, and protocol
-/// status handling through this one path.
-/// Titan targets and Spartan URLs with any query component (including an empty
-/// `?`) require explicit Submit. Reads refuse these before transport at every
-/// redirect hop, rather than sending an upload through ordinary acquisition.
-#[cfg(feature = "smolweb")]
-async fn smolweb_fetch_response<F>(
-    url: &str,
-    identity: Option<&GeminiClientIdentity>,
-    max_bytes: usize,
-    policy: ClientFetchPolicy,
-    on_progress: &mut F,
-) -> Result<(url::Url, errand::Response), FetchFailure>
-where
-    F: FnMut(&url::Url, Option<&str>, &[u8]),
-{
-    let mut current =
-        url::Url::parse(url).map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
-    let deadline = tokio::time::Instant::now()
-        .checked_add(policy.timeout)
-        .ok_or_else(|| FetchFailure::Failed("client request deadline overflow".into()))?;
-    for _ in 0..=policy.max_redirects {
-        // These exchanges have submission semantics even with an empty body.
-        // Check every redirect before transport, so read acquisition never
-        // borrows the authority of the separate explicit Submit command.
-        admit_smolweb_read(&current)?;
-        let response_url = current.clone();
-        let remaining = deadline.saturating_duration_since(tokio::time::Instant::now());
-        if remaining.is_zero() {
-            return Err(FetchFailure::Failed(request_timeout_message(
-                policy.timeout,
-            )));
-        }
-        let options = policy
-            .smolweb_options(max_bytes, remaining, 0)
-            .map_err(FetchFailure::Failed)?;
-        let response = if current.scheme() == "gemini" {
-            match identity.filter(|identity| identity.applies_to(&current)) {
-                Some(identity) => {
-                    errand::fetch_gemini_url_streaming_with_identity_and_options(
-                        &current,
-                        Some(identity.errand_view()),
-                        &options,
-                        |chunk| on_progress(&response_url, chunk.content_type, chunk.bytes),
-                    )
-                    .await
-                },
-                None => {
-                    errand::fetch_gemini_url_streaming_with_options(&current, &options, |chunk| {
-                        on_progress(&response_url, chunk.content_type, chunk.bytes)
-                    })
-                    .await
-                },
-            }
-        } else {
-            match identity.filter(|identity| identity.applies_to(&current)) {
-                Some(identity) => {
-                    errand::fetch_url_with_identity_and_options(
-                        &current,
-                        Some(identity.errand_view()),
-                        &options,
-                    )
-                    .await
-                },
-                None => errand::fetch_url_with_options(&current, &options).await,
-            }
-        }
-        .map_err(|error| smolweb_transport_failure(&current, error))?;
-        match response.status {
-            errand::Status::Success => {
-                return Ok((current, response));
-            },
-            errand::Status::Redirect => {
-                current = current.join(&response.meta).map_err(|error| {
-                    FetchFailure::Failed(format!("bad redirect target: {error}"))
-                })?;
-            },
-            errand::Status::Input => {
-                return Err(smolweb_input_failure(&current, &response));
-            },
-            errand::Status::CertRequired => {
-                return Err(FetchFailure::ClientCertificateRequired {
-                    url: current.to_string(),
-                    prompt: response.meta,
-                    code: response.raw_status,
-                });
-            },
-            errand::Status::Failure => {
-                return Err(FetchFailure::Failed(if response.meta.is_empty() {
-                    "request failed".to_string()
-                } else {
-                    response.meta
-                }));
-            },
-        }
-    }
-    Err(FetchFailure::Failed("too many redirects".to_string()))
-}
-
-#[cfg(feature = "smolweb")]
-fn smolweb_transport_failure(current: &url::Url, error: errand::Error) -> FetchFailure {
-    match error {
-        errand::Error::CertificateChanged { host, pinned, seen } => {
-            FetchFailure::CertificateChanged {
-                url: current.to_string(),
-                target: host,
-                pinned,
-                seen,
-            }
-        },
-        error => FetchFailure::Failed(error.to_string()),
-    }
-}
-
-#[cfg(feature = "smolweb")]
-fn smolweb_input_failure(current: &url::Url, response: &errand::Response) -> FetchFailure {
-    FetchFailure::InputRequired {
-        url: current.to_string(),
-        prompt: response.meta.clone(),
-        // Gemini status 11 is the sensitive-input form. Other protocols
-        // currently expose only an ordinary input code.
-        sensitive: response.raw_status == Some(11),
-    }
-}
-
-/// The content-type to render a smolweb response under, in nematic's vocabulary.
-/// Most schemes carry their own media type (gemini/spartan `text/gemini`, a gopher
-/// menu `application/gopher-menu`, a gopher text file `text/plain`); finger has no
-/// type of its own, so it is tagged `text/x-finger` to reach the finger engine.
-#[cfg(feature = "smolweb")]
-fn smolweb_content_type(url: &url::Url, response: &errand::Response) -> String {
-    match errand::Scheme::parse(url.scheme()) {
-        // Protocols whose content type must be fixed regardless of the response
-        // meta field, so the host routes to the correct nematic engine.
-        Some(errand::Scheme::Finger) => "text/x-finger".to_string(),
-        Some(errand::Scheme::Nex) => "application/x-nex".to_string(),
-        Some(errand::Scheme::Guppy) => "application/x-guppy".to_string(),
-        Some(errand::Scheme::Titan) => "application/x-titan".to_string(),
-        // MIME routing strips parameters only when it compares types. Keep the
-        // complete success value here so response language/charset survive the
-        // host's existing content_type seam.
-        _ => response
-            .mime()
-            .map_or_else(|| "text/gemini".to_string(), |_| response.meta.clone()),
-    }
 }
 
 mod cookies;
@@ -1052,177 +515,8 @@ mod tests;
 mod client_limits_tests;
 
 #[cfg(all(test, not(target_arch = "wasm32")))]
-mod http_progress_tests {
-    use super::do_fetch_ua_with_context_observed;
-
-    #[tokio::test]
-    async fn http_redirect_reports_final_url_and_complete_body_before_return() {
-        let mut server = mockito::Server::new_async().await;
-        let redirect = server
-            .mock("GET", "/start")
-            .with_status(302)
-            .with_header("location", "/final")
-            .expect(1)
-            .create_async()
-            .await;
-        let final_response = server
-            .mock("GET", "/final")
-            .with_status(200)
-            .with_header("content-type", "text/html; charset=utf-8")
-            .with_body("redirected page")
-            .expect(1)
-            .create_async()
-            .await;
-        let context = netfetcher::FetchContext::permissive();
-        let mut events = Vec::new();
-        let mut reported = Vec::new();
-        let fetched = do_fetch_ua_with_context_observed(
-            &format!("{}/start", server.url()),
-            64,
-            None,
-            &context,
-            |response_url, content_type, bytes| {
-                events.push("complete-body");
-                reported.push((
-                    response_url.to_string(),
-                    content_type.map(str::to_owned),
-                    bytes.to_vec(),
-                ));
-            },
-        )
-        .await
-        .expect("redirected HTTP page fetch");
-
-        assert_eq!(fetched.bytes, b"redirected page");
-        assert_eq!(
-            reported,
-            vec![(
-                format!("{}/final", server.url()),
-                Some("text/html; charset=utf-8".to_owned()),
-                b"redirected page".to_vec(),
-            )]
-        );
-        events.push("terminal-outcome");
-        assert_eq!(events, ["complete-body", "terminal-outcome"]);
-        redirect.assert_async().await;
-        final_response.assert_async().await;
-    }
-
-    #[tokio::test]
-    async fn http_body_cap_failure_does_not_report_complete_source() {
-        let mut server = mockito::Server::new_async().await;
-        let response = server
-            .mock("GET", "/large")
-            .with_status(200)
-            .with_body("larger than cap")
-            .expect(1)
-            .create_async()
-            .await;
-        let context = netfetcher::FetchContext::permissive();
-        let mut progress = Vec::new();
-        let result = do_fetch_ua_with_context_observed(
-            &format!("{}/large", server.url()),
-            4,
-            None,
-            &context,
-            |response_url, content_type, bytes| {
-                progress.push((
-                    response_url.to_string(),
-                    content_type.map(str::to_owned),
-                    bytes.to_vec(),
-                ));
-            },
-        )
-        .await;
-
-        assert!(result.unwrap_err().contains("4-byte cap"));
-        assert!(
-            progress.is_empty(),
-            "partial bytes are not a completed source"
-        );
-        response.assert_async().await;
-    }
-
-    #[tokio::test]
-    async fn html_attachment_is_returned_without_streaming_as_a_document() {
-        let mut server = mockito::Server::new_async().await;
-        let response = server
-            .mock("GET", "/download")
-            .with_status(200)
-            .with_header("content-type", "text/html")
-            .with_header("content-disposition", "attachment; filename=page.html")
-            .with_body("downloaded bytes")
-            .expect(1)
-            .create_async()
-            .await;
-        let context = netfetcher::FetchContext::permissive();
-        let mut progress = Vec::new();
-        let fetched = do_fetch_ua_with_context_observed(
-            &format!("{}/download", server.url()),
-            64,
-            None,
-            &context,
-            |response_url, content_type, bytes| {
-                progress.push((
-                    response_url.to_string(),
-                    content_type.map(str::to_owned),
-                    bytes.to_vec(),
-                ));
-            },
-        )
-        .await
-        .expect("HTTP attachment fetch");
-
-        assert_eq!(fetched.bytes, b"downloaded bytes");
-        assert_eq!(
-            fetched.content_disposition.as_deref(),
-            Some("attachment; filename=page.html")
-        );
-        assert!(
-            progress.is_empty(),
-            "attachments are not streamed documents"
-        );
-        response.assert_async().await;
-    }
-
-    #[tokio::test]
-    async fn nonredirect_http_success_reports_final_url_and_body_once() {
-        let mut server = mockito::Server::new_async().await;
-        let response = server
-            .mock("GET", "/page")
-            .with_status(200)
-            .with_header("content-type", "text/plain")
-            .with_body("plain page")
-            .expect(1)
-            .create_async()
-            .await;
-        let requested_url = format!("{}/page", server.url());
-        let context = netfetcher::FetchContext::permissive();
-        let mut progress = Vec::new();
-        let fetched = do_fetch_ua_with_context_observed(
-            &requested_url,
-            64,
-            None,
-            &context,
-            |response_url, content_type, bytes| {
-                progress.push((
-                    response_url.to_string(),
-                    content_type.map(str::to_owned),
-                    bytes.to_vec(),
-                ));
-            },
-        )
-        .await
-        .expect("HTTP page fetch");
-
-        assert_eq!(fetched.bytes, b"plain page");
-        assert_eq!(progress.len(), 1);
-        assert_eq!(progress[0].0, requested_url);
-        assert_eq!(progress[0].1.as_deref(), Some("text/plain"));
-        assert_eq!(progress[0].2, b"plain page");
-        response.assert_async().await;
-    }
-}
+#[path = "http_progress_tests.rs"]
+mod http_progress_tests;
 
 #[cfg(all(feature = "https-blobs", not(target_arch = "wasm32")))]
 pub mod https_blob;
@@ -1230,3 +524,55 @@ pub mod https_blob;
 pub mod iroh_blob;
 
 pub mod crawler;
+
+#[path = "submission.rs"]
+mod submission;
+
+#[cfg(all(feature = "smolweb", feature = "actor"))]
+use submission::submit_smolweb;
+
+#[cfg(all(feature = "smolweb", feature = "actor"))]
+use submission::smolweb_submission_answer;
+
+#[path = "page.rs"]
+mod page;
+
+pub use page::fetch_page;
+
+pub use page::fetch_page_capped;
+
+pub use page::fetch_page_with_policy;
+
+use page::fetch_page_interactive_capped;
+
+use page::request_timeout_message;
+
+use page::preflight_read;
+
+#[cfg(feature = "smolweb")]
+use page::admit_smolweb_read;
+
+#[cfg(feature = "smolweb")]
+use page::url_without_query;
+
+pub use page::fetch_page_anonymous_capped;
+
+pub use page::fetch_page_anonymous_with_policy;
+
+#[path = "smolweb_response.rs"]
+mod smolweb_response;
+
+#[cfg(feature = "smolweb")]
+use smolweb_response::smolweb_fetch;
+
+#[cfg(feature = "smolweb")]
+use smolweb_response::smolweb_fetch_response;
+
+#[cfg(feature = "smolweb")]
+use smolweb_response::smolweb_transport_failure;
+
+#[cfg(feature = "smolweb")]
+use smolweb_response::smolweb_input_failure;
+
+#[cfg(feature = "smolweb")]
+use smolweb_response::smolweb_content_type;
