@@ -1,8 +1,8 @@
 # Domain adoption: every application's data in the reservoir
 
 **Status:** 2026-11-05: opened as a draft for Mark's review. Nothing is
-scheduled. D1 to D6 are ruled; D4 carries one proposed condition. Everything
-else marked *proposed* waits for a ruling. Only Cleromancy is in the reservoir
+scheduled. D1 to D6 are ruled, including reservoir custody of Knot's
+operation store. Everything marked *proposed* waits for a ruling. Only Cleromancy is in the reservoir
 today.
 
 **For:** moving each family application's own data into a mere of the
@@ -66,12 +66,11 @@ transport, in one conversations mere
 
 Answering O2: "a notes domain sounds like a good target for clips. but why
 can't that be knot's operation store?" It can. The `notes` domain is backed by
-Knot's Stickleback operation store, and clips land there. *Proposed
-condition:* the reservoir store holds it (D1), not Knot's own process, so
-other applications reach it through `mere/notes` and Knot's operation
-semantics serve as its validator. Otherwise it would be a second durable
-owner, which the reservoir's no-bypass constraint refuses. Stickleback is also
-the carrier M4 names for replication, so the store's shape already suits it.
+Knot's Stickleback operation store, and clips land there. Mark confirmed
+on 2026-11-05 that the reservoir holds the operation store under D1.
+Applications, including Knot, reach it through `mere/notes`. Knot supplies
+the operation semantics for validation. The reservoir owns durable admission
+and store lifetimes.
 
 Links: answers O2 · summary notes and clips live in Knot's operation store,
 held by the reservoir store
@@ -196,7 +195,7 @@ fetched when opened and an eviction budget per device.
 | Hocket | `music`, shared with Woodshed (D5) | Projects: session, history DAG, media | Audio device | Best: UUIDs, content-hashed media, mergeable history | `hocket-model` (`ProjectBundle::validate`) | Unsealed today; no node authorship |
 | Redshank | `listening` | Library, subscriptions, notes and voice notes, progress, pins, transcripts | Enclosure cache, budget, volume, rate | Weak: timestamp note ids, whole-model JSON | `redshank-model` (pure, typed errors) | Unsealed; id scheme |
 | Ringdown | none of its own | Presets and bindings ride Woodshed's settings | BLE pairing, MIDI ports | Positional bank slots | `ringdown` profile checks | Instrument has no read-back |
-| Knot Editor | `notes`, backed by its operation store (D4) | Sealed document vault, retained captures, clips and relations | Search index, file catalog, `knot-sync.json` writers | Stable ids with revisions | `knot-document` and its operation semantics | Resident holding of the operation store (D4 condition) |
+| Knot Editor | `notes`, backed by its operation store (D4) | Sealed document vault, retained captures, clips and relations | Search index, file catalog, `knot-sync.json` writers | Stable ids with revisions | `knot-document` and its operation semantics | Integrate the operation store into the reservoir (D4) |
 | Turnstone | `browsing` | Session graphs, trails, recycle bin, retained clips | Cookies (persona custody), windows, workbench, page bytes over budget | UUID sessions; no domain crate | New work | Generic graph needs a validator |
 | Signalman / Murm | `conversations` (D3) | Every conversation linked to the identity or a derived identity, any transport; contacts | Radio and device journals, station grants, channel keys | Journal-counter ids | `message.rs` read model, maybe | No persistence home yet for `shell/comms`; cross-transport identity linking |
 | Isocosm | `worlds` for personal saves | Mesocosm and Eponym saves; a GM's own secrets | Session network state | Pure `isocosm-core`; revisions unclear | `isocosm-core` | Campaign retirement plan F3 |
