@@ -63,6 +63,21 @@ impl SystemNativeIdentityUi {
             .ok_or(NativeIdentityFailure::UiUnavailable)
     }
 
+    fn confirmation(&self, title: &str, message: &str) -> Result<bool, NativeIdentityFailure> {
+        self.require_graphical_backend()?;
+        let dialog = light_file_dialog::dialog::MessageBox::new(title, message)
+            .buttons(light_file_dialog::MessageBoxType::YesNo)
+            .default_button(if cfg!(windows) { 1 } else { 0 });
+        #[cfg(target_os = "linux")]
+        let answer = dialog.try_show().map_err(|error| {
+            tracing::warn!(%error, "native confirmation supplied no decision");
+            NativeIdentityFailure::UiUnavailable
+        })?;
+        #[cfg(not(target_os = "linux"))]
+        let answer = dialog.show();
+        Ok(answer == light_file_dialog::MessageBoxButton::Ok)
+    }
+
     fn password_input(
         &self,
         title: &str,
@@ -160,7 +175,6 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
         decision: personae::signing::SigningDecision,
     ) -> Result<bool, NativeIdentityFailure> {
         use personae::signing::{RememberApproval, SigningDecision};
-        self.require_graphical_backend()?;
         let clean = |text: &str| {
             text.chars()
                 .filter(|c| !c.is_control())
@@ -197,27 +211,14 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
             clean(&request.payload_digest),
             scope,
         );
-        Ok(
-            light_file_dialog::dialog::MessageBox::new("Djinn · Signing confirmation", &message)
-                .buttons(light_file_dialog::MessageBoxType::YesNo)
-                .default_button(if cfg!(windows) { 1 } else { 0 })
-                .show()
-                == light_file_dialog::MessageBoxButton::Ok,
-        )
+        self.confirmation("Djinn · Signing confirmation", &message)
     }
     fn confirm_application(&self, app: &str, grant: &str) -> Result<bool, NativeIdentityFailure> {
-        self.require_graphical_backend()?;
         let app: String = app.chars().filter(|c| !c.is_control()).take(64).collect();
         let message = format!(
             "An application named \"{app}\" asks for:\n\n{grant}\n\nAllow it? Djinn remembers the answer."
         );
-        Ok(
-            light_file_dialog::dialog::MessageBox::new("Djinn · New application", &message)
-                .buttons(light_file_dialog::MessageBoxType::YesNo)
-                .default_button(if cfg!(windows) { 1 } else { 0 })
-                .show()
-                == light_file_dialog::MessageBoxButton::Ok,
-        )
+        self.confirmation("Djinn · New application", &message)
     }
     fn confirm_quarantine(
         &self,
@@ -237,14 +238,7 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
         let message = format!(
             "Persona: {profile}\nReview: {title}\n\n{question}\nThis decision is made by Djinn."
         );
-        Ok(
-            light_file_dialog::dialog::MessageBox::new("Djinn · Quarantine review", &message)
-                .buttons(light_file_dialog::MessageBoxType::YesNo)
-                // Windows indexes visible buttons; Unix backends use 0 for No.
-                .default_button(if cfg!(windows) { 1 } else { 0 })
-                .show()
-                == light_file_dialog::MessageBoxButton::Ok,
-        )
+        self.confirmation("Djinn · Quarantine review", &message)
     }
     fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure> {
         self.require_graphical_backend()?;

@@ -79,6 +79,15 @@ impl MessageBox {
         self.default_button = button;
         self
     }
+
+    /// Show a checked Linux graphical confirmation. Only an explicit successful
+    /// choice is an answer; cancellation/backend failure returns an error.
+    #[cfg(target_os = "linux")]
+    pub fn try_show(self) -> Result<MessageBoxButton, crate::MessageBoxError> {
+        crate::linux_confirmation::show(
+            &self.title, &self.message, self.buttons, self.icon, self.default_button,
+        )
+    }
 }
 
 impl Dialog for MessageBox {
