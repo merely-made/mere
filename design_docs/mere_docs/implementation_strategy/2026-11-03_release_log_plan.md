@@ -781,6 +781,18 @@ or a precise reference alone, and no storage migration is selected here.
   implementation of the six store traits `Manager` needs is the first step; the
   probe's `MapStore` is a sketch.
 
+- **Repin.** Every root moved to `p2mere-*` 0.8 under the old dependency keys
+  (eidetic `1fcdb35`, murm `bc82e1aa92e`, gemot `c9e5ebf`, esp `3e97257`,
+  knot-editor `6ea3ce2`, cleromancy `7e0f5ba`, mere `8b8caef`, turnstone
+  `cc9cc6d2`, isocosm `86d07fab`, merelyllc.com `b8cb629`); no root resolves
+  `p2panda-core`. Frozen receipt harnesses keep their `mark-ik/p2panda` tags by
+  rule. Left open: Mere holds cleromancy-core at `8cc4f83` and the old genet and
+  netrender revisions, because current genet pins vello by exact rev under new
+  package names (a render-stack refresh, not this plan's); three
+  `mere-resident` lib tests fail, one (`ActionNotOffered`) identically on
+  untouched main and one on a too-long socket path in a worktree; stale
+  `mere-p2panda-net` comments in isocosm and turnstone manifests.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -814,3 +826,6 @@ or a precise reference alone, and no storage migration is selected here.
 - 2026-11-05: D12 recorded (forward-secure conversations, bounded durable
   data). R8 intake and evaluation recorded; 0.9.0 prepared with the store's
   SQLite coupling removed.
+- 2026-11-05: `p2mere-*` 0.9.0 published (tag `p2mere-0.9.0`, `66904f86`):
+  the upstream intake plus the store's SQLite decoupling. The family repin onto
+  0.8 landed; moving it to 0.9 waits on Muniment's store-trait update.
