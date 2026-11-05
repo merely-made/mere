@@ -529,6 +529,24 @@ an API being documented is not a passing receiving test.
     clipped by the controls strip at 720 px, worse in a panel. The web lock moved
     netrender to `b14e8452b` for its WebGL `FramePlan` import fix.
 
+- 2026-11-04, B1 live intake (Graphshell port; not qualified):
+  - Admitted live visits wake the open writer view (`capture.available`). It
+    pulls one numbered batch at a time through the existing capture
+    transaction and acknowledges only a committed batch. A failed or
+    malformed batch is answered with its error and stays queued. A batch
+    holds the graph like any save, so edits and handover wait for it.
+  - Checked: the extension Node smokes, and an unpacked load in headless Chrome
+    for Testing 1234 with `history` granted in the test build:
+    - With the view left open, a→b→c browsing in another tab appeared within
+      about 0.5 s per visit.
+    - Revisiting a gave one new visit and one absorbed duplicate.
+    - A reload reopened all three objects.
+    - A malformed batch returned its error unacknowledged.
+  - Open: the consent prompt and live capture in headed Chromium and Firefox;
+    a transaction failure in a real store; a hidden writer tab takes batches
+    only when shown, because the frame loop pauses; each batch reloads the
+    capture's access records, a cost that grows with history.
+
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
 when the first run is recorded, with workspace artifacts under `Code/output`.
