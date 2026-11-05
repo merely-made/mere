@@ -78,6 +78,8 @@ pub mod local_edit;
 pub mod local_intake;
 #[cfg(feature = "web")]
 pub mod local_locations;
+#[cfg(feature = "web")]
+pub mod local_profile;
 #[cfg(any(feature = "native", feature = "web"))]
 pub mod local_projection;
 #[cfg(feature = "web")]

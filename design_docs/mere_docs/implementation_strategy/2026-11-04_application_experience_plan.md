@@ -502,6 +502,32 @@ an API being documented is not a passing receiving test.
 
 - 2026-11-04: plan written from the application brief and current source seams;
   D1 records delivery order. No implementation phase or runtime gate closed.
+- 2026-11-04, first P0/S1/B1 cut (Graphshell port; not qualified):
+  - **P0.** `graphshell::local_profile` and `GraphshellApp::open_local`: the
+    extension mints a `graphshell.local-profile/v1` record; the page opens
+    `graphshell-local-v1` (latest session or empty, never seeded) and attributes
+    work and capture to `graphshell://local-scope/<id>` and its browser, not the
+    fixture persona/device. `?fixture=` routes keep their stores. One writer per
+    profile: a page-lifetime Web Lock; other views stand by and hand over only
+    while `data-writer-busy` is false. `background.js` answers only its own
+    pages and refuses messages over 64 KiB.
+  - **S1.** `prepare_reference` keeps the exact address and names this-device
+    reach; graph ids, inline data and internal schemes refuse. `browser.attached`
+    opens accepted HTTP(S) addresses through `tabs.create`; other schemes refuse.
+    In the local profile, `system.default` names the missing native host.
+  - **B1 (partial).** The capture consent panel, lost with `component.html`,
+    returns in the extension's own `graph.html`; Chrome side panel and Firefox
+    sidebar declared.
+  - Checked: graphshell lib tests (321 pass), extension Node smokes, and an
+    unpacked load in headless Chrome for Testing 1234: empty fresh open, second
+    view standby and handover, reopen with the saved object, Copy link resolved
+    by the clipboard, Open in this browser landing on the exact URL.
+  - Open: headed Chromium and Firefox runs (Firefox not loaded); busy-handover
+    refusal and clipboard denial in a browser; capture while a view stays open
+    (intake still happens at page open); simultaneous co-viewing rather than
+    handover; smolweb open awaits B3's reader; the object-details drawer is
+    clipped by the controls strip at 720 px, worse in a panel. The web lock moved
+    netrender to `b14e8452b` for its WebGL `FramePlan` import fix.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
