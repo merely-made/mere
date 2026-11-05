@@ -98,7 +98,7 @@ human-response deadline.
 
 ## Retention
 
-UI receipts have a 200000-byte subcap within the fleet rollout's 1500000-byte
+UI receipts have a 200000-byte subcap within the fleet rollout's 2000000-byte
 record reserve; the shared receiving peak remains 160000000 bytes. Candidate,
 recovery and compressed delivery copies stay in that shared count. Reuse stable
 Cargo targets/build directories, preserve unrelated WIP, and remove only verified

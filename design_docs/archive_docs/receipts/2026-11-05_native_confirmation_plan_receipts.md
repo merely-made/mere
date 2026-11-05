@@ -123,3 +123,16 @@ this exact pre-start command. All seven originals were restored and verified;
 no corrected-resident startup or real application decision occurred. Dramatis
 owns repairing that check against measured exit/length/output hashes and retaining
 the failed run. The qualified replacement and locked graph remain unchanged.
+
+## 2026-11-05: receiving help-contract correction qualified
+
+The separate Dramatis continuation checks the measured exit and both output
+lengths/digests. Ten actual T-PC binary/invalid-result cases and fourteen
+synthetic recovery/input cases pass against driver
+`d89ccb3d528750dfb8d72dca960086f67c6827bd259da5d8968c054f59a94c60`.
+No production rebuild occurred. The unchanged pair is restaged under a distinct
+resume-loader attempt, preserving both failed journals and original recovery.
+Actual PS5 read-only preflight passes. The all-host record reserve is2000000
+bytes for retained history and private code/journals, within the same160000000
+peak cap; the controlling raw-pair window is155972520 bytes. Native vault and
+real application admission remain pending.
