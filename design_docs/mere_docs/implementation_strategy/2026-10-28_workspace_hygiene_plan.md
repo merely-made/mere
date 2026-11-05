@@ -260,9 +260,12 @@ their live tools and open repair conditions have a maintained home.
   actual role; no open condition is lost and remaining owner holds are named.
 - Needs: the packet and fixture manifests under `Code/testing/mere/closure-audit/`;
   maintained Instrument tools are in `support/instrument`, link tools in
-  `support/link-model`; Q465's close contract has source-bound controls and an owned
-  headless macOS browser receipt. Full Instrument product qualification remains
-  with Cambium presentation and needs its original or freshly qualified inputs.
+  `support/link-model`; Q465's full bounded Instrument pilot is freshly qualified
+  at `1c064dfef`, with eight headed browser cases, two native cases, 20 reviewed
+  captures and actual owned-resource release. Its
+  [checkpoint](../../../../../testing/mere/closure-audit/batch-11-checkpoint.md)
+  records exact source/build/package bindings, unchanged-input CPU evidence,
+  the separate failing header audit and browser seed-content limits.
   The three fresh link-family packets at source `8675407b1` now pass their full
   verifier, complete CPU inventories, headed AMD WebGPU seed/reopen scenarios and
   26 image reviews. Their [checkpoint](../../../../../testing/mere/closure-audit/batch-10-checkpoint.md)
@@ -308,6 +311,16 @@ their live tools and open repair conditions have a maintained home.
 - 2026-08-27: Cargo does not copy a workspace-root `LICENSE` into a member package (verified on retinue), which is why published crates ship SPDX and Exhibit A with no license text file (sweep 382-410).
 
 ## Progress
+
+- 2026-11-05: fresh Instrument packages at `1c064dfef` qualify Q465's bounded
+  headed/product and native pilot, including actual process/profile/port/bundle
+  release, all eight browser cases, both native cases and 20 individual image
+  reviews. Maintained harnesses follow current public controls and actual native
+  application lifetime; Forme preview borrowing and command dismissal focus are
+  repaired without relaxing the original assertions. The batch-11 checkpoint
+  records earlier CPU/Clippy evidence reused only for unchanged inputs and the
+  separate 268-notice header failure. Historical packages and active owner work
+  retain their identities; physical input, human AT and cross-app gates remain.
 
 - 2026-11-05: fresh ordinary paths, shared attachments and counted topology qualify
   at Mere `8675407b1ab56ca843cca6b21ac685c14dfd8b1f`, with the Netrender

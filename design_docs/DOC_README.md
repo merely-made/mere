@@ -1158,4 +1158,8 @@ and [link qualification tools](../support/link-model/README.md) have maintained
 source homes separate from frozen evidence. Both require explicit artifact/site
 inputs and fresh output paths for writers. The locator is
 `Code/testing/mere/receipt-relocation-2026-11-04/batch-07-reader.md`; the existing
-Instrument closure/runtime qualification and active owner work remain separate.
+Instrument pilot is now freshly qualified at `1c064dfef`: eight headed browser
+cases, both native scenarios, 20 reviewed captures and actual owned-resource
+release. Its [checkpoint](../../../testing/mere/closure-audit/batch-11-checkpoint.md)
+preserves build/source bindings, unchanged-input CPU evidence, browser seed-body
+limits and the separate failing header audit. Active owner work retains its scope.

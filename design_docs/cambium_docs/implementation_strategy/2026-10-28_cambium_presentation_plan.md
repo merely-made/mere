@@ -200,6 +200,15 @@ The same `OperatorFocus` overlay fed by a remote operator's presence over the ep
 
 - 2026-10-28: cut from the browser presentation tenants, overlay roots and UA widgets, portable tiles and operator presence plans; nothing new landed.
 - 2026-10-29: drafted the retained-component design here, then reconciled it into the canonical composition plan. Removed the duplicate contracts and phase sequence; PT1 retains whole-pane movement and shares qualification with composition P6. Implementation, runtime qualification and publication remain open.
+- 2026-11-05: Q465's maintained Instrument pilot is freshly qualified at
+  `1c064dfef`, with eight headed Chrome/AMD WebGPU cases, both native scenarios,
+  20 individually reviewed captures and actual browser/native resource release.
+  Forme preview borrowing and command-menu graph focus are repaired. The
+  [checkpoint](../../../../../testing/mere/closure-audit/batch-11-checkpoint.md)
+  binds packages/builds, unchanged-input CPU evidence and source identities.
+  Browser seed nodes have no article bodies, so their reading captures qualify
+  layout/persistence only. Human AT, physical pointer, cross-app and other
+  platform gates remain separate; the repository header audit is still red.
 
 ## Received from the backlog holder, 2026-10-28
 

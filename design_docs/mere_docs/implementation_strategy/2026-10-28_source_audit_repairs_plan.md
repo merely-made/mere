@@ -90,5 +90,12 @@ Actual GPU, custody, browser, model, broker and wallet runs were not made; the p
 
 - 2026-10-28: cut from the full-source audit plan; nothing new landed.
 - 2026-11-03: reconciled Q054's bounded repair status with the harness plan; no new code or register recount.
+- 2026-11-05: Q465's repaired close contract is qualified through fresh Instrument
+  packages at `1c064dfef`: eight headed browser cases, two native scenarios,
+  actual owned-resource release and 20 reviewed captures. The
+  [batch-11 checkpoint](../../../../../testing/mere/closure-audit/batch-11-checkpoint.md)
+  preserves exact build/source bindings, unchanged-input CPU evidence, browser
+  seed-content limits and the separate failing header audit. Frozen registers
+  and their historical repaired counts are unchanged.
 
 - 2026-11-04 receipt-home repair: the frozen Q/A packet moved unchanged to `Code/testing/mere/support/receipts/authority-success-audit/`; its [reader map](../../../../../testing/mere/receipt-relocation-2026-11-04/authority-reader.md) preserves old-path lookup and qualification. No finding or candidate is closed by this move.
