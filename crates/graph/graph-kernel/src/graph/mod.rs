@@ -122,6 +122,7 @@ mod resource_content_handle_tests;
 mod resource_content_tests;
 mod resource_pair_bounds;
 pub mod resource_properties;
+pub mod resource_tag_admission;
 pub mod resource_tags;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
 pub mod revert;
