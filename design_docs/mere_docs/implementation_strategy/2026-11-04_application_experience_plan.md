@@ -724,8 +724,8 @@ an API being documented is not a passing receiving test.
       with only a console warning: the new writer's epoch makes it stale.
       Resending to a different follower after a writer closes was run only in
       the smoke, not in a browser.
-    - The title and tags path, and an edit refused as stale, ran in tests but
-      not headed. Firefox and the real extension runtime were not run.
+    - The title and tags path and a stale edit refusal have library tests.
+      The headed extension receipt below covers adding an object.
     - The command menu's **New node** stays view-only though **Add an object**
       is queued.
 - 2026-11-05, P0 hidden writer:
@@ -736,6 +736,8 @@ an API being documented is not a passing receiving test.
     The normal save path still owns the store and the writer lock stays with
     the same Graphshell view. Replies follow storage completion; an unanswered
     request still does not tell the follower whether the write committed.
+  - The hidden writer add and fresh-process reopen passed in the installed
+    Chrome and Firefox extensions. See the application experience receipts.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
