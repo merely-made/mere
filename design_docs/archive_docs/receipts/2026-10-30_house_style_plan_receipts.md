@@ -1019,7 +1019,9 @@ from `6364e5d9` to `b14e8452bf34e5b5006422bb6f53f4c2e0ab1820` in its lockfiles.
 Two offline launches stop before compiling because the new checkout is not
 cached. A locked receiving run fetches that published revision, then renews
 the native and all eight feature/narrow baselines before H11 Rust edits.
-The receiving lock SHA-256 is `e4533ac49757897090a1b34180e1ef311b8189163560242e6f2bbca7024adeb6`.
+The Windows working-file receiving lock SHA-256 is `e4533ac49757897090a1b34180e1ef311b8189163560242e6f2bbca7024adeb6`.
+The published LF Git-blob SHA-256 is `b9a3060cd9664d2cf543d0bd510bea293cab2f5e41dd1a2eec69244b9c91349d`;
+normalizing CRLF to LF makes the working bytes identical to that blob.
 Those foreign lockfile changes are not H11-owned and will not be swept up.
 
 All three feature builds and four of five narrow test runs pass. Nematic's
@@ -1162,4 +1164,4 @@ helper/log/guard transients total 4689291 bytes before that final run,
 within the 100 MB cap; remove them after published-blob verification. The
 stable shared Mere target is reused. No isolated Cargo target, Cargo home or
 worktree is created or retained. Concurrent device-pairing and stack-reduction
-plan WIP remains outside both H11 publication commits.
+plan WIP remains outside all H11 publication commits.
