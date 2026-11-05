@@ -4,6 +4,7 @@
 //! Shared model, layout and producer preparation, before either graphics route.
 use super::*;
 use crate::meristem_bounds::RootView;
+use crate::work_attribution::WorkTimer;
 use crate::{FrameProfile, Host, HostTree, PortableCaptureError, ProducerFramePurpose};
 
 fn micros(elapsed: crate::Duration) -> u64 {
@@ -19,6 +20,33 @@ where
     pub fn prepare_presentation_frame(
         &mut self,
     ) -> Result<Option<PreparedFrame>, PresentationFailure> {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            self.prepare_with_native(None)
+        }
+        #[cfg(target_arch = "wasm32")]
+        {
+            self.prepare_with_native()
+        }
+    }
+
+    pub(crate) fn prepare_with_native(
+        &mut self,
+        #[cfg(not(target_arch = "wasm32"))] submission: Option<
+            &genet_render_host::NativeFrameSubmission,
+        >,
+    ) -> Result<Option<PreparedFrame>, PresentationFailure> {
+        #[cfg(not(target_arch = "wasm32"))]
+        if self.s.pending_native.is_some() {
+            return Ok(None);
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        let measured = submission.is_some();
+        #[cfg(target_arch = "wasm32")]
+        let measured = false;
+        let whole = measured.then(WorkTimer::start);
+        let validation = measured.then(WorkTimer::start);
+        let mut work = crate::NativePreparationWork::default();
         self.s.last_redraw_presentation = None;
         self.s.last_raster_failure = None;
         if self.s.capture_owner.is_disposed() {
@@ -77,6 +105,8 @@ where
         self.deliver_files();
         let started = crate::Instant::now();
         let mut profile = FrameProfile::default();
+        work.validation = validation.and_then(WorkTimer::finish);
+        let hook = measured.then(WorkTimer::start);
         let phase = crate::Instant::now();
         let animating = self.prepare_frame();
         if self.s.capture_owner.is_disposed() {
@@ -84,6 +114,8 @@ where
             return Ok(None);
         }
         profile.frame_hook_us = micros(phase.elapsed());
+        work.application_hook = hook.and_then(WorkTimer::finish);
+        let setup = measured.then(WorkTimer::start);
         let scale = self.layout_scale() as f32;
         let extent = self.s.window.as_ref().map(|window| window.inner_size());
         let presentable = self.s.presentation_driver.is_some() || self.s.surface.is_some();
@@ -100,8 +132,11 @@ where
             return Ok(None);
         };
         let (lw, lh) = (width as f32 / scale, height as f32 / scale);
+        work.frame_setup = setup.and_then(WorkTimer::finish);
+        let layout = measured.then(WorkTimer::start);
         let phase = crate::Instant::now();
         let anim_active = self.relayout(lw, lh);
+        work.model_layout = layout.and_then(WorkTimer::finish);
         profile.relayout_us = micros(phase.elapsed());
         profile.layout_update_us = self.s.last_layout_update_us;
         profile.layout_tick_us = self.s.last_layout_tick_us;
@@ -123,7 +158,27 @@ where
             native,
         };
         if mode == FrameContentMode::NativeTexture {
-            profile.producers = self.prepare_producers(scale);
+            let producers = measured.then(WorkTimer::start);
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                profile.producers = if let Some(submission) = submission {
+                    if !self.s.shared.producers.can_stage_native() {
+                        return Err(failure(
+                            None,
+                            "producer changed to a source without native staging".into(),
+                            None,
+                        ));
+                    }
+                    self.prepare_producers_staged(scale, submission)
+                } else {
+                    self.prepare_producers(scale)
+                };
+            }
+            #[cfg(target_arch = "wasm32")]
+            {
+                profile.producers = self.prepare_producers(scale);
+            }
+            work.producers = producers.and_then(WorkTimer::finish);
             if let Some(error) = self.s.shared.producers.gpu_remap_failure() {
                 self.refuse_producer_resource(error);
                 return Ok(None);
@@ -135,6 +190,7 @@ where
                     Some(NativePresentationFailure::Rasterize(refusal.failure)),
                 ));
             }
+            let fragments = measured.then(WorkTimer::start);
             let phase = crate::Instant::now();
             self.sync_leaf_fragments().map_err(|error| {
                 failure(
@@ -144,11 +200,18 @@ where
                 )
             })?;
             profile.leaf_fragments_us = micros(phase.elapsed());
+            work.leaf_fragments = fragments.and_then(WorkTimer::finish);
         }
         let phase = crate::Instant::now();
+        #[cfg(not(target_arch = "wasm32"))]
+        if submission.is_none() {
+            self.sync_ime_area();
+        }
+        #[cfg(target_arch = "wasm32")]
         self.sync_ime_area();
         profile.ime_us = micros(phase.elapsed());
         let phase = crate::Instant::now();
+        let emission = measured.then(WorkTimer::start);
         let mut native_scene = None;
         let paint = match mode {
             FrameContentMode::NativeTexture => {
@@ -182,14 +245,34 @@ where
             ),
         };
         profile.emit_scene_us = micros(phase.elapsed());
+        work.emit_scene = emission.and_then(WorkTimer::finish);
+        let binding = measured.then(WorkTimer::start);
         let sequence = self
             .s
             .presentation_sequence
             .checked_add(1)
             .ok_or_else(|| failure(None, "presentation sequence exhausted".into(), None))?;
+        let native_producer_identities = {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                if submission.is_some() {
+                    self.s.shared.producers.staged_image_identities()
+                } else {
+                    self.s.shared.producers.image_identities()
+                }
+            }
+            #[cfg(target_arch = "wasm32")]
+            {
+                self.s.shared.producers.image_identities()
+            }
+        };
+        work.packet_binding = binding.and_then(WorkTimer::finish);
+        work.finish(whole.and_then(WorkTimer::finish));
+        profile.native_work.preparation = measured.then_some(work);
         Ok(Some(PreparedFrame {
             paint,
             native_scene,
+            native_producer_identities,
             host: self.s.presentation_host,
             sequence,
             width,

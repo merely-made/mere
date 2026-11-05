@@ -24,6 +24,7 @@ pub struct WgpuDriver {
     lifetime: PresentationLifetime,
     output: Option<(PresentedFrame, super::wgpu::WgpuOutput)>,
     profile: Option<FrameProfile>,
+    raster_cache: super::wgpu::RasterCache,
     captures: crate::CaptureOwner,
 }
 impl WgpuDriver {
@@ -41,6 +42,7 @@ impl WgpuDriver {
             lifetime: PresentationLifetime::new(generation),
             output: None,
             profile: None,
+            raster_cache: Default::default(),
             captures: crate::CaptureOwner::default(),
         }
     }
@@ -63,6 +65,21 @@ impl WgpuDriver {
     }
 }
 impl PresentationDriver for WgpuDriver {
+    #[cfg(not(target_arch = "wasm32"))]
+    fn supports_native_receiving(&self) -> bool {
+        self.portable.is_none()
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn native_presented(&mut self, stamp: PresentedFrame, image: NativePresentedImage) {
+        if self.lifetime.accepts(stamp.context_generation) {
+            let _ = self
+                .captures
+                .resume(self.backend(), stamp.context_generation);
+            self.raster_cache.clear();
+            self.output = Some((stamp, image.output));
+        }
+    }
     fn backend(&self) -> PresentationBackend {
         PresentationBackend::Wgpu
     }
@@ -117,12 +134,22 @@ impl PresentationDriver for WgpuDriver {
                 profile.emit_scene_us = profile
                     .emit_scene_us
                     .saturating_add(phase.elapsed().as_micros().min(u64::MAX as u128) as u64);
-                presenter.present_scene(frame, &scene, &[], 1.0, &mut profile, None)
+                presenter.present_scene(
+                    frame,
+                    &scene,
+                    &[],
+                    1.0,
+                    &mut profile,
+                    &mut self.raster_cache,
+                    None,
+                )
             },
             (PreparedPaint::Portable(_), None) => {
                 return Err(self.failure("portable paint without a portable WebGPU route"));
             },
-            (PreparedPaint::Native(_), _) => presenter.present(frame, &mut profile, None),
+            (PreparedPaint::Native(_), _) => {
+                presenter.present(frame, &mut profile, &mut self.raster_cache, None)
+            },
         };
         self.profile = Some(profile);
         let Some(output) = result? else {
@@ -146,6 +173,7 @@ impl PresentationDriver for WgpuDriver {
                 generation: self.generation(),
             });
         self.output = None;
+        self.raster_cache.clear();
         self.surface = None;
         self.lifetime.lose();
     }
@@ -173,6 +201,7 @@ impl PresentationDriver for WgpuDriver {
         self.lifetime
             .finish_restore()
             .map_err(|e| self.failure(e))?;
+        self.raster_cache.clear();
         self.surface = Some(next);
         Ok(true)
     }
@@ -200,6 +229,7 @@ impl PresentationDriver for WgpuDriver {
     fn dispose(&mut self) {
         self.captures.scope().dispose();
         self.output = None;
+        self.raster_cache.clear();
         self.surface = None;
         self.lifetime.dispose();
     }

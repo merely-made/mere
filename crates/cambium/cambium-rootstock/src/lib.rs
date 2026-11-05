@@ -33,15 +33,23 @@
 // The types an event source implements the seams against, re-exported so a
 // source names this crate rather than four.
 pub use document_session_api::DocumentA11yProjection;
+pub use genet_render_host::RasterizeFailure;
 pub use genet_scripted_dom::{NodeId, ScriptedDom};
 pub use sprigging::LeafRegistry;
 
 use genet_render::VisualMovement;
 
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod native_receiving_control;
 #[cfg(test)]
 mod projection_tests;
 
 mod a11y_publication;
+mod work_attribution;
+pub use work_attribution::{
+    NativeGpuWork, NativePreparationWork, NativeWorkAttribution, NativeWorkCall,
+    NativeWorkCallKind, NativeWorkPacket, NativeWorkSpan, NativeWorkerWork,
+};
 mod semantics;
 pub use a11y_provenance::SemanticNodeIdentity;
 pub use a11y_publication::{
@@ -56,11 +64,13 @@ pub use semantics::{
 mod files;
 pub use files::{FileAnswer, FileChooser};
 mod presentation;
+#[cfg(not(target_arch = "wasm32"))]
+pub use presentation::NativePresentedImage;
 pub use presentation::{
     ContextGeneration, FrameContentMode, NativePresentationFailure, PendingPresentationCapture,
-    PortableMaterializer, PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice,
-    PresentationDriver, PresentationFailure, PresentationLifetime, PresentationState, WgpuDriver,
-    WgpuSurfaceFactory, backend_attempts,
+    PortableMaterializer, PreparedFrame, PreparedPaint, PreparedPresentationObserver,
+    PresentationBackend, PresentationChoice, PresentationDriver, PresentationFailure,
+    PresentationLifetime, PresentationState, WgpuDriver, WgpuSurfaceFactory, backend_attempts,
 };
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
@@ -206,6 +216,13 @@ impl TitlebarInsets {
 pub trait Surface {
     /// The present core: wgpu device, queue, and the netrender renderer.
     fn core(&self) -> &genet_render_host::RenderCore;
+
+    /// Native hosts opt into nonblocking, shared-core frame submission.
+    /// Custom surfaces without an owned Core keep the checked legacy route.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn shared_core(&self) -> Option<std::sync::Arc<genet_render_host::RenderCore>> {
+        None
+    }
 
     /// The surface's texture format.
     fn format(&self) -> wgpu::TextureFormat;
@@ -380,8 +397,20 @@ pub enum A11yTarget {
 /// with the host, which owns the activation and focus paths, rather than
 /// splitting it across two implementations that would then have to agree.
 pub trait Accessibility {
+    /// Install only the native window root before revealing a receiving
+    /// window. This is adapter bootstrap, not accepted DOM/producer content.
+    fn prepare_native_window(&mut self) {}
+
     /// Current physical adapter/mirror attachment, independent of tree acceptance.
     fn adapter_state(&self) -> A11yAdapterState;
+
+    /// Drain only requests bound to the last submitted tree, without reading
+    /// contributors or publishing another projection. `Some(empty)` is an
+    /// implemented drain with no work. `None` keeps the combined `sync` path
+    /// for adapters that have not opted into independent action service.
+    fn drain_actions(&mut self, _owner: &A11yOwner) -> Option<Vec<A11yRequest>> {
+        None
+    }
 
     /// Publish the current tree and drain what the reader asked for since the
     /// last call. Report the publisher outcome separately from action requests;
@@ -491,6 +520,8 @@ mod mount_probe_tests;
 mod multi_host;
 #[cfg(test)]
 mod multi_host_tests;
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod native_a11y_tail_control;
 mod recovery;
 mod spatial;
 mod tree;

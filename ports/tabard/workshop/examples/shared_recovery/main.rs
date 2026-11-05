@@ -524,8 +524,15 @@ async fn capture(mount: &BrowserMount) -> Result<Capture, String> {
     {
         let mut host = mount.host().borrow_mut();
         let out = observed.clone();
-        host.s.pending_presentation_observer = Some(Box::new(move |ctx, p| {
-            *out.borrow_mut() = Some(seal(ctx, p))
+        host.s.pending_presentation_observer = Some(Box::new(move |ctx, proposed| {
+            let frozen = seal(ctx, proposed);
+            cambium_rootstock::PreparedPresentationObserver::new(move |actual| {
+                *out.borrow_mut() = Some(if actual == proposed {
+                    frozen
+                } else {
+                    Err("capture presentation changed after preparation".into())
+                });
+            })
         }));
         let out = copied.clone();
         // The host starts an owned, stamped readback of the presented frame.

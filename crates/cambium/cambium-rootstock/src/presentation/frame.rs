@@ -14,6 +14,8 @@ pub struct PreparedFrame {
     /// Native paint translated once and bound to this host's physical producer
     /// identities during preparation; portable frames carry none.
     pub(crate) native_scene: Option<paint_list_render::TranslatedDisplayList>,
+    /// Physical registrations validated while binding this native packet.
+    pub(crate) native_producer_identities: Vec<crate::ProducerImageIdentity>,
     pub host: u64,
     /// Proposed sequence; the host commits it only after presentation succeeds.
     pub sequence: u64,
@@ -79,6 +81,17 @@ pub trait PendingPresentationCapture {
 }
 
 pub trait PresentationDriver {
+    /// Opt into Rootstock's standard native encode/qualify/compose lifecycle.
+    /// Merely exposing a same-device surface does not bypass a custom driver's
+    /// presentation policy. Portable and browser drivers keep their own route.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn supports_native_receiving(&self) -> bool {
+        false
+    }
+
+    /// Retain the same accepted image for this driver's branded captures.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn native_presented(&mut self, _stamp: crate::PresentedFrame, _image: NativePresentedImage) {}
     fn take_profile(&mut self) -> Option<crate::FrameProfile> {
         None
     }
@@ -101,4 +114,12 @@ pub trait PresentationDriver {
         stamp: crate::PresentedFrame,
     ) -> Result<Box<dyn PendingPresentationCapture>, crate::CaptureRefusal>;
     fn dispose(&mut self);
+}
+
+/// An image already qualified and submitted by Rootstock's native lifecycle.
+/// Only the host constructs it; drivers opt into receiving rather than
+/// presenting a second raster or reading newer source state.
+#[cfg(not(target_arch = "wasm32"))]
+pub struct NativePresentedImage {
+    pub(crate) output: super::wgpu::WgpuOutput,
 }

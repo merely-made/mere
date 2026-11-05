@@ -18,6 +18,7 @@ pub use netrender::SourceAlpha;
 
 mod bridge;
 mod child_lifetime;
+mod submission;
 pub use child_lifetime::{ProducerChildLifetime, ProducerChildToken};
 
 /// Producer dispatch, not durable or asynchronous operation completion.
@@ -116,6 +117,10 @@ pub struct ProducerContext<'a> {
     /// immutable device lifetime identity; use it rather than pointer identity
     /// for any producer-owned GPU cache. CPU source identity remains separate.
     pub core: &'a genet_render_host::RenderCore,
+    /// Native producer work belongs to this host's one attribution batch.
+    /// Direct and browser callers retain their existing checked raster path.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub native_submission: Option<&'a genet_render_host::NativeFrameSubmission>,
 }
 
 /// A full-size, single-layer, non-multisampled base-mip view. Its texture must
@@ -131,6 +136,32 @@ pub struct ProducedTexture {
 }
 
 pub trait TextureProducer {
+    /// Explicit promise that rendering can prepare output without publishing
+    /// its visible geometry, routes or retained skip state before acceptance.
+    fn supports_native_staging(&self) -> bool {
+        false
+    }
+
+    /// Prepare one native candidate. Unsupported legacy producers are never
+    /// silently invoked through a transactional host path.
+    fn render_staged(
+        &mut self,
+        _cx: &ProducerContext<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        Err(genet_render_host::RasterizeFailure::SourceError(
+            "producer does not support native staging".into(),
+        ))
+    }
+
+    /// Promote prepared presentation facts after successful host publication.
+    fn publish_staged(&mut self) {}
+    /// Discard or revoke prepared facts; the next required draw must be fresh.
+    fn discard_staged(&mut self) {}
+    /// The prepared source still belongs to its captured presentation lifetime.
+    fn staged_is_live(&self) -> bool {
+        true
+    }
+
     /// Called after layout, before document paint. None keeps the last usable
     /// image; it leaves an empty slot when `needs_frame` is true. Cheaply skip
     /// unchanged world/appearance inputs here. Depth remains producer-owned.
@@ -306,6 +337,24 @@ impl ProducerRole {
 }
 
 impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
+    fn supports_native_staging(&self) -> bool {
+        self.borrow().supports_native_staging()
+    }
+    fn render_staged(
+        &mut self,
+        cx: &ProducerContext<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        self.borrow_mut().render_staged(cx)
+    }
+    fn publish_staged(&mut self) {
+        self.borrow_mut().publish_staged();
+    }
+    fn discard_staged(&mut self) {
+        self.borrow_mut().discard_staged();
+    }
+    fn staged_is_live(&self) -> bool {
+        self.borrow().staged_is_live()
+    }
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
         self.borrow_mut().render(cx)
     }

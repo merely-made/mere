@@ -42,22 +42,70 @@ where
         }
     }
 
-    /// Hand this frame to the accessibility host: build/install/update the
-    /// tree, and route the screen reader's requests back into the retained DOM.
-    /// Called after `redraw`, once this frame's layout exists. The first sync
-    /// reveals the hidden window (install-before-show).
-    ///
-    /// The two request kinds stay apart, because they mean different things to
-    /// the person using the reader: `Click` is "do this control's thing" and
-    /// goes through the same dispatch a mouse press does; `Focus` is "put the
-    /// cursor here" and only moves focus. Collapsing them would fire every
-    /// control a reader navigates across.
+    /// Publish after an accepted picture, or service the previous tree's
+    /// actions while a native submission/refusal has no new displayed picture.
+    /// Legacy adapters retain their combined synchronization path.
     pub fn sync_a11y(&mut self) -> Vec<crate::A11yDispatch> {
-        use crate::{
-            A11yAdapterState as Adapter, A11yPublication as Publication,
-            A11yPublicationSkip as Skip,
+        if self.s.native_receiving
+            && (self.s.last_redraw_presentation.is_none()
+                || self.a11y_publication_skip()
+                    == Some(crate::A11yPublicationSkip::PendingPresentation))
+        {
+            return self.drain_a11y_actions();
+        }
+        self.sync_a11y_tree()
+    }
+
+    /// Consume actions against the last submitted namespace without building
+    /// another tree. Every request is re-admitted independently against the
+    /// live owner, target and contributor. Opted-in adapters consume gestures
+    /// on hidden/ended/recovering hosts without replaying them on later reveal.
+    ///
+    /// An adapter returning `None` has not opted into a separate drain; its
+    /// original combined synchronization and publication guards still apply.
+    pub fn drain_a11y_actions(&mut self) -> Vec<crate::A11yDispatch> {
+        let started = crate::Instant::now();
+        let owner = crate::A11yOwner::new(&self.s.a11y_owner);
+        let requests = self
+            .s
+            .a11y
+            .as_mut()
+            .and_then(|a11y| a11y.drain_actions(&owner));
+        let Some(requests) = requests else {
+            return self.sync_a11y_tree();
         };
-        let skip = if !self.s.a11y_owner.get() {
+        let reason = self
+            .a11y_publication_skip()
+            .unwrap_or(crate::A11yPublicationSkip::PendingPresentation);
+        self.record_a11y_skip(reason);
+        let results = self.apply_a11y_requests(&requests);
+        if let Some(profile) = self.s.last_frame_profile.as_mut() {
+            profile.a11y_actions_us = profile
+                .a11y_actions_us
+                .saturating_add(elapsed_us(started.elapsed()));
+        }
+        results
+    }
+
+    fn native_a11y_context_available(&self) -> bool {
+        !self.s.native_receiving
+            || (self.s.displayed_presentation.is_some()
+                && self.s.displayed_input.is_some()
+                && !self.s.needs_recovery_surface
+                && self
+                    .s
+                    .shared
+                    .render_core
+                    .as_ref()
+                    .is_none_or(|core| core.device_failure().is_none())
+                && self.s.recovery_status.as_ref().is_none_or(|status| {
+                    matches!(status, genet_render_host::RecoveryStatus::Ready { .. })
+                }))
+    }
+
+    fn a11y_publication_skip(&self) -> Option<crate::A11yPublicationSkip> {
+        use crate::A11yPublicationSkip as Skip;
+        if !self.s.a11y_owner.get() {
             Some(Skip::OwnerEnded)
         } else if self.s.a11y.is_none() {
             Some(Skip::NoAdapter)
@@ -65,49 +113,90 @@ where
             Some(Skip::NoRunner)
         } else if self.s.layout.is_none() {
             Some(Skip::NoLayout)
+        } else if self.s.native_receiving
+            && (self.s.hidden
+                || self.s.close_requested
+                || !self.native_a11y_context_available()
+                || !(self.s.displayed_presentation.is_some_and(|stamp| {
+                    f64::from(stamp.layout_scale) == self.layout_scale()
+                        && self.s.window.as_ref().is_some_and(|window| {
+                            window.inner_size() == (stamp.width, stamp.height)
+                        })
+                }) && self.input_layout_is_displayed()))
+        {
+            Some(Skip::PendingPresentation)
         } else {
             None
-        };
-        if let Some(reason) = skip {
-            let adapter = self
-                .s
-                .a11y
-                .as_ref()
-                .map_or(Adapter::NotConfigured, |a11y| a11y.adapter_state());
-            self.record_a11y_publication(Publication::skipped(adapter, reason));
+        }
+    }
+
+    fn record_a11y_skip(&mut self, reason: crate::A11yPublicationSkip) {
+        #[cfg(not(target_arch = "wasm32"))]
+        let first_busy =
+            reason == crate::A11yPublicationSkip::NoLayout && self.s.native_waiter.is_some();
+        #[cfg(target_arch = "wasm32")]
+        let first_busy = false;
+        if (reason == crate::A11yPublicationSkip::PendingPresentation || first_busy)
+            && !self.s.hidden
+            && !self.s.close_requested
+            && !self.s.needs_recovery_surface
+        {
+            if let Some(a11y) = self.s.a11y.as_mut() {
+                a11y.prepare_native_window();
+            }
+        }
+        let adapter = self
+            .s
+            .a11y
+            .as_ref()
+            .map_or(crate::A11yAdapterState::NotConfigured, |a11y| {
+                a11y.adapter_state()
+            });
+        self.record_a11y_publication(crate::A11yPublication::skipped(adapter, reason));
+    }
+
+    fn sync_a11y_tree(&mut self) -> Vec<crate::A11yDispatch> {
+        if let Some(reason) = self.a11y_publication_skip() {
+            self.record_a11y_skip(reason);
             return Vec::new();
         }
-        // A screen reader is told physical client pixels, and the tree it is
-        // told them about is laid out in layout pixels: the transform between
-        // them is the layout scale, zoom included. A reader that read the
-        // device scale alone would point at a control's unzoomed position.
         let layout_scale = self.layout_scale();
+        let started = crate::Instant::now();
         let requests = {
-            let (dom, mount, focus) = match self.s.runner.as_ref() {
-                Some(runner) => (runner.dom(), runner.mount(), runner.focus()),
-                None => return Vec::new(),
-            };
+            let runner = self
+                .s
+                .runner
+                .as_ref()
+                .expect("publication requires a runner");
+            let (dom, mount, focus) = (runner.dom(), runner.mount(), runner.focus());
             let dom_ref = dom.borrow();
             let view = crate::WindowDom::new(&dom_ref, mount);
-            // Focus can change without hover; last_focus belongs to restyling,
-            // not to the accessibility adapter's current focus report.
             let focus = focus.map(|node| view.opaque_id(node));
-            let (Some(a11y), Some(layout)) = (self.s.a11y.as_mut(), self.s.layout.as_ref()) else {
-                return Vec::new();
-            };
-            // The window is the adapter's own now, so the seam does not carry it.
-            a11y.sync(
-                &crate::A11yOwner::new(&self.s.a11y_owner),
-                &view,
-                layout,
-                &mut self.s.shared.leaves,
-                &mut self.s.shared.producers,
-                focus,
-                layout_scale,
-            )
+            self.s
+                .a11y
+                .as_mut()
+                .expect("publication requires an adapter")
+                .sync(
+                    &crate::A11yOwner::new(&self.s.a11y_owner),
+                    &view,
+                    self.s.layout.as_ref().expect("publication requires layout"),
+                    &self.s.shared.leaves,
+                    &self.s.shared.producers,
+                    focus,
+                    layout_scale,
+                )
         };
+        let publish_us = elapsed_us(started.elapsed());
         self.record_a11y_publication(requests.publication);
-        self.apply_a11y_requests(&requests.requests)
+        let started = crate::Instant::now();
+        let results = self.apply_a11y_requests(&requests.requests);
+        if let Some(profile) = self.s.last_frame_profile.as_mut() {
+            profile.a11y_publish_us = profile.a11y_publish_us.saturating_add(publish_us);
+            profile.a11y_actions_us = profile
+                .a11y_actions_us
+                .saturating_add(elapsed_us(started.elapsed()));
+        }
+        results
     }
 
     /// Route drained screen-reader requests into the retained DOM. Split out of
@@ -203,6 +292,9 @@ where
         use layout_dom_api::LayoutDom as _;
         if !self.s.a11y_owner.get() {
             return Err(Refusal::Cancelled);
+        }
+        if self.s.hidden || self.s.close_requested || !self.native_a11y_context_available() {
+            return Err(Refusal::Unavailable);
         }
         if matches!(request.action, A11yAction::SetValue(value) if !value.is_finite()) {
             return Err(Refusal::InvalidValue);

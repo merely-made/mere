@@ -500,6 +500,7 @@ fn main() {
 
     let after_frame_lane = lane.clone();
     let hooks: HostHooks<Harness, Logic, Child> = HostHooks {
+        prepare_presentation: Box::new(|_, _| None),
         // Follow the window, and hand the host the graph's paint.
         frame: Box::new(|ctx: &mut AppCtx<'_, Harness, Logic, Child>| {
             let tile = (

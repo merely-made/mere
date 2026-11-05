@@ -21,6 +21,9 @@ where
     /// disposing a window while lending a shared forest is not qualified.
     pub fn take_disposal(&mut self) -> HostDisposal {
         self.s.hidden = true;
+        self.s.raster_cache.clear();
+        self.s.displayed_input = None;
+        self.s.displayed_presentation = None;
         self.s.a11y_owner.set(false);
         let a11y_notice = if !matches!(
             self.s.a11y_publication.outcome,
@@ -49,6 +52,10 @@ where
         // and keeps later frame preparation from presenting.
         self.s.capture_owner.scope().dispose();
         HostDisposal {
+            #[cfg(not(target_arch = "wasm32"))]
+            pending_native: self.s.pending_native.take(),
+            #[cfg(not(target_arch = "wasm32"))]
+            native_waiter: self.s.native_waiter.take(),
             producers: Some(std::mem::take(&mut self.s.shared.producers)),
             fragments: std::mem::take(&mut self.s.shared.leaf_fragments),
             driver: self.s.presentation_driver.take(),
@@ -193,7 +200,7 @@ where
     /// not divide by hand — and so the harness can drive the same arithmetic
     /// the winit `CursorMoved` arm runs.
     pub fn layout_point(&self, x: f64, y: f64) -> (f32, f32) {
-        let scale = self.layout_scale();
+        let scale = self.input_scale();
         ((x / scale) as f32, (y / scale) as f32)
     }
 
@@ -330,54 +337,6 @@ where
         self.apply_pending();
     }
 
-    /// Seal a read-only projection of the source just submitted. Deliberately
-    /// does not apply pending requests, consume zoom edges or dispatch input.
-    pub fn observe_presentation(&mut self, frame: PresentedFrame) {
-        let Some(observer) = self.s.pending_presentation_observer.take() else {
-            return;
-        };
-        let logical_size = self.logical_size();
-        let ui_zoom = self.ui_zoom();
-        let commands = self.s.commands.clone();
-        let Some(runner) = self.s.runner.as_mut() else {
-            return;
-        };
-        let ctx = AppCtx {
-            runner,
-            layout: self.s.layout.as_ref(),
-            window: self.s.window.as_deref(),
-            logical_size,
-            ui_zoom,
-            zoom_changed: false,
-            leaves: &mut self.s.shared.leaves,
-            files: &mut self.s.files,
-            producers: &mut self.s.shared.producers,
-            set_sheet: &mut self.s.pending_sheet,
-            set_ui_zoom: &mut self.s.pending_ui_zoom,
-            close: &mut self.s.close_requested,
-            wake: &self.wake,
-            capture: &mut self.s.pending_capture,
-            presentation_observer: &mut self.s.pending_presentation_observer,
-            capture_stamped: &mut self.s.pending_stamped_capture,
-            capture_paint: &mut self.s.pending_paint_capture,
-            pointer: &mut self.s.pending_pointer,
-            a11y: &mut self.s.pending_a11y,
-            a11y_owner: &self.s.a11y_owner,
-            a11y_publication: crate::A11yPublicationSnapshot {
-                host: self.s.presentation_host,
-                sequence: self.s.a11y_publication_sequence,
-                publication: self.s.a11y_publication,
-            },
-            scroll: &mut self.s.pending_scroll,
-            window_commands: &commands,
-            render_core: self.s.shared.render_core.as_ref(),
-            geometry: self.s.geometry,
-            frame_profile: self.s.last_frame_profile,
-            presentation: self.s.last_redraw_presentation,
-        };
-        observer(&ctx, frame);
-    }
-
     /// Apply requests a hook made after its temporary borrows of the runner and
     /// view state ended. Shared by normal hooks and close negotiation.
     /// Swap the application's stylesheet: this window lays out afresh under
@@ -404,22 +363,6 @@ where
             window.request_redraw();
         }
         self.drain_pointer();
-    }
-
-    /// Drain one application wake. The caller is the native `UserEvent` path
-    /// or the windowless harness; either way, a worker owns its channel and
-    /// this host only gives it a UI-thread drain turn and a redraw.
-    pub fn process_wake(&mut self) -> bool {
-        if !self.wake.take_pending() {
-            return false;
-        }
-        self.with_ctx(Hook::AfterWake);
-        if !self.s.hidden {
-            if let Some(window) = self.s.window.as_ref() {
-                window.request_redraw();
-            }
-        }
-        true
     }
 
     /// Ask the application whether a close should keep the window visible,
@@ -570,6 +513,7 @@ where
     /// The tail of every input dispatch: the application hook, then the
     /// host-owned IME and repaint policy.
     pub fn after_dispatch(&mut self) {
+        self.s.native_dirty = true;
         self.with_ctx(Hook::AfterDispatch);
         self.open_requested_file();
         let Some(window) = self.s.window.as_ref() else {

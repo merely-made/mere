@@ -6,15 +6,38 @@ use super::{
     NativePresentationFailure, PreparedFrame, PreparedPaint, PresentationBackend,
     PresentationFailure,
 };
+use crate::work_attribution::WorkTimer;
 use crate::{FrameProfile, Surface};
 use netrender::{ColorLoad, ExternalTexturePlacement};
 fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
 }
+
+fn reset_raster_profile(profile: &mut FrameProfile) {
+    profile.raster_reused = false;
+    profile.shadows_us = 0;
+    profile.raster_us = 0;
+    profile.raster_total_us = 0;
+    profile.tile_invalidate_us = 0;
+    profile.dirty_tile_rebuild_us = 0;
+    profile.master_compose_us = 0;
+    profile.vello_render_us = 0;
+    profile.dirty_tiles = 0;
+}
+#[derive(Clone)]
 pub(crate) struct WgpuOutput {
     pub _texture: wgpu::Texture,
     pub view: wgpu::TextureView,
 }
+pub(crate) type RasterCache = super::raster_cache::QualifiedRasterCache<wgpu::Device, WgpuOutput>;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum OutputPresentation {
+    Presented,
+    Reconfigured,
+    Unavailable,
+}
+
 pub(crate) struct WgpuPresentation<'a> {
     surface: &'a dyn Surface,
 }
@@ -39,6 +62,7 @@ impl<'a> WgpuPresentation<'a> {
         &self,
         packet: &PreparedFrame,
         profile: &mut FrameProfile,
+        cache: &mut RasterCache,
         trace: Option<&crate::frame::FrameTrace>,
     ) -> Result<Option<WgpuOutput>, PresentationFailure> {
         let (PreparedPaint::Native(_), Some(translated)) = (&packet.paint, &packet.native_scene)
@@ -57,27 +81,52 @@ impl<'a> WgpuPresentation<'a> {
             &translated.box_shadow_masks,
             packet.scale,
             profile,
+            cache,
             trace,
         )
     }
 
-    /// Rasterize one complete scene at `raster_scale` and present it. Native
-    /// frames pass the layout scale; a materialized portable scene is already
-    /// in physical pixels and passes 1.
-    pub fn present_scene(
+    /// Produce a qualified complete image before any surface acquisition.
+    /// Kept separate so output lifetime can be checked on a real offscreen GPU.
+    fn rasterize_scene(
         &self,
         packet: &PreparedFrame,
         scene: &netrender::Scene,
         box_shadow_masks: &[paint_list_render::BoxShadowMaskRequest],
         raster_scale: f32,
         profile: &mut FrameProfile,
+        cache: &mut RasterCache,
         trace: Option<&crate::frame::FrameTrace>,
-    ) -> Result<Option<WgpuOutput>, PresentationFailure> {
+    ) -> Result<WgpuOutput, PresentationFailure> {
         macro_rules! trace { ($phase:expr, $($args:tt)*) => { if let Some(trace) = trace { trace.mark($phase,format_args!($($args)*)); } }; }
+        // A retained image performs none of these stages. Do not report the
+        // renderer's previous frame timings as work done by this request.
+        reset_raster_profile(profile);
         let frame = packet;
         let surface = self.surface;
         let (pw, ph, scale) = (packet.width, packet.height, raster_scale);
-        let frame_started = packet.started;
+        if let Some(loss) = surface.core().device_failure() {
+            cache.clear();
+            return Err(self.failure(packet, NativePresentationFailure::DeviceLost(loss)));
+        }
+        let policy_allows_reuse = cfg!(not(target_arch = "wasm32"))
+            && surface
+                .try_renderer()
+                .map_err(|failure| self.failure(packet, refused(failure)))?
+                .vello_output_reuse_allowed();
+        if !policy_allows_reuse {
+            cache.clear();
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Some(output) = cache.lookup(surface.device(), packet, policy_allows_reuse) {
+            let output = surface
+                .core()
+                .try_reuse_native_raster(|| output.clone())
+                .map_err(|failure| self.failure(packet, refused(failure)))?;
+            profile.raster_reused = true;
+            trace!("raster-reused", "qualified output retained");
+            return Ok(output);
+        }
         // Blurred shadows lower to image ops backed by per-frame GPU masks.
         // Keeping only `translated.scene` drops those masks and leaves the
         // image keys unresolved, which makes every blurred CSS box-shadow
@@ -141,16 +190,98 @@ impl<'a> WgpuPresentation<'a> {
             }
             profile.dirty_tiles = renderer.vello_last_dirty_count().unwrap_or_default() as u64;
         }
+        let output = WgpuOutput {
+            _texture: _tex,
+            view,
+        };
+        if policy_allows_reuse {
+            cache.insert(surface.device().clone(), packet, output.clone());
+        }
+        Ok(output)
+    }
+
+    /// Rasterize one complete scene and present it through the shared surface path.
+    pub fn present_scene(
+        &self,
+        packet: &PreparedFrame,
+        scene: &netrender::Scene,
+        box_shadow_masks: &[paint_list_render::BoxShadowMaskRequest],
+        raster_scale: f32,
+        profile: &mut FrameProfile,
+        cache: &mut RasterCache,
+        trace: Option<&crate::frame::FrameTrace>,
+    ) -> Result<Option<WgpuOutput>, PresentationFailure> {
+        let output = self.rasterize_scene(
+            packet,
+            scene,
+            box_shadow_masks,
+            raster_scale,
+            profile,
+            cache,
+            trace,
+        )?;
+        if self.present_output_traced(packet, &output, profile, trace)?
+            == OutputPresentation::Presented
+        {
+            Ok(Some(output))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Acquire, compose and present an already qualified output. This method
+    /// performs no scene rasterization and never accepts a cache candidate.
+    pub fn present_output(
+        &self,
+        packet: &PreparedFrame,
+        output: &WgpuOutput,
+        profile: &mut FrameProfile,
+    ) -> Result<bool, PresentationFailure> {
+        self.present_output_status(packet, output, profile)
+            .map(|status| status == OutputPresentation::Presented)
+    }
+
+    pub fn present_output_status(
+        &self,
+        packet: &PreparedFrame,
+        output: &WgpuOutput,
+        profile: &mut FrameProfile,
+    ) -> Result<OutputPresentation, PresentationFailure> {
+        self.present_output_traced(packet, output, profile, None)
+    }
+
+    fn present_output_traced(
+        &self,
+        packet: &PreparedFrame,
+        output: &WgpuOutput,
+        profile: &mut FrameProfile,
+        trace: Option<&crate::frame::FrameTrace>,
+    ) -> Result<OutputPresentation, PresentationFailure> {
+        macro_rules! trace { ($phase:expr, $($args:tt)*) => { if let Some(trace) = trace { trace.mark($phase,format_args!($($args)*)); } }; }
+        let frame = packet;
+        let surface = self.surface;
+        let (pw, ph) = (packet.width, packet.height);
+        let frame_started = packet.started;
+        if let Some(loss) = surface.core().device_failure() {
+            return Err(self.failure(packet, NativePresentationFailure::DeviceLost(loss)));
+        }
+        let clear = wgpu::Color {
+            r: f64::from(frame.clear[0]),
+            g: f64::from(frame.clear[1]),
+            b: f64::from(frame.clear[2]),
+            a: f64::from(frame.clear[3]),
+        };
         let phase = crate::Instant::now();
         trace!("acquire-begin", "");
-        let frame = match surface.acquire_status() {
+        let acquire_work = profile.native_work.packet.is_some().then(WorkTimer::start);
+        let acquired = surface.acquire_status();
+        profile.native_work.acquire = acquire_work.and_then(WorkTimer::finish);
+        let frame = match acquired {
             genet_render_host::SurfaceAcquire::Frame(frame) => frame,
             genet_render_host::SurfaceAcquire::DeviceLost(loss) => {
                 trace!("acquire-device-lost", "");
-                // Release this frame's old-device resources before the host
-                // acknowledges detachment and can open the replacement factory.
-                drop(view);
-                drop(_tex);
+                // The caller drops its candidate before acknowledging
+                // detachment and opening the replacement factory.
                 return Err(self.failure(packet, NativePresentationFailure::DeviceLost(loss)));
             },
             genet_render_host::SurfaceAcquire::SurfaceLost => {
@@ -161,13 +292,13 @@ impl<'a> WgpuPresentation<'a> {
                 trace!("acquire-reconfigured", "");
                 profile.acquire_us = elapsed_us(phase.elapsed());
                 profile.total_us = elapsed_us(frame_started.elapsed());
-                return Ok(None);
+                return Ok(OutputPresentation::Reconfigured);
             },
             genet_render_host::SurfaceAcquire::Unavailable { reason } => {
                 trace!("acquire-unavailable", "{reason}");
                 profile.acquire_us = elapsed_us(phase.elapsed());
                 profile.total_us = elapsed_us(frame_started.elapsed());
-                return Ok(None);
+                return Ok(OutputPresentation::Unavailable);
             },
         };
         trace!("acquire-end", "");
@@ -179,6 +310,7 @@ impl<'a> WgpuPresentation<'a> {
         // fresh swapchain texture first so transparent app-frame margins do
         // not preserve undefined pixels from the compositor-owned image.
         let phase = crate::Instant::now();
+        let clear_work = profile.native_work.packet.is_some().then(WorkTimer::start);
         let mut encoder =
             surface
                 .device()
@@ -205,10 +337,12 @@ impl<'a> WgpuPresentation<'a> {
         }
         surface.queue().submit([encoder.finish()]);
         profile.clear_us = elapsed_us(phase.elapsed());
+        profile.native_work.clear = clear_work.and_then(WorkTimer::finish);
         let phase = crate::Instant::now();
+        let compose_work = profile.native_work.packet.is_some().then(WorkTimer::start);
         match surface.try_renderer() {
             Ok(renderer) => renderer.compose_external_texture(
-                &view,
+                &output.view,
                 &target,
                 surface.format(),
                 pw,
@@ -219,31 +353,27 @@ impl<'a> WgpuPresentation<'a> {
                 trace!("compose-refused", "{failure}");
                 drop(frame);
                 drop(target);
-                drop(view);
-                drop(_tex);
                 return Err(self.failure(packet, refused(failure)));
             },
         }
         trace!("compose-end", "");
         profile.compose_us = elapsed_us(phase.elapsed());
+        profile.native_work.compose = compose_work.and_then(WorkTimer::finish);
         if let Some(loss) = surface.core().device_failure() {
             trace!("compose-device-lost", "");
             drop(frame);
             drop(target);
-            drop(view);
-            drop(_tex);
             return Err(self.failure(packet, NativePresentationFailure::DeviceLost(loss)));
         }
         // wgpu 30 moved presentation from SurfaceTexture to Queue.
         let phase = crate::Instant::now();
         trace!("present-begin", "");
+        let present_work = profile.native_work.packet.is_some().then(WorkTimer::start);
         surface.queue().present(frame);
+        profile.native_work.present = present_work.and_then(WorkTimer::finish);
         trace!("present-end", "");
         profile.present_us = elapsed_us(phase.elapsed());
-        Ok(Some(WgpuOutput {
-            _texture: _tex,
-            view,
-        }))
+        Ok(OutputPresentation::Presented)
     }
 }
 
@@ -256,3 +386,9 @@ fn refused(failure: genet_render_host::RasterizeFailure) -> NativePresentationFa
         failure => NativePresentationFailure::Rasterize(failure),
     }
 }
+
+#[cfg(not(target_arch = "wasm32"))]
+mod native;
+
+#[cfg(test)]
+mod tests;

@@ -28,7 +28,9 @@ mod hidden_panel_tests;
 #[cfg(test)]
 mod incremental_tests;
 mod interaction;
+mod presented_input;
 mod producer;
+pub(crate) use presented_input::PresentedInput;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
@@ -83,6 +85,7 @@ pub struct OwnedLayout {
     layout_with_text_us: u64,
     content_extent_us: u64,
     generation: u64,
+    input_lifetime: std::sync::Arc<()>,
 }
 
 impl OwnedLayout {

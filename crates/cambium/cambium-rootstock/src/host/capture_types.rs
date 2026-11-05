@@ -61,8 +61,12 @@ pub type StampedCaptureFrame = CaptureFrame;
 pub type StampedCaptureFn = Box<dyn FnOnce(Result<StampedCaptureFrame, CaptureRefusal>) + 'static>;
 
 /// One-shot read-only observation, before capture callbacks and pointer/AT input.
-pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> =
-    Box<dyn FnOnce(&AppCtx<'_, State, Logic, V, T>, PresentedFrame)>;
+pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> = Box<
+    dyn FnOnce(
+        &AppCtx<'_, State, Logic, V, T>,
+        PresentedFrame,
+    ) -> crate::PreparedPresentationObserver,
+>;
 
 /// The paint commands and inline font/image resources of the next presented
 /// frame, before renderer translation. External GPU texture commands retain

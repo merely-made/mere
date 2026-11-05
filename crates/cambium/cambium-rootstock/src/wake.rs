@@ -48,6 +48,17 @@ impl HostWake {
         Arc::new(move || wake.wake())
     }
 
+    /// Wake the event source for host-owned completion without labelling it
+    /// an application worker result. The host drains its own flag separately.
+    pub(crate) fn notification(&self, pending: Arc<AtomicBool>) -> Arc<dyn Fn() + Send + Sync> {
+        let signal = self.signal.clone();
+        Arc::new(move || {
+            if !pending.swap(true, Ordering::AcqRel) {
+                signal();
+            }
+        })
+    }
+
     pub(crate) fn take_pending(&self) -> bool {
         self.pending.swap(false, Ordering::AcqRel)
     }

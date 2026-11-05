@@ -36,11 +36,14 @@ use layout_dom_api::LayoutDom;
 use sprigging::LeafRegistry;
 use winit::window::Window;
 
+mod action_drain;
+mod bootstrap;
 #[cfg(test)]
 mod namespace_tests;
 mod publication;
 #[cfg(test)]
 mod publication_tests;
+mod synchronization;
 
 /// The screen-reader request vocabulary, re-exported from the neutral seam.
 ///
@@ -54,8 +57,16 @@ use cambium_rootstock::{
 };
 
 impl Accessibility for A11yHost {
+    fn prepare_native_window(&mut self) {
+        self.bootstrap_native_window();
+    }
+
     fn adapter_state(&self) -> A11yAdapterState {
         self.adapter_state()
+    }
+
+    fn drain_actions(&mut self, owner: &cambium_rootstock::A11yOwner) -> Option<Vec<A11yRequest>> {
+        Some(self.drain_native_actions(owner))
     }
 
     fn sync(
@@ -111,136 +122,6 @@ impl A11yHost {
     /// Physical adapter installation only; this does not report latest tree publication.
     pub fn status(&self) -> BridgeStatus {
         self.bridge.status()
-    }
-
-    /// Project the current layout into an AccessKit tree (with each leaf's own
-    /// semantics), install it on the first call — revealing `window`, which must
-    /// have been created hidden so the adapter attaches first — and update it
-    /// after. Returns the screen reader's Click and Focus requests, in request
-    /// order and still typed, for the caller to route each through the matching
-    /// path (activation for `Click`, focus for `Focus`).
-    ///
-    /// `focus` is the app's currently-focused DOM node's opaque id (from
-    /// `LayoutDom::opaque_id`), used as the tree's focus when it is really in the
-    /// tree, so a stale id never points the reader at nothing.
-    fn sync_inner(
-        &mut self,
-        owner: &cambium_rootstock::A11yOwner,
-        dom: &cambium_rootstock::WindowDom<'_>,
-        layout: &cambium_rootstock::OwnedLayout,
-        leaves: &LeafRegistry<u64>,
-        producers: &ProducerRegistry,
-        focus: Option<u64>,
-        layout_scale: f64,
-    ) -> A11ySync {
-        if !owner.is_live() {
-            self.requests.clear();
-            self.namespace.clear();
-            return A11ySync {
-                requests: Vec::new(),
-                publication: A11yPublication::skipped(
-                    self.adapter_state(),
-                    A11yPublicationSkip::OwnerEnded,
-                ),
-            };
-        }
-        let Some(window) = self.window.clone() else {
-            // No window yet: nothing to install against, and no reader to ask.
-            return A11ySync {
-                requests: Vec::new(),
-                publication: A11yPublication::skipped(
-                    A11yAdapterState::Detached,
-                    A11yPublicationSkip::NoWindow,
-                ),
-            };
-        };
-        // Resolve queued events through the publication they could have seen,
-        // before reading contributors or replacing the published maps.
-        let requests = self
-            .bridge
-            .drain_actions()
-            .into_iter()
-            .filter_map(|req| {
-                self.map_parts(req.action, req.data, req.target_tree, req.target_node)
-            })
-            .collect();
-        let projection =
-            cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
-        let contribution_issues = projection.producer_issues.len();
-        let bindings = projection.publication_bindings(owner, dom, leaves, producers);
-        let mut tree = projection.tree;
-        scale_tree_to_window(&mut tree, dom, layout_scale);
-        let publication = bindings
-            .map_err(|issue| {
-                (
-                    A11yPublicationRefusal::InvalidBindings,
-                    format!("{issue:?}"),
-                )
-            })
-            .and_then(|bindings| {
-                self.namespace
-                    .prepare(tree, bindings)
-                    .map_err(|issue| (A11yPublicationRefusal::InvalidTree, format!("{issue:?}")))
-            });
-        let publication::Prepared {
-            tree,
-            namespace,
-            requests: next,
-        } = match publication {
-            Ok(candidate) => candidate,
-            Err((reason, issue)) => {
-                self.requests.clear();
-                self.namespace.clear();
-                eprintln!("[cambium-winit] accessibility publication refused: {issue}");
-                // Match install failure: a rejected accessibility tree must not
-                // leave the application hidden. A later sync may retry.
-                window.set_visible(true);
-                return A11ySync {
-                    requests: Vec::new(),
-                    publication: A11yPublication::refused(self.adapter_state(), reason),
-                };
-            },
-        };
-        let node_count = tree.nodes.len();
-        let mut outcome = A11yPublicationOutcome::Submitted {
-            nodes: node_count,
-            contribution_issues,
-        };
-        if !self.installed {
-            match self.bridge.install(&window, tree) {
-                Ok(()) => {
-                    self.installed = true;
-                    self.requests = next;
-                    self.namespace = namespace;
-                    eprintln!(
-                        "[cambium-winit] accessibility {:?}, {node_count} nodes projected",
-                        self.bridge.status()
-                    );
-                },
-                Err(e) => {
-                    self.requests.clear();
-                    self.namespace.clear();
-                    outcome = A11yPublicationOutcome::Refused {
-                        reason: A11yPublicationRefusal::AdapterInstall,
-                    };
-                    eprintln!("[cambium-winit] accessibility install failed: {e}");
-                },
-            }
-            // Keep the app usable on adapter failure; retry installation on the
-            // next sync rather than claiming that a failed install succeeded.
-            window.set_visible(true);
-        } else {
-            self.bridge.update(tree);
-            self.requests = next;
-            self.namespace = namespace;
-        }
-        A11ySync {
-            requests,
-            publication: A11yPublication {
-                adapter: self.adapter_state(),
-                outcome,
-            },
-        }
     }
 
     fn adapter_state(&self) -> A11yAdapterState {

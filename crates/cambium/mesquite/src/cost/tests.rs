@@ -137,3 +137,108 @@ fn phase_and_sample_limits_refuse_instead_of_silently_truncating() {
     assert!(c.begin("empty").is_err());
     assert!(c.begin("bad/name").is_err());
 }
+
+#[test]
+fn pending_attempts_keep_raw_work_and_latency_but_do_not_become_eligible_frames() {
+    let mut costs = Costs::default();
+    costs.begin("native").unwrap();
+    let totals = Totals {
+        redraws: 1,
+        mesh_bytes: 40,
+        instance_bytes: 20,
+    };
+    costs
+        .observe_attempt(
+            0,
+            Some(FrameProfile {
+                native_pending: true,
+                total_us: 7,
+                native_submit_us: 7,
+                ..Default::default()
+            }),
+            totals,
+            false,
+            true,
+            false,
+            false,
+        )
+        .unwrap();
+    costs
+        .observe_attempt(
+            0,
+            Some(FrameProfile {
+                native_pending: true,
+                total_us: 2,
+                native_collect_us: 2,
+                ..Default::default()
+            }),
+            totals,
+            false,
+            true,
+            false,
+            false,
+        )
+        .unwrap();
+    costs
+        .observe_attempt(
+            1,
+            Some(FrameProfile {
+                total_us: 10,
+                native_submit_us: 7,
+                native_collect_us: 3,
+                native_latency_us: 80_000,
+                ..Default::default()
+            }),
+            totals,
+            false,
+            true,
+            true,
+            true,
+        )
+        .unwrap();
+    // A failed acquisition can have no pending batch; it is still not presented.
+    costs
+        .observe_attempt(1, profile(9000), totals, false, true, true, false)
+        .unwrap();
+    costs.end().unwrap();
+    let report = costs.phases[0].report(true);
+    assert_eq!(report.samples.len(), 4);
+    assert_eq!(report.eligible_frames, 1);
+    assert_eq!(report.pending_attempts, 2);
+    assert_eq!(report.unpresented_attempts, 3);
+    assert_eq!(report.all_frames_us["total_us"].median, 10.0);
+    assert_eq!(report.all_frames_us["native_latency_us"].median, 80_000.0);
+    assert_eq!(report.all_attempt_counter_totals["actual_scene_redraws"], 1);
+    assert_eq!(report.eligible_counter_totals["actual_scene_redraws"], 0);
+    assert_eq!(costs.first_document.as_ref().unwrap().attempt, 3);
+    assert_eq!(costs.first_populated.as_ref().unwrap().attempt, 3);
+    assert_eq!(report.observed_ui_thread_us, 9012);
+    assert_eq!(costs.ui_thread_us, 9012);
+    assert_eq!(costs.attempts, 4);
+    assert_eq!(costs.native_pending_attempts, 2);
+    assert_eq!(costs.unpresented_attempts, 3);
+}
+
+#[test]
+fn a_phase_of_only_pending_attempts_cannot_qualify_as_a_presented_timing_phase() {
+    let mut costs = Costs::default();
+    costs.begin("pending").unwrap();
+    costs
+        .observe_attempt(
+            0,
+            Some(FrameProfile {
+                native_pending: true,
+                ..Default::default()
+            }),
+            Totals::default(),
+            false,
+            true,
+            false,
+            false,
+        )
+        .unwrap();
+    assert!(costs.end().is_err());
+    assert!(costs.first_document.is_none());
+    assert!(costs.first_populated.is_none());
+    assert_eq!(costs.phases[0].report(true).eligible_frames, 0);
+}

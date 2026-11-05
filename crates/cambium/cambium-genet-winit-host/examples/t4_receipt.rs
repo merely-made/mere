@@ -512,10 +512,12 @@ fn main() {
                 let count = ctx
                     .render_core
                     .and_then(|core| core.renderer().fragment_lower_count());
-                observed.set(count);
-                if want_control_lower {
-                    results_for_observer.borrow_mut().control_lower_after = count;
-                }
+                cambium_rootstock::PreparedPresentationObserver::new(move |_stamp| {
+                    observed.set(count);
+                    if want_control_lower {
+                        results_for_observer.borrow_mut().control_lower_after = count;
+                    }
+                })
             }));
             if want_pixels {
                 let sink = pending.clone();

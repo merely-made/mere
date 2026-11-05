@@ -233,39 +233,6 @@ where
     pub presentation: Option<PresentedFrame>,
 }
 
-/// The application's hooks. Plain closures, owned state lives in their
-/// captured environment (an `Rc<RefCell<...>>` for anything shared).
-pub struct HostHooks<State: 'static, Logic, V, T = Runner<State, Logic, V>>
-where
-    Logic: FnMut(&State) -> V,
-    V: RootView<State>,
-{
-    /// Runs at the top of every frame, before layout and paint: drive
-    /// animations, sync leaves, poll backends. Return `true` to keep frames
-    /// coming (an animation is live).
-    pub frame: FrameHook<State, Logic, V, T>,
-    /// The tail of every input dispatch: persist, push state to backends,
-    /// drain window-chrome requests.
-    pub after_dispatch: AppHook<State, Logic, V, T>,
-    /// Runs after a redraw attempt and accessibility synchronization. Inspect
-    /// `AppCtx::presentation` before doing work that requires a new presented
-    /// frame. Failed acquisition still gives asynchronous readback and bounded
-    /// presentation waits a turn; it must not advance a presentation scenario.
-    pub after_frame: AppHook<State, Logic, V, T>,
-    /// Runs after an application-owned worker wakes the host, before the
-    /// redraw it requested. Drain the application's own channel here.
-    pub after_wake: AppHook<State, Logic, V, T>,
-    /// Decides what a native or application-requested close means. The host
-    /// owns the resulting visibility or exit; the application owns policy.
-    pub close_request: CloseRequestHook<State, Logic, V, T>,
-    /// The text seam: which text field has focus, if any.
-    pub focused_text: Box<dyn Fn(&T) -> Option<FocusedTextSlot<State>>>,
-    /// Pre-dispatch keyboard intercept (Escape policy and friends). Return
-    /// `true` to consume the event; `after_dispatch` runs either way when
-    /// consumed.
-    pub key_intercept: Box<dyn FnMut(&mut T, &KeyPress) -> bool>,
-}
-
 /// What `init` hands back once the window exists.
 pub struct Init<State, Logic> {
     /// The application state the runner owns.
@@ -362,6 +329,10 @@ pub struct AppShared {
 /// and retained fragment IDs are retired. Shared-forest disposal is not qualified.
 #[must_use = "drop the disposal guard outside the host borrow"]
 pub struct HostDisposal {
+    #[cfg(not(target_arch = "wasm32"))]
+    pending_native: Option<crate::presentation::native::PendingFrame>,
+    #[cfg(not(target_arch = "wasm32"))]
+    native_waiter: Option<genet_render_host::NativeFrameWaiter>,
     producers: Option<crate::ProducerRegistry>,
     fragments: std::collections::HashMap<u64, (u64, u64)>,
     driver: Option<Box<dyn crate::PresentationDriver>>,
@@ -435,6 +406,12 @@ where
     pub(crate) last_leaf_boxes_us: u64,
     pub(crate) last_leaf_render_us: u64,
     pub(crate) last_leaf_repaints: u64,
+    // Retire all pending/output GPU ownership before the detach subscription.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub(crate) pending_native: Option<crate::presentation::native::PendingFrame>,
+    #[cfg(not(target_arch = "wasm32"))]
+    pub(crate) native_waiter: Option<genet_render_host::NativeFrameWaiter>,
+    pub(crate) raster_cache: crate::presentation::wgpu::RasterCache,
     /// What this window shares with the application's other windows.
     pub shared: AppShared,
     /// Declared after shared GPU resources so a closing host releases them
@@ -506,6 +483,11 @@ where
     pub pending_stamped_capture: Option<StampedCaptureFn>,
     pub presentation_host: u64,
     pub presentation_sequence: u64,
+    pub(crate) native_receiving: bool,
+    pub(crate) displayed_input: Option<Rc<crate::owned_layout::PresentedInput>>,
+    pub(crate) displayed_presentation: Option<PresentedFrame>,
+    pub(crate) native_completion_pending: Arc<AtomicBool>,
+    pub(crate) native_dirty: bool,
     /// The current redraw's successful presentation, cleared at the start of
     /// each attempt. Separate from the monotonic sequence, which survives a
     /// failed acquisition and a surface suspension.
@@ -590,4 +572,9 @@ mod commands;
 #[path = "host/hooks.rs"]
 mod hooks;
 
-pub use hooks::{AppHook, CloseRequestHook, FocusedTextHook, FrameHook, KeyInterceptHook};
+#[path = "host/presentation_hooks.rs"]
+mod presentation_hooks;
+
+pub use hooks::{
+    AppHook, CloseRequestHook, FocusedTextHook, FrameHook, HostHooks, KeyInterceptHook,
+};

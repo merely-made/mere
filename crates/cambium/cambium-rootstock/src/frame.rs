@@ -352,6 +352,10 @@ where
     }
 
     pub fn redraw(&mut self) {
+        #[cfg(not(target_arch = "wasm32"))]
+        if self.redraw_native() {
+            return;
+        }
         let trace = FrameTrace::new(self.s.presentation_host, self.s.presentation_sequence);
         macro_rules! trace {
             ($phase:expr, $($args:tt)*) => {
@@ -381,6 +385,7 @@ where
         let output = crate::presentation::wgpu::WgpuPresentation::new(surface).present(
             &prepared,
             &mut profile,
+            &mut self.s.raster_cache,
             trace.as_ref(),
         );
         let output = match output {
@@ -403,6 +408,9 @@ where
             _ => None,
         };
         let presented = prepared.presentation_stamp();
+        self.s.native_receiving = false;
+        self.s.displayed_input = None;
+        self.s.displayed_presentation = Some(presented);
         self.s.presentation_sequence = presented.sequence;
         let sequence = presented.sequence;
         self.s.last_redraw_presentation = Some(presented);
@@ -457,14 +465,13 @@ where
     /// skips the cascade when no rule can depend on that state, and skips
     /// text layout when the cascade leaves the computed styles unchanged.
     pub fn hover(&mut self) {
+        let hovered_node = self.hit_at_cursor();
         let (Some(runner), Some(layout)) = (self.s.runner.as_ref(), self.s.layout.as_mut()) else {
             return;
         };
-        let (x, y) = self.s.cursor;
         let dom = runner.dom();
         let dom_ref = dom.borrow();
         let view = crate::WindowDom::new(&dom_ref, runner.mount());
-        let hovered_node = layout.hit_test(&view, x, y);
         let focused_node = runner.focus();
         let hovered = hovered_node.map(|n| layout_dom_api::LayoutDom::opaque_id(&view, n));
         let focused = focused_node.map(|n| layout_dom_api::LayoutDom::opaque_id(&view, n));
@@ -496,7 +503,10 @@ where
             .and_then(|hit| self.s.runner.as_ref()?.hover_target(hit));
         if target == self.s.last_hover_hit {
             if let Some(target) = target {
-                let (local, size) = self.local_in(target);
+                let Some((local, size)) = self.input_local(target) else {
+                    self.s.last_hover_hit = None;
+                    return;
+                };
                 if let Some(runner) = self.s.runner.as_mut() {
                     runner.dispatch_hover(target, HoverEvent::new(HoverPhase::Move, local, size));
                 }
@@ -511,18 +521,27 @@ where
                 // A view replacement can retire the cached Leave target; its
                 // handler can also retire the prospective Enter target. Neither
                 // has geometry or an event route in the current document.
-                let live = self
-                    .s
-                    .runner
-                    .as_ref()
-                    .is_some_and(|runner| runner.dom().borrow().is_live(node));
+                let live = self.s.runner.as_ref().is_some_and(|runner| {
+                    let dom = runner.dom();
+                    let dom = dom.borrow();
+                    if self.s.native_receiving {
+                        crate::WindowDom::new(&dom, runner.mount()).contains(node)
+                    } else {
+                        dom.is_live(node)
+                    }
+                });
                 if !live {
                     if self.s.last_hover_hit == Some(node) {
                         self.s.last_hover_hit = None;
                     }
                     continue;
                 }
-                let (local, size) = self.local_in(node);
+                let Some((local, size)) = self.input_local(node) else {
+                    if self.s.last_hover_hit == Some(node) {
+                        self.s.last_hover_hit = None;
+                    }
+                    continue;
+                };
                 if let Some(runner) = self.s.runner.as_mut() {
                     runner.dispatch_hover(node, HoverEvent::new(phase, local, size));
                 }

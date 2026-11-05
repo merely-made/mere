@@ -37,6 +37,9 @@ fn source_identity() -> u64 {
 /// the host's `needs_frame` flag also force rasterization. Callback functions
 /// operate on the currently bound source, including after a library/session
 /// reopen replaces an otherwise identically revisioned source.
+/// The arbitrary mutable source callback does not imply transactional native
+/// staging; this adapter retains the legacy path until its source explicitly
+/// supplies a staged publication contract.
 pub struct SceneProducer<T> {
     source: Rc<RefCell<T>>,
     source_identity: u64,
@@ -187,7 +190,7 @@ impl<T> TextureProducer for SceneProducer<T> {
             .scene(logical_size.0, logical_size.1)
             .map_err(genet_render_host::RasterizeFailure::SourceError)?;
         let [width, height] = cx.frame.physical_size;
-        let (texture, view) = cx.core.try_rasterize_scaled_for(
+        let (texture, view) = cx.try_rasterize_scaled_for(
             self.raster_key,
             &scene,
             width,
@@ -256,6 +259,12 @@ mod tests {
             name: Some(source.name.clone()),
             children: Vec::new(),
         })
+    }
+
+    #[test]
+    fn arbitrary_mutable_source_callbacks_do_not_claim_transactional_staging() {
+        let producer = SceneProducer::new(source("source"), 83, frame, revision, semantics);
+        assert!(!producer.supports_native_staging());
     }
 
     #[test]

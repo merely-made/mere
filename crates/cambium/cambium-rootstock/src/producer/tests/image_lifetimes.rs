@@ -48,6 +48,7 @@ fn gpu_host_timestamps_and_visibility_reach_the_producer() {
         frame: Box::new(|_| false),
         after_dispatch: Box::new(|_| {}),
         after_frame: Box::new(|_| {}),
+        prepare_presentation: Box::new(|_, _| None),
         after_wake: Box::new(|_| {}),
         close_request: Box::new(|_, _| crate::CloseDisposition::Exit),
         focused_text: Box::new(|_| None),

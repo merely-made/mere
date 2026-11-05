@@ -32,10 +32,20 @@ where
     /// Browser context loss invalidates the current frame and captures before
     /// producers or presentation can run again. The retained runner survives.
     pub fn lose_presentation_context(&mut self) {
+        #[cfg(not(target_arch = "wasm32"))]
+        self.cancel_native(CaptureRefusal::ContextLost {
+            backend: crate::PresentationBackend::Wgpu,
+            generation: self
+                .s
+                .presentation_driver
+                .as_ref()
+                .map_or(crate::ContextGeneration(0), |d| d.generation()),
+        });
         let Some(driver) = self.s.presentation_driver.as_mut() else {
             return;
         };
         driver.lose();
+        self.s.raster_cache.clear();
         let refusal = CaptureRefusal::ContextLost {
             backend: driver.backend(),
             generation: driver.generation(),
@@ -60,6 +70,7 @@ where
                 if let Some(driver) = self.s.presentation_driver.as_mut() {
                     driver.lose();
                 }
+                self.s.raster_cache.clear();
                 self.s.surface = None;
                 self.s.needs_recovery_surface = true;
                 if let Some(window) = &self.s.window {
@@ -191,6 +202,10 @@ where
         }
         let status = owner.status();
         if let Some(loss) = status.loss() {
+            #[cfg(not(target_arch = "wasm32"))]
+            self.cancel_native(CaptureRefusal::DeviceLost(loss.clone()));
+            self.s.displayed_input = None;
+            self.s.displayed_presentation = None;
             self.s
                 .capture_owner
                 .scope()
@@ -204,6 +219,7 @@ where
                 if let Some(driver) = self.s.presentation_driver.as_mut() {
                     driver.lose();
                 }
+                self.s.raster_cache.clear();
                 self.s.surface = None;
                 self.s.shared.render_core = None;
                 self.s.needs_recovery_surface = true;
@@ -245,6 +261,12 @@ where
     /// A new device is ready but this window's surface could not be configured.
     /// Keep the failure typed and explicit; never reattach the lost surface.
     pub fn refuse_recovery_surface(&mut self, generation: u64, error: String) {
+        #[cfg(not(target_arch = "wasm32"))]
+        self.cancel_native(CaptureRefusal::SurfaceUnavailable {
+            generation,
+            error: error.clone(),
+        });
+        self.s.raster_cache.clear();
         self.s.surface = None;
         self.s.last_redraw_presentation = None;
         self.s.recovery_status = Some(RecoveryStatus::SurfaceUnavailable {

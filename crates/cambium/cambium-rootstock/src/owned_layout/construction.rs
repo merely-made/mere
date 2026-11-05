@@ -69,6 +69,7 @@ impl OwnedLayout {
             layout_with_text_us,
             content_extent_us,
             generation: 1,
+            input_lifetime: std::sync::Arc::new(()),
         }
     }
 

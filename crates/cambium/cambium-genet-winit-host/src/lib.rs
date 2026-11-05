@@ -64,6 +64,9 @@ mod harness;
 #[cfg(test)]
 mod headed_tests;
 mod key_admission;
+#[cfg(not(target_arch = "wasm32"))]
+mod native_diagnostics;
+mod redraw_turn;
 mod scene_producer;
 mod windows;
 #[cfg(target_os = "windows")]
@@ -78,9 +81,9 @@ pub use cambium_rootstock::{
     CloseRequest, CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook,
     FrameProfile, HOST_WHEEL_LINE_PX, Host, HostFont, HostHooks, HostImage, HostOptions,
     HostPointer, HostWake, HostWindow, IdlePolicy, Init, Key, KeyInterceptHook, KeyPress,
-    Modifiers, NamedKey, PaintCaptureFn, RelayoutProfile, Runner, ScrollAlign, ScrollIntoView,
-    Surface, WheelUnit, WindowCommand, WindowCommands, WindowFrame, WindowGeometry, WindowTree,
-    ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
+    Modifiers, NamedKey, PaintCaptureFn, PreparedPresentationObserver, RelayoutProfile, Runner,
+    ScrollAlign, ScrollIntoView, Surface, WheelUnit, WindowCommand, WindowCommands, WindowFrame,
+    WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
 pub use caption_controls::{
     CaptionLabels, caption_controls_for_frame, platform_caption_controls, platform_window_frame,
@@ -270,6 +273,9 @@ pub struct WinitSurface {
     surface: WindowSurface,
 }
 impl Surface for WinitSurface {
+    fn shared_core(&self) -> Option<Arc<RenderCore>> {
+        Some(self.core.clone())
+    }
     fn core(&self) -> &RenderCore {
         &self.core
     }
@@ -472,7 +478,28 @@ where
             self.core.attach_shared_recovery(core.shared_recovery());
             return Ok(core);
         }
-        let core = Arc::new(RenderCore::boot((self.options.netrender)())?);
+        let options = (self.options.netrender)();
+        #[cfg(not(target_arch = "wasm32"))]
+        let gpu_timing =
+            native_diagnostics::requested(std::env::var_os("CAMBIUM_NATIVE_GPU_TIMING").as_deref());
+        #[cfg(not(target_arch = "wasm32"))]
+        let options = native_diagnostics::with_gpu_timing(options, gpu_timing);
+        let core = Arc::new(RenderCore::boot(options)?);
+        // CPU/quality observations do not depend on timestamp capability.
+        // Instrumentation refusal is diagnostic and cannot refuse an app boot.
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Err(error) = core.enable_native_worker_diagnostics() {
+            eprintln!("[cambium-host] native worker attribution unavailable: {error}");
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        if gpu_timing {
+            eprintln!(
+                "[cambium-host] native GPU timing requested=true device-enabled={}",
+                core.device()
+                    .features()
+                    .contains(wgpu::Features::TIMESTAMP_QUERY)
+            );
+        }
         self.core_boots += 1;
         self.s.shared.render_core = Some(core.clone());
         self.core.attach_shared_recovery(core.shared_recovery());
@@ -1108,9 +1135,8 @@ where
         {
             window.request_redraw();
         }
-        self.process_wake();
-        self.sync_app_frame_extents();
-        self.run_window_commands();
+        self.application_wake_turn();
+        self.presentation_wake_turn();
     }
 
     /// One window event, through the host's routing, and the window verbs it
@@ -1209,7 +1235,7 @@ where
                 // distance under the finger as the pointer does, at any zoom.
                 // A wheel's `LineDelta` is a count of lines and is not scaled.
                 let (dx, dy) =
-                    genet_winit_host::wheel_delta_from_winit_logical(delta, self.layout_scale());
+                    genet_winit_host::wheel_delta_from_winit_logical(delta, self.input_scale());
                 self.wheel(dx, dy);
             },
             WindowEvent::Ime(ime) => self.ime(cambium_winit::composition_from_winit(&ime)),
@@ -1230,6 +1256,12 @@ where
                 },
             },
             WindowEvent::RedrawRequested => {
+                #[cfg(not(target_arch = "wasm32"))]
+                if self.core.coalesce_presentation_redraw() {
+                    self.drain_a11y_action_turn();
+                    return;
+                }
+
                 // The snapshot hooks read; refreshed here so a frame always
                 // sees where the window is now, as the live query used to.
                 self.refresh_geometry();
@@ -1238,33 +1270,8 @@ where
                 // The hook receives this attempt's presentation identity (or
                 // None), so scenarios pause while async readback and bounded
                 // presentation waits keep receiving turns.
-                let a11y_started = std::time::Instant::now();
-                self.sync_a11y();
-                if let Some(profile) = self.s.last_frame_profile.as_mut() {
-                    profile.a11y_us =
-                        a11y_started.elapsed().as_micros().min(u64::MAX as u128) as u64;
-                    profile.total_us = profile.total_us.saturating_add(profile.a11y_us);
-                    if perf_trace() {
-                        eprintln!("[cambium-host] frame {}", profile.summary());
-                    }
-                }
-                if frame_trace()
-                    && self.s.last_redraw_presentation.is_none()
-                    && let Some(window) = self.native_window.as_ref()
-                {
-                    #[cfg(target_os = "macos")]
-                    trace_owned_macos_window(window, "unpresented redraw");
-                    if let Some(failure) = &self.s.last_presentation_failure {
-                        eprintln!("[cambium-host] unpresented refusal: {failure}");
-                    }
-                    eprintln!(
-                        "[cambium-host] unpresented redraw visible={:?} focused={} minimized={:?}",
-                        window.is_visible(),
-                        window.has_focus(),
-                        window.is_minimized()
-                    );
-                }
-                self.with_ctx(Hook::AfterFrame);
+                self.finish_redraw_attempt();
+                return;
             },
             _ => {},
         }

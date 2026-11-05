@@ -26,6 +26,7 @@ use genet_scripted_dom::NodeId;
 use crate::meristem_bounds::RootView;
 use crate::{Host, Key, KeyPress, NamedKey};
 
+mod presented;
 mod trace;
 
 pub(crate) fn to_visual_caret(caret: CaretPosition) -> VisualCaret {
@@ -119,58 +120,6 @@ where
         self.s.cursor
     }
 
-    /// The topmost node at an arbitrary point, in the retained layout's own
-    /// coordinates.
-    ///
-    /// Hit testing is host machinery, not window machinery: a browser host asks
-    /// the same question of the same layout. Client-side decorations compose
-    /// this with their own reading of the node, rather than repeating the walk.
-    pub fn hit_at(&self, x: f32, y: f32) -> Option<NodeId> {
-        let runner = self.s.runner.as_ref()?;
-        let layout = self.s.layout.as_ref()?;
-        let dom = runner.dom();
-        let dom_ref = dom.borrow();
-        let view = crate::WindowDom::new(&dom_ref, runner.mount());
-        layout.hit_test(&view, x, y)
-    }
-
-    /// The retained layout, for callers that read it without re-hit-testing.
-    pub fn layout(&self) -> Option<&crate::OwnedLayout> {
-        self.s.layout.as_ref()
-    }
-
-    /// The cursor in `node`'s **local** coordinate space, plus `node`'s box
-    /// size — the pair a Cambium pointer or wheel handler normalizes with
-    /// (`local.0 / size.0` is a slider's value) without knowing layout.
-    ///
-    /// Use Genet's inverse accumulated paint transform and scroll geometry.
-    /// Custom leaves use their content box; ordinary controls use their border box.
-    /// `((0, 0), (0, 0))` when the node has no laid-out box.
-    pub(crate) fn local_in(&self, node: NodeId) -> ((f32, f32), (f32, f32)) {
-        let local =
-            self.s
-                .runner
-                .as_ref()
-                .zip(self.s.layout.as_ref())
-                .and_then(|(runner, layout)| {
-                    let dom = runner.dom();
-                    let dom_ref = dom.borrow();
-                    let view = crate::WindowDom::new(&dom_ref, runner.mount());
-                    layout.local_coordinates(&view, node, self.s.cursor)
-                });
-        local.unwrap_or(((0.0, 0.0), (0.0, 0.0)))
-    }
-
-    fn producer_admits_pointer(&self, node: NodeId) -> bool {
-        let Some((runner, layout)) = self.s.runner.as_ref().zip(self.s.layout.as_ref()) else {
-            return false;
-        };
-        let dom = runner.dom();
-        let dom = dom.borrow();
-        let view = crate::WindowDom::new(&dom, runner.mount());
-        layout.producer_admits_pointer(&view, node, self.s.cursor, &self.s.shared.producers)
-    }
-
     /// A left-button press in the content area: click, then drag capture, then
     /// the host's own click-to-caret default.
     pub fn click(&mut self) {
@@ -182,7 +131,9 @@ where
             return;
         }
         // 1. The click, carrying the real hit point in the target's space.
-        let (local, _) = self.local_in(node);
+        let Some((local, _)) = self.input_local(node) else {
+            return;
+        };
         let mut prevented = {
             let Some(runner) = self.s.runner.as_mut() else {
                 return;
@@ -199,8 +150,9 @@ where
             .runner
             .as_ref()
             .and_then(|runner| runner.pointer_target(node));
-        if let Some(target) = capture {
-            let (local, size) = self.local_in(target);
+        if let Some(target) = capture
+            && let Some((local, size)) = self.input_local(target)
+        {
             if let Some(runner) = self.s.runner.as_mut() {
                 runner.dispatch_pointer_down(
                     node,
@@ -262,7 +214,9 @@ where
             .runner
             .as_ref()
             .and_then(|runner| runner.pointer_target(node));
-        let (local, size) = self.local_in(target.unwrap_or(node));
+        let Some((local, size)) = self.input_local(target.unwrap_or(node)) else {
+            return;
+        };
         if let Some(runner) = self.s.runner.as_mut() {
             runner.dispatch_pointer_down(
                 node,
@@ -273,34 +227,6 @@ where
             );
         }
         self.after_dispatch();
-    }
-
-    /// Place the caret at the cursor when the press focused a text field, and
-    /// anchor a drag selection there.
-    fn place_caret_at_cursor(&mut self) {
-        let (Some(runner), Some(layout)) = (self.s.runner.as_mut(), self.s.layout.as_ref()) else {
-            return;
-        };
-        let Some(slot) = (self.hooks.focused_text)(runner) else {
-            return;
-        };
-        let (x, y) = self.s.cursor;
-        let caret = {
-            let dom = runner.dom();
-            let dom = dom.borrow();
-            let view = crate::WindowDom::new(&dom, runner.mount());
-            layout.caret_position_at_point(&view, slot.node, x, y)
-        };
-        let Some(caret) = caret else { return };
-        runner.update(|state| {
-            let input = (slot.get_mut)(state);
-            let position = from_visual_caret(caret);
-            input.apply(TextCommand::SetSelection(CaretSelection {
-                anchor: position,
-                focus: position,
-            }));
-        });
-        self.s.text_drag = Some(slot.node);
     }
 
     /// A pointer move while a drag is captured. Routed to the capturing
@@ -316,7 +242,9 @@ where
         else {
             return;
         };
-        let (local, size) = self.local_in(target);
+        let Some((local, size)) = self.input_local(target) else {
+            return;
+        };
         if let Some(runner) = self.s.runner.as_mut() {
             let button = runner
                 .pointer_capture_owner()
@@ -342,8 +270,9 @@ where
             .runner
             .as_ref()
             .and_then(|runner| runner.pointer_capture());
-        if let Some(target) = capture {
-            let (local, size) = self.local_in(target);
+        if let Some(target) = capture
+            && let Some((local, size)) = self.input_local(target)
+        {
             if let Some(runner) = self.s.runner.as_mut() {
                 runner.dispatch_pointer_up(
                     PointerEvent::new(PointerPhase::Up, local, size)
@@ -364,8 +293,9 @@ where
             .runner
             .as_ref()
             .and_then(|r| r.pointer_capture().zip(r.pointer_capture_owner()));
-        if let Some((target, (pointer_id, button))) = capture {
-            let (local, size) = self.local_in(target);
+        if let Some((target, (pointer_id, button))) = capture
+            && let Some((local, size)) = self.input_local(target)
+        {
             if let Some(runner) = self.s.runner.as_mut() {
                 runner.dispatch_pointer_cancel(
                     PointerEvent::new(PointerPhase::Cancel, local, size)
@@ -377,42 +307,6 @@ where
             self.after_dispatch();
         }
         self.s.text_drag = None;
-    }
-
-    pub fn drag_text_selection(&mut self) {
-        let Some(drag_node) = self.s.text_drag else {
-            return;
-        };
-        let (Some(runner), Some(layout)) = (self.s.runner.as_mut(), self.s.layout.as_ref()) else {
-            return;
-        };
-        let Some(slot) = (self.hooks.focused_text)(runner) else {
-            self.s.text_drag = None;
-            return;
-        };
-        if slot.node != drag_node {
-            self.s.text_drag = None;
-            return;
-        }
-        let (x, y) = self.s.cursor;
-        let caret = {
-            let dom = runner.dom();
-            let dom = dom.borrow();
-            let view = crate::WindowDom::new(&dom, runner.mount());
-            layout.caret_position_at_point(&view, slot.node, x, y)
-        };
-        let Some(caret) = caret else {
-            return;
-        };
-        runner.update(|state| {
-            let input = (slot.get_mut)(state);
-            let anchor = input.caret_selection().anchor;
-            input.apply(TextCommand::SetSelection(CaretSelection {
-                anchor,
-                focus: from_visual_caret(caret),
-            }));
-        });
-        self.after_dispatch();
     }
 }
 

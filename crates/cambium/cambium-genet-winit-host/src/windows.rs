@@ -291,6 +291,37 @@ where
         }
     }
 
+    /// Application results share one drain; image completions belong to each
+    /// receiving window. A completion alone never fans out fresh frame demand.
+    fn process_wake_turns(&mut self, event_loop: &ActiveEventLoop) -> Vec<ProjectionId> {
+        let first = self.multi().windows().next();
+        let application = first
+            .and_then(|id| {
+                self.multi()
+                    .with_window(id, |window| window.application_wake_turn())
+            })
+            .unwrap_or(false);
+        if application {
+            for id in self.multi().windows().collect::<Vec<_>>() {
+                self.want_frame(id);
+            }
+            // A shared application drain can close a different window. Honor
+            // those revocations before visiting its prepared presentation.
+            self.after_turn(event_loop, &[]);
+        }
+        let mut collected = Vec::new();
+        for id in self.multi().windows().collect::<Vec<_>>() {
+            if self
+                .multi()
+                .with_window(id, |window| window.presentation_wake_turn())
+                .unwrap_or(false)
+            {
+                collected.push(id);
+            }
+        }
+        collected
+    }
+
     fn launch(&mut self, event_loop: &ActiveEventLoop) {
         let init = self.init.take().expect("launched once");
         let WindowsInit {
@@ -420,25 +451,13 @@ where
     }
 
     fn user_event(&mut self, event_loop: &ActiveEventLoop, event: HostEvent) {
-        match event {
-            // The wake is the application's, not a window's: its drain hook
-            // runs once, in the first open window's turn.
+        let collected = match event {
             HostEvent::Wake => {
                 self.poll_shared_device_recovery();
-                let multi = self.multi();
-                let first = multi.windows().next();
-                if let Some(id) = first {
-                    multi.with_window(id, |window| window.wake_turn());
-                }
-                // What the drain changed may show in any window, through a
-                // leaf or a producer as easily as the document, so every
-                // window is asked for a frame.
-                for id in self.multi().windows().collect::<Vec<_>>() {
-                    self.want_frame(id);
-                }
+                self.process_wake_turns(event_loop)
             },
-        }
-        self.after_turn(event_loop, &[]);
+        };
+        self.after_turn(event_loop, &collected);
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, native: WindowId, event: WindowEvent) {

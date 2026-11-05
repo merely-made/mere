@@ -76,6 +76,19 @@ where
     /// Retire staged images before a platform drops/replaces its surface, or
     /// suspend transient targets while the containing window is hidden.
     pub fn suspend_producers(&mut self) {
+        #[cfg(not(target_arch = "wasm32"))]
+        self.cancel_native(crate::CaptureRefusal::PresentationError {
+            backend: crate::PresentationBackend::Wgpu,
+            generation: crate::ContextGeneration(
+                self.s
+                    .shared
+                    .render_core
+                    .as_ref()
+                    .map_or(0, |core| core.generation()),
+            ),
+            source_key: None,
+            error: "prepared picture cancelled while presentation was suspended".into(),
+        });
         let dom = self
             .s
             .runner
@@ -112,6 +125,32 @@ where
     }
 
     pub(crate) fn prepare_producers(&mut self, scale: f32) -> ProducerFrameStats {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            self.prepare_producers_impl(scale, None)
+        }
+        #[cfg(target_arch = "wasm32")]
+        {
+            self.prepare_producers_impl(scale)
+        }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub(crate) fn prepare_producers_staged(
+        &mut self,
+        scale: f32,
+        submission: &genet_render_host::NativeFrameSubmission,
+    ) -> ProducerFrameStats {
+        self.prepare_producers_impl(scale, Some(submission))
+    }
+
+    fn prepare_producers_impl(
+        &mut self,
+        scale: f32,
+        #[cfg(not(target_arch = "wasm32"))] submission: Option<
+            &genet_render_host::NativeFrameSubmission,
+        >,
+    ) -> ProducerFrameStats {
         self.s.shared.producers.clear_render_failure();
         if let Some(core) = self.s.shared.render_core.as_ref() {
             self.s.shared.producers.bind_core(core);
@@ -154,6 +193,12 @@ where
                 shared.producers.forget_device();
             }
             return ProducerFrameStats::default();
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Some(submission) = submission {
+            return shared
+                .producers
+                .prepare_window_staged(surface, layout, &view, scale, &elsewhere, submission);
         }
         shared
             .producers

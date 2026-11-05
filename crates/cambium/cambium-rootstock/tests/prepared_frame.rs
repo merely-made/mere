@@ -249,7 +249,10 @@ fn shared_redraw_observes_only_successful_driver_frames_and_refuses_failed_captu
     let counts = observed.clone();
     state.pending_presentation_observer = Some(Box::new(move |_, stamp| {
         assert_eq!(stamp.sequence, 1);
-        counts.set(counts.get() + 1);
+        PreparedPresentationObserver::new(move |accepted| {
+            assert_eq!(stamp, accepted);
+            counts.set(counts.get() + 1);
+        })
     }));
     let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
     let mut host = Host::new(
@@ -312,7 +315,9 @@ fn driver_cannot_commit_a_stamp_from_another_context() {
     }));
     let observed = Rc::new(Cell::new(false));
     let observation = observed.clone();
-    state.pending_presentation_observer = Some(Box::new(move |_, _| observation.set(true)));
+    state.pending_presentation_observer = Some(Box::new(move |_, _| {
+        PreparedPresentationObserver::new(move |_| observation.set(true))
+    }));
     let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
     let mut host = Host::new(
         HostOptions::default(),
