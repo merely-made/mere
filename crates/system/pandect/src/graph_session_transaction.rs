@@ -113,6 +113,7 @@ impl<B: LegacyTransactionBackend> GraphSession<B> {
             self.stored(pending);
             return Ok(());
         }
+        self.ensure_writable()?;
         self.commit(pending, CommitExtra::default()).await
     }
 
@@ -442,6 +443,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             saved_pending_links_revision: self.saved_pending_links_revision,
             retained_pending_links_revision: self.retained_pending_links_revision,
             merge_marks: self.merge_marks.clone(),
+            observing: self.observing,
         }
     }
 }

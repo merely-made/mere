@@ -126,6 +126,8 @@ pub enum SessionError {
     /// A component fork's seed names no node.
     NoSuchNode(Uuid),
     ReadOnly(SessionId),
+    /// This handle only observes the session; another holds its one writer.
+    Observing(SessionId),
     Validation(String),
     Store(StoreError),
     /// A merge-in cannot go ahead: the source is not a branch or picked-off
@@ -149,6 +151,11 @@ impl std::fmt::Display for SessionError {
             Self::ReadOnly(id) => write!(
                 f,
                 "session {} is read-only (a codicil thaw, or merged); fork or branch before editing",
+                id.as_uuid()
+            ),
+            Self::Observing(id) => write!(
+                f,
+                "session {} is open here to view only; edit it where its writer is open",
                 id.as_uuid()
             ),
             Self::Validation(reason) => write!(f, "candidate graph refused: {reason}"),
@@ -706,6 +713,9 @@ pub struct GraphSession<B> {
     /// Merged marks to write on other sessions: an undone merge clears its
     /// source's, a redone one sets it again.
     merge_marks: Vec<(SessionId, Option<MergedMark>)>,
+    /// Whether this handle only observes: every edit and write refuses, and
+    /// nothing records it, so the stored session never learns of it.
+    observing: bool,
 }
 
 #[path = "graph_session_transaction.rs"]
@@ -775,6 +785,7 @@ impl<B: Backend> GraphSession<B> {
             saved_pending_links_revision: 0,
             retained_pending_links_revision: 1,
             merge_marks: Vec::new(),
+            observing: false,
         }
     }
 
@@ -995,6 +1006,7 @@ impl<B: Backend> GraphSession<B> {
             saved_pending_links_revision: 1,
             retained_pending_links_revision: 1,
             merge_marks: Vec::new(),
+            observing: false,
         };
         session.load_views().await?;
         record_into(&mut session.graph, &session.pending);
@@ -1250,7 +1262,21 @@ impl<B: Backend> GraphSession<B> {
         Ok(())
     }
 
+    /// Make this handle an observer: it reads the stored session and refuses
+    /// every edit before it runs. One view of a profile writes; others observe.
+    pub fn observe(mut self) -> Self {
+        self.observing = true;
+        self
+    }
+
+    pub fn is_observing(&self) -> bool {
+        self.observing
+    }
+
     pub fn ensure_writable(&self) -> Result<(), SessionError> {
+        if self.observing {
+            return Err(SessionError::Observing(self.id()));
+        }
         if self.manifest.codicil_read_only || self.manifest.merged.is_some() {
             return Err(SessionError::ReadOnly(self.id()));
         }
@@ -3536,6 +3562,56 @@ mod tests {
             bytes.push((key.clone(), store.get(&key).await.unwrap().unwrap()));
         }
         bytes
+    }
+
+    #[test]
+    fn an_observer_reads_the_stored_session_and_refuses_every_edit() {
+        pollster::block_on(async {
+            let store = muniment::MemoryBackend::default();
+            let sessions = MereSessions::new(store.clone());
+            let id = sessions.mint(person(), None).await.unwrap().session_id;
+            let mut writer = sessions.open(id).await.unwrap();
+            writer.apply(person(), vec![add(1)]).await.unwrap();
+            let key = ViewKey::new("graphshell", "panel").unwrap();
+            let mut observer = sessions.open(id).await.unwrap().observe();
+            assert!(observer.is_observing());
+            assert_eq!(
+                observer.graph().nodes().count(),
+                1,
+                "it reads what was committed"
+            );
+            let frozen = stored_bytes(&store).await;
+            assert!(matches!(
+                observer.apply(person(), vec![add(2)]).await,
+                Err(SessionError::Observing(_))
+            ));
+            assert!(matches!(
+                observer.edit_now(person(), |_| panic!("must not execute")),
+                Err(SessionError::Observing(_))
+            ));
+            assert!(matches!(
+                observer.undo(person()).await,
+                Err(SessionError::Observing(_))
+            ));
+            assert!(matches!(
+                observer
+                    .set_view(person(), key, ViewIntent::default())
+                    .await,
+                Err(SessionError::Observing(_))
+            ));
+            observer.flush(wall_clock_now()).await.unwrap();
+            assert_eq!(
+                stored_bytes(&store).await,
+                frozen,
+                "an observer writes nothing"
+            );
+            assert_eq!(observer.graph().nodes().count(), 1);
+
+            // The writer keeps committing; a fresh observer sees it.
+            writer.apply(person(), vec![add(2)]).await.unwrap();
+            let reopened = sessions.open(id).await.unwrap().observe();
+            assert_eq!(reopened.graph().nodes().count(), 2);
+        });
     }
 
     #[test]

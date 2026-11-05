@@ -583,6 +583,45 @@ an API being documented is not a passing receiving test.
       exclusions apply only to visits queued later.
     - Captured nodes land overlapping until the layout settles.
 
+- 2026-11-05, P0 co-viewing (Graphshell port and pandect; not qualified):
+  - A second view of the installed profile now follows the writer rather than
+    standing by.
+  - `GraphSession::observe` makes a handle that refuses every edit before it
+    runs (`SessionError::Observing`) and is never stored.
+  - `MereHost::observe` opens the latest session that way, without advancing
+    the epoch or migrating. Its `persist` stores nothing and refuses
+    anything pending; its candidate commits and staging are refused.
+  - The follower hands no store to documents, panes or retained content, and
+    takes no capture.
+  - The writer posts `committed` when a save finishes; followers reread the
+    store then, and when shown.
+  - **Edit here** takes the lock and remounts that view as the writer. The
+    old writer reloads into a follower. A closed writer's lock is taken by a
+    follower within about 2 s.
+  - Checked:
+    - pandect and graphshell lib tests (299 and 322 pass), including an
+      observer that sees the writer's commits, refuses an edit before it
+      lands, and leaves the stored bytes unchanged.
+    - Headed Chromium and Firefox with two views of one profile:
+      - captures made by the writer appear in the follower, at once if it is
+        shown, otherwise when it is shown;
+      - **Edit here** reverses the roles, and capture continues in the new
+        writer;
+      - closing the writer promotes the follower;
+      - a new view joins as a follower;
+      - reloads agree;
+      - dragging and wheeling the follower's canvas raised no refusal.
+    - The `history` grant was made in the test copies for these runs.
+  - Open:
+    - Product-level edits in a follower are refused by the host and reported
+      as an error; they are not yet hidden or disabled in the UI.
+    - Follower documents, panes and retained content are unavailable rather
+      than read-only.
+    - A writer that reloads by itself can lose the lock to a follower polling
+      for a vacancy.
+    - The side panel as a follower was not inspected in this build.
+    - Each refresh reopens the whole session.
+
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
 when the first run is recorded, with workspace artifacts under `Code/output`.
