@@ -223,7 +223,10 @@ its data reaches a second device.
 - **O6. Linking derived identities to conversations (D3).** How a transport
   identity (a Reticulum or Misfin address, a station key) is attested as
   derived from the persona, so its conversations can be claimed.
-- **O7. Which domains add their own key (D6).**
+- **O7. Optional vault protection is available to any domain (D6).** Mark
+  confirmed on 2026-11-05 that any domain may add a vault key. Persona sealing
+  remains the base layer for persona-associated data. Vault creation, recovery,
+  unlock and delegation are open design questions.
 
 ## Findings
 
