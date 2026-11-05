@@ -657,6 +657,82 @@ an API being documented is not a passing receiving test.
     here**. It fails without the change.
   - Open: no real browser reload was run; the smoke fakes Web Locks and the
     channel.
+- 2026-11-05, P0 followers queue edits (Graphshell port; not qualified):
+  - Decision (Mark, 2026-11-05): a follower holds a read-only store and hands
+    its edits to the writer, which admits them. The writer lock stays in
+    Graphshell; muniment gains no helper.
+  - A follower now opens its store through `IndexedDbBackend::read_only()`
+    (Eidetic `1da8d5a`). Documents, panes and retained content get that
+    handle, so they read; a save through it is refused by the store and shown
+    by the pane, never dropped. `forme_source` and `retained_store` hand on
+    only a handle that reports itself read-only. This closes the earlier open
+    item above.
+  - Queued from a follower: **Add an object** by address, and **Send changes**
+    for a title and tags. Everything else stays "Viewing only": choosing a
+    file, the command menu's storing commands, link and assertion hides and
+    withdrawal, item role, relations and facets, projections, couplings,
+    scenes and session undo or redo.
+  - `graphshell::follower_edit` holds the request, the reply and the writer's
+    ledger. A request is `{id, view, base, edit}`; `base` is the session id
+    and projection epoch the follower last read, and an edit of an object also
+    carries the title and tags it read. The writer refuses, with a reason, a
+    request whose session or epoch has moved on (a new session, or any writer
+    reopening), one whose object has since changed, one for a missing object,
+    and one from a view that is itself following. It admits through
+    `create_address` with `persist_intake`, and through `save_metadata`: the
+    functions its own forms call, stored before the answer.
+  - Transport is on the existing views channel: `edit`, `edit-received`,
+    `edit-reply` and `writer-ready`. `follower-queue.js` sends a request once,
+    once to each writer that announces itself afterwards, and once more if
+    nothing acknowledged it. The page and the Rust app exchange the messages
+    as DOM events. The follower shows the edit as sent, then admitted or
+    refused with the reason, and reads again after a refusal and after the
+    writer's `committed`.
+  - Dedupe: the writer answers an id once from its ledger of the last 256 and
+    replays that answer for a repeat. The page keeps an edit it has handed to
+    the app and does not hand it over twice. A writer that reloaded has no
+    ledger, and a repeat is still safe: an address already held is returned,
+    and a title and tags already equal to the request's are admitted as
+    already applied.
+  - A writer with an edit in hand answers a handover request with `busy`, as
+    it does for a save. A writer that closes mid-request answers nothing; the
+    follower that takes the lock announces itself and each other follower
+    sends its waiting edit once. A follower closed before the answer loses
+    only the answer.
+  - Checked:
+    - graphshell lib tests (330, eight new): a writer admits a follower's new
+      object and title and tags; a stale epoch, a changed object and a missing
+      object are refused with the stored bytes unchanged; a repeated id is
+      admitted once, also when it carries other content; a follower admits
+      nothing; a write-refusing store handle cannot open as the writer or
+      store, and its bytes do not move; the wire shapes refuse unknown fields.
+      pandect lib tests (299) pass.
+    - `smoke-writer-handover.mjs`, extended: queue, answer, duplicates while
+      stored and after, a silent writer (one resend, then a refusal),
+      a writer that dies mid-request with the other follower taking over and
+      answering once, and no handover while an edit is held.
+    - The Wasm build, and headed Chromium (the Browser pane, three tabs of one
+      origin, with the extension runtime stubbed by a test page, a real Web Lock
+      and `BroadcastChannel`): a follower's address went to the writer, was
+      stored there, and appeared in the follower with an `admitted` answer; the
+      follower opened the workbench pane on the read-only store without error
+      and the IndexedDB contents were unchanged.
+    - Closing the writer with an edit waiting: the submitting follower took the
+      lock, and its edit was lost (see Open).
+  - Open:
+    - A writer in a hidden tab runs no frames, so it admits a queued edit when
+      it is shown; the follower meanwhile reaches its limit and reports no
+      answer. The edit is still applied later.
+    - A follower that takes the writer with its own edit unanswered drops it,
+      with only a console warning: the new writer's epoch makes it stale.
+      Resending to a different follower after a writer closes was run only in
+      the smoke, not in a browser.
+    - The title and tags path, and an edit refused as stale, ran in tests but
+      not headed. Firefox and the real extension runtime were not run.
+    - The command menu's **New node** stays view-only though **Add an object**
+      is queued.
+    - Mere's Eidetic pin predates the read-only handle, so these checks used
+      Eidetic `8b4b3ec` locally; the build needs the repin.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
