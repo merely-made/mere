@@ -547,6 +547,42 @@ an API being documented is not a passing receiving test.
     only when shown, because the frame loop pauses; each batch reloads the
     capture's access records, a cost that grows with history.
 
+- 2026-11-05, B1 headed runs (Graphshell port; not qualified):
+  - Chromium: Chrome for Testing 1234, headed, with the unpacked build. The
+    run used the Chromium test switch that auto-accepts the permission prompt.
+  - Firefox: Firefox 159.0.1, headed, with the build installed as a temporary
+    add-on through WebDriver BiDi. Optional-permission prompts were
+    auto-granted by pref, and the event page was set to suspend after 3 s.
+  - Both browsers passed the same steps:
+    - an empty first open;
+    - a real click on **Enable capture**;
+    - a→b→c in another tab appearing in the open view, in Firefox across a
+      suspended event page;
+    - after a browser restart, the same graph reopened and kept capturing;
+    - a saved excluded origin stayed out of the queue and the graph;
+    - the side panel or sidebar opened while the tab kept the one writer
+      (Chromium showed it on standby);
+    - **Stop capture** removed `history` and admitted nothing more.
+  - Fixes from the runs:
+    - In Firefox, the workspace never finished opening on a new profile. The
+      mount waited on `navigator.storage.persist()`, which Firefox holds until
+      a person answers its prompt. That wait is now bounded, and the extension
+      declares `unlimitedStorage`.
+    - In Firefox, a page message that reaches the event page while it
+      suspends is refused. The page now retries that error.
+  - Open:
+    - Firefox needed test-only plumbing: BiDi cannot open `moz-extension:`
+      pages, so the test copy opens the workspace on install; scripts in the
+      page need system access; and a temporary add-on keeps its storage across
+      a restart only through the keep-on-uninstall prefs. A signed install
+      and the real prompts in both browsers remain unrun.
+    - Private windows were not exercised.
+    - Chromium reports `persisted()` false despite `unlimitedStorage`, so the
+      storage line may understate how durable the store is.
+    - An exclusion saved after a visit is already queued does not remove it:
+      exclusions apply only to visits queued later.
+    - Captured nodes land overlapping until the layout settles.
+
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
 when the first run is recorded, with workspace artifacts under `Code/output`.
