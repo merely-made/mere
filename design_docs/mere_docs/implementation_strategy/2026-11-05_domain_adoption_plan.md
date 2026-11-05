@@ -225,8 +225,24 @@ its data reaches a second device.
   derived from the persona, so its conversations can be claimed.
 - **O7. Optional vault protection is available to any domain (D6).** Mark
   confirmed on 2026-11-05 that any domain may add a vault key. Persona sealing
-  remains the base layer for persona-associated data. Vault creation, recovery
-  and unlock are open design questions.
+  remains the base layer for persona-associated data. Mark confirmed on
+  2026-11-05 that the optional vault has an independent unlock. Opening the
+  persona leaves the vault locked.
+
+  **Proposed unlock and recovery.** Generate a random vault key at creation.
+  On a supported device, a PIN can authorize release through device-backed
+  custody with enforced retry limits. For portable passphrase unlock, derive
+  a wrapping key with Argon2id and use it to seal the random vault key.
+  Recovery uses a separate high-entropy credential that can recover the
+  vault key. A persona-associated vault still needs persona access to open
+  its base layer. An anonymous vault has its own recovery credential and
+  uses it to recover access without a persona. The exact recovery format
+  and enrollment ceremony remain open.
+
+  **Proposed lifetime.** Locking clears access while leaving the vault on
+  disk. A disposable vault can use the same format with an explicit
+  retention or wipe policy. Wipe scope must account for recovery copies
+  and replicas separately.
 
   **Authority grants (Mark, 2026-11-05).** Use Meadowcap as the model for
   scoped delegation. An owner can sign a grant naming a recipient, the
