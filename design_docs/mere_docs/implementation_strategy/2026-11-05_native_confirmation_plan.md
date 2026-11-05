@@ -1,10 +1,11 @@
 # Native confirmation repair
 
-**Status, 2026-11-05: confirmation repair qualified; receiving in progress.**
+**Status, 2026-11-05: confirmation repair and S-PC receiving qualified.**
 S-PC reached actual native application approval through the repaired dialog.
-Its later rollback came from a separate confined SSH-agent crash. Mere owns the
-platform-dialog repair; Dramatis's fleet rollout owns the agent correction,
-recovery, installed-binary acceptance and later root-trust steps.
+Dramatis fixed the separate confined SSH-agent crash and verified receiving,
+cold reopen and the consent pin with that same recorded application approval.
+Mere owns the platform dialog. Dramatis owns the custody rollout and remote
+consent checks.
 
 This implements the native answer boundary required by D25 of the
 [capability door plan](2026-10-30_capability_door_plan.md). That plan owns
@@ -132,4 +133,8 @@ generated delivery/cache files after their owners have exited.
   real application approval and original vault-list comparison. The later SSH
   agent crash is owned by Dramatis and reproduced by its certificate-bearing
   confinement gate. Preserve/reuse the actual approved CLI policy after validation;
-  full personal receiving remains open while the corrected custodian is prepared.
+  full personal receiving remained open while the corrected custodian was prepared.
+- 2026-11-05: S-PC's successful corrected-agent retry verified the original
+  identity, catalog, SSH agent and weekly settings while reusing the actual
+  application approval. The same approval survived cold reopen. Dramatis owns
+  the separate outbound SSH and live root pin readback receipts.

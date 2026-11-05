@@ -153,3 +153,11 @@ also passes, with native service replacement/acceptance still open. The actual
 accepted CLI grant is preserved for exact validated reuse, not synthesized anew.
 Complete runtime evidence lives in Dramatis's fleet-agent continuity receipts.
 Its record reserve is now3000000 bytes within the unchanged160000000 peak cap.
+
+## 2026-11-05: S-PC receiving and preserved approval verified
+
+The corrected Dramatis custodian passed personal receiving with the unchanged
+Mere resident and CLI. The resumed run verified the prior actual application
+approval and original vault/agent continuity. Cold reopen retained that approval
+and the same encrypted vault. Native result and remote pin readback live in
+`dramatis/design_docs/archive_docs/receipts/2026-11-05_fleet_agent_continuity_receipts.md`.
