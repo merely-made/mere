@@ -1,7 +1,8 @@
 # Release log: carrier-neutral sites, shares and clips
 
 **Status:** 2026-11-05: in progress. R2's first slice and R3's stream-sync
-slice landed; R1 is prepared and publishing (see Progress). Sharing semantics
+slice landed; R1 published; R7, R4's grammar and R6's first slice landed;
+consumers move to `p2mere-*` in a family repin (see Findings, "Wave 2"). Sharing semantics
 refined in D9–D11 and R6. Phases rescoped 2026-11-03
 after a redundancy pass over Eidetic, Murm, Gemot, Dramatis, Armillary, Errand,
 Distillery and Mere (Findings, "Redundancy pass"). Design:
@@ -666,6 +667,69 @@ or a precise reference alone, and no storage migration is selected here.
 - **R3 open.** The 24 MiB snapshot over Reticulum (M12's resource carriage),
   the R4 resolver and gossip over non-iroh carriers.
 
+### Wave 2, 2026-11-05
+
+- **R1 published.** All eleven `p2mere-*` 0.8.0 crates are on crates.io
+  (`p2mere` and `-core`, `-auth`, `-encryption`, `-store`, `-discovery`,
+  `-spaces`, `-stream`, `-sync`, `-net`, `-blobs`), from `merely-made/p2mere`
+  tag `p2mere-0.8.0` (`b6899c09`). The dry run found that `p2panda-sync` and
+  `p2panda-net` use `mpsc::Sender` as a `Sink` without enabling
+  `futures-channel`'s `sink` feature; workspace unification hid it, upstream
+  has the same gap, and the fork now enables it (`UPSTREAM.md`). crates.io
+  allows five new crate names in a burst, then about one per ten minutes.
+- **R1 consumers are a family repin, not a manifest edit.** Roots reach p2panda
+  both directly and through git dependencies on each other (eidetic, murm,
+  dramatis, gemot, knot-editor, mere). A repo that switches to `p2mere-*` while
+  another in the same graph still resolves the patched `p2panda-*` gets two
+  copies of each type. The switch has to move every repo in dependency order
+  with their locks, as one coordinated refresh.
+- **R7 key tiers.** Dramatis `cc7b99e`: Personae `UnassociatedKeypair` (fresh
+  Ed25519, zeroized, no raw-seed constructor, persisted only by
+  `seal`/`unseal`) and a sealed `CarrierKeypair` trait implemented only by
+  `DerivedKeypair` and `UnassociatedKeypair`, so a master key still can't reach
+  a transport; insigne `AssociationClaim` with `AssociationRevocation`, signed
+  by the subject key and scoped by `CapabilityScope`. Murm `e92fe5f17ed`:
+  `P2pandaTransport::builder_for` and a new `ReticulumTransport::builder_for`
+  take `&impl CarrierKeypair`; an unassociated key's Reticulum identity shares
+  neither half with the persona. The I2P plan records the D3 decision
+  (unassociated by default on anonymous carriers).
+- **R7 open.** SAM destination keys don't yet come from `UnassociatedKeypair`;
+  an association claim proves only the subject's consent (no associate
+  countersignature or revocation ledger); unassociated keys aren't wired into
+  wallet or vault custody; no Tor transport. Arti 0.48.0 looks buildable
+  without compiled C with `default-features = false`, `tokio`, rustls and no
+  `static` or `compression`, but still links the system libsqlite3 through
+  `tor-dirmgr`; that needs a `cargo tree` check. Murm's `--lib` kill/timing
+  tests and `seed_residue` didn't finish clean under load and weren't compared
+  with unchanged main.
+- **R4 address grammar.** `gemot-address` (`gemot/crates/address`, no
+  dependencies; re-exported as `gemot_site::address`):
+  `knot://<64-hex key>/<path>[@<64-hex edition>]` and the governed
+  `knot://<64-hex anchor>.moot/<path>[@…]`. Display round-trips for Copy link;
+  hosts and pins render lowercase; today's Personae-root addresses parse
+  unchanged. Turnstone's `parse_place_held_address` uses it (gemot `3b4c254`,
+  `9cfa40f`, `37e7a77`, `e3cc052`; turnstone `b73883d`). `mere://` names no
+  Moots or co-op sessions today.
+- **R6 first slice.** gemot-site `clip.rs`: a `ClipPayloadV1` named by its
+  blake3 digest in a `Clip` edition with provenance; `open_clip` verifies from
+  the address key; `republish` starts a new log under the republisher's key
+  whose first edition names the source in `fork_of`. Knot `EditionFrame`
+  (knot-editor `77e2818`) opens an address and republishes, returning the new
+  Copy-link address. Turnstone's `clip_edition` builds the edition, but the
+  live clip path doesn't sign one yet: it needs R7's custody wiring.
+- **R4/R6 open.** The `.moot` host carries one 32-byte value while
+  `CollectionRef` is two (`moot_id`, `collection_id`), so the resolver has to
+  settle which it names. `fork_of` names an edition, not its log key, so a
+  fork carries the source address only as an unverified hint. Clip payload
+  digests stand in for blob manifests until M12. Named-recipient grants aren't
+  built; clips and forks are reference or bearer only. Reader history over clip
+  frames is untested.
+- **Pins.** Mere still pins eidetic `7a3453a`; Knot and Turnstone reach
+  gemot-site at eidetic `a7a1458` beside their older copy, and moving only
+  their eidetic rows breaks `pandect` (`FacetId` mismatch). `cargo update -p
+  knot-editor` in Turnstone drags all of Mere, Genet and Dramatis main, so
+  Turnstone takes gemot-site directly under `authoring` until a family refresh.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -693,3 +757,6 @@ or a precise reference alone, and no storage migration is selected here.
   library names unchanged and adds `UPSTREAM.md`; the umbrella publishes as
   `p2mere` (Mark's call). The umbrella's `tests/api.rs` hung for about ten
   minutes in four tests and was not checked against the untouched tag.
+- 2026-11-05: wave 2. R1 published (`p2mere-*` 0.8.0, tag `p2mere-0.8.0`); R7
+  first slice (dramatis `cc7b99e`, murm `e92fe5f17ed`); R4 grammar and R6 first
+  slice (gemot `3b4c254`…`e3cc052`, knot-editor `77e2818`, turnstone `b73883d`).
