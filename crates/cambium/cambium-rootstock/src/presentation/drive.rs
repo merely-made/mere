@@ -57,6 +57,9 @@ where
             },
         };
         self.s.last_presentation_failure = None;
+        self.s.native_receiving = false;
+        self.s.displayed_input = None;
+        self.s.displayed_presentation = Some(presented);
         self.s.presentation_sequence = presented.sequence;
         self.s.last_redraw_presentation = Some(presented);
         let backend = self

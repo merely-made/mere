@@ -260,6 +260,15 @@ pub trait Product: Sized {
         CostObservation::default()
     }
 
+    /// Optional bounded scalar diagnostics from the product's work counters.
+    /// Acquired after producer/UI stage clocks, so snapshot/serialization work
+    /// is outside those clocks. Cumulative readings need stable epochs across
+    /// replacement; repeated snapshots are provenance, not additional work.
+    fn cost_details(&self, ctx: &Ctx<'_, Self>) -> Option<serde_json::Value> {
+        let _ = ctx;
+        None
+    }
+
     /// Handle a scenario verb the generic grammar did not recognize.
     /// `checkpoints` is the read-only view of what `remember` has taken, so a
     /// product verb compares against the same checkpoints the shared verbs do.

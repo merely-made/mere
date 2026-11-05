@@ -15,7 +15,7 @@ use std::{
 };
 
 use crate::{CaptureBackend, Readback, capture::NativeCapture};
-use cambium_rootstock::{Duration, Instant, PresentedFrame};
+use cambium_rootstock::{Duration, Instant, PreparedPresentationObserver, PresentedFrame};
 use serde::Serialize;
 use taproot::{Outcome, Progress, Scenario};
 
@@ -369,18 +369,19 @@ impl<P: Product> Lane<P> {
             files.install(ctx.files);
         }
         let presented = self.admit_frame(ctx.window.is_some(), ctx.presentation, now);
-        if presented {
-            let observation = self.product.cost_observation(ctx);
-            if let Err(why) = self.costs.observe(
-                self.frames,
-                ctx.frame_profile,
-                observation.totals,
-                self.pending.is_some(),
-                observation.valid,
-                observation.populated,
-            ) {
-                self.errors.push(why);
-            }
+        let observation = self.product.cost_observation(ctx);
+        let details = self.product.cost_details(ctx);
+        if let Err(why) = self.costs.observe_attempt_with_details(
+            self.frames,
+            ctx.frame_profile,
+            observation.totals,
+            self.pending.is_some(),
+            observation.valid,
+            observation.populated,
+            presented,
+            details,
+        ) {
+            self.errors.push(why);
         }
         self.collect_capture(ctx);
         if self
@@ -555,33 +556,20 @@ impl<P: Product> Lane<P> {
             let sink = seal.clone();
             let run = observer.run;
             let measured_run = run.clone();
-            *ctx.presentation_observer = Some(Box::new(move |ctx, presentation| {
-                *sink.borrow_mut() = Some((observer.observe)(ctx, presentation).and_then(
-                    |projection| {
-                        // Include run/request/frame identity as well as the frozen
-                        // projection in admission accounting.
-                        #[derive(Serialize)]
-                        struct Admission<'a> {
-                            run: &'a str,
-                            request: u64,
-                            presentation: crate::Presentation,
-                            projection: &'a crate::CaptureProjection,
-                        }
-                        let metadata = Admission {
-                            run: &measured_run,
-                            request,
-                            presentation: presentation.into(),
-                            projection: &projection,
-                        };
-                        let encoded_bytes =
-                            crate::pairing::encoded_size(&metadata, limits.max_projection_bytes)?;
-                        Ok(crate::pairing::SealedProjection {
-                            presentation,
-                            projection,
-                            encoded_bytes,
-                        })
-                    },
-                ));
+            *ctx.presentation_observer = Some(Box::new(move |ctx, proposed| {
+                // Freeze before native validation waits. Publication later receives
+                // only the stamp and these owned readings, never a live AppCtx.
+                let frozen = (observer.observe)(ctx, proposed);
+                PreparedPresentationObserver::new(move |actual| {
+                    *sink.borrow_mut() = Some(crate::pairing::seal_projection(
+                        &measured_run,
+                        request,
+                        proposed,
+                        actual,
+                        frozen,
+                        limits.max_projection_bytes,
+                    ));
+                })
             }));
             self.next_capture_request = next_request;
             self.paired_requests += 1;

@@ -56,6 +56,8 @@ pub struct RelayoutProfile {
 /// wgpu, Vello, or a platform event loop.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FrameProfile {
+    /// Additive, packet-bound UI/worker observations. Missing clocks stay null.
+    pub native_work: crate::NativeWorkAttribution,
     pub producers: crate::ProducerFrameStats,
     pub total_us: u64,
     pub frame_hook_us: u64,
@@ -77,6 +79,30 @@ pub struct FrameProfile {
     pub emit_scene_us: u64,
     pub shadows_us: u64,
     pub raster_us: u64,
+    /// The complete raster was retained; no new checked raster was submitted.
+    pub raster_reused: bool,
+    /// Submission/empty collection attempts have no newly presented picture.
+    pub native_pending: bool,
+    /// UI preparation and encoding, without asynchronous qualification time.
+    pub native_submit_us: u64,
+    /// UI collection and publication, including surface acquisition.
+    pub native_collect_us: u64,
+    /// Preparation to presentation wall time, including worker qualification.
+    pub native_latency_us: u64,
+    /// A measured native timing partition is present, including zero spans.
+    pub native_timing_available: bool,
+    /// Preparation to scheduling the completion job.
+    pub native_preseal_us: u64,
+    /// Scheduling to completion-worker start; not host-thread work.
+    pub native_queue_us: u64,
+    /// Worker qualification wall time, including polls/scopes; not GPU time.
+    pub native_worker_us: u64,
+    /// Qualified result ready to successful channel receipt, including dispatch.
+    pub native_ready_to_collect_us: u64,
+    /// Successful channel receipt to completed publication, before host A11y.
+    pub native_postcollect_us: u64,
+    /// Sum of the five disjoint intervals; boundaries are rounded cumulatively.
+    pub native_timeline_us: u64,
     pub acquire_us: u64,
     pub clear_us: u64,
     pub compose_us: u64,
@@ -84,6 +110,10 @@ pub struct FrameProfile {
     pub capture_us: u64,
     pub pointer_us: u64,
     pub a11y_us: u64,
+    /// Adapter tree synchronization, including a legacy combined adapter's drain.
+    pub a11y_publish_us: u64,
+    /// Independent action draining and host dispatch; no tree publication.
+    pub a11y_actions_us: u64,
     pub raster_total_us: u64,
     pub tile_invalidate_us: u64,
     pub dirty_tile_rebuild_us: u64,
@@ -192,7 +222,11 @@ impl FrameProfile {
     /// One compact line suitable for a headed receipt's diagnostic log.
     pub fn summary(self) -> String {
         format!(
-            "total={}us hook={}us relayout={}us layout-update={}us tick={}us apply={}us layout-rebuild={}us style-resolve={}us layout-text={}us content-extent={}us mutations={} layout-rebuilt={} leaf-boxes={}us leaf-render={}us leaf-repaints={} fragments={}us emit={}us raster={}us acquire={}us clear={}us compose={}us capture={}us present={}us a11y={}us raster-inner={}us invalidate={}us rebuild={}us master={}us vello={}us dirty-tiles={} producer={}us staging={}us producer-calls={} stages={}",
+            "native-pending={} native-submit={}us native-collect={}us native-latency={}us total={}us hook={}us relayout={}us layout-update={}us tick={}us apply={}us layout-rebuild={}us style-resolve={}us layout-text={}us content-extent={}us mutations={} layout-rebuilt={} leaf-boxes={}us leaf-render={}us leaf-repaints={} fragments={}us emit={}us raster={}us raster-reused={} acquire={}us clear={}us compose={}us capture={}us present={}us a11y={}us raster-inner={}us invalidate={}us rebuild={}us master={}us vello={}us dirty-tiles={} producer={}us staging={}us producer-calls={} stages={} work=[{}]",
+            self.native_pending,
+            self.native_submit_us,
+            self.native_collect_us,
+            self.native_latency_us,
             self.total_us,
             self.frame_hook_us,
             self.relayout_us,
@@ -211,6 +245,7 @@ impl FrameProfile {
             self.leaf_fragments_us,
             self.emit_scene_us,
             self.raster_us,
+            self.raster_reused,
             self.acquire_us,
             self.clear_us,
             self.compose_us,
@@ -227,6 +262,7 @@ impl FrameProfile {
             self.producers.stage_us,
             self.producers.render_calls,
             self.producers.stages,
+            self.native_work.summary(),
         )
     }
 }

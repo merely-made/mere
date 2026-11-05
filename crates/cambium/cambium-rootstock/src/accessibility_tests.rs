@@ -6,6 +6,7 @@
 
 //! Accessibility focus follows the runner, independently of hover restyling.
 
+mod action_tails;
 mod activation_tests;
 mod outcome_tests;
 mod publication_tests;

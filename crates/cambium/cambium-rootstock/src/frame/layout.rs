@@ -293,6 +293,9 @@ where
     /// coordinates the cursor uses. `None` with no focused field, before a
     /// layout, or while the caret is scrolled out of its field.
     pub fn focused_caret_rect(&self) -> Option<(f32, f32, f32, f32)> {
+        if !self.input_layout_is_displayed() {
+            return None;
+        }
         let (node, caret, _) = self.focused_overlay()?;
         let layout = self.s.layout.as_ref()?;
         let runner = self.s.runner.as_ref()?;
@@ -306,6 +309,9 @@ where
     /// Where the focused field's selection paints, one rect per line run, in
     /// the same coordinates, clipped to the field. Empty with no selection.
     pub fn focused_selection_rects(&self) -> Vec<(f32, f32, f32, f32)> {
+        if !self.input_layout_is_displayed() {
+            return Vec::new();
+        }
         let Some((node, _, Some((start, end)))) = self.focused_overlay() else {
             return Vec::new();
         };
@@ -340,6 +346,9 @@ where
     /// Tell the platform IME where the caret is, so a candidate window opens
     /// beside the text rather than at the window origin.
     pub(crate) fn sync_ime_area(&self) {
+        if !self.input_layout_is_displayed() {
+            return;
+        }
         let (Some(window), Some(layout), Some(runner)) = (
             self.s.window.as_ref(),
             self.s.layout.as_ref(),

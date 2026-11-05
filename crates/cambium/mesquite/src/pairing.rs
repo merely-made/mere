@@ -19,7 +19,8 @@ pub struct CaptureProjection {
     pub product: serde_json::Value,
 }
 
-/// A factory result, evaluated once at the successful presentation boundary.
+/// A factory evaluated once while the candidate frame is prepared. Its owned
+/// result is sealed only if that exact frame is accepted for presentation.
 /// `run` is a product-supplied fresh run identity, not a clock/sequence guess.
 pub type CaptureObserverFn<P> =
     Box<dyn FnOnce(&Ctx<'_, P>, PresentedFrame) -> Result<CaptureProjection, String>>;
@@ -116,3 +117,42 @@ pub(crate) fn encoded_size(value: &impl Serialize, limit: usize) -> Result<usize
     serde_json::to_writer(&mut counter, value).map_err(|error| error.to_string())?;
     Ok(counter.bytes)
 }
+
+/// Seal only owned prepare-time facts, never a later product context.
+pub(crate) fn seal_projection(
+    run: &str,
+    request: u64,
+    expected: PresentedFrame,
+    actual: PresentedFrame,
+    projection: Result<CaptureProjection, String>,
+    limit: usize,
+) -> Result<SealedProjection, String> {
+    if actual != expected {
+        return Err("capture presentation changed after preparation".into());
+    }
+    let projection = projection?;
+    #[derive(Serialize)]
+    struct Admission<'a> {
+        run: &'a str,
+        request: u64,
+        presentation: Presentation,
+        projection: &'a CaptureProjection,
+    }
+    let encoded_bytes = encoded_size(
+        &Admission {
+            run,
+            request,
+            presentation: actual.into(),
+            projection: &projection,
+        },
+        limit,
+    )?;
+    Ok(SealedProjection {
+        presentation: actual,
+        projection,
+        encoded_bytes,
+    })
+}
+
+#[cfg(test)]
+mod tests;

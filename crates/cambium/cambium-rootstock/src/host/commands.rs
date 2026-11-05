@@ -61,12 +61,18 @@ where
 {
     /// The callback handed to the AccessKit adapter. It fires on the adapter's
     /// own thread when a screen reader acts on an otherwise idle application,
-    /// and its only job is to raise the flag [`idle_policy`](Self::idle_policy)
-    /// reads — the wake path a test can prove end to end without an OS
-    /// adapter to stand in for the screen reader.
+    /// and signals the event source with its own flag. The next idle policy
+    /// requests an action-service turn without labelling it application work.
     pub fn a11y_waker(&self) -> impl Fn() + Send + Sync + 'static {
-        let wake = self.s.a11y_wake.clone();
-        move || wake.store(true, Ordering::Relaxed)
+        let notify = self.wake.notification(self.s.a11y_wake.clone());
+        move || notify()
+    }
+
+    /// Consume an accessibility-only notification without preparing a frame.
+    /// Event sources service the last tree's actions, including hidden-window
+    /// refusals, before considering a new picture or native completion.
+    pub fn take_a11y_wake(&self) -> bool {
+        self.s.a11y_wake.swap(false, Ordering::AcqRel)
     }
 
     /// Decide what the event loop does on an idle turn, consuming the
@@ -74,7 +80,7 @@ where
     /// so the wake path is assertable: `Wait` really means nothing is pending,
     /// and a raised wake really becomes a repaint rather than being swallowed.
     pub fn idle_policy(&mut self, now: crate::Instant) -> IdlePolicy {
-        if self.s.a11y_wake.swap(false, Ordering::Relaxed) {
+        if self.take_a11y_wake() {
             return IdlePolicy::A11yWake;
         }
         // Overlay scrollbars mid-hold/mid-fade keep frames coming until
@@ -100,6 +106,7 @@ where
             frame: Box::new(|_| false),
             after_dispatch: Box::new(|_| {}),
             after_frame: Box::new(|_| {}),
+            prepare_presentation: Box::new(|_, _| None),
             after_wake: Box::new(|_| {}),
             close_request: Box::new(|_, _| CloseDisposition::Exit),
             focused_text: Box::new(|_| None),

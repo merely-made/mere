@@ -26,6 +26,12 @@ pub use portable::PortableCaptureError;
 pub(crate) use portable::PortablePlan;
 use portable::PortableSlot;
 
+#[path = "legacy.rs"]
+mod legacy;
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "native.rs"]
+mod native;
+
 // Rootstock physical producer IDs use the upper half of Netrender's
 // lower-62-bit producer domain, below its generated shadow-mask range.
 // Full renderer keys are 0xE000_0000_0000_0000..0xFFFF_0000_0000_0000.
@@ -187,6 +193,7 @@ fn remap_gpu_display_list(
     Ok(())
 }
 
+#[derive(Clone)]
 struct Image {
     output: ProducedTexture,
     size: [u32; 2],
@@ -218,6 +225,9 @@ struct Entry {
     logical_size: (f32, f32),
     error: Option<ProducerError>,
     portable: Option<PortableSlot>,
+    force_frame: bool,
+    #[cfg(not(target_arch = "wasm32"))]
+    accepted_semantics: Option<native::SemanticSnapshot>,
 }
 
 /// Registrations survive CSS hiding; removing a previously bound DOM node
@@ -241,10 +251,14 @@ pub struct ProducerRegistry {
     // renderer. A weak handle never keeps the lost device/core alive.
     cleanup_core: Weak<genet_render_host::RenderCore>,
     pub(super) timestamp: Option<std::time::Duration>,
+    #[cfg(not(target_arch = "wasm32"))]
+    staged: Option<native::StagedPreparation>,
 }
 
 impl Drop for ProducerRegistry {
     fn drop(&mut self) {
+        #[cfg(not(target_arch = "wasm32"))]
+        self.discard_staged(None);
         if let Some(core) = self.cleanup_core.upgrade() {
             self.retire_renderer_images(&core);
         }

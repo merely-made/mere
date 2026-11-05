@@ -13,64 +13,6 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
-    /// The focused text field's node and selection, before dispatch.
-    pub(super) fn focused_text_selection(&self) -> Option<(NodeId, CaretSelection)> {
-        let runner = self.s.runner.as_ref()?;
-        let slot = (self.hooks.focused_text)(runner)?;
-        Some((slot.node, (slot.get)(runner.state()).caret_selection()))
-    }
-
-    /// The host's caret default: move the focused field's selection **visually**
-    /// — through the laid-out lines, so wrapped and bidi text move the way they
-    /// look — starting from `base`, the selection as it stood before dispatch.
-    ///
-    /// The field's own key handler has already applied its *logical* move by
-    /// the time this runs (arrow keys route like any other key now), so this
-    /// deliberately recomputes from `base` and overwrites it. The layout-aware
-    /// answer wins; the field keeps working unchanged in a host that has no
-    /// layout to consult.
-    pub(super) fn move_focused_text_visual(
-        &mut self,
-        press: &KeyPress,
-        base: Option<(NodeId, CaretSelection)>,
-    ) {
-        let word = press.modifiers.ctrl || press.modifiers.alt;
-        let Some(movement) = press.caret_movement(word) else {
-            return;
-        };
-        let Some((base_node, base_selection)) = base else {
-            return;
-        };
-        let (Some(runner), Some(layout)) = (self.s.runner.as_mut(), self.s.layout.as_ref()) else {
-            return;
-        };
-        let Some(slot) = (self.hooks.focused_text)(runner) else {
-            return;
-        };
-        // Focus moved during dispatch: there is no caret context to continue.
-        if slot.node != base_node {
-            return;
-        }
-        // The borrow ends with the move: the update below rebuilds the tree.
-        let moved = {
-            let dom = runner.dom();
-            let dom_ref = dom.borrow();
-            layout.selection_visual_move(
-                &crate::WindowDom::new(&dom_ref, runner.mount()),
-                slot.node,
-                to_visual_selection(base_selection),
-                movement,
-                press.modifiers.shift,
-            )
-        };
-        let Some(moved) = moved else {
-            return;
-        };
-        runner.update(|state| {
-            (slot.get_mut)(state).apply(TextCommand::SetSelection(from_visual_selection(moved)));
-        });
-    }
-
     /// Release the named key in the host's platform-neutral input state.
     /// Releasing Tab ends held-Tab spatial navigation; other releases have no
     /// host default. This does not synthesize an application key press/action.
@@ -119,7 +61,7 @@ where
             } else if self.s.tab_held
                 && let Some(dir) = press.direction()
             {
-                let moved = self.focus_spatial(dir);
+                let moved = self.input_layout_is_displayed() && self.focus_spatial(dir);
                 if trace {
                     eprintln!("[cambium-host]   spatial {dir:?} moved={moved}");
                 }
@@ -243,77 +185,5 @@ where
             composition,
         )));
         self.after_dispatch();
-    }
-
-    /// A wheel notch, in logical pixels. The event source normalizes lines
-    /// versus pixels; both winit and the DOM report both kinds.
-    pub fn wheel(&mut self, dx: f32, dy: f32) {
-        let _trace = trace::InputSpan::start("wheel");
-        // The notch as it arrived, before the Shift axis swap: Ctrl+wheel
-        // zooms on the vertical gesture whatever Shift is doing.
-        let raw_dy = dy;
-        // Desktop convention (shared cambium-winit policy): Shift + vertical
-        // wheel scrolls horizontally.
-        let (dx, dy) = wheel_axes(dx, dy, self.s.modifiers.shift);
-        let hit = self.hit_at_cursor();
-        // 1. The view layer first: the nearest `on_wheel` ancestor of the hit
-        //    node gets the notch, with cursor-local coordinates so it can
-        //    anchor a zoom under the pointer.
-        let mut prevented = false;
-        if let Some(node) = hit {
-            let target = self
-                .s
-                .runner
-                .as_ref()
-                .and_then(|runner| runner.wheel_target(node));
-            if let Some(target) = target {
-                let (local, size) = self.local_in(target);
-                if let Some(runner) = self.s.runner.as_mut() {
-                    runner.dispatch_wheel(
-                        node,
-                        WheelEvent::new((dx, dy), local, size)
-                            .with_modifiers(self.s.modifiers.into()),
-                    );
-                    prevented = runner.default_prevented();
-                }
-                self.after_dispatch();
-            }
-        }
-        // 2. The host default: scroll the nearest overflow container under the
-        //    cursor (the engine hit-tests, clamps, and chains). Suppressed when
-        //    a handler consumed the notch, so a canvas that pans on the wheel
-        //    does not also scroll the page behind it.
-        if prevented {
-            return;
-        }
-        // 2a. Ctrl+wheel steps the zoom instead of scrolling — a host default
-        //     like the scrolling one, and gated the same way, so a canvas that
-        //     runs its own Ctrl+wheel zoom keeps it by preventing the default.
-        //     Wheeling *up* (toward the start of the document) enlarges, which
-        //     is every browser's direction.
-        if self.s.modifiers.ctrl && raw_dy != 0.0 {
-            self.step_ui_zoom(raw_dy < 0.0);
-            self.after_dispatch();
-            return;
-        }
-        let (x, y) = self.s.cursor;
-        let scrolled = if let (Some(runner), Some(layout)) =
-            (self.s.runner.as_ref(), self.s.layout.as_mut())
-        {
-            let dom = runner.dom();
-            let dom_ref = dom.borrow();
-            let view = crate::WindowDom::new(&dom_ref, runner.mount());
-            layout.scroll_at_target(&view, x, y, dx, dy)
-        } else {
-            None
-        };
-        if let Some(target) = scrolled {
-            // Wake the scrolled target's overlay bar; the fade clock keeps
-            // redraws coming until it hides again.
-            self.s.scrollbar_fade.note(target, crate::Instant::now());
-            if let Some(window) = self.s.window.as_ref() {
-                window.request_redraw();
-            }
-        }
     }
 }

@@ -23,6 +23,9 @@ pub enum A11yPublicationSkip {
     NoWindow,
     NoRunner,
     NoLayout,
+    /// This turn cannot publish a new displayed geometry/source. The previously
+    /// submitted tree and its independently admitted actions may remain live.
+    PendingPresentation,
     OwnerEnded,
 }
 

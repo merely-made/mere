@@ -105,8 +105,13 @@ pub const fn backend_attempts(choice: PresentationChoice) -> &'static [Presentat
 mod frame;
 pub use frame::*;
 mod prepare;
+pub(crate) mod raster_cache;
 pub(crate) mod wgpu;
 mod wgpu_driver;
 pub use wgpu_driver::{PortableMaterializer, WgpuDriver, WgpuSurfaceFactory};
 
 mod drive;
+mod publication;
+pub use publication::PreparedPresentationObserver;
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod native;

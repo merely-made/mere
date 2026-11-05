@@ -460,6 +460,7 @@ fn main() {
 
     let after_frame_lane = lane.clone();
     let hooks: HostHooks<Smoke, Logic, Child> = HostHooks {
+        prepare_presentation: Box::new(|_, _| None),
         frame: Box::new(|_ctx| false),
         after_dispatch: Box::new(|_ctx| {}),
         after_frame: Box::new(move |ctx: &mut AppCtx<'_, Smoke, Logic, Child>| {

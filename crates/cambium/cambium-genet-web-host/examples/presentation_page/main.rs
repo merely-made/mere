@@ -222,8 +222,10 @@ pub fn request_capture(id: u32) -> u32 {
         let mounted = &mounts[id as usize];
         let mut host = mounted.host().borrow_mut();
         let observed = probe.clone();
-        host.s.pending_presentation_observer = Some(Box::new(move |_, stamp| {
-            observed.borrow_mut().expected = Some(stamp)
+        host.s.pending_presentation_observer = Some(Box::new(move |_, _proposed| {
+            cambium_rootstock::PreparedPresentationObserver::new(move |stamp| {
+                observed.borrow_mut().expected = Some(stamp);
+            })
         }));
         host.s.pending_stamped_capture = Some(Box::new(move |capture| {
             probe.borrow_mut().pending = Some(capture.map_err(|e| e.to_string()))

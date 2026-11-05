@@ -56,6 +56,7 @@ pub async fn start(canvas_id: String) -> Result<(), JsValue> {
             images: Vec::new(),
         },
         HostHooks {
+            prepare_presentation: Box::new(|_, _| None),
             frame: Box::new(|_ctx| false),
             after_dispatch: Box::new(|_ctx| {}),
             after_frame: Box::new(|_ctx| {}),

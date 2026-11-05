@@ -76,6 +76,16 @@ where
             pending_stamped_capture: None,
             presentation_host: next_host_identity(),
             presentation_sequence: 0,
+            raster_cache: Default::default(),
+            native_receiving: false,
+            displayed_input: None,
+            displayed_presentation: None,
+            native_completion_pending: Arc::new(AtomicBool::new(false)),
+            native_dirty: false,
+            #[cfg(not(target_arch = "wasm32"))]
+            pending_native: None,
+            #[cfg(not(target_arch = "wasm32"))]
+            native_waiter: None,
             last_redraw_presentation: None,
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
@@ -105,6 +115,13 @@ impl Drop for HostDisposal {
     fn drop(&mut self) {
         // Registry cleanup uses its weak core while the detached core is live.
         // Release all owned GPU resources before opening the detach barrier.
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Some(mut pending) = self.pending_native.take() {
+            pending.refuse(CaptureRefusal::HostDisposed);
+            drop(pending);
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        drop(self.native_waiter.take());
         drop(self.producers.take());
         let fragments = std::mem::take(&mut self.fragments);
         if let Some(core) = &self.core {
