@@ -1,10 +1,10 @@
 # Native confirmation repair
 
-**Status, 2026-11-05: in progress.** S-PC's isolated custody receiving reached
-native unlock and the selected weekly lock settings, then rolled back after an
-application-confirmation backend failure was persisted as an owner refusal.
-Mere owns this platform-dialog repair. Dramatis's fleet rollout owns recovery,
-installed-binary acceptance and the later root-trust steps.
+**Status, 2026-11-05: confirmation repair qualified; receiving in progress.**
+S-PC reached actual native application approval through the repaired dialog.
+Its later rollback came from a separate confined SSH-agent crash. Mere owns the
+platform-dialog repair; Dramatis's fleet rollout owns the agent correction,
+recovery, installed-binary acceptance and later root-trust steps.
 
 This implements the native answer boundary required by D25 of the
 [capability door plan](2026-10-30_capability_door_plan.md). That plan owns
@@ -98,7 +98,7 @@ human-response deadline.
 
 ## Retention
 
-UI receipts have a 200000-byte subcap within the fleet rollout's 2000000-byte
+UI receipts have a 200000-byte subcap within the fleet rollout's 3000000-byte
 record reserve; the shared receiving peak remains 160000000 bytes. Candidate,
 recovery and compressed delivery copies stay in that shared count. Reuse stable
 Cargo targets/build directories, preserve unrelated WIP, and remove only verified
@@ -128,3 +128,8 @@ generated delivery/cache files after their owners have exited.
   staged on S-PC by bounded streaming, with no T/controller archive copies.
   The final resume driver and read-only PS5 preflight pass; native receiving,
   target loader acceptance and real owner choice remain open in P3.
+- 2026-11-05: S-PC's corrected loader continuation passed native vault unlock,
+  real application approval and original vault-list comparison. The later SSH
+  agent crash is owned by Dramatis and reproduced by its certificate-bearing
+  confinement gate. Preserve/reuse the actual approved CLI policy after validation;
+  full personal receiving remains open while the corrected custodian is prepared.

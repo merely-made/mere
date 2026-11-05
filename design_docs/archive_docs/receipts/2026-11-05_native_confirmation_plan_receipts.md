@@ -136,3 +136,20 @@ Actual PS5 read-only preflight passes. The all-host record reserve is2000000
 bytes for retained history and private code/journals, within the same160000000
 peak cap; the controlling raw-pair window is155972520 bytes. Native vault and
 real application admission remain pending.
+
+## 2026-11-05: real S-PC approval reached; later agent fault is separate
+
+The d89 continuation passed actual native vault/polkit interaction, application
+approval and the original vault-slot comparison. Its saved failure stage is
+`verify-original-agent-identities`. Public system logs identify a confined agent
+panic; all original files were restored and independently verified. This does
+qualify the repaired native application-answer path on S-PC. It does not qualify
+complete personal receiving or Linux executable pinning for that label grant.
+
+Dramatis reproduced the agent crash with a seeded SSH identity: hostname lookup
+calls blocked `uname` during certificate generation. Its narrow fix and expanded
+certificate/signing gate pass on T/S/Y/R/X. Exact-normal-binary interoperability
+also passes, with native service replacement/acceptance still open. The actual
+accepted CLI grant is preserved for exact validated reuse, not synthesized anew.
+Complete runtime evidence lives in Dramatis's fleet-agent continuity receipts.
+Its record reserve is now3000000 bytes within the unchanged160000000 peak cap.
