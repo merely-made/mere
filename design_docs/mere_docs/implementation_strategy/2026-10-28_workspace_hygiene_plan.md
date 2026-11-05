@@ -5,9 +5,9 @@
 **For:** keeping the family's repositories buildable from a clean checkout and consistent in releases, versions, registry names, dependency currency and license headers. Opened by Mark's 2026-09-23 audit of the publishable crates (reserved crates receive their capabilities; components are modules), the 2026-09-16 lattice rulings, the 2026-10-08 refresh scope (mere, genet and netrender, the rest by propagation) and the 2026-08-22 license ruling (MPL-2.0 by default with correct provenance).
 Not here: the mere-apparatus row of C2 (exact presented frame, worker qualification, human AT), which is `2026-10-28_diagnostics_and_accessibility_plan.md`; CXF import (chatelaine plan P4 onward), which is the chatelaine and CXF plan in the dramatis repository; the Burn cohort's residue, carried vendor patches and the ESP package receipt, which are `2026-10-28_distillery_models_plan.md`, and S63's consolidated ML plan, which that plan is; dynamics determinism and permitted actions (S3 to S6) and C3's libm figure at 5,000 bodies, which are `2026-10-28_dynamics_grammar_plan.md`; the lexical capability plan's L1, L3, L5 and Turnstone L4 (S42), which stay in `2026-09-16_lexical_capability_plan.md`; the MPL section 3.2 executable-form notice (one line in an About panel or installer), which is the packaging lane in `2026-10-28_family_update_resident_plan.md`; the Linebender text family and glyph-facing types, which are netrender's Vello lane (`netrender-notes/2026-10-08_vello_upstream_lane.md`); the 441 audit findings, which are routed by `2026-10-28_source_audit_repairs_plan.md`; the Linux and macOS headed runs of other plans' gates, which are `2026-10-28_platform_qualification_plan.md` (F18 and F20, phase X1, stay here).
 
-Receipts from this plan's runs go to `archive_docs/<date>/`, never into this
-plan (DOC_POLICY §8). Evidence that matters is a test in the repository or a
-line in Findings.
+Receipts from this plan's runs go to `Code/testing/mere/`; fixed inputs read by
+code stay in the owning `tests/fixtures/` home. Evidence that matters is a test
+in the repository or a line in Findings.
 
 ## Constraints
 
@@ -263,6 +263,10 @@ their live tools and open repair conditions have a maintained home.
   `support/link-model`; Q465's close contract has source-bound controls and an owned
   headless macOS browser receipt. Full Instrument product qualification remains
   with Cambium presentation and needs its original or freshly qualified inputs.
+  The three fresh link-family packets at source `8675407b1` now pass their full
+  verifier, complete CPU inventories, headed AMD WebGPU seed/reopen scenarios and
+  26 image reviews. Their [checkpoint](../../../../../testing/mere/closure-audit/batch-10-checkpoint.md)
+  records exact packet homes, hashes, ignored tests and retained historical limits.
 - From: the standing receipt-home instruction and the 2026-11-04 closure approval.
 
 ## Open questions
@@ -304,6 +308,17 @@ their live tools and open repair conditions have a maintained home.
 - 2026-08-27: Cargo does not copy a workspace-root `LICENSE` into a member package (verified on retinue), which is why published crates ship SPDX and Exhibit A with no license text file (sweep 382-410).
 
 ## Progress
+
+- 2026-11-05: fresh ordinary paths, shared attachments and counted topology qualify
+  at Mere `8675407b1ab56ca843cca6b21ac685c14dfd8b1f`, with the Netrender
+  `b14e8452` import repair. Canvas passes 673 tests, Graphshell web 287 and Seiche
+  224; the inventories retain 19, 6 and 10 ignored tests. All six headed AMD WebGPU
+  scenarios and 26 reviewed PNGs pass. Recorded public-control setup opens the
+  panes each original script expects; scenario bytes, assertions and tolerances
+  remain intact. Distinct seed/reopen processes exit, profiles are removed and
+  ports are reused. Historical packets keep their missing-original status;
+  full Instrument/Q465, physical input, human AT and cross-app gates remain separate.
+  Exact evidence is in `Code/testing/mere/closure-audit/batch-10-checkpoint.md`.
 
 - 2026-11-04: adopted the approved dialog-cancellation carry and VDIP whole archive, relocated qualified evidence and executable inputs with their path repairs, and preserved remaining mixed-packet owner holds. Manifests and qualification limits are in `Code/testing/mere/closure-audit/`.
 - 2026-11-04: continued with 55 frozen receipt groups (1,618 tracked files), preserving checkout and canonical Git forms where they differ. Current Mere navigation and two Genet references now use the external homes. Existing browser-family and stack-pillar manifest discrepancies remain disclosed; no historical tools were run. Seven ignored local Cargo inputs remain untouched at their old paths. Instrument renewal/Q465, four cross-importing link-model verifiers, P7 server, ownership-repair output and active owner packets remain held for their actual harness or ownership work; the complete disposition and locator are `Code/testing/mere/closure-audit/batch-06-support-review.json` and `Code/testing/mere/receipt-relocation-2026-11-04/batch-06-reader.md`.
