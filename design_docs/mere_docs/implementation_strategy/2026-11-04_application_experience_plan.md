@@ -616,9 +616,6 @@ an API being documented is not a passing receiving test.
     - Follower documents, panes and retained content are unavailable rather
       than read-only. Muniment's `IndexedDbBackend` has no read-only handle
       to give them; one in eidetic would let the panes read and refuse saves.
-    - A writer that reloads by itself can lose the lock to a follower polling
-      for a vacancy.
-    - The side panel as a follower was not inspected in this build.
     - Each refresh reopens the whole session.
 - 2026-11-05, P0 follower UI (Graphshell port; not qualified):
   - A follower offers nothing that would store a change. It drops session
@@ -639,9 +636,27 @@ an API being documented is not a passing receiving test.
     - the follower lacked them;
     - the follower's details were read-only;
     - its menu showed **New node**, undo, redo and **Save scene** disabled.
-  - Open: Firefox was not rerun. Projection editing opens in a follower, and
-    its saves are refused only when tried. The coupling editor's apply is
-    likewise refused, not hidden.
+  - In a follower, the projection editor arranges and compares drafts but
+    offers no save, undo-save or redo-save, and says "Viewing only". The
+    coupling editor does not open.
+  - The bar is centred with insets, so the 360 px side panel gives it its
+    whole width.
+  - Also checked:
+    - the same follower run in headed Firefox over BiDi, with the same
+      results;
+    - the Chrome side panel as a follower of a writing tab: it shows the
+      graph, has no edit controls, catches up on a new visit, and **Edit
+      here** makes it the writer while the tab follows.
+- 2026-11-05, P0 writer reload (Graphshell extension page; not qualified):
+  - A writer announces `reloading` on the views channel at `pagehide`,
+    unless it is handing over. Followers then leave a vacant lock alone for
+    3 s, so a reloaded page keeps the role.
+  - A closing writer looks the same, so takeover after a close comes about
+    3 s later.
+  - Checked: `smoke-writer-handover.mjs` covers reload, close and **Edit
+    here**. It fails without the change.
+  - Open: no real browser reload was run; the smoke fakes Web Locks and the
+    channel.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
