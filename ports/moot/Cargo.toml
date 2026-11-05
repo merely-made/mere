@@ -88,7 +88,7 @@ muniment = { workspace = true, features = ["redb"] }
 personae.workspace = true
 servitor.workspace = true
 stickleback.workspace = true
-p2panda-core = "0.7.0"
+p2panda-core = { package = "p2mere-core", version = "0.8" }
 hex = "0.4"
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
 

@@ -101,8 +101,8 @@ armillary = { workspace = true, features = ["tokio"] }
 base64.workspace = true
 chartulary.workspace = true
 eidetic.workspace = true
-p2panda-core = "0.7.0"
-p2panda-store = { version = "0.7.0", default-features = false }
+p2panda-core = { package = "p2mere-core", version = "0.8" }
+p2panda-store = { package = "p2mere-store", version = "0.8", default-features = false }
 stickleback.workspace = true
 blake3.workspace = true
 chatelaine.workspace = true
@@ -148,7 +148,7 @@ kernel.workspace = true
 light-file-dialog = "3.21.3"
 # Knot's file-source and protocol-serving adapters. Portable snapshot records
 # come directly from site-model; both consumers share the same model identity.
-site-host = { package = "gemot-site-host", git = "https://www.github.com/merely-made/gemot.git", rev = "449235180618d33617c624f3d50018ebcaede9a6" }
+site-host = { package = "gemot-site-host", git = "https://www.github.com/merely-made/gemot.git", rev = "c9e5ebfd11167e051133bd27166f3290fc2f5331" }
 # The policy vocabulary the device sensor fills in (`DeviceConditions`), and
 # the `ConditionSource` seam it plugs into. `mere-mesh` refuses to touch the
 # OS; `src/conditions.rs` is the Windows-facing half that seam expects.
@@ -322,11 +322,11 @@ ostiary = { workspace = true, features = ["native"] }
 castellan-client = { workspace = true, features = ["client"] }
 pollster = "0.4"
 mere-view.workspace = true
-p2panda-core = "0.7.0"
+p2panda-core = { package = "p2mere-core", version = "0.8" }
 # The Knot residue test's baselines (iroh alone, p2panda-net alone), built as
 # mere-transport's seed residue test builds them; transport's own rows.
 iroh = "1.0.3"
-p2panda-net = { package = "mere-p2panda-net", version = "=0.7.5", default-features = false, features = [
+p2panda-net = { package = "p2mere-net", version = "0.8", default-features = false, features = [
   "address_book",
   "iroh_endpoint",
   "iroh_mdns",
