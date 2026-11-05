@@ -1,8 +1,9 @@
 # Domain adoption: every application's data in the reservoir
 
 **Status:** 2026-11-05: opened as a draft for Mark's review. Nothing is
-scheduled. Two rulings bind it (D1, D2). Everything marked *proposed* waits for
-a ruling. Only Cleromancy is in the reservoir today.
+scheduled. D1 to D6 are ruled; D4 carries one proposed condition. Everything
+else marked *proposed* waits for a ruling. Only Cleromancy is in the reservoir
+today.
 
 **For:** moving each family application's own data into a mere of the
 identity's reservoir, so that it follows the person to every device and any of
@@ -46,6 +47,61 @@ local. Woodshed's custody ruling 6 applies this to Woodshed's whole domain.
 Links: woodshed survey ruling 6 · summary replication is the default for
 everything authored; device facts stay local
 
+### D3. Conversations follow the identity across transports (Mark, 2026-11-05)
+
+Answering O1: "it would be nice if conversations could follow you across
+transports and devices ... not knowing the costs, being naive, i'll say all of
+'em i can link to my identity or relevant derived identities." A
+`conversations` domain holds every conversation the person can link to their
+identity or a derived identity, whatever the transport (Murm's carriers,
+Misfin, Reticulum through Outrider). It is the persistence home that
+`crates/shell/comms` lacks. The person's copy moves; channel keys and other
+secrets stay in custody, and radio, station and device journals stay local.
+The costs are unmeasured.
+
+Links: answers O1 · summary every identity-linked conversation, on any
+transport, in one conversations mere
+
+### D4. The notes mere is Knot's operation store (Mark, 2026-11-05)
+
+Answering O2: "a notes domain sounds like a good target for clips. but why
+can't that be knot's operation store?" It can. The `notes` domain is backed by
+Knot's Stickleback operation store, and clips land there. *Proposed
+condition:* the reservoir store holds it (D1), not Knot's own process, so
+other applications reach it through `mere/notes` and Knot's operation
+semantics serve as its validator. Otherwise it would be a second durable
+owner, which the reservoir's no-bypass constraint refuses. Stickleback is also
+the carrier M4 names for replication, so the store's shape already suits it.
+
+Links: answers O2 · summary notes and clips live in Knot's operation store,
+held by the reservoir store
+
+### D5. Domains by data: one music domain (Mark, 2026-11-05)
+
+Answering O3 ("yeah") and Woodshed's domain name ("music, i guess"). Woodshed
+and Hocket share one `music` domain, since both record phrases through
+`hocket-model`. Mark also floated a music library ("we've no musicbee library
+or anything (i guess redshank could do something like that???)"): if one is
+built, it joins `music`. Redshank's podcast listening stays `listening` until
+then.
+
+Links: answers O3 · summary Woodshed and Hocket share the music domain; a
+future music library joins it
+
+### D6. Sealing in two layers (Mark, 2026-11-05)
+
+Answering O4: "persona key is non negotiable for identity-associated access
+... but the vault key is. so there should always be that personal encryption,
+but you can have that additional domain-level protection? but maybe you don't
+need to encrypt and protect your notes, and maybe you do." Every mere is
+sealed under the persona's key, always. The persona also scopes the
+reservoir: it lives under `personas/<persona>/reservoir/`, so the persona is
+the index as well as the key. A domain may add its own vault key on top, and
+each domain chooses whether to. Notes may or may not.
+
+Links: answers O4 · summary persona sealing always; a domain-level key is
+optional per domain
+
 ## The pattern every domain follows (proposed)
 
 A domain is a kind of data, not an application (reservoir ruling of
@@ -66,8 +122,8 @@ A domain is a kind of data, not an application (reservoir ruling of
 6. **A migration ruled per application.** No application invents one. The
    proposed shape: a one-time import of the existing store, with the source
    kept read-only until the imported mere is verified.
-7. **No downgrade at rest.** Data that is sealed today stays sealed in the
-   reservoir (M3).
+7. **No downgrade at rest.** Every mere is sealed under the persona's key
+   (D6, M3); a domain may add its own key.
 8. **Communal data stays with its community.** A personal mere holds the
    person's own slice: their copies, roles and references.
 
@@ -100,13 +156,15 @@ unregistered product domains.
 
 The reservoir store (`crates/system/pandect/src/reservoir.rs`) and the
 per-mere stores carry no sealing today. Woodshed's sessions and Knot's vault
-are sealed now; moving them in unsealed would downgrade them. Seal mere
-contents with keys released by custody (Dramatis's `castellan-client` already
-seals retained payload bytes) or record a ruling that explains why not.
+are sealed now; moving them in unsealed would downgrade them. Per D6,
+seal every mere under the persona's key released by custody (Dramatis's
+`castellan-client` already seals retained payload bytes), with an optional
+second, domain-level key that each domain may choose.
 - Done when: a mere's durable files are unreadable without the persona's
-  released key, and a locked vault refuses reads and writes as Woodshed's
-  `Custodied` backend does today.
-- Needs: a ruling on the key scope (per persona or per domain).
+  released key; a domain that chose its own key also needs that key; and a
+  locked vault refuses reads and writes as Woodshed's `Custodied` backend does
+  today.
+- Needs: nothing beyond D6.
 
 ### M4. Replication across the persona's devices
 
@@ -134,13 +192,13 @@ fetched when opened and an eviction budget per device.
 | Application | Domain (proposed) | What moves | Stays local | Readiness | Validator source | Blockers |
 |---|---|---|---|---|---|---|
 | Cleromancy | `divination`, `personal-facts` | Already in: readings, charts, reflections | Scrubber and UI selection, sync consent | Replay-checked revisions | `cleromancy-core` | Its plan's O1, O2, O7 |
-| Woodshed | `practice` | Sets, working Sets, progressions, song, history, relationships, takes | Window, audio and MIDI devices, view state | Per-Set counters, positional song bars, `Revision(0)` overview, non-canonical history JSON | `woodshedding` plus checks carved out of `woodshed-core` | Its plan |
-| Hocket | `phrases`, or shared with Woodshed's looper (O3) | Projects: session, history DAG, media | Audio device | Best: UUIDs, content-hashed media, mergeable history | `hocket-model` (`ProjectBundle::validate`) | Unsealed today; no node authorship |
+| Woodshed | `music`, shared with Hocket (D5) | Sets, working Sets, progressions, song, history, relationships, takes | Window, audio and MIDI devices, view state | Per-Set counters, positional song bars, `Revision(0)` overview, non-canonical history JSON | `woodshedding` plus checks carved out of `woodshed-core` | Its plan |
+| Hocket | `music`, shared with Woodshed (D5) | Projects: session, history DAG, media | Audio device | Best: UUIDs, content-hashed media, mergeable history | `hocket-model` (`ProjectBundle::validate`) | Unsealed today; no node authorship |
 | Redshank | `listening` | Library, subscriptions, notes and voice notes, progress, pins, transcripts | Enclosure cache, budget, volume, rate | Weak: timestamp note ids, whole-model JSON | `redshank-model` (pure, typed errors) | Unsealed; id scheme |
 | Ringdown | none of its own | Presets and bindings ride Woodshed's settings | BLE pairing, MIDI ports | Positional bank slots | `ringdown` profile checks | Instrument has no read-back |
-| Knot Editor | `notes` (O2) | Sealed document vault, retained captures and relations | Search index, file catalog, `knot-sync.json` writers | Stable ids with revisions | `knot-document` | "Knot's own mere" ambiguous |
+| Knot Editor | `notes`, backed by its operation store (D4) | Sealed document vault, retained captures, clips and relations | Search index, file catalog, `knot-sync.json` writers | Stable ids with revisions | `knot-document` and its operation semantics | Resident holding of the operation store (D4 condition) |
 | Turnstone | `browsing` | Session graphs, trails, recycle bin, retained clips | Cookies (persona custody), windows, workbench, page bytes over budget | UUID sessions; no domain crate | New work | Generic graph needs a validator |
-| Signalman / Murm | O1 | The person's copies, contacts and references only | Radio and device journals, station grants, channel keys | Journal-counter ids | `message.rs` read model, maybe | What "conversations" means |
+| Signalman / Murm | `conversations` (D3) | Every conversation linked to the identity or a derived identity, any transport; contacts | Radio and device journals, station grants, channel keys | Journal-counter ids | `message.rs` read model, maybe | No persistence home yet for `shell/comms`; cross-transport identity linking |
 | Isocosm | `worlds` for personal saves | Mesocosm and Eponym saves; a GM's own secrets | Session network state | Pure `isocosm-core`; revisions unclear | `isocosm-core` | Campaign retirement plan F3 |
 | Gemot | the person's slice only | Roles, standing and membership references | Relay, pool, cache | Operation hashes; deterministic folds | Per-lane `verify` | Moot records are communal |
 
@@ -150,26 +208,23 @@ fetched when opened and an eviction budget per device.
 2. M3 before any sealed store moves in.
 3. Woodshed as the first new consumer, as its owner has ruled.
 4. Redshank next: its model crate is already pure.
-5. Hocket, once O3 settles whether it shares a domain with Woodshed's looper.
-6. Knot, once O2 is answered.
-7. Turnstone, then the personal slices of Isocosm, Signalman and Gemot.
+5. Hocket, into the same `music` domain (D5).
+6. Knot's operation store as the `notes` mere (D4).
+7. Turnstone, Signalman's `conversations` (D3), then the personal slices of
+   Isocosm and Gemot.
 
 M4 and M5 run beside steps 3 to 7. No application's move is accepted until
 its data reaches a second device.
 
 ## Open questions
 
-- **O1. Signalman's conversations.** In-repo Signalman is radio management;
-  the inbox and conversation model is `crates/shell/comms`, with no
-  persistence home. Which conversations should follow the person?
-- **O2. Knot's own mere.** Knot's retention plan says "Knot's own mere is the
-  retained-data home for its domain". Is that a reservoir `notes` domain or
-  Knot's existing operation store?
-- **O3. Domains by data, not by app.** Woodshed's looper and Hocket both
-  record phrases through `hocket-model`. Do they share one domain?
-- **O4. Key scope for sealing (M3):** one key per persona, or one per domain.
+- **O1 to O4** were answered on 2026-11-05 by D3 to D6.
 - **O5. Settings that follow the person.** Theme, accessibility and pedal
   bindings follow; device choices do not. Is that the general rule?
+- **O6. Linking derived identities to conversations (D3).** How a transport
+  identity (a Reticulum or Misfin address, a station key) is attested as
+  derived from the persona, so its conversations can be claimed.
+- **O7. Which domains add their own key (D6).**
 
 ## Findings
 
@@ -180,4 +235,4 @@ its data reaches a second device.
 
 ## Progress
 
-- 2026-11-05: plan opened.
+- 2026-11-05: plan opened. D3 to D6 recorded the same day.
