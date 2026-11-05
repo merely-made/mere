@@ -111,3 +111,15 @@ installed hash checks precede both native `--help` loaders and resident start.
 Actual noninteractive Windows PowerShell 5 `-VerifyOnly` passes against the
 staged S-PC packet without opening a window. Real target loaders, protected
 recovery inspection, native owner answer and personal receiving remain open.
+
+## 2026-11-05: native receiving stopped before corrected-resident start
+
+S-PC's resume reached existing protected-state validation and installed binary
+hash checks, then rolled back at an incorrect receiving-loader expectation.
+The added driver required exit0 from `djinn --help`; pinned source and the exact
+replacement independently show that this command prints static usage on stderr
+and exits2. The unchanged vault CLI help exits0. The human traceback identifies
+this exact pre-start command. All seven originals were restored and verified;
+no corrected-resident startup or real application decision occurred. Dramatis
+owns repairing that check against measured exit/length/output hashes and retaining
+the failed run. The qualified replacement and locked graph remain unchanged.
