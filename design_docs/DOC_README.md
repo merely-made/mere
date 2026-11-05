@@ -1,15 +1,11 @@
-Shared native sites (2026-11-04): `gemot-site` and `gemot-site-host` now live in
+Remaining extraction/reorganization scope (2026-11-05): the [source homes map](mere_docs/technical_architecture/2026-10-28_source_homes_map.md#remaining-work-and-reorganization-2026-11-05) distinguishes completed Distillery/mesh moves from the held Alembic/Athanor split, Dramatis application and games-leaf candidates, resident adapters, and library/application directory cleanup. Current consumer edges and done-conditions supersede the historical candidate table.
 
 Ordered source extractions (2026-11-04): Gemot sites, Knot Mora/CMUdict/Reference
-Data, Murm Pipit, and Cleromancy Turquet/shared daily Sky. The [source homes
-map](mere_docs/technical_architecture/2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
-records public receiving sources and their separate checks. Mere has 84 members;
-Gemot retains the wider writer and optional community-workflow scope.
-Gemot and are consumed directly by Knot and the resident. Native V1 contracts
-are preserved. Canonical source-cut/writer scope:
-`gemot/design_docs/2026-11-04_site_extraction_plan.md`; the site-publication plan
-here retains resident, reader and browser integration. The community namespace
-and agreed-work candidate stays in Gemot's publication plan.
+Data, Murm Pipit, and Cleromancy Turquet/shared daily Sky have landed. Mere has
+84 workspace members. Gemot's site plan owns the wider format writers and first
+namespace/agreed-work implementation, now locally qualified, plus November 5
+headed controls and protected catalogue metadata. Mere retains browser, graph
+and resident integration; installed-custody and remote-machine gates stay separate.
 
 Source-audit receipt home (2026-11-04): the 1,876-file frozen packet now lives under `Code/testing/mere/support/receipts/authority-success-audit/`. Its [Q/A reader map](../../../testing/mere/receipt-relocation-2026-11-04/authority-reader.md) preserves register lookup, original bytes and old-path provenance. Open repairs and qualification remain in their current owner plans; this move closes no findings.
 
