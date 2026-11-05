@@ -1,7 +1,7 @@
 # Source homes map: which Mere packages fit another repository
 
 **Date:** 2026-10-28
-**Status (2026-11-03):** the remaining extraction and directory scope is refreshed
+**Status (2026-11-05):** the remaining extraction and directory scope is refreshed
 below. The original findings were read at Mere `d4d5b0c32` (`cargo metadata` over the
 workspace) and at the 2026-10-28 `main` of Murm, Gemot, Eidetic, ESP, Isocosm,
 Knot, Turnstone, Cleromancy and Woodshed (their manifests' Mere dependencies).
@@ -174,9 +174,10 @@ shared library and keeps pane/navigation code. Cleromancy keeps UTC/twilight
 policies and authored interpretation while exposing the richer named-zone API.
 Historical V1 receipts keep the recorded 0.13 identity and exact DTO bytes;
 new calculations identify the imported 0.17 engine. Existing releases,
-immutable Git pins and historical evidence remain available. Gemot's optional
-namespace/agreed-work workflow and wider Markdown/HTML writers remain in its
-own plan, with explicit done conditions rather than source-move acceptance.
+immutable Git pins and historical evidence remain available. Gemot's wider writers and first namespace/agreed-work workflow are now
+implemented and locally qualified in its owning plan. November 5 also qualifies
+local native controls and protected catalogue metadata; installed custody and
+remote-machine gates remain separate.
 
 Directory cleanup follows these cuts:
 
@@ -199,6 +200,127 @@ Directory cleanup follows these cuts:
 Station Custody and the shared native site libraries have completed source cuts under this scope. The remaining rows are
 reviewable scopes with named receiving gates, not completed moves or authority
 to replace the existing policies.
+
+## Remaining work and reorganization, 2026-11-05
+
+Mark requested a fresh scope including ESP/Distillery mesh and ports, and added
+that reorganization is acceptable. This is a source/manifest review, not another
+build qualification. The two already dirty pairing and stack-reduction plans
+are preserved. Current source dependencies take priority over the historical
+candidate table above.
+
+### Ownership cuts, in recommended order
+
+1. **Finish the Distillery workshop split.** ESP, Distillery, `mere-mesh`, model
+   probes and inference patches already resolve from `distillery.git` at Mere's
+   `6346f087` supplier. Do not extract them a second time. The local `repos/esp`
+   checkout still has its historical name and `distillery-receive` branch; its
+   remote is Distillery. Align that checkout only after checking its owner and
+   registered paths, separately from changing product source.
+
+   Live remainder: `crates/distillery/alembic` (four Rust files, 738 lines) and
+   `ports/distillery/athanor` (seven, 5,222 lines), counted recursively under
+   `src`, including tests. Alembic supplies records/controls; Athanor supplies
+   workshop authority, driver and sealed state. Move their graph-free core and
+   producer surfaces into Distillery. Keep the concrete `workshop_destination`
+   and `workshop_sealed_destination` graph adapter in Mere. Kernel/Pandect must
+   not import agent-domain authority to achieve the cut: pass admitted effects
+   and validation through an explicit adapter boundary. Preserve operation ids,
+   sealed contexts, uncertain-write reconciliation and atomic destination receipts.
+   D16 and W3 remain explicit owner-plan gates; this scope does not claim their
+   two-host recovery matrix has passed.
+
+   Done when the owner plan resolves those questions, both actual hosts pass
+   acceptance/restart/duplicate/lock-loss recovery, the receiver has no Mere
+   implementation-source back edge, and consumers use the published receiver.
+   Remove both misleading Distillery donor directories after blob comparison.
+
+2. **Move the Dramatis application, not the widget family.** `ports/dramatis`
+   is a packaged app: five source files, 766 lines in the current tree (the old
+   1,464-line estimate is stale). Receive it as a separate application root in
+   Dramatis, with its packaging scripts, icons, paths and custody/profile tests.
+   Core identity packages remain GUI-independent. Persona Picker stays Cambium:
+   Woodshed also consumes it. Done when standalone app/packaging checks and
+   real resident-client behavior pass without a Dramatis-core dependency cycle.
+
+3. **Move the games-only leaves.** Modulus and Tenant are used by Isocosm's
+   Eponym/Mesocosm/Isometer roots. Move them together with their tests and engine
+   notices, then qualify every actual root. Conatus/Nisus require a separate
+   boundary review: Seiche's optional GPU evaluator imports Conatus in Mere.
+   Keep Numen/Seiche here and preserve the single host-owned wgpu device.
+   Done when the receiving feature graphs and targeted numerical/runtime checks
+   pass without adding an Isocosm dependency to Mere's ordinary graph toolkit.
+
+4. **Review communications and community adapters by role.** `mere-comms` has
+   both Moot and Signalman consumers; its contract may stay, while concrete
+   protocol adapters belong to Murm/Errand. `ports/moot` is a library (15 files,
+   5,776 source lines), not an executable. Governed domain behavior belongs to
+   Gemot, transport to Murm, and graph/capture projection to Mere. Split only
+   where that removes a real back edge. `mere-facts` imports Kernel, Dramatis
+   and Gaz: retain its graph mapping here unless a portable record core is
+   demonstrated. Done when actual feature consumers qualify and the Gemot and
+   Dramatis core graphs remain independent of Mere implementation crates.
+
+### Resident and inference adapter review
+
+`mere-resident` still composes the platform (75 source files, 43,630 lines,
+including inline tests), but reusable identity already comes from Dramatis.
+Review by responsibility rather than moving this entire resident to one owner:
+
+- Distillery: reusable model loading, inference lifecycle, job/lease scheduling,
+  provider advertisements and device-condition sensing. Inspect
+  `resident_inference`, its `mesh_discovery`, `resident_distillery` and
+  `conditions.rs`. The current discovery proof checks a graph space and current
+  keyed reader through `PersonalSyncHost`; keep that authorization adapter here
+  while moving any independent signed compute protocol beside Mesh.
+- Murm: generic carriage, joining, discovery and live synchronization mechanisms.
+  Graph replica operations, graph keys and graph-specific acceptance remain
+  Mere's adapters over Murm and Eidetic. Inspect `sync/` without copying its
+  Graphshell-owned operation grammar into a transport library.
+- Eidetic: generic blob acquisition, retained claims, encryption and storage
+  machinery; Mere retains graph ownership/reference/retention decisions.
+- Gemot: namespace, agreement and community publication policy; Mere retains
+  graph projections, browser actions and explicit resident mounting.
+- Armillary/Dramatis: runner lifecycle and identity/custody respectively; Mere
+  retains platform dialogs, graph routes and registration of concrete producers.
+
+Done when owner crates can be tested independently, Mere only supplies concrete
+bindings, and lock/shutdown/restart behavior matches existing consumer receipts.
+No blanket deletion or replacement of resident composition is implied.
+Distillery-extraction D19 (November 5) closes the earlier lifetime fork: the
+reservoir store owns opening, durability and closing. Djinn and application
+embedding hosts execute it. Preserve this ownership when splitting the resident;
+do not assign storage lifetime authority to a background process.
+
+### Directory-only cleanup
+
+After ownership cuts, group by role with package and wire names unchanged:
+
+| Current path | Proposed role/home |
+| --- | --- |
+| `ports/gazette-ledger` | Reusable projection under `crates/`, alongside graph integration; it is a two-file library already published as `gazette-ledger`. |
+| `ports/moot` | Reusable community/graph integration under `crates/`; move graph-free domain pieces to Gemot only after the feature split. |
+| `ports/tabard/workshop` | Shared Tabard library under `crates/`; desktop frame stays an application. |
+| `ports/graphshell` | Separate reusable graph host/composition from `graphshell-mere`'s executable frame before choosing paths. Keep the standalone web host independently buildable. |
+| `ports/pelt/{core,desktop}` | Core is shared by Graphshell; keep the browser integration library distinct from its executable frame. |
+| Application frames | A consistent `apps/` layout is reasonable once library/frame boundaries are explicit; do not merely rename all of `ports/`. |
+| `crates/probes`, `support`, `testing` | Tracked probes follow capability owners; source fixtures stay with readers. Frozen receipts keep cited identities and maps. |
+
+`mere-edit` remains a shared source-edit contract: both Knot and Isocosm consume
+it. Document Host and UX Events need an entry-point/feature audit before removal;
+missing external dependency rows alone are insufficient evidence of dead code.
+The tracked co-op relay belongs in Murm with a new input-qualified harness cohort.
+Old inference probe directory names can contain only ignored generated residue;
+check tracked files and live owners before proposing any removal. Likewise audit
+remaining Burn patches against actual consumers, since Conatus/Seiche also use
+Burn. Avoid a blanket move of every tensor patch to Distillery.
+
+Each implementation slice updates members, relative paths, package includes,
+patches, scripts, CI, source-size rules and documentation readers together.
+Required receipts: donor/source/notice comparison, targeted owner tests and
+locked actual-consumer feature checks; add headed/process tests only for changed
+runtime behavior. Retained evidence cap is 100 MB per lane unless refined before
+running. Reuse stable targets; preserve all foreign WIP and historical evidence.
 
 ## What the code adds
 

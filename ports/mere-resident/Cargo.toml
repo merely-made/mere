@@ -145,7 +145,9 @@ knot-editor = { workspace = true, features = ["peers"] }
 kernel.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from
 # graphshell with the keeper adapters (dramatis repo plan, D15).
-light-file-dialog = "3.21.3"
+# The checked Linux confirmation API belongs to this vendored supplier. Keep it
+# with the host when Mere is received through Git, independently of root patches.
+light-file-dialog = { version = "3.21.3", path = "../../support/patches/light-file-dialog" }
 # Knot's file-source and protocol-serving adapters. Portable snapshot records
 # come directly from site-model; both consumers share the same model identity.
 site-host = { package = "gemot-site-host", git = "https://www.github.com/merely-made/gemot.git", rev = "c9e5ebfd11167e051133bd27166f3290fc2f5331" }

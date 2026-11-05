@@ -203,6 +203,31 @@ prior art, not an adoption decision; see the
 
 Links: area publishing · amends release-log D10 · plans release-log · summary owned resources can restrict audience and delegation; references inherit source authority and independent copies are not remotely recalled
 
+- **D12, forward secrecy where it fits, bounded durability elsewhere (2026-11-05):**
+
+**2026-11-05 · new.** The R8 evaluation found p2panda-spaces offers only the
+durable data scheme and that the family's `forward_secure_messages` profile is
+a label with no mechanism behind it. Asked to compare durable data with and
+without forward secrecy, Mark:
+
+> Compare durable data with and without forward secrecy. Me personally, i think it makes the network more trustable
+
+Then, on the per-lane recommendation:
+
+> yeah, record D12 and wire it in
+
+Conversations (Murm posts, co-op chat, direct messages) default to
+forward secrecy through p2panda-encryption's `message_scheme` ratchet, so a
+stolen device or leaked key doesn't open past messages. Shared and published
+data (sealed releases, moot collections, shares) keeps the durable
+`data_scheme`, because late readers and holders must be able to decrypt it,
+with bounded retention: old epoch secrets are forgotten after a set window
+through Stickleback's `forget_authorized`, giving forward secrecy at epoch
+granularity. Spaces, if adopted, carries the durable side; the ratchet sits
+beside it for conversations.
+
+Links: area encryption · plans release-log · summary forward-secure conversations by default; durable shared data with bounded epoch retention
+
 ## Constraints
 
 - **Two release authorities.** Governed releases are Gemot collection
@@ -730,6 +755,32 @@ or a precise reference alone, and no storage migration is selected here.
   knot-editor` in Turnstone drags all of Mere, Genet and Dramatis main, so
   Turnstone takes gemot-site directly under `authoring` until a family refresh.
 
+### Wave 3a, 2026-11-05
+
+- **R8 intake.** `merely-made/p2mere` branch `intake-20261105` (`6e123c61`)
+  merges upstream `d01898bf` (59 commits). The store traits changed
+  incompatibly (every write is an explicit `_tx` method; `KeySecretsStore`
+  became `PreKeyBundlesStore`), so the next release is 0.9.0 and Muniment must
+  follow. Upstream's `tx!`-on-`SqliteStore` use in the address-book actor was
+  declined under D8. Spaces brought awaitable `PendingSpace`/`PendingGroup`,
+  removed-member queries and a compact `AuthenticatedMember` encoding (a spaces
+  wire change); net moved to iroh 1.4.1; encryption to hpke-rs 0.8
+  (RUSTSEC-2026-0387). The umbrella's `tests/api.rs` still hangs in five tests.
+- **R8 evaluation (audit R25).** Probe `gemot/probes/spaces-eval` (gemot
+  `510b68f`, outside every workspace), 16 tests. Spaces meets concurrent add and
+  remove, nested devices, key rotation, offline revoked peers and cold reopen;
+  partial on Muniment without SQLite (traits are backend-neutral, but the
+  store's `spaces` feature forced SQLite, now fixed for 0.9.0); fails on a
+  forward-secure profile (data scheme only; see D12). Gemot's `MootGroup`
+  converges on members but its epoch number depends on delivery order; it holds
+  no nested-group state. Spaces has no Personae-root attestation and no epoch
+  forgetting. Recommendation: adopt spaces for generic group transitions and
+  key agreement (most of Stickleback's `group_session.rs` and `group_lane.rs`),
+  keep Personae attestation, epoch forgetting and the Muniment-backed durable
+  lane, and keep Gemot's constitution and authority meaning. A Muniment
+  implementation of the six store traits `Manager` needs is the first step; the
+  probe's `MapStore` is a sketch.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -760,3 +811,6 @@ or a precise reference alone, and no storage migration is selected here.
 - 2026-11-05: wave 2. R1 published (`p2mere-*` 0.8.0, tag `p2mere-0.8.0`); R7
   first slice (dramatis `cc7b99e`, murm `e92fe5f17ed`); R4 grammar and R6 first
   slice (gemot `3b4c254`…`e3cc052`, knot-editor `77e2818`, turnstone `b73883d`).
+- 2026-11-05: D12 recorded (forward-secure conversations, bounded durable
+  data). R8 intake and evaluation recorded; 0.9.0 prepared with the store's
+  SQLite coupling removed.

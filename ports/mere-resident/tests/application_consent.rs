@@ -88,6 +88,34 @@ fn declaration() -> AppDeclaration {
     }
 }
 
+struct UnavailableOwner;
+
+impl NativeIdentityUi for UnavailableOwner {
+    fn confirm_application(&self, _: &str, _: &str) -> Result<bool, NativeIdentityFailure> {
+        Err(NativeIdentityFailure::UiUnavailable)
+    }
+    fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure> {
+        Err(NativeIdentityFailure::UiUnavailable)
+    }
+    fn prompt_ssh_private_key_passphrase(&self) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
+        Err(NativeIdentityFailure::UiUnavailable)
+    }
+}
+
+#[test]
+fn a_native_backend_failure_does_not_become_a_remembered_no() {
+    let directory = tempfile::tempdir().unwrap();
+    let settings = directory.path().join("settings.json");
+    let consent = OwnerConsent::new(
+        settings.clone(), AppRouteGrants::new(AllowedAppRoutes::none()), Arc::new(UnavailableOwner),
+    );
+    assert!(consent.decide(&AppId::new("fixture-app"), &declaration(), None).is_err());
+    assert!(!settings.exists(), "no owner decision was supplied");
+    let kept = OwnerSettings::load(&settings).unwrap();
+    assert!(kept.applications.is_none());
+    assert!(kept.refused_applications.is_empty());
+}
+
 /// Serve the door as Djinn does: custody served to grants, no application
 /// granted, and the owner asked about the rest.
 async fn serve(settings: &Path, owner: Arc<Owner>) -> (String, AppRouteGrants) {

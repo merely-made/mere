@@ -44,6 +44,11 @@ pub mod types;
 /// 详见 [模块文档](self)。
 pub mod dialog;
 
+#[cfg(any(target_os = "linux", test))]
+mod linux_confirmation;
+#[cfg(target_os = "linux")]
+pub use linux_confirmation::MessageBoxError;
+
 #[cfg(windows)]
 mod windows;
 #[cfg(not(windows))]
@@ -111,6 +116,15 @@ pub fn message_box(
         } else {
             MessageBoxButton::Cancel
         };
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let backend = dialog::DialogBackend::query();
+        if backend.graphic && linux_confirmation::supported(&backend.name) {
+            return linux_confirmation::show_with_backend(
+                &backend.name, title, message, dialog_type, icon, default_button,
+            ).unwrap_or(MessageBoxButton::Cancel);
+        }
     }
     let result = dialog_impl::message_box(title, message, dialog_type, icon, default_button);
     MessageBoxButton::from_int(result)
