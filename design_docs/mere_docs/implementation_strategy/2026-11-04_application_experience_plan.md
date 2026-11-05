@@ -720,9 +720,6 @@ an API being documented is not a passing receiving test.
     - Closing the writer with an edit waiting: the submitting follower took the
       lock, and its edit was lost (see Open).
   - Open:
-    - A writer in a hidden tab runs no frames, so it admits a queued edit when
-      it is shown; the follower meanwhile reaches its limit and reports no
-      answer. The edit is still applied later.
     - A follower that takes the writer with its own edit unanswered drops it,
       with only a console warning: the new writer's epoch makes it stale.
       Resending to a different follower after a writer closes was run only in
@@ -731,8 +728,14 @@ an API being documented is not a passing receiving test.
       not headed. Firefox and the real extension runtime were not run.
     - The command menu's **New node** stays view-only though **Add an object**
       is queued.
-    - Mere's Eidetic pin predates the read-only handle, so these checks used
-      Eidetic `8b4b3ec` locally; the build needs the repin.
+- 2026-11-05, P0 hidden writer:
+  - The 0.9 family repin brings in the read-only IndexedDB handle. Refresh the
+    standalone web lock to resolve the same p2mere cohort.
+  - Queue delivery and storage completion wake the application through the
+    Cambium browser host, even if the document receives no animation frames.
+    The normal save path still owns the store and the writer lock stays with
+    the same Graphshell view. Replies follow storage completion; an unanswered
+    request still does not tell the follower whether the write committed.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created

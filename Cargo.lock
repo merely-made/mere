@@ -10519,6 +10519,7 @@ version = "0.0.1"
 dependencies = [
  "armillary",
  "eidetic",
+ "eidetic-search",
  "fleece",
  "genet-host-api",
  "genet-static-dom",
