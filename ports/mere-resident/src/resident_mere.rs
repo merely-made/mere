@@ -129,8 +129,8 @@ struct Routes {
 
 impl MereRoutes {
     /// Compose Cleromancy's portable product authority in either resident mode.
-    /// The supplier owns the record/replay semantics; Djinn owns installation
-    /// and durability, so applications cannot select a weaker callback.
+    /// The supplier owns the record/replay semantics; the resident owns installation
+    /// and durability (distillery D19), so applications cannot select a weaker callback.
     pub fn with_divination_authority(self) -> Self {
         self.with_domain_validator(
             "divination",

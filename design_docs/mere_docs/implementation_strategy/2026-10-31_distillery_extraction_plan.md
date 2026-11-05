@@ -154,9 +154,21 @@ waits for a planned second host, not an arrived one.
 
   Links: amends distillery-extraction D17 · summary Slim Djinn to the door before publishing; producers depend on the door's wire contract, not on Djinn.
 
+- **D19. The store owns its lifetimes (Mark, 2026-11-05):** "The store itself", over a
+  long-running resident service that Djinn launches and over each application owning its own
+  mere. Opening, durability and closing of every mere belong to the reservoir store (pandect's
+  reservoir and the resident library), wherever it is hosted. A Djinn-launched resident and an
+  application embedding the resident only execute it. Phones were the deciding case: a device
+  that runs no Djinn embeds the resident, so lifetimes cannot belong to a background process
+  only some devices run. Closes F1. Woodshed's reopened custody ruling followed the same day:
+  its whole domain moves into a Woodshed mere
+  (`woodshed/design_docs/2026-10-14_dsp_graphshell_hocket_survey_brief.md`, ruling 6).
+
+  Links: closes distillery-extraction F1 · follows D11 · summary Store lifetimes belong to the reservoir store; Djinn and embedding hosts only execute it.
+
 ## Open forks
 
-- **F1 (D11).** If Djinn holds no meres, which owner takes the resident's store lifetimes?
+- **F1 (D11).** Closed by D19 (2026-11-05): the reservoir store owns its lifetimes.
 - **F2.** Closed by D14.
 - **F4 (D18).** Answered by Armillary's Djinn slimming plan
   (`armillary/design_docs/armillary_docs/implementation_strategy/2026-10-31_djinn_slimming_plan.md`):
