@@ -1840,3 +1840,15 @@ committing it.
 `dramatis`, `cleromancy`, `wgpu-weld`, `smolweb` rows stay on their revisions
 until each repository's `main` has been qualified against the consumers that
 pin it. The switch for those is one manifest edit and a `cargo update -p`.
+
+**Upheld (Mark, 2026-11-06): "Uphold the ruling", then "commit it and carry the
+round through"**, over superseding it for the renderer family or entirely. Put to
+Mark on finding that Mere had drifted to `www.` spellings and `rev` pins for
+Genet, Netrender, Murm and Knot from `60168aa6e` (2026-11-03) through `ad6aaf60e`
+and `b38abf4e7`, with no recorded ruling. The drift produced exactly the cost
+above: one evening's repins cascaded Mere → Knot → Mere → Knot → Murm, Knot named
+Murm three ways, and consumers doubled 23 Genet crates the moment Mere moved.
+Outcome: applies. The restoration lands Mere first, holding every lock revision
+(Genet moves only to `e8ebe2e06da`, whose difference from `ceb5a979` is CI
+scripts, docs and its canonical Netrender rows), with a transitional Murm bridge
+for the Knot revision it pins, removed when Mere repins Knot.
