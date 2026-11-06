@@ -1,0 +1,954 @@
+{
+  "browser": "chrome",
+  "browser_app": "/Applications/Google Chrome.app",
+  "headed": true,
+  "fixture_profile": true,
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "scenario": "goal-surface-tag-suggestions-cold-reopen",
+  "started_utc": "2026-11-06T04:58:39.287661+00:00",
+  "package": "/Users/markik/Code/worktrees/mere-browser-goal-20261105/ports/graphshell/web/extension/dist/chromium",
+  "result": "pass",
+  "goal": "keep a sourdough starter alive while away",
+  "browser_version": "156.0.8078.80",
+  "extension_version": "0.1.0",
+  "writer_initial": {
+    "url": "chrome-extension://oajkkocppbpbmfblepgbiidagliniofd/graph.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "title": "GRAPHSHELL H3 READY \u00b7 Graphshell",
+    "role": "writer",
+    "visibility": "visible",
+    "dataset": {
+      "ownsTitle": "",
+      "appearanceApplication": "",
+      "ready": "true",
+      "mounted": "true",
+      "renderBackend": "auto",
+      "appearanceOwner": "application",
+      "appearanceTheme": "theme:graphshell_night",
+      "appearanceMode": "dark",
+      "appearanceSource": "derived",
+      "appearanceBackground": "rgb(4, 15, 22)",
+      "appearanceStatus": "Built-in appearance",
+      "writerBusy": "false",
+      "contextGeneration": "1",
+      "presentationSequence": "2",
+      "remoteState": "no link",
+      "selectedRenderBackend": "webgpu",
+      "computeAvailable": "true",
+      "presenter": "tree"
+    },
+    "events": [],
+    "errors": [],
+    "consoleErrors": [],
+    "semantic": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "0 of 0 shown",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "seeded": [
+    "Sourdough starter basics: feeding and flour",
+    "Keeping a sourdough starter alive while away for a month",
+    "Oven steam helps baking loaves rise",
+    "Dry a sourdough starter into flakes for travel baking",
+    "Quarterly tax filing checklist"
+  ],
+  "screenshots": [
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/01-seeded-graph.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/02-goal-run.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/03-suggestions.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/04-accepted-and-rejected.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/05-regenerated.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/05-cold-reopen.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/06-follower-goal.png",
+    "/Users/markik/Code/testing/eidetic/browser_goal_20261105/run1/07-follower-suggestions.png"
+  ],
+  "status_after_load": [
+    "Read retained records again",
+    "Read 5 retained records \u00b7 0 tag suggestion(s) kept"
+  ],
+  "goal_summary": [
+    "1 of 5 sources read matched \"keep a sourdough starter alive while away\" (terms: alive, away, keep, sourdough, starter). Every reachable retained source was read."
+  ],
+  "suggestions_before": [
+    "Suggestion \u00b7 sourdough \u00b7 Keeping a sourdough starter alive while away for a month \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074"
+  ],
+  "suggestions_after_decisions": [
+    "Suggestion \u00b7 sourdough \u00b7 Keeping a sourdough starter alive while away for a month \u00b7 Accepted by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Rejected by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074"
+  ],
+  "notes": [
+    "Rejected \u00b7 recorded as a review; no tag changed"
+  ],
+  "b_sourdough_rows_before_regenerate": 1,
+  "suggestions_after_regenerate": [
+    "Suggestion \u00b7 sourdough \u00b7 Keeping a sourdough starter alive while away for a month \u00b7 Accepted by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Rejected by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995"
+  ],
+  "reopen_writer": {
+    "url": "chrome-extension://oajkkocppbpbmfblepgbiidagliniofd/graph.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "title": "GRAPHSHELL H3 READY \u00b7 Graphshell",
+    "role": "writer",
+    "visibility": "visible",
+    "dataset": {
+      "ownsTitle": "",
+      "appearanceApplication": "",
+      "ready": "true",
+      "mounted": "true",
+      "renderBackend": "auto",
+      "appearanceOwner": "application",
+      "appearanceTheme": "theme:graphshell_night",
+      "appearanceMode": "dark",
+      "appearanceSource": "derived",
+      "appearanceBackground": "rgb(4, 15, 22)",
+      "appearanceStatus": "Built-in appearance",
+      "writerBusy": "false",
+      "contextGeneration": "1",
+      "presentationSequence": "2",
+      "remoteState": "no link",
+      "selectedRenderBackend": "webgpu",
+      "computeAvailable": "true",
+      "presenter": "tree"
+    },
+    "events": [],
+    "errors": [],
+    "consoleErrors": [],
+    "semantic": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "5 of 5 shown",
+                          "children": [
+                            {
+                              "role": "group",
+                              "label": "Sourdough starter basics: feeding and flour",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Keeping a sourdough starter alive while away for a month",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Oven steam helps baking loaves rise",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Dry a sourdough starter into flakes for travel baking",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Quarterly tax filing checklist",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "reopen_suggestions": [
+    "Suggestion \u00b7 sourdough \u00b7 Keeping a sourdough starter alive while away for a month \u00b7 Accepted by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Rejected by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995"
+  ],
+  "reopen_suggestions_after_regenerate": [
+    "Suggestion \u00b7 sourdough \u00b7 Keeping a sourdough starter alive while away for a month \u00b7 Accepted by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Rejected by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941276875",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941276875",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941276875"
+  ],
+  "follower_initial": {
+    "url": "chrome-extension://oajkkocppbpbmfblepgbiidagliniofd/graph.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "title": "GRAPHSHELL H3 READY \u00b7 Graphshell",
+    "role": "follower",
+    "visibility": "visible",
+    "dataset": {
+      "ownsTitle": "",
+      "appearanceApplication": "",
+      "ready": "true",
+      "mounted": "true",
+      "renderBackend": "auto",
+      "appearanceOwner": "application",
+      "appearanceTheme": "theme:graphshell_night",
+      "appearanceMode": "dark",
+      "appearanceSource": "derived",
+      "appearanceBackground": "rgb(4, 15, 22)",
+      "appearanceStatus": "Built-in appearance",
+      "writerBusy": "false",
+      "contextGeneration": "1",
+      "presentationSequence": "5",
+      "remoteState": "no link",
+      "selectedRenderBackend": "webgpu",
+      "computeAvailable": "true",
+      "presenter": "tree"
+    },
+    "events": [],
+    "errors": [],
+    "consoleErrors": [],
+    "semantic": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "5 of 5 shown",
+                          "children": [
+                            {
+                              "role": "group",
+                              "label": "Sourdough starter basics: feeding and flour",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Keeping a sourdough starter alive while away for a month",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Oven steam helps baking loaves rise",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Dry a sourdough starter into flakes for travel baking",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Quarterly tax filing checklist",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "follower_suggestions": [
+    "Suggestion \u00b7 sourdough \u00b7 Keeping a sourdough starter alive while away for a month \u00b7 Accepted by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Rejected by https://mere.computer/ns/agent#person/user \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941217074",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941248995",
+    "Suggestion \u00b7 baking \u00b7 Oven steam helps baking loaves rise \u00b7 Not reviewed \u00b7 run browser-1793941276875",
+    "Suggestion \u00b7 sourdough \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941276875",
+    "Suggestion \u00b7 baking \u00b7 Dry a sourdough starter into flakes for travel baking \u00b7 Not reviewed \u00b7 run browser-1793941276875"
+  ],
+  "follower_write_controls": [],
+  "follower_goal_summary": [
+    "1 of 5 sources read matched \"keep a sourdough starter alive while away\" (terms: alive, away, keep, sourdough, starter). Every reachable retained source was read."
+  ]
+}
