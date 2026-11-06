@@ -1,8 +1,9 @@
 # Domain adoption: every application's data in the reservoir
 
 **Status:** 2026-11-05: opened as a draft for Mark's review. Nothing is
-scheduled. D1 to D6 are ruled, including reservoir custody of Knot's
-operation store. Everything marked *proposed* waits for a ruling. Only Cleromancy is in the reservoir
+scheduled. D1 to D8 are ruled, including reservoir custody of Knot's
+operation store. The domain contract every move depends on is not written
+yet (M0). Everything marked *proposed* waits for a ruling. Only Cleromancy is in the reservoir
 today.
 
 **For:** moving each family application's own data into a mere of the
@@ -101,6 +102,27 @@ each domain chooses whether to. Notes may or may not.
 Links: answers O4 · summary persona sealing always; a domain-level key is
 optional per domain
 
+### D7. Settings follow the person; device choices stay (Mark, 2026-11-05)
+
+Answering O5. Settings about the person replicate with the rest of their
+data: theme, accessibility, tuning and pedal bindings. Settings about the
+machine stay on it: audio and MIDI ports, window geometry and layout, and
+other device choices.
+
+Links: answers O5 · summary person settings move; device settings stay
+
+### D8. Every application's authored store is held by the reservoir (Mark, 2026-11-05)
+
+Mark, on D4's generalisation: "so wait, then every app would need their store
+in the reservoir, yes? i'm fine with that, but have we prepared for that
+contract?" Yes: D1, D2 and D4 together mean each application's authored data
+lives in a reservoir mere, and the application becomes a client of it. Device
+facts stay in device-local stores. The contract this needs is not prepared
+yet; M0 writes it.
+
+Links: generalises D1 and D4 · summary every app is a client of its domain's
+mere; M0 writes the contract
+
 ## The pattern every domain follows (proposed)
 
 A domain is a kind of data, not an application (reservoir ruling of
@@ -127,6 +149,32 @@ A domain is a kind of data, not an application (reservoir ruling of
    person's own slice: their copies, roles and references.
 
 ## Mere's shared work (proposed)
+
+### M0. Write the domain contract (D8)
+
+Today the contract is implicit. A mere is one pandect graph
+(`pandect::reservoir::MereRecord` has no store kind), and a domain adds a
+`GraphValidator` and optionally a `GraphAdmissionValidator` through
+`ResidentMere::with_domain_validator`. Cleromancy is the only domain written
+against it. Missing:
+- How an application's records map to graph nodes, facets and edges. No
+  application other than Cleromancy has a mapping.
+- Store kinds (O8). Knot's operation store is a Stickleback operation log
+  that the resident keeps beside the reservoir (`resident_knot.rs`, with its
+  own vault root), not a graph mere. D4 needs either a second store kind or a
+  graph projection of the log.
+- The client side: how an application attaches to `mere/<domain>` or embeds
+  the resident, opens, edits and observes its domain, and what it does while
+  the mere is locked or unreachable.
+- Device-local stores: one shared place for what stays (D7), so applications
+  stop carrying their own.
+- Drafted 2026-11-06:
+  [the domain contract](../technical_architecture/2026-11-06_domain_contract.md).
+  Mark ruled one kind of store for every mere (O8) on 2026-11-06.
+- Done when: one contract document names what a domain supplies and what a
+  client may do, and Cleromancy conforms to it unchanged or with recorded
+  changes. O8 is ruled.
+- Needs: nothing. M1 to M5 build against it.
 
 ### M1. A domain registry for both compositions
 
@@ -203,7 +251,7 @@ fetched when opened and an eviction budget per device.
 
 ## Order (proposed)
 
-1. M1 and M2, since every new domain needs them.
+1. M0, then M1 and M2, since every new domain needs them.
 2. M3 before any sealed store moves in.
 3. Woodshed as the first new consumer, as its owner has ruled.
 4. Redshank next: its model crate is already pure.
@@ -218,8 +266,7 @@ its data reaches a second device.
 ## Open questions
 
 - **O1 to O4** were answered on 2026-11-05 by D3 to D6.
-- **O5. Settings that follow the person.** Theme, accessibility and pedal
-  bindings follow; device choices do not. Is that the general rule?
+- **O5** was answered on 2026-11-05 by D7.
 - **O6. Linking derived identities to conversations (D3).** How a transport
   identity (a Reticulum or Misfin address, a station key) is attested as
   or otherwise linked to the persona, so its conversations can be claimed.
@@ -274,13 +321,32 @@ its data reaches a second device.
   about key distribution and revocation. The grant format and enforcement
   design remain open.
 
+  **No domain has chosen one yet (Mark, 2026-11-05):** "this is less of a
+  thing to decide now and an opt in feature to create". The optional vault
+  is built as an opt-in feature; no domain is scheduled to use it.
+- **O8. Store kinds (M0).** Is every mere a graph, with Knot's operation log
+  projected into one, or does the reservoir hold a second kind of store for
+  operation logs? D4 depends on the answer. Mark, 2026-11-05: "I'm ok with a
+  second kind, but then are there gonna be other kinds? Isn't a graph a
+  log…?" The contract proposes neither: every mere becomes one Stickleback
+  causal operation log, with the graph as one fold over it, as Graphshell's
+  personal replica already does. That also carries M3 and M4. **Ruled by
+  Mark on 2026-11-06: "Yes, one kind."** Cleromancy's existing meres start
+  fresh rather than convert (contract C1).
+
 ## Findings
 
 - 2026-11-05: data inventories of all ten applications (from fresh clones)
   found only Cleromancy in the reservoir; no reservoir sealing; replication
   limited to Graphshell's personal graph; validator composition hard-coded to
   Cleromancy in both compositions.
+- 2026-11-05: no written domain contract exists. `MereRecord` carries no store
+  kind, so every mere is a graph; Knot is resident in Djinn as its own route
+  over its own vault, beside the reservoir rather than in it.
 
 ## Progress
 
-- 2026-11-05: plan opened. D3 to D6 recorded the same day.
+- 2026-11-05: plan opened. D3 to D6 recorded the same day; D7, D8, M0 and O8
+  added after Mark asked whether the contract was ready.
+- 2026-11-06: M0's contract drafted. Mark ruled O8 (one kind of store) and
+  contract C1 (Cleromancy's meres start fresh).
