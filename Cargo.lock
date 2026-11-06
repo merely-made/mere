@@ -7453,6 +7453,8 @@ dependencies = [
  "layout-dom-api",
  "mandrake",
  "mere",
+ "mere-fetch",
+ "mere-fleece",
  "mere-overmap",
  "mere-view",
  "ostiary",
