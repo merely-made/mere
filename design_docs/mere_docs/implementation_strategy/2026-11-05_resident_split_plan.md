@@ -1,7 +1,8 @@
 # Resident split plan
 
-**Status:** 2026-11-05: plan. Nothing has moved. D1 to D4 settle the four graph-free pieces;
-the sync and inference slices and F1 remain to be resolved before their source moves.
+**Status:** 2026-11-05: plan. Nothing has moved. D1 to D6 settle the graph-free pieces and the
+inference protocol; D7 sends key-agreement carriage to its own plan. S6's remaining candidates
+come back as forks.
 
 **For:** splitting `ports/mere-resident` (75 source files, 43,624 lines including inline tests
 and the receipt-host binaries) by responsibility, so that each owner's reusable behaviour is
@@ -59,10 +60,10 @@ runtime behaviour changes.
 
 ### S1. Device conditions to mesh-host (D1)
 Move `conditions.rs` (Windows Win32 sensing, stated thermal, `SignalProvenance`,
-`validate_policy_coverage`) into Distillery's `mesh-host` as the real `ConditionSource` beside
-its stub. Mere keeps the line that selects it.
+`validate_policy_coverage`) into Distillery's `distillery::mesh_host::sense` module (`mesh_host` is a
+module of the `distillery` crate, not a crate) as the real `ConditionSource` beside its stub. Mere keeps the line that selects it.
 - Done when: its 21 tests pass in Distillery on Windows and the non-Windows path builds; the
-  resident's conditions behaviour is unchanged; `mesh-host` gains no graph or Mere dependency.
+  resident's conditions behaviour is unchanged; `distillery` gains no graph or Mere dependency.
 
 ### S2. Vault-lock triggers and identity dialogs to Dramatis (D2)
 Move `lock_triggers/` (policy, idle sampler, Linux logind/Mutter and Windows WTS/suspend
@@ -85,14 +86,25 @@ under per-domain leases, with verified copy of old per-lane stores) into Eidetic
 - Done when: the lease and migration tests pass in Eidetic; personal-graph transfer and Knot
   evidence still share one store in the resident; old stores are copied and never deleted.
 
-### S5. Inference: protocol out, lane composition stays
-`resident_inference.rs` composes Distillery's `InferenceLane` and stays. `mesh_discovery.rs`
-exchanges attested compute endpoints only after proof of current graph authority through
-`PersonalSyncHost`: the signed endpoint exchange is a candidate for Mesh, the authority check
-stays. `personal.rs` binds inference's private log to the personal graph's key group and stays.
-- Done when: the endpoint protocol, if separable, is tested in Distillery without a graph; the
-  authority check remains in Mere; the inference plan's native gates still pass.
-- Needs: a read of `mesh_discovery.rs` to confirm the protocol separates; a fork if it does not.
+### S5. Inference: endpoint protocol to Distillery (D5), lane composition stays
+`resident_inference.rs` composes Distillery's `InferenceLane` and stays; so does `personal.rs`.
+From `mesh_discovery.rs` (332) about 110 lines move into Distillery's `inference_stage` beside
+`discovery_permitted` (`discovery.rs:77`, the same authority-as-callback pattern): `Identity`,
+`Packet`, `signed`, `signing_bytes`, `verify_facts` (`:62-92`, already takes the current-reader
+check as a callback), the notochord framing, the consts and the test. The `mere.djinn/` domain
+tag and ALPN are renamed at the receiver. `Packet::verify` stays as a thin adapter feeding the
+three graph facts (`compute_space`, node id, `current_reader`); `Bridge` and `StageNetwork`
+stay. No existing Mesh type overlaps.
+- Done when: the protocol test passes in Distillery with no graph type; the
+  `inference-stages` resident build checks against it; the inference plan's native gates pass.
+
+### S6a. Lifecycle event file to Armillary (D6)
+Move `resident_events.rs` (280; imports only `std` and `serde_json`, format
+`djinn.resident-events/v1`) into `armillary/crates/djinn` beside `resident.rs`. The emit sites
+in `bin/djinn.rs` supply product names such as `knot-closed` and stay. `resident_events/diagnostics.rs`
+(225) stays: it imports Mere's `registry` observations and diagnostics.
+- Done when: the event-file tests pass in Armillary; the resident's `--events-file` output is
+  byte-identical on the harness lifecycle; `resident_status` reads it unchanged.
 
 ### S6. Sync: generic carriage to Murm, graph replica stays
 `personal_sync_host.rs` (2,514), `graph_keys.rs`, `carriage_host*.rs` and `transfer_staging.rs`
@@ -102,13 +114,18 @@ Murm's `murm-sync` and `transport` should own, without copying Graphshell's oper
 into a transport library.
 - Done when: every mechanism moved is tested in Murm with no graph type; lock, shutdown and
   restart behaviour matches the existing personal-sync receipts.
-- Needs: a per-file read; each candidate comes back as a fork.
+- Read 2026-11-05: Mere already builds on Murm's `P2pandaOverlayHost`, `BlobStore`/`BlobLease`
+  and `JoinedSpace` rather than reimplementing them. Candidates, each still a fork: pairing
+  choreography (`pair_node`/`unpair_node`/sibling topics, ~60 lines), the paired-peer blob fetch
+  gate (~100), overlay and blob bring-up in `open` (~70), `carriage_host`'s shared-endpoint
+  `attach`/`join_lane` skeleton (~200), the store-release wait in `close` against
+  `JoinedSpace::leave_and_wait` (~35), the `author_key_change` rollback shape and
+  `PersonalGraphSeals` (Eidetic, not Murm). Key-agreement carriage left under D7.
 
 ## Open forks
 
-- **F1.** `resident_events/` (505, zero graph refs) writes Djinn's lifecycle event file and a
-  local diagnostics copy under the Djinn test harness plan. Candidates: Armillary beside
-  Djinn, or Mere as harness-specific composition.
+- **F1.** Closed by D6.
+- **F2.** S6's remaining candidates (above), one fork each.
 
 ## Decisions
 
@@ -139,6 +156,31 @@ into a transport library.
 
   Links: summary The resident's leased iroh blob custody becomes Eidetic storage machinery.
 
+- **D5. The compute-endpoint protocol goes to Distillery (Mark, 2026-11-05):** "Move protocol to
+  Distillery", over keeping it until a second host needs it. Put to Mark on finding about 110
+  of `mesh_discovery`'s 332 lines graph-free, with `verify_facts` already taking authority as a
+  callback and no overlapping Mesh type. Outcome: applies the map's Distillery bullet (provider
+  advertisements; "independent signed compute protocol beside Mesh").
+
+  Links: summary The signed compute-endpoint exchange moves to Distillery; Mere keeps the graph-authority adapter.
+
+- **D6. The lifecycle event file goes to Armillary, its diagnostics copy stays (Mark,
+  2026-11-05):** "Split: events to Armillary", over keeping both. Put to Mark on finding the
+  event file free of Mere dependencies and the diagnostics copy bound to Mere's `registry`.
+  Outcome: new; closes F1.
+
+  Links: summary Djinn's lifecycle event file lives in Armillary; the registry-backed diagnostics copy stays in Mere.
+
+- **D7. Plan adopting the separate key-agreement lane (Mark, 2026-11-05):** "Plan adoption",
+  over keeping key agreement embedded in the graph lane. Put to Mark on finding that Eidetic's
+  `GroupKeyLane` (`stickleback/src/group_lane.rs:409`) and Murm's `GroupKeySync`
+  (`sync/src/group_key.rs:18`) carry key agreement on their own lane while Mere's
+  `GraphKeyGroup` carries it as `PersonalGraphEvent::GroupDispatch`/`PublishPrekey` and uses
+  neither. A dedicated plan moves the carriage onto them, keeps roster reconciliation
+  (`key_paired_devices`) in Mere and owns the wire-format migration. Outcome: new.
+
+  Links: summary Key agreement moves onto Eidetic's GroupKeyLane and Murm's GroupKeySync under its own plan; roster reconciliation stays in Mere.
+
 ## Findings
 
 - 2026-11-05: seven pieces (12 files, 5,125 lines) carry no graph type; the rest of the
@@ -147,3 +189,4 @@ into a transport library.
 ## Progress
 
 - 2026-11-05: inventory and D1 to D4; no source moved.
+- 2026-11-05: S5, S6 and F1 read by subagents and spot-checked; D5 to D7; no source moved.

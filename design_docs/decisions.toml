@@ -685,6 +685,21 @@ title = ". Leased blob custody goes to Eidetic (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "The resident's leased iroh blob custody becomes Eidetic storage machinery."
 
+[decisions."resident-split D5"]
+title = ". The compute-endpoint protocol goes to Distillery (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "The signed compute-endpoint exchange moves to Distillery; Mere keeps the graph-authority adapter."
+
+[decisions."resident-split D6"]
+title = ". The lifecycle event file goes to Armillary, its diagnostics copy stays (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "Djinn's lifecycle event file lives in Armillary; the registry-backed diagnostics copy stays in Mere."
+
+[decisions."resident-split D7"]
+title = ". Plan adopting the separate key-agreement lane (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "Key agreement moves onto Eidetic's GroupKeyLane and Murm's GroupKeySync under its own plan; roster reconciliation stays in Mere."
+
 [decisions."stack-lift D1"]
 title = "the remote board's mapping lives in `graphshell-host`"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
