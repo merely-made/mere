@@ -29,3 +29,24 @@ transport smoke coverage.
 On the merged source, the locked Fleece and graph-kernel library runs
 passed 20 and 535 tests; Graphshell passed 330 with seven ignored.
 The writer-handover transport smoke passed.
+
+
+## 2026-11-05 — Title, tags and stale edits with a hidden writer
+
+Chrome 156.0.8078.80 and Firefox 159.0.1 passed the title and tag edit and the
+stale object refusal in their installed unpacked extensions. The packages
+and Wasm hash match the preceding receipt. The follower selected the saved
+object, entered a new title and two tags, and used **Send changes**. Its
+refresh notification was held for one commit so a second submission from
+the same form would still carry the previous title and tags. Both requests
+used the same session, epoch and member.
+
+In both browsers the writer stayed hidden through both replies. It admitted
+the first edit once and refused the second because the object had changed.
+The follower reread the accepted title, and a fresh process reopened the
+same extension profile with that title and both tags. The stale draft
+did not replace either field.
+
+Raw receipts and screenshots are under
+`Code/testing/mere/graphshell-hidden-writer-20261105/`, in
+`metadata-run1/chrome/` and `metadata-run2/firefox/`.
