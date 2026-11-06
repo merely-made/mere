@@ -811,6 +811,28 @@ or a precise reference alone, and no storage migration is selected here.
   verifies, so the result is the newest edition the contacted holders had;
   governed reads fetch Moot history separately before `verify_reader_evidence`.
 
+- **D12.** Eidetic `e669eb2`: Stickleback `MessageSession` on `message_scheme`
+  (one-time pre-keys per peer, signed under the group-scoped Personae key),
+  `GroupKeyLane` generic over both session kinds, and
+  `GroupEncryptionProfile::bounded_durable()` keeping 8 epochs through
+  `forget_authorized`. Murm-sync `LaneKind` defaults to `Conversation`
+  (forward-secure); `Durable` takes the bounded window. Gaps, all fork-side
+  under D5: membership uses upstream's test-only `AckedTestDgm` (no re-adding a
+  removed member, no production ordering); `DcgkaState` fields are private, so
+  pre-key registration edits serialized state (making them `pub` in p2mere
+  removes that); frames must arrive in causal order; no multi-device; no
+  pre-key rotation; the retention window counts epochs, not time.
+- **0.9 move.** Every root on `p2mere-*` 0.9 with one copy of p2mere, gemot,
+  murm-sync and stickleback (eidetic `4aaa64d1`/`5182e4e`, murm `0aaf4b16d3d`,
+  gemot `120bac79877b`/`9912dc85`, esp `27fd59188c50`, knot-editor `81185a2`,
+  mere `a1f2c15ff`, isocosm `9568dfd8`, merelyllc.com `037863fc`, turnstone
+  `8a980768`), except cleromancy: moving Graphshell onto current Mere needs
+  Mere's newer genet, netrender and vello, so it waits on the render-stack
+  refresh. Turnstone holds genet and netrender at its locked revisions through
+  patch tables, and its lock still lists unused 0.8 optional deps of its old
+  Mere and Knot pins. Muniment needed nothing; Stickleback's `MunimentStore`
+  took the `_tx` traits with a no-op `Transaction`.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -847,6 +869,7 @@ or a precise reference alone, and no storage migration is selected here.
 - 2026-11-05: `p2mere-*` 0.9.0 published (tag `p2mere-0.9.0`, `66904f86`):
   the upstream intake plus the store's SQLite decoupling. The family repin onto
   0.8 landed; moving it to 0.9 waits on Muniment's store-trait update.
-
 - 2026-11-05: wave 3b. R4 resolver landed (gemot `cd795b0`, murm
   `d73851580a6`); the 0.9 move and D12 lanes are running.
+- 2026-11-05: D12 wired (eidetic `e669eb2`; Murm through the 0.9 move) and the
+  family moved to 0.9 except cleromancy. R5 holders and R7 follow-ups next.
