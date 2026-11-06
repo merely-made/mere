@@ -17,7 +17,7 @@ use mere_resident::settings::OwnerSettings;
 use ostiary::app_admission::AppId;
 use ostiary::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
 
-const BACKEND: &str = r#"#!/bin/sh
+const KDIALOG: &str = r#"#!/bin/sh
 case " $* " in
   *" --menu "*)
     printf '%s\000' "$@" > "$MERE_CONFIRM_ARGS"
@@ -33,10 +33,36 @@ printf 'unexpected synthetic backend invocation\n' >&2
 exit 88
 "#;
 
+// Exit codes and output follow Zenity 4.2.2 as measured on Fedora 45: an unknown
+// option exits 255, and a timeout exits 5 after printing the default tag.
+const ZENITY: &str = r#"#!/bin/sh
+case " $* " in
+  *" --radiolist "*)
+    printf '%s\000' "$@" > "$MERE_CONFIRM_ARGS"
+    case "$MERE_CONFIRM_MODE" in
+      failure) printf 'This option is not available.\n' >&2; exit 255;;
+      timeout) printf 'no\n'; exit 5;;
+      no) printf 'no\n'; exit 0;;
+      yes) printf 'yes\n'; exit 0;;
+    esac;;
+  *" --version "*) printf '4.2.2\n'; exit 0;;
+esac
+printf 'unexpected synthetic backend invocation\n' >&2
+exit 88
+"#;
+
 fn scenario(mode: &str) {
+    run_scenario("kdialog", KDIALOG, "KDE", mode);
+}
+
+fn gnome_scenario(mode: &str) {
+    run_scenario("zenity", ZENITY, "gnome", mode);
+}
+
+fn run_scenario(name: &str, script: &str, desktop: &str, mode: &str) {
     let directory = tempfile::tempdir().unwrap();
-    let backend = directory.path().join("kdialog");
-    std::fs::write(&backend, BACKEND).unwrap();
+    let backend = directory.path().join(name);
+    std::fs::write(&backend, script).unwrap();
     std::fs::set_permissions(&backend, std::fs::Permissions::from_mode(0o700)).unwrap();
     let args = directory.path().join("args");
     let path = format!("{}:/usr/bin:/bin", directory.path().display());
@@ -44,8 +70,8 @@ fn scenario(mode: &str) {
         .args(["--exact", "checked_native_child", "--nocapture"])
         .env("PATH", path)
         .env("DISPLAY", ":synthetic-confirmation")
-        .env("XDG_SESSION_DESKTOP", "KDE")
-        .env("XDG_CURRENT_DESKTOP", "KDE")
+        .env("XDG_SESSION_DESKTOP", desktop)
+        .env("XDG_CURRENT_DESKTOP", desktop)
         .env_remove("WAYLAND_DISPLAY")
         .env_remove("SSH_CLIENT")
         .env_remove("SSH_CONNECTION")
@@ -65,11 +91,21 @@ fn scenario(mode: &str) {
     );
     let arguments = std::fs::read(&args).expect("the checked native choice was reached");
     let arguments: Vec<_> = arguments.split(|b| *b == 0).collect();
-    assert!(
-        arguments
-            .windows(2)
-            .any(|a| a == [b"--default".as_slice(), b"no"])
-    );
+    let has = |flag: &[u8]| arguments.iter().any(|a| *a == flag);
+    if name == "kdialog" {
+        assert!(
+            arguments
+                .windows(2)
+                .any(|a| a == [b"--default".as_slice(), b"no"])
+        );
+    } else {
+        assert!(
+            arguments
+                .windows(3)
+                .any(|a| a == [b"TRUE".as_slice(), b"no", b"No"])
+        );
+        assert!(has(b"--no-markup") && has(b"--hide-column=2") && has(b"--print-column=2"));
+    }
     assert!(
         arguments
             .iter()
@@ -98,6 +134,26 @@ fn explicit_native_yes_grants_only_the_declaration() {
 }
 
 #[test]
+fn zenity_parser_failure_leaves_actual_owner_policy_unchanged() {
+    gnome_scenario("failure");
+}
+
+#[test]
+fn zenity_timeout_with_default_tag_is_not_an_answer() {
+    gnome_scenario("timeout");
+}
+
+#[test]
+fn zenity_explicit_no_is_kept() {
+    gnome_scenario("no");
+}
+
+#[test]
+fn zenity_explicit_yes_grants_only_the_declaration() {
+    gnome_scenario("yes");
+}
+
+#[test]
 fn checked_native_child() {
     let Ok(mode) = std::env::var("MERE_CONFIRM_MODE") else {
         return;
@@ -120,7 +176,7 @@ fn checked_native_child() {
     let answer = consent.decide(&app, &declaration, None);
     let policy = OwnerSettings::load(&settings).unwrap();
     match mode.as_str() {
-        "failure" => {
+        "failure" | "timeout" => {
             assert!(answer.is_err());
             assert!(!settings.exists());
             assert!(policy.refused_applications.is_empty());
