@@ -9,8 +9,8 @@ rust-version = "1.97.1"
 publish = false
 
 [dependencies]
-gemot = { version = "0.1.1", git = "https://www.github.com/merely-made/gemot.git", rev = "bcfd40831253734d3e7ef954190d4d37e8fbaea2" }
-mien = { version = "0.0.1", git = "https://www.github.com/merely-made/gemot.git", rev = "bcfd40831253734d3e7ef954190d4d37e8fbaea2" }
+gemot = { version = "0.1.1", git = "https://www.github.com/merely-made/gemot.git", rev = "120bac79877be97ac9a7b1c79e7eb1b78238003a" }
+mien = { version = "0.0.1", git = "https://www.github.com/merely-made/gemot.git", rev = "120bac79877be97ac9a7b1c79e7eb1b78238003a" }
 transport = { package = "mere-transport", version = "0.0.2", git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7", features = ["noise", "notochord"] }
 murm-ocapn-transport = { version = "0.1.0", git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
 murm-ocapn = { version = "0.1.0", git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }

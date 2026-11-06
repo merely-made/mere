@@ -150,7 +150,7 @@ kernel.workspace = true
 light-file-dialog = { version = "3.21.3", path = "../../support/patches/light-file-dialog" }
 # Knot's file-source and protocol-serving adapters. Portable snapshot records
 # come directly from site-model; both consumers share the same model identity.
-site-host = { package = "gemot-site-host", git = "https://www.github.com/merely-made/gemot.git", rev = "bcfd40831253734d3e7ef954190d4d37e8fbaea2" }
+site-host = { package = "gemot-site-host", git = "https://www.github.com/merely-made/gemot.git", rev = "9912dc85de2b86707eb712563dd556ec3e2a57e0" }
 # The policy vocabulary the device sensor fills in (`DeviceConditions`), and
 # the `ConditionSource` seam it plugs into. `mere-mesh` refuses to touch the
 # OS; `src/conditions.rs` is the Windows-facing half that seam expects.
