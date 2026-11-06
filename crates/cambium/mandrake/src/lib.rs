@@ -42,7 +42,7 @@
 //! `commands` receipt section appears only after use or explicit
 //! [`Lane::set_command_audit_limits`]. Legacy `act` labels keep their own path.
 //!
-//! `MESQUITE_CAPTURE_PAINT=1` or [`Lane::set_paint_capture`] adds a postcard
+//! `MANDRAKE_CAPTURE_PAINT=1` or [`Lane::set_paint_capture`] adds a postcard
 //! `.paintlist` beside each saved PNG, with full font/image payloads and a
 //! `paint_path` in JSON receipts. Both come from the same presented frame.
 //! Existing sidecars and export errors fail the receipt. External GPU images

@@ -27,7 +27,7 @@ portable = ["netrender/vello-webgl"]
 # Direct WebGL2 presentation, independently of optional WebGPU compute.
 webgl = ["portable"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
-image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
+image-decode = ["cambium-rootstock/image-decode", "mandrake/image-decode"]
 
 [dependencies]
 # The stock this is grafted onto. Everything below is what a browser adds.
@@ -48,7 +48,7 @@ layout_dom_api = { workspace = true }
 # The browser itself. Declared for wasm32 only, so a native build of the
 # workspace resolves none of it.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-mesquite = { path = "../mesquite", default-features = false }
+mandrake = { path = "../mandrake", default-features = false }
 js-sys = "0.3"
 wasm-bindgen = "=0.2.129"
 # Reading a chosen file's bytes, which the browser hands over asynchronously.

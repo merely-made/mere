@@ -93,7 +93,7 @@ pub use files::{DialogFileChooser, choose_save_path, read_file};
 pub use harness::{Harness, inert_hooks};
 pub use scene_producer::SceneProducer;
 pub use windows::{WindowHooks, WindowHost, WindowsInit, run_windows};
-// Scenario execution lives in Mesquite; applications implement mesquite::Product.
+// Scenario execution lives in Mandrake; applications implement mandrake::Product.
 
 pub use cambium_rootstock::Instant;
 use cambium_rootstock::meristem_bounds::RootView;

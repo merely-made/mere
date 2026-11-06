@@ -168,7 +168,7 @@ impl<P: Product> Lane<P> {
             script_files: None,
             records: Vec::new(),
             capture_backend: Box::new(NativeCapture),
-            capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
+            capture_paint: std::env::var_os("MANDRAKE_CAPTURE_PAINT")
                 .is_some_and(|value| value == "1"),
             diagnostics: None,
             a11y_publication: None,
@@ -183,7 +183,7 @@ impl<P: Product> Lane<P> {
     }
 
     /// Opt into a resource-preserving `.paintlist` beside each saved PNG.
-    /// Defaults to `MESQUITE_CAPTURE_PAINT=1`. This is a capture/replay aid,
+    /// Defaults to `MANDRAKE_CAPTURE_PAINT=1`. This is a capture/replay aid,
     /// not a timing run: full font bytes are serialized without elision.
     /// External GPU images remain references, not portable pixel payloads.
     pub fn set_paint_capture(&mut self, enabled: bool) {
@@ -191,7 +191,7 @@ impl<P: Product> Lane<P> {
     }
 
     /// Read a scenario using the established environment/path conventions and
-    /// text receipt format. The host supplies native file access; Mesquite owns
+    /// text receipt format. The host supplies native file access; Mandrake owns
     /// scripted chooser answers, capture timing, and completion.
     pub fn from_config(
         config: crate::LaneConfig,

@@ -5,11 +5,11 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 # SPDX-License-Identifier: MPL-2.0
 
-"""Run a Mesquite native scenario through macOS LaunchServices.
+"""Run a Mandrake native scenario through macOS LaunchServices.
 
 The temporary application bundle launches the real binary without modifying
 its host or rendering path. Product profile isolation is supplied with --env.
-The Mesquite receipt, rather than open's exit status, determines success.
+The Mandrake receipt, rather than open's exit status, determines success.
 """
 
 import argparse
@@ -39,7 +39,7 @@ def owns_executable(process: str, executable: Path) -> bool:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
-    parser.add_argument("--prefix", required=True, help="Mesquite product environment prefix")
+    parser.add_argument("--prefix", required=True, help="Mandrake product environment prefix")
     parser.add_argument("--scenario", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True, help="New receipt directory")
     parser.add_argument("--env", action="append", default=[], metavar="KEY=VALUE")
@@ -71,9 +71,9 @@ def main():
     timed_out = False
     owned_pids = set()
     remaining = []
-    scratch = tempfile.mkdtemp(prefix="mesquite-native-")
+    scratch = tempfile.mkdtemp(prefix="mandrake-native-")
     try:
-        app = Path(scratch) / "MesquiteAcceptance.app"
+        app = Path(scratch) / "MandrakeAcceptance.app"
         executable = app / "Contents/MacOS/product"
         executable.parent.mkdir(parents=True)
         # A copy keeps a concurrent rebuild from replacing the launched image.
@@ -81,8 +81,8 @@ def main():
         binary_hash = hashlib.sha256(executable.read_bytes()).hexdigest()
         with (app / "Contents/Info.plist").open("wb") as file:
             plistlib.dump({
-                "CFBundleIdentifier": "made.merely.mesquite.acceptance." + uuid.uuid4().hex,
-                "CFBundleName": "Mesquite Native Acceptance",
+                "CFBundleIdentifier": "made.merely.mandrake.acceptance." + uuid.uuid4().hex,
+                "CFBundleName": "Mandrake Native Acceptance",
                 "CFBundleExecutable": "product",
                 "CFBundlePackageType": "APPL",
                 "CFBundleVersion": "1",

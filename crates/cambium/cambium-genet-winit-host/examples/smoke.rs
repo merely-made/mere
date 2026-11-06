@@ -28,11 +28,11 @@
 //! as size + digest, which is how the receipt can claim a frame was really
 //! drawn (and, after a resize, really redrawn at the new size).
 //!
-//! The scenario runs on the shared [`mesquite::Lane`]; this file supplies only
-//! the smoke's own half through [`mesquite::Product`], and is the reference for how an
+//! The scenario runs on the shared [`mandrake::Lane`]; this file supplies only
+//! the smoke's own half through [`mandrake::Product`], and is the reference for how an
 //! application does that.
 
-use mesquite::{CaptureRecord, LaneConfig};
+use mandrake::{CaptureRecord, LaneConfig};
 use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::rc::Rc;
@@ -256,7 +256,7 @@ struct SmokeLane {
     release_file: Option<std::path::PathBuf>,
 }
 
-impl mesquite::Product for SmokeLane {
+impl mandrake::Product for SmokeLane {
     type State = Smoke;
     type Logic = Logic;
     type View = Child;
@@ -321,7 +321,7 @@ impl mesquite::Product for SmokeLane {
     fn app_step(
         &mut self,
         _ctx: &mut AppCtx<'_, Smoke, Logic, Child>,
-        _checkpoints: mesquite::Checkpoints<'_>,
+        _checkpoints: mandrake::Checkpoints<'_>,
         line: &str,
     ) -> Result<(), String> {
         match line.split_whitespace().next() {
@@ -442,7 +442,7 @@ fn main() {
     // HOST_SMOKE_SCENARIO, HOST_SMOKE_CAPTURE_DIR and HOST_SMOKE_RECEIPT.
     let lane = LaneConfig::from_env("HOST_SMOKE").map(|config| {
         let path = config.scenario.display().to_string();
-        let lane = mesquite::Lane::from_config(
+        let lane = mandrake::Lane::from_config(
             config,
             SmokeLane {
                 alpha: Vec::new(),

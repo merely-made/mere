@@ -133,7 +133,7 @@ struct Exercise {
 fn exercise(lines: &[String], limits: Option<CommandAuditLimits>, text: bool) -> Exercise {
     static NEXT: AtomicU64 = AtomicU64::new(0);
     let path = std::env::temp_dir().join(format!(
-        "mesquite-command-{}-{}.receipt",
+        "mandrake-command-{}-{}.receipt",
         std::process::id(),
         NEXT.fetch_add(1, Ordering::Relaxed)
     ));

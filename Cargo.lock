@@ -2269,8 +2269,8 @@ dependencies = [
  "genet-winit",
  "layout-dom-api",
  "light-file-dialog",
+ "mandrake",
  "meristem",
- "mesquite",
  "netrender",
  "objc2-app-kit 0.3.2",
  "paint_list_api",
@@ -2328,7 +2328,7 @@ dependencies = [
  "genet-scripted-dom",
  "js-sys",
  "layout-dom-api",
- "mesquite",
+ "mandrake",
  "netrender",
  "paint_list_api",
  "paint_list_render",
@@ -5032,7 +5032,7 @@ dependencies = [
  "dramatis",
  "image",
  "luggage",
- "mesquite",
+ "mandrake",
  "ostiary",
  "persona-picker",
  "personae",
@@ -7462,10 +7462,10 @@ dependencies = [
  "graphshell-endpoint",
  "hest",
  "layout-dom-api",
+ "mandrake",
  "mere",
  "mere-overmap",
  "mere-view",
- "mesquite",
  "ostiary",
  "pandect",
  "sceno",
@@ -10093,6 +10093,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc04a4c58212d57930a24bf47d3fa87485264a3a054e9c10e042eb373573ad3c"
 
 [[package]]
+name = "mandrake"
+version = "0.1.0"
+dependencies = [
+ "apparatus-core",
+ "cambium",
+ "cambium-rootstock",
+ "genet-scripted-dom",
+ "paint_list_api",
+ "png 0.17.16",
+ "postcard",
+ "serde",
+ "serde_json",
+ "sprigging",
+ "taproot",
+]
+
+[[package]]
 name = "markup5ever"
 version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10759,11 +10776,11 @@ dependencies = [
  "genet-scripted-dom",
  "incipit",
  "layout-dom-api",
+ "mandrake",
  "mere",
  "mere-cartography",
  "mere-curation",
  "mere-kernel",
- "mesquite",
  "netrender",
  "pictograph",
  "platen",
@@ -10781,23 +10798,6 @@ dependencies = [
  "anymore",
  "kurbo",
  "tracing",
-]
-
-[[package]]
-name = "mesquite"
-version = "0.1.0"
-dependencies = [
- "apparatus-core",
- "cambium",
- "cambium-rootstock",
- "genet-scripted-dom",
- "paint_list_api",
- "png 0.17.16",
- "postcard",
- "serde",
- "serde_json",
- "sprigging",
- "taproot",
 ]
 
 [[package]]
@@ -13819,10 +13819,10 @@ dependencies = [
  "image",
  "inker",
  "layout-dom-api",
+ "mandrake",
  "mere-fleece",
  "mere-lanes",
  "mere-surface-api",
- "mesquite",
  "mockito",
  "netrender",
  "paint_list_render",
@@ -17845,7 +17845,7 @@ dependencies = [
  "dirs 5.0.1",
  "genet-presenter",
  "layout-dom-api",
- "mesquite",
+ "mandrake",
  "netrender",
  "serde_json",
  "tabard-workshop",

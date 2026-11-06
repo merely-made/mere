@@ -19,7 +19,7 @@ use kernel::{
     graph::{EdgeFamily, NodeKey, SemanticSubKind},
 };
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
-use mesquite::{CaptureRecord, Lane, LaneConfig, Product};
+use mandrake::{CaptureRecord, Lane, LaneConfig, Product};
 use pictograph::canvas::fold_projection::FoldTraversalDirection;
 use pictograph::canvas::{CameraView, Canvas, FoldEndpoint, PointerButton};
 use sprigging::ColorF;

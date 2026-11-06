@@ -11,7 +11,7 @@
 //! A headless run presents no frames, so no capture can land here. That makes
 //! the lost-capture path testable, and leaves real captures to the headed smoke.
 
-use mesquite::LaneConfig;
+use mandrake::LaneConfig;
 use std::cell::Cell;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
@@ -95,7 +95,7 @@ const SHEET: &str = "button { display: block; width: 120px; height: 32px; }
 
 struct TestLane;
 
-impl mesquite::Product for TestLane {
+impl mandrake::Product for TestLane {
     type State = App;
     type Logic = Logic;
     type View = Child;
@@ -109,9 +109,9 @@ impl mesquite::Product for TestLane {
 
     fn app_step_with_clicks(
         &mut self,
-        ctx: &mut mesquite::Ctx<'_, Self>,
-        _: mesquite::Checkpoints<'_>,
-        clicks: &mut mesquite::Clicks,
+        ctx: &mut mandrake::Ctx<'_, Self>,
+        _: mandrake::Checkpoints<'_>,
+        clicks: &mut mandrake::Clicks,
         line: &str,
     ) -> Result<(), String> {
         if line != "select-far" {
@@ -170,7 +170,7 @@ fn run_in(dir: &Path, scenario: &str) -> (String, Harness<App, Logic, Child>) {
 
 struct TestProduct(&'static str);
 
-impl mesquite::Product for TestProduct {
+impl mandrake::Product for TestProduct {
     type State = App;
     type Logic = Logic;
     type View = Child;
@@ -181,10 +181,10 @@ impl mesquite::Product for TestProduct {
     fn sheet(&self) -> &'static str {
         self.0
     }
-    fn snapshot(&self, ctx: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+    fn snapshot(&self, ctx: &mandrake::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
         TestLane.snapshot(ctx, 0, 1.0)
     }
-    fn drain_events(&mut self, ctx: &mut mesquite::Ctx<'_, Self>) -> Vec<String> {
+    fn drain_events(&mut self, ctx: &mut mandrake::Ctx<'_, Self>) -> Vec<String> {
         TestLane.drain_events(ctx)
     }
     fn default_capture_path(&self) -> PathBuf {
@@ -192,7 +192,7 @@ impl mesquite::Product for TestProduct {
     }
     fn target_point(
         &self,
-        ctx: &mesquite::Ctx<'_, Self>,
+        ctx: &mandrake::Ctx<'_, Self>,
         _: cambium_rootstock::NodeId,
         rect: [f32; 4],
     ) -> (f32, f32) {
@@ -209,7 +209,7 @@ fn run_lane(
     dir: &Path,
     scenario: &str,
     sheet: &'static str,
-    use_mesquite: bool,
+    use_mandrake: bool,
 ) -> (String, Harness<App, Logic, Child>) {
     let dir = dir.to_path_buf();
     let path = dir.join("test.scn");
@@ -220,8 +220,8 @@ fn run_lane(
         receipt: None,
     };
     let receipt = config.receipt_path().expect("receipt path");
-    let hooks: HostHooks<App, Logic, Child> = if use_mesquite {
-        let mut lane = mesquite::Lane::new(
+    let hooks: HostHooks<App, Logic, Child> = if use_mandrake {
+        let mut lane = mandrake::Lane::new(
             TestProduct(sheet),
             Some(taproot::Scenario::parse(scenario).unwrap()),
             Some(receipt.clone()),
@@ -234,7 +234,7 @@ fn run_lane(
         }
     } else {
         let mut lane =
-            mesquite::Lane::from_config(config, TestLane, cambium_genet_winit_host::read_file)
+            mandrake::Lane::from_config(config, TestLane, cambium_genet_winit_host::read_file)
                 .expect("scenario parses");
         HostHooks {
             after_frame: Box::new(move |ctx| lane.after_frame(ctx)),
@@ -375,7 +375,7 @@ fn a_held_semantic_click_rejects_a_hidden_or_renamed_target_without_retargeting(
     for hide in [false, true] {
         let result = Rc::new(std::cell::RefCell::new(None));
         let observed = result.clone();
-        let mut clicks = mesquite::Clicks::default();
+        let mut clicks = mandrake::Clicks::default();
         let mut requested = false;
         let hooks = HostHooks {
             after_frame: Box::new(move |ctx: &mut AppCtx<'_, App, Logic, Child>| {
@@ -440,14 +440,14 @@ fn a_held_semantic_click_rejects_a_hidden_or_renamed_target_without_retargeting(
 }
 #[test]
 fn both_receipt_modes_click_the_visible_part_of_an_oversized_button() {
-    for mesquite in [false, true] {
+    for mandrake in [false, true] {
         let (receipt, h) = run_lane(
-            &scratch(&format!("tall-{mesquite}")),
+            &scratch(&format!("tall-{mandrake}")),
             "click role:button Far\nassert snap count == 1\n",
             "button { display:block; width:120px; height:32px; }
              .scroller { height:64px; overflow:auto; }
              .scroller button { height:300px; }",
-            mesquite,
+            mandrake,
         );
         assert_eq!(h.state().count, 1, "{receipt}");
         assert!(!receipt.contains("FAIL:"), "{receipt}");
@@ -456,13 +456,13 @@ fn both_receipt_modes_click_the_visible_part_of_an_oversized_button() {
 
 #[test]
 fn both_receipt_modes_fail_an_unrevealable_target_even_without_an_assertion() {
-    for mesquite in [false, true] {
+    for mandrake in [false, true] {
         let (receipt, h) = run_lane(
-            &scratch(&format!("clipped-{mesquite}")),
+            &scratch(&format!("clipped-{mandrake}")),
             "click role:button Far\n",
             "button { display:block; width:120px; height:32px; }
              .scroller { height:0; overflow:hidden; }",
-            mesquite,
+            mandrake,
         );
         assert_eq!(h.state().count, 0);
         assert!(receipt.contains("never came into view"), "{receipt}");
@@ -474,9 +474,9 @@ fn both_receipt_modes_fail_an_unrevealable_target_even_without_an_assertion() {
 }
 
 #[test]
-fn mesquite_scrolls_then_uses_the_product_target_point_before_advancing() {
+fn mandrake_scrolls_then_uses_the_product_target_point_before_advancing() {
     let (receipt, h) = run_lane(
-        &scratch("mesquite-far"),
+        &scratch("mandrake-far"),
         "click role:button Count\nassert snap count == 1\nclick role:button Far\nassert snap count == 2\n",
         SHEET,
         true,
@@ -528,7 +528,7 @@ fn exercise_editor_click(selector: taproot::Selector) {
         (rect[0] + rect[2] / 2.0, rect[1] + rect[3] / 2.0)
     }
 
-    let mut clicks = mesquite::Clicks::default();
+    let mut clicks = mandrake::Clicks::default();
     let mut started = false;
     let hooks: HostHooks<Editor, EditorLogic, EditorView> = HostHooks {
         after_frame: Box::new(move |ctx| {
@@ -609,7 +609,7 @@ fn exercise_editor_click(selector: taproot::Selector) {
 }
 
 #[test]
-fn mesquite_reveals_a_partly_clipped_small_control() {
+fn mandrake_reveals_a_partly_clipped_small_control() {
     let (receipt, host) = run_lane(
         &scratch("partly-clipped-small"),
         "click role:button Far\nassert snap count == 1\n",
@@ -626,7 +626,7 @@ fn mesquite_reveals_a_partly_clipped_small_control() {
 }
 
 #[test]
-fn mesquite_reveals_a_partly_clipped_large_non_text_control() {
+fn mandrake_reveals_a_partly_clipped_large_non_text_control() {
     let (receipt, host) = run_lane(
         &scratch("partly-clipped-large"),
         "click role:button Far\nassert snap count == 1\n",
@@ -751,7 +751,7 @@ fn text_and_json_runs_use_the_same_checkpoint_commands() {
 }
 
 struct RefusingProduct;
-impl mesquite::Product for RefusingProduct {
+impl mandrake::Product for RefusingProduct {
     type State = App;
     type Logic = Logic;
     type View = Child;
@@ -761,10 +761,10 @@ impl mesquite::Product for RefusingProduct {
     fn sheet(&self) -> &str {
         SHEET
     }
-    fn snapshot(&self, _: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+    fn snapshot(&self, _: &mandrake::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
         ProbeSnapshot::default()
     }
-    fn receipt_checks(&self, _: &[mesquite::CaptureRecord]) -> Vec<String> {
+    fn receipt_checks(&self, _: &[mandrake::CaptureRecord]) -> Vec<String> {
         vec!["product acceptance failed".into()]
     }
     fn receipt_lines(&self) -> Vec<String> {
@@ -780,7 +780,7 @@ fn product_acceptance_can_fail_either_receipt_format() {
         std::fs::write(&scenario_path, "log done\n").unwrap();
         let receipt = dir.join("receipt");
         let mut lane = if json {
-            mesquite::Lane::new(
+            mandrake::Lane::new(
                 RefusingProduct,
                 Some(taproot::Scenario::parse("log done\n").unwrap()),
                 Some(receipt.clone()),
@@ -788,7 +788,7 @@ fn product_acceptance_can_fail_either_receipt_format() {
                 Rc::new(Cell::new(0)),
             )
         } else {
-            mesquite::Lane::from_config(
+            mandrake::Lane::from_config(
                 LaneConfig {
                     scenario: scenario_path,
                     capture_dir: None,
@@ -843,7 +843,7 @@ fn product_completion_runs_once_and_preserves_failures_when_kept_open() {
         saw_failure: Rc<Cell<bool>>,
         reject: bool,
     }
-    impl mesquite::Product for Completion {
+    impl mandrake::Product for Completion {
         type State = App;
         type Logic = Logic;
         type View = Child;
@@ -853,12 +853,12 @@ fn product_completion_runs_once_and_preserves_failures_when_kept_open() {
         fn sheet(&self) -> &str {
             SHEET
         }
-        fn snapshot(&self, ctx: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+        fn snapshot(&self, ctx: &mandrake::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
             TestLane.snapshot(ctx, 0, 1.0)
         }
         fn complete(
             &mut self,
-            _: &mut mesquite::Ctx<'_, Self>,
+            _: &mut mandrake::Ctx<'_, Self>,
             outcome: &taproot::Outcome,
         ) -> Result<(), String> {
             self.calls.set(self.calls.get() + 1);
@@ -884,7 +884,7 @@ fn product_completion_runs_once_and_preserves_failures_when_kept_open() {
         std::fs::write(&path, script).unwrap();
         let calls = Rc::new(Cell::new(0));
         let saw_failure = Rc::new(Cell::new(false));
-        let mut lane = mesquite::Lane::from_config(
+        let mut lane = mandrake::Lane::from_config(
             LaneConfig {
                 scenario: path,
                 capture_dir: Some(dir.clone()),
@@ -944,7 +944,7 @@ fn scenario_keys_use_retained_focus_and_button_activation() {
 }
 
 #[test]
-fn generated_names_agree_for_mesquite_native_accessibility_and_attribute_updates() {
+fn generated_names_agree_for_mandrake_native_accessibility_and_attribute_updates() {
     const GENERATED_SHEET: &str = "button { display: block; width: 180px; height: 32px; }
         .count::before { content: attr(data-prefix); } .count::after { content: ']'; }";
     let (receipt, mut h) = run_lane(

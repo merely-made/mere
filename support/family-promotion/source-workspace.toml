@@ -129,7 +129,7 @@ members = [
     "crates/cambium/sprigging",
     # The scenario lane over a Cambium document host. Landed 2026-09-14 from
     # Isometry, where it was `wing-scenario`; the products switch to it next.
-    "crates/cambium/mesquite",
+    "crates/cambium/mandrake",
     # Retained application chrome over Cambium, so it sits under the umbrella.
     "crates/cambium/workbench",
     # The mere view every application embeds (reservoir plan V2b).
@@ -368,7 +368,7 @@ illume = { version = "0.0.2", path = "crates/nematic/illume" }
 # is also a workspace member is a hard lockfile collision.
 cambium = { version = "0.3.3", path = "crates/cambium/cambium" }
 cambium-rootstock = { version = "0.1.0", path = "crates/cambium/cambium-rootstock", default-features = false }
-mesquite = { version = "0.1.0", path = "crates/cambium/mesquite" }
+mandrake = { version = "0.1.0", path = "crates/cambium/mandrake" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-genet-web-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
@@ -726,7 +726,7 @@ mere-overmap = { path = "crates/cambium/mere-overmap" }
 mere-view = { path = "crates/cambium/mere-view" }
 mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 meristem = { path = "crates/cambium/meristem" }
-mesquite = { path = "crates/cambium/mesquite" }
+mandrake = { path = "crates/cambium/mandrake" }
 mien = { path = "crates/moot/mien" }
 mooting = { path = "crates/moot/mooting" }
 numen = { path = "crates/conatus/numen" }

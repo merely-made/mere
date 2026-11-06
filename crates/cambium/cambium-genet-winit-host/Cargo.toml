@@ -57,7 +57,7 @@ winit = { workspace = true }
 taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
 workbench = { workspace = true }
 serde_json = { workspace = true }
-mesquite = { version = "0.1.0", path = "../mesquite" }
+mandrake = { version = "0.1.0", path = "../mandrake" }
 
 # The tests drive the harness by role/label, and read the DOM directly for the
 # assertions the state does not carry.

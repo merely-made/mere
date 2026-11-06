@@ -70,11 +70,11 @@ path = "crates/cambium/cambium/src/retained_composition/view.rs"
 reason = "View. Existing source-size debt; a responsibility split must preserve ComponentOperationSpan and existing module visibility."
 
 [[exception]]
-path = "crates/cambium/mesquite/src/lane.rs"
+path = "crates/cambium/mandrake/src/lane.rs"
 reason = "The lane lifecycle: tick per presented frame, arm and collect captures, honour a frame limit, defer the close, write the receipt, set the exit code. Existing source-size debt; a responsibility split must preserve PaintReadback, SealReadback, PendingReadback and existing module visibility."
 
 [[exception]]
-path = "crates/cambium/mesquite/src/probe_tests.rs"
+path = "crates/cambium/mandrake/src/probe_tests.rs"
 reason = "The actual Probe, retained host geometry and wheel callback, without an OS window or GPU. Existing source-size debt; a responsibility split must preserve Store, State, View and existing module visibility."
 
 [[exception]]
@@ -449,7 +449,7 @@ reason = "Workbench reading tiles and their scoped Forme draft in the retained p
 
 [[exception]]
 path = "ports/graphshell/src/web_tree/lane.rs"
-reason = "Product observations and actions for Mesquite on the tree page. Existing source-size debt; a responsibility split must preserve TreeLane, HeardItem and existing module visibility."
+reason = "Product observations and actions for Mandrake on the tree page. Existing source-size debt; a responsibility split must preserve TreeLane, HeardItem and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/web_tree/link_inspection.rs"

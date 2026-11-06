@@ -33,7 +33,7 @@ livery = [
     "dep:cambium", "dep:cambium-desktop", "dep:genet-livery", "dep:genet-scripted-dom",
     "dep:genet-render", "dep:accesskit", "dep:layout-dom-api", "dep:paint_list_render", "dep:url",
     "dep:windows", "dep:dpi", "dep:scrying-engine",
-    "dep:tabard-workshop", "dep:cambium-rootstock", "dep:mesquite", "dep:taproot", "dep:dirs",
+    "dep:tabard-workshop", "dep:cambium-rootstock", "dep:mandrake", "dep:taproot", "dep:dirs",
 ]
 # Named developer receipt for applying a Tabard artifact to Pelt Chrome. This
 # stays optional so the generic shell has no Tabard runtime dependency.
@@ -129,7 +129,7 @@ cambium = { workspace = true, optional = true }
 cambium-desktop = { workspace = true, optional = true }
 cambium-rootstock = { workspace = true, optional = true }
 tabard-workshop = { workspace = true, optional = true, features = ["native-host"] }
-mesquite = { workspace = true, optional = true }
+mandrake = { workspace = true, optional = true }
 taproot = { workspace = true, optional = true }
 dirs = { version = "6", optional = true }
 netrender = { workspace = true, optional = true }

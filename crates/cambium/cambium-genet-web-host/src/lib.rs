@@ -24,7 +24,7 @@
 //!
 //! A capture hook reads a presented frame back as a [`PendingFrame`] through
 //! [`capture_into`], where the desktop reads it at once with `read_frame`.
-//! [`WebCapture`] supplies asynchronous readback to Mesquite's scenario lane.
+//! [`WebCapture`] supplies asynchronous readback to Mandrake's scenario lane.
 //!
 //! ## Off wasm, only the mirror's plan compiles
 //!
