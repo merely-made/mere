@@ -36,10 +36,13 @@ async fn invoke(
     );
 }
 async fn open(route: &str) -> (AppBrokerClient, EndpointDescriptor) {
-    let mut c =
-        AppBrokerClient::open_route(AppId::new("graphshell"), AppRouteId::new(route).unwrap())
-            .await
-            .unwrap();
+    let mut c = AppBrokerClient::open_declared_route(
+        AppId::new(graphshell::declaration::APP),
+        AppRouteId::new(route).unwrap(),
+        graphshell::declaration::declaration(),
+    )
+    .await
+    .unwrap();
     let d = c.open_session().await.unwrap().descriptor;
     (c, d)
 }
