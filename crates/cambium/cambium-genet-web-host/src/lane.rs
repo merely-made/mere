@@ -4,10 +4,10 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Browser readback for Mesquite. The shared lane owns capture completion.
+//! Browser readback for Mandrake. The shared lane owns capture completion.
 use crate::capture::{PendingFrame, capture_into};
 use cambium_rootstock::{CaptureFn, StampedCaptureFn};
-use mesquite::{CaptureBackend, Readback, StampedFrame, StampedReadback};
+use mandrake::{CaptureBackend, Readback, StampedFrame, StampedReadback};
 use std::{cell::RefCell, rc::Rc};
 
 /// Asynchronous captures delivered to the product without filesystem writes.
@@ -17,7 +17,7 @@ impl CaptureBackend for WebCapture {
     fn arm_stamped(
         &mut self,
         capture: &mut Option<StampedCaptureFn>,
-        identity: mesquite::CaptureRequest,
+        identity: mandrake::CaptureRequest,
     ) -> Result<StampedReadback, String> {
         let slot = Rc::new(RefCell::new(None));
         let sink = slot.clone();

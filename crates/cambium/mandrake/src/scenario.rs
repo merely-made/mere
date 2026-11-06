@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Configuration and text receipt compatibility for the shared Mesquite lane.
+//! Configuration and text receipt compatibility for the shared Mandrake lane.
 //! This module has no scenario pump; both receipt formats use `Lane`.
 
 use cambium::{FileEvent, FileRequest, OpenedFile};

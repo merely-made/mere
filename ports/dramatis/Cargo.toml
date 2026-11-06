@@ -29,7 +29,7 @@ path = "src/main.rs"
 
 [dependencies]
 cambium.workspace = true
-mesquite.workspace = true
+mandrake.workspace = true
 taproot.workspace = true
 cambium-desktop.workspace = true
 persona-picker.workspace = true

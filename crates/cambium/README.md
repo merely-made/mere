@@ -15,7 +15,7 @@ remain for source compatibility during consumer migration.
   caption controls and a windowless acceptance harness
 - `cambium-winit`: winit keyboard translation for Cambium applications
 - `sprigging`: engine-neutral custom leaves and arrangement geometry
-- `mesquite`: the scenario lane over a document host — scenario ticking,
+- `mandrake`: the scenario lane over a document host — scenario ticking,
   captures, pixel checks, cost accounting and one JSON receipt
 
 Every crate is MPL-2.0 (see the repository `LICENSE`). Meristem (from

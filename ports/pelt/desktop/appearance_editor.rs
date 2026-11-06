@@ -72,9 +72,9 @@ impl EditorWindow {
             .map_err(|error| error.to_string())?;
         state.edit_definition(&resolved.theme, resolved.resolved.theme_mode)?;
         let completion = Rc::new(Cell::new(None));
-        let lane = mesquite::LaneConfig::from_env("PELT_APPEARANCE")
+        let lane = mandrake::LaneConfig::from_env("PELT_APPEARANCE")
             .map(|config| {
-                mesquite::Lane::from_config(
+                mandrake::Lane::from_config(
                     config,
                     EditorLane {
                         completion: completion.clone(),
@@ -152,7 +152,7 @@ struct EditorLane {
     completion: Rc<Cell<Option<bool>>>,
     sheet: String,
 }
-impl mesquite::Product for EditorLane {
+impl mandrake::Product for EditorLane {
     type State = WorkshopState;
     type Logic = Logic;
     type View = WorkshopView;
@@ -216,7 +216,7 @@ impl mesquite::Product for EditorLane {
     fn app_step(
         &mut self,
         ctx: &mut Context<'_>,
-        _: mesquite::Checkpoints<'_>,
+        _: mandrake::Checkpoints<'_>,
         line: &str,
     ) -> Result<(), String> {
         if let Some(text) = line.strip_prefix("text ") {

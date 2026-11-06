@@ -8,7 +8,7 @@
 use cambium::{AnyView, GenetCtx, GenetElement, el};
 use cambium_genet_winit_host::{Harness, HostHooks, Init, inert_hooks};
 use cambium_rootstock::{CaptureFn, Frame};
-use mesquite::{CaptureBackend, Ctx, Lane, Product, Readback};
+use mandrake::{CaptureBackend, Ctx, Lane, Product, Readback};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,

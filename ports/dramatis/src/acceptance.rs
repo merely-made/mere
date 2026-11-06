@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
-//! Shared Mesquite lane over the ordinary window; it carries public state only.
+//! Shared Mandrake lane over the ordinary window; it carries public state only.
 use crate::{
     State,
     views::{Child, Logic, SHEET},
 };
-use mesquite::{Ctx, Product};
+use mandrake::{Ctx, Product};
 use taproot::ProbeSnapshot;
 #[derive(Default)]
 pub struct Acceptance {
@@ -63,7 +63,7 @@ impl Product for Acceptance {
     fn app_step(
         &mut self,
         _: &mut Ctx<'_, Self>,
-        _: mesquite::Checkpoints<'_>,
+        _: mandrake::Checkpoints<'_>,
         line: &str,
     ) -> Result<(), String> {
         if let Some(json) = line.strip_prefix("await ") {

@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Native acceptance follows the ordinary Theme → Edit themes → saved choice
-//! controls. Mesquite drives the actual shared editor; the existing workspace
+//! controls. Mandrake drives the actual shared editor; the existing workspace
 //! compositor captures the application after explicit activation.
 
 use super::*;

@@ -22,7 +22,7 @@
 //! `theme-dark` and `tier` (the sessions, and two archives, as an overmap tier
 //! on the graph's canvas).
 
-use mesquite::{CaptureRecord, LaneConfig};
+use mandrake::{CaptureRecord, LaneConfig};
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -292,7 +292,7 @@ fn count_attr(runner: &Runner<Harness, Logic, Child>, name: &str) -> usize {
     walk(&dom, runner.root(), &LocalName::from(name))
 }
 
-impl mesquite::Product for HarnessLane {
+impl mandrake::Product for HarnessLane {
     type State = Harness;
     type Logic = Logic;
     type View = Child;
@@ -425,7 +425,7 @@ impl mesquite::Product for HarnessLane {
     fn app_step(
         &mut self,
         ctx: &mut AppCtx<'_, Harness, Logic, Child>,
-        _checkpoints: mesquite::Checkpoints<'_>,
+        _checkpoints: mandrake::Checkpoints<'_>,
         line: &str,
     ) -> Result<(), String> {
         let mut parts = line.split_whitespace();
@@ -485,7 +485,7 @@ impl mesquite::Product for HarnessLane {
 fn main() {
     let lane = LaneConfig::from_env("MERE_VIEW").map(|config| {
         let path = config.scenario.display().to_string();
-        let lane = mesquite::Lane::from_config(
+        let lane = mandrake::Lane::from_config(
             config,
             HarnessLane {
                 sheet: sheet(LIGHT),

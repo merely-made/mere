@@ -95,6 +95,36 @@ title = "P4–P6 stay outlines until P2 lands"
 source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
 summary = "P4–P6 stay outlines with a goal and done-condition until P2 proves the retained table."
 
+[decisions."cambium-publish D1"]
+title = ". Publish the app's GUI dependencies first (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "The Dramatis app's GUI chain goes to crates.io; mere.git main is the interim."
+
+[decisions."cambium-publish D2"]
+title = ". `mesquite` becomes `mandrake` (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "The scenario lane publishes as mandrake."
+
+[decisions."cambium-publish D3"]
+title = ". Rename everywhere, consumers now (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "Package, lib and imports take mandrake in Mere and its four consumer repositories now."
+
+[decisions."cambium-publish D4"]
+title = ". Drop the accesskit patch (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "cambium-a11y remaps through accesskit's public API with an exhaustiveness canary; the local patch goes."
+
+[decisions."cambium-publish D5"]
+title = ". Publish the vello sparse fork under Netrender names (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "The fork's sparse vello crates publish under Netrender names, keeping exact curve refusal and the tolerance fix."
+
+[decisions."cambium-publish D6"]
+title = ". Bench embeddings leave rootstock (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "Toolkit-embedding benches live in a probe crate; published rootstock carries no git dependency."
+
 [decisions."capability-door D1"]
 title = "OS channels on one device"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"

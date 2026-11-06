@@ -120,12 +120,12 @@ fn main() {
     }
     // Reuse the stack's presented-frame driver; requests still pass through
     // retained controls, the app worker, and the admitted custody route.
-    if let Some(config) = mesquite::LaneConfig::from_env("DRAMATIS") {
+    if let Some(config) = mandrake::LaneConfig::from_env("DRAMATIS") {
         let scenario = taproot::Scenario::parse(
             &std::fs::read_to_string(&config.scenario).expect("Dramatis scenario file"),
         )
         .expect("Dramatis scenario");
-        let mut lane = mesquite::Lane::new(
+        let mut lane = mandrake::Lane::new(
             dramatis_app::acceptance::Acceptance::default(),
             Some(scenario),
             config.receipt_path(),

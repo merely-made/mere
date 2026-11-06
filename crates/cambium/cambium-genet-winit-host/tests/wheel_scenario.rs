@@ -22,7 +22,7 @@ use cambium_genet_winit_host::{
     AppCtx, HOST_WHEEL_LINE_PX, Harness, HostHooks, HostPointer, Init, Modifiers, WheelUnit,
     inert_hooks,
 };
-use mesquite::{Lane, Product};
+use mandrake::{Lane, Product};
 use taproot::{ProbeSnapshot, Scenario};
 
 /// What the consumer was handed for one notch.

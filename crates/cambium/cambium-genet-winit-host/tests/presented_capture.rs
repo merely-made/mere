@@ -8,7 +8,7 @@
 use cambium::{AnyView, GenetCtx, GenetElement, button, el};
 use cambium_genet_winit_host::{Harness, HostHooks, Init, inert_hooks};
 use cambium_rootstock::{CaptureFn, Frame, HostPointer, PresentedFrame, StampedCaptureFn};
-use mesquite::{
+use mandrake::{
     CaptureBackend, CaptureObserver, CaptureProjection, CaptureProjectionLimits, Ctx, Lane,
     Product, Readback, StampedFrame, StampedReadback,
 };
@@ -86,7 +86,7 @@ impl CaptureBackend for Delayed {
     fn arm_stamped(
         &mut self,
         _: &mut Option<StampedCaptureFn>,
-        mut identity: mesquite::CaptureRequest,
+        mut identity: mandrake::CaptureRequest,
     ) -> Result<StampedReadback, String> {
         let fail = self.fail;
         let foreign = self.foreign;
