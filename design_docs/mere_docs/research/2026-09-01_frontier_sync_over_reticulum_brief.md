@@ -31,6 +31,11 @@ two peers may never be online together.
   (the iroh-bound sync driver), [`murm/native/crates/transport/src/reticulum_transport.rs`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/reticulum_transport.rs)
    (the carrier), `crates/p2panda` *(historical citation)* <!-- doc-audit: historical-path --> under `Code/crates` (the fork surveyed).
 
+The [2026-11-05 continuation](#9-reticulum-reachability-and-following-site-revisions-2026-11-05)
+records the p2mere discussion, the later `StreamSync` catch-up path, and the
+connection to contact introductions and site revision following. Sections 1–8
+describe the September evidence and rulings.
+
 ---
 
 ## 1. Summary
@@ -50,8 +55,8 @@ vocabulary with a different driver," not a new protocol. Three session shapes
 | Carrier | `ReticulumTransport` maps `connect`/`accept` onto retinue links as `AsyncRead + AsyncWrite`; announces stay under the 255-byte LoRa frame (regression test); `link_mtu`, reliable window and RTT are tunable. Feature-gated, default off, no consumer in `ports/`. No reconnect, no outbox. | `reticulum_transport.rs`, `tests.rs`; direct-PHY probe sets MTU 255 / window 1 / RTT 2 s |
 | Bulk transfer | Retinue Resources: windowed, bz2 when it shrinks, 464-byte parts, per-part map hashes, 64-byte completion proof. `Endpoint::send_payload_with_config` already chooses one link packet or a Resource by size. A request/response lane (`request`, `respond_auto`) exists and mere does not use it. | `retinue/crates/retinue/src/{resource,endpoint}.rs` |
 | Operation format | p2panda-core header is definite-length CBOR, ~104 bytes (genesis, no body) to ~230 bytes (facade extensions). No size cap anywhere; body and header ship in one frame; blobs crate is a stub in 0.7.1. | `p2panda-core/src/operation/header.rs`, `validation.rs` |
-| Ingest and ordering | p2panda-stream has no networking dependency; its causal orderer keeps the pending queue in the store, so late and out-of-order arrival is the designed case. Stickleback's processor adds retained-frontier continuity and prune-aware backlink checks. | `p2panda-stream/src/lib.rs`, `crates/stickleback/src/processor.rs` |
-| Bundle | Native drop: manifest, self-delimiting records, staged resume by `DropId`, `DropReceipt` as the one anti-retransmission primitive. Limits are desktop-shaped (64 MiB protected, 16 MiB per record); `CausalLimits` carries a source comment saying it is "not a radio budget." | `crates/stickleback/src/{drop,drop_io,receipt,causal}.rs` |
+| Ingest and ordering | p2panda-stream has no networking dependency; its causal orderer keeps the pending queue in the store, so late and out-of-order arrival is the designed case. Stickleback's processor adds retained-frontier continuity and prune-aware backlink checks. | `p2panda-stream/src/lib.rs`, `eidetic/crates/stickleback/src/processor.rs` |
+| Bundle | Native drop: manifest, self-delimiting records, staged resume by `DropId`, `DropReceipt` as the one anti-retransmission primitive. Limits are desktop-shaped (64 MiB protected, 16 MiB per record); `CausalLimits` carries a source comment saying it is "not a radio budget." | `eidetic/crates/stickleback/src/drop.rs`, `eidetic/crates/stickleback/src/drop_io.rs`, `eidetic/crates/stickleback/src/receipt.rs`, `eidetic/crates/stickleback/src/causal.rs` |
 | Courier store | Outrider propagation node: opaque `(destination, ciphertext)` by transient id, proof-of-work admission, capacity eviction, age expiry, two-stage offer / want-handled / serve fetch. Never decrypts. Defaults: 240 bytes per message, one per fetch. | `retinue/crates/outrider/src/propagation.rs` |
 | Reconciliation | None a non-iroh carrier can use. `JoinedSpace::join` takes `p2panda_net::{Endpoint, Gossip}` and builds LogSync over iroh QUIC plus an iroh-gossip overlay. The direct session trigger upstream is `#[cfg(test)]`. The only bilateral operation lane, murm's session lane, is a one-way push with no frontier, want-list, ack or resume. | `joined_space.rs:133-172`; `p2panda-net/src/sync/handle.rs:76-86`; `murm/native/crates/murm/src/session_lane.rs` |
 
@@ -222,3 +227,177 @@ held until the loopback numbers exist.
 - **Upstream.** p2panda's TODO about exposing `initiate_session` and its
   own README roadmap item for delay-tolerant delivery over LoRa and BLE
   suggest the stateless driver may be contributable. Not pursued yet.
+
+## 9. Reticulum reachability and following site revisions (2026-11-05)
+
+**Status, 2026-11-05:** Discussion record with source findings and proposed
+interfaces. Source findings describe the cited revisions. The combined
+workflow has no end-to-end qualification.
+
+### Reticulum alongside direct iroh
+
+The preferred direction is a complete baseline for discovery and bounded
+application exchange wherever Reticulum is available, with direct iroh paths
+alongside it. An iroh-only peer can participate without acquiring a Reticulum
+address. Two peers can meet over Reticulum, authenticate an alternate iroh
+route, catch up there, and later exchange a few urgent operations over radio.
+Each route feeds the same operation validation and retained history. A fast
+Reticulum path can also carry substantial traffic. The available path and the
+kind of exchange determine the budget, so losing a fast path need not spill a
+backlog onto a scarce one.
+
+Reticulum announces make destinations discoverable. Routes carry traffic to
+those destinations, and applications choose the audience and timing for their
+own dissemination. Iroh supplies authenticated bilateral QUIC, multiplexed
+streams, hole punching and relay fallback. Possible integrations run both
+ways. A Reticulum contact can disclose an iroh endpoint, and an iroh link could
+carry a Reticulum adjacency between otherwise separated networks. An I2P
+interface is another possible route into that fabric. Each integration has
+its own reachability and identity semantics.
+
+Reticulum is the wire protocol. Retinue is the existing in-process Rust
+implementation in Murm. Python RNS or Reticulum-Go could supply the selected
+Link, request or Resource capabilities through a host adapter. A
+microReticulum node can participate as a router without implementing the
+application exchange. An embedded application peer would need to support the
+chosen exchange profile, with interoperability checked for the primitives and
+limits it uses. Application peers also need to agree on framing, version and
+admission. See the [Reticulum manual](https://reticulum.network/manual/understanding.html),
+[Reticulum-Go compatibility report](https://github.com/Quad4-Software/Reticulum-Go/blob/master/COMPATIBILITY.md),
+and [microReticulum](https://github.com/attermann/microReticulum).
+
+**Source finding.** At `p2mere-0.9.0`, the sync protocol still runs over a
+generic sink and stream. The ready-made `p2mere-net` sync feature still
+depends on the iroh endpoint and gossip, the session actor opens iroh
+bidirectional streams, and `TransportAddress` has only an iroh variant.
+Murm already supplies a default-off `ReticulumTransport` and a `StreamSync`
+driver that runs `TopicLogSync` over an admitted ordered stream with a frame
+ceiling, read budget and deadline. The driver is catch-up only. This corrects
+the September statement that non-iroh reconciliation was unavailable. The
+bounded frontier exchange in §§5–7 remains a distinct radio design, and an
+offline courier would have its own delivery policy. See the
+[p2mere feature graph](https://github.com/merely-made/p2mere/blob/66904f867e4026c0ff7bb9acae52ab05ef2de732/p2panda-net/Cargo.toml#L27),
+[sync trait](https://github.com/merely-made/p2mere/blob/66904f867e4026c0ff7bb9acae52ab05ef2de732/p2panda-sync/src/traits.rs#L14),
+and `murm/native/crates/sync/src/stream_sync.rs` and
+`murm/native/crates/transport/src/reticulum_transport.rs` at `0aaf4b16`.
+
+### Contact introductions and Moot discovery
+
+Dramatis already has the vocabulary for this. Insigne represents what a
+persona presents to an audience. Gaz keeps received contact claims in a
+persona-scoped book with trust per endpoint. Gazette resolves published
+claims, including WebFinger. A contact can pass the same kind of presentation
+bilaterally. WebFinger is one lookup path for handles and links. The recipient
+checks evidence before trusting a binding. See
+`dramatis/crates/insigne/src/lib.rs`, `dramatis/crates/gaz/README.md`,
+`dramatis/crates/gazette/README.md` and [RFC 7033](https://www.rfc-editor.org/rfc/rfc7033.html).
+
+Mark's condition for introducing someone else's alternate routes was “that
+ought to be an option you opt into” and “the ‘automatically’ of that is
+conditional.” A persona can disclose selected public keys, protocol addresses
+or service links to a chosen audience and decide which claims may be passed
+on. A contact can forward a permitted presentation and optionally endorse it.
+The recipient's policy decides whether to import it, verify the binding and
+try a route. A route attempt and access to a service each have their own
+admission rules. Sharing contact books, relationship edges and links between
+personas each requires its own disclosure choice. Reusing a public key can
+itself reveal such a link. Keep transient IP candidates out of general
+contact records by default. A direct IP connection can still reveal addresses
+to its peer.
+
+A Moot can spread in a similar way. An introduction can name the space,
+its authority and willing providers of the portions they may serve.
+Discovering a Moot, reading a publication, joining, retaining a copy and
+redistributing it are separate decisions. A seeder may keep material
+available after the author leaves while the Moot's rules continue to govern
+selection and access. A read-only share can describe permission to sync and
+serve a selected view or revision. The fork relationship describes the
+recipient's editorial lineage, independently of that permission.
+
+### Clips, mirrors and forks
+
+| Relationship | Retained material | Later source updates |
+|---|---|---|
+| Clip | A captured passage, object or revision with provenance | The capture stays fixed |
+| Mirror | A retained copy with an upstream | Verified updates advance the copy under its following policy |
+| Fork | A locally authored branch with an exact base revision and upstream | Changes queue for review or follow a policy for selected sections |
+
+Mark agreed that the first content edit to a mirror should create its fork
+automatically. The fork starts from the exact revision being edited. The
+originator remains the author of the retained source, and the fork author owns
+the derivative revision. Local arrangement, tags and annotations can remain
+attached to the retained object separately from a content edit. A share can
+expose a fixed version or the evolving selected view of a mirror or fork.
+
+Receiving a new source revision and adopting it are separate events. The fork
+can take a corrected closure date, defer a section move and keep its own
+introduction from the same upstream update. It must remember which parts it
+has adopted, so accepting the correction leaves the move in the queue. If an
+upstream navigation change adds a link to a new page, review can offer the page
+with the link or let the editor retarget it. Mark also agreed that a fork could
+keep following selected sections while reviewing the rest.
+
+### Source, representation and section identity
+
+Sem and Weave suggest the level of comparison. Parse the source into entities
+such as pages, sections, links and assets, then compare their changes against
+the fork's base. Stable section IDs make a renamed or relocated section
+recognizable. Djot can express block IDs and attributes in editable source.
+A theme can render a notice prominently using its role while a fork follows
+it by its ID. Other formats can supply structure through their own adapters.
+The site model defines which IDs persist, which roles mean something to the
+theme and which changes can merge together. See [Sem](https://github.com/Ataraxy-Labs/sem),
+[Weave](https://github.com/Ataraxy-Labs/weave) and the
+[Djot syntax reference](https://github.com/jgm/djot/blob/main/doc/syntax.md#block-attributes).
+
+Tumblr-style themes suggest independently reusable presentation. A theme can
+take named content, and a site template can also supply starter pages,
+navigation and places for local content. The content and theme can each have
+an upstream. A Moot can write its own introduction, mirror a source's notices
+and take a navigation fix from the theme author separately. Gemot already has
+bounded declarative HTML template settings in the V2 writer. A portable theme
+or site-template lineage is a further design. See
+[Tumblr theme customization](https://help.tumblr.com/knowledge-base/customizing-your-theme/)
+and `gemot/crates/site-model/src/generate.rs`.
+
+### What the published source supports
+
+The observations below are from Knot `81185a2`, Gemot `bcfd408` and Eidetic
+`6d5a69a`. The writer and reader boundaries matter more than a filename or
+content hash on its own.
+
+| Existing piece | What it identifies or verifies | Boundary for section following |
+|---|---|---|
+| Knot publication and Mark export | `PublicationId` identifies an exported document. `KnotPublishedDocument` carries the source operation and exact authored body digest. A stored CommonMark projection records the source operation, digest and media type. | Document granularity. Identical projected bodies can reuse a Mark version even when source operations differ. See `knot-editor/crates/knot-editor/src/publish.rs` and `knot-editor/crates/knot-editor/src/mark/adapter.rs`. |
+| Stickleback edition and Gemot site reader | An ordinary site has a release-log key and signed editions naming exact `PublishedSnapshotV1` bytes. Governed reads resolve a Moot and collection to an exact `CollectionVersion` and contribution. `knot://` can name the upstream and a page path. | The native snapshot has one site format and addresses pages by path. A reader verifies the supplied history and can remember known heads. See `eidetic/crates/stickleback/src/edition/body.rs`, `gemot/crates/site-model/src/site_log.rs`, `gemot/crates/site-model/src/publication.rs` and `gemot/crates/address/src/lib.rs`. |
+| Gemot format writers used by Knot | Gemtext, Scroll and CommonMark inputs can produce checked Gemtext, Scroll, Markdown and HTML artifacts. `GeneratedPage` retains the source path, format and digest alongside its output bytes. The exported `site-v2.json` envelope can correlate outputs built from the same source. | The V2 export is separate from the signed V1 publication. Static replies carry media type and bytes. Generated HTML heading IDs are derived from text, with disambiguation suffixes. See `gemot/crates/site-model/src/generate.rs`, `gemot/crates/site-model/src/generate/render.rs`, `gemot/crates/site-host/src/generate.rs` and `knot-editor/apps/desktop/src/site_generation.rs`. |
+| Knot `EditionFrame` and Gemot clip | A verified clip opens from an edition address, supplied history and payload. Explicit republishing signs a new log under the fork author's key and records `fork_of` as the exact source edition. The payload retains a source URL and optional selector. | The stored selector and edition ancestry give capture provenance. Durable section identity, first-edit creation and a selective upstream queue remain proposed. See `gemot/crates/site-model/src/clip.rs` and `knot-editor/crates/knot-editor/src/edition_frame.rs`. |
+
+### Proposed representation map
+
+Have the existing release or governed publication authority commit to a map
+that binds a stable page ID at a particular verified source revision to the
+media types and digests of its available representations. The map also
+records stable section IDs and their locations in each representation, or
+that a representation omits a section. It can use the existing writer's
+source digest and output bytes as inputs. In a governed site, the accepted
+contribution and collection history supply the authority. In an ordinary site,
+the edition chain supplies it.
+
+For example, `trail-guide` at revision R names exact HTML and Gemtext outputs.
+`closure-notices` may have an HTML fragment, a location in the Gemtext
+projection, or an explicit omission. A follower verifies the representation
+against R and remembers the page and section IDs. On R+1 it can recognize
+the same section after a heading rename, filename change or switch of serving
+peer, and seek a richer representation if necessary. A digest identifies
+particular bytes. The authority's map supplies the relationship between them.
+An unsigned capture can still support a structural diff and a suggested match
+for review. It has capture provenance rather than verified continuity.
+
+A useful proof would publish one source revision in two formats, verify both
+through independent providers, then rename a section in the next revision
+while keeping its ID. A fork would follow that section, retain its own edit
+elsewhere and leave a deferred change queued. It would also refuse a wrong
+output digest and handle a projection that omits the followed section. Which
+section mappings survive each writer, and how to represent a section split or
+join, remain open design questions.
