@@ -5,7 +5,8 @@
 inference patches. The renamed repository preserves the receiving history;
 all seven actual consumer repositories pass their locked receiving checks.
 The primary `distillery-receive` checkout is preserved. Athanor and Alembic
-remain held under D16, outside this completed cutover.
+were held under D16, outside this completed cutover; D20 and D21 (2026-11-05)
+release them, and the workshop cut is scoped in the source homes map.
 **Receipts:** donor/source and manifest comparison, standalone tests and feature
 checks, Cargo source identities, every actual consumer check, and final pushed
 commits. Retain at most 100 MB in `Code/testing/esp/distillery-extraction-20261103`;
@@ -165,6 +166,28 @@ waits for a planned second host, not an arrived one.
   (`woodshed/design_docs/2026-10-14_dsp_graphshell_hocket_survey_brief.md`, ruling 6).
 
   Links: closes distillery-extraction F1 · follows D11 · summary Store lifetimes belong to the reservoir store; Djinn and embedding hosts only execute it.
+
+- **D20. The workshop move does not wait for W3 (Mark, 2026-11-05):** "Decouple from W3", over
+  waiting for the full matrix and over running it first. Put to Mark on finding that the
+  Alembic lane owing D16's answers has been quiet since 2026-10-29 (last workshop commit
+  `bd5ec7eb5`) and that only the source homes scope, not D16, made the two-host W3 matrix a
+  precondition. Answers D16's second question: the graph-free workshop core (Athanor's
+  `workshop`, `workshop_seal`, `workshop_driver`; Alembic's `workshop`, `workshop-surface`,
+  `workshop-native`) leaves Mere for Distillery, lifting the Alembic plan's "no source-home
+  move" constraint for this cut. The move is qualified by re-running the bounded library and
+  native-process gates that already pass, in the receiving home. W3 stays open as a product
+  gate and travels with the code. Outcome: refines D16, whose hold ends.
+
+  Links: amends distillery-extraction D16 · summary The workshop core moves on its existing bounded gates; W3 remains a product gate that travels with it.
+
+- **D21. Workshop destinations become a pandect feature (Mark, 2026-11-05):** "Pandect
+  feature", over a dedicated Mere adapter crate. Answers D16's first question:
+  `workshop_destination` and `workshop_sealed_destination`, which write through
+  `pandect::graph_session` and `kernel::GraphDelta`, move into a `pandect` feature, the
+  pattern D12 set for the furnace; Graphshell's `alembic-workshop` enables it. Outcome:
+  applies D12.
+
+  Links: amends distillery-extraction D16 · draws on distillery-extraction D12 · summary The graph-writing workshop destinations are a pandect feature, not a new crate.
 
 ## Open forks
 

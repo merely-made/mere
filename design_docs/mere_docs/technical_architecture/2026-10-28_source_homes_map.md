@@ -211,7 +211,18 @@ candidate table above.
 
 ### Ownership cuts, in recommended order
 
-1. **Finish the Distillery workshop split.** ESP, Distillery, `mere-mesh`, model
+Dramatis goes first (Mark, 2026-11-05: "Dramatis first"): it is ungated and
+small, so it proves the move procedure before the larger workshop cut.
+
+1. **Move the Dramatis application, not the widget family.** `ports/dramatis`
+   is a packaged app of 1,464 lines: five `src` files (766), three test files
+   (650) and `build.rs` (48). Receive it as a separate application root in
+   Dramatis, with its packaging scripts, icons, paths and custody/profile tests.
+   Core identity packages remain GUI-independent. Persona Picker stays Cambium:
+   Woodshed also consumes it. Done when standalone app/packaging checks and
+   real resident-client behavior pass without a Dramatis-core dependency cycle.
+
+2. **Finish the Distillery workshop split.** ESP, Distillery, `mere-mesh`, model
    probes and inference patches already resolve from `distillery.git` at Mere's
    `6346f087` supplier. Do not extract them a second time. The local `repos/esp`
    checkout still has its historical name and `distillery-receive` branch; its
@@ -222,26 +233,21 @@ candidate table above.
    `ports/distillery/athanor` (seven, 5,222 lines), counted recursively under
    `src`, including tests. Alembic supplies records/controls; Athanor supplies
    workshop authority, driver and sealed state. Move their graph-free core and
-   producer surfaces into Distillery. Keep the concrete `workshop_destination`
-   and `workshop_sealed_destination` graph adapter in Mere. Kernel/Pandect must
-   not import agent-domain authority to achieve the cut: pass admitted effects
-   and validation through an explicit adapter boundary. Preserve operation ids,
-   sealed contexts, uncertain-write reconciliation and atomic destination receipts.
-   D16 and W3 remain explicit owner-plan gates; this scope does not claim their
-   two-host recovery matrix has passed.
+   producer surfaces into Distillery (distillery-extraction D20). The concrete
+   `workshop_destination` and `workshop_sealed_destination` graph adapter
+   becomes a `pandect` feature that Graphshell's `alembic-workshop` enables
+   (distillery-extraction D21). Kernel/Pandect must not import agent-domain
+   authority to achieve the cut: pass admitted effects and validation through
+   an explicit adapter boundary. Preserve operation ids, sealed contexts,
+   uncertain-write reconciliation and atomic destination receipts. The two-host
+   W3 matrix is not a gate on this move (D20); it stays open in the Alembic plan
+   and travels with the code.
 
-   Done when the owner plan resolves those questions, both actual hosts pass
-   acceptance/restart/duplicate/lock-loss recovery, the receiver has no Mere
-   implementation-source back edge, and consumers use the published receiver.
-   Remove both misleading Distillery donor directories after blob comparison.
-
-2. **Move the Dramatis application, not the widget family.** `ports/dramatis`
-   is a packaged app of 1,464 lines: five `src` files (766), three test files
-   (650) and `build.rs` (48). Receive it as a separate application root in
-   Dramatis, with its packaging scripts, icons, paths and custody/profile tests.
-   Core identity packages remain GUI-independent. Persona Picker stays Cambium:
-   Woodshed also consumes it. Done when standalone app/packaging checks and
-   real resident-client behavior pass without a Dramatis-core dependency cycle.
+   Done when the bounded library and native-process workshop gates that pass in
+   Mere today pass again from the receiver in both hosts, the receiver has no
+   Mere implementation-source back edge, and consumers use the published
+   receiver. Remove both misleading Distillery donor directories after blob
+   comparison.
 
 3. **Move the games-only leaves.** Modulus and Tenant are used by Isocosm's
    Eponym/Mesocosm/Isometer roots. Move them together with their tests and engine

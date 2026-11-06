@@ -270,7 +270,10 @@ win.
   `workshop`, `workshop_seal`, `workshop_driver`; Alembic's `workshop`, `workshop-surface`,
   `workshop-native`) leave Mere with Distillery, against this plan's "no source-home move"
   constraint? Athanor and Alembic stay in Mere until this is answered (distillery-extraction
-  D16).
+  D16). **Answered 2026-11-05:** (1) yes, a `pandect` feature (distillery-extraction D21);
+  (2) yes, without waiting for W3: the core moves on its existing bounded gates and W3
+  travels with it as an open product gate (distillery-extraction D20). The Constraints'
+  "no source-home move" no longer covers this cut.
 
 ## Decisions — workshop reconciliation (2026-10-24)
 
