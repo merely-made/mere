@@ -572,6 +572,21 @@ summary = "Repair the necessary receiving cohorts to qualify the local lint gate
 draws_on = ["stack.7"]
 governs = ["H3"]
 
+[decisions."key-lane D1"]
+title = ". Prekeys travel on the lane (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
+summary = "Prekey bundles move onto GroupKeyLane as a version-2 record kind; all key material leaves the graph log."
+
+[decisions."key-lane D2"]
+title = ". Reader-set intents stay in the graph log (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
+summary = "AdmitReader and RetireReader remain personal-graph events gated by SyncRoster; only cryptographic carriage moves."
+
+[decisions."key-lane D3"]
+title = ". Clean break for old logs (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
+summary = "The PublishPrekey and GroupDispatch variants are removed; graphs keyed before the move are not carried forward."
+
 [decisions."node-body-face-model D1"]
 title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"

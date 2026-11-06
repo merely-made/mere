@@ -181,6 +181,10 @@ into a transport library.
 
   Links: summary Key agreement moves onto Eidetic's GroupKeyLane and Murm's GroupKeySync under its own plan; roster reconciliation stays in Mere.
 
+  Planned in `2026-11-06_key_lane_plan.md` (2026-11-06), where key-lane D1 to D3 refine it:
+  prekeys also move onto the lane, the reader-set intents stay in the graph log, old logs are not
+  carried forward.
+
 ## Findings
 
 - 2026-11-05: seven pieces (12 files, 5,125 lines) carry no graph type; the rest of the
@@ -190,3 +194,4 @@ into a transport library.
 
 - 2026-11-05: inventory and D1 to D4; no source moved.
 - 2026-11-05: S5, S6 and F1 read by subagents and spot-checked; D5 to D7; no source moved.
+- 2026-11-06: D7's plan opened (`2026-11-06_key_lane_plan.md`).
