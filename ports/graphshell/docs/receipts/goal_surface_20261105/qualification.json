@@ -1,0 +1,449 @@
+{
+  "captures": [
+    {
+      "height": 1840,
+      "path": "stage-0.png",
+      "presentation": "PresentedFrame { context_generation: ContextGeneration(1), host: 1, sequence: 3, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 0,
+      "unique_colors": 1443,
+      "width": 2560
+    },
+    {
+      "height": 1840,
+      "path": "stage-1.png",
+      "presentation": "PresentedFrame { context_generation: ContextGeneration(1), host: 1, sequence: 6, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 1,
+      "unique_colors": 2126,
+      "width": 2560
+    },
+    {
+      "height": 1840,
+      "path": "stage-2.png",
+      "presentation": "PresentedFrame { context_generation: ContextGeneration(1), host: 1, sequence: 9, width: 2560, height: 1840, layout_scale: 2.0 }",
+      "stage": 2,
+      "unique_colors": 2459,
+      "width": 2560
+    }
+  ],
+  "frames": 17,
+  "goal": "keep a starter alive while travelling",
+  "graph_writes": false,
+  "input": "goal buffer filled and Find clicked through Genet DOM callbacks by the finite host harness; no physical pointer/keyboard qualification",
+  "network": false,
+  "provider": "lexical (eidetic_search::goal::GoalAssessor under fleece::retained_traversal); no model",
+  "retained_pages": 5,
+  "run": {
+    "cited": [
+      "https://kitchen.example/travel-baking",
+      "https://kitchen.example/starter-care"
+    ],
+    "matched": 2,
+    "steps": 6,
+    "stop": "Exhausted"
+  },
+  "source_profile": "synthetic fixture: page text in PageTextStore (two versions of one page), links in a real Mere graph",
+  "start": "https://kitchen.example/bread-index",
+  "status": "passed",
+  "traversal_receipt": {
+    "bytes": 965,
+    "failures": [
+      {
+        "depth": 1,
+        "failure": "Missing",
+        "requested_version": null,
+        "source": {
+          "kind": "page_text",
+          "owner": "graphshell-goal-fixture",
+          "source": "6c154f20-f68b-5a07-9e5d-23b84267f5f4"
+        }
+      }
+    ],
+    "goal": {
+      "assessments": [
+        {
+          "coverage_permille": 166,
+          "matched_terms": [
+            "a"
+          ],
+          "matches": [
+            {
+              "end": 109,
+              "start": 108
+            }
+          ],
+          "matches_truncated": false,
+          "missing_terms": [
+            "alive",
+            "keep",
+            "starter",
+            "travelling",
+            "while"
+          ],
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "f59ad623-a092-59f7-b100-e55fca87125b"
+          },
+          "text_hash": "blake3:c1bb3be6a7f43260bebb6059c84f538c2e466f9c33081b6b30a00b0a68af6d7c",
+          "verdict": "Continue",
+          "version": "c1bb3be6a7f43260bebb6059c84f538c2e466f9c33081b6b30a00b0a68af6d7c"
+        },
+        {
+          "coverage_permille": 666,
+          "matched_terms": [
+            "a",
+            "starter",
+            "travelling",
+            "while"
+          ],
+          "matches": [
+            {
+              "end": 12,
+              "start": 7
+            },
+            {
+              "end": 23,
+              "start": 13
+            },
+            {
+              "end": 30,
+              "start": 29
+            },
+            {
+              "end": 49,
+              "start": 48
+            },
+            {
+              "end": 62,
+              "start": 61
+            },
+            {
+              "end": 84,
+              "start": 77
+            },
+            {
+              "end": 122,
+              "start": 121
+            },
+            {
+              "end": 214,
+              "start": 207
+            }
+          ],
+          "matches_truncated": false,
+          "missing_terms": [
+            "alive",
+            "keep"
+          ],
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "17a6cd9f-5a37-53ba-8e2c-fff8254eb174"
+          },
+          "text_hash": "blake3:b725e3d486b0740f52d89099f4e33a2b9ebb61d08827456b46b51c8f9bf4bd7c",
+          "verdict": "Match",
+          "version": "b725e3d486b0740f52d89099f4e33a2b9ebb61d08827456b46b51c8f9bf4bd7c"
+        },
+        {
+          "coverage_permille": 833,
+          "matched_terms": [
+            "a",
+            "alive",
+            "keep",
+            "starter",
+            "while"
+          ],
+          "matches": [
+            {
+              "end": 7,
+              "start": 0
+            },
+            {
+              "end": 30,
+              "start": 23
+            },
+            {
+              "end": 82,
+              "start": 78
+            },
+            {
+              "end": 84,
+              "start": 83
+            },
+            {
+              "end": 92,
+              "start": 85
+            },
+            {
+              "end": 98,
+              "start": 93
+            },
+            {
+              "end": 104,
+              "start": 99
+            },
+            {
+              "end": 152,
+              "start": 151
+            },
+            {
+              "end": 160,
+              "start": 159
+            },
+            {
+              "end": 168,
+              "start": 161
+            },
+            {
+              "end": 179,
+              "start": 178
+            }
+          ],
+          "matches_truncated": false,
+          "missing_terms": [
+            "travelling"
+          ],
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "35917c39-16f2-5481-8066-308459d7b981"
+          },
+          "text_hash": "blake3:1a616822578fe6eedbf12657593b6395e16533c895e17ce57a76bd20dba3f914",
+          "verdict": "Match",
+          "version": "1a616822578fe6eedbf12657593b6395e16533c895e17ce57a76bd20dba3f914"
+        },
+        {
+          "coverage_permille": 166,
+          "matched_terms": [
+            "a"
+          ],
+          "matches": [
+            {
+              "end": 67,
+              "start": 66
+            },
+            {
+              "end": 103,
+              "start": 102
+            }
+          ],
+          "matches_truncated": false,
+          "missing_terms": [
+            "alive",
+            "keep",
+            "starter",
+            "travelling",
+            "while"
+          ],
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "41305951-51c5-5258-8794-57e941786ea4"
+          },
+          "text_hash": "blake3:c66b6bad103a0ca84477d49ee7d1785a1e3829fe406996bd8748c1815b6ed455",
+          "verdict": "Continue",
+          "version": "c66b6bad103a0ca84477d49ee7d1785a1e3829fe406996bd8748c1815b6ed455"
+        },
+        {
+          "coverage_permille": 333,
+          "matched_terms": [
+            "a",
+            "starter"
+          ],
+          "matches": [
+            {
+              "end": 54,
+              "start": 53
+            },
+            {
+              "end": 62,
+              "start": 55
+            }
+          ],
+          "matches_truncated": false,
+          "missing_terms": [
+            "alive",
+            "keep",
+            "travelling",
+            "while"
+          ],
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "88d53d2d-6989-5aef-82ed-dd6d9e64400c"
+          },
+          "text_hash": "blake3:2e4508a8fc81774cbbad7789e55992046241dc2ec22f517ce08fbfe2bd00159a",
+          "verdict": "Continue",
+          "version": "2e4508a8fc81774cbbad7789e55992046241dc2ec22f517ce08fbfe2bd00159a"
+        }
+      ],
+      "goal": "keep a starter alive while travelling",
+      "matched": 2,
+      "operation_version": "eidetic.goal-assessment/v1",
+      "selections": [
+        {
+          "index": 0,
+          "matched_terms": [],
+          "pending": 1,
+          "rule": "OldestFallback",
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "f59ad623-a092-59f7-b100-e55fca87125b"
+          }
+        },
+        {
+          "index": 0,
+          "matched_terms": [
+            "travelling",
+            "while"
+          ],
+          "pending": 5,
+          "rule": "GoalTermOverlap",
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "17a6cd9f-5a37-53ba-8e2c-fff8254eb174"
+          }
+        },
+        {
+          "index": 0,
+          "matched_terms": [
+            "starter"
+          ],
+          "pending": 4,
+          "rule": "GoalTermOverlap",
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "35917c39-16f2-5481-8066-308459d7b981"
+          }
+        },
+        {
+          "index": 0,
+          "matched_terms": [],
+          "pending": 3,
+          "rule": "OldestFallback",
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "41305951-51c5-5258-8794-57e941786ea4"
+          }
+        },
+        {
+          "index": 0,
+          "matched_terms": [],
+          "pending": 2,
+          "rule": "OldestFallback",
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "6c154f20-f68b-5a07-9e5d-23b84267f5f4"
+          }
+        },
+        {
+          "index": 0,
+          "matched_terms": [],
+          "pending": 1,
+          "rule": "OldestFallback",
+          "source": {
+            "kind": "page_text",
+            "owner": "graphshell-goal-fixture",
+            "source": "88d53d2d-6989-5aef-82ed-dd6d9e64400c"
+          }
+        }
+      ],
+      "settings": {
+        "max_goal_chars": 10000,
+        "max_selectors": 64,
+        "max_text_chars": 10000000,
+        "min_coverage_permille": 500,
+        "satisfy_after": 3
+      },
+      "terms": [
+        "a",
+        "alive",
+        "keep",
+        "starter",
+        "travelling",
+        "while"
+      ],
+      "tokenizer": "unicode-words/uax29-default-unicode-17.0.0"
+    },
+    "omissions": {
+      "depth": 0,
+      "duplicates": 2,
+      "fanout": 0,
+      "pending": 0
+    },
+    "requests": 6,
+    "stop": "Exhausted",
+    "visits": [
+      {
+        "bytes": 132,
+        "depth": 0,
+        "requested_version": null,
+        "retained_version": "c1bb3be6a7f43260bebb6059c84f538c2e466f9c33081b6b30a00b0a68af6d7c",
+        "source": {
+          "kind": "page_text",
+          "owner": "graphshell-goal-fixture",
+          "source": "f59ad623-a092-59f7-b100-e55fca87125b"
+        },
+        "text_hash": "blake3:c1bb3be6a7f43260bebb6059c84f538c2e466f9c33081b6b30a00b0a68af6d7c",
+        "verdict": "Continue"
+      },
+      {
+        "bytes": 290,
+        "depth": 1,
+        "requested_version": null,
+        "retained_version": "b725e3d486b0740f52d89099f4e33a2b9ebb61d08827456b46b51c8f9bf4bd7c",
+        "source": {
+          "kind": "page_text",
+          "owner": "graphshell-goal-fixture",
+          "source": "17a6cd9f-5a37-53ba-8e2c-fff8254eb174"
+        },
+        "text_hash": "blake3:b725e3d486b0740f52d89099f4e33a2b9ebb61d08827456b46b51c8f9bf4bd7c",
+        "verdict": "Match"
+      },
+      {
+        "bytes": 244,
+        "depth": 1,
+        "requested_version": null,
+        "retained_version": "1a616822578fe6eedbf12657593b6395e16533c895e17ce57a76bd20dba3f914",
+        "source": {
+          "kind": "page_text",
+          "owner": "graphshell-goal-fixture",
+          "source": "35917c39-16f2-5481-8066-308459d7b981"
+        },
+        "text_hash": "blake3:1a616822578fe6eedbf12657593b6395e16533c895e17ce57a76bd20dba3f914",
+        "verdict": "Match"
+      },
+      {
+        "bytes": 164,
+        "depth": 1,
+        "requested_version": null,
+        "retained_version": "c66b6bad103a0ca84477d49ee7d1785a1e3829fe406996bd8748c1815b6ed455",
+        "source": {
+          "kind": "page_text",
+          "owner": "graphshell-goal-fixture",
+          "source": "41305951-51c5-5258-8794-57e941786ea4"
+        },
+        "text_hash": "blake3:c66b6bad103a0ca84477d49ee7d1785a1e3829fe406996bd8748c1815b6ed455",
+        "verdict": "Continue"
+      },
+      {
+        "bytes": 135,
+        "depth": 1,
+        "requested_version": null,
+        "retained_version": "2e4508a8fc81774cbbad7789e55992046241dc2ec22f517ce08fbfe2bd00159a",
+        "source": {
+          "kind": "page_text",
+          "owner": "graphshell-goal-fixture",
+          "source": "88d53d2d-6989-5aef-82ed-dd6d9e64400c"
+        },
+        "text_hash": "blake3:2e4508a8fc81774cbbad7789e55992046241dc2ec22f517ce08fbfe2bd00159a",
+        "verdict": "Continue"
+      }
+    ]
+  }
+}
