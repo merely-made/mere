@@ -1,7 +1,8 @@
 # Domain contract: what a domain supplies and what a client may do
 
-**Status:** 2026-11-06: draft for Mark's review; nothing implemented. The
-direction in "One kind of store" is proposed, not ruled. Written for M0 of
+**Status:** 2026-11-06: draft; nothing implemented. Mark ruled one kind of
+store (O8) and a fresh start for Cleromancy's meres (C1) on 2026-11-06; C2 to
+C5 are open. Written for M0 of
 [the domain adoption plan](../implementation_strategy/2026-11-05_domain_adoption_plan.md),
 which made every application's authored store a reservoir mere (D8).
 
@@ -15,7 +16,7 @@ prepared; it was not.
 format (adoption plan O7, Meadowcap model); the optional domain vault, an
 opt-in feature built later.
 
-## One kind of store (proposed)
+## One kind of store (Mark, 2026-11-06)
 
 Mark, on O8: "I'm ok with a second kind, but then are there gonna be other
 kinds? Isn't a graph a log…?" It is. Every store in question is an
@@ -39,7 +40,7 @@ D2 and D6 require: a signed causal log on Stickleback, sealed per operation,
 checked before insert, and synced between devices. Graphshell's replica also
 shows a graph kept as the fold of such a log.
 
-**Proposal:** a mere is one Stickleback causal operation log. A domain
+**Ruled** ("Yes, one kind"): a mere is one Stickleback causal operation log. A domain
 supplies its event grammar, its fold and its admission policy; the reservoir
 supplies everything else. A graph is the fold most domains use, not a
 different kind of store. Knot's store fits as it is, which answers D4
@@ -110,14 +111,16 @@ Cleromancy's path is the precedent
 
 Its grammar today is graph edits, its fold is graph replay, and its policy is
 `validate_divination_graph`; those carry over. What changes is beneath it:
-its mere's linear journal becomes a causal log. That moves real data
-(Cleromancy is the only domain with any), so Mark rules how; see C1.
+its mere's linear journal becomes a causal log. Mark chose a fresh start
+(C1): the new meres begin empty and the old stores stay on disk untouched.
 
 ## Open questions
 
-- **C1. Existing meres.** Cleromancy's `divination` and `personal-facts`
-  meres sit on the linear journal. Convert them into causal logs, or start
-  fresh as Woodshed chose (Woodshed plan W5)?
+- **C1. Existing meres: a fresh start (Mark, 2026-11-06).** Cleromancy's
+  `divination` and `personal-facts` meres are not converted. The causal-log
+  meres begin empty; the linear-journal stores stay on disk untouched and
+  are no longer opened. Retiring them is Mark's call, later. Same choice as
+  Woodshed's W5.
 - **C2. Sessions and branches.** A graph mere holds several sessions with
   three-way `merge_in` (`pandect/src/graph_session_merge.rs`). In a causal
   log, concurrent heads are already branches. Do sessions become named heads
@@ -135,5 +138,5 @@ its mere's linear journal becomes a causal log. That moves real data
 ## Done when
 
 This document names what a domain supplies and what a client may do;
-Cleromancy is checked against it with any changes recorded; and Mark rules
-the one-kind proposal (adoption plan O8) and C1.
+and Cleromancy is checked against it with any changes recorded. O8 and C1
+are ruled.

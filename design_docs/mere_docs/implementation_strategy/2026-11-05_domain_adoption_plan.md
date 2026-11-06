@@ -170,10 +170,10 @@ against it. Missing:
   stop carrying their own.
 - Drafted 2026-11-06:
   [the domain contract](../technical_architecture/2026-11-06_domain_contract.md).
-  It proposes one kind of store for every mere (O8).
+  Mark ruled one kind of store for every mere (O8) on 2026-11-06.
 - Done when: one contract document names what a domain supplies and what a
-  client may do, Cleromancy conforms to it unchanged or with recorded
-  changes, and O8 is ruled.
+  client may do, and Cleromancy conforms to it unchanged or with recorded
+  changes. O8 is ruled.
 - Needs: nothing. M1 to M5 build against it.
 
 ### M1. A domain registry for both compositions
@@ -330,8 +330,9 @@ its data reaches a second device.
   second kind, but then are there gonna be other kinds? Isn't a graph a
   log…?" The contract proposes neither: every mere becomes one Stickleback
   causal operation log, with the graph as one fold over it, as Graphshell's
-  personal replica already does. That would also carry M3 and M4. Waits for
-  Mark's ruling.
+  personal replica already does. That also carries M3 and M4. **Ruled by
+  Mark on 2026-11-06: "Yes, one kind."** Cleromancy's existing meres start
+  fresh rather than convert (contract C1).
 
 ## Findings
 
@@ -347,4 +348,5 @@ its data reaches a second device.
 
 - 2026-11-05: plan opened. D3 to D6 recorded the same day; D7, D8, M0 and O8
   added after Mark asked whether the contract was ready.
-- 2026-11-06: M0's contract drafted; O8 answered with a one-kind proposal.
+- 2026-11-06: M0's contract drafted. Mark ruled O8 (one kind of store) and
+  contract C1 (Cleromancy's meres start fresh).
