@@ -73,35 +73,35 @@ console_error_panic_hook = "0.1"
 # `genet-taffy` and `sonic-rs` by package name anywhere in that repository.
 [patch.crates-io]
 # Canonical promoted families; keep registry and Git consumers type-identical.
-armillary = { git = "https://github.com/merely-made/armillary.git", rev = "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc" }
-chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-commons-spine = { git = "https://www.github.com/merely-made/gemot.git", rev = "204ee036ece5e576ff3c8b1a27797c59139e4d3b" }
-dict-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-eidetic = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-errand = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "01268ae2373859489284a00f1447699fadb9442f" }
-finger-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-fsp-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-gemini-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-gemot = { git = "https://www.github.com/merely-made/gemot.git", rev = "204ee036ece5e576ff3c8b1a27797c59139e4d3b" }
-gopher-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-guppy-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-hagiograph = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-kepler-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-luggage = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-mere-proofs = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-mien = { git = "https://www.github.com/merely-made/gemot.git", rev = "204ee036ece5e576ff3c8b1a27797c59139e4d3b" }
-misfin = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-moothold = { git = "https://www.github.com/merely-made/gemot.git", rev = "204ee036ece5e576ff3c8b1a27797c59139e4d3b" }
-mooting = { git = "https://www.github.com/merely-made/gemot.git", rev = "204ee036ece5e576ff3c8b1a27797c59139e4d3b" }
-muniment = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-nex-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-scorpion-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-scroll-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-servitor = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-spartan-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-stickleback = { git = "https://www.github.com/merely-made/eidetic.git", rev = "98f2c6977d7210d2149b80ee8be0b3e0f724d44b" }
-text-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
+armillary = { git = "https://github.com/merely-made/armillary.git", branch = "main" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+commons-spine = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
+dict-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+errand = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+esp = { git = "https://github.com/merely-made/distillery.git", branch = "main" }
+finger-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+fsp-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+gemini-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+gemot = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
+gopher-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+guppy-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+hagiograph = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+kepler-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+luggage = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+mere-proofs = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+mien = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
+misfin = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+moothold = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
+mooting = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+nex-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+scorpion-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+scroll-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+servitor = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+spartan-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
+stickleback = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+text-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
 # Keep the standalone smoke on this checkout's current scripted-DOM and
 # render-neutral DOM contracts instead of a previously published graph.
 genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.2" }
@@ -128,10 +128,4 @@ too_many_lines = "warn"
 
 [lints]
 workspace = true
-
-[patch."https://github.com/merely-made/distillery.git"]
-esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "01268ae2373859489284a00f1447699fadb9442f" }
-esp-testkit = { git = "https://www.github.com/merely-made/distillery.git", rev = "01268ae2373859489284a00f1447699fadb9442f" }
-distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "01268ae2373859489284a00f1447699fadb9442f" }
-mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "01268ae2373859489284a00f1447699fadb9442f" }
 
