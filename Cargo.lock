@@ -5303,6 +5303,7 @@ version = "0.0.1"
 source = "git+https://www.github.com/merely-made/eidetic.git?rev=86e78dd37914fd61f8ca336bf0ab2da716356fca#86e78dd37914fd61f8ca336bf0ab2da716356fca"
 dependencies = [
  "eidetic",
+ "esp",
  "genet-text",
  "serde",
  "serde_json",
@@ -7303,6 +7304,7 @@ dependencies = [
  "dramatis",
  "eidetic",
  "eidetic-search",
+ "esp",
  "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "genet-presenter",
  "genet-scripted-dom",
