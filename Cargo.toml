@@ -710,7 +710,6 @@ stickleback = { git = "https://www.github.com/merely-made/eidetic.git", rev = "5
 
 # Complete the selected Knot contract closure so transitive Mere packages
 # use this workspace source rather than a second immutable Mere checkout.
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
 cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-a11y = { path = "crates/cambium/cambium-winit-a11y" }
@@ -777,7 +776,6 @@ document-session-api = { git = "https://www.github.com/merely-made/genet.git", r
 # Reuse the Windows password class across cancellation and sequential prompts.
 light-file-dialog = { path = "support/patches/light-file-dialog" }
 # Canonical promoted families; keep registry and Git consumers type-identical.
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "5182e4e244c85b1008182a1be6b822f65a8efe50" }
 commons-spine = { git = "https://www.github.com/merely-made/gemot.git", rev = "bcfd40831253734d3e7ef954190d4d37e8fbaea2" }
 eidetic = { git = "https://www.github.com/merely-made/eidetic.git", rev = "5182e4e244c85b1008182a1be6b822f65a8efe50" }
@@ -852,11 +850,6 @@ cubek-matmul = { path = "support/patches/cubek-matmul" }
 # the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
 # cases, plus nine unfused native launcher controls. Vendored patch source
 # remains for provenance; current consumers select the registry crate.
-# burn-remote 0.22.1: pump-observed targeted close and session receipts
-# let owner reclaim stop one admitted lease without dropping the protocol.
-# Remove when upstream provides equivalent control and passes the lifecycle
-# receipt, including reclaim and recovery.
-burn-remote = { git = "https://www.github.com/merely-made/distillery.git", rev = "27fd59188c5036627aec0f85feaa59907c7ba53f" }
 layout-dom-api = { git = "https://www.github.com/merely-made/genet.git", rev = "ceb5a9795a8f26ffe3c6fba25a55bfce3dd0a15d", version = "=0.1.1" }
 genet-scripted-dom = { git = "https://www.github.com/merely-made/genet.git", rev = "ceb5a9795a8f26ffe3c6fba25a55bfce3dd0a15d", version = "=0.1.2" }
 # Livery/Buckram select published genet-taffy 0.16 directly. No Git patch is
@@ -892,19 +885,12 @@ opt-level = 3
 # Compatibility source keys for immutable suppliers published before the
 # repository rename. Targets and current direct dependencies use Murm.
 [patch."https://github.com/merely-made/retinue.git"]
-embedded-graphics = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
-embedded-graphics-core = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
 mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
 murm-webrtc = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
 murm = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
-radio-face = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
 retinue = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
-selvage = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
-seneschal = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
-tulle = { git = "https://www.github.com/merely-made/murm.git", rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7" }
 
 [patch."https://www.github.com/merely-made/mere.git"]
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 chartulary = { git = "https://www.github.com/merely-made/eidetic.git", rev = "5182e4e244c85b1008182a1be6b822f65a8efe50" }
 commons-spine = { git = "https://www.github.com/merely-made/gemot.git", rev = "bcfd40831253734d3e7ef954190d4d37e8fbaea2" }
 eidetic = { git = "https://www.github.com/merely-made/eidetic.git", rev = "5182e4e244c85b1008182a1be6b822f65a8efe50" }
@@ -945,7 +931,6 @@ apparatus-core = { git = "https://www.github.com/merely-made/armillary.git", rev
 
 [patch."https://github.com/merely-made/distillery.git"]
 esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "27fd59188c5036627aec0f85feaa59907c7ba53f" }
-esp-testkit = { git = "https://www.github.com/merely-made/distillery.git", rev = "27fd59188c5036627aec0f85feaa59907c7ba53f" }
 distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "27fd59188c5036627aec0f85feaa59907c7ba53f" }
 mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "27fd59188c5036627aec0f85feaa59907c7ba53f" }
 
@@ -973,35 +958,7 @@ rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
 git = "https://www.github.com/merely-made/murm.git"
 rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
 
-[patch."https://github.com/merely-made/murm.git".outrider]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
-[patch."https://github.com/merely-made/murm.git".postilion]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
-[patch."https://github.com/merely-made/murm.git".radio-face]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
-[patch."https://github.com/merely-made/murm.git".radio-hand]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
 [patch."https://github.com/merely-made/murm.git".retinue]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
-[patch."https://github.com/merely-made/murm.git".selvage]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
-[patch."https://github.com/merely-made/murm.git".seneschal]
-git = "https://www.github.com/merely-made/murm.git"
-rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
-
-[patch."https://github.com/merely-made/murm.git".tulle]
 git = "https://www.github.com/merely-made/murm.git"
 rev = "0aaf4b16d3d265a7d0af09f083d622284f5846d7"
 
