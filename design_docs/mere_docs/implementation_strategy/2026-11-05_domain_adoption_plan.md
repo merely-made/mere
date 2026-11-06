@@ -168,6 +168,9 @@ against it. Missing:
   the mere is locked or unreachable.
 - Device-local stores: one shared place for what stays (D7), so applications
   stop carrying their own.
+- Drafted 2026-11-06:
+  [the domain contract](../technical_architecture/2026-11-06_domain_contract.md).
+  It proposes one kind of store for every mere (O8).
 - Done when: one contract document names what a domain supplies and what a
   client may do, Cleromancy conforms to it unchanged or with recorded
   changes, and O8 is ruled.
@@ -323,7 +326,12 @@ its data reaches a second device.
   is built as an opt-in feature; no domain is scheduled to use it.
 - **O8. Store kinds (M0).** Is every mere a graph, with Knot's operation log
   projected into one, or does the reservoir hold a second kind of store for
-  operation logs? D4 depends on the answer.
+  operation logs? D4 depends on the answer. Mark, 2026-11-05: "I'm ok with a
+  second kind, but then are there gonna be other kinds? Isn't a graph a
+  log…?" The contract proposes neither: every mere becomes one Stickleback
+  causal operation log, with the graph as one fold over it, as Graphshell's
+  personal replica already does. That would also carry M3 and M4. Waits for
+  Mark's ruling.
 
 ## Findings
 
@@ -339,3 +347,4 @@ its data reaches a second device.
 
 - 2026-11-05: plan opened. D3 to D6 recorded the same day; D7, D8, M0 and O8
   added after Mark asked whether the contract was ready.
+- 2026-11-06: M0's contract drafted; O8 answered with a one-kind proposal.
