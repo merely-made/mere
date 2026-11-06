@@ -34,6 +34,7 @@ pub mod resident_knot;
 pub mod resident_mere;
 pub mod resident_projection;
 pub mod resident_reservoir;
+pub mod retained_custody;
 pub mod resident_site;
 #[cfg(feature = "moot-site")]
 pub mod moot_site;

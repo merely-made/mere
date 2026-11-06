@@ -128,19 +128,19 @@ struct Routes {
     served: Mutex<BTreeMap<String, Arc<MereShared>>>,
     access: Mutex<BTreeMap<(MereId, AppId), MereApplicationAccess>>,
     access_loaded: AtomicBool,
-    /// Whether each mere's retained page-text store may be written now. Every
-    /// store is unsealed today, so the default never pauses.
-    retained_custody: Arc<dyn pandect::RetainedCustody>,
+    /// How each mere's retained page text is sealed, and whether it may be
+    /// written now. Unconfigured by default: nothing is written in plaintext.
+    retained: crate::retained_custody::RetainedSealing,
 }
 
 impl MereRoutes {
-    /// Let `custody` decide whether retained page text may be written, so a
-    /// locked or unavailable custody pauses keeping rather than writing
-    /// plaintext. Composed before any route is served.
-    pub fn with_retained_custody(mut self, custody: Arc<dyn pandect::RetainedCustody>) -> Self {
+    /// Seal retained page text through `sealing` (the custodian's retained
+    /// payload lane) and pause keeping while it is locked or unavailable.
+    /// Composed before any route is served.
+    pub fn with_retained_sealing(mut self, sealing: crate::retained_custody::RetainedSealing) -> Self {
         Arc::get_mut(&mut self.inner)
-            .expect("compose retained custody before serving routes")
-            .retained_custody = custody;
+            .expect("compose retained sealing before serving routes")
+            .retained = sealing;
         self
     }
 
@@ -202,7 +202,7 @@ impl MereRoutes {
                 served: Mutex::new(BTreeMap::new()),
                 access: Mutex::new(BTreeMap::new()),
                 access_loaded: AtomicBool::new(false),
-                retained_custody: Arc::new(pandect::PlainCustody),
+                retained: crate::retained_custody::RetainedSealing::unconfigured(),
             }),
         }
     }
@@ -427,7 +427,7 @@ impl MereRoutes {
             shared_root: self.inner.shared_root.clone(),
             mere: mere.id,
             retained: OnceCell::new(),
-            retained_custody: Arc::clone(&self.inner.retained_custody),
+            retained_sealing: self.inner.retained.clone(),
         });
         let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
@@ -767,8 +767,8 @@ struct MereShared {
     mere: MereId,
     /// The reservoir-owned retained page-text store, opened on first use so a
     /// mere that never keeps page text never creates one.
-    retained: OnceCell<Result<pandect::RetainedText<RedbBackend>, String>>,
-    retained_custody: Arc<dyn pandect::RetainedCustody>,
+    retained: OnceCell<Result<pandect::RetainedText<pandect::SealedValues<RedbBackend>>, String>>,
+    retained_sealing: crate::retained_custody::RetainedSealing,
 }
 
 impl MereShared {
@@ -2250,9 +2250,48 @@ mod tests {
         }
     }
 
+    type RetainedHost = castellan::authority::PersonaeHost<castellan::custody::SealedProfileStorage>;
+    pub(super) const VAULT_PASSPHRASE: &[u8] = b"isolated retained-content fixture";
+
+    /// A real custodian host with a wallet and a staged epoch under `root`,
+    /// reopened if it is already there, and the sealing that uses it.
+    fn retained_custody(
+        root: &std::path::Path,
+    ) -> (Arc<RetainedHost>, crate::retained_custody::RetainedSealing) {
+        use castellan::custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage};
+        let dir = root.join("retained-custody");
+        let wallet = PersonaId::from_uuid(Uuid::from_u128(0x5336_77));
+        let profile = Profile::new(
+            personae::ProfileId("retained".into()),
+            "Retained fixture",
+            personae::Ed25519Keypair::from_seed([0x52; 32]),
+        );
+        let fresh = !dir.exists();
+        let storage = SealedProfileStorage::open_with_key(dir.join("vault"), [0x63; 32]);
+        if fresh {
+            castellan::custody::wallet::ensure_wallet_state(&dir, wallet, "Retained fixture")
+                .unwrap();
+            storage.enroll_passphrase(VAULT_PASSPHRASE).unwrap();
+            storage.save_profile(&profile).unwrap();
+        }
+        let host = Arc::new(castellan::authority::PersonaeHost::new(
+            IdentityVault::with_profile(storage, profile),
+            None,
+            dramatis::view::VaultProtectionView::OsProtected,
+        ));
+        let sealing = crate::retained_custody::RetainedSealing::custodial(
+            host.clone(),
+            dir,
+            wallet,
+            personae::ProfileId("retained".into()),
+        );
+        (host, sealing)
+    }
+
     /// A reservoir with its route and the mere routes over one shared door,
     /// and the mere for `domain` ensured through the reservoir route.
     struct Fixture {
+        retained_host: Option<Arc<RetainedHost>>,
         _root: tempfile::TempDir,
         reservoir: ResidentReservoir,
         catalog: AppEndpointCatalog,
@@ -2307,7 +2346,7 @@ mod tests {
         validator: Option<pandect::GraphValidator>,
         remote: Option<graphshell_host::projection_host::SharedCatalog>,
         handlers: HandlerRegistry,
-        custody: Option<Arc<dyn pandect::RetainedCustody>>,
+        custody: Option<crate::retained_custody::RetainedSealing>,
         reopen: Option<tempfile::TempDir>,
     ) -> Fixture {
         let root = reopen.unwrap_or_else(|| tempfile::tempdir().unwrap());
@@ -2356,9 +2395,12 @@ mod tests {
             Some(remote) => routes.with_remote_catalog(remote),
             None => routes,
         };
-        let routes = match custody {
-            Some(custody) => routes.with_retained_custody(custody),
-            None => routes,
+        let (retained_host, routes) = match custody {
+            Some(custody) => (None, routes.with_retained_sealing(custody)),
+            None => {
+                let (host, sealing) = retained_custody(root.path());
+                (Some(host), routes.with_retained_sealing(sealing))
+            },
         };
         catalog
             .update(|catalog| reservoir.register(catalog, Some(routes.clone())))
@@ -2380,6 +2422,7 @@ mod tests {
         };
         assert_eq!(door.invoke(ensure).unwrap(), IntentResult::Accepted);
         Fixture {
+            retained_host,
             _root: root,
             reservoir,
             catalog,

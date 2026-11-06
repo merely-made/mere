@@ -16,7 +16,8 @@ use chirograph::{
 use graphshell::kept_text::{
     KEEP_PAGES_INTENT, KEEP_SETTING_INTENT, KeepPagesV1, KeepSettingV1, KeptPage,
 };
-use std::sync::atomic::AtomicBool;
+use dramatis_resident::custody_host::ResidentCustody;
+use personae::IdentityProvider as _;
 
 fn graph_intent(session: &ProjectionSnapshot, intent: &str, payload: Vec<u8>) -> IntentInvocation {
     IntentInvocation {
@@ -39,6 +40,7 @@ fn setting(enabled: bool) -> Vec<u8> {
 
 fn keep(pages: &[(&str, &str)]) -> Vec<u8> {
     serde_json::to_vec(&KeepPagesV1 {
+        fetches: Vec::new(),
         pages: pages
             .iter()
             .map(|(url, text)| KeptPage {
@@ -229,114 +231,213 @@ async fn a_graph_the_client_does_not_hold_is_refused_and_so_is_the_remote_and_am
     ));
 }
 
-struct Gate(AtomicBool);
-impl pandect::RetainedCustody for Gate {
-    fn writable(&self) -> Result<(), String> {
-        if self.0.load(std::sync::atomic::Ordering::SeqCst) {
-            Ok(())
-        } else {
-            Err("The vault is locked.".into())
+
+fn plaintext_in(root: &std::path::Path, needle: &str) -> bool {
+    fn walk(dir: &std::path::Path, needle: &[u8], hit: &mut bool) {
+        for entry in std::fs::read_dir(dir).into_iter().flatten().flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                walk(&path, needle, hit);
+            } else if path.extension().is_some_and(|e| e == "redb")
+                && path.to_string_lossy().contains("meres")
+            {
+                let bytes = std::fs::read(&path).unwrap();
+                *hit |= bytes.windows(needle.len()).any(|w| w == needle);
+            }
         }
     }
+    let mut hit = false;
+    walk(root, needle.as_bytes(), &mut hit);
+    hit
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn locked_custody_pauses_keeping_visibly_and_unlocking_resumes() {
-    let gate = Arc::new(Gate(AtomicBool::new(true)));
+async fn nothing_is_kept_in_plaintext_when_no_custody_is_configured() {
     let fixture = fixture_inner(
-        0x5336_04,
+        0x5336_07,
         "browsing",
         None,
         None,
         HandlerRegistry::default(),
-        Some(gate.clone()),
+        Some(crate::retained_custody::RetainedSealing::unconfigured()),
         None,
     )
     .await;
     let mut app = fixture.attach("graphshell").await;
     let graph = graph(&mut app);
-    app.invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true)))
-        .unwrap();
-    gate.0.store(false, std::sync::atomic::Ordering::SeqCst);
-    let paused = read(&mut app, &graph, Default::default()).unwrap();
-    assert_eq!(
-        paused.keeping,
-        RetainedKeeping::Paused {
-            reason: "The vault is locked.".into()
-        }
+    let state = read(&mut app, &graph, Default::default()).unwrap();
+    assert!(
+        matches!(&state.keeping, RetainedKeeping::Paused { reason } if reason.contains("no wallet custody")),
+        "{:?}",
+        state.keeping
     );
+    for intent in [
+        (KEEP_SETTING_INTENT, setting(true)),
+        (KEEP_PAGES_INTENT, keep(&[("https://a.test/", "never in plaintext")])),
+    ] {
+        let refused = app.invoke(graph_intent(&graph, intent.0, intent.1)).unwrap();
+        assert!(matches!(refused, IntentResult::Rejected { .. }), "{refused:?}");
+    }
+    assert!(!plaintext_in(fixture._root.path(), "never in plaintext"));
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn locking_the_vault_pauses_keeping_and_reading_and_unlocking_resumes() {
+    let fixture = fixture(0x5336_04, "browsing").await;
+    let host = fixture.retained_host.clone().unwrap();
+    let mut app = fixture.attach("graphshell").await;
+    let graph = graph(&mut app);
+    assert_eq!(
+        app.invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true))).unwrap(),
+        IntentResult::Accepted
+    );
+    assert_eq!(
+        app.invoke(graph_intent(&graph, KEEP_PAGES_INTENT, keep(&[("https://a.test/", "kept before the lock")]))).unwrap(),
+        IntentResult::Accepted
+    );
+    host.lock_vault().unwrap();
+    let paused = read(&mut app, &graph, Default::default()).unwrap();
+    assert!(
+        matches!(&paused.keeping, RetainedKeeping::Paused { reason } if reason.contains("locked")),
+        "{:?}",
+        paused.keeping
+    );
+    assert!(paused.pages.is_empty(), "locked custody cannot open the text");
     let refused = app
-        .invoke(graph_intent(
-            &graph,
-            KEEP_PAGES_INTENT,
-            keep(&[("https://a.test/", "never written while locked")]),
-        ))
+        .invoke(graph_intent(&graph, KEEP_PAGES_INTENT, keep(&[("https://b.test/", "never written while locked")])))
         .unwrap();
     assert!(
         matches!(&refused, IntentResult::Rejected { reason } if reason.contains("paused") && reason.contains("locked")),
         "{refused:?}"
     );
-    gate.0.store(true, std::sync::atomic::Ordering::SeqCst);
+    host.unlock_with_passphrase(super::VAULT_PASSPHRASE).unwrap();
     let resumed = read(&mut app, &graph, Default::default()).unwrap();
     assert_eq!(resumed.keeping, RetainedKeeping::On);
-    assert!(resumed.pages.is_empty(), "the paused attempt wrote nothing");
+    assert_eq!(resumed.pages.len(), 1, "the locked attempt wrote nothing");
     assert_eq!(
-        app.invoke(graph_intent(
-            &graph,
-            KEEP_PAGES_INTENT,
-            keep(&[("https://a.test/", "kept after unlock")]),
-        ))
-        .unwrap(),
+        app.invoke(graph_intent(&graph, KEEP_PAGES_INTENT, keep(&[("https://b.test/", "kept after unlock")]))).unwrap(),
         IntentResult::Accepted
     );
-    assert_eq!(read(&mut app, &graph, Default::default()).unwrap().pages.len(), 1);
+    assert_eq!(read(&mut app, &graph, Default::default()).unwrap().pages.len(), 2);
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn kept_text_and_the_setting_survive_a_cold_reopen_of_the_resident() {
+async fn values_are_sealed_at_rest_and_another_lane_cannot_open_them() {
+    use castellan_client::custody_payload::{PayloadBytes, PayloadOperation, PayloadRequest};
+    let fixture = fixture(0x5336_08, "browsing").await;
+    let host = fixture.retained_host.clone().unwrap();
+    let mut app = fixture.attach("graphshell").await;
+    let graph = graph(&mut app);
+    app.invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true))).unwrap();
+    let secret = "a sentence only the person should read";
+    assert_eq!(
+        app.invoke(graph_intent(&graph, KEEP_PAGES_INTENT, keep(&[("https://a.test/", secret)]))).unwrap(),
+        IntentResult::Accepted
+    );
+    assert_eq!(read(&mut app, &graph, Default::default()).unwrap().pages.len(), 1);
+    let mere = fixture.reservoir.meres().await.remove(0);
+    let persona = fixture.reservoir.persona();
+    let shared_root = fixture._root.path().to_path_buf();
+    let Fixture { _root, reservoir, catalog, grants, routes, .. } = fixture;
+    drop((app, reservoir, catalog, grants, routes));
+    assert!(!plaintext_in(_root.path(), secret), "no plaintext at rest");
+    assert!(!plaintext_in(_root.path(), "should read"));
+    // Take a stored envelope and offer it to a different lane's scope.
+    let raw = pandect::open_mere_retained_backend(&shared_root, persona, mere.id).unwrap();
+    use muniment::Backend;
+    let key = raw.list("blob/").await.unwrap().remove(0);
+    let envelope: serde_json::Value =
+        serde_json::from_slice(&raw.get(&key).await.unwrap().unwrap()).unwrap();
+    let hash: eidetic::Hash = serde_json::from_value(envelope["hash"].clone()).unwrap();
+    let marker: eidetic::SealedBlobRef = serde_json::from_value(envelope["seal"].clone()).unwrap();
+    let ciphertext: Vec<u8> = serde_json::from_value(envelope["ciphertext"].clone()).unwrap();
+    let wallet = PersonaId::from_uuid(Uuid::from_u128(0x5336_77));
+    let master = host.master_public_key().to_bytes();
+    let ask = |lane: &str| {
+        let request = PayloadRequest {
+            profile: personae::ProfileId("retained".into()),
+            master,
+            content_hash: hash,
+            operation: PayloadOperation::Unseal {
+                bytes: PayloadBytes(ciphertext.clone()),
+                marker: marker.clone(),
+            },
+            custody_epoch: None,
+        };
+        let scope = serde_json::to_vec(&(lane, "retained", &master)).unwrap();
+        host.payload(&_root.path().join("retained-custody"), wallet, request, scope)
+    };
+    assert!(ask("graphshell.retained-content/custody-v1").is_err(), "another lane is refused");
+    assert!(ask("turnstone.retained-clips/custody-v1").is_err());
+    assert!(
+        ask(crate::retained_custody::RETAINED_LANE).is_ok(),
+        "the shared retained lane opens it"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn sealed_text_and_the_setting_survive_a_cold_reopen_of_the_resident() {
     let fixture = fixture(0x5336_05, "browsing").await;
     let mut app = fixture.attach("graphshell").await;
     let graph = graph(&mut app);
-    app.invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true)))
-        .unwrap();
+    app.invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true))).unwrap();
     assert_eq!(
-        app.invoke(graph_intent(
-            &graph,
-            KEEP_PAGES_INTENT,
-            keep(&[("https://a.test/", "a body that must outlive the process")]),
-        ))
-        .unwrap(),
+        app.invoke(graph_intent(&graph, KEEP_PAGES_INTENT, keep(&[("https://a.test/", "a body that must outlive the process")]))).unwrap(),
         IntentResult::Accepted
     );
     drop(app);
-    let Fixture {
-        _root,
-        reservoir,
-        catalog,
-        grants,
-        routes,
-        ..
-    } = fixture;
-    // The resident exits: every owner of the reservoir and its stores goes.
-    drop((reservoir, catalog, grants, routes));
-    let reopened = fixture_inner(
-        0x5336_05,
-        "browsing",
-        None,
-        None,
-        HandlerRegistry::default(),
-        None,
-        Some(_root),
-    )
-    .await;
+    let Fixture { _root, reservoir, catalog, grants, routes, retained_host, .. } = fixture;
+    // The resident exits: every owner of the reservoir, its stores and custody goes.
+    drop((reservoir, catalog, grants, routes, retained_host));
+    let reopened = fixture_inner(0x5336_05, "browsing", None, None, HandlerRegistry::default(), None, Some(_root)).await;
+    // A cold custodian starts locked-or-unlocked per its vault; unlock it.
     let mut app = reopened.attach("graphshell").await;
-    let reopened_graph = super::graph(&mut app);
-    let graph = reopened_graph;
+    let graph = super::graph(&mut app);
     let kept = read(&mut app, &graph, Default::default()).unwrap();
     assert_eq!(kept.keeping, RetainedKeeping::On);
     assert_eq!(kept.pages.len(), 1);
+    assert_eq!(kept.pages[0].versions[0].text, "a body that must outlive the process");
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn an_explicit_fetch_is_recorded_beside_the_text_it_produced() {
+    use graphshell::kept_text::{FetchRecordV1, fetch_record_key};
+    let fixture = fixture(0x5336_06, "browsing").await;
+    let mut app = fixture.attach("graphshell").await;
+    let graph = graph(&mut app);
+    app.invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true))).unwrap();
+    let text = "a typed address, fetched once";
+    let record = FetchRecordV1 {
+        requested: "http://127.0.0.1:9/a".into(),
+        final_url: "http://127.0.0.1:9/a".into(),
+        fetched_at_ms: 1234,
+        status: 200,
+        content_type: Some("text/html".into()),
+        html_bytes: 400,
+        text_bytes: text.len() as u64,
+        text_version: eidetic::Hash::of(text.as_bytes()).to_hex(),
+    };
+    let payload = serde_json::to_vec(&KeepPagesV1 {
+        pages: vec![KeptPage { url: record.final_url.clone(), text: text.into(), at_ms: 0, private: false }],
+        fetches: vec![record.clone()],
+    })
+    .unwrap();
     assert_eq!(
-        kept.pages[0].versions[0].text,
-        "a body that must outlive the process"
+        app.invoke(graph_intent(&graph, KEEP_PAGES_INTENT, payload)).unwrap(),
+        IntentResult::Accepted
     );
+    let mere = fixture.reservoir.meres().await.remove(0);
+    let persona = fixture.reservoir.persona();
+    let (host, sealing) = (fixture.retained_host.clone().unwrap(), ());
+    let _ = sealing;
+    let Fixture { _root, reservoir, catalog, grants, routes, .. } = fixture;
+    drop((app, reservoir, catalog, grants, routes));
+    // Reading the record back goes through the same custody: sealed at rest.
+    assert!(!plaintext_in(_root.path(), "fetched once"));
+    let (_, sealing) = (host, crate::retained_custody::RetainedSealing::unconfigured());
+    let _ = sealing;
+    let raw = pandect::open_mere_retained_backend(_root.path(), persona, mere.id).unwrap();
+    use muniment::Backend;
+    let key = fetch_record_key(&record.final_url, record.fetched_at_ms);
+    assert!(raw.list("retained-text/fetch/v1/").await.unwrap().contains(&key), "the record exists under its key");
 }

@@ -1201,6 +1201,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     #[cfg(feature = "personal-sync")]
     let coop_relays = owner.coop_relays()?;
     #[cfg(feature = "personal-sync")]
+    let retained_persona = owner.content.retained_persona;
+    #[cfg(feature = "personal-sync")]
     if let Some(persona) = owner.content.retained_persona {
         keeper.configure_payload_custody(profile_id.clone(), persona, data_root.clone())?;
     }
@@ -1404,6 +1406,19 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .with_coop_relays(coop_relays.clone())
                 .with_profile_subject_authority(personae.clone())
                 .with_divination_authority()
+                // Retained page text is sealed by the custodian under the
+                // shared retained lane, or not kept: the resident has no
+                // plaintext path. Without a configured wallet persona it
+                // says so.
+                .with_retained_sealing(match retained_persona {
+                    Some(persona) => mere_resident::retained_custody::RetainedSealing::custodial(
+                        personae.clone(),
+                        data_root.clone(),
+                        persona,
+                        profile_id.clone(),
+                    ),
+                    None => mere_resident::retained_custody::RetainedSealing::unconfigured(),
+                })
             });
             if let Some(route) = catalog
                 .update(|catalog| resident.register_reservoir_route(catalog, routes.clone()))

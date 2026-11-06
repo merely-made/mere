@@ -25,7 +25,7 @@ use chirograph::{
 use graphshell::goal_surface::{GraphFacts, RetainedPages, door as page_door};
 use graphshell::kept_text::{
     KEEP_PAGES_INTENT, KEEP_SETTING_INTENT, KeepPagesV1, KeepSettingV1, KeepTextPolicy, KeptBatch,
-    judge, record_kept_pages,
+    fetch_record_key, judge, record_kept_pages,
 };
 use pandect::{KeepPageText, Keeping, RetainedText};
 
@@ -54,11 +54,19 @@ fn wire(keeping: Keeping) -> RetainedKeeping {
 
 impl MereShared {
     /// The mere's retained store, opened by the reservoir's owner on first use.
-    async fn retained(&self) -> Result<&RetainedText<RedbBackend>, String> {
+    async fn retained(&self) -> Result<&RetainedText<pandect::SealedValues<RedbBackend>>, String> {
         self.retained
             .get_or_init(|| async {
                 pandect::open_mere_retained_backend(&self.shared_root, self.persona, self.mere)
-                    .map(|backend| RetainedText::new(backend, Arc::clone(&self.retained_custody)))
+                    .map(|backend| {
+                        RetainedText::new(
+                            pandect::SealedValues::new(
+                                backend,
+                                Arc::clone(&self.retained_sealing.sealer),
+                            ),
+                            Arc::clone(&self.retained_sealing.gate),
+                        )
+                    })
                     .map_err(|error| error.to_string())
             })
             .await
@@ -80,7 +88,19 @@ impl MereEndpoint {
         let (shared, host) = (Arc::clone(&self.shared), Arc::clone(&self.host));
         run(async move {
             let store = shared.retained().await?;
-            let keeping = wire(store.keeping().await?);
+            let state = store.keeping().await?;
+            let paused = matches!(state, Keeping::Paused(_));
+            let keeping = wire(state);
+            if paused {
+                // Custody is locked or absent: nothing can be unsealed, so say
+                // so and carry no pages, rather than failing obscurely.
+                return Ok(page_door::to_wire(
+                    &RetainedPages::default(),
+                    request.session,
+                    limits,
+                    keeping,
+                ));
+            }
             // Copy the graph's facts out, then read the store without the lock.
             let facts = GraphFacts::read(host.lock().await.graph());
             let pages = RetainedPages::load_bounded(
@@ -146,10 +166,20 @@ impl MereEndpoint {
                 }
             }
             let summary = record_kept_pages(store.backend(), &KeptBatch { policy, pages }).await;
-            match summary.error {
-                Some(error) => rejected(format!("Page text could not be kept: {error}")),
-                None => Ok(IntentResult::Accepted),
+            if let Some(error) = summary.error {
+                return rejected(format!("Page text could not be kept: {error}"));
             }
+            // The explicit fetch is recorded beside the text it produced.
+            let slots = JsonSlots::new(store.backend().clone());
+            for fetch in &asked.fetches {
+                if let Err(error) = slots
+                    .save(&fetch_record_key(&fetch.final_url, fetch.fetched_at_ms), fetch)
+                    .await
+                {
+                    return rejected(format!("The fetch record could not be kept: {error}"));
+                }
+            }
+            Ok(IntentResult::Accepted)
         })
     }
 }
