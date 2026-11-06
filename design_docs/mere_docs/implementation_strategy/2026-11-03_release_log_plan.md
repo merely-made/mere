@@ -833,6 +833,47 @@ or a precise reference alone, and no storage migration is selected here.
   Mere and Knot pins. Muniment needed nothing; Stickleback's `MunimentStore`
   took the `_tx` traits with a no-op `Transaction`.
 
+### Wave 4, 2026-11-06
+
+- **Upstream.** No new commits on p2panda main since the `d01898bf` intake.
+  Unmerged branch `troubleshoot-missing-message-history-issue` fixes late-added
+  spaces members missing old messages and multi-body handling in the node;
+  take it at the next intake once merged.
+- **R5 holders.** Murm crate `murm-holder` (murm `6bd9789cf52`), beside
+  `murm-resolve`, leaving `mere-resident` to its split plan. A holder agrees to
+  hold a key, acquires through the resolver, re-verifies, and is bounded by
+  `max_editions`, `max_logs` and an agreement expiry (`sweep`). Acknowledgement:
+  the holder signs holder key, log key, head and a publisher challenge;
+  `Replication` reads pending until configured holders acknowledge the current
+  head, and a Noise dial names the holder key it must prove. `PoolSetting`
+  selects the personal mesh or named holder pools with a privacy tier per route
+  (data visibility and resolution) and reports routes below the floor. Tested
+  end to end over memory and Noise/TCP; iroh/p2panda and Reticulum untested for
+  holders. Open: incremental catch-up (each acquire re-pulls the log), scheduling
+  under Armillary/Djinn, publisher push, a p2panda ack dialer, wiring the pool
+  setting into publishing, Gemot P1's accepted-transfer fact behind `AckSink`.
+- **R7 follow-ups.** Dramatis `b2ab8bf`: the custodian's `unassociated`
+  operation (create, sign, release) keeps keys sealed under the open persona; a
+  locked custodian can't mint or use one. Murm `df8f0a6daa5`: opt-in `i2p`
+  feature, `anonymous_i2p_key(&UnassociatedKeypair)` makes a stable SAM
+  destination from HKDF children of the seed, sharing no bytes with the key's
+  other identities (not yet run against a live router); Reticulum already binds
+  from the carrier key and a test shows no shared halves with the persona.
+  Turnstone `60b7718e`: `ClipSigning` signs live clips as editions at the chosen
+  tier (default unassociated) and verifies before recording; unassociated
+  signing waits on a custody door call (`CustodyCall`/`CustodyOperation` in
+  Armillary and Djinn), and until then such clips stay unsigned rather than
+  fall back to a linked key. Turnstone's `authoring` feature doesn't compile on
+  main: its lock holds knot-editor `6ea3ce2` (0.8-era) beside stickleback on
+  0.9, and moving Turnstone's Mere and Knot pins forward meets the same
+  render-stack refresh as cleromancy. So the integration was tested only in a
+  scratch crate.
+- **arti 0.48.0.** Default features compile C (zstd, lzma, native-tls) and link
+  system SQLite. Minimal (`tokio` + `rustls`, no `static` or `compression`)
+  compiles no C but still links system libsqlite3 through `tor-dirmgr`'s
+  rusqlite, so a Tor `Transport` is compile-clean, not link-clean, under the
+  no-C rule.
+
 ## Progress
 
 - 2026-11-04: D9–D11 record recipient control, link-first delivery and the
@@ -873,3 +914,5 @@ or a precise reference alone, and no storage migration is selected here.
   `d73851580a6`); the 0.9 move and D12 lanes are running.
 - 2026-11-05: D12 wired (eidetic `e669eb2`; Murm through the 0.9 move) and the
   family moved to 0.9 except cleromancy. R5 holders and R7 follow-ups next.
+- 2026-11-06: R5 holders (murm `6bd9789cf52`) and R7 follow-ups (dramatis
+  `b2ab8bf`, murm `df8f0a6daa5`, turnstone `60b7718e`) landed.
