@@ -341,6 +341,42 @@ area = "Stack"
 summary = "An application declares its retained-content seal scope and the grant pins it; Turnstone keeps its string; the label table goes after S2."
 draws_on = ["stack.2"]
 
+[decisions."cycle-breaks D1"]
+title = ". Mere↔Knot and Mere↔Cleromancy: the resident stops depending (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D2"]
+title = ". Eidetic↔Distillery: the ESP adapter moves to ESP (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D3"]
+title = ". gemot↔Murm: an address trait (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D4"]
+title = ". Mere↔Murm: mere-comms goes down (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D5"]
+title = ". Mere↔Woodshed: adapters go up (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D6"]
+title = ". Dev-only edges count (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D7"]
+title = ". Extract the contract leaves first (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D8"]
+title = ". The bottom layer is the revived Graphshell repository, named for the protocol (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D9"]
+title = ". Contract plus host-role kit (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
