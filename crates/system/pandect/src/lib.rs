@@ -134,6 +134,7 @@ pub mod persona_settings_store;
 // The reservoir: every mere a persona holds, one per data domain, indexed under
 // `personas/<id>/reservoir/` (reservoir plan V1).
 pub mod reservoir;
+pub mod retained_text;
 pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so
@@ -214,6 +215,13 @@ pub use reservoir::{
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use reservoir::{open_mere_archive_backend, open_mere_backend, open_reservoir_backend};
+pub use retained_text::{
+    DEFAULT_KEPT_BYTES, KEEP_SETTING_SCHEMA, KEEP_SETTING_SLOT, KeepPageText, Keeping,
+    MAX_KEPT_BYTES, PlainCustody, RETAINED_DB_FILENAME, RetainedCustody, RetainedText,
+    retained_path,
+};
+#[cfg(not(target_arch = "wasm32"))]
+pub use retained_text::open_mere_retained_backend;
 pub use cartography_geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
 pub use saved_scene::{
     DEFAULT_ARRANGEMENT, SAVED_SCENE_FACET, SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3,
