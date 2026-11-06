@@ -2890,10 +2890,10 @@ dependencies = [
 [[package]]
 name = "commons-spine"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 dependencies = [
  "chartulary",
- "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "insigne",
  "mere-proofs",
  "muniment",
@@ -4803,7 +4803,7 @@ dependencies = [
 [[package]]
 name = "distillery"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9#25db074e2f9d33103535d5b0638bd6aa1daab0d9"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=a235cbdbca187aa7507739b3f6cf9a2f7846fcc0#a235cbdbca187aa7507739b3f6cf9a2f7846fcc0"
 dependencies = [
  "apparatus-core",
  "armillary",
@@ -4812,7 +4812,7 @@ dependencies = [
  "chirograph",
  "eidetic",
  "eidetic-search",
- "esp 0.1.0 (git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9)",
+ "esp",
  "graphshell-endpoint",
  "incipit",
  "insigne",
@@ -5676,7 +5676,7 @@ checksum = "d817e038c30374a4bcb22f94d0a8a0e216958d4c3dcde369b1439fec4bdda6e6"
 [[package]]
 name = "esp"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9#25db074e2f9d33103535d5b0638bd6aa1daab0d9"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=a235cbdbca187aa7507739b3f6cf9a2f7846fcc0#a235cbdbca187aa7507739b3f6cf9a2f7846fcc0"
 dependencies = [
  "armillary",
  "burn",
@@ -5690,15 +5690,6 @@ dependencies = [
  "tokenizers",
  "tracing",
  "wgpu",
- "zeroize",
-]
-
-[[package]]
-name = "esp"
-version = "0.1.0"
-source = "git+https://www.github.com/merely-made/distillery.git?rev=27fd59188c5036627aec0f85feaa59907c7ba53f#27fd59188c5036627aec0f85feaa59907c7ba53f"
-dependencies = [
- "serde",
  "zeroize",
 ]
 
@@ -6446,12 +6437,12 @@ dependencies = [
 [[package]]
 name = "gemot"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f1dfad17aa809f96091abca5f792e4d6578637f1#f1dfad17aa809f96091abca5f792e4d6578637f1"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 dependencies = [
  "insigne",
  "mere-proofs",
- "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=f1dfad17aa809f96091abca5f792e4d6578637f1)",
- "mooting 0.1.0 (git+https://www.github.com/merely-made/gemot.git?rev=f1dfad17aa809f96091abca5f792e4d6578637f1)",
+ "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
+ "mooting 0.1.0 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "muniment",
  "murm-sync",
  "p2mere-auth",
@@ -6470,12 +6461,12 @@ dependencies = [
 [[package]]
 name = "gemot"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=9bfea63e49667c7a1399644a09f875dba9a223a0#9bfea63e49667c7a1399644a09f875dba9a223a0"
 dependencies = [
  "insigne",
  "mere-proofs",
- "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
- "mooting 0.1.0 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=9bfea63e49667c7a1399644a09f875dba9a223a0)",
+ "mooting 0.1.0 (git+https://www.github.com/merely-made/gemot.git?rev=9bfea63e49667c7a1399644a09f875dba9a223a0)",
  "muniment",
  "murm-sync",
  "p2mere-auth",
@@ -6494,16 +6485,16 @@ dependencies = [
 [[package]]
 name = "gemot-address"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 
 [[package]]
 name = "gemot-site"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 dependencies = [
  "blake3",
  "eidetic",
- "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=f1dfad17aa809f96091abca5f792e4d6578637f1)",
+ "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=9bfea63e49667c7a1399644a09f875dba9a223a0)",
  "gemot-address",
  "language-tags",
  "muniment",
@@ -6517,7 +6508,7 @@ dependencies = [
 [[package]]
 name = "gemot-site-host"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -7312,7 +7303,7 @@ dependencies = [
  "dramatis",
  "eidetic",
  "eidetic-search",
- "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "genet-presenter",
  "genet-scripted-dom",
  "getrandom 0.3.4",
@@ -7338,7 +7329,7 @@ dependencies = [
  "mere-overmap",
  "mere-proofs",
  "mere-transport",
- "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "muniment",
  "murm-sync",
  "murm-webrtc",
@@ -9373,7 +9364,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "knot-catalog",
 ]
@@ -9381,7 +9372,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9394,7 +9385,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9414,7 +9405,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "cambium",
  "illume",
@@ -9431,7 +9422,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9440,7 +9431,7 @@ dependencies = [
  "chirograph",
  "dramatis",
  "eidetic",
- "esp 0.1.0 (git+https://www.github.com/merely-made/distillery.git?rev=27fd59188c5036627aec0f85feaa59907c7ba53f)",
+ "esp",
  "fleece",
  "gemot-site",
  "graphshell-endpoint",
@@ -10528,10 +10519,10 @@ dependencies = [
 [[package]]
 name = "mere-mesh"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9#25db074e2f9d33103535d5b0638bd6aa1daab0d9"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=a235cbdbca187aa7507739b3f6cf9a2f7846fcc0#a235cbdbca187aa7507739b3f6cf9a2f7846fcc0"
 dependencies = [
  "blake3",
- "esp 0.1.0 (git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9)",
+ "esp",
  "insigne",
  "mere-proofs",
  "mere-transport",
@@ -10559,7 +10550,7 @@ dependencies = [
  "commons-spine",
  "eidetic",
  "eidetic-search",
- "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "genet-scripted-dom",
  "genet-static-dom",
  "hex",
@@ -10569,7 +10560,7 @@ dependencies = [
  "mere-fleece",
  "mere-proofs",
  "mere-transport",
- "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "mien 0.0.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "muniment",
  "murm-ocapn",
  "notochord",
@@ -10685,11 +10676,11 @@ dependencies = [
  "dramatis-resident",
  "eidetic",
  "errand",
- "esp 0.1.0 (git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9)",
+ "esp",
  "futures-util",
  "gaz",
  "gemini-protocol",
- "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3)",
+ "gemot 0.1.1 (git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4)",
  "gemot-site",
  "gemot-site-host",
  "graphshell",
@@ -10764,7 +10755,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#2070296527854a1665946a89321546b1a8ae4d75"
+source = "git+https://github.com/merely-made/murm.git?branch=main#98f79b4ef56168239eb93ceaae1dcdde465ee34d"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10822,7 +10813,7 @@ dependencies = [
 [[package]]
 name = "mien"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f1dfad17aa809f96091abca5f792e4d6578637f1#f1dfad17aa809f96091abca5f792e4d6578637f1"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 dependencies = [
  "insigne",
  "muniment",
@@ -10838,7 +10829,7 @@ dependencies = [
 [[package]]
 name = "mien"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=9bfea63e49667c7a1399644a09f875dba9a223a0#9bfea63e49667c7a1399644a09f875dba9a223a0"
 dependencies = [
  "insigne",
  "muniment",
@@ -11041,7 +11032,7 @@ dependencies = [
 [[package]]
 name = "mooting"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f1dfad17aa809f96091abca5f792e4d6578637f1#f1dfad17aa809f96091abca5f792e4d6578637f1"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=73ae3633400109de7e8fd5a66393a12eb609f0d4#73ae3633400109de7e8fd5a66393a12eb609f0d4"
 dependencies = [
  "p2mere-core",
  "serde",
@@ -11051,7 +11042,7 @@ dependencies = [
 [[package]]
 name = "mooting"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/gemot.git?rev=f4c1b60139c3315e921393ef72fda35b152b15b3#f4c1b60139c3315e921393ef72fda35b152b15b3"
+source = "git+https://www.github.com/merely-made/gemot.git?rev=9bfea63e49667c7a1399644a09f875dba9a223a0#9bfea63e49667c7a1399644a09f875dba9a223a0"
 dependencies = [
  "p2mere-core",
  "serde",
@@ -11061,12 +11052,12 @@ dependencies = [
 [[package]]
 name = "mora"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 
 [[package]]
 name = "mora-cmudict"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "mora",
 ]
@@ -11164,7 +11155,7 @@ dependencies = [
 [[package]]
 name = "murm-sync"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#2070296527854a1665946a89321546b1a8ae4d75"
+source = "git+https://github.com/merely-made/murm.git?branch=main#98f79b4ef56168239eb93ceaae1dcdde465ee34d"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11203,7 +11194,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#2070296527854a1665946a89321546b1a8ae4d75"
+source = "git+https://github.com/merely-made/murm.git?branch=main#98f79b4ef56168239eb93ceaae1dcdde465ee34d"
 dependencies = [
  "bytes",
  "futures-util",
@@ -14192,7 +14183,7 @@ dependencies = [
  "chartulary",
  "chirograph",
  "emblem",
- "esp 0.1.0 (git+https://www.github.com/merely-made/distillery.git?rev=25db074e2f9d33103535d5b0638bd6aa1daab0d9)",
+ "esp",
  "euclid",
  "genet-livery",
  "genet-scripted-dom",
@@ -14824,7 +14815,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools 0.12.1",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -15584,7 +15575,7 @@ dependencies = [
 [[package]]
 name = "reference-data"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b41853a5e0f55114e7561316fd897e8b7278e51d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#40ac979b820d72b266126e272e74f30e147fd5d2"
 dependencies = [
  "blake3",
  "serde",
