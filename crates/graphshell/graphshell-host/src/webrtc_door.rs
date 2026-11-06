@@ -657,7 +657,9 @@ fn verify_derived(
     derived.verify(message, &Ed25519Signature::from_bytes(&signature))
 }
 
-#[cfg(test)]
+// The matrix drives the native halves (`carrier`, `transport`), so it
+// builds only where they do; a bare `-p graphshell-host` has no `native`.
+#[cfg(all(test, feature = "native", not(target_arch = "wasm32")))]
 mod tests {
     //! The fail-closed matrix.
     //!

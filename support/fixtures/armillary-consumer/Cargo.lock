@@ -4,8 +4,8 @@ version = 4
 
 [[package]]
 name = "armillary"
-version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=92d5b15cf39aaac40a3f2d863ffee69c9be11bfc#92d5b15cf39aaac40a3f2d863ffee69c9be11bfc"
+version = "0.1.2"
+source = "git+https://github.com/merely-made/armillary.git?branch=main#c27d3bfeb96faf750c0cb6be9dc167815a3083be"
 dependencies = [
  "tracing",
 ]
