@@ -1,0 +1,980 @@
+{
+  "browser": "chrome",
+  "headed": true,
+  "fixture_profile": true,
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "scenario": "keep-page-text-goal-cold-reopen",
+  "started_utc": "2026-11-06T06:02:36.670211+00:00",
+  "package": "/private/tmp/keep-ext-pre",
+  "result": "pass",
+  "live_remembering": "off throughout",
+  "goal": "vermicast red wigglers seedlings",
+  "server": "127.0.0.1:55645",
+  "browser_version": "156.0.8078.80",
+  "extension_version": "0.1.0",
+  "writer_initial": {
+    "url": "chrome-extension://oajkkocppbpbmfblepgbiidagliniofd/graph.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "title": "GRAPHSHELL H3 READY \u00b7 Graphshell",
+    "role": "writer",
+    "visibility": "visible",
+    "dataset": {
+      "ownsTitle": "",
+      "appearanceApplication": "",
+      "ready": "true",
+      "mounted": "true",
+      "renderBackend": "auto",
+      "appearanceOwner": "application",
+      "appearanceTheme": "theme:graphshell_night",
+      "appearanceMode": "dark",
+      "appearanceSource": "derived",
+      "appearanceBackground": "rgb(4, 15, 22)",
+      "appearanceStatus": "Built-in appearance",
+      "writerBusy": "false",
+      "contextGeneration": "1",
+      "presentationSequence": "2",
+      "remoteState": "no link",
+      "selectedRenderBackend": "webgpu",
+      "computeAvailable": "true",
+      "presenter": "tree"
+    },
+    "events": [],
+    "errors": [],
+    "consoleErrors": [],
+    "semantic": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "0 of 0 shown",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "panel_first": {
+    "status": "Page text is off. Graphshell has not asked for access to the pages you load.",
+    "storage": "Browser storage: 0.0 MB used of 1100717 MB \u00b7 the browser may clear it under storage pressure",
+    "problem": "",
+    "enable": false,
+    "disable": true
+  },
+  "screenshots": [
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/01-control-off-by-default.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/02-goal-before-titles-only.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/03-control-on.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/04-pages-kept.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/05-unchanged-page-counted.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/06-goal-cites-page-bodies.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/07-long-page-cut-at-limit.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/08-cold-reopen-goal.png",
+    "/Users/markik/Code/testing/eidetic/keep_content_20261106/run10/09-cold-reopen-panel.png"
+  ],
+  "seeded": [
+    "Garden notes one",
+    "Garden notes two",
+    "Garden notes three"
+  ],
+  "goal_before_keeping": {
+    "summary": [
+      "0 of 3 sources read matched \"vermicast red wigglers seedlings\" (terms: red, seedlings, vermicast, wigglers). Every reachable retained source was read."
+    ],
+    "cited": [],
+    "passages": [
+      "Redo session",
+      "Shared Resource",
+      "Authored mix status",
+      "Authored grouping status",
+      "Authored schedule status",
+      "0 of 3 sources read matched \"vermicast red wigglers seedlings\" (terms: red, seedlings, vermicast, wigglers). Every reachable retained source was read.",
+      "Garden notes one \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 3 pending.Read version 5f51cb3ab8d9 (64 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Garden notes two \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 2 pending.Read version 0b50c3222e31 (64 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Garden notes three \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 1 pending.Read version 5456ed21795c (68 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Redo saved forme change"
+    ]
+  },
+  "panel_after_enable": {
+    "status": "Keeping page text \u00b7 0 kept \u00b7 0 waiting \u00b7 0 unchanged \u00b7 1 skipped (private window, excluded or not a web page)",
+    "storage": "Browser storage: 0.1 MB used of 1100629 MB \u00b7 the browser may clear it under storage pressure",
+    "problem": "",
+    "enable": true,
+    "disable": false
+  },
+  "writer_after_enable": {
+    "url": "chrome-extension://oajkkocppbpbmfblepgbiidagliniofd/graph.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "title": "GRAPHSHELL H3 READY \u00b7 Graphshell",
+    "role": "writer",
+    "visibility": "visible",
+    "dataset": {
+      "ownsTitle": "",
+      "appearanceApplication": "",
+      "ready": "true",
+      "mounted": "true",
+      "renderBackend": "auto",
+      "captureAccepted": "0",
+      "captureDropped": "0",
+      "captureBuffered": "0",
+      "keepKept": "0",
+      "keepUnchanged": "0",
+      "keepRefused": "0",
+      "keepError": "",
+      "appearanceOwner": "application",
+      "appearanceTheme": "theme:graphshell_night",
+      "appearanceMode": "dark",
+      "appearanceSource": "derived",
+      "appearanceBackground": "rgb(4, 15, 22)",
+      "appearanceStatus": "Built-in appearance",
+      "writerBusy": "false",
+      "contextGeneration": "1",
+      "presentationSequence": "2",
+      "remoteState": "no link",
+      "selectedRenderBackend": "webgpu",
+      "computeAvailable": "true",
+      "presenter": "tree"
+    },
+    "events": [],
+    "errors": [],
+    "consoleErrors": [],
+    "semantic": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "3 of 3 shown",
+                          "children": [
+                            {
+                              "role": "group",
+                              "label": "Garden notes one",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Garden notes two",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Garden notes three",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "panel_after_loads": "Keeping page text \u00b7 3 kept \u00b7 0 waiting \u00b7 0 unchanged \u00b7 3 skipped (private window, excluded or not a web page)",
+  "panel_after_loads_detail": {
+    "status": "Keeping page text \u00b7 3 kept \u00b7 0 waiting \u00b7 0 unchanged \u00b7 3 skipped (private window, excluded or not a web page)",
+    "storage": "Browser storage: 0.1 MB used of 1100594 MB \u00b7 the browser may clear it under storage pressure",
+    "problem": "",
+    "enable": true,
+    "disable": false
+  },
+  "panel_after_reload": {
+    "status": "Keeping page text \u00b7 3 kept \u00b7 0 waiting \u00b7 1 unchanged \u00b7 3 skipped (private window, excluded or not a web page)",
+    "storage": "Browser storage: 0.1 MB used of 1100544 MB \u00b7 the browser may clear it under storage pressure",
+    "problem": "",
+    "enable": true,
+    "disable": false
+  },
+  "idb_key_prefixes": {
+    "page-text/": 3,
+    "resource-capture/": 3,
+    "blob/": 3
+  },
+  "goal_after_keeping": {
+    "summary": [
+      "1 of 3 sources read matched \"vermicast red wigglers seedlings\" (terms: red, seedlings, vermicast, wigglers). Every reachable retained source was read."
+    ],
+    "cited": [
+      "Garden notes onehttp://127.0.0.1:55645/notes/1 \u00b7 version fb8c0937be5f \u00b7 matchMatched red, seedlings, vermicast, wigglers \u00b7 missing none \u00b7 coverage 100%\u2026Garden notes Vermicast is worm castings. A damp, warm bin lets red wig\u2026\u2026rmicast is worm castings. A damp, warm bin lets red wigglers turn kitchen scraps into vermicast wit\u2026\u2026ast is worm castings. A damp, warm bin lets red wigglers turn kitchen scraps into vermicast within weeks\u2026\u2026 within weeks, and the finished vermicast feeds seedlings without burning them. Compost notes continue wi\u20262 more passages not shown."
+    ],
+    "passages": [
+      "Authored mix status",
+      "Authored grouping status",
+      "Authored schedule status",
+      "1 of 3 sources read matched \"vermicast red wigglers seedlings\" (terms: red, seedlings, vermicast, wigglers). Every reachable retained source was read.",
+      "Garden notes one \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 3 pending.Read version fb8c0937be5f (1081 bytes): match; matched red, seedlings, vermicast, wigglers, missing none.",
+      "Garden notes two \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 2 pending.Read version f816bf0c6fc4 (1032 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Garden notes three \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 1 pending.Read version baca42d05641 (32786 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Redo saved forme change"
+    ]
+  },
+  "goal_excluded_origin": {
+    "summary": [
+      "0 of 3 sources read matched \"tanglefoot excluded origin\" (terms: excluded, origin, tanglefoot). Every reachable retained source was read."
+    ],
+    "cited": [],
+    "passages": [
+      "0 of 3 sources read matched \"tanglefoot excluded origin\" (terms: excluded, origin, tanglefoot). Every reachable retained source was read.",
+      "Garden notes one \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 3 pending.Read version fb8c0937be5f (1081 bytes): not a match; matched none, missing excluded, origin, tanglefoot.",
+      "Garden notes two \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 2 pending.Read version f816bf0c6fc4 (1032 bytes): not a match; matched none, missing excluded, origin, tanglefoot.",
+      "Garden notes three \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 1 pending.Read version baca42d05641 (32786 bytes): not a match; matched none, missing excluded, origin, tanglefoot."
+    ]
+  },
+  "goal_long_page_start": {
+    "summary": [
+      "1 of 3 sources read matched \"quillback\" (terms: quillback). Every reachable retained source was read."
+    ],
+    "cited": [
+      "Garden notes threehttp://127.0.0.1:55645/notes/3 \u00b7 version baca42d05641 \u00b7 matchMatched quillback \u00b7 missing none \u00b7 coverage 100%\u2026Long QUILLBACK begins this long page. Compost notes continue w\u2026"
+    ],
+    "passages": [
+      "1 of 3 sources read matched \"quillback\" (terms: quillback). Every reachable retained source was read.",
+      "Garden notes one \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 3 pending.Read version fb8c0937be5f (1081 bytes): not a match; matched none, missing quillback.",
+      "Garden notes two \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 2 pending.Read version f816bf0c6fc4 (1032 bytes): not a match; matched none, missing quillback.",
+      "Garden notes three \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 1 pending.Read version baca42d05641 (32786 bytes): match; matched quillback, missing none."
+    ]
+  },
+  "goal_long_page_end_cut": {
+    "summary": [
+      "0 of 3 sources read matched \"zzfinalmarker\" (terms: zzfinalmarker). Every reachable retained source was read."
+    ],
+    "cited": [],
+    "passages": [
+      "0 of 3 sources read matched \"zzfinalmarker\" (terms: zzfinalmarker). Every reachable retained source was read.",
+      "Garden notes one \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 3 pending.Read version fb8c0937be5f (1081 bytes): not a match; matched none, missing zzfinalmarker.",
+      "Garden notes two \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 2 pending.Read version f816bf0c6fc4 (1032 bytes): not a match; matched none, missing zzfinalmarker.",
+      "Garden notes three \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 1 pending.Read version baca42d05641 (32786 bytes): not a match; matched none, missing zzfinalmarker."
+    ]
+  },
+  "server_requests": [
+    "/notes/1",
+    "/favicon.ico",
+    "/notes/2",
+    "/notes/3",
+    "/secret",
+    "/favicon.ico",
+    "/notes/raw.txt",
+    "/notes/1"
+  ],
+  "reopen_writer": {
+    "url": "chrome-extension://oajkkocppbpbmfblepgbiidagliniofd/graph.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "title": "GRAPHSHELL H3 READY \u00b7 Graphshell",
+    "role": "writer",
+    "visibility": "visible",
+    "dataset": {
+      "ownsTitle": "",
+      "appearanceApplication": "",
+      "ready": "true",
+      "mounted": "true",
+      "renderBackend": "auto",
+      "captureAccepted": "0",
+      "captureDropped": "0",
+      "captureBuffered": "0",
+      "keepKept": "0",
+      "keepUnchanged": "0",
+      "keepRefused": "0",
+      "keepError": "",
+      "appearanceOwner": "application",
+      "appearanceTheme": "theme:graphshell_night",
+      "appearanceMode": "dark",
+      "appearanceSource": "derived",
+      "appearanceBackground": "rgb(4, 15, 22)",
+      "appearanceStatus": "Built-in appearance",
+      "writerBusy": "false",
+      "contextGeneration": "1",
+      "presentationSequence": "2",
+      "remoteState": "no link",
+      "selectedRenderBackend": "webgpu",
+      "computeAvailable": "true",
+      "presenter": "tree"
+    },
+    "events": [],
+    "errors": [],
+    "consoleErrors": [],
+    "semantic": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "3 of 3 shown",
+                          "children": [
+                            {
+                              "role": "group",
+                              "label": "Garden notes one",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Garden notes two",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Garden notes three",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "panel_after_reopen": {
+    "status": "Keeping page text \u00b7 3 kept \u00b7 0 waiting \u00b7 1 unchanged \u00b7 3 skipped (private window, excluded or not a web page)",
+    "storage": "Browser storage: 0.0 MB used of 1100507 MB \u00b7 the browser may clear it under storage pressure",
+    "problem": "",
+    "enable": true,
+    "disable": false
+  },
+  "goal_after_cold_reopen": {
+    "summary": [
+      "1 of 3 sources read matched \"vermicast red wigglers seedlings\" (terms: red, seedlings, vermicast, wigglers). Every reachable retained source was read."
+    ],
+    "cited": [
+      "Garden notes onehttp://127.0.0.1:55645/notes/1 \u00b7 version fb8c0937be5f \u00b7 matchMatched red, seedlings, vermicast, wigglers \u00b7 missing none \u00b7 coverage 100%\u2026Garden notes Vermicast is worm castings. A damp, warm bin lets red wig\u2026\u2026rmicast is worm castings. A damp, warm bin lets red wigglers turn kitchen scraps into vermicast wit\u2026\u2026ast is worm castings. A damp, warm bin lets red wigglers turn kitchen scraps into vermicast within weeks\u2026\u2026 within weeks, and the finished vermicast feeds seedlings without burning them. Compost notes continue wi\u20262 more passages not shown."
+    ],
+    "passages": [
+      "Authored mix status",
+      "Authored grouping status",
+      "Authored schedule status",
+      "1 of 3 sources read matched \"vermicast red wigglers seedlings\" (terms: red, seedlings, vermicast, wigglers). Every reachable retained source was read.",
+      "Garden notes one \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 3 pending.Read version fb8c0937be5f (1081 bytes): match; matched red, seedlings, vermicast, wigglers, missing none.",
+      "Garden notes two \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 2 pending.Read version f816bf0c6fc4 (1032 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Garden notes three \u00b7 depth 0Chosen: No pending label shared a goal term; took the oldest of 1 pending.Read version baca42d05641 (32786 bytes): not a match; matched none, missing red, seedlings, vermicast, wigglers.",
+      "Redo saved forme change"
+    ]
+  },
+  "requests_after_everything": [
+    "/notes/1",
+    "/favicon.ico",
+    "/notes/2",
+    "/notes/3",
+    "/secret",
+    "/favicon.ico",
+    "/notes/raw.txt",
+    "/notes/1"
+  ]
+}

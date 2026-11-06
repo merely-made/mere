@@ -741,6 +741,31 @@ an API being documented is not a passing receiving test.
     the commit, and reopened the saved object in a fresh process. See the
     application experience receipts.
 
+- 2026-11-06, B1/P5 keep page text (Graphshell extension; Chrome, not
+  qualified for Firefox):
+  - An optional **Page text** control, off by default and separate from live
+    remembering. Enabling requests optional `scripting` and `<all_urls>`
+    access; refusal leaves it off, removal later turns it off and drops queued
+    text. On a tab finishing load, the worker injects an extractor with
+    `scripting.executeScript` (visible `main`/`article`/body text; no content
+    scripts, no fetches), bounds it in UTF-8 bytes (32/128/256 KiB), skips
+    private windows, unaccepted schemes and the history panel's excluded
+    origins, and queues it beside the visits. The writer view hands a delivery
+    to the app, which records each page with `eidetic::PageTextStore` (version
+    is the BLAKE3 of the text; `kept_text.rs`) and only then acknowledges it.
+    Store failures stay queued and show in the panel with kept, unchanged,
+    waiting, failed, omitted, cut and skipped counts and browser storage state.
+    Forgetting an address forgets its kept text.
+  - Checked: graphshell lib tests (325 with `web,goal-surface`, seven new:
+    record layout, idempotence per version, size and policy bounds, full-store
+    error and retry, forget, and a goal that only the kept body matches citing
+    its passage); `smoke-keep-text.mjs` (queue, drain, ack, failure, bounds,
+    permission removal, extractor) and the existing smokes; the Wasm build; a
+    headed Chrome 156 run with a local server and a cold reopen, receipt
+    `ports/graphshell/docs/receipts/keep_content_20261106/`.
+  - Open: the native access prompt was not driven (the run pre-granted it in the
+    manifest); Firefox; real data; the drain waits for a visible writer tab.
+
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
 when the first run is recorded, with workspace artifacts under `Code/output`.
