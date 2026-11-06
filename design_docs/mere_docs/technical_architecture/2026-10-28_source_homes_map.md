@@ -236,8 +236,8 @@ candidate table above.
    Remove both misleading Distillery donor directories after blob comparison.
 
 2. **Move the Dramatis application, not the widget family.** `ports/dramatis`
-   is a packaged app: five source files, 766 lines in the current tree (the old
-   1,464-line estimate is stale). Receive it as a separate application root in
+   is a packaged app of 1,464 lines: five `src` files (766), three test files
+   (650) and `build.rs` (48). Receive it as a separate application root in
    Dramatis, with its packaging scripts, icons, paths and custody/profile tests.
    Core identity packages remain GUI-independent. Persona Picker stays Cambium:
    Woodshed also consumes it. Done when standalone app/packaging checks and
