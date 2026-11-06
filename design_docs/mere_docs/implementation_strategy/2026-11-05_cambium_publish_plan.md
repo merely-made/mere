@@ -1,7 +1,8 @@
 # Cambium publish plan
 
-**Status:** 2026-11-05: in progress. P0 landed in Mere and Woodshed's root workspace; P1's
-accesskit removal landed in Mere. Nothing is published yet.
+**Status:** 2026-11-06: in progress. P0 landed in Mere and every consumer (Woodshed and its
+Hocket/Redshank ports, Knot, Cleromancy, Isocosm, Turnstone, Signalman); P1's accesskit removal
+landed. Nothing is published yet.
 
 **For:** publishing the Cambium desktop chain to crates.io so that applications outside Mere,
 first the Dramatis application (source homes map, ownership cut 1), depend on registry
@@ -112,6 +113,12 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
   `dramatis` and `personae` are published.
 
 ## Progress
+
+- 2026-11-06: P0 done. The rename reached every consumer in the same round that restored the
+  family source convention (family brief, "Family source convention", upheld 2026-11-06):
+  Woodshed 17ff090d, Knot 40ac979, Cleromancy 4df159b, Turnstone 5be7608c, Murm/Signalman
+  1aebf9c1542, Isocosm 26306b02. Each also dropped its accesskit-from-Mere patch row. The
+  `mesquite.commands/v1` wire id and Isocosm's `mesquite_byte_scope` receipt key stay.
 
 - 2026-11-05: closure mapped; blockers examined; D1 to D6; P0 rename landed in Mere.
 - 2026-11-05: accesskit remap (`cambium-winit-a11y/src/remap.rs`) replaces the patch: 28
