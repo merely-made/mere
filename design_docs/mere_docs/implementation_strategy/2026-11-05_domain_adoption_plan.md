@@ -349,4 +349,8 @@ its data reaches a second device.
 - 2026-11-05: plan opened. D3 to D6 recorded the same day; D7, D8, M0 and O8
   added after Mark asked whether the contract was ready.
 - 2026-11-06: M0's contract drafted. Mark ruled O8 (one kind of store) and
-  contract C1 (Cleromancy's meres start fresh).
+  contract C1 to C5: Cleromancy's meres start fresh; sessions are lines in
+  one log; full checks where an edit is made and again where it is
+  received; out-of-order operations wait; the contract interface lives in
+  Stickleback and the graph fold in pandect. M0 now waits only on checking
+  Cleromancy against it.
