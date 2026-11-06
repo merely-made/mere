@@ -218,7 +218,7 @@ pub use reservoir::{open_mere_archive_backend, open_mere_backend, open_reservoir
 pub use retained_text::{
     DEFAULT_KEPT_BYTES, KEEP_SETTING_SCHEMA, KEEP_SETTING_SLOT, KeepPageText, Keeping,
     MAX_KEPT_BYTES, PlainCustody, RETAINED_DB_FILENAME, RetainedCustody, RetainedText,
-    retained_path,
+    SealedValues, SharedSealer, retained_path,
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use retained_text::open_mere_retained_backend;
