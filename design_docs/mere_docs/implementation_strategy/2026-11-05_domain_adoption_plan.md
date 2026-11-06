@@ -150,7 +150,7 @@ A domain is a kind of data, not an application (reservoir ruling of
 
 ## Mere's shared work (proposed)
 
-### M0. Write the domain contract (D8)
+### M0. Write the domain contract (D8): done 2026-11-06
 
 Today the contract is implicit. A mere is one pandect graph
 (`pandect::reservoir::MereRecord` has no store kind), and a domain adds a
@@ -352,5 +352,10 @@ its data reaches a second device.
   contract C1 to C5: Cleromancy's meres start fresh; sessions are lines in
   one log; full checks where an edit is made and again where it is
   received; out-of-order operations wait; the contract interface lives in
-  Stickleback and the graph fold in pandect. M0 now waits only on checking
-  Cleromancy against it.
+  Stickleback and the graph fold in pandect.
+- 2026-11-06: M0 done. Cleromancy checked against the contract: it conforms
+  through the route, with Mere-side changes for session, codicil and view
+  operations and one Cleromancy-side move (appearance to person settings).
+  Mark ruled C6 to C8: receiver checks read only the log; arrangements
+  follow and attention stays; a codicil is a snapshot blob plus an
+  operation.

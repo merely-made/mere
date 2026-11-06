@@ -1,7 +1,8 @@
 # Domain contract: what a domain supplies and what a client may do
 
-**Status:** 2026-11-06: draft; nothing implemented. Mark ruled one kind of
-store (O8) and C1 to C5 on 2026-11-06. Written for M0 of
+**Status:** 2026-11-06: complete as a contract; nothing implemented. Mark
+ruled one kind of store (O8) and C1 to C8 on 2026-11-06, and Cleromancy is
+checked against it. Written for M0 of
 [the domain adoption plan](../implementation_strategy/2026-11-05_domain_adoption_plan.md),
 which made every application's authored store a reservoir mere (D8).
 
@@ -110,10 +111,55 @@ Cleromancy's path is the precedent
 
 ## Cleromancy against the contract
 
-Its grammar today is graph edits, its fold is graph replay, and its policy is
-`validate_divination_graph`; those carry over. What changes is beneath it:
-its mere's linear journal becomes a causal log. Mark chose a fresh start
-(C1): the new meres begin empty and the old stores stay on disk untouched.
+Checked on 2026-11-06 against Cleromancy `813a0de` and Mere `c8f3131d`.
+Mark chose a fresh start for its meres (C1): the new meres begin empty and
+the old stores stay on disk untouched.
+
+**Conforms as it is:**
+- **Route only.** Production code reaches its meres only through
+  `ReservoirAttachment::open_application` (`src/ui/worker.rs`) and
+  `PersonalFactsClient`. `DirectoryBackend`, `ReservoirStore`,
+  `GraphSession` and `MereSessions` appear only in
+  `tests/granted_ambient.rs`. The `legacy-receipts` feature still writes a
+  muniment slot (`cleromancy/mere-host/v1`); it is off in the resident path
+  and stays off.
+- **Grammar.** Edits are `CapturedDelta`s recorded on a candidate graph
+  (`CleromancyHost::record_edits`, `src/host/operations.rs`) and sent as
+  `ApplyEditsV1::checked`: add node, set title, insert tag, set facet, touch
+  last visited, assert relation. These become operations in the graph
+  grammar (C5) with no product change.
+- **Policy.** `validate_divination_graph` (`src/host/domain.rs`) and
+  `personal_facts::validate` take only the graph, do no I/O, and read no
+  sequence number or clock. Both carry over as admission policies under C3.
+- **Stale edits.** A refused revision surfaces as "The sessions changed;
+  read them again." with no retry (`mere_overmap::route::declined`). Under
+  C2 edits from other devices no longer conflict this way; the refusal
+  remains for two clients on one device, and the behaviour is right.
+- **Unavailable.** `WorkerUpdate::Unavailable` clears the graph, sessions
+  and selection and shows the message (`src/ui/native/worker_update.rs`).
+  Nothing keeps a private copy of authored data.
+- **Device-local state.** Sync consent (`sync-settings.json`) is already
+  local and says so; it belongs in the device-local store.
+- **No blobs.** Cleromancy stores JSON facets only, so M5 does not block it.
+
+**Changes, all on Mere's side unless marked:**
+- **Session intents become operations (C2).** Cleromancy mints, attaches,
+  forks, branches, merges, trashes and restores sessions through
+  `mere_overmap::route`. Each except attach becomes an operation in the log;
+  attach stays a per-connection choice of line. The route keeps its wire
+  vocabulary, so Cleromancy does not change.
+- **Codicils.** Cleromancy saves, opens and composes codicils (frozen,
+  content-addressed graphs) through `archive_intent`. See C8.
+- **View state.** Cleromancy keeps its reading workspace's selection, focus
+  and layout in the mere through `SET_VIEW_INTENT` (view key
+  `reading-workspace`). See C7.
+- **The personal-facts admission check** asks the resident whether a
+  profile exists (`validate_new_profile_subjects` with a lookup,
+  `resident_mere.rs`). A receiving device may answer differently. See C6.
+- **Appearance (Cleromancy's side).** `appearance.json` sits in
+  Cleromancy's data root. Under D7 the theme choice follows the person, so
+  it moves to the person's settings; the theme library `themes.json` has the
+  same open question as Woodshed's.
 
 ## Rulings
 
@@ -152,9 +198,27 @@ its mere's linear journal becomes a causal log. Mark chose a fresh start
   pandect, where Mere's graph authority stays (resident split plan). The
   reservoir and the resident compose domains as they do now. M1's registry
   holds Stickleback domain implementations.
+- **C6. Checks every device repeats read only the log (Mark, 2026-11-06).**
+  A policy run on receivers (C3) is deterministic over the mere's log, so
+  every device reaches the same verdict. A check that needs authority from
+  outside the log, such as whether a profile exists in the persona's vault,
+  runs only where the operation is authored, and the writer's signature
+  vouches for it. Personal-facts' `validate_new_profile_subjects` lookup
+  becomes an author-side check; `personal_facts::validate` stays the
+  receiver policy.
+- **C7. Arrangements follow; attention stays (Mark, 2026-11-06).** View
+  state a person deliberately sets up (layouts, saved arrangements)
+  replicates as operations. Selection, focus and camera position stay in
+  the device-local store, keeping the rule that the attention axis is never
+  synced. Cleromancy's `reading-workspace` view splits along that line.
+- **C8. A codicil is a snapshot blob and an operation (Mark, 2026-11-06).**
+  Saving a codicil writes the frozen graph as a content-addressed blob (M5)
+  and records an operation in the log that references it, so it replicates
+  like any other blob. Opening one starts a new session line from it (C2);
+  composing is a merge.
 
 ## Done when
 
 This document names what a domain supplies and what a client may do,
 and Cleromancy is checked against it with any changes recorded. O8 and C1
-to C5 are ruled; what remains is the Cleromancy check.
+to C8 are ruled, and Cleromancy is checked. M0 is done.
