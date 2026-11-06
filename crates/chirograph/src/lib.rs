@@ -523,6 +523,15 @@ pub use text_payloads::{
     KnotClipSelectorV1, KnotEffectV1, NativeGlyphV1, SaveTextV1, TextEncoding,
 };
 
+#[path = "retained.rs"]
+mod retained;
+
+pub use retained::{
+    RETAINED_PAGES_CEILING, RETAINED_PAGES_DEFAULT, RetainedKeeping, RetainedLinkWire,
+    RetainedPageWire, RetainedPagesLimits, RetainedPagesRequest, RetainedPagesResponse,
+    RetainedTruncation, RetainedUnretainedWire, RetainedVersionWire,
+};
+
 #[path = "carrier.rs"]
 mod carrier;
 

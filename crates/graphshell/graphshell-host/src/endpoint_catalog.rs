@@ -18,7 +18,7 @@ use std::fmt::Display;
 use chirograph::{
     CarrierNotice, EndpointDescriptor, IntentInvocation, IntentResult, ProjectionRequest,
     ProjectionSnapshot, ResourceChunkRequest, ResourceChunkResponse, ResourceRequest,
-    ResourceResponse, ResumeReply, ResumeRequest,
+    ResourceResponse, ResumeReply, ResumeRequest, RetainedPagesRequest, RetainedPagesResponse,
 };
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
@@ -70,6 +70,15 @@ pub trait ResidentEndpoint: Send {
     }
 
     fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, String>;
+
+    /// The page text this endpoint has retained for the session the client
+    /// holds. Defaulted: most endpoints keep none.
+    fn retained_pages(
+        &mut self,
+        _request: RetainedPagesRequest,
+    ) -> Result<RetainedPagesResponse, String> {
+        Err("this endpoint retains no page text".to_string())
+    }
 
     /// A product that does not emit revision bells remains a valid resident
     /// endpoint. A notifying registration overrides this through the typed
@@ -363,6 +372,13 @@ impl PresentationSource for ResidentEndpointSession {
     ) -> Result<ResourceChunkResponse, Self::Error> {
         self.endpoint.resource_chunk(request)
     }
+
+    fn retained_pages(
+        &mut self,
+        request: RetainedPagesRequest,
+    ) -> Result<Option<RetainedPagesResponse>, Self::Error> {
+        self.endpoint.retained_pages(request).map(Some)
+    }
 }
 
 impl IntentSink for ResidentEndpointSession {
@@ -490,6 +506,16 @@ where
         self.endpoint
             .invoke(intent)
             .map_err(|error| error.to_string())
+    }
+
+    fn retained_pages(
+        &mut self,
+        request: RetainedPagesRequest,
+    ) -> Result<RetainedPagesResponse, String> {
+        self.endpoint
+            .retained_pages(request)
+            .map_err(|error| error.to_string())?
+            .ok_or_else(|| "this endpoint retains no page text".to_string())
     }
 
     fn poll_notice(&mut self) -> Result<Option<CarrierNotice>, String> {

@@ -38,7 +38,7 @@ mod projection_contract {
         CarrierResponseBody, EndpointDescriptor, IntentInvocation, IntentResult,
         LiveViewReferenceV1, ProjectionRequest, ProjectionSnapshot, ResourceChunkRequest,
         ResourceChunkResponse, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
-        SessionOpen,
+        RetainedPagesRequest, RetainedPagesResponse, SessionOpen,
     };
 
     /// Everything a carrier needs from an endpoint to serve the common verbs.
@@ -101,6 +101,19 @@ mod projection_contract {
                 request.offset,
                 request.length,
             ))
+        }
+
+        /// The page text this endpoint has retained for the graph session the
+        /// client holds: bounded, read-only, with its omissions counted.
+        ///
+        /// Defaulted to `Ok(None)`, "this endpoint keeps no page text", so the
+        /// verb is additive: only a mere that owns a retained store answers it,
+        /// and `dispatch_common` reports `None` as a refusal.
+        fn retained_pages(
+            &mut self,
+            _request: RetainedPagesRequest,
+        ) -> Result<Option<RetainedPagesResponse>, Self::Error> {
+            Ok(None)
         }
     }
 
@@ -170,6 +183,11 @@ mod projection_contract {
                 .resource_chunk(request)
                 .map(|chunk| CarrierResponseBody::ResourceChunk(Box::new(chunk)))
                 .map_err(|error| error.to_string()),
+            CarrierRequestBody::RetainedPages(request) => endpoint
+                .retained_pages(request)
+                .map_err(|error| error.to_string())
+                .and_then(|pages| pages.ok_or_else(|| "this endpoint retains no page text".into()))
+                .map(|pages| CarrierResponseBody::RetainedPages(Box::new(pages))),
             CarrierRequestBody::Resume(request) => {
                 resume(endpoint, request).map(CarrierResponseBody::Resume)
             },

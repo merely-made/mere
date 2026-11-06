@@ -204,6 +204,12 @@ impl<C: SessionCalls> Carrier for WitCarrier<C> {
                 self.call(|c, s| c.suspend(s))?;
                 A::Suspended
             },
+            // The WIT interface has no page-text call; the door carries it.
+            Q::RetainedPages(_) => {
+                return Err(CarrierError::Refused(
+                    "this carrier has no retained page text read".into(),
+                ));
+            },
             Q::Close => {
                 let session = self
                     .session

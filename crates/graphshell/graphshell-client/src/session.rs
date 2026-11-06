@@ -399,6 +399,7 @@ pub fn unexpected(expected: &str, actual: &CarrierResponseBody) -> String {
             CarrierResponseBody::Resume(_) => "a resume reply",
             CarrierResponseBody::Intent(_) => "an intent result",
             CarrierResponseBody::Opened(_) => "an opened session",
+            CarrierResponseBody::RetainedPages(_) => "retained pages",
             CarrierResponseBody::Closed => "a session close",
             CarrierResponseBody::Suspended => "a session suspend",
         }

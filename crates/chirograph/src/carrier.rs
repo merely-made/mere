@@ -86,6 +86,10 @@ pub enum CarrierRequestBody {
     Close,
     /// Going away, but keep the session resumable.
     Suspend,
+    /// A bounded, read-only read of the page text the mere has retained, for
+    /// the graph session the client holds. Appended last: older peers never
+    /// send it, and an endpoint that keeps no page text refuses it.
+    RetainedPages(RetainedPagesRequest),
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -105,6 +109,7 @@ pub enum CarrierResponseBody {
     Opened(Box<SessionOpened>),
     Closed,
     Suspended,
+    RetainedPages(Box<RetainedPagesResponse>),
 }
 
 /// A failure reported by an endpoint without exposing its native error type.
