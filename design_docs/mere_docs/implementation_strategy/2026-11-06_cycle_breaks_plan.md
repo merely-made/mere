@@ -219,6 +219,30 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   Links: area stack · draws on stack.3 · plans cycle_breaks P0 · summary Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository.
 
+- **D7. Extract the contract leaves first (Mark, 2026-11-06):** "D: hybrid, leaves first", on
+  `../research/2026-11-06_host_guest_contract_brief.md`. The clean contract crates move to a
+  bottom layer now; the full host/guest split is decided later. Unpauses D4/P6 once the leaves are
+  out. Outcome: new.
+
+  Links: area stack · draws on cycle_breaks D4 · plans cycle_breaks P6 · summary The host/guest contract's leaf crates are extracted to a bottom layer first; the full split waits.
+
+- **D8. The bottom layer is the revived Graphshell repository, named for the protocol (Mark,
+  2026-11-06):** "we can use it as the bottom layer. unarchive, hard cut, i'm ok with that" and
+  "graphshell = the protocol". `mark-ik/graphshell` was unarchived and transferred to
+  `merely-made/graphshell`; it is cut over to hold only the contract, with no transitional copy
+  left in Mere. The Graphshell reference host (`ports/graphshell`, `graphshell-mere`,
+  `graphshell-host`) stays above Mere. Outcome: new.
+
+  Links: area stack · draws on cycle_breaks D7 · plans cycle_breaks P6 · summary The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere.
+
+- **D9. Contract plus host-role kit (Mark, 2026-11-06):** "Contract + kit". The bottom layer holds
+  `chirograph`, one WIT world with `script/wire` and `witgen`, `sceno`, `scenotime`, `hest` (and
+  `mere-curation` if guests need it), plus `graphshell-endpoint`'s default surface and
+  `graphshell-client`; the endpoint's `door`, `profile` and projection-provider features, and
+  `scenomise`, stay in Mere. Outcome: new.
+
+  Links: area stack · draws on cycle_breaks D8 · plans cycle_breaks P6 · summary The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features.
+
 ## Findings
 
 Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other repositories'
