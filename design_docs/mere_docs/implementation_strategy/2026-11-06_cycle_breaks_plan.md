@@ -2,7 +2,8 @@
 
 **Status:** 2026-11-06: plan. Nothing has moved. D1 to D5 settle the break for each open
 family dependency cycle; the Genet/Murm cycle needs no break (Findings). Two forks remain
-open (F1, F2).
+open (F1, F2). D6 (dev edges count) added the same day. D4 and P6 are paused pending the
+[host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); D1, D2, D3 and D5 proceed.
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -126,6 +127,8 @@ Murm still reaches Gemot through another edge, the check names it and the phase 
 
 ### P6. D4 mere-comms moves into Murm
 
+**Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md).** Do not start; the brief may change where F1's scene crates live.
+
 Done when `crates/shell/comms` (package `mere-comms`, lib `comms`; `serde`, `async-trait`,
 optional `murm` and `misfin`, dev `identity`, `transport`) lives in Murm; Mere's `ports/moot`
 and `ports/graphshell` (`comms` feature) consume it from `murm.git`; Murm's `signalman` takes
@@ -156,11 +159,14 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   chain from `mere.git`. D4 moves only `mere-comms`. Whether the scene crates become
   upstream of Murm (published, per the Cambium publish plan), the feature moves out, or the
   desktop's separate root is the accepted answer for the optional feature too, is not ruled.
+  The [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) offers a rule (scene vocabulary below Murm) and leaves
+  `scenomise::backdrops` open.
 - **F2. Gemot's dev edge into Distillery.** `distillery` takes `gemot`, `mien` and `mooting`
   as dev-dependencies, and `gemot` takes `eidetic-search` optionally. After P4 the loop
   Gemot, Eidetic, ESP, Eidetic is gone; whether a Gemot to Distillery dev edge is a cycle the
   check should refuse is a decision for the check's rule (dev edges), put to Mark when P0
-  runs.
+  runs. The rule is ruled by D6; the Gemot to Distillery edge itself is still to be judged
+  under it.
 
 ## Decisions
 
@@ -196,6 +202,8 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   belong to Murm and Errand, now with the whole crate moving. F1 records that this alone
   does not clear Signalman's scene crates.
 
+  **Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md).**
+
   Links: area stack · draws on resident-split S6, stack.3 · plans cycle_breaks P6 · summary mere-comms moves into Murm so signalman's comms feature no longer names Mere.
 
 - **D5. Mere↔Woodshed: adapters go up (Mark, 2026-11-06):** "Mere↔Woodshed: adapters up".
@@ -204,6 +212,12 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   adapters as "adapters for other owners".
 
   Links: area stack · draws on stack.3 · plans cycle_breaks P7 · summary Woodshed's block-editing adapters move out of Graphshell into Woodshed behind its features; Mere no longer names Woodshed.
+
+- **D6. Dev-only edges count (Mark, 2026-11-06):** "Count them". Dev-dependency edges are cycles in
+  the family check: tests use fixtures, or live in the higher repository. Settles F2's check rule
+  and the dev-only fixture in P0's tests (a dev-only cycle fails). Outcome: new.
+
+  Links: area stack · draws on stack.3 · plans cycle_breaks P0 · summary Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository.
 
 ## Findings
 
@@ -298,3 +312,4 @@ Illustrative design, not compile-ready code.
 ## Progress
 
 - 2026-11-06: plan written from the cycle map; D1 to D5 recorded; nothing implemented.
+- 2026-11-06: D6 recorded; D4/P6 paused pending the host/guest contract brief; nothing implemented.
