@@ -25,6 +25,8 @@ relicensed, and nothing here receives a Merely copyright line.
 | `support/patches/cubek-reduce` | MIT OR Apache-2.0 | [tracel-ai/cubecl](https://github.com/tracel-ai/cubecl) | `LICENSE-MIT`, `LICENSE-APACHE` in-tree |
 | `support/patches/burn-cubecl` | MIT OR Apache-2.0 | [tracel-ai/burn](https://github.com/tracel-ai/burn) | upstream's |
 | `support/patches/burn-remote` | MIT OR Apache-2.0 | [tracel-ai/burn](https://github.com/tracel-ai/burn) | upstream's |
+| `support/patches/accesskit` | MIT OR Apache-2.0 | [AccessKit/accesskit](https://github.com/AccessKit/accesskit), 0.25.1 with local traversal changes | `LICENSE-MIT`, `LICENSE-APACHE`, and the upstream notices in `src/` |
+| `support/patches/light-file-dialog` | Zlib | [wengchengjian/light-file-dialog](https://github.com/wengchengjian/light-file-dialog), 3.21.3 with local dialog fixes | License and attribution in `README.md` and `Cargo.toml`, exact import and patch provenance in `UPSTREAM.json` |
 | `ports/pelt/examples/resources` | MPL-2.0 | [servo/servo](https://github.com/servo/servo) (`resources/`), by way of genet | Servo's |
 | `crates/conatus/conatus/src/resident/binning` | Apache-2.0 | [dimforge/nexus](https://github.com/dimforge/nexus) at `1cfbd76`, by Sébastien Crozet / Dimforge | `LICENSE-APACHE` in-tree; port and change notice in `mod.rs` |
 | `crates/canvas/pictograph/src/canvas/tests/data/arxiv_topics.tsv` | CC0-1.0 (arXiv metadata) | [arXiv API](https://export.arxiv.org/api/query), terms at <https://info.arxiv.org/help/api/tou.html> | `arxiv_topics.provenance.json` beside it: the twelve requests, the licence quote, the window, the selection |
@@ -62,7 +64,8 @@ provenance note record where the bytes came from (SHA-256 `942a7716…`).
 
 ## Frozen evidence
 
-Mark's own sources whose bytes a recorded receipt pins by SHA-256. They are
+Mark's own sources whose bytes a recorded receipt pins by SHA-256 or a golden
+test compares exactly. They are
 MPL-2.0 like everything else he wrote, but a per-file header would change the
 bytes and break the receipt, so they carry none. Exhibit A allows the notice
 to sit where a recipient would look for it when a per-file notice is not
@@ -73,8 +76,22 @@ The tool skips them, as it skips Retained licenses.
 |---|---|---|
 | `Code/testing/mere/design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` | `artifact-sha256.json` at its root and in `custody-backend/`, and the arena's run JSONs; its `.gitattributes` keeps the bytes so the digests survive checkout | 2026-10-06, ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md) |
 | `Code/testing/mere/design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/original-control/tabard-patchless-atlas-repro.rs` | `tabard-patchless-atlas-repro-build.json` beside it; `source_sha256` matches the separately retained canonical Git-byte copy, while the Windows checkout form is also preserved | Existing frozen-source rule, 2026-10-06 ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md); recorded 2026-10-10 |
+| `design_docs/mere_docs/receipts/natal-cap-20261017/narrow-lock-cache.py` | `mere-preservation-before.json` in the adjacent `shared_resident_materialization_20261018` packet | S79, recorded 2026-11-05 |
+| `design_docs/mere_docs/receipts/shared_resident_materialization_20261018/verify.py` | `artifact-hashes.json` beside it | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_20261020` | `artifact-sha256.json`, including the prior cohort | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_graph_view_20261020` | `artifact-sha256.json`, including the prior cohort | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_mac_thinkpad_20261020` | `artifact-sha256.json` | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_relay_20261020` | `artifact-sha256.json`, including the relay source | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_two_machines_20261020` | `artifact-sha256.json`, including the diagnostic scripts | S79, recorded 2026-11-05 |
+| `support/family-promotion/contextual-navigation-publication/macos-intel-chrome` | `file-manifest.json` and `continuation-manifest.json` | S79, recorded 2026-11-05 |
+| `support/receipts/domain-actions-live-20261020/run.py` | `artifact-sha256.json` and `accepted/qualification.json` | S79, recorded 2026-11-05 |
+| `support/receipts/dramatis-authentication-20261021/freeze.py` | `artifact-manifest.json` beside it | S79, recorded 2026-11-05 |
+| `support/receipts/dramatis-authentication-m4-20261022` | `manifest.json` | S79, recorded 2026-11-05 |
+| `support/receipts/resident-embedding-20261020/driver.py` | `qualification.json` beside it | S79, recorded 2026-11-05 |
+| `testing/receipts/tucket-custody/tucket-authority-clean.rs` | `clean_source_sha256` in `qualification.json` beside it | S79, recorded 2026-11-05 |
+| `crates/script/wire/tests/generated/conformance.rs` | `crates/script/witgen/tests/golden.rs` compares the line-ending-normalized file with generator output | Generated golden fixture, recorded 2026-11-05 |
 
-These two frozen packets moved unchanged from their former `design_docs/` homes
+The first two frozen packets moved unchanged from their former `design_docs/` homes
 on 2026-11-04. The locator at
 `Code/testing/mere/receipt-relocation-2026-11-04/batch-06-reader.md` records the
 old roots, both byte forms and existing sealed-manifest discrepancies. The
