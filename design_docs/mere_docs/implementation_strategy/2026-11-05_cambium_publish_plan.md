@@ -1,7 +1,7 @@
 # Cambium publish plan
 
-**Status:** 2026-11-05: plan, in progress. P0 (the `mesquite` → `mandrake` rename in Mere) is
-done; nothing is published yet.
+**Status:** 2026-11-05: in progress. P0 landed in Mere and Woodshed's root workspace; P1's
+accesskit removal landed in Mere. Nothing is published yet.
 
 **For:** publishing the Cambium desktop chain to crates.io so that applications outside Mere,
 first the Dramatis application (source homes map, ownership cut 1), depend on registry
@@ -44,7 +44,10 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
 `crates/cambium/mandrake`, package and lib `mandrake`. The receipt schema id
 `mesquite.commands/v1` is a wire name and stays.
 - Done when: every Mere consumer checks on all targets (native and wasm32), `mandrake`'s tests
-  pass, and Woodshed, Knot, Cleromancy and Isocosm take the new name with their Mere pin bump.
+  pass, and Woodshed (root and its `ports/` workspaces), Knot, Cleromancy, Isocosm, Turnstone and
+  Murm's `apps/signalman-desktop` take the new name with their Mere pin bump. Knot, Isocosm,
+  Cleromancy, Turnstone and Signalman also drop their `[patch.crates-io] accesskit` row, which
+  pointed at Mere's removed patch, at the bump that reaches the remap.
 
 ### P1. Remove the blockers
 - accesskit (D4): `cambium-a11y` remaps through accesskit's public `Node` API (8 vector and 7
@@ -111,3 +114,7 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
 ## Progress
 
 - 2026-11-05: closure mapped; blockers examined; D1 to D6; P0 rename landed in Mere.
+- 2026-11-05: accesskit remap (`cambium-winit-a11y/src/remap.rs`) replaces the patch: 28
+  `cambium-a11y` tests pass, including a fixture over all 16 NodeId properties and a canary that
+  reads AccessKit's own `Properties` schema; Mere and the standalone `native-id-consumer` probe
+  resolve registry accesskit. The probe's dependency also had a stale package name, fixed.

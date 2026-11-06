@@ -41,6 +41,7 @@ mod bootstrap;
 #[cfg(test)]
 mod namespace_tests;
 mod publication;
+mod remap;
 #[cfg(test)]
 mod publication_tests;
 mod synchronization;

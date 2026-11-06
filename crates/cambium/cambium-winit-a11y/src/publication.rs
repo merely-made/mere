@@ -105,7 +105,7 @@ impl NativeIds {
         };
         for (id, node) in &mut tree.nodes {
             *id = map(*id)?;
-            node.try_map_node_ids(map)?;
+            crate::remap::try_map_node_ids(node, &map)?;
         }
         tree.tree.as_mut().unwrap().root = map(root)?;
         tree.focus = map(tree.focus)?;

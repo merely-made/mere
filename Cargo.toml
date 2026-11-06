@@ -145,7 +145,6 @@ members = [
     "crates/cambium/tinct",
 ]
 exclude = [
-    "support/patches/accesskit",
     "support/patches/light-file-dialog",
     "crates/probes",
     # The unpublished browser host carries Git-only Genet presentation deps.
@@ -769,8 +768,6 @@ script-witgen = { path = "crates/script/witgen" }
 peer-facts = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 # Registry custody clients and Git-hosted Djinn share the same door types.
 ostiary = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
-# Schema-owned complete NodeId traversal for native publication namespaces.
-accesskit = { path = "support/patches/accesskit" }
 # Registry Webcue and native Genet sessions share one canonical input vocabulary.
 document-session-api = { git = "https://www.github.com/merely-made/genet.git", rev = "ceb5a9795a8f26ffe3c6fba25a55bfce3dd0a15d" }
 # Reuse the Windows password class across cancellation and sequential prompts.
