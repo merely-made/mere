@@ -70,6 +70,9 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use tokio::sync::{Mutex, OnceCell};
 
+#[path = "resident_mere_retained.rs"]
+mod retained;
+
 /// How often a granted client polls a mere's route for bells.
 pub const MERE_NOTICE_POLL: Duration = Duration::from_millis(50);
 
@@ -125,9 +128,22 @@ struct Routes {
     served: Mutex<BTreeMap<String, Arc<MereShared>>>,
     access: Mutex<BTreeMap<(MereId, AppId), MereApplicationAccess>>,
     access_loaded: AtomicBool,
+    /// Whether each mere's retained page-text store may be written now. Every
+    /// store is unsealed today, so the default never pauses.
+    retained_custody: Arc<dyn pandect::RetainedCustody>,
 }
 
 impl MereRoutes {
+    /// Let `custody` decide whether retained page text may be written, so a
+    /// locked or unavailable custody pauses keeping rather than writing
+    /// plaintext. Composed before any route is served.
+    pub fn with_retained_custody(mut self, custody: Arc<dyn pandect::RetainedCustody>) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("compose retained custody before serving routes")
+            .retained_custody = custody;
+        self
+    }
+
     /// Compose Cleromancy's portable product authority in either resident mode.
     /// The supplier owns the record/replay semantics; the resident owns installation
     /// and durability (distillery D19), so applications cannot select a weaker callback.
@@ -186,6 +202,7 @@ impl MereRoutes {
                 served: Mutex::new(BTreeMap::new()),
                 access: Mutex::new(BTreeMap::new()),
                 access_loaded: AtomicBool::new(false),
+                retained_custody: Arc::new(pandect::PlainCustody),
             }),
         }
     }
@@ -407,19 +424,23 @@ impl MereRoutes {
             lifecycle: AtomicU64::new(1),
             codicil_sessions: Mutex::new(HashMap::new()),
             pending_merges: Mutex::new(BTreeMap::new()),
+            shared_root: self.inner.shared_root.clone(),
+            mere: mere.id,
+            retained: OnceCell::new(),
+            retained_custody: Arc::clone(&self.inner.retained_custody),
         });
         let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
         let grants = self.inner.grants.clone();
         catalog
-            .update(|catalog| register_mere_routes(catalog, &route, &ambient, &shared, &grants))
+            .update(|catalog| register_mere_routes(catalog, &route, &ambient, &shared, &grants, true))
             .await
             .map_err(|error| error.to_string())?;
         if let Some(remote) = &self.inner.remote {
             let mut remote = remote
                 .lock()
                 .map_err(|_| "the remote catalog lock is poisoned".to_string())?;
-            register_mere_routes(&mut remote, &route, &ambient, &shared, &grants)
+            register_mere_routes(&mut remote, &route, &ambient, &shared, &grants, false)
                 .map_err(|error| error.to_string())?;
         }
         if self.inner.custody_endpoint.is_some() {
@@ -452,6 +473,7 @@ fn register_mere_routes(
     ambient: &ResidentEndpointRoute,
     shared: &Arc<MereShared>,
     grants: &AppRouteGrants,
+    local: bool,
 ) -> Result<(), graphshell_host::endpoint_catalog::ResidentEndpointCatalogError> {
     let (opened, explicit_grants, explicit_id) =
         (Arc::clone(shared), grants.clone(), route.id().to_string());
@@ -465,6 +487,7 @@ fn register_mere_routes(
                 explicit_grants.clone(),
                 &explicit_id,
                 false,
+                local,
             )
         },
     )?;
@@ -480,6 +503,7 @@ fn register_mere_routes(
                 ambient_grants.clone(),
                 &ambient_id,
                 true,
+                false,
             )
         },
     )
@@ -495,6 +519,10 @@ struct AccessEndpoint {
     ambient: bool,
     ambient_resources: BTreeMap<ContentHash, Vec<u8>>,
     ambient_disclosed: BTreeSet<ContentHash>,
+    /// Whether this connection may read and keep retained page text: an
+    /// explicit local application route only. Ambient crossings and the
+    /// dialable remote catalog never see it.
+    retained_ok: bool,
 }
 
 impl AccessEndpoint {
@@ -504,6 +532,7 @@ impl AccessEndpoint {
         grants: AppRouteGrants,
         route: &str,
         ambient: bool,
+        retained_ok: bool,
     ) -> Result<Self, String> {
         let app = context
             .application()
@@ -525,6 +554,7 @@ impl AccessEndpoint {
             ambient,
             ambient_resources: BTreeMap::new(),
             ambient_disclosed: BTreeSet::new(),
+            retained_ok,
         })
     }
     fn check(&self) -> Result<(), String> {
@@ -641,11 +671,26 @@ impl PresentationSource for AccessEndpoint {
         }
         Ok(response)
     }
+    fn retained_pages(
+        &mut self,
+        request: chirograph::RetainedPagesRequest,
+    ) -> Result<Option<chirograph::RetainedPagesResponse>, String> {
+        self.check()?;
+        if !self.retained_ok {
+            return Err("retained page text is read over an explicit local route only".into());
+        }
+        self.endpoint.retained_pages(request)
+    }
 }
 impl IntentSink for AccessEndpoint {
     type Error = String;
     fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
         self.check()?;
+        if !self.retained_ok && retained::is_retained_intent(&intent) {
+            return Ok(IntentResult::Rejected {
+                reason: "retained page text is kept over an explicit local route only".into(),
+            });
+        }
         if self.ambient {
             return Ok(IntentResult::Rejected {
                 reason: "ambient mere access is read-only; open the mere explicitly to edit it"
@@ -718,6 +763,12 @@ struct MereShared {
     codicil_sessions: Mutex<HashMap<String, Vec<SessionId>>>,
     /// Merges waiting for a choice on each conflict, by source session.
     pending_merges: Mutex<BTreeMap<uuid::Uuid, HeldMerge>>,
+    shared_root: PathBuf,
+    mere: MereId,
+    /// The reservoir-owned retained page-text store, opened on first use so a
+    /// mere that never keeps page text never creates one.
+    retained: OnceCell<Result<pandect::RetainedText<RedbBackend>, String>>,
+    retained_custody: Arc<dyn pandect::RetainedCustody>,
 }
 
 impl MereShared {
@@ -2002,6 +2053,13 @@ impl PresentationSource for MereEndpoint {
             other => Err(format!("this mere serves no projection {other:?}")),
         }
     }
+
+    fn retained_pages(
+        &mut self,
+        request: chirograph::RetainedPagesRequest,
+    ) -> Result<Option<chirograph::RetainedPagesResponse>, Self::Error> {
+        self.read_retained(request).map(Some)
+    }
 }
 
 impl IntentSink for MereEndpoint {
@@ -2012,6 +2070,9 @@ impl IntentSink for MereEndpoint {
             MERE_SESSIONS if intent.intent == SAVE_CODICIL_INTENT => self.invoke_archive(intent),
             MERE_SESSIONS => self.invoke_sessions(intent),
             MERE_ARCHIVE => self.invoke_archive(intent),
+            MERE_GRAPH if retained::is_retained_intent(&intent) => {
+                self.invoke_retained(intent)
+            },
             MERE_GRAPH => self.invoke_graph(intent),
             MERE_NOTES => self.invoke_notes(intent),
             other => Ok(IntentResult::Rejected {
@@ -2237,7 +2298,19 @@ mod tests {
         remote: Option<graphshell_host::projection_host::SharedCatalog>,
         handlers: HandlerRegistry,
     ) -> Fixture {
-        let root = tempfile::tempdir().unwrap();
+        fixture_inner(persona_n, domain, validator, remote, handlers, None, None).await
+    }
+
+    async fn fixture_inner(
+        persona_n: u128,
+        domain: &str,
+        validator: Option<pandect::GraphValidator>,
+        remote: Option<graphshell_host::projection_host::SharedCatalog>,
+        handlers: HandlerRegistry,
+        custody: Option<Arc<dyn pandect::RetainedCustody>>,
+        reopen: Option<tempfile::TempDir>,
+    ) -> Fixture {
+        let root = reopen.unwrap_or_else(|| tempfile::tempdir().unwrap());
         let reservoir = ResidentReservoir::open(root.path(), persona(persona_n))
             .await
             .unwrap();
@@ -2281,6 +2354,10 @@ mod tests {
         };
         let routes = match remote {
             Some(remote) => routes.with_remote_catalog(remote),
+            None => routes,
+        };
+        let routes = match custody {
+            Some(custody) => routes.with_retained_custody(custody),
             None => routes,
         };
         catalog
@@ -5999,4 +6076,5 @@ mod tests {
     }
 
     mod mcp;
+    mod retained;
 }
