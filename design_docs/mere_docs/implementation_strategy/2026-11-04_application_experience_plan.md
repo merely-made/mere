@@ -736,8 +736,10 @@ an API being documented is not a passing receiving test.
     request still does not tell the follower whether the write committed.
   - Adding an object, updating its title and tags, refusing a stale edit,
     and reopening the accepted metadata in a fresh process passed in the
-    installed Chrome and Firefox extensions. See the application experience
-    receipts.
+    installed Chrome and Firefox extensions. Both also refused **Edit here**
+    during a pending IndexedDB save, transferred the sole writer lock after
+    the commit, and reopened the saved object in a fresh process. See the
+    application experience receipts.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created

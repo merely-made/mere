@@ -50,3 +50,26 @@ did not replace either field.
 Raw receipts and screenshots are under
 `Code/testing/mere/graphshell-hidden-writer-20261105/`, in
 `metadata-run1/chrome/` and `metadata-run2/firefox/`.
+
+
+## 2026-11-05 — Handover during a queued edit
+
+The [headed handover harness](../../../ports/graphshell/web/extension/qualify_handover.py)
+ran the same packages in Chrome 156.0.8078.80 and Firefox 159.0.1.
+A native IndexedDB transaction in the follower held the overlapping store
+scope with a read pump. The harness observed the hidden writer start a real
+save, with the write pending behind that transaction, before it clicked
+**Edit here** in the follower. The writer refused the handover as busy and
+kept the sole exclusive Web Lock. The waiting handover request was canceled.
+
+Releasing the transaction let the writer commit and acknowledge one edit.
+The next **Edit here** transferred the sole lock to the follower. The old
+writer reloaded as a hidden follower and displayed the same single saved
+object when shown. Showing it did not move the lock. A fresh browser
+process reopened the same profile with exactly one saved object.
+
+Raw receipts and screenshots are under
+`Code/testing/mere/graphshell-handover-20261105/`, in
+`20261106T005455Z/chrome/` and `20261106T005538Z/firefox/`.
+The harness controls the overlap without replacing IndexedDB or the
+application save path. This scenario covers voluntary handover.
