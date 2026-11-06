@@ -7292,6 +7292,7 @@ dependencies = [
  "distillery",
  "dramatis",
  "eidetic",
+ "eidetic-search",
  "gemot",
  "genet-presenter",
  "genet-scripted-dom",
