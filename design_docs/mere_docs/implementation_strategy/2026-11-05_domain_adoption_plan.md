@@ -222,7 +222,21 @@ its data reaches a second device.
   bindings follow; device choices do not. Is that the general rule?
 - **O6. Linking derived identities to conversations (D3).** How a transport
   identity (a Reticulum or Misfin address, a station key) is attested as
-  derived from the persona, so its conversations can be claimed.
+  or otherwise linked to the persona, so its conversations can be claimed.
+
+  Two enrollment paths are proposed.
+
+  1. **Persona-derived accounts.** At issuance, record a persona-signed
+     binding to the protocol and account identity, including the transport
+     key or destination the account uses.
+  2. **Existing accounts.** Verify control with a fresh, transport-specific
+     challenge, then have the persona authorize the binding. Retain the
+     proof alongside the binding.
+
+  Both paths give conversation admission a verified account binding to
+  check. Imported records retain their original transport account and
+  message identity. Grouping threads across transports remains a separate
+  decision.
 - **O7. Optional vault protection is available to any domain (D6).** Mark
   confirmed on 2026-11-05 that any domain may add a vault key. Persona sealing
   remains the base layer for persona-associated data. Mark confirmed on
