@@ -287,8 +287,14 @@ Review by responsibility rather than moving this entire resident to one owner:
   machinery; Mere retains graph ownership/reference/retention decisions.
 - Gemot: namespace, agreement and community publication policy; Mere retains
   graph projections, browser actions and explicit resident mounting.
-- Armillary/Dramatis: runner lifecycle and identity/custody respectively; Mere
-  retains platform dialogs, graph routes and registration of concrete producers.
+- Armillary/Dramatis: runner lifecycle and identity/custody respectively,
+  Dramatis including its vault-lock triggers and native identity dialogs
+  (resident-split D2); Mere retains graph routes and registration of concrete
+  producers.
+
+The split is planned in
+[`2026-11-05_resident_split_plan.md`](../implementation_strategy/2026-11-05_resident_split_plan.md),
+which carries the per-owner slices and their done-conditions.
 
 Done when owner crates can be tested independently, Mere only supplies concrete
 bindings, and lock/shutdown/restart behavior matches existing consumer receipts.

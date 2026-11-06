@@ -665,6 +665,26 @@ area = "encryption"
 summary = "forward-secure conversations by default; durable shared data with bounded epoch retention"
 plans = ["release-log"]
 
+[decisions."resident-split D1"]
+title = ". Device conditions go to mesh-host (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "Device-condition sensing lives in Distillery's mesh-host; Mere selects it."
+
+[decisions."resident-split D2"]
+title = ". Vault-lock triggers and identity dialogs go to Dramatis (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "Dramatis owns its vault-lock triggers and native identity dialogs."
+
+[decisions."resident-split D3"]
+title = ". Moot publication to Gemot, NomadNet carriage to Murm (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "Moot publication goes to Gemot and its NomadNet carriage to Murm, licence gate kept."
+
+[decisions."resident-split D4"]
+title = ". Leased blob custody goes to Eidetic (Mark, 2026-11-05)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
+summary = "The resident's leased iroh blob custody becomes Eidetic storage machinery."
+
 [decisions."stack-lift D1"]
 title = "the remote board's mapping lives in `graphshell-host`"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
