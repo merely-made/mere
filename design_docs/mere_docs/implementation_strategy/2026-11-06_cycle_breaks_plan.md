@@ -911,3 +911,13 @@ Illustrative design, not compile-ready code.
   machine; the brief said to stop rather than fetch it. Web today: progression blocks open as text,
   the command disabled and the class named, with "Review block adapters" setting a flag and a
   status line.
+- 2026-11-07: P7 step 2 done after Mark approved fetching jco (`17186947c` the Worker, the review host, the
+  exports and the build script; `3c06dfda6` open-the-pane, swatch retry; Woodshed `backdrop-scene` command).
+  Checked in the browser pane against the real signed Woodshed pack: unclaimed class disabled and named,
+  "Review block adapters" opens a real review, approval loads the component into a Worker, the pane lists
+  the guest's bars, offers its example and commands, and draws Chart, Tab and Score from the vector sheet
+  (screenshots in `testing/mere/guest_blocks_spike_20261106/web_headed/`). The "Editable document"
+  control is not reachable on `tree.html?app=local` at baseline either: it sits behind Panes, Graph
+  controls, and enabling that crashes the page (genet-livery "C3 resolves every paint color") in a
+  build of `ea1103089` as in this one, so it is not a regression; `window.blockAdapters.openPane()` and an
+  "Open block pane" button open the same pane.
