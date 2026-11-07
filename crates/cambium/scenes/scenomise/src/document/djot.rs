@@ -7,7 +7,7 @@
 //! Domain declarations remain separate from the JSON payload's facts. This is
 //! an inert codec, without a domain resolver, evaluation, I/O or source writes.
 use super::{SCENE_DOCUMENT_FORMAT, SceneDocument};
-use crate::backdrops::MAX_SCENE_INPUT_BYTES;
+use sceno_backdrops::MAX_SCENE_INPUT_BYTES;
 use jotdown::{Container, Event, Parser};
 
 impl SceneDocument {

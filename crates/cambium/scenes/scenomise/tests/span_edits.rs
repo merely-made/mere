@@ -4,10 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use scenomise::{
-    backdrops::SceneInput,
-    span_edit::{SpanEdit, SpanEditIntent},
-};
+use sceno_backdrops::SceneInput;
+use scenomise::span_edit::{SpanEdit, SpanEditIntent};
 const METRE: &str =
     include_str!("../../../../../support/design-studies/backdrops/templates/metre.json");
 const MUSIC: &str =
@@ -64,7 +62,7 @@ fn metre_and_progressions_share_proposals_without_source_mutation() {
 }
 #[test]
 fn checked_span_math_refuses_invalid_inputs_and_clamps_edges() {
-    use scenomise::template::Span;
+    use sceno_backdrops::template::Span;
     let s = Span {
         start: 2,
         length: 2,
@@ -95,7 +93,7 @@ fn checked_span_math_refuses_invalid_inputs_and_clamps_edges() {
 
 #[test]
 fn metre_alignment_is_bounded_explicit_and_legacy_compatible() {
-    use scenomise::{backdrops::SceneFacts, template::Span};
+    use sceno_backdrops::{SceneFacts, template::Span};
     let mut input = SceneInput::parse(METRE).unwrap();
     let original = serde_json::to_value(&input).unwrap();
     assert!(

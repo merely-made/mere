@@ -34,7 +34,6 @@
 //! the item, rather than shipping source truth for a solver to re-derive.
 
 pub mod arrangement;
-pub mod backdrops;
 #[cfg(feature = "authoring")]
 pub mod authoring;
 pub mod catalog;
@@ -48,7 +47,6 @@ pub mod matrix;
 pub mod opened_link;
 pub mod projection;
 pub mod registry;
-pub mod template;
 pub mod span_edit;
 mod relax;
 mod solve;

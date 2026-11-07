@@ -6,7 +6,8 @@
 //! Actual shared surface → Netrender → Vello CPU frames; no browser/GPU claim.
 use netrender::vello_backends::{CpuSession, SparseResourceLimits};
 use pictograph::canvas::backdrop_surface::{BackdropSurface, SurfaceTheme};
-use scenomise::{backdrops::SceneInput, document::SceneDocument};
+use sceno_backdrops::SceneInput;
+use scenomise::document::SceneDocument;
 use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -112,7 +112,7 @@ item's `hit` shape when present and its footprint otherwise.
 
 ## Portable backdrop recipes
 
-`scenomise::backdrops` compiles three version-1 `SceneInput` recipes into a
+`sceno-backdrops` (merely-made/graphshell) compiles three version-1 `SceneInput` recipes into a
 `BackdropScene`: metre grid, fretboard, and terrain with coverage. The whole
 bundle carries geometry, labels, relation explanations, source references,
 revision, diagnostics and unplaced readings. Export the bundle when passing
@@ -174,7 +174,7 @@ The CPU receipt exercises the actual shared painter with Vello, including
 selection pixel changes and an unmeasured-area sample. Reproduce it with:
 
 ```sh
-cargo test -p scenomise --test backdrop_scenes
+cargo test -p sceno-backdrops --test backdrop_scenes   # in merely-made/graphshell
 cargo test -p pictograph --no-default-features --features canvas --lib backdrop_surface
 cargo test -p cambium --lib backdrop_scene
 cargo run -p pictograph --no-default-features --features backdrop-cpu \
@@ -210,7 +210,7 @@ optional input directory after its output directory, containing `metre.json`,
 
 ## Sequence templates
 
-`scenomise::template` supplies source-disclosed lanes, nested groups, integer
+`sceno_backdrops::template` supplies source-disclosed lanes, nested groups, integer
 tick spans, expected slots, occurrence alignments and explained relationships.
 The `templated_sequence` recipe uses the same `BackdropSurface` and Graphshell
 producer as metre, fretboard and terrain. Metre lowers its foot groups and

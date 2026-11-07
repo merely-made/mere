@@ -8,7 +8,7 @@
 //! The stage and its input/renderer belong to the embedding host; this view
 //! emits occurrence selection and never obtains source-edit authority.
 use crate::{AnyView, GenetCtx, GenetElement, OptionalAction, View, button, el};
-use scenomise::backdrops::BackdropScene;
+use sceno_backdrops::BackdropScene;
 use std::collections::BTreeSet;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -55,9 +55,9 @@ where
             .filter(|field| field.device.as_deref() == selected)
         {
             let tier = match field.tier {
-                Some(scenomise::backdrops::CoverageTier::Fringe) => "Fringe",
-                Some(scenomise::backdrops::CoverageTier::Usable) => "Usable",
-                Some(scenomise::backdrops::CoverageTier::Near) => "Near",
+                Some(sceno_backdrops::CoverageTier::Fringe) => "Fringe",
+                Some(sceno_backdrops::CoverageTier::Usable) => "Usable",
+                Some(sceno_backdrops::CoverageTier::Near) => "Near",
                 None => "Unmeasured",
             };
             children.push(Box::new(el(
@@ -227,7 +227,7 @@ mod tests {
     #[test]
     fn semantic_actions_keep_distinct_occurrences_and_never_mutate_source() {
         // The design-study fixture is also packaged so registry tests are self-contained.
-        let input = scenomise::backdrops::SceneInput::parse(include_str!(
+        let input = sceno_backdrops::SceneInput::parse(include_str!(
             "../tests/fixtures/fretboard.json"
         ))
         .unwrap();

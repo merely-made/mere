@@ -4,10 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use scenomise::{
-    backdrops::SceneInput,
-    document::{LinkedScene, SceneDocument},
-};
+use sceno_backdrops::SceneInput;
+use scenomise::document::{LinkedScene, SceneDocument};
 fn document() -> SceneDocument {
     let primary = SceneInput::parse(include_str!(
         "../../../../../support/design-studies/backdrops/templates/progression.json"
