@@ -16631,6 +16631,7 @@ dependencies = [
  "petgraph 0.8.3",
  "pollster 0.4.0",
  "rapier2d",
+ "seiche-model",
  "serde",
  "serde_json",
  "serde_path_to_error",
@@ -16640,6 +16641,15 @@ dependencies = [
  "uuid",
  "wasm-bindgen",
  "wgpu",
+]
+
+[[package]]
+name = "seiche-model"
+version = "0.0.1"
+dependencies = [
+ "euclid",
+ "petgraph 0.8.3",
+ "serde",
 ]
 
 [[package]]
