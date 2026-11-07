@@ -304,15 +304,6 @@ reservoir (`catchment`) and engine (`mere`) names are already ruled.
   (Alembic decision #5 keeps view streams beside the journal) or lift to the host's view sidecar crate.
 - **F25. `mod-loader`.** Into `document-host` (sole consumer, 1,399 lines) vs a host `mods` crate for future consumers.
 
-## 2026-11-07: P0 drift audit (read-only, Sonnet subagent, no builds)
-
-Spot-checked by the controller the same day: the backstep cycle (scenograph and scenomise depend on backstep; cambium on both), the registry features (only `mod-loader`, `observations` and `diagnostics` enabled anywhere), `pandect` depending on `tabard`, `ux-events` with no dependents, `mere-comms` absent from the tree and pinned from murm.git, and `linked-data/src/statements.rs` using `inker::EngineDocument` all hold.
-
-# P0 drift audit: engine-side, Graphshell-set and elsewhere crates
-
-Read-only audit, 2026-11-07, of `design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md`
-(Crate dispositions, P0, D1, D10). Inker and Seiche sets are other lanes' work. Nothing was edited.
-
 ## Method and caveats
 
 - **Lines** are Rust lines under `src`, tests included (a shell `find ... -name '*.rs' | xargs cat | wc -l`
