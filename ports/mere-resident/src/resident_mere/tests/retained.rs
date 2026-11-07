@@ -281,6 +281,42 @@ async fn nothing_is_kept_in_plaintext_when_no_custody_is_configured() {
     assert!(!plaintext_in(fixture._root.path(), "never in plaintext"));
 }
 
+/// The custodian answers "locked" when a persona has no staged sealing key.
+/// An unlocked vault must say what is missing, not that it is locked.
+#[tokio::test(flavor = "multi_thread")]
+async fn an_unlocked_vault_without_a_sealing_key_does_not_read_as_locked() {
+    let vault_root = tempfile::tempdir().unwrap();
+    let (host, _) = retained_custody(vault_root.path());
+    assert!(!host.is_locked());
+    let empty_wallet = tempfile::tempdir().unwrap();
+    let sealing = crate::retained_custody::RetainedSealing::custodial(
+        host.clone(),
+        empty_wallet.path().to_path_buf(),
+        PersonaId::from_uuid(Uuid::from_u128(0x5336_77)),
+        personae::ProfileId("retained".into()),
+    );
+    let fixture = fixture_inner(
+        0x5336_08,
+        "browsing",
+        None,
+        None,
+        HandlerRegistry::default(),
+        Some(sealing),
+        None,
+    )
+    .await;
+    let mut app = fixture.attach("graphshell").await;
+    let graph = graph(&mut app);
+    let refused = app
+        .invoke(graph_intent(&graph, KEEP_SETTING_INTENT, setting(true)))
+        .unwrap();
+    let IntentResult::Rejected { reason } = refused else {
+        panic!("{refused:?}")
+    };
+    assert!(reason.contains("no sealing key"), "{reason}");
+    assert!(!reason.contains("is locked"), "{reason}");
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn locking_the_vault_pauses_keeping_and_reading_and_unlocking_resumes() {
     let fixture = fixture(0x5336_04, "browsing").await;

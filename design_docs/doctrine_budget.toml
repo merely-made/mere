@@ -7,5 +7,5 @@
 lines_per_statement = 18
 
 [statements]
-"The stack" = 7                             # 5
+"The stack" = 8                             # 5; raised to 8 on 2026-11-07 (Mark: "i will give one more statement for a core architectural concern. 8?"; engine-split D22)
 "Surfaces" = 5                              # 4, added 2026-10-28

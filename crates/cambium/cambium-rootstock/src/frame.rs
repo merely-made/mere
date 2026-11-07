@@ -485,7 +485,17 @@ where
         // idle-frozen clock.
         let now_s = self.s.anim_base.elapsed().as_secs_f64();
         let _ = layout.tick_animations(&view, now_s);
-        if layout.set_interaction(&view, hovered_node, focused_node) {
+        // A dispatch since the last frame may have changed the DOM, and the
+        // retained style learns of that only when relayout drains the
+        // mutations. Cascading now would lay out nodes it never styled, so
+        // the state waits for that relayout, which applies both.
+        let settled = dom_ref.pending_mutations().1.is_empty();
+        let restyled = if settled {
+            layout.set_interaction(&view, hovered_node, focused_node)
+        } else {
+            layout.note_interaction(hovered_node, focused_node)
+        };
+        if restyled {
             drop(dom_ref);
             if let Some(window) = self.s.window.as_ref() {
                 window.request_redraw();
