@@ -2,7 +2,7 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D21 are ruled (D21 reverts D20); the plan is on origin's main
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D22 are ruled (D21 reverts D20); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
 `merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
@@ -604,6 +604,18 @@ revision and what crosses at frame rate.
 
   Links: area The stack · replaces engine-split D20 · draws on engine-split D7 · plans engine-split C · summary The wgpu repositories all stay; Inker is recorded as the owner of the scrying and welding engines.
 
+- **D22. An eighth Stack statement, for the roots (Mark, 2026-11-07):** asked what the trunk is
+  if it is not Mere, Graphshell, Inker or Genet, and whether leaves are guests: "i will give one
+  more statement for a core architectural concern. 8?" The answer given: leaves are not guests
+  (a guest implements the contract; a leaf is a library both sides link); the graph has two
+  roots by nature, a data root (Eidetic: logs, stores, the domain interface, the pack header,
+  the witness and the frame) and a presentation root (the contract workspace: projection
+  contract, WIT world, scene types, command vocabulary, colour), with custody beside them;
+  a leaf goes to the root of its nature; one trunk is not forced. Outcome: new, Stack 9; the
+  Stack budget rises to eight.
+
+  Links: area The stack · draws on engine-split D12, engine-split D19, domain-contract C5 · summary The stack has a data root and a presentation root; a leaf goes to the root of its nature; Stack 9 says so.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -821,6 +833,8 @@ revision and what crosses at frame rate.
   then adding the one `sceno-backdrops` dependency line offline; `--locked` metadata is
   consistent and the clippy gate is running. D21 recorded, reverting D20 on the build-surface
   evidence.
+- 2026-11-07: tinct pushed to graphshell main (`d80316db`). The relock committed on main. D22
+  recorded; Stack 9 written with the eighth slot.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
