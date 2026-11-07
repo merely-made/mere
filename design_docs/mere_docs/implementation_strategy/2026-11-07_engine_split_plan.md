@@ -2,7 +2,8 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D23 are ruled (D21 reverts D20); the plan is on origin's main
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D24 are ruled (D21 reverts D20); `merely-made/inker` holds the twelve
+crates with history (main `3109942`, pushed); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
 `merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
@@ -704,6 +705,15 @@ revision and what crosses at frame rate.
 
   Links: area The stack · amends engine-split D2, cycle-breaks D8 · draws on mere:stack.3 · plans engine-split P3 · summary The Graphshell repository is the host layer as a library, contract root below and hosting above, with no application; Turnstone holds the reference host and the MCP server.
 
+- **D24. Fleece's fixtures copy into the Graphshell port (Mark, 2026-11-07):** when Mere deletes
+  `crates/fleece`, the port's tests and fixture example read Fleece's portable-clip fixtures
+  (`knot.json`, `redshank.json`, `voice.wav`) by relative path in eight places: "Copy the three
+  fixtures into the port (Recommended)", over reading them from Inker's checkout or a shared
+  test-asset home (the family-wide answer F5 also raised). Outcome: applies P1; the shared
+  asset home stays an open fork.
+
+  Links: area The stack · draws on engine-split D1 · plans engine-split P1 · summary The Graphshell port carries its own copies of Fleece's three portable-clip fixtures.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -970,3 +980,11 @@ revision and what crosses at frame rate.
   and the graphshell host plan's T7; the Seiche population must take `seiche-model` with the six
   crates. The Inker history lane is running (filter-repo on the twelve paths); its first push
   waits on Mark.
+- 2026-11-07: Inker populated with history: `git clone --no-local` of Mere `f8c06097e`, filter-repo on
+  the twelve crate paths and three design areas (477 commits kept, tree identical for 270
+  files), root files added (workspace manifest from the proved standalone, lock reduced from
+  1849 to 891 packages, toolchain, licences, README naming D21), the Roboto test font carried
+  with its Apache-2.0 text (F5 closed for Inker); check green, 769 tests with P1's features,
+  clippy warnings only; pushed to `merely-made/inker` main at `3109942` on Mark's word. Mark
+  ruled the canonical DOC_POLICY core plus an Inker addendum and a DOC_README (a lane is
+  writing them) and D24. The Mere donor lane for the twelve directories opened.
