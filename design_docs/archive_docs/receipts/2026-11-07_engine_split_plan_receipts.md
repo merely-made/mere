@@ -979,3 +979,58 @@ consumers. wgpu-scry is the producer for the operating system's own webview (Web
 WPE), exposing frames, navigation, input and cookies through `scrying`. wgpu-weld is the producer for Chromium
 through CEF accelerated off-screen rendering (`welding`), including the CEF subprocess, profile and sandbox
 policy that has no counterpart in the other three.
+
+## 2026-11-07: P1 lane under D15 to D17
+
+`target/` and the consumer scratch copies had been cleared; rebuilt cold.
+
+- `cargo check --offline -p mere-lanes -p illume -p knot-editor-host --features
+  mere-lanes/{netfetch,smolweb,retained-clips},illume/markdown --tests`: green, 1m 08s.
+- `cargo test` of the same: Illume 39 (gains the 2 lexer tests), `knot-editor-host` 7 (loses
+  them), `mere-lanes` 91 lib (88 plus 3 reading-type tests) + 1 `smolweb_streaming_render`.
+- `cargo check --offline --workspace --all-targets --exclude mere-resident --keep-going`:
+  fails only in `tabard-workshop` (1 site, `src/reader.rs:134`) and `graphshell` (5 sites,
+  `src/retained_content.rs` 299, 305, 306, 313, 315), lib and lib test. The workshop was
+  converted at its edge; `cargo test -p tabard-workshop`: all suites pass (14, 4, 1, 4, 16, 1,
+  1 with 1 ignored, 4, 6, 8, 7). The Graphshell port is the recorded D16 follow-up; its
+  dependents were not checked past it.
+- Standalone workspace regenerated (same generator, font copy placed again, lock seeded from
+  Mere's). `cargo metadata --all-features`: Inker edges into Mere or Graphshell are
+  `knot-editor-host -> cambium`, `mere-fleece -> mere-rdf` (optional), `mere-lanes -> tabard`
+  (palette only), `script-rhai -> hest`; the other edges listed run from `mere.git` packages
+  onward to graphshell.git (`hest`, `sceno`, `sceno-backdrops`).
+- `cargo check --offline --workspace --all-targets` with the lanes, Fleece, canvas and
+  `illume/markdown` features: green, 2m 19s. `cargo test --no-fail-fast` with the same: 765
+  passed, 0 failed.
+- Turnstone and Knot were not rechecked: under D16 Turnstone does not compile against these
+  lanes until it converts, and Knot's `knot-document` is being repinned in its own lane.
+
+## 2026-11-07: P1 lane after D15 and D19 (rebased onto main `4b99ce9f2`)
+
+- The staged work was saved as a patch, the branch moved to main (its old head was an
+  ancestor), and the patch reapplied cleanly; plan, receipts and lock were taken from main and
+  the lane's edits redone.
+- The smolweb palette moved into `mere-lanes` (`src/smolweb/palette.rs`, Tabard's module and
+  its four tests, doc lines changed) over `tinct` from graphshell.git `branch = "main"`; the
+  Tabard row left the lanes' manifest.
+- `cargo check -p mere-lanes` (online once, to fetch graphshell `d80316db`): green. The lock
+  then held graphshell.git at two revisions (ten packages at `40e8c8df`, `tinct` at
+  `d80316db`) and offline Cargo stopped with an internal error ("failed to find tinct ... in
+  path source"); `cargo update -p` on the ten graphshell packages moved them to `d80316db`,
+  changing nothing else.
+- `cargo check --offline --workspace --all-targets --keep-going`: fails only in `graphshell`
+  (lib and lib test), the five D16 sites in `src/retained_content.rs` (299, 305, 306, 313,
+  315). `mere-resident` checks now.
+- `cargo test` of `mere-lanes` (netfetch, smolweb, retained-clips), `illume/markdown`,
+  `knot-editor-host`, `tabard-workshop`: lanes 95 + 1, Illume 39, `knot-editor-host` 7,
+  workshop suites all pass.
+- Standalone workspace regenerated (37 inherited dependencies; rows rewritten to the Mere
+  repository: `cambium`, `mere-rdf`). `cargo metadata --all-features`: Inker edges into Mere
+  are `knot-editor-host -> cambium` and `mere-fleece -> mere-rdf` (optional); into Graphshell's
+  contract root `mere-lanes -> tinct` and `script-rhai -> hest`; no Tabard. Check with the
+  lanes, Fleece, canvas and `illume/markdown` features: green, 48.3s. `cargo test
+  --no-fail-fast`: 769 passed, 0 failed.
+- Graphshell port converted at its five D16 sites (option (a)). `cargo check -p graphshell
+  --all-targets --offline`: green, 10m 07s. `cargo test -p graphshell --offline --lib --
+  retained_content reading`: 19 passed, 1 ignored (needs a real wgpu adapter), 317 filtered,
+  including `reading_controls_keep_held_accesses_and_search_independent`.

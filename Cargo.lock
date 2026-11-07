@@ -8476,6 +8476,7 @@ version = "0.0.3"
 dependencies = [
  "jotdown",
  "logos",
+ "pulldown-cmark",
 ]
 
 [[package]]
@@ -9500,7 +9501,6 @@ dependencies = [
  "illume",
  "inker",
  "nematic",
- "pulldown-cmark",
 ]
 
 [[package]]
@@ -10336,6 +10336,7 @@ dependencies = [
  "futures-util",
  "genet-host-api",
  "inker",
+ "mere-fleece",
  "mere-pageload",
  "mere-transport",
  "mockito",
@@ -10383,9 +10384,8 @@ dependencies = [
  "genet-host-api",
  "genet-static-dom",
  "image",
- "incipit",
  "inker",
- "mere-fetch",
+ "mere-pageload",
  "mere-rdf",
  "mere-transport",
  "muniment",
@@ -10479,8 +10479,8 @@ dependencies = [
  "pollster 0.4.0",
  "serde",
  "serde_json",
- "tabard",
  "tempfile",
+ "tinct",
  "tokio",
  "url",
  "uuid",
@@ -16339,9 +16339,11 @@ name = "scenograph"
 version = "0.0.6"
 dependencies = [
  "backstep",
+ "libm",
  "mere-curation",
  "sceno",
  "script-engine-api",
+ "script-rhai",
  "serde",
  "serde_json",
 ]
@@ -16433,7 +16435,6 @@ dependencies = [
  "inker",
  "libm",
  "rhai",
- "scenograph",
  "script-engine-api",
  "serde_json",
  "wasm-bindgen",

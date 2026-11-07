@@ -27,6 +27,8 @@ persona-cookies = ["dep:eidetic", "dep:pandect", "dep:serde", "dep:serde_json", 
 flip = ["dep:inker"]
 https-blobs = ["dep:eidetic", "dep:ureq"]
 iroh-blobs = ["dep:eidetic", "dep:transport"]
+# Fleece's crawl seam over the single-hop crawler transport (engine split P1).
+fleece-crawl = ["dep:fleece", "fleece/crawl"]
 
 [dependencies]
 async-trait = "0.1"
@@ -59,6 +61,7 @@ workspace = true
 bytes = "1"
 ureq = { version = "2.10", default-features = false, features = ["tls"], optional = true }
 transport = { workspace = true, optional = true }
+fleece = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 transport = { workspace = true, features = ["test-identity"] }
