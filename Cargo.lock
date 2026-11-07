@@ -10014,7 +10014,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#71188bb66d15bdd3618db12f148bc42e5cbef284"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10418,6 +10418,7 @@ dependencies = [
 [[package]]
 name = "mere-framing"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#71188bb66d15bdd3618db12f148bc42e5cbef284"
 dependencies = [
  "postcard",
  "serde",
@@ -17593,11 +17594,11 @@ dependencies = [
 [[package]]
 name = "state-witness"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#71188bb66d15bdd3618db12f148bc42e5cbef284"
 dependencies = [
  "mere-framing",
  "postcard",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -18321,6 +18322,7 @@ dependencies = [
 [[package]]
 name = "tinct"
 version = "0.2.0"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#d80316db1115077a76d62aff8ca156852ed7924d"
 dependencies = [
  "serde",
 ]
@@ -19534,7 +19536,7 @@ checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 [[package]]
 name = "vector-sheet"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/graphshell.git?branch=main#40e8c8df15915d86377117842c08cf10fd13c987"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#d80316db1115077a76d62aff8ca156852ed7924d"
 dependencies = [
  "ciborium",
  "serde",

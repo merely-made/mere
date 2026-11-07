@@ -673,16 +673,21 @@ revision and what crosses at frame rate.
   a `domain` module in `stickleback` (policy and authority hooks exist; grammar and fold traits
   do not); D10's pack header splits out of `PackManifest` in `eidetic::pack`. No new crate
   either way.
-- **D12 consumers, once Eidetic's branch is on its main.** Mere deletes `crates/system/state-witness`
-  and `crates/system/framing` and their member rows; `pictograph/Cargo.toml:140` and
-  `seiche/Cargo.toml:83` repin `state-witness` to eidetic.git `branch = "main"`; the root
-  `framing` row goes (nothing else in Mere needs it); Isocosm's `isometer-core/Cargo.toml:21` and
-  `cosmograph/Cargo.toml:31` repin the same way; Seiche's replay example then takes it from
+- **D12 and D19 consumers.** Mere's side is done (Progress, 2026-11-07): the three crates are
+  deleted, `pictograph` and `seiche` take `state-witness` from eidetic.git, the root `framing`
+  row is gone, `tinct` and `tincture` come from graphshell.git and the `tinct` patch row is
+  dropped. Still open, outside Mere: Isocosm's `shared/isometer/crates/isometer-core/Cargo.toml:21`
+  and `shared/cosmograph/Cargo.toml:31` repin `state-witness` to eidetic.git; the five tinct
+  consumers repoint their own `tinct` row to graphshell.git in the same relock that moves their
+  mere.git past this change, or the graph carries two `Tinct`s (Cleromancy `Cargo.toml:83`,
+  Isocosm `shared/isomere/Cargo.toml:33`, Knot `apps/desktop/Cargo.toml:51`, Woodshed
+  `Cargo.toml:142`, `ports/redshank/Cargo.toml:20` and `ports/hocket/Cargo.toml:119`; mer3ly
+  has no row and only relocks). Seiche's replay example then takes the witness from
   eidetic.git and the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
   would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
   rule's universal header, the witness does not publish; both names stay.
-- **P1 forks F4 and F6: settled by D19.** `tinct` must reach the Graphshell contract root before
-  the lanes can take it; until then P1's palette line stays as it is.
+- **P1 forks F4 and F6: settled by D19.** `tinct` is in the Graphshell contract root and Mere
+  takes it from there; the lanes may take it now.
 - **P1 fork F6, the smolweb palette (new, 2026-11-07, now settled by D19; kept for the record).** `SmolwebTheme::Site` derives each site's
   palette through Tinct at construction and on every colour-mode change, and `ModeProfile` is
   Tinct's type in the lanes' public API (Turnstone names it 12 times). Options: the lanes own
@@ -858,3 +863,15 @@ revision and what crosses at frame rate.
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
   forks under P2, `state-witness` first.
+- 2026-11-07: D12 and D19 donor side landed on a worktree branch: Mere deleted
+  `state-witness`, `mere-framing` and `tinct` (each content-identical to Eidetic `71188bb` and
+  Graphshell `d80316db`; tinct's manifest differs only in its comment and workspace serde) and
+  their member, `framing` and patch rows; `pictograph` and `seiche` take the witness from
+  eidetic.git, `tinct` and `tincture` come from graphshell.git. The lock was edited by hand:
+  eidetic.git moved `6b4ec49` to `71188bb` (10 entries, plus the two moved crates) and
+  graphshell.git `40e8c8d` to `d80316d` (10, plus tinct); upstream between those revisions only
+  added the moved crates, nothing else moved, `--locked` metadata is consistent.
+  `ports/graphshell/web/Cargo.lock` moved graphshell.git the same way (8, plus tinct);
+  `support/family-promotion/source-*` are the 2026-10-19 checkpoint and stay. Workspace check,
+  the pictograph, seiche, tabard and registry tests (460 passed, 12 ignored) and clippy green.
+  Outside consumers are in Open.
