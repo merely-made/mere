@@ -1008,7 +1008,7 @@ revision and what crosses at frame rate.
   (`d634ee0c485`), a `seiche-model` split (the rapier-free model re-exported under the old paths)
   and the graphshell host plan's T7; the Seiche population must take `seiche-model` with the six
   crates. The Inker history lane is running (filter-repo on the twelve paths); its first push
-  waits on Mark.<<<<<<< ours
+  waits on Mark.
 - 2026-11-07: Inker populated with history: `git clone --no-local` of Mere `f8c06097e`, filter-repo on
   the twelve crate paths and three design areas (477 commits kept, tree identical for 270
   files), root files added (workspace manifest from the proved standalone, lock reduced from
@@ -1017,10 +1017,6 @@ revision and what crosses at frame rate.
   clippy warnings only; pushed to `merely-made/inker` main at `3109942` on Mark's word. Mark
   ruled the canonical DOC_POLICY core plus an Inker addendum and a DOC_README (a lane is
   writing them) and D24. The Mere donor lane for the twelve directories opened.
-||||||| original
-
-=======
-
 - 2026-11-07: P1 cut in Mere (worktree branch, not pushed). Deleted the twelve Inker crate
   directories and `inker_docs`, `nematic_docs`, `verso_docs` (blobs compared against
   `inker.git` `3109942`: identical but for the Roboto path in `document-canvas`'s text test);
@@ -1039,7 +1035,6 @@ revision and what crosses at frame rate.
   debug info off): workspace check green; `graphshell` lib 330 passed, 7 ignored, and the
   `retained_content_fixture` example builds; the `uxtree` probe test passes; clippy green
   (0 errors); the web workspace checks green.
->>>>>>> theirs
 - 2026-11-07: P1 complete on both sides. The donor cut (`bdd8f7ee7`) merged into main as `cd8490fa2`
   through the hooks and pushed: 289 files, 63,710 lines left Mere; Mere's rows name `inker.git`;
   five `mere.git` patch redirects stay until Knot repins; the port and uxtree carry their own
