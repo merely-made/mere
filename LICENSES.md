@@ -149,7 +149,7 @@ crates under Exhibit A and every manifest on `MPL-2.0`.
 | `nematic` | `crates/nematic/nematic` | 0.1.1 | — |
 | `illume` | `crates/nematic/illume` | 0.0.2 | — |
 | `errand` | `crates/system/errand` (moved to Errand's repository 2026-10-19; see Source promotions below) | 0.3.4, MIT OR Apache-2.0 | — |
-| `tinct` | `crates/cambium/tinct` | 0.1.2, MIT OR Apache-2.0 | — (deleted by Mark's ruling, `642ca2d7`, 2026-09-24) |
+| `tinct` | `crates/cambium/tinct` (moved to Graphshell's repository 2026-11-07; see Source promotions below) | 0.1.2, MIT OR Apache-2.0 | — (deleted by Mark's ruling, `642ca2d7`, 2026-09-24) |
 
 Each arrived from genet 2026-09-03 under its own published grant; relicensing
 is the sweep plan's call at the next bump. Nothing here was relicensed on the
@@ -182,7 +182,7 @@ were each proposed and declined on 2026-08-22.
 
 If one is ever granted, its manifest says `MIT OR Apache-2.0` explicitly with a
 comment naming the brief, and it is listed here. `illume`, `errand` and `tinct`
-now live in this repository; the decline stands, and what they do carry is the
+arrived in this repository (errand and tinct have since moved on); the decline stands, and what they do carry is the
 published-grant disposition in the section above, which is a different thing.
 
 ## How to add a file from elsewhere
@@ -211,3 +211,7 @@ the plan's own pattern set on 2026-08-27. Discovery should grep for
 ## Source promotions (2026-10-19)
 
 Luggage now lives in the Eidetic family; its derivative notices and published-grant record travel in `eidetic/LICENSES.md`. Errand now lives in the continuing Smolweb repository at `errand/LICENSES.md`, alongside the protocol crates and their retained MIT licenses. Historical paths in the rulings above describe their former Mere locations. The move changes no license grant.
+
+## Source promotions (2026-11-07)
+
+Under the engine split plan, `state-witness` and `mere-framing` moved to Eidetic (D12) and `tinct` to the Graphshell repository's contract root (D19), each an exact copy. None carried notice files; tinct's published 0.1.2 keeps its grant as recorded above. The move changes no license grant.
