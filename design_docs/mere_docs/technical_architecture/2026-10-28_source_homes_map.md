@@ -610,8 +610,9 @@ Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
   (cycle breaks D2, P4, 2026-11-06).
   Gemot↔Murm no longer works this way: `murm-resolve` owns the `ReleaseAddress` trait and Gemot
   implements it in `gemot-site-host` (cycle breaks D3, P5, 2026-11-06). Mere↔Murm still does, by
-  one optional feature and one isolated root: Signalman's `portable-scenes` (`scenomise`) and
-  `signalman-desktop`; `mere-comms` moved into Murm (D4, P6) and F1 is open.
+  one isolated root: `signalman-desktop` (cycle breaks D17); `mere-comms` moved into Murm (D4, P6)
+  and the `backdrops` slice of `scenomise` moved to Graphshell as `sceno-backdrops` (D17, 2026-11-06),
+  so no Murm lock outside that root names Mere.
   - A separate workspace root inside the receiving repository keeps that
     repository's lockfile and CI scope free of Mere. Murm's
     `apps/signalman-desktop` already does this.
