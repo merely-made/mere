@@ -2,7 +2,7 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D24 are ruled (D21 reverts D20); `merely-made/inker` holds the twelve
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D25 are ruled (D21 reverts D20); `merely-made/inker` holds the twelve
 crates with history (main `3109942`, pushed); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
@@ -723,6 +723,15 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D1 · plans engine-split P1 · summary The Graphshell port carries its own copies of Fleece's three portable-clip fixtures.
 
+- **D25. The conatus engine plan and its two briefs move to Seiche as its first area (Mark,
+  2026-11-07):** they sat in `mere_docs/` with no area root, so by the letter they stayed, while
+  their subject is now entirely Seiche: "Move the conatus plan and its two briefs to Seiche as its
+  first area (Recommended)". Mere's addendum rule, when code moves out its docs move with it. The
+  dynamics grammar and physics catalog plans have consumers on both sides and stay in Mere, cited
+  from both. Outcome: applies DOC_POLICY §4 (docs live with the owner of the subject).
+
+  Links: area The stack · draws on engine-split D5 · plans engine-split P2 · summary Seiche's first design area holds the conatus engine plan and its two briefs; the dynamics grammar and physics catalog plans stay in Mere.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -1038,3 +1047,14 @@ revision and what crosses at frame rate.
   empty `crates/crawl` and `crates/import` directories removed. Opened next: Seiche population
   with history (seven crates, `seiche-model` included), Knot's repin to `inker.git` with the
   editor move (D17), Turnstone's repin with its D16 boundary conversions.
+- 2026-11-07: Seiche populated with history at `Code/worktrees/seiche-history`: clone of Mere `4fa1686da`,
+  filter-repo on the seven crate paths and the conatus README (159 commits kept, trees
+  hash-identical, 197 files), root files as Inker's, no patch table needed (the `cubek-matmul`
+  patch is Mere's own path and not carried), lock reduced 1847 to 859 packages; check, all-features
+  check and clippy green, 372 tests pass (seiche-model's 9 split from seiche's 215), binding replay
+  byte-identical to the recorded trace; main `a545239`, not yet pushed. Mark ruled: push after a
+  second commit fixing the seven `repository` fields and the conatus README's links, and D25.
+  Knot's lane committed `6f2ac20` (rows to inker.git, editor into `knot_document::retained`, 61
+  and 78 knot-document tests, six Windows `cfg(not(unix))` failures apart); Mark ruled the lane
+  repins Mere to current main so the lock holds one source per package, keeps the `retained`
+  path, and the stale `.cargo/scope-navigation-local.toml` overlay in Knot's checkout is deleted.

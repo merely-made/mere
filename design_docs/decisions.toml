@@ -635,6 +635,10 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 title = ". Fleece's fixtures copy into the Graphshell port (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 
+[decisions."engine-split D25"]
+title = ". The conatus engine plan and its two briefs move to Seiche as its first area (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
