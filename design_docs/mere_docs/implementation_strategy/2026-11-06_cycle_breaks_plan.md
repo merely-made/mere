@@ -896,3 +896,18 @@ Illustrative design, not compile-ready code.
   `WorkerAdapter` is tested against a scripted transport); the four notation scenarios under
   `ports/graphshell/web/scenarios/` still name the old Woodshed controls. Details in
   guest_blocks "Implementation status".
+- 2026-11-07: P7's missing pieces, in order. (1) `1d6b2bc48` extracts `graphshell::block_pane` (host-neutral
+  `Pane`, adapters and views over a `PaneHost` and `PanePorts`; the web page binds it thinly in
+  `web_tree/blocks.rs`); web wasm checks, `block_editing` 37, lib 379 pass. (3) `ced77aa00` adds the
+  native Cambium window `graphshell-blocks` with an in-window review panel (reads each
+  `--adapter PACK COMPONENT`, verifies with `CapsuleMount::review`, loads only on "Approve block
+  adapter"); logic tests 2 pass; it was compiled and unit-tested, not shown, because the Mac's
+  console was locked. (4) `c4baa830b` moves the four notation scenarios to the guest flow
+  (`blocks-insert-example`, `blocks-view-*`, `blocks-command-*`, `blocks-guest-*`, probes
+  `blocks-view-mode`, `blocks-event-selected`, `blocks-adapters`) and adds 3 tests that they parse and
+  name real controls. **(2) is not done**: the web Worker and the disclose, review and load host for
+  block adapter packs need `@bytecodealliance/jco` 1.37.0, which the applet path takes from npm
+  (`ports/moot/examples/capsule-library`, a pnpm lock) and which is neither vendored nor on this
+  machine; the brief said to stop rather than fetch it. Web today: progression blocks open as text,
+  the command disabled and the class named, with "Review block adapters" setting a flag and a
+  status line.

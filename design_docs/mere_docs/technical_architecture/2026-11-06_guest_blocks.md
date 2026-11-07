@@ -549,25 +549,33 @@ new, from the spike and from rulings 5 and 6.
   `block-guest`, as in Delivery.
 - **R3: ruled.** "New graphshell-blocks bin." As in Native.
 
-## Implementation status (2026-11-06)
+## Implementation status (2026-11-07)
 
 Landed (SHAs in the cycle breaks plan's Progress): the `block-guest` world, `rows`, argument and
 pattern fields, and the `vector-sheet` crate in Graphshell; in Mere the `BlockAdapter` trait,
 registry, memo, rhyme as the built-in adapter, the vector sheet painter (`SheetLeaf`), the
-`power:block-adapter` grant, `crates/script/block-host`, the `WorkerAdapter`, the block pane
+`power:block-adapter` grant, `crates/script/block-host`, the `WorkerAdapter`, the host-neutral
+`graphshell::block_pane` (the web page binds it thinly in `web_tree/blocks.rs`), the pane
 dispatching by class (unclaimed class disabled and named, "Review block adapters" entry),
-`graphshell-blocks` (native `GuestAdapter` and a headless render receipt), and the deletion of
-`bars.rs` and both Woodshed rows; in Woodshed the `blocks` and `block-guest` features, the pack
-builder and the conformance test. No Mere lock holds a Woodshed package.
+`graphshell-blocks` (the native `GuestAdapter`, the native Cambium window `graphshell-blocks` with
+an in-window review panel, and a headless render receipt), the four notation scenarios on the
+guest flow, and the deletion of `bars.rs` and both Woodshed rows; in Woodshed the `blocks` and
+`block-guest` features, the pack builder and the conformance test. No Mere lock holds a Woodshed
+package.
 
 Changes made on the way that the design did not state: `rows` is a sixth call; commands may declare
 an argument field and the class a pattern field; the hidden `backdrop-scene` text command carries
 the swatch scene; the progression's arrangement scene comes from `sceno-backdrops` (D17), so the
 guest no longer depends on any Mere crate; the status text after an apply is generic.
 
-Open: the host-neutral `block_pane` and a Cambium window for `graphshell-blocks` (ruling 6 asked for
-a native pane; what exists is the native host and a headless receipt); the web Worker JavaScript
-and the headed web check; the four notation scenarios; `power:block-adapter` review UI wiring in the
-web host. Headless receipts: `/Users/markik/Code/testing/mere/guest_blocks_spike_20261106/real/`
-(Chart, Tab and Score drawn by the real guest through the host's sheet painter, compound paths
-intact, compared with the spike's leaf images).
+**Open: the web Worker host.** The web pane has the `WorkerAdapter` and its memo but nothing yet
+that discloses, reviews and loads a block adapter pack in the browser. The applet path it should
+mirror (`ports/graphshell/web/applets/`, `ports/moot/examples/capsule-library/build.mjs`) turns a
+component into a Worker-loadable module with `@bytecodealliance/jco` 1.37.0, an npm development
+dependency that is not vendored, not on this machine, and not installable without a download. Until
+that is available, a web user sees progression blocks as text with the command disabled and the
+class named. Native does not have this gap: `graphshell-blocks` reviews and loads packs in process.
+Headless receipts: `/Users/markik/Code/testing/mere/guest_blocks_spike_20261106/real/` and
+`real2/` (Chart, Tab and Score drawn by the real guest through the host's sheet painter, compound
+paths intact, compared with the spike's leaf images). The native window was compiled and its logic
+tested, but not shown: the Mac's console was locked.
