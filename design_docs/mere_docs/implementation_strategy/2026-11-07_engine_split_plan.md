@@ -958,7 +958,6 @@ revision and what crosses at frame rate.
   the pictograph, seiche, tabard and registry tests (460 passed, 12 ignored) and clippy green.
   Outside consumers are in Open.
 
-||||||| 4b99ce9f2
 
 - 2026-11-07: P1 lane rebased onto main `4b99ce9f2` (D15 landed). F6 settled by D19: the
   smolweb palette moved into `mere-lanes` over Graphshell's `tinct`, so the lanes no longer
