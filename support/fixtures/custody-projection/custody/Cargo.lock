@@ -95,7 +95,7 @@ checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 [[package]]
 name = "castellan-client"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "base64",
  "chatelaine",
@@ -172,7 +172,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "serde",
  "uuid",
@@ -290,7 +290,7 @@ dependencies = [
 [[package]]
 name = "dramatis"
 version = "0.0.5"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "gaz",
  "personae",
@@ -403,7 +403,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "insigne",
  "serde",
@@ -599,7 +599,7 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "blake3",
  "ed25519-dalek",
@@ -714,7 +714,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "personae"
 version = "0.3.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "blake3",
  "chacha20poly1305",
