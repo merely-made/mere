@@ -465,7 +465,7 @@ async fn child_serves_the_registered_domain() {
             move |routes| async move {
                 registered.store(true, Ordering::SeqCst);
                 Ok(if product {
-                    routes.with_divination_authority()
+                    routes.with_resident_defaults().unwrap()
                 } else {
                     routes.with_domain_validator(DOMAIN, validator(calls))
                 })
@@ -491,7 +491,7 @@ async fn child_serves_the_registered_domain() {
             grants.clone(),
         );
         let routes = if product {
-            routes.with_divination_authority()
+            routes.with_resident_defaults().unwrap()
         } else {
             routes.with_domain_validator(DOMAIN, validator(calls.clone()))
         };

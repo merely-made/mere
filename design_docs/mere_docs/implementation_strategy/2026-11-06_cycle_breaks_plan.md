@@ -105,8 +105,16 @@ compositions serve their domains from the registry, a second (fixture) domain is
 editing either composition (M1), a product domain without authority is refused with the typed
 error and the hard-coded `"divination" | "personal-facts"` list is gone (M2), the conformance
 tests of the domain contract's section 6 pass over a fixture graph domain and a fixture lane,
-and the standard conditions hold. Which authority forms the registration carries (linked
-closure, guest, declared policy) waits on D14 (a).
+and the standard conditions hold. D15 settled the authority forms: `Authority::{Graph closure, Guest,
+Declared}`, the last two typed and refusing as "pending: no authority installed" until P2 and P3
+implement them; no `Lane`.
+
+**Interim (landed):** the registry's default for an unregistered, unreserved domain is
+`Unregistered::ServeGeneric` (served under generic graph authority, as before), and only reserved
+domains (`divination`) are refused with the typed `domain-not-registered` error when not
+registered. Strict refusal of every unregistered domain, `Unregistered::Refuse`, is one switch;
+flip it when the applications register, which flips the assertion of the
+`unvalidated-control` case in `embedded_reservoir_validation.rs`.
 
 ### P2a. A door route to the resident's blob custody
 
@@ -790,4 +798,5 @@ Illustrative design, not compile-ready code.
   clean with and without `peers`, 10 `captured_collection` tests pass). No other family lock names
   `mere-comms`, and `murm-resolve` has no consumer outside Murm.
 - 2026-11-06: D15 recorded (authority and lane split; wasm guest after a spike; the blob door route first); P1's Lane and distribution parts superseded; P2 and P3 reshaped; P2a added.
+- 2026-11-06: P1b landed: `mere_resident::domain_registry` (`DomainRegistry`, `DomainRegistration`, `Authority::{Graph, Guest, Declared}`, typed `domain-not-registered`), `MereRoutes::with_registry`, `bin/djinn.rs` and the embedded resident registering through it, `personal-facts` installed by `mere_defaults`, divination still registered by Mere until P3. mere-resident lib 259 to 261, new `tests/domain_registry.rs` 8, other targets unchanged; the same known failures; pandect 331. Interim: `ServeGeneric` plus reserved domains.
 - 2026-11-06: D16 recorded (Mark answered guest_blocks R1 to R3); implementation of P7 begins.

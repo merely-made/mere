@@ -159,7 +159,8 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
         catalog.clone(),
         grants.clone(),
     )
-    .with_divination_authority();
+    .with_resident_defaults()
+    .unwrap();
     catalog
         .update(|catalog| reservoir.register(catalog, Some(routes)))
         .await
