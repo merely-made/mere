@@ -1,9 +1,12 @@
 # Guest blocks: Woodshed's progression and notation as a guest of the block pane
 
-**Status:** 2026-11-06: design, unreviewed; nothing implemented, nothing moved. Written first,
+**Status:** 2026-11-06: design; Mark ruled the eight first-round decisions the same day
+(recorded as [cycle_breaks D13](../implementation_strategy/2026-11-06_cycle_breaks_plan.md), shown
+under "Rulings" below), and the view spike was run. **The spike fell short for painting (Spike), so
+ruling 2 is back with Mark (R1 below) and nothing moves.** Rulings 5 and 6 changed Delivery, What
+moves, Native and the Cycle check; those sections are rewritten. Nothing implemented. Written first,
 as P1 was, because [cycle_breaks D12](../implementation_strategy/2026-11-06_cycle_breaks_plan.md)
-(Mark: "D: Woodshed as a guest") chose a new mechanism. Mark reviews it before any code or file
-moves. Cited by the plan's P7.
+(Mark: "D: Woodshed as a guest") chose a new mechanism. Cited by the plan's P7.
 
 **For:** letting Mere's block pane host Woodshed's progression editing and notation view without
 Mere naming Woodshed in any manifest or lock (D5's end), while the pane keeps working with no
@@ -11,7 +14,7 @@ Woodshed installed.
 
 **Not here:** the guest model for other apps (the host/guest brief's recursion is untouched); the
 domain registration seam (`2026-11-06_domain_contract.md`, which is about stores, not views);
-a native block pane, which does not exist today (Delivery).
+the host-neutral extraction of the pane is described under Native but is Mere work.
 
 ## What exists today
 
@@ -164,6 +167,9 @@ What the guest receives and returns, in the order asked:
   overlay of buttons. An applet surface (a retained Cambium view from the guest) would give
   the guest control of focus and layout inside Mere's tree, which is the OpenDoc direction the
   brief warns against.
+- **Ruling 2 and the spike:** the ruling was this scene plus regions, spike first. The regions
+  half holds; the painting half does not (Spike). Until Mark answers R1, `view-result.scene` and
+  `regions` are provisional, and a second field for the drawing may be added.
 - **Not in the interface:** network, storage, clipboard, time. The world imports `log` and `caps`
   only, so the component is a pure function of its inputs; "unimported means unreachable" does
   the sandboxing, and review has little to grant.
@@ -174,6 +180,71 @@ event-level hit regions, or whether `woodshed-notation` needs a scene output bes
 leaf (`bars::scene` already produces a scene-shaped `SceneInput` for the backdrop, but not for the
 notation leaf); (2) the size of a component built from `woodshedding` and `woodshed-notation`
 against the 16 MiB component cap.
+
+## Spike: can a `sceno` scene plus regions replace `NotationLeaf`?
+
+Ruling 2 required this before any move. Run 2026-11-06 in a scratch workspace
+(`/Users/markik/Code/worktrees/cycles-20261106/p7/spike`, nothing committed to any repository);
+screenshots and numbers in `/Users/markik/Code/testing/mere/guest_blocks_spike_20261106/`
+(`report.txt`, 12 leaf/scene PNGs, one host-path PNG, the measured component).
+
+**Method.** For `Score::progression_example` (4 bars) and `rhythm_example` (11 events), in Chart,
+Tab and Score modes at 640 px: (A) paint the real `NotationLeaf` and rasterise the paint list
+through Netrender and Vello CPU; (B) carry the same drawing as a `sceno::Scene` (every fill
+as a `Backdrop` with a `Polygon` footprint and an open `kind` for the colour role, one `ProjectedItem`
+with a hit footprint per authored event from `event_rects()`) and paint it again with a
+spike-local painter, because the host has none for a generic scene; (C) freeze that scene with
+`graphshell-client`'s `FrozenScene`; (D) draw Mere's `progression.json` through `BackdropSurface`,
+the host's existing scene path.
+
+| Case | Paint cmds | Polygons | Contours that lost a hole | Scene JSON | Pixels differing A vs B |
+|---|---|---|---|---|---|
+| progression Chart | 36 | 36 | 0 | 41 KB | 0 (0.00%) |
+| progression Tab | 60 | 74 | 14 | 98 KB | 512 (0.17%) |
+| progression Score | 60 | 96 | 36 | 138 KB | 2,348 (0.94%) |
+| rhythm Chart | 41 | 41 | 0 | 57 KB | 0 (0.00%) |
+| rhythm Tab | 61 | 65 | 4 | 102 KB | 88 (0.06%) |
+| rhythm Score | 57 | 67 | 10 | 87 KB | 720 (0.52%) |
+
+**What the scene carries.** Event-level hit regions, accessible names and order. Four events became
+four items and `FrozenScene` listed them ("Bar 1, event 1" and so on; 11 for the rhythm score), so
+`event_rects()` and the per-event button overlay are replaceable. Selection and the playhead are
+presentation state the host applies over these items.
+
+**What it does not carry: the drawing.**
+1. `sceno` says it outright: "The scene never carries rendered content." A `Backdrop` has an open
+   `kind` string, a footprint and two flags: no colour, no fill rule, no text.
+2. The host's existing path cannot take an arbitrary scene. `BackdropSurface::new` accepts only a
+   scenomise `SceneInput` (disclosed-data facts: fretboard, terrain, templated sequence), and its
+   `paint` draws backdrops only as guide-coloured strokes plus marks and labels. `FrozenScene` is
+   the semantic reading and paints nothing. `hostpath_progression_BackdropSurface.png` is what that
+   path draws for a progression: spans, relations and text, no engraving.
+3. Forcing the drawing into polygon backdrops works for single-contour shapes (the chord chart is
+   pixel-identical) and fails visibly for anything with a counter: `progression_score_B_scene.png`
+   shows the treble clef, whole and half note heads solid, and `progression_tab_B_scene.png` shows
+   the fret digits 0, 6, 8 and 9 as filled blobs. `Footprint::Polygon` is one contour. Bezier
+   outlines were also flattened (6 segments each) and the scenes are 40 to 140 KB for four bars.
+4. Text (bar numbers, chord symbols) is overlay text in the leaf today and has no primitive in the
+   scene.
+
+**Verdict.** A `sceno` scene plus regions is enough for the regions and not enough to replace
+`NotationLeaf`'s painting. Missing: compound (multi-contour) fills with a fill rule, fill versus
+stroke, theme-role paint, text runs, and a host painter for a generic scene. Adding them to `sceno`
+is a contract change in merely-made/graphshell, and it contradicts `sceno`'s stated stance that a
+scene carries no rendered content, so it is Mark's to rule. A host painter is a Mere change. This
+design therefore does not choose; R1 puts the options to him.
+
+**Component size** (wasm32-wasip2, release, LTO, `opt-level = "s"`, stripped, a real component with
+the draft `block-guest` world exporting `view`):
+
+| Guest contents | Size | gzip -9 |
+|---|---|---|
+| `woodshedding` and `sceno` only | 151,052 B (0.14 MiB) | not measured |
+| plus `woodshed-notation` (engraving, Bravura 889,228 B, and `sprigging`) | 1,208,190 B (1.15 MiB) | not measured |
+| plus `scenomise` (the arrangement `SceneInput`) | 1,718,946 B (1.64 MiB) | 645,865 B |
+
+Against `MAX_COMPONENT_BYTES` (16 MiB) the full guest is about 10%. Most of it is the font.
+Dropping `sprigging` (if the view is not a paint list) shrinks it further; not measured.
 
 ## Layer
 
@@ -188,9 +259,10 @@ single source (DOC_POLICY §2); a Mere-local copy would be exactly the drift D10
 the guest wrapper that calls a mounted component, review and grants (`capsule_applet`), and the
 Worker plumbing stay in `ports/graphshell`, which D8 left above Mere.
 
-**This design adds nothing to `merely-made/graphshell`.** Putting the interface there is a
-ruling for Mark (Decision 1): the common rules say a contract item is reported, not added.
-Until he rules, the WIT lands nowhere.
+**Ruled (decision 1): the interface goes in the graphshell protocol WIT as a new `block-guest`
+world.** It is added in step 2 of the order of work, after Mark answers R1, because R1 may add a
+drawing vocabulary to the same repository and the two should land together. This design adds
+nothing there yet.
 
 ```
 merely-made/graphshell   block-adapter WIT, sceno           (protocol, below Mere)
@@ -198,8 +270,8 @@ merely-made/graphshell   block-adapter WIT, sceno           (protocol, below Mer
 merely-made/mere     host: BlockAdapter trait, pane,        (host, above the protocol)
                      guest wrapper, review + grants
         ^
-merely-made/woodshed guest: woodshed-blocks (component),    (guest, above Mere and
-                     built against the WIT; tests use Mere   the protocol)
+merely-made/woodshed guest: woodshedding/blocks +              (guest, above Mere and
+                     woodshed-notation/block-guest component  the protocol)
 ```
 
 No arrow points from Mere to Woodshed. Woodshed to Mere and to Graphshell are the legal edges
@@ -207,15 +279,32 @@ already in its lock.
 
 ## Delivery
 
-**What Woodshed ships.** A new crate (proposed `crates/woodshed-blocks`, a workspace member
-beside `woodshedding`, not a feature of it, so `woodshedding`'s dependencies and the other
-Woodshed roots do not move). It holds the moved `bars.rs` logic against the WIT's `block`,
-`change` and `attr` types, and the notation-view portion, producing `view-result`. It builds for
-`wasm32` as a component with `world block-guest`, exporting one `claim` (`progression`). A
-Woodshed script packages it as a signed pack: `PackManifest { name: "woodshed-blocks", parts:
-[WasmComponent], requested_scopes: ["power:block-adapter"] }`, signed with Woodshed's author key
-through the same `eidetic` pack-signing path the applets use. The same crate builds natively as an
-rlib, so its unit tests (including the 8) run without wasm.
+**What Woodshed ships (ruling 5: a feature of `woodshedding`).** Taken literally the ruling
+cannot hold for the whole guest, and the reason is a dependency direction, not a preference:
+`woodshed-notation` depends on `woodshedding`, so the engraving and view code cannot live in
+`woodshedding` without inverting that edge. The split that keeps the ruling where it can hold:
+
+- **`woodshedding` feature `blocks`** (off by default; ruling 5): the moved `bars.rs` adapter logic,
+  as plain Rust over `woodshedding` types (`rows`, `choices`, `attributes`, `music`, `write_music`,
+  `time_signatures`, `meter_attributes`, `plaintext`), returning its own small structs. Its one new
+  optional dependency is `serde_json` (the logic reads the `woodshed` source attribute as JSON). No
+  WIT, no `sceno`, no `scenomise`: the portable core stays free of Mere and Graphshell. The 8 tests
+  that are pure move here; the 3 that use `Document` and `Preview` are rewritten (ruling 7).
+- **`woodshed-notation` feature `block-guest`** (enables `woodshedding/blocks`): the WIT bindings
+  (`wit-bindgen`), the `change` and `attr` mapping, the view (engraving, `event_rects`, regions, and
+  whatever R1 decides the drawing is), the arrangement backdrop scene (`bars::scene`, which needs
+  `scenomise`, `sceno`, `mere-curation` and `scenograph`), the example, and the component entry. A
+  cdylib is built only when its package is the build root, so declaring `crate-type = ["rlib",
+  "cdylib"]` here does not change any dependent. The wasm build is `cargo build -p woodshed-notation
+  --target wasm32-wasip2 --release --features block-guest`; the spike built exactly this shape.
+- Alternatives to the second bullet, for Mark (R2): move the engraving into `woodshedding` under
+  the feature, which makes everything literally a `woodshedding` feature but puts about 735 lines and
+  the 889 KB Bravura font in the portable core; or a new crate, which ruling 5 declined.
+
+The pack: `PackManifest { name: "woodshed-blocks", parts: [WasmComponent], requested_scopes:
+["power:block-adapter"] }`, signed with Woodshed's author key through the same `eidetic`
+pack-signing path the applets use, built by a Woodshed script. The native rlib build runs the unit
+tests without wasm.
 
 **How Graphshell discovers, reviews and loads it on the web.** The existing applet path, widened
 by one power and one purpose:
@@ -242,16 +331,57 @@ command)`, shows the previous result marked stale, and re-asks on change. The pa
 `completed: Rc<RefCell<..>>` already does this for IndexedDB saves. This is the main cost of
 D12 and it is in Mere's pane, not in Woodshed.
 
-**Native.** `editable-blocks` requires `web` and `applets` is web only, so there is no native
-block pane and no native applet host in `ports/graphshell` today. Nothing in D12 needs one. The
-pack format is identical for the wasmtime-based `crates/script/app-host`, so a native pane would
-load the same signed pack under the same review; building that is outside this design and listed
-as Decision 6.
+### Native (ruling 6: a native block pane now, over `app-host`)
+
+Today there is none: `editable-blocks` requires `web`, which in `ports/graphshell` is a misnomer
+for the portable host modules (they compile natively; the same crate already builds Cambium
+desktop shells), and `applets` is the same. Ruling 6 adds one. What exists to build on, and what
+does not:
+
+- **Exists:** `capsule_applet` (review, signed-pack and component verification, grants) is
+  portable Rust with no browser dependency; `muniment/directory` gives the document store a
+  native `Backend` (the pane's `store::load` and `save` are generic over `DocumentStore`);
+  `cambium-desktop` and `cambium_genet_winit_host::run` give native windows
+  (`graphshell-alembic`, `graphshell-coop`, `goal-surface-host`); `crates/script/app-host`
+  runs components under wasmtime 45 with a watchdog epoch and `StoreLimits`.
+- **Does not exist:** a host for the `block-guest` world. `app-host` binds only `app-core`
+  (`bindgen!` per world; "two worlds, two hosts" is the existing pattern with `document-host`).
+  A native block pane therefore needs a third host crate, **`crates/script/block-host`**, binding
+  `block-guest` over the same `mere:script` WIT (via the endpoint's `links` metadata, as D10
+  describes), with `guarded_engine` and `Watchdog` shared or copied from `app-host`, exposing
+  `BlockScript::attach_bytes`, `describe`, `choices`, `apply`, `run`, `view` as blocking calls.
+- **The pane must leave `web_tree`.** `blocks.rs` is written against the web page's private types.
+  The generic pane splits into a host-neutral `graphshell::block_pane` (the `Pane` state, the
+  registry, the view builders, over a small trait giving size, appearance, storage, wake and the
+  adapter calls) and two bindings: the existing `web_tree` one (storage `IndexedDbBackend`,
+  adapters through the Worker, results memoised) and a native one. This is the largest single piece
+  of work in D13 and should land before the guest moves (order of work, step 3).
+- **Which native shell:** a new bin **`graphshell-blocks`** in `ports/graphshell`
+  (feature `editable-blocks-native`), a Cambium desktop window in the style of `graphshell-alembic`:
+  one window, the generic pane, a document directory under the user's data dir, and a review
+  dialog. None of the three existing native shells is a document editor, and putting the pane in
+  one of them would couple it to the coop session or the goal surface. Knot's desktop app is the
+  natural document-editing shell and could host the same `block_pane` later, but it is another
+  repository's application and is not part of this design (R3).
+- **Same pack, same review.** The native shell loads the same signed pack as the web one:
+  `CapsuleMount::review` verifies the signature, the component digest and size; `approve` grants
+  only `power:block-adapter`, and only if the pack asked; the review dialog names the class the
+  component claims and the author key, and a new grant needs a new review. The disclosure comes
+  from a Moot collection through `ports/moot` when the shell has one, exactly as on the web; a
+  directory of already-fetched packs is the offline form. Revocation drops the instance and its
+  registry entry.
+- **Calling model.** Native calls are in process and bounded by the watchdog, so they are
+  synchronous and answer inside the frame; the pane's memo is still keyed the same way and is
+  simply always fresh. The component never runs on the render thread unguarded: a turn that hits
+  its epoch deadline traps, the host survives, the registry entry is dropped and the pane shows the
+  interim state with the refusal text.
+- **What native adds to the guarantees:** nothing new for Cargo. `block-host` and
+  `graphshell-blocks` are Mere crates and name no Woodshed package.
 
 **Where the pack comes from.** Woodshed's release publishes the signed pack and its disclosure
 entry. Mere does not commit, vendor or fetch it at build time: a pack checked into Mere would be a
 Woodshed artifact inside Mere's tree, and a build-time fetch would be a source edge. The product
-site that serves the page may list it as a disclosed capsule (an operations choice, Decision 4),
+site that serves the page may list it as a disclosed capsule (an operations choice; ruling 4 settles the mechanism),
 and a user may add one by address.
 
 ## What moves and what stays
@@ -260,15 +390,21 @@ and a user may add one by address.
 
 | From Mere | To Woodshed | Tests |
 |---|---|---|
-| `block_editing/bars.rs` (741 lines) | `woodshed-blocks`, as the guest's adapter logic | the 8 `bars` tests, count 8 before and after |
-| notation-view portion of `web_tree/blocks.rs` (about 350 to 450 lines: `insert_progression`, `write_notation`, `notation_*`, the `NotationLeaf` leaf, bar-line export, backdrop scene call) | `woodshed-blocks`, as `view`, `run` and `describe`'s `example` | none exist; add component round-trip tests |
-| `support/woodshed-block-example.json` | `woodshed-blocks` | covered by the example test |
+| `block_editing/bars.rs` (741 lines): the adapter logic | `woodshedding` feature `blocks` | the 5 pure `bars` tests move unchanged |
+| `bars::scene` (the arrangement `SceneInput`) | `woodshed-notation` feature `block-guest` | covered by a view test |
+| notation-view portion of `web_tree/blocks.rs` (about 350 to 450 lines: `insert_progression`, `write_notation`, `notation_*`, the `NotationLeaf` leaf, bar-line export, backdrop scene call) | `woodshed-notation` feature `block-guest`, as `view`, `run` and the claim's `example` | none exist; add component round-trip tests |
+| `support/woodshed-block-example.json` | `woodshed-notation` (`block-guest`) | covered by the example test |
 
-Tests: 3 of the 8 use `Document` and `Preview`. Two ways to keep them (Decision 7): a Woodshed
-dev-dependency on Mere's `graphshell` library with `editable-blocks` (legal, guest above host,
-but it puts Mere's `graphshell`, `knot-editor-host` and `illume` in Woodshed's lock), or rewrite
-the three against the guest's own `change` and `attr` types and have one conformance test in
-Woodshed load the real pack through Mere's host, which exercises `Document::apply` once.
+Tests (ruling 7): 5 of the 8 are pure and move unchanged to `woodshedding` (count 8 before; 5 plus
+3 rewritten after). The 3 that use `Document` and `Preview` (write-notation atomicity, the
+saved-music reading, grouping through one history) are rewritten against the adapter's own types
+(attribute maps and `change` records), so Woodshed's lock gains no editor stack. The one thing
+they proved through `Document::apply` (a returned map changes only that block's attributes, in one
+undo step) is covered by **one conformance test in Woodshed** that loads the real pack through
+Mere's host and applies a result through `Document`. That test is a Woodshed dev-dependency on Mere
+(guest above host, legal under D6) and lives under `woodshed-notation`'s `block-guest` feature, so
+it adds `graphshell` (with `editable-blocks`, `knot-editor-host`, `illume`) to Woodshed's root lock
+only. The count is 8 before and 8 plus the conformance test after.
 
 **Stays in Mere, generalised** (`ports/graphshell`):
 
@@ -282,6 +418,7 @@ Woodshed load the real pack through Mere's host, which exercises `Document::appl
   `SHEET`'s `blocks-notation-*` classes are renamed `blocks-guest-*`.
 - `rhyme.rs` becomes the first `BlockAdapter` implementation (built in). This is the evidence
   that the trait is not Woodshed-shaped: two implementations before the first guest exists.
+- `block_pane` (new, host-neutral) and `crates/script/block-host` (new, native host); see Native.
 - `capsule_applet.rs` gains `power:block-adapter`; `web/applets/worker.mjs` gains the
   request/response path next to the action path.
 - A fixture block guest (a small component built in Mere, not Woodshed) for Mere's own tests of
@@ -316,101 +453,119 @@ Standard done conditions 1 and 3, with D5 and D6, applied to each piece:
   `editable-blocks` keeps its name for the generic pane and loses `dep:woodshedding`. After
   relocking, `Cargo.lock` (now `woodshedding` at line 21327) and
   `ports/graphshell/web/Cargo.lock` (now `woodshed-notation` at 12296 and `woodshedding` at
-  12306) hold no Woodshed package.
-- **No dev edge.** Mere's tests of the pane, loader and registry use the Mere-built fixture
-  guest. No Mere test, dev-dependency or committed file names a Woodshed package or contains a
-  Woodshed pack. The real pack is exercised only from Woodshed (guest above host: a Woodshed
+  12306) hold no Woodshed package. The new `block-host` crate and `graphshell-blocks` bin add
+  Mere-only edges.
+- **No dev edge.** Mere's tests of the pane, loader, registry and `block-host` use a fixture guest
+  built in Mere. No Mere test, dev-dependency or committed file names a Woodshed package or contains
+  a Woodshed pack. The real pack is exercised only from Woodshed (the conformance test: a Woodshed
   dev-dependency on Mere, which D6 permits because Mere does not depend on Woodshed), or from
   `Code/testing/mere`.
 - **The guest has no Cargo edge from Mere at all.** A signed pack is data. The cycle check reads
   locks, so a runtime-loaded component is invisible to it by construction; the guarantee is the
   rule above, not the check, and the plan's P7 done list carries it.
-- **Graphshell (the protocol repo).** If Decision 1 puts the WIT there, `graphshell` gains a
-  world and no dependency; Woodshed already takes `sceno` from it.
-- **Woodshed's lock roots** (8 `Cargo.lock` files on main, 2026-11-06):
+- **Graphshell (the protocol repo).** The WIT gains a world (and R1 may add a drawing vocabulary
+  to `sceno`); it gains no dependency. Woodshed already takes `sceno` from it.
+- **Woodshed's lock roots** (8 `Cargo.lock` files on main, 2026-11-06). A `Cargo.lock` records
+  optional dependencies whether or not a feature is on (the plan's Findings), so what the features
+  add to `woodshedding` and `woodshed-notation` reaches every lock that holds those packages.
+  Counts are packages whose lock `source` is that repository's git URL; "holds" is checked in each
+  lock.
 
-  | Root | Mere packages | Graphshell packages | At the move |
-  |---|---|---|---|
-  | `Cargo.lock` (workspace) | 32 | 4 | takes `woodshed-blocks`; relock; gains the WIT source |
-  | `validation/relationship-recipe` | 26 | 4 | path-depends on `woodshedding` and `woodshed-notation`; relock only if either's dependencies change (a new crate leaves them unchanged) |
-  | `ports/hocket` | 22 | 2 | relock only if it takes a changed crate |
-  | `ports/redshank` | 25 | 2 | relock only if it takes a changed crate |
-  | `examples/musicxml-timing` | 0 | 0 | names `woodshedding` or the notation crate; no relock expected |
-  | `ports/ringdown` | 0 | 0 | none |
-  | `ports/redshank/spikes/playback` | 0 | 0 | none |
-  | `testing/campaigns/audio-packs-ap0` | 0 | 0 | already broken (known), not chased |
+  | Root | Mere pkgs | Graphshell pkgs | Holds `woodshedding` / `woodshed-notation` | At the move |
+  |---|---|---|---|---|
+  | `Cargo.lock` (workspace) | 32 | 4 | yes / yes | relock; gains `wit-bindgen` edges and the conformance test's `graphshell` editor stack |
+  | `validation/relationship-recipe` | 26 | 4 | yes / yes | relock (the features' optional deps are recorded) |
+  | `examples/musicxml-timing` | 0 | 0 | yes / no | relock; gains only `serde_json` and its registry dependencies, because `blocks` is the only feature on `woodshedding` and needs nothing else |
+  | `ports/hocket` | 22 | 2 | no / no | untouched |
+  | `ports/redshank` | 25 | 2 | no / no | untouched |
+  | `ports/redshank/spikes/playback` | 0 | 0 | no / no | untouched |
+  | `ports/ringdown` | 0 | 0 | no / no | untouched |
+  | `testing/campaigns/audio-packs-ap0` | 0 | 0 | no / no | already broken (known), not chased |
 
-  Counts are packages whose lock `source` is that repository's git URL. The four roots that
-  name Mere and Graphshell are the ones the repin loop touches. Keeping the guest in a new
-  crate keeps `woodshedding`'s own graph unchanged, so the neighbouring roots do not churn.
-  Relock in dependency order (Graphshell, Mere, Woodshed) with `cargo +1.97.1 update -p`.
+  Three roots hold `woodshedding`, so three relock. This corrects my first draft, which expected
+  Hocket and Redshank to churn: their locks hold neither package. The split in "What Woodshed
+  ships" is what keeps `examples/musicxml-timing` from gaining Mere or Graphshell packages: a
+  spike dependency closure for `woodshedding` plus `sceno`, `scenomise` and `wit-bindgen` is 4
+  family packages (`sceno`; `mere-curation`, `scenograph`, `scenomise`) and 37 registry packages
+  (`/Users/markik/Code/worktrees/cycles-20261106/p7/spike`, `cargo metadata`, normal edges,
+  wasm32-wasip2). Putting those on `woodshedding` itself, as a literal reading of ruling 5 would,
+  makes the portable core's example lock name Mere and Graphshell. Relock in dependency order
+  (Graphshell, Mere, Woodshed) with `cargo +1.99.1 update -p` per the family repin loop; Woodshed's
+  toolchain row is 1.97.1.
 
 ## Order of work (after review)
 
-1. Mark rules the decisions below.
-2. If the WIT is a protocol item: add `block-adapter` and `block-guest` to the graphshell
-   repository (cut first: receiver builds and tests).
-3. Mere: `BlockAdapter`, the registry, rhyme as the first implementation, the pane rewritten over
-   the registry with the interim behaviour, `power:block-adapter`, the worker path, the fixture
-   guest. The Woodshed code stays in Mere and keeps working until step 4 is verified.
-4. Woodshed: `woodshed-blocks` with the moved code and tests, the pack script, the conformance
-   test; tests and blob comparison against Mere's copies.
+1. Mark answers R1 to R3.
+2. In the graphshell repository: the `block-guest` world and `block-adapter` interface, and whatever
+   R1 adds for the drawing (cut first: the receiver builds and tests; the protocol repo's
+   conformance fixture gets a block-guest round trip).
+3. Mere: `BlockAdapter`, the registry, rhyme as the first implementation; the generic pane
+   extracted from `web_tree` into `block_pane` with the interim behaviour and the memo; the web
+   binding (Worker path, `power:block-adapter`); `crates/script/block-host`; the `graphshell-blocks`
+   native bin; a fixture block guest built in Mere. The Woodshed code stays in Mere and keeps
+   working until step 5 is verified.
+4. Woodshed: `woodshedding/blocks` and `woodshed-notation/block-guest`, the pack script, the
+   rewritten tests and the conformance test; blob comparison against Mere's copies; relock the
+   three roots.
 5. Mere: delete `bars.rs` and the notation-view portion, the two manifest rows, relock the web
    lock and the main lock; build with `web/scripts/build-viewer.py` and check the digest; run
-   the cycle proof over both repositories' lock roots.
+   `graphshell-blocks` against the real pack; run the cycle proof over both repositories' lock
+   roots.
 6. Docs: plan Progress, source homes map ("Graphshell names three things", "Repository cycles"),
    Woodshed's docs, this document's status.
 
-## Decisions for Mark
+## Rulings
 
-1. **Where does the `block-adapter` interface live?**
-   - (a) The WIT file in `merely-made/graphshell`, as a new world. One source, usable by any host
-     above the protocol; the file already holds non-projection worlds. Recommended.
-   - (b) A Mere-local WIT beside `app-host`. Smaller blast radius, but it is a second copy of a
-     wire name, and D10's links-metadata rule would apply to it too.
-   - (c) No WIT: a Rust trait object loaded only by a native host. Does not reach the web
-     product, which is the only block pane that exists. Not recommended.
-2. **What does a guest's view return?**
-   - (a) A `sceno` scene plus accessible regions, drawn by the host. Recommended: no toolkit in
-     the guest, the host keeps focus and accessibility.
-   - (b) A retained applet surface (a Cambium view tree). More expressive; the guest then drives
-     layout and focus inside Mere's tree, and the guest needs the toolkit.
-   - (c) Paint commands (Sprigging). Cheapest port of `NotationLeaf`, but it names Sprigging in the
-     contract, and Sprigging is a Mere crate.
-3. **How does the web host call a guest, given the worker is asynchronous?**
-   - (a) Worker, asynchronous, with the pane memoising results and showing stale state.
-     Recommended: same isolation as applets, and the cost is in one place.
-   - (b) Instantiate the jco adapter on the main thread and call synchronously. Simplest for the
-     pane, but guest CPU runs on the render thread, and review would have to bound it.
-   - (c) Worker, and block the pane's disabled/enabled state until the first answer. Simple, but
-     the command bar flickers on every selection.
-4. **How does the product find Woodshed's pack?**
-   - (a) Woodshed publishes the signed pack; the product site discloses it as a capsule in a Moot
-     collection and the user reviews it once. Recommended: no Cargo edge, no vendored artifact,
-     and the existing review UI is reused.
-   - (b) A "Add block adapter" control that takes an address or file. Works with no site
-     support; the first-run experience is a user chore.
-   - (c) The product ships the pack as a static asset next to the wasm. Best first run, but the
-     bytes are a Woodshed artifact inside the product's release; acceptable only if it is built
-     in Woodshed's release and copied by the site's deployment, never committed in Mere.
-5. **Where does the guest live in Woodshed?**
-   - (a) A new crate `crates/woodshed-blocks`. Recommended: `woodshedding`'s dependencies stay
-     the same, so the other Woodshed roots do not churn.
-   - (b) A feature of `woodshedding`. Fewer crates, but it adds the WIT and wasm toolchain to the
-     portable core that Hocket and Redshank use.
-6. **Is a native block pane in scope?**
-   - (a) No, as today. Recommended: D12 loses nothing the user has natively.
-   - (b) Build it now over `app-host` (wasmtime) with the same pack and review.
-   - (c) Decide when a second host is planned (Stack 1's rule for leaving a port).
-7. **The 3 `Document`-dependent `bars` tests.**
-   - (a) Rewrite them against the guest's own types and add one conformance test that loads the
-     real pack through Mere's host. Recommended: keeps Mere's editor stack out of Woodshed's lock.
-   - (b) Keep them unchanged with a Woodshed dev-dependency on Mere's `graphshell`
-     (`editable-blocks`). Same tests and same count, but the lock gains `knot-editor-host` and
-     `illume`.
-8. **The interim text.**
-   - (a) Disable the command with the class name and a review entry when a capsule is disclosed.
-     Recommended.
-   - (b) Silent: the block is an ordinary div with no explanation.
-   - (c) Hide progression blocks' source behind a read-only card until an adapter is installed.
-     Safer against hand-edits of the structured source, but it hides the user's own text.
+Mark, 2026-11-06, on the eight decisions of the first draft (recorded as
+[cycle_breaks D13](../implementation_strategy/2026-11-06_cycle_breaks_plan.md)); R1 to R3 are
+new, from the spike and from rulings 5 and 6.
+
+1. **Interface: ruled.** "Put `block-adapter` in the graphshell protocol WIT, as a new
+   `block-guest` world in merely-made/graphshell." See Layer.
+2. **View: ruled, with a condition that was triggered.** "A `sceno` scene plus regions, but run a
+   spike first. If the spike falls short, come back to him before choosing differently." It fell
+   short: see Spike and R1. Nothing different has been chosen.
+3. **Calling: ruled.** "A Worker, asynchronous, with a memo and stale state." See Delivery; native
+   is in process (Native).
+4. **Discovery: ruled.** "A Moot capsule that is reviewed once." See Delivery and Native.
+5. **Crate: ruled.** "A feature of `woodshedding`, not a new crate." Not the first draft's
+   recommendation; Delivery and the Cycle check are rewritten around it. It cannot hold for the
+   view without inverting an edge: R2.
+6. **Native: ruled.** "Build a native block pane now, over `app-host`." Not the first draft's
+   recommendation; see Native. `app-host` itself binds only `app-core`, so the host is a sibling
+   crate, `block-host`.
+7. **Tests: ruled.** "Rewrite them against the guest's own types, and add one conformance test
+   through Mere's host." See What moves and what stays.
+8. **Unclaimed class: ruled.** "Disable the command, name the class, and add a 'Review block
+   adapters' entry." See Interim behaviour.
+
+### Open (for Mark)
+
+- **R1. How is the notation drawn, given the spike?**
+  - (a) Extend `sceno` with a drawing vocabulary (compound paths with a fill rule, stroke, theme-role
+    paint, text runs) and give Mere a generic scene painter. Honest to ruling 2, but it is a contract
+    change in merely-made/graphshell that reverses `sceno`'s "never carries rendered content", and
+    the painter becomes a second renderer beside `BackdropSurface`.
+  - (b) Keep the `sceno` scene for regions, order and names, and return the drawing as a second
+    payload in `view-result`: a small versioned vector sheet (compound fills, strokes, theme roles,
+    text runs), a new payload type in the graphshell protocol painted by one Mere painter. It is the
+    closest match to what `NotationLeaf` already emits (a paint list) and leaves `sceno`'s stance
+    alone. Recommended.
+  - (c) The drawing as paint commands or a retained applet surface (the first draft's options (c)
+    and (b)). Cheapest to port, but it names Sprigging or Cambium in the contract.
+- **R2. Where does the view and component entry live, given ruling 5?**
+  - (a) `woodshedding` feature `blocks` for the adapter logic and `woodshed-notation` feature
+    `block-guest` for the view and the entry, as in Delivery. Keeps the portable core free of Mere
+    and Graphshell and `examples/musicxml-timing`'s lock free of family packages. Recommended.
+  - (b) Move the engraving into `woodshedding` under the feature so everything is one feature of
+    one crate: about 735 lines and the 889 KB font in the portable core, and `woodshedding` takes
+    `sceno`, `scenomise` and the rest, so `examples/musicxml-timing` newly names Mere and
+    Graphshell.
+  - (c) A new crate. Ruling 5 declined it.
+- **R3. Which native shell?**
+  - (a) A new `graphshell-blocks` bin in `ports/graphshell`. Recommended: no coupling to coop or the
+    goal surface, and `block_pane` is reusable.
+  - (b) Add the pane to `graphshell-coop`. Less new code, but it ties a document editor to the coop
+    session.
+  - (c) Host `block_pane` in Knot's desktop app. The natural document shell, but another
+    repository's application and a Mere to Knot dependency the plan is removing (D1).

@@ -170,10 +170,16 @@ Done when (amended by D12):
   design's first decision), or Mere-local if he rules otherwise;
 - Mere's applet host loads a reviewed, signed component pack as a block adapter (a new
   `power:block-adapter` grant in `capsule_applet`);
-- `bars.rs` with its 8 tests and the notation-view portion of `blocks.rs` live in Woodshed,
-  built there as a signed wasm component pack, with the 8 tests passing in Woodshed (count
-  before and after), and a conformance test in Woodshed that loads the real pack through
-  Mere's host;
+- `bars.rs` and the notation-view portion of `blocks.rs` live in Woodshed (D13): the adapter
+  logic as `woodshedding`'s feature `blocks`, the view and the component entry as
+  `woodshed-notation`'s feature `block-guest`, built as a signed wasm component pack; the 8
+  `bars` tests count 8 before and 8 after (5 move unchanged, 3 rewritten against the adapter's own
+  types) plus one conformance test in Woodshed that loads the real pack through Mere's host;
+- Mere has a host-neutral `block_pane`, a `crates/script/block-host` for the `block-guest` world
+  and a native `graphshell-blocks` shell that loads the same pack under the same review (D13,
+  ruling 6);
+- the guest-blocks open questions R1 (the drawing), R2 (the view's home) and R3 (the native shell)
+  are answered;
 - `editable-blocks` stays as the generic pane's feature but loses `dep:woodshedding`; the
   `woodshedding` row in `ports/graphshell/Cargo.toml` and the `woodshed-notation` row and its
   `product` entry in `ports/graphshell/web/Cargo.toml` are gone;
@@ -311,6 +317,30 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   and held for Mark's review.
 
   Links: area stack · draws on cycle_breaks D5, D8, D9, host_guest_contract_brief · amends cycle_breaks D5 · plans cycle_breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
+
+- **D13. The guest-blocks decisions (Mark, 2026-11-06):** the eight decisions of
+  [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md), answered as relayed:
+  1. Interface: "Put `block-adapter` in the graphshell protocol WIT, as a new `block-guest` world in
+     merely-made/graphshell."
+  2. View: "A `sceno` scene plus regions, but run a spike first. If the spike falls short, come back
+     to him before choosing differently." The spike was run the same day and fell short for painting
+     (guest_blocks, Spike); the view is back with Mark and nothing different is chosen.
+  3. Calling: "A Worker, asynchronous, with a memo and stale state."
+  4. Discovery: "A Moot capsule that is reviewed once."
+  5. Crate: "A feature of `woodshedding`, not a new crate." Not the design's recommendation. It holds
+     for the adapter logic; the view and component entry go in a `woodshed-notation` feature,
+     because `woodshed-notation` depends on `woodshedding` (guest_blocks R2).
+  6. Native: "Build a native block pane now, over `app-host`." Not the design's recommendation.
+     `app-host` binds only `app-core`, so the host is a sibling `crates/script/block-host`, and the
+     pane is extracted from `web_tree` into a host-neutral `block_pane` (guest_blocks, Native).
+  7. Tests: "Rewrite them against the guest's own types, and add one conformance test through
+     Mere's host."
+  8. Unclaimed class: "Disable the command, name the class, and add a 'Review block adapters'
+     entry."
+  Outcome: settles D12's design except the view's drawing (guest_blocks R1), the home of the view
+  (R2) and the native shell (R3), which are put to Mark.
+
+  Links: area stack · draws on cycle_breaks D12, guest_blocks · plans cycle_breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
 
 ## Findings
 
@@ -465,3 +495,7 @@ Illustrative design, not compile-ready code.
   and F1's `scenomise` edge.
 - 2026-11-06: D12 recorded and P7 reshaped (Mark chose D, Woodshed as a guest); the design is
   `technical_architecture/2026-11-06_guest_blocks.md`; nothing implemented, held for Mark's review.
+- 2026-11-06: D13 recorded (Mark's eight guest-blocks answers). The view spike was run and fell short
+  for painting (a `sceno` scene carries the event regions and names but not the engraving: holes
+  lost, no colour, text or fill rule); the full guest component is 1,718,946 B against the 16 MiB
+  cap. R1 to R3 are with Mark; nothing moved.
