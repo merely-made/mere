@@ -1058,3 +1058,17 @@ revision and what crosses at frame rate.
   and 78 knot-document tests, six Windows `cfg(not(unix))` failures apart); Mark ruled the lane
   repins Mere to current main so the lock holds one source per package, keeps the `retained`
   path, and the stale `.cargo/scope-navigation-local.toml` overlay in Knot's checkout is deleted.
+- 2026-11-07: Seiche pushed to `merely-made/seiche` main `a6b8641` (161 commits; second commit set the
+  seven `repository` fields, fixed the conatus README's links and founded `seiche_docs` with the
+  conatus engine plan and the conatus/Nexus alignment brief under D25; the field system extraction
+  note stays in Mere, it spans the kernel and the host). Mere's donor lane for the seven crates
+  opened. Knot main `a58ba28`: Inker from `inker.git`, the editor as `knot_document::retained::KnotEditor`
+  (D17), Mere repinned to current main with one source per package, the stale local overlay
+  deleted. Turnstone main `841c8117`: nine rows to `inker.git`, D16 conversions in
+  `src/shell/reading_edge.rs`, Knot's lock moved to `2c703c4`, five Inker and one tinct redirect
+  rows in its mere.git patch table until Knot and Woodshed repin; one CEF download happened through
+  the repository's own verify script and was deleted with the build directory. Both pushed on
+  Mark's word; lane worktrees and branches removed. Free disk 481 GB after cleanup; Mark handles the
+  rest himself. Next: Mere relocks to Knot `a58ba28` and drops its five redirects and the port's
+  `knot-editor-host` use (after the Seiche donor merge); Turnstone's `knot_authoring` moves to
+  `knot-document`; then `knot-editor-host` retires from Inker.
