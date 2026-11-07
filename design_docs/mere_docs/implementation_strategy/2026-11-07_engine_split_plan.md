@@ -6,7 +6,8 @@ contract is deferred by D4; the Pandect sidecar owners are open.
 crates with history (main `3109942`, pushed); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
-`merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
+`merely-made/seiche` exists, empty; `merely-made/inker` holds the twelve Inker crates (main `436c841`) and Mere
+takes them from it (P1's cut, below); the engine-to-workspace contract
 is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -281,6 +282,14 @@ Knot to the canonical source. Mere receives Inker as a supplier.
   headed receipts that exist today pass from the new home; the moved packages keep their
   names.
 - Needs: P0's lines for the Inker crates.
+- State (2026-11-07): **Mere's half is cut.** Mere deleted its twelve copies and the three
+  design areas and takes the crates from `inker.git` (`branch = "main"`, locked at
+  `3109942`; `436c841` above it adds only Inker's DOC_POLICY and DOC_README). Every moved
+  file matched Inker's copy except `document-canvas`'s text test, which reads Inker's own
+  Roboto (F5, settled there). Knot's pinned revision still names five of them through
+  `mere.git`, so Mere's `mere.git` patch table redirects those five to `inker.git`;
+  Inker names the Cambium family through `mere.git`, so the Graphshell web workspace now
+  restates eight Cambium-family path redirects. Turnstone and Knot repin is open.
 
 **Lane state, 2026-11-07 (worktree branch `worktree-agent-a61f20e98db5486a2`; receipts in the
 plan's receipt file).** Landed in the worktree: Fleece's `crawl` takes `Fetched` from
@@ -354,7 +363,7 @@ then import `KnotEditor` from `knot-document`, and their manifests drop `knot-ed
   Rhai batch into `hest::Invocation`s against a host-offered `CommandSet`; Mere's graphshell
   port and Knot's endpoint tests consume it. `hest` is in Graphshell's contract root, which
   Inker may name; nothing changes.
-- F5 (open), a file edge: `document-canvas`'s text test includes Cambium's
+- F5 (settled in Inker 2026-11-07: Inker carries the font with its Apache-2.0 notice), a file edge: `document-canvas`'s text test includes Cambium's
   `examples/genet_web_smoke/assets/Roboto-Regular.ttf` (168 KB, no licence file beside it,
   ten users in Mere). The standalone proof placed a copy at that path in the scratch
   workspace. Options: Inker carries its own copy with the licence, or the family gets one
@@ -738,7 +747,7 @@ revision and what crosses at frame rate.
   `structured-data` feature turns JSON-LD blocks into graph contributions with no consumer:
   to the engine (recommended), the host, or retired; Inker cannot depend on `mere-rdf` until
   P5 without a cycle. F4 `script-rhai`'s `command` module builds `hest` invocations: to the host
-  (recommended), or `hest` ruled a contract leaf Inker may name. F5 `document-canvas`'s text
+  (recommended), or `hest` ruled a contract leaf Inker may name. F5 (settled: Inker carries its own) `document-canvas`'s text
   test reads Cambium's bundled Roboto font with no licence file: Inker carries its own with a
   licence, or the family gets one home for test assets. Also: the repository's pre-commit
   clippy fails on main before any P1 change (Knot's locked `knot-composition` still uses
@@ -784,6 +793,18 @@ revision and what crosses at frame rate.
   `knot-document` takes `KnotEditor`, `EditOutcome` and `KnotReadout` with their tests and
   drops `knot-editor-host`; Turnstone and the port import from `knot-document`; then
   `knot-editor-host` retires. `tabard-workshop` was converted by the lane already.
+- **After P1's cut (2026-11-07).** Knot (`Cargo.toml` 80, 107 to 111 at `2c703c4`) names
+  `script-rhai`, `illume`, `inker`, `knot-editor-host` and `nematic` from `mere.git`; Mere
+  redirects them in its `mere.git` patch table until Knot takes them from `inker.git`, and
+  then those five rows leave. Turnstone repins its own Inker rows to `inker.git`. Inker
+  names `cambium` (and through it the Cambium family) and `mere-rdf` from `mere.git`, which
+  every consumer must redirect to one source; the host's half of F2 ends that edge. Active
+  Mere documents still carry 28 code-font paths into the moved crates in 16 documents (the
+  doc audit's `missing_known_root_paths`, 428 before the cut and 434 after); Markdown links
+  were repointed, these were not. `graft-engine` and `weld-engine` have no Mere consumer,
+  so they left the lock with `welding` 0.15.0; their two workspace rows stay for the
+  hosts that inherit them. `.cargo/config.toml.example` lines 71 and 72 still describe
+  `knot-editor-host` as a workspace member.
 - **Knot repin (D15) on the branch.** Four of nine tests in `knot-editor`'s
   `composition_retention` fail on Windows with `CheckpointStorage("legacy checkpoint storage
   replacement is supported only on Unix")`, from the `#[cfg(not(unix))]` arm in
@@ -978,7 +999,7 @@ revision and what crosses at frame rate.
   (`d634ee0c485`), a `seiche-model` split (the rapier-free model re-exported under the old paths)
   and the graphshell host plan's T7; the Seiche population must take `seiche-model` with the six
   crates. The Inker history lane is running (filter-repo on the twelve paths); its first push
-  waits on Mark.
+  waits on Mark.<<<<<<< ours
 - 2026-11-07: Inker populated with history: `git clone --no-local` of Mere `f8c06097e`, filter-repo on
   the twelve crate paths and three design areas (477 commits kept, tree identical for 270
   files), root files added (workspace manifest from the proved standalone, lock reduced from
@@ -987,3 +1008,26 @@ revision and what crosses at frame rate.
   clippy warnings only; pushed to `merely-made/inker` main at `3109942` on Mark's word. Mark
   ruled the canonical DOC_POLICY core plus an Inker addendum and a DOC_README (a lane is
   writing them) and D24. The Mere donor lane for the twelve directories opened.
+||||||| original
+
+=======
+
+- 2026-11-07: P1 cut in Mere (worktree branch, not pushed). Deleted the twelve Inker crate
+  directories and `inker_docs`, `nematic_docs`, `verso_docs` (blobs compared against
+  `inker.git` `3109942`: identical but for the Roboto path in `document-canvas`'s text test);
+  the root members, the twelve `[workspace.dependencies]` rows now `inker.git` with
+  `branch = "main"`, nine `mere.git` patch rows dropped and five re-added as `inker.git`
+  redirects for Knot. Lock edited by hand, one `cargo fetch` of `inker.git`: ten packages
+  moved from path to `inker.git#3109942`, `graft-engine`, `weld-engine` and `welding` left
+  (no consumer), no other source moved. The web workspace's two rows moved the same way
+  (seven packages) with eight Cambium-family path redirects. The port's three portable-clip
+  fixtures are copied to `ports/graphshell/tests/fixtures/portable_clip/` (Mark's ruling
+  of 2026-11-07). `line-ceiling.toml` lost six Inker rows; `LICENSES.md`, DOC_README, DOC_POLICY
+  and `moved_out.json` record the move; `support/family-promotion/source-*` is the
+  2026-10-19 checkpoint and stays. The first check found a second file edge: `uxtree`'s
+  probe test reads two Micron navigation probes from `nematic`; they are copied to
+  `crates/forme/uxtree/tests/fixtures/micron/` under the same ruling. Gates (locked, offline,
+  debug info off): workspace check green; `graphshell` lib 330 passed, 7 ignored, and the
+  `retained_content_fixture` example builds; the `uxtree` probe test passes; clippy green
+  (0 errors); the web workspace checks green.
+>>>>>>> theirs

@@ -145,30 +145,6 @@ reason = "The WebRTC door: how a browser holding an invitation becomes an admitt
 path = "crates/graphshell/graphshell-host/src/webrtc_session.rs"
 reason = "The live half of the WebRTC door: the join sequence over a real channel, and the admitted session it produces. Existing source-size debt; a responsibility split must preserve HostedInvite, JoinConclusion, ServedJoin and existing module visibility."
 
-[[exception]]
-path = "crates/inker/engines/scrying-engine/src/translation.rs"
-reason = "Type translations between inker surface-engine types and the scrying producer trait's vocabulary. Existing source-size debt; a responsibility split must preserve ScryingNativeFramePayload and existing module visibility."
-
-[[exception]]
-path = "crates/inker/engines/weld-engine/src/welding_0_15.rs"
-reason = "Direct, version-pinned adapter for Welding 0.15. Existing source-size debt; a responsibility split must preserve WeldingNativeFramePayload, WeldingSurface and existing module visibility."
-
-[[exception]]
-path = "crates/inker/inker/src/cue_browser.rs"
-reason = "Inker's platform browser bindings on the shared surface protocol. Existing source-size debt; a responsibility split must preserve FrameReader, BrowserSurface and existing module visibility."
-
-[[exception]]
-path = "crates/inker/inker/src/document.rs"
-reason = "Portable document model — what engines produce. Existing source-size debt; a responsibility split must preserve EngineDocument, DocumentProvenance, DocumentTrustState and existing module visibility."
-
-[[exception]]
-path = "crates/inker/inker/src/document/render.rs"
-reason = "Round-trip rendering of [EngineDocument] back into native CommonMark and gemtext. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "crates/inker/inker/src/surface_engine.rs"
-reason = "Surface-engine traits and registry — parallel dispatch path for long-lived, frame-streaming engines alongside [crate::engine]. Existing source-size debt; a responsibility split must preserve UserAgentRequestId, WebRequestId, PermissionDescriptor and existing module visibility."
-
 
 [[exception]]
 path = "crates/mere/src/roster.rs"

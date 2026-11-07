@@ -144,10 +144,10 @@ crates under Exhibit A and every manifest on `MPL-2.0`.
 
 | Crate | Path | Published version's grant | In-tree notice files |
 |---|---|---|---|
-| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | — (the pair carried over from `verso-tile` 0.1.0 was dropped by merge `0a8198ba`, 2026-09-06, and stays removed under ruling S40) |
-| `document-canvas` | `crates/inker/document-canvas` | 0.1.0 | — |
-| `nematic` | `crates/nematic/nematic` | 0.1.1 | — |
-| `illume` | `crates/nematic/illume` | 0.0.2 | — |
+| `inker` | `crates/inker/inker` (moved to Inker's repository 2026-11-07; see Source promotions below) | 0.1.1, MIT OR Apache-2.0 | — (the pair carried over from `verso-tile` 0.1.0 was dropped by merge `0a8198ba`, 2026-09-06, and stays removed under ruling S40) |
+| `document-canvas` | `crates/inker/document-canvas` (moved to Inker's repository 2026-11-07; see Source promotions below) | 0.1.0 | — |
+| `nematic` | `crates/nematic/nematic` (moved to Inker's repository 2026-11-07; see Source promotions below) | 0.1.1 | — |
+| `illume` | `crates/nematic/illume` (moved to Inker's repository 2026-11-07; see Source promotions below) | 0.0.2 | — |
 | `errand` | `crates/system/errand` (moved to Errand's repository 2026-10-19; see Source promotions below) | 0.3.4, MIT OR Apache-2.0 | — |
 | `tinct` | `crates/cambium/tinct` (moved to Graphshell's repository 2026-11-07; see Source promotions below) | 0.1.2, MIT OR Apache-2.0 | — (deleted by Mark's ruling, `642ca2d7`, 2026-09-24) |
 
@@ -166,8 +166,8 @@ inker's was dropped by merge `0a8198ba` (2026-09-06) and stays deleted, since
 inker is MPL-2.0 like the rest of the workspace. The versions already on
 crates.io keep the grant they were published under.
 
-The three engine adapters — `scrying-engine`, `graft-engine` and `weld-engine`
-— are `publish = false` and have no published version, so nothing is held open
+The three engine adapters — `scrying-engine`, `graft-engine` and `weld-engine`,
+in Inker's repository since 2026-11-07 — are `publish = false` and have no published version, so nothing is held open
 for them.
 
 This section, like the one above it, is **not** the skip list. Every source in
@@ -215,3 +215,5 @@ Luggage now lives in the Eidetic family; its derivative notices and published-gr
 ## Source promotions (2026-11-07)
 
 Under the engine split plan, `state-witness` and `mere-framing` moved to Eidetic (D12) and `tinct` to the Graphshell repository's contract root (D19), each an exact copy. None carried notice files; tinct's published 0.1.2 keeps its grant as recorded above. The move changes no license grant.
+
+Under the same plan's P1, the twelve Inker crates moved to `merely-made/inker` with their history: `inker`, `document-canvas`, the three engine adapters, `knot-editor-host`, `nematic`, `illume`, `mere-lanes`, `mere-pageload`, `mere-fleece` and `script-rhai`. The published-grant rows for `inker`, `document-canvas`, `nematic` and `illume` travel in `inker/LICENSES.md`, which also records the Roboto test font `document-canvas` now carries with its Apache-2.0 notice. Historical paths in the rulings above describe their former Mere locations. The move changes no license grant.

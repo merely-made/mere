@@ -4934,15 +4934,14 @@ dependencies = [
 [[package]]
 name = "document-canvas"
 version = "0.1.0"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "genet-parley",
  "inker",
- "nematic",
  "netrender",
  "paint_list_api",
  "paint_list_render",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -7209,15 +7208,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "graft-engine"
-version = "0.2.0"
-dependencies = [
- "accesskit 0.25.1",
- "inker",
- "tracing",
-]
-
-[[package]]
 name = "grafting"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8475,6 +8465,7 @@ dependencies = [
 [[package]]
 name = "illume"
 version = "0.0.3"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "jotdown",
  "logos",
@@ -8560,16 +8551,14 @@ checksum = "a257582fdcde896fd96463bf2d40eefea0580021c0712a0e2b028b60b47a837a"
 [[package]]
 name = "inker"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "accesskit 0.25.1",
  "document-session-api",
- "genet-scripted-dom",
  "getrandom 0.4.3",
- "layout-dom-api",
  "petgraph 0.8.3",
  "serde",
  "serde_json",
- "toml 0.8.23",
  "tracing",
  "uuid",
  "webcue",
@@ -9498,6 +9487,7 @@ dependencies = [
 [[package]]
 name = "knot-editor-host"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "cambium",
  "illume",
@@ -10378,6 +10368,7 @@ dependencies = [
 [[package]]
 name = "mere-fleece"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "armillary",
  "eidetic",
@@ -10388,16 +10379,8 @@ dependencies = [
  "image",
  "inker",
  "mere-pageload",
- "mere-rdf",
- "mere-transport",
- "muniment",
- "nematic",
- "oxjsonld",
- "oxrdf",
- "pollster 0.4.0",
  "serde",
  "serde_json",
- "tempfile",
  "tokio",
  "tracing",
  "url",
@@ -10461,8 +10444,8 @@ dependencies = [
 [[package]]
 name = "mere-lanes"
 version = "0.1.0"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
- "async-trait",
  "bytes",
  "document-canvas",
  "document-session-api",
@@ -10473,20 +10456,15 @@ dependencies = [
  "image",
  "inker",
  "mere-fleece",
- "mockito",
- "muniment",
  "nematic",
  "netfetcher",
  "netrender",
- "pollster 0.4.0",
- "serde",
  "serde_json",
  "tempfile",
  "tinct",
  "tokio",
  "url",
  "uuid",
- "wgpu",
 ]
 
 [[package]]
@@ -10594,6 +10572,7 @@ dependencies = [
 [[package]]
 name = "mere-pageload"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 
 [[package]]
 name = "mere-proofs"
@@ -11392,6 +11371,7 @@ dependencies = [
 [[package]]
 name = "nematic"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "errand",
  "genet-static-dom",
@@ -16431,15 +16411,14 @@ source = "git+https://github.com/merely-made/genet.git?branch=main#d634ee0c485db
 [[package]]
 name = "script-rhai"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
- "getrandom 0.3.4",
  "hest",
  "inker",
  "libm",
  "rhai",
  "script-engine-api",
  "serde_json",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -16525,6 +16504,7 @@ dependencies = [
 [[package]]
 name = "scrying-engine"
 version = "0.2.0"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "dpi",
  "inker",
@@ -20391,37 +20371,6 @@ name = "weezl"
 version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a28ac98ddc8b9274cb41bb4d9d4d5c425b6020c50c46f25559911905610b4a88"
-
-[[package]]
-name = "weld-engine"
-version = "0.2.0"
-dependencies = [
- "dpi",
- "inker",
- "tracing",
- "welding",
-]
-
-[[package]]
-name = "welding"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e94298e32686b5d447c2abade5bb4594d4e2c4467a7116d3eb253fc7d230fed7"
-dependencies = [
- "dpi",
- "grafting",
- "libc",
- "libloading 0.9.0",
- "log",
- "objc2 0.6.4",
- "objc2-foundation 0.3.2",
- "objc2-io-surface",
- "objc2-metal 0.3.2",
- "thiserror 2.0.21",
- "wgpu",
- "wgpu-hal",
- "windows",
-]
 
 [[package]]
 name = "wesl"
