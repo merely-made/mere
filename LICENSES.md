@@ -28,7 +28,6 @@ relicensed, and nothing here receives a Merely copyright line.
 | `support/patches/accesskit` | MIT OR Apache-2.0 | [AccessKit/accesskit](https://github.com/AccessKit/accesskit), 0.25.1 with local traversal changes | `LICENSE-MIT`, `LICENSE-APACHE`, and the upstream notices in `src/` |
 | `support/patches/light-file-dialog` | Zlib | [wengchengjian/light-file-dialog](https://github.com/wengchengjian/light-file-dialog), 3.21.3 with local dialog fixes | License and attribution in `README.md` and `Cargo.toml`, exact import and patch provenance in `UPSTREAM.json` |
 | `ports/pelt/examples/resources` | MPL-2.0 | [servo/servo](https://github.com/servo/servo) (`resources/`), by way of genet | Servo's |
-| `crates/conatus/conatus/src/resident/binning` | Apache-2.0 | [dimforge/nexus](https://github.com/dimforge/nexus) at `1cfbd76`, by Sébastien Crozet / Dimforge | `LICENSE-APACHE` in-tree; port and change notice in `mod.rs` |
 | `crates/canvas/pictograph/src/canvas/tests/data/arxiv_topics.tsv` | CC0-1.0 (arXiv metadata) | [arXiv API](https://export.arxiv.org/api/query), terms at <https://info.arxiv.org/help/api/tou.html> | `arxiv_topics.provenance.json` beside it: the twelve requests, the licence quote, the window, the selection |
 
 `ports/pelt/examples/resources` holds two Servo logo images that Pelt's
@@ -42,7 +41,7 @@ carries the house header.
 These are vendored patch trees consumed through
 `[patch]`; they are upstream's work carrying upstream's terms.
 
-`crates/conatus/conatus/src/resident/binning` is a close hand port, to CubeCL,
+`crates/conatus/conatus/src/resident/binning` (in Seiche's repository since 2026-11-07, where its row now lives; see Source promotions below) was a close hand port, to CubeCL,
 of Nexus's exclusive scan (`src_rbd_shaders/utils/prefix_sum.rs` and its
 staging in `src_rbd/utils/prefix_sum.rs`) and of the count / cursor / finalize
 pattern of its MPM particle sort (`src_mpm_shaders/grid/sort.rs`), made on
@@ -217,3 +216,5 @@ Luggage now lives in the Eidetic family; its derivative notices and published-gr
 Under the engine split plan, `state-witness` and `mere-framing` moved to Eidetic (D12) and `tinct` to the Graphshell repository's contract root (D19), each an exact copy. None carried notice files; tinct's published 0.1.2 keeps its grant as recorded above. The move changes no license grant.
 
 Under the same plan's P1, the twelve Inker crates moved to `merely-made/inker` with their history: `inker`, `document-canvas`, the three engine adapters, `knot-editor-host`, `nematic`, `illume`, `mere-lanes`, `mere-pageload`, `mere-fleece` and `script-rhai`. The published-grant rows for `inker`, `document-canvas`, `nematic` and `illume` travel in `inker/LICENSES.md`, which also records the Roboto test font `document-canvas` now carries with its Apache-2.0 notice. Historical paths in the rulings above describe their former Mere locations. The move changes no license grant.
+
+Under the same plan's P2, the seven spatial crates moved to `merely-made/seiche` with their history: `numen`, `seiche`, `seiche-model`, `nisus`, `modulus`, `conatus` and `tenant`. The Nexus binning row (`crates/conatus/conatus/src/resident/binning`, Apache-2.0, with its `LICENSE-APACHE` and the port notice in `mod.rs`) travels in `seiche/LICENSES.md`. The move changes no license grant.

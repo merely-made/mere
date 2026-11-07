@@ -6,7 +6,8 @@ contract is deferred by D4; the Pandect sidecar owners are open.
 crates with history (main `3109942`, pushed); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
-`merely-made/seiche` exists, empty; `merely-made/inker` holds the twelve Inker crates (main `436c841`) and Mere
+`merely-made/seiche` holds the seven spatial crates (main `a6b8641`) and Mere takes `seiche` and
+`numen` from it (P2's cut, below); `merely-made/inker` holds the twelve Inker crates (main `436c841`) and Mere
 takes them from it (P1's cut, below); the engine-to-workspace contract
 is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
 
@@ -387,6 +388,12 @@ projection crates that consume the workspace kernel stay with the host.
   replay rerun from it equals the 2026-10-20 recorded traces witness for witness; Mere's
   canvas checks; Isocosm's Eponym and Mesocosm check against the standalone crates with one
   source each. Not done: the repository, the move, the repins.
+- State (2026-11-07, Mere's cut on a worktree branch): Seiche main `a6b8641` holds the seven
+  crates (`seiche-model` included) with history and D25's two documents; Mere deleted
+  `crates/conatus/`, takes `seiche` and `numen` from `seiche.git` (`pictograph` and
+  `graph-kernel` inherit), and redirects both in its `mere.git` patch table until the outside
+  consumers repin (Open, After P2's cut). Not done: those repins, and Isocosm resolving
+  Eponym and Mesocosm from `seiche.git`.
 - Edges the move keeps: `armillary` (family git, optional `actor`), the kiss3d fork by rev,
   and Mere's `cubek-matmul` patch, which the standalone graph lacks (Burn features only).
 - Forks, open: (1) `state-witness`, seiche's one edge into Mere, dev-only, for the replay
@@ -740,7 +747,7 @@ revision and what crosses at frame rate.
   engine's own: `linked-data/src/statements.rs` makes the engine depend on `inker`, which a
   2026-07-10 ruling placed there so Inker stayed kernel-free; under the split it belongs with
   Inker's emitted statements or the host's intake adapter.
-- **P2 forks (Seiche lane).** `state-witness`: seiche's dev-edge back into Mere is a
+- **P2 forks (Seiche lane).** `state-witness` (settled by D12; Seiche takes it from eidetic.git): seiche's dev-edge back into Mere is a
   mere/seiche cycle under cycle-breaks D6, and Isocosm consumes it directly; Seiche takes it
   from `mere.git`, or it and `mere-framing` move to Seiche, or the replay examples move to
   the host as consumer tests. `nisus` into `conatus` behind a voxel feature would free the
@@ -782,8 +789,8 @@ revision and what crosses at frame rate.
   mere.git past this change, or the graph carries two `Tinct`s (Cleromancy `Cargo.toml:83`,
   Isocosm `shared/isomere/Cargo.toml:33`, Knot `apps/desktop/Cargo.toml:51`, Woodshed
   `Cargo.toml:142`, `ports/redshank/Cargo.toml:20` and `ports/hocket/Cargo.toml:119`; mer3ly
-  has no row and only relocks). Seiche's replay example then takes the witness from
-  eidetic.git and the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
+  has no row and only relocks). Seiche's replay example takes the witness from eidetic.git
+  (Seiche `a6b8641`), and with Mere's copies deleted (P2's cut) the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
   would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
   rule's universal header, the witness does not publish; both names stay.
 - **P1 forks F4 and F6: settled by D19.** `tinct` is in the Graphshell contract root and Mere
@@ -814,6 +821,22 @@ revision and what crosses at frame rate.
   so they left the lock with `welding` 0.15.0; their two workspace rows stay for the
   hosts that inherit them. `.cargo/config.toml.example` lines 71 and 72 still describe
   `knot-editor-host` as a workspace member.
+- **After P2's cut (2026-11-07).** Rows that name the spatial crates through `mere.git` and
+  repoint to `git = "https://github.com/merely-made/seiche.git", branch = "main"`, checked
+  against each repository's current tree: Isocosm `eponym/Cargo.toml` 54 (`conatus`), 55
+  (`modulus`), 57 (`tenant`); `mesocosm/Cargo.toml` 29 (`tenant`), 37 (`nisus`), 46
+  (`conatus`); `shared/isometer/crates/isometer-lens/Cargo.toml` 26 (`modulus`), 44
+  (`conatus`); `mesocosm/crates/probes/parry-ground/Cargo.toml` 17 (`conatus`); and, to
+  eidetic.git under D12, `state-witness` at `shared/isometer/crates/isometer-core/Cargo.toml` 21
+  and `shared/cosmograph/Cargo.toml` 31. Cleromancy `Cargo.toml` 74 and `core/Cargo.toml` 40
+  (`seiche`, serde, no defaults); Knot `Cargo.toml` 79 (`seiche` 0.0.6, serde, no defaults);
+  Murm `apps/signalman-desktop/Cargo.toml` 67 (`seiche`); mer3ly
+  `crates/repo-graph/Cargo.toml` 27 (`seiche`, now `branch = "main"`, no longer the
+  `www.github.com` rev pin P2's block records). Isocosm's `.cargo/tabletop-local.toml` 62 and 63
+  overlay `numen` and `seiche` onto Mere's deleted paths. Until Knot and Cleromancy repin,
+  Mere's `mere.git` patch table redirects `numen` and `seiche`; then those two rows leave.
+  Active Mere documents still carry 21 code-font lines into `crates/conatus/` in 10 documents;
+  the one Markdown link was repointed.
 - **Knot repin (D15) on the branch.** Four of nine tests in `knot-editor`'s
   `composition_retention` fail on Windows with `CheckpointStorage("legacy checkpoint storage
   replacement is supported only on Unix")`, from the `#[cfg(not(unix))]` arm in
@@ -1058,3 +1081,18 @@ revision and what crosses at frame rate.
   and 78 knot-document tests, six Windows `cfg(not(unix))` failures apart); Mark ruled the lane
   repins Mere to current main so the lock holds one source per package, keeps the `retained`
   path, and the stale `.cargo/scope-navigation-local.toml` overlay in Knot's checkout is deleted.
+- 2026-11-07: P2 cut in Mere (worktree branch, not pushed). Deleted `crates/conatus/` (the seven
+  crates and its README, trees as Seiche `a545239` took them) and D25's two documents; the
+  member rows and the `seiche-model`, `nisus`, `modulus` and `conatus` workspace rows (no Mere
+  consumer) are gone, `seiche` and `numen` name `seiche.git` on `branch = "main"`, and the two
+  `mere.git` patch rows became `seiche.git` redirects for Knot and Cleromancy. The physics dev
+  opt-level table stays: all six packages remain in both graphs. Lock edited by hand, one
+  `cargo fetch` of `seiche.git`: `seiche`, `seiche-model`, `numen` and `conatus` moved from path
+  to `seiche.git#a6b8641`; `nisus`, `modulus`, `tenant`, the kiss3d fork, `rapier3d` and 13
+  registry packages only they reached left (1843 to 1823); no other source moved. The web
+  workspace moved the same four and needed no patch rows (1139 packages either way).
+  `LICENSES.md`, DOC_README, DOC_POLICY, `moved_out.json` and the seiche-replay README record
+  the move; `line-ceiling.toml` named no moved file. Gates (locked, offline, debug info off):
+  workspace check green; `pictograph` and `mere-kernel` tests 553 passed, 3 ignored, and
+  `pictograph` with `canvas,gpu` 676 passed, 19 ignored; clippy 0 errors; the web workspace
+  checks green. Outside repins are in Open (After P2's cut).
