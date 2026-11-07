@@ -28,7 +28,7 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def until(path, processes=(), seconds=240):
+def until(path, processes=(), seconds=150):
     end = time.monotonic() + seconds
     while time.monotonic() < end:
         if Path(path).exists():
@@ -89,7 +89,7 @@ class Fixture(http.server.ThreadingHTTPServer):
 
 def main():
     parser = argparse.ArgumentParser()
-    for key in ['binary', 'djinn', 'prepare', 'lock', 'output']:
+    for key in ['binary', 'djinn', 'prepare', 'lock', 'wallet', 'output']:
         parser.add_argument('--' + key, required=True, type=Path)
     args = parser.parse_args()
     out = args.output.resolve()
@@ -104,8 +104,14 @@ def main():
     # The owner's yes for the two declared applications, written as Djinn writes a yes it was given.
     grants = json.loads(subprocess.run([str(args.lock.resolve()), 'grants'], env=resident.environment,
                                        capture_output=True, text=True, check=True, timeout=60).stdout)
+    # The owner stages the retained persona's wallet and key epoch (nothing is created implicitly)
+    # and names it in settings; Djinn then seals retained page text under it.
+    retained_persona = str(uuid.uuid4())
+    subprocess.run([str(args.wallet.resolve()), str(private / 'owner/data'), retained_persona],
+                   env=resident.environment, capture_output=True, text=True, check=True, timeout=60)
     write(Path(resident.environment['XDG_DATA_HOME']) / 'graphshell/settings/NativeRetained.json',
-          {'reservoir': {'enabled': True, 'persona': str(uuid.uuid4())}, 'applications': grants})
+          {'reservoir': {'enabled': True, 'persona': str(uuid.uuid4())},
+           'content': {'retained_persona': retained_persona}, 'applications': grants})
     domain = 'browsing'
     processes = []
     app = private / 'owner.app'
@@ -139,6 +145,8 @@ def main():
         until(public / (name + '.json'), (p,))
         p.wait(timeout=30)
         receipt = json.loads((public / (name + '.json')).read_text())
+        failed = receipt.get('final', {}).get('await-failed')
+        assert not failed, f'{name}: an await gave up: {failed}'
         assert receipt['ok'], receipt
         assert receipt['captures'] and all(c['width'] > 200 and c['height'] > 200 for c in receipt['captures'])
         return receipt

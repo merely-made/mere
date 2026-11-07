@@ -619,6 +619,18 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 title = ". scrying and welding move into Inker; cue and graft stay (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 
+[decisions."engine-split D21"]
+title = ". D20 reverted: scrying and welding stay separate, Inker named as their owner (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D22"]
+title = ". An eighth Stack statement, for the roots (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D23"]
+title = ". Graphshell is the host layer as a library; Turnstone takes the reference-host duties (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
@@ -970,6 +982,11 @@ source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "Background work has an owner, configurable limits, cancellation and joined completion; refusal, failure, cancellation and success remain distinguishable."
 draws_on = ["house-style D15", "stack.6"]
+
+[statements."stack.9"]
+title = "Two roots, by nature"
+source = "design_docs/doctrine.md"
+area = "The stack"
 
 [statements."surfaces.1"]
 title = "A frame hosts one presentation"
