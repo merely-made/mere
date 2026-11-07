@@ -954,4 +954,4 @@ Illustrative design, not compile-ready code.
   `71188bb` (remote-fixture's `insigne` and `personae` followed to Dramatis `696472da`); Mere's `ports/graphshell/web`
   no longer carries the unused `netrender-vello-shaders` patch (the graph takes shaders at the rev
   `netrender-vello-encoding` names), and its lock lost the matching `patch.unused` entry. Each touched root passes
-  `metadata --locked` twice with no diff and `check --locked`. Distillery `94e4fb2`; Mere: see the next line.
+  `metadata --locked` twice with no diff and `check --locked`. Distillery `94e4fb2`; Mere `b27e07466`, merged to main as `25b19570e`. Woodshed needed no change (the guest paints labels in ink; its conformance test builds `SheetTheme` literals, which this change leaves as they were).
