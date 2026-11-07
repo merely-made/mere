@@ -1113,3 +1113,10 @@ revision and what crosses at frame rate.
   owed by consumers: Isocosm (conatus, modulus, tenant, nisus rows and state-witness), Cleromancy,
   Knot, Murm's signalman-desktop and mer3ly repoint `seiche` rows to `seiche.git`; Isocosm's
   `.cargo/tabletop-local.toml` overlays numen and seiche onto deleted paths.
+- 2026-11-07: Turnstone main `6c4d278b`: `KnotEditor` from `knot_document::retained` at Knot `a58ba28`,
+  `knot-document` with its `engine` feature, the `knot-editor-host` row and the five Inker redirect
+  rows gone (clean resolve, no unused patch); the `tinct` redirect stays while Woodshed names it
+  through `mere.git`. Mere's matching cut opened (relock to Knot `a58ba28`, drop the five redirects,
+  port's `block_editing` onto `knot-document`). Outside repins opened for Isocosm (conatus family
+  to `seiche.git`, state-witness to `eidetic.git`, tinct to `graphshell.git`) and Cleromancy (seiche,
+  tinct).
