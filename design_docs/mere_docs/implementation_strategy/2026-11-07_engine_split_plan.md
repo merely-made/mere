@@ -195,6 +195,49 @@ holds six layout strategies, not only contracts, while `pictograph` is 93% graph
   recorded.
 - Needs: nothing.
 
+**Inker crates** (P1 lane, 2026-11-07; lines of Rust under `src`, consumers across Mere,
+Turnstone and Knot manifests). Proposals for Mark to confirm or refuse; F1 to F4 are P1's forks.
+
+- `inker` (9.8k; 9 Mere crates, Turnstone, Knot): fits, selecting engines and carrying the
+  document model, surface-engine contract, cue, sniff, flip and the pure `statements` walk the
+  engine ingests. Stays whole; frees nothing.
+- `document-canvas` (6.5k; lanes, platen, tabard-workshop): fits, laying out
+  `inker::EngineDocument`. Stays: folding it into `inker` would put parley and netrender under
+  every engine-controller consumer (fetch, platen, uxtree, linked-data). Frees nothing.
+- `graft-engine` (1.0k), `scrying-engine` (1.5k), `weld-engine` (1.9k) (Turnstone optional;
+  pelt-desktop takes scrying): each is one `inker::SurfaceEngine` adapter over one foreign
+  producer, a module's worth. Merge into `inker` as feature-gated `surface` modules, keeping
+  `inker`'s default graph wgpu-free; frees three names, none claimed on crates.io (all
+  `publish = false`). No distinct purpose in this plan needs them.
+- `nematic` (10.5k; lanes, uxtree, document-canvas dev, Turnstone, Knot): fits, lowering
+  smolweb formats to inker documents over `errand` (its only direct smolweb crate). Stays;
+  frees nothing.
+- `illume` (2.0k; cambium optional, graphshell, Knot): fits, the portable lexer. Took
+  `knot-editor-host`'s Markdown reuse-lexer and `full_pack` with their two tests, behind the
+  new `markdown` feature (D17).
+- `knot-editor-host` (0.3k; graphshell port, Turnstone, Knot's `knot-document`): retiring
+  (D17). The lexers are in Illume and re-exported here; `KnotEditor` and `KnotReadout` go to
+  Knot's `knot-document`; when the consumers have moved, the crate retires and frees
+  `knot-editor-host` (published 0.1.1).
+- `mere-lanes` (8.4k; graphshell, pelt, tabard-workshop, Turnstone): fits, the reader and
+  smolweb lanes over the document canvas. Owns its `ReadingPreferences`, `ReadingAnchor` and
+  reader styles (D16) and the smolweb palette over Graphshell's `tinct` (D19); no Tabard
+  dependency remains. Its `remote` fetcher
+  (netfetcher and errand, 0.4k) overlaps `mere-fetch`'s transport and is traced in P3. Stays;
+  frees nothing.
+- `mere-pageload` (0.8k; mere-fetch re-exports it, pelt-core, Turnstone, now Fleece's crawl):
+  fits, the sans-IO page load and fetch vocabulary. Stays: folding it into `inker` would make
+  `mere-fetch`'s optional `inker` edge mandatory. Frees nothing.
+- `mere-fleece` (7.0k; lanes, moot, pelt, graphshell, the facade, Turnstone): fits, bounded
+  traversal, retained traversal, clipping, capture and the Eidetic bridge. P1 cut its
+  `crawl-graph` intake (below). `structured-data` (0.6k, no consumer in any manifest) projects
+  JSON-LD blocks into graph contributions through `mere-rdf`, which is the engine's job by this
+  plan's own sentence (F3). Stays; frees nothing.
+- `script-rhai` (1.2k; graphshell, Knot): fits, the Rhai `BlockEvaluator` and `ValueEngine`.
+  Its `command` module collects `hest::Invocation`s from a host-offered `CommandSet` over
+  `hest` from Graphshell's contract root, which Inker may name (D19 settles F4). Stays whole;
+  frees nothing.
+
 **Spatial crates (P2 lane, 2026-11-07).** Lines are `src` lines; dependents are manifests in
 Mere, Isocosm, Cleromancy, Knot, Murm and mer3ly.
 - `conatus` (5,959): fits. Host-neutral 3D bodies, collision, queries and fixed step over a
@@ -243,41 +286,72 @@ graph binding became the generic `crawl::session::CrawlSession<D, T>`, retiring 
 `crawl-graph` feature and its `incipit` and `mere-rdf` edges (no consumer enabled it); the
 single-hop lowering moved with its test to `mere-fetch`'s new `fleece-crawl` feature; the
 Scenograph rule-runner test moved from `script-rhai` to `scenograph` as a consumer test, so
-the dev edge back to the host is gone. A standalone workspace of the twelve crates (copied to
-the system temp directory, Genet and smolweb, `merely-made/errand`, from their canonical
-URLs) checks and tests green (761 tests; one timing test failed under a concurrent build and
-passed three of three alone). Mere checks green except `mere-resident`, whose Knot dependency
-is broken on this tree before P1; Knot and Turnstone check green with the twelve packages
-patched to the standalone workspace, each resolving from one source. Four edges into Mere or Graphshell remain, each held by a fork,
-plus one file edge:
+the dev edge back to the host is gone. Under D16 `mere-lanes` owns `ReadingPreferences`,
+`ReadingAnchor` and reader styles (`ReaderRole`, `ReaderFontStyle`, `ReaderStyles`, with
+family lists the host resolves); `tabard-workshop` converts Tabard's typography at its edge.
+Under D17 the Markdown reuse-lexer and `full_pack` moved with their tests to Illume's new
+`markdown` feature; `knot-editor-host` re-exports them and is marked for retirement. A
+standalone workspace of the twelve crates (copied to the system temp directory, Genet and
+smolweb, `merely-made/errand`, from their canonical URLs) checks and tests green (769 tests).
+On main after D15 (`4b99ce9f2`) Mere checks green; the Graphshell port converts at its five
+D16 boundary sites in `retained_content.rs` (Mark's option (a)), its persisted anchors staying
+Tabard's. Two Inker edges into Mere remain, plus one file edge; `mere-lanes -> tinct`
+and `script-rhai -> hest` reach Graphshell's contract root, which D19 allows:
 
-- F1, `mere-lanes -> tabard`. The lanes' public API takes and returns
-  `tabard::ReadingPreferences` and `tabard::ReadingAnchor`, re-exports Tabard's smolweb palette
-  (which carries `tinct::ModeProfile`), and maps `tabard::Typography`;
-  `ReadingPreferences::typography()` returns Tabard's type. Turnstone names the two Tabard
-  types in over forty places and persists the anchor. Options: (a) the types move into the
-  lanes and Tabard re-exports them (consumers unchanged; Tabard, a theme library under Pandect,
-  the registry and wasm hosts, gains the lanes' netrender and parley graph); (b) the lanes own
-  their own types and each host converts Tabard's at the edge, cut first: new API beside the
-  old, consumers move, then the Tabard edge goes; (c) the types go to `inker`, which both
-  depend on. Recommended: (b), the plan's own wording.
-- F2, `knot-editor-host -> cambium`. `KnotEditor` wraps Cambium's own `TextInput`, and Mere's
-  graphshell port, Turnstone and Knot's `knot-document` all import
-  `knot_editor_host::KnotEditor`, so the edge cannot go without consumer edits. Options for
-  the editor: (a) Knot's `knot-document`, which already wraps it; (b) `cambium` behind a
-  feature; (c) a host crate taking a freed name; (d) generic over a buffer trait Cambium
-  implements. The lexers go to Illume either way. Recommended: (a).
-- F3, `mere-fleece -> mere-rdf` (optional, `structured-data`, no consumer in any manifest).
+- F6, settled by D19 (Mark's smallest option): the smolweb palette (`SmolwebTheme`,
+  `SmolwebPalette`, `ModeProfile`) moved into `mere-lanes` (`src/smolweb/palette.rs`, with its
+  four tests) over `tinct` from graphshell.git; the lanes no longer depend on Tabard, which
+  keeps its own smolweb module for the hosts. Mere's graphshell.git rows moved together to
+  `d80316db` (ten packages), since the lanes' `tinct` exists only from there and Cargo cannot
+  hold one branch at two revisions offline.
+
+Host follow-up under D16 (not edited here). Each host keeps persisting Tabard's types and
+converts at the lanes' boundary:
+
+- Turnstone: 22 uses of `tabard::ReadingAnchor` or `tabard::ReadingPreferences` in 11 files;
+  the boundary calls are `src/shell/content_pool.rs` lines 221 and 229
+  (`restore_reading_anchor`), 260 and 267 (`reading_preferences()` compared with the host's),
+  282 and 289 (`set_reading_preferences`); `src/shell/effects/shell_effect_control_content.rs`
+  264 and 268 (`restore_reading_anchor`); `src/shell/reader_observe.rs` 135 and 139
+  (`reading_anchor()`) and 188 (`reading_preferences()`); and the test
+  `src/shell/content_pool/tests/hidden_finite_livery_work_schedules_ticks_until_settled_cases.rs`
+  211 and 215. The persisted anchor stays Tabard's: `src/scope_navigation.rs:26`
+  (`Scope.reading`), its deserializer `src/scope_navigation/impl_de_deserialize_de_for_scope.rs`
+  13 and 19 (including the legacy shape), `src/reading_view.rs` (the `anchors` map, line 40)
+  and `src/action/effect.rs:17` (`RestoreReadingAnchor`).
+- Graphshell port (converted, option (a)): the compiler named five sites, all in `ports/graphshell/src/retained_content.rs`
+  (299, 305, 306, 313, 315: `reading_anchor`, `restore_reading_anchor`, `reading_preferences`
+  over the reader and smolweb sessions); 22 uses of the Tabard types in 6 files stay as they
+  are. The persisted anchors are `ports/graphshell/src/forme_workspace.rs` 27
+  (`reading_anchors`) and 31 (`scope_navigation`).
+- Turnstone's 12 palette sites (`ModeProfile`, `SmolwebTheme`) name the lanes' own types and
+  need no edit. Its one meeting point is `src/shell/shell_publish_engine_inventory.rs` 374 to
+  384, where `tabard_mode().profile()` (Tinct's `ModeProfile` through Tabard) is assigned to
+  the lanes' `color_mode`: the same type once Tabard and Turnstone take `tinct` from
+  graphshell.git (D19's repoint), a two-field conversion (`dark`, `high_contrast`) until then.
+- Neither host uses `document_style_with_typography`; `tabard-workshop`'s one site is converted
+  (`ports/tabard/workshop/src/reader.rs`, `reader_styles`).
+
+Follow-up under D17 (not edited here): Knot's `crates/knot-document/src/editor.rs` takes
+`KnotEditor`, `EditOutcome` and `KnotReadout` from `crates/inker/knot-editor-host/src/{model,editor}.rs`
+(with `model.rs`'s three tests) and depends on `cambium` and `illume` (feature `markdown`)
+instead of `knot-editor-host` (root `Cargo.toml` line 106, `crates/knot-document/Cargo.toml`
+line 38); Turnstone's `src/knot_authoring.rs:43` and Mere's `ports/graphshell/src/block_editing.rs:14`
+then import `KnotEditor` from `knot-document`, and their manifests drop `knot-editor-host`
+(Turnstone `Cargo.toml` line 268). Then `knot-editor-host` retires and leaves Inker.
+
+- F2 (ruled D17, Knot's `knot-document`), `knot-editor-host -> cambium`: stays until Knot
+  takes the editor (above).
+- F3 (open), `mere-fleece -> mere-rdf` (optional, `structured-data`, no consumer in any manifest).
   It projects JSON-LD blocks into graph contributions, the engine's job. Options: the engine,
   taking plain block text and base address; the host; retirement. Recommended: the engine.
   Finding: `mere-rdf` depends on `mere-kernel` and on `inker`, so Inker cannot depend on the
   engine without a cycle until P5 separates it.
-- F4, `script-rhai -> hest` (graphshell.git, a serde-only leaf). Its `command` module turns a
+- F4, settled by D19: `script-rhai -> hest` (graphshell.git, a serde-only leaf). Its `command` module turns a
   Rhai batch into `hest::Invocation`s against a host-offered `CommandSet`; Mere's graphshell
-  port and Knot's endpoint tests consume it. Options: move `command` to the host; or rule
-  `hest` a contract leaf Inker may name, amending "nothing lower names anything higher".
-  Recommended: move it.
-- F5, a file edge: `document-canvas`'s text test includes Cambium's
+  port and Knot's endpoint tests consume it. `hest` is in Graphshell's contract root, which
+  Inker may name; nothing changes.
+- F5 (open), a file edge: `document-canvas`'s text test includes Cambium's
   `examples/genet_web_smoke/assets/Roboto-Regular.ttf` (168 KB, no licence file beside it,
   ten users in Mere). The standalone proof placed a copy at that path in the scratch
   workspace. Options: Inker carries its own copy with the licence, or the family gets one
@@ -285,9 +359,7 @@ plus one file edge:
 
 The `fleece-crawl` home in `mere-fetch` is a reversible choice (it lowers `fetch::crawler`);
 Mere's graph instantiation of the session, `CrawlSession<GraphId, GraphContribution>`, is
-written by the first host that needs it. Commits are blocked: the repository's clippy hook
-fails on this tree before any P1 change, in Knot's locked `knot-composition` (`abffd2d`),
-which names `scenomise::backdrops`, moved out by `794a88c77` (cycle breaks D17).
+written by the first host that needs it. The branch is rebased onto main after D15 and committed there with the clippy hook run.
 
 ### P2. Seiche
 
@@ -839,3 +911,15 @@ revision and what crosses at frame rate.
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
   forks under P2, `state-witness` first.
+- 2026-11-07: P1 lane rebased onto main `4b99ce9f2` (D15 landed). F6 settled by D19: the
+  smolweb palette moved into `mere-lanes` over Graphshell's `tinct`, so the lanes no longer
+  depend on Tabard; Mere's graphshell.git rows moved together to `d80316db`; F4 settled by D19
+  (no change). Standalone Inker checks and tests green (769). Inker's edges into Mere are
+  `knot-editor-host -> cambium` (until Knot takes the editor) and `mere-fleece -> mere-rdf`
+  optional (F3), plus the Roboto font (F5). Mere checks green except the Graphshell port's
+  five D16 sites, which hold the commit (the hook checks the whole workspace).
+- 2026-11-07: P1 lane: the Graphshell port converts at its five D16 sites
+  (`retained_content.rs`, two local anchor helpers and an inline preferences copy; no manifest
+  change, persisted anchors still Tabard's); `cargo check -p graphshell --all-targets` green,
+  the 19 reading and retained-content lib tests pass. Committed on the lane branch with the
+  clippy hook run; not pushed.

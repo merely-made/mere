@@ -525,6 +525,9 @@ pub mod iroh_blob;
 
 pub mod crawler;
 
+#[cfg(all(feature = "fleece-crawl", not(target_arch = "wasm32")))]
+pub mod fleece_crawl;
+
 #[path = "submission.rs"]
 mod submission;
 
