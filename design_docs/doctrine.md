@@ -14,6 +14,9 @@ doctrine, the parts of its Stack area that bind any product on the stack
 its plans, join in a later pass; the first, Stack 6, joined on 2026-10-25.
 Within the budget in `doctrine_budget.toml`.
 
+**Status, 2026-11-07:** the Stack area's budget rose to eight for Stack 9, two roots
+by nature (engine-split D22).
+
 **Status, 2026-10-28:** a second area, Surfaces, with four statements from
 the [GUI catalog record](mere_docs/design/2026-10-26_gui_catalog_design.md)'s
 rulings of 2026-10-26, placed here by Mark on 2026-10-28; the record keeps
@@ -160,6 +163,30 @@ Links: draws on house-style D15, stack.6 · summary Background work has an owner
 *Added 2026-11-02, outcome new (house-style D15): "Consolidate within the
 seven-statement budget (Recommended)". Stack 5 first folded into stack.3;
 its key is retired, not reused.*
+
+### Stack 9. Two roots, by nature
+
+The stack has two roots, one for each of its natures, and a leaf goes to the
+root of its nature. The data root holds how a fact is stored, sealed, witnessed
+and framed: the causal log and its domain interface, the container graph, the
+store backends, the pack header, the state witness and the record frame. The
+presentation root holds how a thing is shown and acted on across a process
+boundary: the projection contract, the WIT world, the scene types and their
+clocks, the command vocabulary and the colour arithmetic. Custody and identity
+stand beside them. Neither root names anything above it, and the engine, the
+reading and spatial suppliers, the hosts and the applications stand on both.
+A shared library that is neither contract nor store is placed by asking which
+root's consumers all sit beside; one that both sides of the same nature link
+is a commons of that root, and the root's record says so. One trunk is not
+forced: folding the presentation root into the data root would save a
+repository and lose the separation.
+
+Links: draws on engine-split D12, engine-split D19, domain-contract C5, linked-data-platform-lessons D10, cycle-breaks D9 · summary Two roots by nature, data and presentation; a leaf goes to the root of its nature; neither root names anything above it; one trunk is not forced.
+
+*Added 2026-11-07, outcome new (engine-split D22): "i will give one more
+statement for a core architectural concern. 8?". The data root is Eidetic and
+the presentation root is the Graphshell repository's contract workspace as of
+this date; the repositories may change, the rule does not.*
 
 ## Surfaces
 
