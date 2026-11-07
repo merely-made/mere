@@ -765,29 +765,25 @@ an API being documented is not a passing receiving test.
     `ports/graphshell/docs/receipts/keep_content_20261106/`.
   - Open: the native access prompt was not driven (the run pre-granted it in the
     manifest); Firefox; real data; the drain waits for a visible writer tab.
-- 2026-11-07, P0 follower panes (Graphshell port; not qualified):
+- 2026-11-07, P0 follower panes (Graphshell port):
   - A follower's document pane reads through `block_pane::ReadOnly` storage.
-    It offers no save, undo, redo, inserts, guest commands or apply, shows
-    the source as text, and reads the document again after each follower
-    refresh (`PaneHost::refreshes`).
+    It offers no save, undo, redo, inserts, guest commands, apply, rhyme
+    pattern field or block command search. It shows the source as text under
+    a visible "Document source" label (an `aria-label` hid the text from
+    readers), and reads the document again after each follower refresh
+    (`PaneHost::refreshes`).
   - Workbench and presentation-rule controls hide their saves for a
     read-only store. The rules reload on refresh; the workbench arrangement
     does not.
   - The writer reports document, workbench and rules saves as busy, so
     followers refresh after them and handover waits for them.
-  - Checked: graphshell (330) and mere-view (38) lib tests, and the Wasm
-    build. `block_pane` builds only with the web feature, so the lib tests
-    don't reach it.
-  - Open:
-    - No headed check of this build. On main (`78917b4fa`) the extension
-      panics when **Graph controls** opens, before any pane:
-      `genet-livery/src/paint.rs:4722` "C3 resolves every paint color before
-      emission". A `currentColor` border reaches paint unresolved. Main has
-      had it since Genet moved to `24d7ddb`; `dda323e3` (wrapped inline text)
-      is the likely change.
-    - The equivalent change before the block pane extraction passed a headed
-      Chrome check on 2026-11-05: read-only document, and the writer's two
-      saves shown in the follower.
+  - Checked: graphshell (330) and mere-view (38) lib tests, the Wasm build,
+    and headed Chrome and Firefox on main after Rootstock `220d67b6f` (the
+    Graph controls panic): the follower's pane is read-only and shows each of
+    the writer's two saves; its rules pane shows no rule or saved-change
+    controls.
+  - Open: the workbench arrangement does not reload on refresh; an open
+    follower workbench has not been seen headed.
 
 Run evidence from implementation belongs in
 `archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md`, created
