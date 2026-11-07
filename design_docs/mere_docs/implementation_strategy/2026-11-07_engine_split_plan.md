@@ -1105,3 +1105,11 @@ revision and what crosses at frame rate.
   workspace check green; `pictograph` and `mere-kernel` tests 553 passed, 3 ignored, and
   `pictograph` with `canvas,gpu` 676 passed, 19 ignored; clippy 0 errors; the web workspace
   checks green. Outside repins are in Open (After P2's cut).
+- 2026-11-07: P2 complete on both sides. The Seiche donor cut (`44f1dc0cb`) merged into main as
+  `18e612dff` through the hooks and pushed: `crates/conatus` gone (197 files, 49k lines), `seiche` and
+  `numen` from `seiche.git` `a6b8641` with two `mere.git` redirects for Knot and Cleromancy, twenty
+  packages left the lock, pictograph and the kernel green (553 and 676 tests), the two D25 documents
+  deleted with DOC_README pointers. An untracked `quint-shaders` remnant directory removed. Still
+  owed by consumers: Isocosm (conatus, modulus, tenant, nisus rows and state-witness), Cleromancy,
+  Knot, Murm's signalman-desktop and mer3ly repoint `seiche` rows to `seiche.git`; Isocosm's
+  `.cargo/tabletop-local.toml` overlays numen and seiche onto deleted paths.
