@@ -962,3 +962,11 @@ revision and what crosses at frame rate.
   change, persisted anchors still Tabard's); `cargo check -p graphshell --all-targets` green,
   the 19 reading and retained-content lib tests pass. Committed on the lane branch with the
   clippy hook run; not pushed.
+- 2026-11-07: both code lanes merged into main through the hooks and pushed (`1ace7b211`): the
+  consumer cuts (`209ebe6ff`, as `4bc6a2244`) and P1 (`9ae4df0f8`, as `c14a3c8ef`), each merge
+  checked clean of conflicts except one Progress block kept from both sides. Three lane
+  worktrees and their branches removed. Another session landed, in the same hour, a genet relock
+  (`d634ee0c485`), a `seiche-model` split (the rapier-free model re-exported under the old paths)
+  and the graphshell host plan's T7; the Seiche population must take `seiche-model` with the six
+  crates. The Inker history lane is running (filter-repo on the twelve paths); its first push
+  waits on Mark.
