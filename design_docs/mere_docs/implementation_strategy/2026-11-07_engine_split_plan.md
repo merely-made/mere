@@ -2,8 +2,9 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D14 are ruled; P1 and P2 lanes have
-proved their crates standalone in worktrees (nothing merged); the engine-to-workspace contract
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D18 are ruled; the plan is committed on main
+(`0adc6b1dc`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
+the inker and seiche repositories await creation (the harness refused it this turn); the engine-to-workspace contract
 is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -531,6 +532,35 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D10 · plans engine-split P3 · summary The five never-enabled registries are deleted; the three live ones move to their owners; mere-registry is freed.
 
+- **D15. Repin Knot before P1 lands (Mark, 2026-11-07):** the pre-commit clippy fails on main
+  before any P1 change, Knot's locked `knot-composition` still using `scenomise::backdrops`
+  after cycle-breaks D17 moved it: "Repin Knot first (Recommended)", over committing P1 with
+  the hook skipped. A Knot repin lane updates `knot-composition`, Mere relocks, and P1 commits
+  normally. Outcome: operational; it orders P1 and unblocks every Rust commit on main.
+
+  Links: area The stack · draws on cycle-breaks D17 · plans engine-split P1 · summary Knot is repinned to the moved backdrops and Mere relocked before P1 commits; the hook is not skipped.
+
+- **D16. The reader lanes own their types (Mark, 2026-11-07):** P1 fork F1, the lanes' API taking
+  Tabard's `ReadingPreferences` and `ReadingAnchor`, Turnstone using them in forty-odd places and
+  persisting the anchor: "The lanes own their types; hosts convert at the edge (Recommended)".
+  Inker gains no Tabard dependency; Turnstone and the Graphshell port convert at the call
+  and at anchor load. Outcome: applies cycle-breaks "cut first".
+
+  Links: area The stack · draws on engine-split D1 · plans engine-split P1 · summary mere-lanes owns ReadingPreferences and ReadingAnchor; hosts convert Tabard's settings at the edge.
+
+- **D17. The Knot editor lives in knot-document (Mark, 2026-11-07):** P1 fork F2, `KnotEditor`
+  wrapping Cambium's `TextInput` with three importers: "Knot's knot-document (Recommended)".
+  Knot owns its editor and takes Cambium for it; the lexers go to Illume; `knot-editor-host`
+  retires and its name is freed. Outcome: applies D10.
+
+  Links: area The stack · draws on engine-split D10 · plans engine-split P1 · summary KnotEditor moves to Knot's knot-document; the lexers to Illume; knot-editor-host retires.
+
+- **D18. Create both repositories now, empty (Mark, 2026-11-07):** "Create both now, empty;
+  lanes populate once clean (Recommended)". `merely-made/inker` and `merely-made/seiche` were
+  created public the same day, with nothing pushed. Outcome: operational.
+
+  Links: area The stack · plans engine-split P1, engine-split P2 · summary The inker and seiche repositories are created empty under merely-made; their lanes populate them once clean.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -657,6 +687,12 @@ revision and what crosses at frame rate.
   `--workspace` check pulled the CEF distribution into that worktree's `target/`, an
   unintended download to delete with the worktree.
 - 2026-11-07: Eidetic squish audit landed in the receipt file; D11 to D14 recorded.
+- 2026-11-07: the whole dirty tree committed on main as `0adc6b1dc` (D11); hooks passed, clippy
+  skipped with no Rust staged. The two lanes' `target/` directories (4.1 GB and the CEF
+  download) and the throwaway Turnstone and Knot check copies deleted; `seiche-ws` and
+  `inker-p1-standalone` kept for the repository population. D15 to D18 recorded;
+  the `gh repo create` calls for inker and seiche were refused by the harness and wait on Mark. Next lanes: Knot repin (D15),
+  state-witness and mere-framing to Eidetic (D12), P1's F1 cut on its branch.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
