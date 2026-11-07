@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/harbour",
+    "agent": "Mozilla/5.0 (compatible; serval netfetcher)"
+  },
+  {
+    "path": "/tides",
+    "agent": "Mozilla/5.0 (compatible; serval netfetcher)"
+  },
+  {
+    "path": "/shoreline",
+    "agent": "Mozilla/5.0 (compatible; serval netfetcher)"
+  },
+  {
+    "path": "/harbour",
+    "agent": "Mozilla/5.0 (compatible; serval netfetcher)"
+  }
+]
