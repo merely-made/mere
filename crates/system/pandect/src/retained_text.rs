@@ -310,7 +310,8 @@ impl<B> SealedValues<B> {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
 impl<B: Backend + Sync> Backend for SealedValues<B> {
     async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
         self.backend
