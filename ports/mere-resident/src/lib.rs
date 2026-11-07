@@ -16,6 +16,7 @@
 pub mod applications;
 pub mod conditions;
 pub mod custody;
+pub mod domain_registry;
 pub mod door;
 pub mod embedded_reservoir;
 pub mod identity_ui;

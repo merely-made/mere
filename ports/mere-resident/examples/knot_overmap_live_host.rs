@@ -166,7 +166,8 @@ async fn main() {
         catalog.clone(),
         grants.clone(),
     )
-    .with_divination_authority();
+    .with_resident_defaults()
+    .unwrap();
     routes.load_access(&reservoir).await.unwrap();
     catalog
         .update(|catalog| reservoir.register(catalog, Some(routes.clone())))

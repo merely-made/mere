@@ -1405,7 +1405,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .with_custody_endpoint(args.app_endpoint.clone())
                 .with_coop_relays(coop_relays.clone())
                 .with_profile_subject_authority(personae.clone())
-                .with_divination_authority()
+                .with_resident_defaults()
+                .expect("resident domains register once")
                 // Retained page text is sealed by the custodian under the
                 // shared retained lane, or not kept: the resident has no
                 // plaintext path. Without a configured wallet persona it

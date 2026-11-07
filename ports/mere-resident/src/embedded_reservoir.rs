@@ -247,7 +247,7 @@ impl ReservoirAttachment {
         Fut: Future<Output = Result<Arc<dyn ResidentCustody>, String>>,
     {
         Self::open_with(options, identity, |routes| async {
-            Ok(routes.with_divination_authority())
+            routes.with_resident_defaults().map_err(|error| error.to_string())
         })
         .await
     }

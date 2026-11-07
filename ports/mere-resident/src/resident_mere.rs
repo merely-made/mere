@@ -100,6 +100,32 @@ fn now_secs() -> u64 {
         .unwrap_or_default()
 }
 
+fn install(registration: &DomainRegistration) -> Installed {
+    Installed {
+        owner: Some(registration.owner.clone()),
+        version: registration.version,
+        kind: registration.authority.kind(),
+        validator: registration.authority.validator(&registration.domain),
+        admission: registration.authority.admission(),
+    }
+}
+
+/// Cleromancy's divination authority, which Mere still names until cycle
+/// breaks P3 moves this registration into Cleromancy. The supplier owns the
+/// record and replay semantics; the resident owns installation and durability
+/// (distillery D19), so applications cannot select a weaker callback.
+pub fn divination_registration() -> DomainRegistration {
+    DomainRegistration::new(
+        "divination",
+        AppId::new("cleromancy"),
+        "v1",
+        crate::domain_registry::Authority::graph(Arc::new(|graph| {
+            cleromancy_domain::host::validate_divination_graph(graph)
+                .map_err(|error| error.to_string())
+        })),
+    )
+}
+
 /// Serves each mere on its own route: shared by the lane, which serves the
 /// meres already there, and the reservoir route, which serves each new one.
 #[derive(Clone)]
@@ -107,7 +133,10 @@ pub struct MereRoutes {
     inner: Arc<Routes>,
 }
 
-type ProfileLookup = Arc<dyn Fn(&personae::ProfileId) -> Result<bool, String> + Send + Sync>;
+use crate::domain_registry::{
+    DomainNotRegistered, DomainRegistration, DomainRegistry, Installed, ProfileLookup, RegisteredDomain,
+    RegistryError, Unregistered,
+};
 
 struct Routes {
     custody_endpoint: Option<String>,
@@ -119,7 +148,11 @@ struct Routes {
     launch: OnceCell<u64>,
     catalog: WeakAppEndpointCatalog,
     grants: AppRouteGrants,
-    validators: BTreeMap<String, pandect::GraphValidator>,
+    /// The installed registrations: authority by domain (cycle breaks P1b).
+    registered: BTreeMap<String, Installed>,
+    /// Domains refused unless registered, even when others are served generically.
+    reserved: BTreeSet<String>,
+    unregistered: Unregistered,
     handlers: HandlerRegistry,
     profile_lookup: Option<ProfileLookup>,
     /// The dialable projection host's catalog, when one serves these routes
@@ -144,28 +177,54 @@ impl MereRoutes {
         self
     }
 
-    /// Compose Cleromancy's portable product authority in either resident mode.
-    /// The supplier owns the record/replay semantics; the resident owns installation
-    /// and durability (distillery D19), so applications cannot select a weaker callback.
-    pub fn with_divination_authority(self) -> Self {
-        self.with_domain_validator(
-            "divination",
-            Arc::new(|graph| {
-                cleromancy_domain::host::validate_divination_graph(graph)
-                    .map_err(|error| error.to_string())
-            }),
-        )
-        .with_personal_facts_authority()
+    /// Install a domain registry before serving routes: each registration's
+    /// authority, the reserved domains and the policy for unregistered ones.
+    /// The same call serves the daemon and the embedded resident. A domain
+    /// already installed (by an earlier registry or `with_domain_validator`)
+    /// is refused as a duplicate.
+    pub fn with_registry(mut self, registry: &DomainRegistry) -> Result<Self, RegistryError> {
+        let inner = Arc::get_mut(&mut self.inner)
+            .expect("set the registry before cloning or serving routes");
+        for registration in registry.entries() {
+            if inner.registered.contains_key(&registration.domain) {
+                return Err(RegistryError::Duplicate(registration.domain.clone()));
+            }
+            inner
+                .registered
+                .insert(registration.domain.clone(), install(registration));
+        }
+        inner.reserved.extend(registry.reserved().iter().cloned());
+        inner.unregistered = registry.policy();
+        Ok(self)
     }
 
-    /// Install the same biographical-fact rules in daemon and embedded owners.
-    pub fn with_personal_facts_authority(self) -> Self {
-        let persona = self.inner.persona.as_uuid().to_string();
-        self.with_domain_validator(
-            personal_facts::DOMAIN,
-            Arc::new(move |graph| personal_facts::validate_for_persona(graph, &persona)),
-        )
+    /// Install Mere's own domains and, until cycle breaks P3 moves that
+    /// registration into Cleromancy, the divination authority:
+    /// [`DomainRegistry::resident_defaults`] for this persona.
+    pub fn with_resident_defaults(self) -> Result<Self, RegistryError> {
+        let registry = DomainRegistry::resident_defaults(self.persona());
+        self.with_registry(&registry)
     }
+
+    /// The persona these routes serve.
+    pub fn persona(&self) -> PersonaId {
+        self.inner.persona
+    }
+
+    /// The registered domains, as status shows them.
+    pub fn registered_domains(&self) -> Vec<RegisteredDomain> {
+        self.inner
+            .registered
+            .iter()
+            .map(|(domain, installed)| RegisteredDomain {
+                domain: domain.clone(),
+                owner: installed.owner.as_ref().map(|owner| owner.as_str().to_string()),
+                version: installed.version.to_string(),
+                authority: installed.kind.to_string(),
+            })
+            .collect()
+    }
+
     /// Resolve newly introduced profile subjects through the actual owner vault.
     /// Existing admitted references continue to replay after profile deletion.
     pub fn with_profile_subject_authority(
@@ -195,7 +254,10 @@ impl MereRoutes {
                 launch: OnceCell::new(),
                 catalog: catalog.downgrade(),
                 grants,
-                validators: BTreeMap::new(),
+                registered: BTreeMap::new(),
+                // Product domains are refused until registered, with or without a registry.
+                reserved: BTreeSet::from(["divination".to_string(), personal_facts::DOMAIN.to_string()]),
+                unregistered: Unregistered::default(),
                 handlers: HandlerRegistry::default(),
                 profile_lookup: None,
                 remote: None,
@@ -339,8 +401,17 @@ impl MereRoutes {
     ) -> Self {
         Arc::get_mut(&mut self.inner)
             .expect("set validator before cloning or serving routes")
-            .validators
-            .insert(domain.into(), validator);
+            .registered
+            .insert(
+                domain.into(),
+                Installed {
+                    owner: None,
+                    version: "",
+                    kind: "graph",
+                    validator,
+                    admission: None,
+                },
+            );
         self
     }
 
@@ -369,14 +440,20 @@ impl MereRoutes {
             return Err("mere does not belong to this reservoir persona/domain".into());
         }
         let domain = mere.domain.to_string();
-        // Product records must never be writable under generic graph authority.
-        // Both daemon and embedded composition install the same product callback.
-        if matches!(domain.as_str(), "divination" | "personal-facts")
-            && !self.inner.validators.contains_key(&domain)
+        // Product records must never be writable under generic graph authority:
+        // a reserved domain, or any domain under strict M2, is refused unless a
+        // registration installed its authority. Daemon and embedded
+        // composition read the same registry.
+        let installed = self.inner.registered.get(&domain);
+        if installed.is_none()
+            && (self.inner.reserved.contains(&domain)
+                || self.inner.unregistered == Unregistered::Refuse)
         {
-            return Err(format!(
-                "{domain} domain authority is not composed into this resident"
-            ));
+            return Err(DomainNotRegistered {
+                domain,
+                registered: self.inner.registered.keys().cloned().collect(),
+            }
+            .to_string());
         }
         let catalog = self
             .inner
@@ -397,19 +474,10 @@ impl MereRoutes {
             custody_endpoint: self.inner.custody_endpoint.clone(),
             handlers: self.inner.handlers.clone(),
             coop_relays: self.inner.coop_relays.clone(),
-            validator: self.inner.validators.get(&domain).cloned(),
-            admission_validator: if domain == personal_facts::DOMAIN {
-                let lookup = self.inner.profile_lookup.clone();
-                Some(Arc::new(move |before, after| {
-                    personal_facts::validate_new_profile_subjects(before, after, |id| match &lookup
-                    {
-                        Some(resolve) => resolve(id),
-                        None => Err("profile subjects require the resident vault authority".into()),
-                    })
-                }))
-            } else {
-                None
-            },
+            validator: installed.map(|installed| installed.validator.clone()),
+            admission_validator: installed
+                .and_then(|installed| installed.admission.clone())
+                .map(|build| build(self.inner.profile_lookup.clone())),
             archive: open_mere_archive_backend(
                 &self.inner.shared_root,
                 self.inner.persona,
@@ -2389,7 +2457,7 @@ mod tests {
         let routes = if let Some(validator) = validator {
             routes.with_domain_validator(domain, validator)
         } else {
-            routes.with_divination_authority()
+            routes.with_resident_defaults().unwrap()
         };
         let routes = match remote {
             Some(remote) => routes.with_remote_catalog(remote),
@@ -4832,7 +4900,7 @@ mod tests {
                 .serve(&record)
                 .await
                 .unwrap_err()
-                .contains("domain authority")
+                .starts_with("domain-not-registered: divination")
         );
         let mut app = fixture.attach("turnstone").await;
         let initial = graph(&mut app);
