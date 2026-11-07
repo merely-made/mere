@@ -35,6 +35,8 @@
     "nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md": "repos/inker/design_docs/nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md",
     "nematic_docs/implementation_strategy/2026-10-28_micron_navigation_plan.md": "repos/inker/design_docs/nematic_docs/implementation_strategy/2026-10-28_micron_navigation_plan.md",
     "nematic_docs/implementation_strategy/2026-10-28_smolweb_fidelity_plan.md": "repos/inker/design_docs/nematic_docs/implementation_strategy/2026-10-28_smolweb_fidelity_plan.md",
-    "verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md": "repos/inker/design_docs/verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md"
+    "verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md": "repos/inker/design_docs/verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md",
+    "mere_docs/implementation_strategy/2026-10-28_conatus_engine_plan.md": "repos/seiche/design_docs/seiche_docs/implementation_strategy/2026-10-28_conatus_engine_plan.md",
+    "mere_docs/research/2026-08-10_conatus_nexus_alignment_brief.md": "repos/seiche/design_docs/seiche_docs/research/2026-08-10_conatus_nexus_alignment_brief.md"
   }
 }

@@ -293,6 +293,16 @@ engine split plan's P1, with their history, and are indexed in that repository's
 moved crates were repointed to the Inker repository; code-font paths into them were
 not yet (the engine split plan's Open items carry the count).
 
+**Two documents left for Seiche on 2026-11-07.** The conatus engine plan and the
+conatus/nexus alignment brief had no area root here and followed their subject,
+`crates/conatus/`, to `merely-made/seiche` as its first area, `seiche_docs/` (engine
+split plan, P2 and D25), with their history; they are indexed in that repository's
+`design_docs/DOC_README.md`. Their D2 records stay here and map to the new home in
+`support/doc-audit/d2/moved_out.json`. The dynamics grammar and physics catalog plans,
+which have consumers on both sides, stay here. Markdown links into the moved crates were
+repointed to the Seiche repository; code-font paths into them were not (the engine split
+plan's Open items carry the count).
+
 **Member-crate scatter was collapsed 2026-08-24.** Nine `crates/*/design_docs/`
 directories held 20 documents, 18 of which `DOC_README.md` did not index. They
 now live under the area roots above. Core §4 forbids reintroducing them.
