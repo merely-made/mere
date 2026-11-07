@@ -581,6 +581,23 @@ the versions and sha512 integrity of `ports/moot/examples/capsule-library/pnpm-l
 no package manager was usable on the machine, so a small script did what `pnpm install --frozen-lockfile`
 does for that closure. Headed check, route and steps: see the plan's Progress entry for 2026-11-07.
 
+**Moot disclosure (2026-11-07).** Before this, a pack reached the web host only through the build
+script's `adapters.json` and native only as local files. `ports/moot/examples/block_adapter_disclosure.rs`
+now discloses a signed pack the way `capsule-library` discloses an applet: the pack's author shares it
+into a Moot, the founder selects it into a collection, the contribution travels as a plain drop into a
+retaining member, and that member re-verifies the pack (signature, contributor equals pack author,
+`power:block-adapter` alone, component hash and size) before writing `moot-disclosure.json`
+(`moot`, `collection`, `revision`, and per entry the pack address, component address and sizes). The
+revision is the blake3 of the collection version's compact JSON. `build_block_adapters.mjs --moot DIR`
+turns that into `adapters.json` with the real Moot, collection and revision in each entry's
+`CapsuleDisclosure`, and the web review panel and its receipt name them. The native window reads the
+same file with `--moot-disclosure FILE` and names them in its panel. `--pack`/`--component` (disclosed
+as `moot:local-test`), `adapters.json` by hand, and `--adapter` (disclosed as `local-files`) remain as
+development inputs. What is not done: the proof is one process with no network (the transport and
+hosting steps of `capsule-library` are not repeated), neither host fetches from a live Moot, and the
+native shell has no Moot connection of its own, so its Moot checks are those the example made when it
+wrote the file. The proof used a throwaway author seed; the real author key is Mark's.
+
 Headless receipts: `/Users/markik/Code/testing/mere/guest_blocks_spike_20261106/real/` and
 `real2/` (Chart, Tab and Score drawn by the real guest through the host's sheet painter, compound
 paths intact, compared with the spike's leaf images). The native window was compiled and its logic

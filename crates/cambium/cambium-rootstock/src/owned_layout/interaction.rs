@@ -37,9 +37,40 @@ impl OwnedLayout {
     /// Report whether the interaction changed the rendered result. The state
     /// still advances when the cascade is equal, so a later move or rebuild
     /// starts from the correct hovered/focused node.
+    ///
+    /// `dom` must be the document this session last rebuilt: the cascade runs
+    /// with no mutations, so a node inserted since then would be laid out
+    /// without a style. A host holding undrained mutations calls
+    /// [`Self::note_interaction`] instead.
     pub(crate) fn set_interaction<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
+        hovered: Option<NodeId>,
+        focused: Option<NodeId>,
+    ) -> bool {
+        let restyle = self.note_interaction(hovered, focused);
+        self.style_resolve_us = 0;
+        self.layout_with_text_us = 0;
+        self.content_extent_us = 0;
+        if !restyle {
+            return false;
+        }
+
+        let before = self.style.styles().clone();
+        self.update_style(dom, &[]);
+        if *self.style.styles() == before {
+            // Keep fragments, shaped text, scroll offsets and their generation.
+            return false;
+        }
+        self.layout_resolved(dom);
+        true
+    }
+
+    /// Record the hovered and focused nodes without restyling, reporting
+    /// whether a rule depends on the change. The next `rebuild` cascades the
+    /// recorded state together with the mutations it drains.
+    pub(crate) fn note_interaction(
+        &mut self,
         hovered: Option<NodeId>,
         focused: Option<NodeId>,
     ) -> bool {
@@ -71,21 +102,7 @@ impl OwnedLayout {
         }
         self.hovered = hovered;
         self.focused = focused;
-        self.style_resolve_us = 0;
-        self.layout_with_text_us = 0;
-        self.content_extent_us = 0;
-        if !changed || !needs_styles {
-            return false;
-        }
-
-        let before = self.style.styles().clone();
-        self.update_style(dom, &[]);
-        if *self.style.styles() == before {
-            // Keep fragments, shaped text, scroll offsets and their generation.
-            return false;
-        }
-        self.layout_resolved(dom);
-        true
+        changed && needs_styles
     }
 }
 

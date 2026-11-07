@@ -452,7 +452,12 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Links: area stack · draws on cycle_breaks D9, stack.3 · amends cycle_breaks D9 · plans cycle_breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
 
   *D8 and D9 refined 2026-11-07 (engine-split D2): the repository keeps the contract as its
-  bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.*
+  bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.
+  D9 refined again the same day by engine-split D19: the contract root gains `tinct` and is a
+  leaf layer Inker may name, with the drift toward "the family's leaves" named as a cost.
+  D8 refined by engine-split D23: the repository is the host layer as a library, contract root
+  below and hosting above, with no application; the reference host and MCP server go to
+  Turnstone.*
 
 ## Findings
 
@@ -924,3 +929,29 @@ Illustrative design, not compile-ready code.
   controls, and enabling that crashes the page (genet-livery "C3 resolves every paint color") in a
   build of `ea1103089` as in this one, so it is not a regression; `window.blockAdapters.openPane()` and an
   "Open block pane" button open the same pane.
+- 2026-11-07: P7 follow-ups (three items). **Chord-text contrast.** I could not reproduce "nearly invisible" at real size
+  on the web page: the baseline build (colour fix removed) and the fixed build draw Dm7, G7, Cmaj7 and the bar
+  numbers identically, about 16.7:1 on the dark pane (canvas pixel sample, text 224,241,252 on 4,15,22), and the
+  light theme is legible too; the old 400-pixel screenshot was a downscale of an 1100-pixel page, which thins 12-pixel
+  text. The guest is not the cause (it paints labels in `Role::Ink` at full alpha). The host had two real defects:
+  `SheetLeaf::texts()` computed a colour per run and `block_pane` discarded it, leaving each span to inherit
+  whatever its container's colour was; and the accent role (the theme's secondary colour) fails AA for text on some
+  themes (2.63:1 on the default light theme), as would muted (a guide colour at 0.35 alpha). Fix in the host painter:
+  the span now carries the run's colour (`TextRun::css_colour`), and a leaf told its ground (`SheetLeaf::on_ground`,
+  given by both hosts) draws any text role that is under AA in ink; `SheetTheme::from_surface` is the one
+  role mapping the web page and the native window share. Tests: `sheet_leaf` 4 to 9 (all built-in themes in all
+  four modes, Ink and Accent, 192 runs, lowest 4.81:1; the default surface theme; the fallback; CSS colour; the
+  contrast function), `graphshell-blocks` scenarios 3 to 4 (the pane must set the colour); `graphshell` lib with
+  `editable-blocks` 372 pass. Screenshots in `testing/mere/guest_blocks_contrast_20261107/`. **Moot disclosure.**
+  `ports/moot/examples/block_adapter_disclosure.rs` shares a signed block-adapter pack into a Moot, selects it into a
+  collection, ships it as a plain drop to a retaining member that re-verifies it, and writes `moot-disclosure.json`;
+  `build_block_adapters.mjs --moot DIR` builds the site from it with the real Moot, collection and revision in each
+  entry's `CapsuleDisclosure`; the web review panel and receipt name them (checked headed in the browser pane with
+  the throwaway-seed pack); the native window reads the same file with `--moot-disclosure FILE` (unit test; no live
+  Moot connection, so the native shell has no Moot path of its own). `--pack`/`--component`, `adapters.json` and
+  `--adapter` stay as development inputs. Not done: no network in the proof, no live fetch by either host.
+  **Stale locks.** Distillery's `probe`, `remote-fixture` and `session-fixture` roots moved from Eidetic `2df00e0` to
+  `71188bb` (remote-fixture's `insigne` and `personae` followed to Dramatis `696472da`); Mere's `ports/graphshell/web`
+  no longer carries the unused `netrender-vello-shaders` patch (the graph takes shaders at the rev
+  `netrender-vello-encoding` names), and its lock lost the matching `patch.unused` entry. Each touched root passes
+  `metadata --locked` twice with no diff and `check --locked`. Distillery `94e4fb2`; Mere `b27e07466`, merged to main as `25b19570e`. Woodshed needed no change (the guest paints labels in ink; its conformance test builds `SheetTheme` literals, which this change leaves as they were).
