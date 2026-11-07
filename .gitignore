@@ -138,3 +138,7 @@ ports/distillery/tests/fixtures/circuit/
 
 # Installed JavaScript tooling dependencies are reproducible local output.
 node_modules/
+
+# The mere:script WIT world lives in the Graphshell repository; document-host and
+# app-host materialise it here from graphshell-endpoint's build metadata.
+/crates/script/wit/

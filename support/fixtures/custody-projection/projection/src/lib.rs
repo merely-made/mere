@@ -7,7 +7,7 @@
 pub use graphshell_endpoint::ProjectionCatalog;
 #[cfg(feature = "forbidden-api")]
 pub use ostiary::custody_client::CustodyClient;
-pub use graphshell_endpoint::door::projection::{AppBrokerClient, AppRouteCarrier};
+pub use graphshell_door::projection::{AppBrokerClient, AppRouteCarrier};
 
 #[cfg(test)]
 mod tests {

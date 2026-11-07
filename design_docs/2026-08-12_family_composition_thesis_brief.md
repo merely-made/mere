@@ -1105,7 +1105,7 @@ completed general clip system:
   graph references. Payloads can remain outside the graph's individual nodes.
 - [`Graph`](../crates/graph/graph-kernel/src/graph/mod.rs) holds resource and
   surface graphs with explicit shown-resource bindings.
-  [`SourceRef` and scene instances](../crates/cambium/scenes/sceno/src/scene.rs)
+  [`SourceRef` and scene instances](https://github.com/merely-made/graphshell/blob/main/crates/sceno/src/scene.rs)
   distinguish source identity from projected occurrences.
 - [`write_clip_node`](../crates/mere/src/clip.rs) records a caller-formatted clip
   and asserts resource `ClippedFrom` provenance. Semantic clip lowering belongs
@@ -1199,7 +1199,7 @@ pass runs documentation checks and establishes no fresh runtime acceptance.
 
 | Existing contract | Established boundary |
 |---|---|
-| [Chartulary capabilities](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](../crates/cambium/scenes/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
+| [Chartulary capabilities](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](https://github.com/merely-made/graphshell/blob/main/crates/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
 | [Eidetic manifests](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/manifest.rs), [bundles](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
 | [Schema definitions](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/schema_def.rs), [opaque facets](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
 | [Chirograph](../crates/chirograph/src/lib.rs), [Pandect live-view records](../crates/system/pandect/src/live_view.rs) | Advertised actions, payload schemas, scene revision checks, explicit session states and source-owned live/historical cursors. A persisted reference or advertised action supplies no grant. |

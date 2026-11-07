@@ -9,7 +9,7 @@
 
 *Reading, not ruled* marks this brief's own inference. Every other claim is a quotation, a file and line, or a cited source.
 
-**Path key.** Short paths in the tables expand as follows. `seiche/` is `crates/conatus/seiche/src/`; `pictograph/` is `crates/canvas/pictograph/src/canvas/`; `cartography/` is `crates/canvas/cartography/src/`; `sceno/` is `crates/cambium/scenes/sceno/src/`; `numen/` is `crates/conatus/numen/src/`. The main files are `crates/conatus/seiche/src/lib.rs`, `crates/conatus/seiche/src/forces.rs`, `crates/canvas/pictograph/src/canvas/physics_catalog.rs`, `crates/canvas/pictograph/src/canvas/cartography_scene.rs` and `crates/cambium/scenes/sceno/src/score.rs`. Files that exist only on a branch are cited in git's `rev:path` form, for example `1bf47cf9:crates/conatus/seiche/src/laws/density.rs`.
+**Path key.** Short paths in the tables expand as follows. `seiche/` is `crates/conatus/seiche/src/`; `pictograph/` is `crates/canvas/pictograph/src/canvas/`; `cartography/` is `crates/canvas/cartography/src/`; `sceno/` is `graphshell/crates/sceno/src/`; `numen/` is `crates/conatus/numen/src/`. The main files are `crates/conatus/seiche/src/lib.rs`, `crates/conatus/seiche/src/forces.rs`, `crates/canvas/pictograph/src/canvas/physics_catalog.rs`, `crates/canvas/pictograph/src/canvas/cartography_scene.rs` and `graphshell/crates/sceno/src/score.rs`. Files that exist only on a branch are cited in git's `rev:path` form, for example `1bf47cf9:crates/conatus/seiche/src/laws/density.rs`.
 
 ## 0. The result on one page
 

@@ -281,7 +281,7 @@ Open, Save, and revision refresh cross the carrier"
 in-process (B2) and the authority across the process boundary (B4).
 
 The frozen realization turns a scene into navigable semantics for any host
-(`crates/graphshell/graphshell-client/src/frozen.rs`, lines 6 to 24).
+(`graphshell/crates/graphshell-client/src/frozen.rs`, lines 6 to 24).
 
 ### F9. Accessibility: one composition primitive exists on all three platforms, and the stack has not used it
 

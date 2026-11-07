@@ -40,8 +40,9 @@ use wasmtime_wasi::{WasiCtx, WasiCtxBuilder, WasiCtxView, WasiView};
 
 wasmtime::component::bindgen!({
     // The shared, runtime-neutral `mere:script` contract (one WIT, two runtimes:
-    // this native Wasmtime host + the browser jco path). Lives at `crates/script/wit`,
-    // not inside this native crate, so the browser consumes the same world.
+    // this native Wasmtime host + the browser jco path). It lives in the Graphshell
+    // repository (graphshell-endpoint's package) and build.rs materialises it at
+    // `crates/script/wit`, so the browser consumes the same world.
     path: "../wit",
     world: "document-core",
     // Turns run on a fiber (`exports` async, invoked via `call_async`); host imports

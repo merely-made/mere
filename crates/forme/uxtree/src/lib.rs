@@ -39,6 +39,8 @@ use std::hash::{Hash, Hasher};
 use accesskit::{Action, Node, NodeId, Role, TreeId, TreeInfo, TreeUpdate};
 use inker::{Block, EngineDocument, FoldState, InlineSpan, MenuRow, inline_text};
 
+#[cfg(feature = "frozen")]
+pub mod frozen;
 pub mod graft;
 
 pub use graft::{

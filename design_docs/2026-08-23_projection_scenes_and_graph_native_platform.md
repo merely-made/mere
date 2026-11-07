@@ -1036,7 +1036,7 @@ recency timeout or automatic retention on hover. Contextual relevance does not
 imply that an entity must be noninteractive, intangible or stored permanently.
 
 **Checked portable substrate at published Mere `773a0dc2`:**
-[Backdrop](../crates/cambium/scenes/sceno/src/scene.rs) already carries
+[Backdrop](https://github.com/merely-made/graphshell/blob/main/crates/sceno/src/scene.rs) already carries
 independent `visible` and `collidable` flags. It deliberately stays outside
 ordinary item picking. The canvas binder inspected separately at local main
 `d572b322` preserves that distinction, including invisible obstacles; its B1

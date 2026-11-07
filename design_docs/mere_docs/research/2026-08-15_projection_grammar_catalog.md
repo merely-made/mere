@@ -503,7 +503,7 @@ and open item 4; the Scenograph editor plan's track S1, rulings SE53 to SE83.
 
 #### The fold fact (promoted 2026-10-08)
 
-`sceno::Fold` (`crates/cambium/scenes/sceno/src/fold.rs`), landed by the mer3ly
+`sceno::Fold` (`graphshell/crates/sceno/src/fold.rs`), landed by the mer3ly
 site session as its S5 at `64974ccb`; the site's Rulings 149 to 153, and the
 promotion and duplicate rulings in the projection grammar adoption plan (the
 fold fact's promotion, 2026-10-08).

@@ -29,7 +29,7 @@ use chirograph::{
 };
 use djinn::door::app_admission::AppRouteGrants;
 use ostiary::app_client::AppClientError;
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use ostiary::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};

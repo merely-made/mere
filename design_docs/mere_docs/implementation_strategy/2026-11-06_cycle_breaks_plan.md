@@ -1,9 +1,12 @@
 # Cycle breaks plan
 
-**Status:** 2026-11-06: plan. Nothing has moved. D1 to D5 settle the break for each open
+**Status:** 2026-11-06: in progress. D1 to D5 settle the break for each open
 family dependency cycle; the Genet/Murm cycle needs no break (Findings). Two forks remain
-open (F1, F2). D6 (dev edges count) added the same day. D4 and P6 are paused pending the
-[host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); D1, D2, D3 and D5 proceed.
+open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-06) ruled
+the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
+unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
+`merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
+to do, and F1 is half answered. D1, D2, D3 and D5 proceed.
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -127,7 +130,7 @@ Murm still reaches Gemot through another edge, the check names it and the phase 
 
 ### P6. D4 mere-comms moves into Murm
 
-**Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md).** Do not start; the brief may change where F1's scene crates live.
+**Paused 2026-11-06 (Mark) pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); unpaused the same day by D7 to D9.** The scene vocabulary (`sceno`, `scenotime`) now lives in `merely-made/graphshell`, below Murm, so Signalman's `sceno` edge is legal. What is left of P6 is `mere-comms` and F1's `scenomise` edge.
 
 Done when `crates/shell/comms` (package `mere-comms`, lib `comms`; `serde`, `async-trait`,
 optional `murm` and `misfin`, dev `identity`, `transport`) lives in Murm; Mere's `ports/moot`
@@ -160,7 +163,10 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   upstream of Murm (published, per the Cambium publish plan), the feature moves out, or the
   desktop's separate root is the accepted answer for the optional feature too, is not ruled.
   The [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) offers a rule (scene vocabulary below Murm) and leaves
-  `scenomise::backdrops` open.
+  `scenomise::backdrops` open. Answered in part 2026-11-06 by D7 to D9: `sceno` and
+  `scenotime` are in `merely-made/graphshell`; `scenomise` stays in Mere (D9), so
+  `signalman`'s `portable-scenes` still names it through `mere.git` until its `backdrops`
+  slice is ruled a contract helper or the feature moves out.
 - **F2. Gemot's dev edge into Distillery.** `distillery` takes `gemot`, `mien` and `mooting`
   as dev-dependencies, and `gemot` takes `eidetic-search` optionally. After P4 the loop
   Gemot, Eidetic, ESP, Eidetic is gone; whether a Gemot to Distillery dev edge is a cycle the
@@ -202,7 +208,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   belong to Murm and Errand, now with the whole crate moving. F1 records that this alone
   does not clear Signalman's scene crates.
 
-  **Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md).**
+  **Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); unpaused by D7 to D9, which moved the scene vocabulary below Murm.**
 
   Links: area stack · draws on resident-split S6, stack.3 · plans cycle_breaks P6 · summary mere-comms moves into Murm so signalman's comms feature no longer names Mere.
 
@@ -298,6 +304,50 @@ clones; its raw edges are not committed).
   (`ports/moot/Cargo.toml:60`) and Graphshell's `comms` and `workspace-editor` features
   (`ports/graphshell/Cargo.toml:76,235`). The map calls C4's `comms` half "Open" in one place
   and the resident split plan has it as an adapter question; D4 closes both.
+
+### P6 extraction findings (D7 to D9), 2026-11-06
+
+Verified against Mere `49571db83`, the Graphshell repository and the consumers.
+
+- **Moved:** `chirograph`, `hest`, `sceno`, `scenotime`, `script-wire`, `script-witgen`,
+  `graphshell-endpoint` (default surface, carriers and the WIT projection session) and
+  `graphshell-client`, with the one WIT world at
+  `graphshell/crates/graphshell-endpoint/wit/world.wit`. `crates/script/wit/world.wit`
+  and the endpoint's copy were byte-identical (`cmp`); the history of the former is the
+  one carried.
+- **Split, `graphshell-endpoint`:** the `door` module (`projection`, `resident_mere_proxy`,
+  `projection_offer`, `projection_provider`, `profile`) and the four features that pulled
+  Ostiary, Castellan, Dramatis, Insigne and Personae became Mere's `graphshell-door`
+  (`crates/graphshell/graphshell-door`, features `projection-door`, `projection-offer`,
+  `projection-provider`, `profile`, names unchanged, empty by default). Named for the
+  existing `graphshell-host` and `graphshell-mcp` siblings, which are the other
+  `graphshell-*` crates that stay in Mere above the protocol.
+- **Edges that needed a seam** (a moved crate may depend on nothing in Mere, dev edges
+  included, D6): (1) `graphshell-client`'s `accesskit` feature took Mere's `uxtree`, which
+  takes `inker`; `FrozenScene::to_ux_tree` became `uxtree::frozen::FrozenUxTree` behind
+  `uxtree`'s `frozen` feature. (2) `graphshell-client`'s dev edges to `scenomise`,
+  `scenograph`, `incipit`, `uxtree`, `genet-scripted-dom` and `taproot`: 28 of the frozen
+  module's 32 unit tests and the facet and shelfmark tests moved to Mere as
+  `graphshell-client-tests` (the four `sceno`-only tests stayed; the shelfmark test builds
+  its own small capture because the site fixture stays with `scenotime`). (3)
+  `scenotime`'s dev edge to `backstep`: its history test moved to
+  `backstep/tests/scene_trace_history.rs`.
+- **WIT consumers inside Mere** (`document-host`, `app-host`, `settings-wit` and the five
+  guests) read the world by manifest-relative path. The bindgen macros take only literal
+  paths, so `document-host` and `app-host` materialise
+  `crates/script/wit/world.wit` (ignored by git) in `build.rs` from `graphshell-endpoint`'s
+  Cargo `links` metadata (`DEP_GRAPHSHELL_ENDPOINT_WIT`, which Cargo passes from normal
+  dependencies only), and `settings-wit` reads the metadata directly. A build product of
+  the pinned dependency, not a second copy; the moot capsule guest relies on the same path.
+- **`mere-curation` stays.** No moved crate depends on it; its dependents are `scenograph`,
+  `mere-view`, `pandect`, `pictograph` and `forme` in Mere, and Knot, Turnstone and Woodshed,
+  which depend on Mere crates for other reasons.
+- **Versions:** none bumped. `graphshell-endpoint` 0.0.3 on crates.io still carries the
+  door features, so it needs a version bump before its next publication; Distillery's
+  registry rows resolve to the Graphshell git source through Mere's `[patch.crates-io]`.
+- **Order forced by the cycle:** Mere's lock names Knot and Cleromancy, whose old revisions
+  ask `mere.git` for `graphshell-endpoint` with `projection-door`, so Knot and Cleromancy
+  took the source change first and Mere relocked onto them (Progress).
 
 ## Keeping cycles out: the check
 

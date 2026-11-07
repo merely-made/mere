@@ -13,7 +13,7 @@ use chirograph::{
     ContentHash, EndpointDescriptor, PortableCardV1, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot,
 };
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use mere_view::MereViewModel;
 use sceno::InstanceId;
 

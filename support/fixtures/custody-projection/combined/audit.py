@@ -30,7 +30,7 @@ resident = edge(root, "mere_resident")
 djinn = edge(root, "djinn")
 ostiary = edge(root, "ostiary")
 custody = edge(root, "castellan_client")
-endpoint = edge(root, "graphshell_endpoint")
+endpoint = edge(root, "graphshell_door")
 if edge(resident, "djinn") != djinn:
     sys.exit("resident and the fixture must share one Djinn package")
 if edge(resident, "ostiary") != ostiary or edge(endpoint, "ostiary") != ostiary or edge(djinn, "ostiary") != ostiary:

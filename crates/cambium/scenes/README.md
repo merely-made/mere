@@ -37,7 +37,10 @@ motion roles and normalized placement traces in immutable versions. Those
 portable values remain distinct from live simulation state and execution
 handles. The carrier is `knot-editor/crates/knot-composition/src/retention.rs`.
 
-Four crates with separate package versions, recorded in their manifests. The
+`sceno` and `scenotime` left for the protocol layer in
+[merely-made/graphshell](https://github.com/merely-made/graphshell) on 2026-11-06
+(cycle breaks D7 to D9); `scenomise` and `scenograph` stay here and take them
+from there. Four crates with separate package versions, recorded in their manifests. The
 three engine crates share the `sceno-` stem with one function morpheme each; `scenograph` is the
 published name for authoring definitions. The engine crates landed under
 `crates/cambium/scenes/` on 2026-09-03 with the Cambium family, and the
@@ -49,9 +52,9 @@ interaction structure; a scene is a projection of content.
 
 | Crate | Contents |
 | --- | --- |
-| [sceno](sceno/) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Fold` (with `StandIn`, `FoldRule`, `FoldBoundary` and the derived `FoldEffect`), `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
+| [sceno](https://github.com/merely-made/graphshell/tree/main/crates/sceno) (Graphshell repository) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Fold` (with `StandIn`, `FoldRule`, `FoldBoundary` and the derived `FoldEffect`), `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
 | [scenomise](scenomise/) | Layout compilation and choreography. `ProjectionCompiler` converts supported Scenograph definitions and disclosed datasets into scores and scenes. `solve(&Score) -> Scene` realizes a supplied score; `relax(&mut Scene, &Relaxation)` adds repulsion, springs and arrangement pull without a physics engine dependency, including static collision against collidable backdrops. |
-| [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId` / `FoldId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, `SceneTrace` (a base snapshot and labelled steps, each an optional diff plus an opaque host annotation, chain-checked and replayed with `snapshot_at`; no cursor, which is host policy), and `pick(world) -> Option<InstanceId>`. |
+| [scenotime](https://github.com/merely-made/graphshell/tree/main/crates/scenotime) (Graphshell repository) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId` / `FoldId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, `SceneTrace` (a base snapshot and labelled steps, each an optional diff plus an opaque host annotation, chain-checked and replayed with `snapshot_at`; no cursor, which is host policy), and `pick(world) -> Option<InstanceId>`. |
 | [scenograph](scenograph/) | Host-neutral authoring model. Durable projection definitions, local validation, reusable definition binding and variants, deterministic JSON, public source revisions, and opaque runtime witness binding. It owns neither a widget UI, a source authority, a solver, nor a renderer. |
 
 ## Vocabulary

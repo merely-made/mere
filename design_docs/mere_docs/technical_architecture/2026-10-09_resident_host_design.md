@@ -159,7 +159,7 @@ newer notice. Carry latest host coverage into the installed view, including
 context changes that arrived during await. Failures retain the previous reader.
 
 Add product-neutral coverage to the portable snapshot boundary in
-`crates/chirograph/src/lib.rs` and Graphshell's snapshot producer. A proposed
+`graphshell/crates/chirograph/src/lib.rs` and Graphshell's snapshot producer. A proposed
 defaultable Option<PortableCoverageV1> carries limits with layer, reason, separate
 Surface/Resource ID lists and optional count. Preserve Possession, Residency,
 Disclosure, Synchronization and Projection meanings. Absent old-wire metadata

@@ -124,7 +124,7 @@ binds it.
 
 ## 4. T3's pump (landed)
 
-**Landed, Mere `8b08c98b2`:** `crates/graphshell/graphshell-client`:
+**Landed, Mere `8b08c98b2`:** `graphshell/crates/graphshell-client`:
 
 - feature `pump = ["dep:tokio"]` (Tokio `io-util` only; default build
   unchanged and wasm-clean);

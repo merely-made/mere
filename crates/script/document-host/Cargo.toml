@@ -19,6 +19,10 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
+# The WIT world lives in this package; its build script publishes the directory to
+# this crate's build script as DEP_GRAPHSHELL_ENDPOINT_WIT (Cargo passes `links`
+# metadata from normal dependencies only). The crate itself is not used.
+graphshell-endpoint = { workspace = true }
 servitor = { workspace = true }
 # wasmtime 45 (default features: component-model + async always-on). Async exports
 # are invoked via call_async on a fiber so a future sync `fetch` import can suspend

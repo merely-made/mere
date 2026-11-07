@@ -24,7 +24,7 @@ version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3b7f7f85a7e5f68090000ed7622545829afd484d210358702ae4cb97dd0c320"
 dependencies = [
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -37,7 +37,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -467,9 +467,6 @@ name = "arbitrary"
 version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
-dependencies = [
- "derive_arbitrary",
-]
 
 [[package]]
 name = "arc-swap"
@@ -1042,6 +1039,10 @@ dependencies = [
 [[package]]
 name = "backstep"
 version = "0.1.0"
+dependencies = [
+ "sceno",
+ "scenotime",
+]
 
 [[package]]
 name = "backtrace"
@@ -1972,7 +1973,7 @@ dependencies = [
  "smallvec",
  "spin 0.12.3",
  "thiserror 2.0.21",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -2486,7 +2487,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "uuid 1.27.0",
+ "uuid",
  "windows",
  "windows-sys 0.59.0",
  "zeroize",
@@ -2509,7 +2510,7 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "zeroize",
 ]
 
@@ -2596,7 +2597,7 @@ checksum = "d38f2da7a0a2c4ccf0065be06397cc26a81f4e528be095826eee9d4adbb8c60f"
 dependencies = [
  "byteorder",
  "fnv",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -2678,7 +2679,7 @@ dependencies = [
  "serde",
  "serde_json",
  "slotmap",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -2687,13 +2688,14 @@ version = "0.0.3"
 source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "serde",
- "uuid 1.27.0",
+ "uuid",
  "zeroize",
 ]
 
 [[package]]
 name = "chirograph"
 version = "0.0.4"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -2792,7 +2794,7 @@ dependencies = [
 [[package]]
 name = "cleromancy-core"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#da704e5c434c239e38789839913b24adc52e052b"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#afed17272aaf7f9132c5e0e814866c73a459a300"
 dependencies = [
  "blake3",
  "chartulary",
@@ -4507,7 +4509,7 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef552e6f588e446098f6ba40d89ac146c8c7b64aade83c051ee00bb5d2bc18d"
 dependencies = [
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -4570,17 +4572,6 @@ name = "derive-new"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2cdc8d50f426189eef89dac62fabfa0abb27d5cc008f25bf4156a0203325becc"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "derive_arbitrary"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e567bd82dcff979e4b03460c307b3cdc9e96fde3d73bed1496d2bc75d9dd62a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4885,7 +4876,7 @@ dependencies = [
  "ssh-agent-lib",
  "ssh-key",
  "tokio",
- "uuid 1.27.0",
+ "uuid",
  "windows",
  "windows-future",
  "windows-sys 0.59.0",
@@ -4953,6 +4944,7 @@ name = "document-host"
 version = "0.0.1"
 dependencies = [
  "genet-scripted-dom",
+ "graphshell-endpoint",
  "layout-dom-api",
  "mere-registry",
  "pollster 0.4.0",
@@ -5024,7 +5016,7 @@ dependencies = [
  "personae",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -5074,7 +5066,7 @@ dependencies = [
  "ssh-key",
  "tokio",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "windows-sys 0.59.0",
  "zeroize",
 ]
@@ -5294,7 +5286,7 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
- "uuid 1.27.0",
+ "uuid",
  "zeroize",
 ]
 
@@ -6290,7 +6282,7 @@ source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a
 dependencies = [
  "insigne",
  "serde",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -6938,7 +6930,7 @@ dependencies = [
  "cfg-if",
  "js-sys",
  "libc",
- "wasi 0.11.1+wasi-snapshot-preview1",
+ "wasi",
  "wasm-bindgen",
 ]
 
@@ -7272,6 +7264,7 @@ dependencies = [
  "genet-scripted-dom",
  "getrandom 0.3.4",
  "graphshell-client",
+ "graphshell-door",
  "graphshell-endpoint",
  "graphshell-host",
  "hest",
@@ -7329,7 +7322,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
- "uuid 1.27.0",
+ "uuid",
  "wgpu",
  "wgpu-cue",
  "woodshedding",
@@ -7340,38 +7333,60 @@ dependencies = [
 [[package]]
 name = "graphshell-client"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
+dependencies = [
+ "chirograph",
+ "hest",
+ "sceno",
+ "scenotime",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "graphshell-client-tests"
+version = "0.0.0"
 dependencies = [
  "accesskit 0.25.1",
  "chirograph",
  "genet-scripted-dom",
- "hest",
+ "graphshell-client",
  "incipit",
  "layout-dom-api",
  "sceno",
  "scenograph",
  "scenomise",
  "scenotime",
- "serde",
  "serde_json",
  "taproot",
- "tokio",
  "uxtree",
+]
+
+[[package]]
+name = "graphshell-door"
+version = "0.0.1"
+dependencies = [
+ "castellan-client",
+ "chirograph",
+ "dramatis",
+ "graphshell-endpoint",
+ "insigne",
+ "ostiary",
+ "personae",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
 name = "graphshell-endpoint"
 version = "0.0.3"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
- "castellan-client",
  "chirograph",
  "ciborium",
- "dramatis",
- "insigne",
- "ipc-channel",
- "ostiary",
- "personae",
  "sceno",
- "scenotime",
  "script-wire",
  "script-witgen",
  "serde",
@@ -7406,7 +7421,7 @@ dependencies = [
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -7414,7 +7429,7 @@ name = "graphshell-mcp"
 version = "0.0.1"
 dependencies = [
  "chirograph",
- "graphshell-endpoint",
+ "graphshell-door",
  "ostiary",
  "sceno",
  "scenotime",
@@ -7433,7 +7448,7 @@ dependencies = [
  "genet-scripted-dom",
  "graphshell",
  "graphshell-client",
- "graphshell-endpoint",
+ "graphshell-door",
  "hest",
  "layout-dom-api",
  "mandrake",
@@ -7453,7 +7468,7 @@ dependencies = [
  "tempfile",
  "tokio",
  "url",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -7711,7 +7726,7 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -7724,7 +7739,7 @@ dependencies = [
  "quote",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -7776,9 +7791,9 @@ checksum = "e17592d60ebacc7d5e169f4663c5f84f9161cc90328abcfe8456f41e4dfcb284"
 [[package]]
 name = "hest"
 version = "0.2.1"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -8464,7 +8479,7 @@ version = "0.2.1"
 dependencies = [
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -8508,7 +8523,7 @@ dependencies = [
  "serde_json",
  "toml 0.8.23",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "webcue",
 ]
 
@@ -8650,25 +8665,6 @@ dependencies = [
  "bitflags 2.13.2",
  "cfg-if",
  "libc",
-]
-
-[[package]]
-name = "ipc-channel"
-version = "0.23.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf1d9c442a2ec790209da8a49f99f7dae0fad31ba24c9947b01ce5e8de8bddcb"
-dependencies = [
- "crossbeam-channel",
- "libc",
- "mio",
- "postcard",
- "rand 0.10.3",
- "rustc-hash 2.1.3",
- "serde_core",
- "tempfile",
- "thiserror 2.0.21",
- "uuid 0.8.2",
- "windows",
 ]
 
 [[package]]
@@ -9244,7 +9240,7 @@ dependencies = [
  "serde_json",
  "time",
  "url",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -9330,7 +9326,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "knot-catalog",
 ]
@@ -9338,20 +9334,20 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
  "zeroize",
 ]
 
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9365,13 +9361,13 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "cambium",
  "illume",
@@ -9388,7 +9384,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9400,6 +9396,7 @@ dependencies = [
  "esp",
  "fleece",
  "gemot-site",
+ "graphshell-door",
  "graphshell-endpoint",
  "inker",
  "insigne",
@@ -9444,7 +9441,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
- "uuid 1.27.0",
+ "uuid",
  "windows-sys 0.59.0",
  "zeroize",
 ]
@@ -9559,17 +9556,6 @@ name = "leb128"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c83bff1d572d6b9aeef67ddfc8448e4a3737909cb28e81f97c791b9018703e52"
-
-[[package]]
-name = "leb128-tokio"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ea7a96024f819c643b967fc71d687b590765a7b2bd057c3678eb53a89a3d606"
-dependencies = [
- "tokio",
- "tokio-util",
- "tracing",
-]
 
 [[package]]
 name = "leb128fmt"
@@ -10192,7 +10178,7 @@ dependencies = [
  "serde_json",
  "tabard",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "uxtree",
  "workbench",
 ]
@@ -10227,7 +10213,7 @@ dependencies = [
  "serde_json",
  "servitor",
  "tempfile",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -10239,7 +10225,7 @@ dependencies = [
  "scenomise",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -10385,7 +10371,7 @@ dependencies = [
  "serde",
  "serde_json",
  "taffy",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -10424,7 +10410,7 @@ dependencies = [
  "tempfile",
  "time",
  "url",
- "uuid 1.27.0",
+ "uuid",
  "web-time",
 ]
 
@@ -10455,7 +10441,7 @@ dependencies = [
  "tempfile",
  "tokio",
  "url",
- "uuid 1.27.0",
+ "uuid",
  "wgpu",
 ]
 
@@ -10547,7 +10533,7 @@ version = "0.1.0"
 dependencies = [
  "chirograph",
  "graphshell-client",
- "graphshell-endpoint",
+ "graphshell-door",
  "hest",
  "mere-cartography",
  "mere-kernel",
@@ -10558,7 +10544,7 @@ dependencies = [
  "scenotime",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -10591,7 +10577,7 @@ dependencies = [
  "spareval",
  "spargebra",
  "time",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -10651,6 +10637,7 @@ dependencies = [
  "gemot-site-host",
  "graphshell",
  "graphshell-client",
+ "graphshell-door",
  "graphshell-endpoint",
  "graphshell-host",
  "graphshell-mcp",
@@ -10705,7 +10692,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
- "uuid 1.27.0",
+ "uuid",
  "windows",
  "zbus",
  "zeroize",
@@ -10721,7 +10708,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
+source = "git+https://github.com/merely-made/murm.git?branch=main#4686ce09d9ae2b7e1813a21e7aa2ab2fb3787e91"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10764,7 +10751,7 @@ dependencies = [
  "serde_json",
  "sprigging",
  "taproot",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -10896,7 +10883,7 @@ checksum = "4b18443e9c262bfe8fa82f51666e2642c53393f7e5c27b3e1aeab922cff5b9d8"
 dependencies = [
  "libc",
  "log",
- "wasi 0.11.1+wasi-snapshot-preview1",
+ "wasi",
  "windows-sys 0.61.2",
 ]
 
@@ -10992,12 +10979,12 @@ dependencies = [
 [[package]]
 name = "mora"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 
 [[package]]
 name = "mora-cmudict"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "mora",
 ]
@@ -11095,7 +11082,7 @@ dependencies = [
 [[package]]
 name = "murm-sync"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
+source = "git+https://github.com/merely-made/murm.git?branch=main#4686ce09d9ae2b7e1813a21e7aa2ab2fb3787e91"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11134,7 +11121,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
+source = "git+https://github.com/merely-made/murm.git?branch=main#4686ce09d9ae2b7e1813a21e7aa2ab2fb3787e91"
 dependencies = [
  "bytes",
  "futures-util",
@@ -12238,7 +12225,7 @@ dependencies = [
  "serde",
  "serde_json",
  "strum 0.28.0",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -13607,7 +13594,7 @@ dependencies = [
  "sporran",
  "tabard",
  "tempfile",
- "uuid 1.27.0",
+ "uuid",
  "wasm-bindgen-test",
 ]
 
@@ -14015,7 +14002,7 @@ dependencies = [
  "serde_json",
  "ssh-key",
  "thiserror 1.0.69",
- "uuid 1.27.0",
+ "uuid",
  "zeroize",
 ]
 
@@ -14263,7 +14250,7 @@ dependencies = [
  "state-witness",
  "tinct",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "wasm-bindgen",
 ]
 
@@ -14366,7 +14353,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "uxtree",
  "workbench",
 ]
@@ -15627,7 +15614,7 @@ dependencies = [
 [[package]]
 name = "reference-data"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
 dependencies = [
  "blake3",
  "serde",
@@ -15912,7 +15899,7 @@ dependencies = [
  "rend",
  "rkyv_derive",
  "tinyvec",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -16314,6 +16301,7 @@ dependencies = [
 [[package]]
 name = "sceno"
 version = "0.0.7"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "serde",
  "serde_json",
@@ -16349,8 +16337,8 @@ dependencies = [
 [[package]]
 name = "scenotime"
 version = "0.0.5"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
- "backstep",
  "sceno",
  "serde",
  "serde_json",
@@ -16376,7 +16364,7 @@ dependencies = [
  "schemars_derive",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -16426,22 +16414,16 @@ dependencies = [
 [[package]]
 name = "script-wire"
 version = "0.0.1"
-dependencies = [
- "ipc-channel",
- "proptest",
- "serde",
- "wit-bindgen-wrpc",
-]
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 
 [[package]]
 name = "script-witgen"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "anyhow",
- "arbitrary",
  "heck",
  "wit-parser 0.263.0",
- "wit-smith",
 ]
 
 [[package]]
@@ -16628,7 +16610,7 @@ dependencies = [
  "state-witness",
  "toml 0.8.23",
  "tracing",
- "uuid 1.27.0",
+ "uuid",
  "wasm-bindgen",
  "wgpu",
 ]
@@ -16837,6 +16819,7 @@ dependencies = [
 name = "settings-wit"
 version = "0.0.1"
 dependencies = [
+ "graphshell-endpoint",
  "mere-surface-api",
  "script-wire",
  "script-witgen",
@@ -17477,7 +17460,7 @@ dependencies = [
  "personae",
  "serde",
  "serde_json",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -18859,7 +18842,7 @@ dependencies = [
 [[package]]
 name = "turquet"
 version = "0.17.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#da704e5c434c239e38789839913b24adc52e052b"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#afed17272aaf7f9132c5e0e814866c73a459a300"
 dependencies = [
  "hifitime",
  "sofars",
@@ -18948,7 +18931,7 @@ dependencies = [
  "turso_parser",
  "twox-hash",
  "uncased",
- "uuid 1.27.0",
+ "uuid",
  "windows-sys 0.61.2",
 ]
 
@@ -19037,7 +19020,7 @@ dependencies = [
  "tracing",
  "turso_core",
  "turso_parser",
- "uuid 1.27.0",
+ "uuid",
 ]
 
 [[package]]
@@ -19409,16 +19392,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "utf8-tokio"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4650ffa6701dc8e4a1290f18ca044339c16a174cd7d2d7940356e9ea6d8ae9f6"
-dependencies = [
- "tokio",
- "tokio-util",
-]
-
-[[package]]
 name = "utf8-zero"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -19429,15 +19402,6 @@ name = "utf8_iter"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
-
-[[package]]
-name = "uuid"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
-dependencies = [
- "getrandom 0.2.17",
-]
 
 [[package]]
 name = "uuid"
@@ -19478,6 +19442,7 @@ version = "0.0.2"
 dependencies = [
  "accesskit 0.25.1",
  "accesskit_consumer",
+ "graphshell-client",
  "inker",
  "nematic",
  "tracing",
@@ -19611,15 +19576,6 @@ name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b"
-
-[[package]]
-name = "wasi"
-version = "0.14.7+wasi-0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "883478de20367e224c0090af9cf5f9fa85bed63a95c1abf3afc5c083ebc06e8c"
-dependencies = [
- "wasip2",
-]
 
 [[package]]
 name = "wasip2"
@@ -19763,28 +19719,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "wasm-encoder"
-version = "0.263.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b883a26aea02eaabe2d2c3fba7eb039ef5cdcb5d5201ae5551e73d5e251a81f"
-dependencies = [
- "leb128fmt",
- "wasmparser 0.263.0",
-]
-
-[[package]]
-name = "wasm-metadata"
-version = "0.263.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8997a297f42413bee775d73a750def062ee1ec4a6d904703cb08046c0296774d"
-dependencies = [
- "anyhow",
- "indexmap",
- "wasm-encoder 0.263.0",
- "wasmparser 0.263.0",
-]
-
-[[package]]
 name = "wasm-streams"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -19798,19 +19732,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "wasm-tokio"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0db82e3c69e5104f447df7e79c856236b823970191dcf6519decefd934cc1c37"
-dependencies = [
- "leb128-tokio",
- "tokio",
- "tokio-util",
- "tracing",
- "utf8-tokio",
-]
-
-[[package]]
 name = "wasmparser"
 version = "0.248.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -19821,17 +19742,6 @@ dependencies = [
  "indexmap",
  "semver",
  "serde",
-]
-
-[[package]]
-name = "wasmparser"
-version = "0.253.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19db11f87d2486580e1e8b6f494c54df7e0566b87d0b599db843c24019667339"
-dependencies = [
- "bitflags 2.13.2",
- "indexmap",
- "semver",
 ]
 
 [[package]]
@@ -19852,7 +19762,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f5fa0a054ae153606df820eb0a84213e28cda41bbe04ba2628e71b6ba100fcb"
 dependencies = [
  "bitflags 2.13.2",
- "hashbrown 0.17.1",
  "indexmap",
  "semver",
 ]
@@ -21338,83 +21247,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
-name = "wit-bindgen-core"
-version = "0.59.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05cf25dc4bb1981c16aa549ec66c6762b7752bfb8b7c3b3936ae13100298dc72"
-dependencies = [
- "anyhow",
- "heck",
- "wit-parser 0.253.0",
-]
-
-[[package]]
-name = "wit-bindgen-wrpc"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cb0423892c02b5b95b6e0bc21592d9fe5ff518897ecd40dcde220c716767603"
-dependencies = [
- "anyhow",
- "bitflags 2.13.2",
- "bytes",
- "futures",
- "tokio",
- "tokio-util",
- "tracing",
- "wasm-tokio",
- "wit-bindgen-wrpc-rust-macro",
- "wrpc-transport",
-]
-
-[[package]]
-name = "wit-bindgen-wrpc-rust"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd24b55a8eedc0be4ced02707776e4b9ffaaa08da4ec9857134aaaed5aad60fb"
-dependencies = [
- "anyhow",
- "heck",
- "prettyplease 0.2.37",
- "syn 2.0.119",
- "wit-bindgen-core",
- "wrpc-introspect",
-]
-
-[[package]]
-name = "wit-bindgen-wrpc-rust-macro"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbd1b19feb86cd978a2bbd2199dc96a1962880d5029155c3c69735ee0ea40df6"
-dependencies = [
- "anyhow",
- "prettyplease 0.2.37",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
- "wit-bindgen-core",
- "wit-bindgen-wrpc-rust",
-]
-
-[[package]]
-name = "wit-component"
-version = "0.263.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4189bd180353b942b788715519dff886517b540e648c6f6e5129f57429945bf7"
-dependencies = [
- "anyhow",
- "bitflags 2.13.2",
- "indexmap",
- "log",
- "serde",
- "serde_derive",
- "serde_json",
- "wasm-encoder 0.263.0",
- "wasm-metadata",
- "wasmparser 0.263.0",
- "wit-parser 0.263.0",
-]
-
-[[package]]
 name = "wit-parser"
 version = "0.248.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -21435,25 +21267,6 @@ dependencies = [
 
 [[package]]
 name = "wit-parser"
-version = "0.253.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d997b8e5920fcbeec742b58e583325d6419a6aca617ae8075c406a61c65ba8a"
-dependencies = [
- "anyhow",
- "hashbrown 0.17.1",
- "id-arena",
- "indexmap",
- "log",
- "semver",
- "serde",
- "serde_derive",
- "serde_json",
- "unicode-ident",
- "wasmparser 0.253.0",
-]
-
-[[package]]
-name = "wit-parser"
 version = "0.263.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "874d6ce9db4261cb66980ab14f3da066b24292497b6f46f988c0d1b9b27913f3"
@@ -21469,21 +21282,6 @@ dependencies = [
  "serde_json",
  "unicode-ident",
  "wasmparser 0.263.0",
-]
-
-[[package]]
-name = "wit-smith"
-version = "0.263.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e357a0fbe6b3e696dbdb2cc0e48673874128f0976be7d446cf48bb135a5f6d7"
-dependencies = [
- "arbitrary",
- "indexmap",
- "log",
- "semver",
- "wasmparser 0.263.0",
- "wit-component",
- "wit-parser 0.263.0",
 ]
 
 [[package]]
@@ -21565,33 +21363,6 @@ name = "writeable"
 version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
-
-[[package]]
-name = "wrpc-introspect"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4bfc39881f4eafa3bb5d5718b4de1ced6fcef79f6898e3ce83b5bcb36457e278"
-dependencies = [
- "wit-parser 0.253.0",
-]
-
-[[package]]
-name = "wrpc-transport"
-version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cd18318bdc765ea056ee7f612a9f664295fa8a855ef67b5e2bcf859a06a28f4"
-dependencies = [
- "anyhow",
- "bytes",
- "futures",
- "pin-project-lite",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tracing",
- "wasi 0.14.7+wasi-0.2.4",
- "wasm-tokio",
-]
 
 [[package]]
 name = "ws_stream_wasm"
@@ -21896,7 +21667,7 @@ dependencies = [
  "tokio",
  "tracing",
  "uds_windows",
- "uuid 1.27.0",
+ "uuid",
  "windows-sys 0.61.2",
  "winnow 1.0.4",
  "zbus_macros",

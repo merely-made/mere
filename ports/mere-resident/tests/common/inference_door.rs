@@ -13,7 +13,7 @@ use chirograph::{
 use distillery::inference::{INFERENCE_ASK_ROUTE, InferenceRunsV1};
 use ostiary::app_admission::{AppId, AppRouteId};
 use ostiary::app_client::AppClientError;
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, ProfileId};
 use sceno::InstanceId;

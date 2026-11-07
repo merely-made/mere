@@ -14,6 +14,10 @@ default = []
 testkit = []
 
 [dependencies]
+# The WIT world lives in this package; its build script publishes the directory to
+# this crate's build script as DEP_GRAPHSHELL_ENDPOINT_WIT (Cargo passes `links`
+# metadata from normal dependencies only). The crate itself is not used.
+graphshell-endpoint = { workspace = true }
 mere-surface-api = { workspace = true }
 script-wire = { workspace = true }
 workbench = { workspace = true }

@@ -89,7 +89,10 @@ The tool skips them, as it skips Retained licenses.
 | `support/receipts/dramatis-authentication-m4-20261022` | `manifest.json` | S79, recorded 2026-11-05 |
 | `support/receipts/resident-embedding-20261020/driver.py` | `qualification.json` beside it | S79, recorded 2026-11-05 |
 | `testing/receipts/tucket-custody/tucket-authority-clean.rs` | `clean_source_sha256` in `qualification.json` beside it | S79, recorded 2026-11-05 |
-| `crates/script/wire/tests/generated/conformance.rs` | `crates/script/witgen/tests/golden.rs` compares the line-ending-normalized file with generator output | Generated golden fixture, recorded 2026-11-05 |
+
+The generated golden fixture of `script-wire` (`conformance.rs`) left with that crate for
+[merely-made/graphshell](https://github.com/merely-made/graphshell) on 2026-11-06 (cycle breaks D9); its
+ledger entry is in that repository's README.
 
 The first two frozen packets moved unchanged from their former `design_docs/` homes
 on 2026-11-04. The locator at

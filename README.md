@@ -16,10 +16,13 @@ built on it.
 
 Pre-release, under active development.
 
-- Cargo workspace of 92 explicit members. The `mere` facade exposes graph,
+- Cargo workspace of 78 explicit members. The `mere` facade exposes graph,
   linked-data, canvas, workbench and query capabilities.
 - Graphshell remains the complete reference graph host; Djinn supplies the local
   resident composition. Cambium and Conatus remain platform components here.
+- [Graphshell](https://github.com/merely-made/graphshell) is the protocol layer
+  below Mere: the host/guest contract and the host-role kit. Mere, the apps and
+  the other suppliers depend on it; it depends on nothing here.
 - [Eidetic](https://github.com/merely-made/eidetic),
   [Armillary](https://github.com/merely-made/armillary),
   [ESP](https://github.com/merely-made/esp),

@@ -6,7 +6,7 @@
 //! No direct store writes and no co-op invitation or edit API is used here.
 use chirograph::*;
 use ostiary::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use mere_overmap::wire::*;
 use pandect::CapturedDelta;
 use sceno::InstanceId;

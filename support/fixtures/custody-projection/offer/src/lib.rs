@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use graphshell_endpoint::door::projection_offer::{PROJECTION_PROVIDER_ROUTE, ProviderAnswer};
+use graphshell_door::projection_offer::{PROJECTION_PROVIDER_ROUTE, ProviderAnswer};
 pub fn fixture() -> String {
     assert!(!PROJECTION_PROVIDER_ROUTE.is_empty());
     serde_json::to_string(&ProviderAnswer::Idle).unwrap()

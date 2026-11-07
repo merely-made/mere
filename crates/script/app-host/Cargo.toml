@@ -6,8 +6,8 @@
 # decoding an envelope and deciding whether it may lower is the sink's job
 # (turnstone's ring gate), so the host stays app-agnostic.
 #
-# A sibling of document-host over the same `crates/script/wit` contract: two
-# worlds, two hosts, one WIT package.
+# A sibling of document-host over the same `mere:script` contract (one WIT package, in the Graphshell
+# repository, materialised at `crates/script/wit` by build.rs): two worlds, two hosts.
 [package]
 name = "app-host"
 version = "0.0.1"
@@ -21,6 +21,10 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
+# The WIT world lives in this package; its build script publishes the directory to
+# this crate's build script as DEP_GRAPHSHELL_ENDPOINT_WIT (Cargo passes `links`
+# metadata from normal dependencies only). The crate itself is not used.
+graphshell-endpoint = { workspace = true }
 # wasmtime 45, matching document-host (one engine version across the two hosts).
 wasmtime = "45"
 wasmtime-wasi = "45"

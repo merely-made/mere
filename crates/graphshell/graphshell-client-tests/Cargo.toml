@@ -1,0 +1,29 @@
+[package]
+rust-version = "1.97.1"
+name = "graphshell-client-tests"
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Consumer tests of graphshell-client that need Mere (scenomise, scenograph, incipit, uxtree) or Genet. They moved here when graphshell-client moved to the Graphshell repository, which depends on nothing in Mere."
+
+[dependencies]
+
+[dev-dependencies]
+accesskit.workspace = true
+chirograph.workspace = true
+genet-scripted-dom.workspace = true
+graphshell-client.workspace = true
+incipit.workspace = true
+layout_dom_api.workspace = true
+sceno.workspace = true
+scenograph.workspace = true
+scenomise.workspace = true
+scenotime.workspace = true
+serde_json.workspace = true
+taproot = { workspace = true, features = ["image-decode", "estimated-probe-fixtures"] }
+uxtree = { workspace = true, features = ["frozen"] }
+
+[lints]
+workspace = true

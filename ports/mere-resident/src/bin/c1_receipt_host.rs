@@ -24,7 +24,7 @@ use mere_resident::resident_mere::MereRoutes;
 use mere_resident::resident_reservoir::ResidentReservoir;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{self as session_item, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};

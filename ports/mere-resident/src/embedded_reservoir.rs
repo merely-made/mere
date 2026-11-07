@@ -29,7 +29,7 @@ use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::{AppId, AppRouteId};
 use ostiary::app_client::AppClientError;
 use ostiary::declaration::{AppDeclaration, AppGrant};
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
 use personae::{PersonaId, ProfileId};

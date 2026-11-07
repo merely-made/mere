@@ -16,7 +16,7 @@
 //! the stack lift plan's P5 (L3; the browser carrier and identity pair by
 //! Mark's ruling after it); Djinn was their only product caller. The
 //! application side of the door, with the endpoint that forwards over it
-//! (`resident_mere_proxy`), is `graphshell_endpoint::door`; the serving half
+//! (`resident_mere_proxy`), is `graphshell_door`; the serving half
 //! they compose is `graphshell_host`.
 
 mod dramatis_identity;

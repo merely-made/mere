@@ -25,7 +25,7 @@
 //! the wire is NDJSON (T2), read and written by [`line`].
 //!
 //! The application side is elsewhere: the door an application dials is
-//! `graphshell_endpoint::door`, and the client state and session drivers are
+//! `graphshell_door`, and the client state and session drivers are
 //! `graphshell_client`. The brokers a resident runs over this crate (the app
 //! door's server, the browser host) are Djinn's `door` module.
 //!

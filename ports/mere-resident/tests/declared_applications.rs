@@ -361,7 +361,7 @@ async fn a_label_pinned_to_a_signature_refuses_an_unsigned_peer() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn a_declared_provider_offers_only_what_it_declares() {
-    use graphshell_endpoint::door::projection_offer::PROJECTION_PROVIDER_ROUTE;
+    use graphshell_door::projection_offer::PROJECTION_PROVIDER_ROUTE;
     let wallet = tempfile::tempdir().unwrap();
     let directory = tempfile::tempdir().unwrap();
     std::fs::write(directory.path().join("field.knot"), "# Field\n").unwrap();
@@ -445,7 +445,7 @@ async fn projection_provider_serve(
     route: AppRouteId,
     root: std::path::PathBuf,
 ) -> Result<(), ostiary::app_client::AppClientError> {
-    graphshell_endpoint::door::projection_provider::serve(
+    graphshell_door::projection_provider::serve(
         connection,
         route,
         "Knot directory".into(),

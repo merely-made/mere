@@ -34,8 +34,6 @@ members = [
     "crates/script/document-host",
     "crates/script/app-host",
     # Native WIT bindings (capability door D17-D19): the runtime and its generator.
-    "crates/script/wire",
-    "crates/script/witgen",
     # ─── Absorbed 2026-07-23 (design_docs/.../2026-07-23_repo_consolidation_plan.md) ───
     # Cambium and Conatus remain platform components. The 2026-10-19 foundation
     # promotion moved Eidetic, Armillary, ESP and Gemot to independent suppliers;
@@ -53,13 +51,10 @@ members = [
     # The generic `scenograph` facade crate is gone; its solver registry moved
     # into `scenomise`. The published name now belongs to the host-neutral
     # projection authoring model, not a runtime facade.
-    "crates/cambium/scenes/sceno",
     "crates/cambium/scenes/scenomise",
-    "crates/cambium/scenes/scenotime",
     "crates/cambium/scenes/scenograph",
-    "crates/chirograph",
-    "crates/graphshell/graphshell-client",
-    "crates/graphshell/graphshell-endpoint",
+    "crates/graphshell/graphshell-door",
+    "crates/graphshell/graphshell-client-tests",
     "crates/graphshell/graphshell-host",
     "crates/graphshell/graphshell-mcp",
     "ports/graphshell",
@@ -101,7 +96,6 @@ members = [
     # Shared authoring surface; the standalone product is ports/tabard/desktop.
     "ports/tabard/workshop",
     "crates/cambium/cambium-genet-web-host",
-    "crates/cambium/hest",
     "crates/cambium/backstep",
     "crates/cambium/meristem",
     "crates/cambium/sprigging",
@@ -217,9 +211,9 @@ armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary
 # footprints, spaces, measurements) — git sibling consumed one-way, local
 # checkout via the gitignored `.cargo/config.toml` patch. cartography emits
 # sceno scenes (the P2 consumption slice; projection_proofs_plan).
-sceno = { version = "0.0.7", path = "crates/cambium/scenes/sceno" }
+sceno = { version = "0.0.7", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 scenomise = { version = "0.0.7", path = "crates/cambium/scenes/scenomise" }
-scenotime = { version = "0.0.5", path = "crates/cambium/scenes/scenotime" }
+scenotime = { version = "0.0.5", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 scenograph = { version = "0.0.6", path = "crates/cambium/scenes/scenograph" }
 # The remaining families absorbed 2026-07-23. Consumers keep using
 # `<dep>.workspace = true`, so only this block knows where each one lives.
@@ -240,10 +234,11 @@ esp = { version = "0.1.0", git = "https://github.com/merely-made/distillery.git"
 esp-testkit = { version = "0.1.0", git = "https://github.com/merely-made/distillery.git", branch = "main" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
-chirograph = { version = "0.0.4", path = "crates/chirograph" }
+chirograph = { version = "0.0.4", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
-graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
-graphshell-endpoint = { version = "0.0.3", path = "crates/graphshell/graphshell-endpoint" }
+graphshell-client = { version = "0.0.2", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+graphshell-endpoint = { version = "0.0.3", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+graphshell-door = { version = "0.0.1", path = "crates/graphshell/graphshell-door" }
 # The serving half: admission, the session loop, the catalog and the projection
 # host (Graphshell stack lift plan, L2, ruling R4). Default features off here;
 # each consumer names the half it serves.
@@ -369,7 +364,7 @@ mandrake = { version = "0.1.0", path = "crates/cambium/mandrake" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-web = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
-hest = { version = "0.2.1", path = "crates/cambium/hest" }
+hest = { version = "0.2.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.3.0", path = "crates/cambium/sprigging" }
@@ -567,8 +562,8 @@ persona-picker = { package = "persona-picker", path = "crates/cambium/persona-pi
 # Rhai backend for the knot block-evaluator lane (the thin BlockEvaluator
 # slice, distinct from genet's full ScriptEngine seam). Pure Rust, sandboxed.
 script-rhai = { version = "0.0.1", path = "crates/script/rhai" }
-script-wire = { version = "0.0.1", path = "crates/script/wire" }
-script-witgen = { version = "0.0.1", path = "crates/script/witgen" }
+script-wire = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+script-witgen = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 settings-wit = { version = "0.0.1", path = "crates/system/settings-wit" }
 
 # ─── External pins ───────────────────────────────────────────────────────────
@@ -675,13 +670,12 @@ murm = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
-chirograph = { path = "crates/chirograph" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 esp = { git = "https://github.com/merely-made/distillery.git", branch = "main" }
 mere-fetch = { path = "crates/system/fetch" }
 gemot = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
 graphshell = { path = "ports/graphshell" }
-graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
+graphshell-door = { path = "crates/graphshell/graphshell-door" }
 graphshell-host = { path = "crates/graphshell/graphshell-host" }
 illume = { path = "crates/nematic/illume" }
 inker = { path = "crates/inker/inker" }
@@ -695,15 +689,11 @@ nematic = { path = "crates/nematic/nematic" }
 notochord = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 pandect = { path = "crates/system/pandect" }
 personae = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
-sceno = { path = "crates/cambium/scenes/sceno" }
 # Knot has named these two since its `5516606`; they arrived with the
 # `c966e31` pin (wing ruling 586, "With djinn's Knot repin (Recommended)").
 scenograph = { path = "crates/cambium/scenes/scenograph" }
 scenomise = { path = "crates/cambium/scenes/scenomise" }
-scenotime = { path = "crates/cambium/scenes/scenotime" }
 script-rhai = { path = "crates/script/rhai" }
-script-wire = { path = "crates/script/wire" }
-script-witgen = { path = "crates/script/witgen" }
 servitor = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 stickleback = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 
@@ -712,11 +702,9 @@ stickleback = { git = "https://github.com/merely-made/eidetic.git", branch = "ma
 cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
 cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-a11y = { path = "crates/cambium/cambium-winit-a11y" }
-hest = { path = "crates/cambium/hest" }
 document-canvas = { path = "crates/inker/document-canvas" }
 backstep = { path = "crates/cambium/backstep" }
 errand = { git = "https://github.com/merely-made/errand.git", branch = "main" }
-graphshell-client = { path = "crates/graphshell/graphshell-client" }
 incipit = { path = "crates/incipit" }
 luggage = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 mere = { path = "crates/mere" }
@@ -750,20 +738,20 @@ mere-mesh = { git = "https://github.com/merely-made/distillery.git", branch = "m
 
 [patch.crates-io]
 # Published producer contracts share the host workspace's concrete types.
-sceno = { path = "crates/cambium/scenes/sceno" }
-scenotime = { path = "crates/cambium/scenes/scenotime" }
+sceno = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+scenotime = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 scenograph = { path = "crates/cambium/scenes/scenograph" }
 scenomise = { path = "crates/cambium/scenes/scenomise" }
-graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
+graphshell-endpoint = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 incipit = { path = "crates/incipit" }
-chirograph = { path = "crates/chirograph" }
+chirograph = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 mere-surface-api = { path = "crates/system/surface-api" }
 cambium = { path = "crates/cambium/cambium" }
 workbench = { path = "crates/cambium/workbench" }
-hest = { path = "crates/cambium/hest" }
+hest = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 sprigging = { path = "crates/cambium/sprigging" }
-script-wire = { path = "crates/script/wire" }
-script-witgen = { path = "crates/script/witgen" }
+script-wire = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+script-witgen = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 # The custody contract and resident use the same OS peer fact types.
 peer-facts = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", branch = "main" }
 # Registry custody clients and Git-hosted Djinn share the same door types.

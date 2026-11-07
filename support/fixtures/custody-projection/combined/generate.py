@@ -63,10 +63,10 @@ mere-resident = { path = %s, default-features = false }
 djinn = %s
 ostiary = %s
 castellan-client = %s
-graphshell-endpoint = { path = %s, default-features = false, features = ["projection-door", "projection-provider"] }
+graphshell-door = { path = %s, default-features = false, features = ["projection-door", "projection-provider"] }
 ''' % (json.dumps(str(root / "ports/mere-resident")), from_root("djinn", ["resident"]),
        from_root("ostiary", ["native"]), from_root("castellan-client", ["client"]),
-       json.dumps(str(root / "crates/graphshell/graphshell-endpoint")))
+       json.dumps(str(root / "crates/graphshell/graphshell-door")))
 manifest += "\n\n".join(["", *patches]) + "\n"
 # Fail before writing if extraction accidentally produced invalid TOML.
 tomllib.loads(manifest)

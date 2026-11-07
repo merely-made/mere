@@ -3914,7 +3914,7 @@ mod tests {
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
         };
-        use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;
+        use graphshell_door::resident_mere_proxy::ResidentMereProxy;
         use personae::{Ed25519Keypair, ProfileId};
         let fixture = fixture(33, "divination").await;
         fixture

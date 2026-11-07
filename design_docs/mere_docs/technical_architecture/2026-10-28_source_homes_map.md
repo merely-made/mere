@@ -506,6 +506,16 @@ contract. The code divides them:
 A persona and custody client under its own existing name would let custody and
 projection change apart, and Graphshell's name would mean one thing.
 
+**Outcome, 2026-11-06 (cycle breaks D7 to D9, P6).** Graphshell's name now means the
+protocol. The revived [merely-made/graphshell](https://github.com/merely-made/graphshell)
+repository is the bottom layer and holds Chirograph, Sceno, Scenotime, Hest, the endpoint
+traits and carriers, the one `mere:script` WIT world, `graphshell-client`, `script-wire` and
+`script-witgen`. The `door` module left `graphshell-endpoint` for Mere's `graphshell-door`
+(features `projection-door`, `projection-offer`, `projection-provider`, `profile`), which
+depends on the endpoint; `graphshell-host`, `graphshell-mcp` and the reference host
+`ports/graphshell` stay here. `mere-curation`, `scenograph` and `scenomise` stay: no moved
+crate uses them.
+
 ### Two graph edit spines
 
 - The kernel wraps `chartulary::Graph` (`graph-kernel/src/graph/mod.rs:352`)

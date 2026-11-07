@@ -10,7 +10,7 @@ reading deserves a Mere-level format, and what it changes about A6
 Sources: [mer3ly stack consumer survey](2026-08-16_mer3ly_stack_consumer_survey.md),
 [projection grammar adoption plan](../../archive_docs/2026-10-28/2026-08-15_projection_grammar_adoption_plan.md)
 (Open rulings), [graphshell remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
-§4.2, `crates/chirograph/src/lib.rs`, `repos/mer3ly/assets/graph-sandbox.js`
+§4.2, `graphshell/crates/chirograph/src/lib.rs`, `repos/mer3ly/assets/graph-sandbox.js`
 
 ## The object
 

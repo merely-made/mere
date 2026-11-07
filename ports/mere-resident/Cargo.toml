@@ -128,7 +128,8 @@ distillery = { workspace = true, features = ["inference-wire"] }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop", "goal-surface"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
-graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-offer", "profile"] }
+graphshell-endpoint = { workspace = true, features = ["projection"] }
+graphshell-door = { workspace = true, features = ["projection-door", "projection-offer", "profile"] }
 peer-facts.workspace = true
 djinn = { workspace = true, features = ["resident", "door-serve"] }
 ostiary = { workspace = true, features = ["native"] }
@@ -318,7 +319,8 @@ graphshell-mcp = { path = "../../crates/graphshell/graphshell-mcp" }
 # mere view's model it fills, and the kernel's relations to fill it with.
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop", "goal-surface"] }
 mere-overmap = { workspace = true, features = ["view"] }
-graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-provider", "profile"] }
+graphshell-endpoint = { workspace = true, features = ["projection"] }
+graphshell-door = { workspace = true, features = ["projection-door", "projection-provider", "profile"] }
 djinn = { workspace = true, features = ["resident", "door-serve"] }
 ostiary = { workspace = true, features = ["native"] }
 castellan-client = { workspace = true, features = ["client"] }

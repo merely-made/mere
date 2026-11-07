@@ -19,5 +19,11 @@ path = "src/lib.rs"
 
 [dependencies]
 
+[dev-dependencies]
+# A host keeps scene traces in this history (tests/scene_trace_history.rs); the
+# scene crates are Graphshell's, so the test lives here, above them.
+sceno.workspace = true
+scenotime.workspace = true
+
 [lints]
 workspace = true

@@ -37,7 +37,7 @@ def metadata(name, target):
                 walk(dependency["pkg"])
 
     walk(data["resolve"]["root"])
-    endpoint = next(p for p in seen if packages[p]["name"] == {"custody": "castellan-client", "custody-types": "castellan-client", "portable": "ostiary"}.get(name, "graphshell-endpoint"))
+    endpoint = next(p for p in seen if packages[p]["name"] == {"custody": "castellan-client", "custody-types": "castellan-client", "portable": "ostiary", "projection": "graphshell-door", "offer": "graphshell-door", "provider": "graphshell-door"}.get(name, "graphshell-endpoint"))
     names = sorted({packages[p]["name"] for p in seen})
     direct = [
         {"name": packages[d["pkg"]]["name"], "kinds": d["dep_kinds"]}

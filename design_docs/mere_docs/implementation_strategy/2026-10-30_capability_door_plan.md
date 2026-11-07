@@ -301,7 +301,7 @@ part of its manifest entry.
   generator, only ever a build-dependency, so `wit-parser` reaches no shipped
   binary. For what moves he chose "Also a Carrier now", adding "but have a
   look at n1… compatibility is critical": the projection-session interface
-  and its provider world join `crates/script/wit`, the test guest and
+  and its provider world join `graphshell/crates/graphshell-endpoint/wit`, the test guest and
   Wasmtime host test go under app-host's tests, the test provider, call
   script and conformance checks become the runtime's tests, and a `Carrier`
   over the generated client ships now. For its home he chose
@@ -484,7 +484,7 @@ what the existing contract left open: discovery and opening apart from
 methods on an opened session, Resume rechecking authority, revocation and
 cancellation apart from Close and Suspend, and size limits. D14 places it. Flow
 control is already settled: a chunk request acknowledges the previous chunk,
-and notices carry no payload (`crates/chirograph/src/lib.rs:1131-1205`).
+and notices carry no payload (`graphshell/crates/chirograph/src/lib.rs:1131-1205`).
 - Done when: the native pair and the component exchange the same calls and
   payloads; the session is bound through both D12 routes, a generator of our
   own over `wit-parser` and `wit-bindgen-wrpc` with our transport, and their
@@ -648,14 +648,14 @@ error types settle.
   child it forks one end of a socket pair (`platform/linux.rs:268`), the
   launch-handle shape D2 uses.
 - 2026-10-30: `mere:script@0.1.0` has two worlds, `app-core` and
-  `document-core` (`crates/script/wit/world.wit:168,183`), hosted on Wasmtime
+  `document-core` (`graphshell/crates/graphshell-endpoint/wit/world.wit:168,183`), hosted on Wasmtime
   45 by `crates/script/app-host` and `document-host`. Its `caps` is a list of
   strings and its `actions` a name with a JSON payload; it declares no
   resources. The Moot capsule-library guest uses `app-core`, and its native
   host checks each action against signed Servitor delegations
   (`ports/moot/examples/capsule-library/native.rs`).
 - 2026-10-30: chirograph is 2,019 lines with 63 serde types, using
-  `BTreeMap` fields and boxed variants (`crates/chirograph/src/lib.rs`). WIT
+  `BTreeMap` fields and boxed variants (`graphshell/crates/chirograph/src/lib.rs`). WIT
   has no recursive types (component-model `WIT.md`: "Types, however, cannot
   be recursive"). The map half needs a version: WASI 0.3.1 (2026-08-11)
   adopted the component model's `map<K, V>`
@@ -683,7 +683,7 @@ error types settle.
   through leased resident routes", 01:52, seven minutes after this plan)
   added the provider route, owner policy and leases S1 describes, for
   projections (`ports/mere-resident/src/door/projection_offers.rs`,
-  `crates/graphshell/graphshell-endpoint/src/door/projection_offer.rs`).
+  `crates/graphshell/graphshell-door/src/projection_offer.rs`).
   `675540865` then moved the neutral door modules (`app_admission`, `wire`,
   `frame`, `local_endpoint`, `app_client`, the custody modules) to Armillary's
   `djinn` 0.0.3, pinned at `721e17d`

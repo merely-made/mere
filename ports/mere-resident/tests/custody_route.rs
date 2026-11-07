@@ -182,7 +182,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
 
     // Signing happens inside djinn: the signature verifies under the derived
     // key, which never crossed.
-    let session = graphshell_endpoint::door::profile::session_salt("receipt");
+    let session = graphshell_door::profile::session_salt("receipt");
     let (public_key, signature) = client
         .sign(
             KeySource::Persona,

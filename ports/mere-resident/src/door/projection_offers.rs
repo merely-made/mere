@@ -12,7 +12,7 @@ use chirograph::{
 };
 use ostiary::app_admission::{APP_IDENTITY_ROUTE, AppId, AppRouteId};
 use castellan_client::custody::CUSTODY_ROUTE;
-use graphshell_endpoint::door::projection_offer::{
+use graphshell_door::projection_offer::{
     PROJECTION_PROVIDER_ROUTE, ViewerContext, Work, WorkOperation, WorkOutcome,
 };
 use graphshell_host::endpoint_catalog::ResidentEndpoint;

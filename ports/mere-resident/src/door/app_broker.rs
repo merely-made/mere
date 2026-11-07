@@ -28,7 +28,7 @@
 use crate::door::projection_offers::{
     OfferRegistry, ProviderEndpoint, ProviderPermission, ProviderPolicyError,
 };
-use graphshell_endpoint::door::projection_offer::{
+use graphshell_door::projection_offer::{
     PROJECTION_PROVIDER_ROUTE, ProviderAnswer, ProviderCall, WorkOperation, WorkOutcome, WorkResult,
 };
 use std::sync::Arc;
@@ -676,7 +676,7 @@ impl Drop for ProviderLeaseGuard {
 }
 
 fn valid_provider_result(
-    work: &graphshell_endpoint::door::projection_offer::Work,
+    work: &graphshell_door::projection_offer::Work,
     result: &WorkResult,
 ) -> bool {
     work.id == result.id
@@ -870,7 +870,7 @@ mod tests {
 
     #[test]
     fn provider_results_must_match_work_id_session_and_operation() {
-        use graphshell_endpoint::door::projection_offer::Work;
+        use graphshell_door::projection_offer::Work;
         let work = Work {
             id: 7,
             session: "viewer".into(),

@@ -333,7 +333,7 @@ clip parse touches `balaur_script::Value` for the arguments of method tracks.
 `tween.rs` is bound to `Engine`, hecs, the component registry and Rune values.
 
 *What it meets.* L5 has partly landed since the expansion brief.
-`crates/cambium/scenes/scenotime/src/transition.rs` derives a
+`graphshell/crates/scenotime/src/transition.rs` derives a
 `TransitionSchedule` from a validated `SceneDiff` and a `TransitionSpec`. It
 stages windows for exits, updates and entries, staggered in stable instance
 order. Its `sample_at(elapsed_ms)` is pure, and the host supplies the clock.
@@ -407,7 +407,7 @@ and S4 in `design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md`.
 - seiche is on rapier2d 0.33, with neither `enhanced-determinism` nor
   `parallel` on (`crates/conatus/seiche/Cargo.toml`).
 - On the Scenograph side (L4), scenotime's `SceneSnapshot`
-  (`crates/cambium/scenes/scenotime/src/snapshot.rs`) crosses a wire with its
+  (`graphshell/crates/scenotime/src/snapshot.rs`) crosses a wire with its
   tombstones and revisions. Nothing stores one.
 
 *What G8 lacks that balaur has.*
@@ -497,10 +497,10 @@ carries sparse arrangement options, inserted over the base. A variant for
 another definition is refused.
 
 On identity, sceno keeps `SourceRef` apart from `InstanceId`
-(`crates/cambium/scenes/sceno/src/scene.rs`). `SourceRef` is the source's own
+(`graphshell/crates/sceno/src/scene.rs`). `SourceRef` is the source's own
 stable id, which the engine never interprets, and `InstanceId` is an index.
 scenotime never reuses an index within a `SceneEpoch`, and serializes
-tombstones (`crates/cambium/scenes/scenotime/src/ids.rs`). That covers what
+tombstones (`graphshell/crates/scenotime/src/ids.rs`). That covers what
 balaur's prefixes do. Two instances of one source get distinct instance ids,
 and the source id survives a rename or reparent because it belongs to the
 source. It also avoids balaur's collision gap.

@@ -28,7 +28,7 @@ use chirograph::{
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::{AppHello, AppId, AppRouteId};
 use ostiary::declaration::{AppDeclaration, NamePattern};
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use ostiary::wire::{APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 type AppMessage = WireMessage<chirograph::CarrierRequest, castellan_client::custody::CustodyCall>;

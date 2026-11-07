@@ -294,7 +294,7 @@ pass; changes are committed in each repository.
   D17's chain: script-wire 0.0.1, script-witgen 0.0.1 (their publish guard removed),
   chirograph 0.0.4 (Knot's requirement moved first, `62aff7b`; the wit feature needs
   `CarrierError::Lapsed`), graphshell-endpoint 0.0.3 (its `wit/world.wit` is a copy of
-  `crates/script/wit/world.wit` that `tests/wit_copy.rs` holds equal), workbench 0.1.1,
+  `graphshell/crates/graphshell-endpoint/wit/world.wit` that `tests/wit_copy.rs` holds equal), workbench 0.1.1,
   incipit 0.2.1, scenograph 0.0.6, scenomise 0.0.7, mere-surface-api 0.1.1. `dramatis` and
   `personae` rows follow Dramatis's 0.0.4 and 0.3.1. `genet-events` 0.0.1 (Genet `ad3627231`)
   and then `cambium` 0.6.1 followed (Mere `e14dd68cf`): D17's chain is published.

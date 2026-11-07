@@ -5,11 +5,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use ostiary::app_client::AppConnection;
-use graphshell_endpoint::door::projection_offer::PROJECTION_PROVIDER_ROUTE;
+use graphshell_door::projection_offer::PROJECTION_PROVIDER_ROUTE;
 pub fn accepts_connection(_: AppConnection) -> &'static str {
     PROJECTION_PROVIDER_ROUTE
 }
-pub use graphshell_endpoint::door::projection_provider::serve;
+pub use graphshell_door::projection_provider::serve;
 
 #[cfg(feature = "forbidden-api")]
 pub use ostiary::custody_client::CustodyClient;

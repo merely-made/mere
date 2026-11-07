@@ -5,8 +5,12 @@ per-instance `Store<ScriptHost>`, backs the `log` / `caps` / `net` /
 `document-host` imports over a live genet `ScriptedDom`, and drives the per-turn
 `handle-event` contract with atomic, revision-checked apply.
 
-The WIT lives at `crates/script/wit/world.wit`, not in this crate, so the
-browser (jco) path consumes the same contract. Exports and imports are bound
+The WIT lives once, in `graphshell-endpoint`'s package in
+[merely-made/graphshell](https://github.com/merely-made/graphshell)
+(`crates/graphshell-endpoint/wit/world.wit`), not in this crate, so the browser
+(jco) path consumes the same contract. This crate's build script materialises it
+as `crates/script/wit/world.wit` (ignored by git) for the bindgen macro, which
+takes only a manifest-relative literal path. Exports and imports are bound
 async (`exports: { default: async }`), so a turn runs on a fiber and the
 `net.fetch` import can suspend it without blocking the host thread.
 

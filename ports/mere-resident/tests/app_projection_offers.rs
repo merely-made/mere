@@ -25,10 +25,10 @@ use dramatis::view::{
     VaultView,
 };
 use djinn::door::local_endpoint::LocalListener;
-use graphshell_endpoint::door::projection::AppBrokerClient;
-use graphshell_endpoint::door::projection_offer::PROJECTION_PROVIDER_ROUTE;
+use graphshell_door::projection::AppBrokerClient;
+use graphshell_door::projection_offer::PROJECTION_PROVIDER_ROUTE;
 use ostiary::app_client::AppConnection;
-use graphshell_endpoint::door::projection_provider;
+use graphshell_door::projection_provider;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{IdentityError, InMemoryProvider, RetainedKeys};
 

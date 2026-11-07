@@ -16,7 +16,7 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
-graphshell-endpoint = { path = "../../../graphshell/graphshell-endpoint", features = ["wit-testkit"] }
+graphshell-endpoint = { git = "https://github.com/merely-made/graphshell.git", branch = "main", features = ["wit-testkit"] }
 wit-bindgen = "0.58"
 
 [profile.release]

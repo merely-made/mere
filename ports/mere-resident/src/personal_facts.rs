@@ -15,7 +15,7 @@ use chirograph::{
 use dramatis::{birth::BirthFacts, resources::SubjectResourceAssociation, subject::SubjectRef};
 use ostiary::app_admission::{AppId, AppRouteId};
 use ostiary::declaration::AppDeclaration;
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_door::projection::AppBrokerClient;
 use mere_overmap::wire;
 use personal_facts::{BirthResource, ContactResource};
 use serde::{Deserialize, Serialize};

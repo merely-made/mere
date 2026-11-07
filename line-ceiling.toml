@@ -5,10 +5,6 @@ ceiling = 600
 path = "support/patches/"
 reason = "Imported upstream crates with local integration patches; retain upstream source layout."
 
-[[exclude]]
-path = "crates/script/wire/tests/generated/"
-reason = "Generated source subtree; edits belong in the generator or its inputs."
-
 [[exception]]
 path = "crates/cambium/cambium-genet-web-host/src/mirror/tests.rs"
 reason = "Mirror tests. Existing source-size debt; a responsibility split must preserve Board, Logic and existing module visibility."
@@ -112,30 +108,6 @@ reason = "Apply. Existing source-size debt; a responsibility split must preserve
 [[exception]]
 path = "crates/graph/graph-kernel/src/graph/capture.rs"
 reason = "Stable-id graph-delta capture/replay helpers. Existing source-size debt; a responsibility split must preserve CapturedDelta, GraphTableStats, ReplayAttribution and existing module visibility."
-
-[[exception]]
-path = "crates/graphshell/graphshell-client/src/core.rs"
-reason = "The Graphshell session protocol with the I/O taken out. Existing source-size debt; a responsibility split must preserve Progress, Outcome, Pending and existing module visibility."
-
-[[exception]]
-path = "crates/graphshell/graphshell-client/src/frozen.rs"
-reason = "The frozen realization: a scene as navigable semantics. Existing source-size debt; a responsibility split must preserve FrozenRole, FrozenInstance, FrozenRelation and existing module visibility."
-
-[[exception]]
-path = "crates/graphshell/graphshell-client/src/lib.rs"
-reason = "Transport-independent, endpoint-scoped projection state. Existing source-size debt; a responsibility split must preserve MountedScene, ResolvedPresentation, ResolvedContent and existing module visibility."
-
-[[exception]]
-path = "crates/graphshell/graphshell-client/src/remote.rs"
-reason = "A remote session's operation sequencing, with the transport left out. Existing source-size debt; a responsibility split must preserve RemoteOp, ActionForm, RemoteSession and existing module visibility."
-
-[[exception]]
-path = "crates/graphshell/graphshell-client/src/remote/tests.rs"
-reason = "The remote session against a scripted board endpoint speaking NDJSON lines. Existing source-size debt; a responsibility split must preserve Board and existing module visibility."
-
-[[exception]]
-path = "crates/graphshell/graphshell-endpoint/src/stdio.rs"
-reason = "Native local-process carrier for Graphshell endpoints. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]
 path = "crates/graphshell/graphshell-host/src/canary.rs"

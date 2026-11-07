@@ -7,7 +7,10 @@
 //! Binds `mere:script`'s settings interface (capability door K1, D22).
 
 fn main() {
-    let wit = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../script/wit/world.wit");
+    // The world lives once, in graphshell-endpoint's package (Graphshell repository).
+    let wit_dir = std::env::var("DEP_GRAPHSHELL_ENDPOINT_WIT")
+        .expect("graphshell-endpoint's build metadata names its wit directory");
+    let wit = std::path::Path::new(&wit_dir).join("world.wit");
     println!("cargo::rerun-if-changed={}", wit.display());
     let src = script_witgen::generate(&wit, "settings").expect("settings binds");
     let out = std::path::Path::new(&std::env::var("OUT_DIR").unwrap()).join("settings.rs");

@@ -14,8 +14,16 @@ categories = ["accessibility"]
 [lib]
 path = "src/lib.rs"
 
+[features]
+default = []
+# `FrozenScene`'s AccessKit tree (`frozen::FrozenUxTree`): graphshell-client's
+# frozen realization, which moved to the Graphshell repository, handed to the
+# platform assistive stack.
+frozen = ["dep:graphshell-client"]
+
 [dependencies]
 accesskit.workspace = true
+graphshell-client = { workspace = true, optional = true }
 inker.workspace = true
 tracing.workspace = true
 

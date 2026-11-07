@@ -61,6 +61,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 [[package]]
 name = "chirograph"
 version = "0.0.4"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "base64",
  "blake3",
@@ -106,6 +107,7 @@ dependencies = [
 name = "custody-projection-projection-fixture"
 version = "0.0.0"
 dependencies = [
+ "graphshell-door",
  "graphshell-endpoint",
  "ostiary",
  "serde_json",
@@ -140,18 +142,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "graphshell-endpoint"
-version = "0.0.3"
+name = "graphshell-door"
+version = "0.0.1"
 dependencies = [
  "chirograph",
+ "graphshell-endpoint",
  "ostiary",
  "serde_json",
  "tokio",
 ]
 
 [[package]]
+name = "graphshell-endpoint"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
+dependencies = [
+ "chirograph",
+]
+
+[[package]]
 name = "hest"
 version = "0.2.1"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "serde",
 ]
@@ -244,6 +256,7 @@ dependencies = [
 [[package]]
 name = "sceno"
 version = "0.0.7"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "serde",
  "serde_json",
@@ -252,6 +265,7 @@ dependencies = [
 [[package]]
 name = "scenotime"
 version = "0.0.5"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#7cd9ca53882d5a6debd502b5ba068a14fd3efef4"
 dependencies = [
  "sceno",
  "serde",

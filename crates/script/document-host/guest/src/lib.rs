@@ -12,7 +12,7 @@
 //! token it reads, never an address. Uses only its granted `log` capability.
 
 wit_bindgen::generate!({
-    // The shared `mere:script` contract at `crates/script/wit` (see the host's bindgen).
+    // The shared `mere:script` contract, materialised at `crates/script/wit` by the host's build.rs.
     path: "../../wit",
     world: "document-core",
 });

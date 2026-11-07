@@ -30,7 +30,34 @@ const GUESTS: [(&str, &str); 2] = [
     ("guest-bomb", "document_core_guest_bomb.wasm"),
 ];
 
+/// The `mere:script` WIT lives once, in the Graphshell repository
+/// (`graphshell-endpoint/wit/world.wit`). The bindgen macros and the guests'
+/// `generate!` take only literal paths relative to the crate, so the hosts
+/// materialise that file as `crates/script/wit/world.wit` (ignored by git) from
+/// the Cargo `links` metadata `graphshell-endpoint` publishes, before this crate
+/// or its guests compile. It is a build product of the pinned dependency, not a
+/// second copy to keep in step.
+fn materialize_wit() {
+    let dir = std::env::var("DEP_GRAPHSHELL_ENDPOINT_WIT")
+        .expect("graphshell-endpoint's build metadata names its wit directory");
+    let source = Path::new(&dir).join("world.wit");
+    println!("cargo::rerun-if-changed={}", source.display());
+    let root = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR");
+    let target_dir = Path::new(&root).join("../wit");
+    let target = target_dir.join("world.wit");
+    let wanted = std::fs::read(&source).expect("read graphshell-endpoint's WIT world");
+    if std::fs::read(&target).ok().as_deref() == Some(wanted.as_slice()) {
+        return;
+    }
+    std::fs::create_dir_all(&target_dir).expect("create crates/script/wit");
+    // Two hosts materialise the same file in parallel: write beside it, then rename.
+    let staged = target_dir.join(format!("world.wit.{}.tmp", std::process::id()));
+    std::fs::write(&staged, &wanted).expect("stage the WIT world");
+    std::fs::rename(&staged, &target).expect("place the WIT world");
+}
+
 fn main() {
+    materialize_wit();
     let root = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR");
     let root = Path::new(&root);
 
