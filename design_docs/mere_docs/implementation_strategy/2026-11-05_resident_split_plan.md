@@ -23,8 +23,10 @@ Receipts go to `archive_docs/receipts/2026-11-05_resident_split_plan_receipts.md
   opening, durability and closing of every mere; Djinn and embedding hosts execute it. No slice
   assigns storage lifetime authority to a background process or to a receiving owner.
 - **Mere keeps graph authority.** Graph replica operations, graph keys, graph-specific
-  acceptance, route grants, the doors, the reservoir service and concrete producer
-  registration stay here. A piece leaves only when it carries no graph type
+  acceptance, route grants, the doors, the reservoir service, the domain registry and
+  the registration of Mere's own domains stay here. Knot's and Cleromancy's registrations do not:
+  they live with those applications (cycle breaks D1, D14; the domain contract's registration
+  section). A piece leaves only when it carries no graph type
   (`graphshell::`, `pandect::`, `kernel::`, graph ids, `MereRoutes`); a coupled piece is split
   at an explicit adapter first, never moved whole.
 - **Security code follows standards.** Key groups, seals and custody use maintained
@@ -140,7 +142,8 @@ into a transport library.
   both to Dramatis", over moving triggers only and over keeping both. Put to Mark on finding
   both graph-free and implementing Dramatis's vault-lock rulings and native identity callback.
   Outcome: refines the map's "Mere retains platform dialogs", now "Mere retains graph routes
-  and concrete producer registration".
+  and concrete producer registration"; narrowed 2026-11-06 by cycle breaks D1 and D14 to the registry
+  and Mere's own domains' registration, since Knot and Cleromancy register themselves.
 
   Links: summary Dramatis owns its vault-lock triggers and native identity dialogs.
 

@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D1, D2, D3 proceed; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b and left the distribution binary open. D1, D2, D3 proceed; D5 became D12 (Woodshed as a guest, design written, held for review).
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -87,7 +87,22 @@ sibling record it links) states:
 - what the shared dev and test fixtures become (the 1,370-line `embedded_reservoir_validation`
   test and the five Knot tests move to the app repositories as consumers of the resident).
 
-Reviewed by Mark before P2 starts.
+Reviewed by Mark before P2 starts. Written 2026-11-06; Mark answered it in D14, which leaves the
+distribution-binary question open.
+
+### P1b. The domain registry (M1 and M2), Mere's own domains only
+
+Added by D14 (b). Before P2 and P3 both touch `resident_mere.rs`, `resident.rs` and `djinn.rs`,
+build the registry the P1 section of the domain contract specifies: `DomainRegistration` and
+`DomainRegistry` in Mere, `MereRoutes` and `Resident::open` reading it, the composition body of
+`bin/djinn.rs` as a library entry taking a registry, and `mere_defaults()` installing Mere's own
+domains (the personal replica, `personal-facts`). No Knot or Cleromancy change. Done when: both
+compositions serve their domains from the registry, a second (fixture) domain is added without
+editing either composition (M1), a product domain without authority is refused with the typed
+error and the hard-coded `"divination" | "personal-facts"` list is gone (M2), the conformance
+tests of the domain contract's section 6 pass over a fixture graph domain and a fixture lane,
+and the standard conditions hold. Which authority forms the registration carries (linked
+closure, guest, declared policy) waits on D14 (a).
 
 ### P2. D1 Mere stops naming Knot
 
@@ -103,7 +118,7 @@ Done when `mere-resident` drops `cleromancy-core` (renamed `cleromancy-domain`);
 `validate_divination_graph` is installed by Cleromancy's registration, not by
 `with_divination_authority` naming the crate; `embedded_reservoir_validation` runs in
 Cleromancy; Cleromancy's `core/Cargo.toml` stays an app-side manifest; the standard
-conditions hold. P3 may follow P2 or run beside it; both reuse P1 and neither depends on the
+conditions hold. P3 may follow P2 or run beside it; both need P1b and neither depends on the
 other.
 
 ### P4. D2 ESP adapter leaves Eidetic
@@ -300,6 +315,22 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   Links: area stack · draws on cycle_breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
 
+- **D14. P1's decisions answered; the distribution binary reopened (Mark, 2026-11-06):** on the
+  [domain contract](../technical_architecture/2026-11-06_domain_contract.md) section 8.
+  (b) accepted as recommended: P1b runs first (the M1 registry and M2, Mere's own domains only).
+  (c) accepted as recommended: the registration type lives in Mere, with C5's trait in Eidetic and
+  the presenting half in the protocol layer. (d) accepted as recommended: out-of-process authority
+  is not built now. (e) accepted as recommended: the resident split plan's "concrete producer
+  registration stays in Mere" is amended (done in that plan). (f) accepted as recommended: P2
+  parameterises the lease name before S4 moves `resident_blobs.rs`. (a), where the installed
+  resident lives, Mark answered: "Hmmmm. Let's go back to the drawing board." He rejects the
+  three options as framed (a new distribution repository, one app repository, stock `djinn` only).
+  **(a) is open.** The drawing-board section of the domain contract questions the premise that a
+  domain's authority is Rust code linked into the store-owning process; P2 and P3 stay held on
+  it. Outcome: new; amends P1, adds P1b.
+
+  Links: area stack · draws on cycle_breaks D1, domain-contract C5 · amends cycle_breaks P1 · plans cycle_breaks P1, P1b, P2, P3 · summary P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board.
+
 - **D12. Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06):** "D: Woodshed as a
   guest". The generic block pane (Djot documents, rhyme schemes, save, undo, reopen) stays in
   Mere. Woodshed's part (progression and bars, the example, the Chart/Tab/Score notation view,
@@ -472,3 +503,6 @@ Illustrative design, not compile-ready code.
   Mark's review before P2 and P3.
 - 2026-11-06: D12 recorded and P7 reshaped (Mark chose D, Woodshed as a guest); the design is
   `technical_architecture/2026-11-06_guest_blocks.md`; nothing implemented, held for Mark's review.
+- 2026-11-06: D14 recorded (Mark answered P1's decisions b to f as recommended; (a), the
+  distribution binary, is open: "go back to the drawing board"); P1b added; the resident split
+  plan's constraint amended. The drawing-board section is in the domain contract.
