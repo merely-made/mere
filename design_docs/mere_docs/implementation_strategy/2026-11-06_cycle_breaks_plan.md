@@ -416,3 +416,10 @@ Illustrative design, not compile-ready code.
   crates through crates.io and needed no row. Receipts in
   `archive_docs/receipts/2026-11-06_cycle_breaks_plan_receipts.md`. P6 stays open for `mere-comms`
   and F1's `scenomise` edge.
+- 2026-11-06: P1 written as a section of the domain contract
+  ([registration contract](../technical_architecture/2026-11-06_domain_contract.md)): what a
+  domain hands the resident and gets back, the call sites by name for Knot and Cleromancy, the
+  uses that are not domain behaviour (relation intake, the `mere-overlay` tests, the C1 receipt
+  host, `personal-facts`), where each app registers, the split of `embedded_reservoir_validation`
+  (generic half stays, product half moves), and six decisions for Mark. Design only; for
+  Mark's review before P2 and P3.
