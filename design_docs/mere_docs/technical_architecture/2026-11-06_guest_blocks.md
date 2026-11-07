@@ -568,13 +568,19 @@ an argument field and the class a pattern field; the hidden `backdrop-scene` tex
 the swatch scene; the progression's arrangement scene comes from `sceno-backdrops` (D17), so the
 guest no longer depends on any Mere crate; the status text after an apply is generic.
 
-**Open: the web Worker host.** The web pane has the `WorkerAdapter` and its memo but nothing yet
-that discloses, reviews and loads a block adapter pack in the browser. The applet path it should
-mirror (`ports/graphshell/web/applets/`, `ports/moot/examples/capsule-library/build.mjs`) turns a
-component into a Worker-loadable module with `@bytecodealliance/jco` 1.37.0, an npm development
-dependency that is not vendored, not on this machine, and not installable without a download. Until
-that is available, a web user sees progression blocks as text with the command disabled and the
-class named. Native does not have this gap: `graphshell-blocks` reviews and loads packs in process.
+**The web Worker host (2026-11-07).** `web/applets/block_adapters.mjs` (the supplying host and the review
+panel), `block_worker.mjs` (the Worker) and `build_block_adapters.mjs` (the build) mirror the applet host;
+`web_tree/block_adapters.rs` is the wasm-bindgen side (`block_adapter_review`, `_approve`, `_install`,
+`_take_requests`, `_reply`, `_remove`, `block_pane_open`). "Review block adapters" in the pane opens the
+review panel; "Review" verifies the pack and component and shows author key, ask and component address;
+"Approve block adapter" grants `power:block-adapter` and starts the Worker, which verifies again, loads the
+jco output only if its derivation manifest matches the hash the page pinned, describes the component and
+registers the class it claims. jco 1.37.0 and @noble/hashes 2.4.0 were fetched from the public registry at
+the versions and sha512 integrity of `ports/moot/examples/capsule-library/pnpm-lock.yaml` (70 packages,
+79,955,303 bytes downloaded, all integrity checks passed, no install script run, kept outside any repository);
+no package manager was usable on the machine, so a small script did what `pnpm install --frozen-lockfile`
+does for that closure. Headed check, route and steps: see the plan's Progress entry for 2026-11-07.
+
 Headless receipts: `/Users/markik/Code/testing/mere/guest_blocks_spike_20261106/real/` and
 `real2/` (Chart, Tab and Score drawn by the real guest through the host's sheet painter, compound
 paths intact, compared with the spike's leaf images). The native window was compiled and its logic
