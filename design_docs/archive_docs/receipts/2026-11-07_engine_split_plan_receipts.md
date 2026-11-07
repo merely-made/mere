@@ -804,3 +804,187 @@ Total if all four land: 4 names freed, 11,060 lines moved. Nothing else in Eidet
 - Crate: `eidetic` already holds the right home. A header split out of `PackManifest` (version, schema id, refusal) can sit in `pack.rs` or a small `pack` submodule beside it. If F4 slims `eidetic`, `pack` belongs on the stay side (schema, codicil, typed, seal). No new crate.
 
 Both obligations land in existing crates; Eidetic should not spend a name on either.
+
+## 2026-11-07: wgpu-* squish audit (read-only, Sonnet subagent, no builds)
+
+# wgpu-* squish audit (read-only, 2026-11-07)
+
+Scope: inside each of wgpu-cue, wgpu-graft, wgpu-scry, wgpu-weld (D7/D10 keep the repos separate).
+Method: README, design_docs/DOC_README.md + DOC_POLICY.md, every Cargo.toml and lib.rs doc, `wc -l` over
+`src` (no target), manifest greps in mere/genet/netrender/turnstone/isocosm/woodshed via `git ls-files`
+(so `.claude/worktrees` and `target` are excluded). No cargo build run, no network.
+Line counts are physical lines of `src/**/*.rs` only (tests inside src are counted).
+
+Headline: the library crates are already one-intention-per-crate. The sprawl is (a) one leftover directory and
+lib name, (b) demo and probe crates, (c) duplicated "native frame" and web-surface vocabulary between scrying
+and welding that sits above the crate level. Real name-freeing is small; the larger prizes free duplicate type
+names, not crate names.
+
+External dependents key: M = mere, T = turnstone. genet, netrender, isocosm and woodshed have no manifest
+dependency on any crate below (genet's one hit is a comment).
+
+## wgpu-cue (no design_docs, no DOC_POLICY.md; docs/contract.md plus 17 dated receipts)
+
+| Crate (package) | Path | src lines | Dependents in repo / outside | Published | Fits its job | Disposition | Name freed |
+|---|---|---|---|---|---|---|---|
+| `webcue` | crates/webcue | 1443 | wgpu-cue, cue-genet, cue-netrender, cue-scry, execution-proof / M workspace, M inker | yes, 0.1.2 | Wholly: renderer-free Surface control, protocol, frame slots, execution ledger | Keep (the wgpu-free boundary is the point; Fork F5) | none |
+| `wgpu-cue` | crates/wgpu-cue | 841 | cue-genet, cue-netrender, cue-scry, execution-proof / M workspace, M graphshell, M pelt-core, T | yes, 0.1.3 | Wholly: Presenter plus Metal, Vulkan DMA-BUF and DX12 importers over `grafting` | Keep | none |
+| `cue-netrender` (lib `wgpu_cue_netrender`) | adapters/netrender | 1878 | cue-genet, execution-proof / M workspace, M graphshell, M pelt-core | no | Mostly: retained renderer on the host device. cpu, hybrid, render_session, resource_table, scene_job are render-job machinery rather than a producer adapter | Keep (Fork F3) | none |
+| `cue-genet` (lib `wgpu_cue_genet`) | adapters/genet | 515 | execution-proof / none | no | Wholly: a Genet document session as a Webcue Surface | Keep (Fork F3: merge into cue-netrender) | none |
+| `cue-scry` (lib `wgpu_cue_scry`) | adapters/scry | 442 | none / none (macOS-only target deps; lib.rs is 8 lines, wk.rs 434) | no | Wholly, but WKWebView only | Keep (Fork F4: move into scrying) | none |
+| `cue-execution-proof` | support/execution-proof | 7052 | none / none | no | A private proof harness: Metal/Vulkan/DX12 handoff, window receiver, render stream, two bins | Keep as support, not a product name (Fork F6) | none |
+| `cue-registry-receiver-proof` (x2) | receipts/2026-10-22-release/registry-consumer, receipts/2026-10-23-receiving/registry-consumer | n/a | not workspace members / none | publish=false | Frozen receipt fixtures; the same package name appears twice | Keep as archive | none |
+
+Notes: workspace.package.version is 0.1.2 and `wgpu-cue` overrides to 0.1.3. The README documents the five
+library crates as distinct boundaries and matches the manifests. cue-genet has no manifest dependent outside the
+repo; mere and turnstone reach Genet content by other paths (inker and pelt-core use webcue, wgpu-cue and
+cue-netrender, not cue-genet).
+
+## wgpu-graft (DOC_POLICY.md and DOC_README.md present)
+
+| Crate (package) | Path | src lines | Dependents in repo / outside | Published | Fits its job | Disposition | Name freed |
+|---|---|---|---|---|---|---|---|
+| `grafting` | grafting | 8346 | grafting-servo, 9 demos / T (git rev 9f410f1); wgpu-cue, scrying, welding, cue-execution-proof (registry) | yes, 0.6.1 (2026-10-24) | Core: Vulkan/Metal/DX12 import, sync, GL. But `surfman_gl` (1839 lines) is Servo's GL layer and rides in the default features | Keep (Fork F2: move `surfman_gl` to grafting-servo) | none |
+| `grafting-frame` | grafting-frame | 469 | grafting / T (=0.1.1), webcue | yes, 0.1.1 (2026-10-23) | Wholly: wgpu-free owned frame and fence custody | Keep (Fork F1: merge into grafting) | none |
+| `grafting-servo` (dir `servo-wgpu-interop-adapter`, lib `servo_wgpu_interop_adapter`) | servo-wgpu-interop-adapter | 762 | 8 Servo demos / T (git; lib name used in src/shell/servo.rs); M graft-engine deliberately none | no (CHANGELOG: unpublished) | Wholly: Servo offscreen adapter | Keep; finish the rename (dir and lib name still the old name) | `servo-wgpu-interop-adapter` (dir and lib name) |
+| `demo-support` | demo-support | 111 | 8 demos / none | no key | URL helper and ANGLE DLL build | Keep; absorb duplicated `keyutils.rs` | none |
+| `demo-raw-gl` | demo-raw-gl | 557 | none | no key | Servo-free GL demo | Keep (the only non-Servo demo) | none |
+| `demo-servo-winit` | demo-servo-winit | 1423 | none | no key | Reference gate demo | Keep | none |
+| `demo-servo-iced` | demo-servo-iced | 1019 | none (excluded workspace, own lockfile, wgpu 28) | no key | iced demo | Keep (cannot join: web-sys pin) | none |
+| `demo-servo-xilem`, `-blitz`, `-egui`, `-gpui`, `-bevy`, `-slint` | demo-servo-* | 866, 731, 679, 710, 406, 198 | none | no key | One GUI framework each, distinct dependency graphs | Keep; they cannot share a crate (different GUI crates and wgpu majors; Bevy and Iced are DX12-only) | none |
+| `freetype-sys` shim, `yeslogic-fontconfig-sys` | patches/* | n/a | [patch.crates-io] only | no | Vendored patch crates; they hold no name of ours | Keep | none |
+
+Notes: `keyutils.rs` is byte-identical in demo-servo-blitz, -winit and -xilem (331 lines each); egui (148),
+gpui (224) and iced (322) differ. Folding the three identical copies into `demo-support` deletes 662 lines and
+frees no name. Graft's demo manifests carry no `publish = false` (weld's do). README's "nine demos" matches.
+
+## wgpu-scry (DOC_POLICY.md and DOC_README.md present)
+
+| Crate (package) | Path | src lines | Dependents in repo / outside | Published | Fits its job | Disposition | Name freed |
+|---|---|---|---|---|---|---|---|
+| `scrying` | scrying | 28545 | all 6 demos / M scrying-engine (0.7.1 pin, reaches pelt-desktop), T via scrying-engine, cue-scry (git rev 6100df6, macOS) | yes, 0.7.2 (2026-10-07) | Wholly: system-webview producers. Modules: wkwebview 7760, wpe 4966, webview2 4946 + windows_capture 1005, webkit6 2741, webkitgtk 2536, native_frame 1771, lib 2016 | Keep: one crate, five backends as modules. `native_frame` is Fork F2b | none |
+| `demo-win` | demo-win | 5895 | none | no key | Over its job: a 5.9k-line WebView2 probe with smokes, not "minimal" | Keep per OS (Fork F7) | none |
+| `demo-mac` | demo-mac | 4753 | none | no key | Probe; main.rs alone is 4165 lines | Keep per OS (Fork F7) | none |
+| `demo-linux` | demo-linux | 859 | none | no key | WebKitGTK 4.1 probe | Host of one merged Linux demo crate | none (host) |
+| `demo-linux6` | demo-linux6 | 543 | none | no key | WebKitGTK 6.0 probe; same job as demo-linux | Merge into demo-linux as a second bin | `demo-linux6` |
+| `demo-wpe` | demo-wpe | 240 | none | no key | WPE probe | Merge into demo-linux as a bin | `demo-wpe` |
+| `demo-scrying-winit` | demo-scrying-winit | 169 | none | no key | Cross-platform winit smoke; two cfg lines | Merge into the same crate (rename it `demo-scrying`) as a bin | `demo-scrying-winit` |
+
+Notes: the demos carry no `publish = false`, so a workspace publish would try to publish them.
+`line-ceiling.toml` lists demo-linux, demo-mac, demo-win and others as size exceptions.
+
+## wgpu-weld (DOC_POLICY.md and DOC_README.md present; PROJECT_DESCRIPTION.md named but not yet created)
+
+| Crate (package) | Path | src lines | Dependents in repo / outside | Published | Fits its job | Disposition | Name freed |
+|---|---|---|---|---|---|---|---|
+| `welding` | welding | 13395 | 3 demos / M weld-engine (alias `welding-0-15`), T direct (0.15.0) | yes, 0.15.0 (2026-10-17 per the triplet plan; repo README still says 0.14.1, 2026-09-04) | Wholly: CEF OSR into wgpu. Modules: linux_cef 2138, macos_cef 2194, windows_cef 2288, native_frame 1761, surface 1653, runtime 601, plus cookies, permissions, downloads, drag, auth, ime, popup, profile, devtools, snapshot | Keep; `native_frame` is Fork F2b | none |
+| `demo-weld-win` | demo-weld-win | 1922 | none | publish=false | Windows demo; cdylib plus 2 bins (direct, bundle) | Keep per OS (Fork F8) | none |
+| `demo-weld-linux` | demo-weld-linux | 1995 | none | publish=false | Linux demo | Keep per OS (Fork F8) | none |
+| `demo-weld-mac` | demo-weld-mac | 2174 | none | publish=false | macOS demo | Keep per OS (Fork F8) | none |
+
+Notes: `testing/` holds ten HTML probes and no Rust.
+
+## Squish candidates (ordered by names freed per 1,000 lines moved)
+
+Dependency edges used for every check (arrow = "depends on"): webcue -> grafting-frame; wgpu-cue -> webcue,
+grafting; cue-* -> webcue, wgpu-cue; cue-scry -> scrying -> grafting -> grafting-frame; welding -> grafting;
+grafting-servo -> grafting. Demo crates are leaves: nothing depends on any of them (manifest grep, all seven repos).
+
+1. Finish the `grafting-servo` rename. Frees `servo-wgpu-interop-adapter` (directory and lib name
+   `servo_wgpu_interop_adapter`; the package name already changed, per CHANGELOG [Unreleased]). 1 name, 0 lines
+   moved (a `git mv` plus the `use servo_wgpu_interop_adapter` paths in 8 demos; turnstone's
+   src/shell/servo.rs also names the lib, outside this audit's scope). Ratio: unbounded.
+   Cycle check: package name unchanged, so no edge changes.
+2. wgpu-scry Linux and winit probes into one crate: fold demo-linux6 (543), demo-wpe (240) and
+   demo-scrying-winit (169) into demo-linux as bins. 3 names / 952 lines = 3.2 per 1,000. Cycle check: all four
+   are leaves depending only on scrying; no new edge. Caveat: `webkitgtk-fallback` (gtk 0.18) and `webkit6`
+   (gtk4) features unify in one build, so the bins need `required-features` and scripts/test-linux.sh builds per bin.
+3. wgpu-weld demos into one `demo-weld` with three bins: 2 names / about 4,170 lines moved (keeping the Windows
+   crate as host) = 0.48 per 1,000. Cycle check: leaves on welding; no new edge. Caveat in Fork F8.
+4. wgpu-scry demo-mac and demo-win into the same crate as OS bins: 2 more names / 10,648 lines = 0.19 per 1,000.
+   Cycle check: leaves on scrying; target-gated deps (`windows`, `webview2-com`, objc2) already exist per manifest.
+   Not recommended before the ceiling debt in line-ceiling.toml is split (Fork F7).
+5. Hygiene, no name freed: three identical `keyutils.rs` into `demo-support` (662 lines deleted).
+
+Nothing in wgpu-cue squishes: every crate is a distinct dependency boundary and no crate's job is a module of a
+neighbour (the closest pair, cue-genet and cue-netrender, is Fork F3).
+
+## Forks (two defensible answers each)
+
+**F1. grafting-frame into grafting.** Merge: grafting already re-exports all of it (`pub use grafting_frame`);
+frees `grafting-frame`, one fewer publish. Keep (my lean): grafting-frame has only target-gated `windows` and
+`objc2` deps (469 lines, no wgpu), while `grafting` needs one of wgpu-28/29/30 and defaults to wgpu-29 plus
+surfman (euclid, gleam, image, surfman). `webcue` (published, wgpu-major independent, used by mere inker)
+depends on grafting-frame for exactly that reason, and turnstone pins `=0.1.1` directly. A merge forces wgpu or
+a feature gate onto webcue. Frees 1 name for 469 lines and breaks the contract's stated independence.
+
+**F2. grafting `surfman_gl` (1839 lines, default-on `surfman` feature) moves to grafting-servo.**
+Move: surfman is Servo's GL layer; its users are grafting-servo, demo-servo-winit and build.rs only (turnstone,
+scrying, welding, wgpu-cue all use default-features = false). Keeps `grafting` a native-handle importer.
+Keep: the 0.6.1 CHANGELOG records Surfman 0.13 to 0.14 as the break that already cost a patch release, moving a
+public module is a breaking change again, and `grafting::raw_gl` (1739 lines, GL, used by the Servo-free
+demo-raw-gl) would then be the only GL left, so "GL producer family" may be the intended single intention.
+Frees no crate name either way.
+
+**F2b. `scrying::native_frame` (1771) and `welding::native_frame` (1761) versus `grafting`.** Both re-declare
+`InteropBackend`, `NativeFrame`, `NativeFrameKind`, sync types and DMA-BUF/Metal/DX12 frame wrappers, and both
+call `grafting::*` imports underneath (scrying native_frame/dmabuf.rs line 64; welding
+native_frame/vulkan_dmabuf.rs line 153). `InteropBackend` is defined three times (scrying, welding, grafting).
+Move into grafting: removes about 3.5k duplicated lines and two copies of the vocabulary without merging
+repos. Keep: the shapes differ (scrying `DmaBufPlane` offset is u32, welding's is u64 plus size; scrying has
+`TextureImporter` and `ProducerCapabilities`, welding has `CpuBitmap` and `PendingFrameSlot`), and each wraps
+producer policy around an import; a shared type forces one shape on both producers. Frees duplicate type names,
+no crate. It changes grafting's public API, so it is Mark's call.
+
+**F3. cue-genet into cue-netrender.** Merge: cue-genet is 515 lines, built entirely on cue-netrender, and its
+only dependent is the proof harness. Keep (my lean): cue-netrender's dependents (pelt-core, graphshell, the mere
+workspace) take only the renderer; cue-genet adds genet-documents, genet-presenter and genet-host-api git deps at
+one genet rev (de14e67) that they would then inherit. Also cue-netrender holds about 1,500 lines of render-job
+machinery (cpu, hybrid, render_session, resource_table, scene_job); splitting that out would add a name, not
+free one. Merge frees 1 name for 515 lines.
+
+**F4. cue-scry into scrying (behind a `cue` feature).** Move: 442 lines, macOS-only, the other half of
+scrying's WKWebView producer; frees `cue-scry`. Keep (my lean): scrying is published at 0.7.2 with its own
+consumers and would gain webcue, wgpu-cue and through them document-session-api and accesskit, none of which it
+has today; mere's inker places its adapters (scrying-engine, weld-engine, graft-engine) with the contract owner,
+not the producer. Cycle check for the move: scrying -> webcue -> grafting-frame, and nothing in webcue or
+wgpu-cue depends on scrying once cue-scry is gone, so no cycle.
+
+**F5. webcue and wgpu-cue as one crate with a `wgpu` feature.** Merge: 2284 combined lines, frees 1 name.
+Keep (my lean): webcue is deliberately "independent of the engine and the wgpu major" (README and lib doc),
+inker depends on webcue only, and wgpu-cue pins `wgpu = 30.0.1` exactly. Merging changes a published 0.1 pair.
+
+**F6. cue-execution-proof (7052 lines).** Keep: it is the instrument behind the 2026-10 and 2026-11 receipts
+(features metal-handoff, vulkan-handoff, dx12-handoff, window-receiver); nothing depends on it. Retire or move
+to a tests/examples layout: it is `publish = false` support, so the name is not a purpose a consumer sees, but
+it also holds product-shaped code (render_stream 399, render_wire 134, process 193). Frees at most 1 name;
+decide when the receipts are archived.
+
+**F7. wgpu-scry: one demo crate for all six probes, or per OS.** One: frees 5 names (12,459 lines re-homed) and
+one shared winit/wgpu host. Per OS (my lean, candidate 2 only): demo-mac (4753) and demo-win (5895) are large,
+OS-specific (webview2-com plus the `windows` crate; objc2) and on the ceiling-exceptions list, so merging moves
+debt before it is split.
+
+**F8. wgpu-weld: three demos into one.** One `demo-weld`: frees 2 names. Three: demo-weld-win is a cdylib plus a
+`bundle-demo-weld-win` bin using `cef` `build-util`; each OS demo has its own cfg-specific blit, present and
+probe modules; they share file names (main, scripted, probe) but not content. Weak evidence either way.
+
+**F9. scrying and welding (with graft's Servo lane) as one purpose.** For: both re-declare the same web-surface
+vocabulary (`NavigationEvent`, `Cookie`, `SameSite`, `CursorShape`, `DragInput`, `KeyEvent`, `WebRequestId`;
+scrying lib.rs 2016 lines, welding surface.rs 1653), carry an identical lib.rs wgpu alias header and fd-test
+lock, a `native_frame` module and per-OS producers; Webcue `Surface` is a third contract already abstracting
+them. Against (my lean): a different native dependency (OS webview libraries versus the CEF 154 bundle with
+subprocess and sandbox setup), different cadence (scrying 0.7.2, welding 0.15.0), separate hardware CI, and D7
+already ruled them separate. The squish available is shared vocabulary (F2b), not a repo merge.
+
+## What each repository is for
+
+wgpu-cue is the embedding contract: a renderer-free control protocol (`webcue`), host-device presentation
+(`wgpu-cue`) and the adapters that make Genet or WKWebView content a Webcue Surface, so a host such as inker,
+pelt or turnstone never names an engine. wgpu-graft is the importer: `grafting` turns a producer's native GPU
+image (GL, DMA-BUF, IOSurface, DX12 shared handle) into a texture on the host's own wgpu device, with
+`grafting-frame` as the wgpu-free custody layer, and the Servo adapter plus nine demos as its first producer and
+consumers. wgpu-scry is the producer for the operating system's own webview (WebView2, WKWebView, WebKitGTK,
+WPE), exposing frames, navigation, input and cookies through `scrying`. wgpu-weld is the producer for Chromium
+through CEF accelerated off-screen rendering (`welding`), including the CEF subprocess, profile and sandbox
+policy that has no counterpart in the other three.

@@ -4,7 +4,7 @@
 contract is deferred by D4; the Pandect sidecar owners are open.
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D18 are ruled; the plan is committed on main
 (`0adc6b1dc`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
-the inker and seiche repositories await creation (the harness refused it this turn); the engine-to-workspace contract
+`merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
 is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -610,6 +610,36 @@ revision and what crosses at frame rate.
   eidetic.git and the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
   would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
   rule's universal header, the witness does not publish; both names stay.
+- **P1 fork F6, the smolweb palette (new, 2026-11-07).** `SmolwebTheme::Site` derives each site's
+  palette through Tinct at construction and on every colour-mode change, and `ModeProfile` is
+  Tinct's type in the lanes' public API (Turnstone names it 12 times). Options: the lanes own
+  the theme, the palette and a two-flag colour mode and the host supplies the per-site palette
+  through a resolver carried by `Site` (recommended, the shape of D16); rule Tinct, a
+  serde-only colour library, a leaf Inker may name and move the palette over it; or move Tinct
+  to Inker.
+- **Host follow-ups under D16 and D17 (recorded by the P1 lane, with file paths in its P1
+  block).** Turnstone converts at 13 boundary calls in `content_pool.rs`,
+  `shell_effect_control_content.rs` and `reader_observe.rs` and keeps persisting Tabard's
+  anchor; the Graphshell port converts at 5 sites in `retained_content.rs`; Knot's
+  `knot-document` takes `KnotEditor`, `EditOutcome` and `KnotReadout` with their tests and
+  drops `knot-editor-host`; Turnstone and the port import from `knot-document`; then
+  `knot-editor-host` retires. `tabard-workshop` was converted by the lane already.
+- **Knot repin (D15) on the branch.** Four of nine tests in `knot-editor`'s
+  `composition_retention` fail on Windows with `CheckpointStorage("legacy checkpoint storage
+  replacement is supported only on Unix")`, from the `#[cfg(not(unix))]` arm in
+  `checkpoint_migration.rs:328-331` added in `16a4b48` on 2026-10-22; pre-existing by code
+  evidence, not rerun on the old lock. Settle on a Unix machine or with the old lock.
+- **wgpu-* squish (read-only audit, 2026-11-07, in the receipt file).** The library crates are one
+  intention each; the squish is demos and a rename: finish the `grafting-servo` rename (the
+  directory and lib name still say `servo-wgpu-interop-adapter`; Turnstone's `shell/servo.rs`
+  names the lib); fold wgpu-scry's `demo-linux6`, `demo-wpe` and `demo-scrying-winit` into
+  `demo-linux` as bins with `required-features` (frees three names); fold the three
+  `demo-weld-*` crates (two names; the Windows cdylib complicates it); dedupe three
+  byte-identical `keyutils.rs` files into `demo-support` (662 lines, no name). Forks there:
+  `scrying::native_frame` and `welding::native_frame` each re-declare grafting's
+  `InteropBackend`, `NativeFrame` and sync types (about 3.5k duplicated lines, differing
+  `DmaBufPlane` shapes), and scrying and welding share `NavigationEvent`, `Cookie`,
+  `CursorShape`, `DragInput` and `KeyEvent`: shared vocabulary, not a repository merge (D7).
 - **Misfin's home (C).** It sits in smolweb but serves `mere-comms`, which cycle-breaks D4
   sends to Murm. Whether it follows smolweb into Inker or goes to Murm.
 - **Pandect's traced parts (P4).** Owners for settings, view sidecars, worker declarations and
@@ -706,6 +736,27 @@ revision and what crosses at frame rate.
   matching, manifests byte-identical, 18 lock lines added, check and clippy green, 37 tests
   pass; not merged, not pushed. Consumer steps are in Open. The wgpu-* squish audit opened in
   the freed slot.
+- 2026-11-07: Mark created `merely-made/inker` and `merely-made/seiche`, empty, from the M4.
+- 2026-11-07: the Eidetic lane had branched from a local main 64 commits behind origin; the push
+  was refused. The branch was rebased onto origin/main (`71188bb`), the lock regenerated on
+  origin's with the same 18 added lines, and the gates rerun before the push.
+- 2026-11-07: Knot repin lane (D15) done on `repin/backdrops` at `2c703c4` in
+  `Code/worktrees/knot-editor-repin-backdrops`, branched from origin's main (local main was 11
+  behind): `sceno-backdrops` taken from graphshell.git per cycle-breaks D8, D9 and D17; five
+  source files, four manifests, mere.git moved to `3b354929` and graphshell.git to `40e8c8df`
+  in the lock, other families held at their old revisions; check, clippy and the composition,
+  readings and desktop tests green; the Windows `composition_retention` failures are in Open.
+  Not pushed. Mere relocks with `cargo update -p knot-editor` once it is on Knot's main
+  (`support/family-promotion/source-Cargo.lock` holds six more lines if it follows).
+- 2026-11-07: P1 lane under D16 and D17: `mere-lanes` owns `ReadingPreferences`, `ReadingAnchor`
+  and reader styles (`reading_style.rs`, no serde; hosts persist and convert);
+  `MarkdownLexer` and `full_pack` moved to `illume` behind a `markdown` feature with their
+  tests; `knot-editor-host` re-exports them and says it is retiring; `tabard-workshop`
+  converted. Standalone Inker: check green, 765 tests pass, 0 fail. Remaining edges:
+  `knot-editor-host -> cambium` (until Knot takes the editor), `mere-lanes -> tabard` (F6,
+  palette only), `mere-fleece -> mere-rdf` optional (F3), `script-rhai -> hest` (F4), the
+  Roboto font (F5). 32 entries staged on `worktree-agent-a61f20e98db5486a2`, uncommitted
+  until D15 lands and Mere relocks. The wgpu-* audit landed in the receipt file.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
