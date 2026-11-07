@@ -7348,6 +7348,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "graphshell-blocks"
+version = "0.0.1"
+dependencies = [
+ "block-host",
+ "eidetic",
+ "graphshell",
+ "personae",
+ "sceno",
+ "serde_json",
+ "vector-sheet",
+]
+
+[[package]]
 name = "graphshell-client"
 version = "0.0.2"
 source = "git+https://github.com/merely-made/graphshell.git?branch=main#40e8c8df15915d86377117842c08cf10fd13c987"
