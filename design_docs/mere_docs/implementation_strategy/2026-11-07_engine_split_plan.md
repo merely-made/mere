@@ -2,8 +2,9 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D18 are ruled; the plan is committed on main
-(`0adc6b1dc`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D20 are ruled; the plan is on origin's main
+(pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
+repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
 `merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
 is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
 
@@ -395,8 +396,10 @@ with history preserved as the 2026-10-19 promotion did. `smolweb` (the protocol 
 `nematic` and `inker` are its consumers; `misfin` is the exception to check, since
 `mere-comms` is its other consumer and Murm may be its home. `emblem` (IconVG) into
 Graphshell with P3, since `pictograph` is its only consumer. `wavicle` (WavPack) into
-Woodshed, its only consumer, on Woodshed's own schedule. The `wgpu-*` repositories stay
-separate.
+Woodshed, its only consumer, on Woodshed's own schedule. `wgpu-scry` and `wgpu-weld` into
+Inker as feature-gated engine members with P1 (D20); `wgpu-cue` and `wgpu-graft` stay.
+Inside each wgpu repository the audit's folds apply: the `grafting-servo` rename finished,
+the scry and weld demo crates folded, the three `keyutils.rs` copies deduplicated.
 - Done when: each folded repository is archived with a pointer to its new home; its crates
   publish from the receiver under their existing names; every consumer resolves them from
   one source; the family's repository count is recorded.
@@ -561,6 +564,28 @@ revision and what crosses at frame rate.
 
   Links: area The stack · plans engine-split P1, engine-split P2 · summary The inker and seiche repositories are created empty under merely-made; their lanes populate them once clean.
 
+- **D19. Inker may name the bottom root; tinct joins it (Mark, 2026-11-07):** Tinct's ten
+  consumers in six repositories all sit beside Cambium or Tabard, Tinct depends on serde only,
+  and P1's F4 (`script-rhai` naming `hest`) and F6 (the smolweb palette deriving through Tinct)
+  are the same question: "Yes: tinct joins the bottom root, Inker may name it (Recommended)".
+  `tinct` moves into the Graphshell repository's Mere-free contract root (cycle-breaks D9's
+  leaves); Inker takes `tinct` and `hest` from that root, which names nothing above it; the
+  palette moves into the lanes over Tinct and `script-rhai` keeps its `command` module.
+  Outcome: refines cycle-breaks D9 (the root gains tinct) and settles P1's F4 and F6.
+
+  Links: area The stack · amends cycle-breaks D9 · draws on engine-split D2, engine-split D16 · plans engine-split P1, engine-split P3 · summary The Graphshell contract root gains tinct and is a leaf layer Inker may name; the palette lives in the lanes over Tinct.
+
+- **D20. scrying and welding move into Inker; cue and graft stay (Mark, 2026-11-07):** on the
+  producer/host reading of the wgpu family (scry and weld drive the OS webview and CEF and have
+  no consumer but Inker's adapters; cue is the host's embedding contract and graft its GPU
+  importer, pinned by Pelt, Graphshell, Mere and Turnstone): "scry and weld into Inker as
+  feature-gated members; cue and graft stay (Recommended)". CEF and WebKit build weight is
+  opt-in behind features. Mark, on the difference: "huh. odd. wonder why cue and graft are
+  different than the other two on this count." Outcome: refines D7 (the wgpu repositories no
+  longer all stay); the family nets 22 repositories from 25.
+
+  Links: area The stack · amends engine-split D7 · draws on mere:stack.3 · plans engine-split C · summary wgpu-scry and wgpu-weld fold into Inker as feature-gated engine members; wgpu-cue and wgpu-graft stay below Inker.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -610,7 +635,9 @@ revision and what crosses at frame rate.
   eidetic.git and the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
   would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
   rule's universal header, the witness does not publish; both names stay.
-- **P1 fork F6, the smolweb palette (new, 2026-11-07).** `SmolwebTheme::Site` derives each site's
+- **P1 forks F4 and F6: settled by D19.** `tinct` must reach the Graphshell contract root before
+  the lanes can take it; until then P1's palette line stays as it is.
+- **P1 fork F6, the smolweb palette (new, 2026-11-07, now settled by D19; kept for the record).** `SmolwebTheme::Site` derives each site's
   palette through Tinct at construction and on every colour-mode change, and `ModeProfile` is
   Tinct's type in the lanes' public API (Turnstone names it 12 times). Options: the lanes own
   the theme, the palette and a two-flag colour mode and the host supplies the per-site palette
@@ -757,6 +784,11 @@ revision and what crosses at frame rate.
   palette only), `mere-fleece -> mere-rdf` optional (F3), `script-rhai -> hest` (F4), the
   Roboto font (F5). 32 entries staged on `worktree-agent-a61f20e98db5486a2`, uncommitted
   until D15 lands and Mere relocks. The wgpu-* audit landed in the receipt file.
+- 2026-11-07: Eidetic main pushed at `71188bb` (D12 landed); Knot main pushed at `2c703c4` (D15
+  landed, fast-forward from origin's main); Mere main merged with origin's four viewer commits
+  (no Rust on this side, nothing to gate) and pushed at `9e790a152`, so the plan is upstream.
+  Mere's relock to Knot started. D19 and D20 recorded; a lane opened to move `tinct` into
+  the Graphshell contract root.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the

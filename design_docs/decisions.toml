@@ -611,6 +611,14 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 title = ". Create both repositories now, empty (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 
+[decisions."engine-split D19"]
+title = ". Inker may name the bottom root; tinct joins it (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D20"]
+title = ". scrying and welding move into Inker; cue and graft stay (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
