@@ -1031,3 +1031,10 @@ revision and what crosses at frame rate.
   `retained_content_fixture` example builds; the `uxtree` probe test passes; clippy green
   (0 errors); the web workspace checks green.
 >>>>>>> theirs
+- 2026-11-07: P1 complete on both sides. The donor cut (`bdd8f7ee7`) merged into main as `cd8490fa2`
+  through the hooks and pushed: 289 files, 63,710 lines left Mere; Mere's rows name `inker.git`;
+  five `mere.git` patch redirects stay until Knot repins; the port and uxtree carry their own
+  fixtures (D24 applied twice). Inker main is `436c841` with its DOC_POLICY and DOC_README. The
+  empty `crates/crawl` and `crates/import` directories removed. Opened next: Seiche population
+  with history (seven crates, `seiche-model` included), Knot's repin to `inker.git` with the
+  editor move (D17), Turnstone's repin with its D16 boundary conversions.
