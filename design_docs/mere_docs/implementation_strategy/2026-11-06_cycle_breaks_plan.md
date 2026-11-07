@@ -387,3 +387,15 @@ Illustrative design, not compile-ready code.
 
 - 2026-11-06: plan written from the cycle map; D1 to D5 recorded; nothing implemented.
 - 2026-11-06: D6 recorded; D4/P6 paused pending the host/guest contract brief; nothing implemented.
+- 2026-11-06: D7 to D9 / P6 extraction landed. History exported from Mere `49571db83` with
+  `git filter-branch` (the filter-repo tool was not installed; `--prune-empty`, merges kept; 582
+  commits; the exported tree equals the donor blobs, checked) and merged into
+  `merely-made/graphshell` (old `main` `7676823c`, 1,263 commits and 8 branches left alone; the
+  cut-over note is `docs/2026-11-06_cut_over.md`): graphshell `7cd9ca53` (tests 264 default, 291
+  all-features, pass). Knot `2dd25442` and Cleromancy `afed1727` took the source change first,
+  because Mere's lock names them; Mere `18c0f24a5` is the cut (door split into `graphshell-door`,
+  seams, docs). Consumers: Knot `abffd2d5`, Cleromancy `671e9bc4`, Turnstone `53559826`, Woodshed
+  `dbd0da9d`, Isocosm `a9a227cc`, merelyllc.com `c6150c12`, Murm `b80cf589`. Distillery names the
+  crates through crates.io and needed no row. Receipts in
+  `archive_docs/receipts/2026-11-06_cycle_breaks_plan_receipts.md`. P6 stays open for `mere-comms`
+  and F1's `scenomise` edge.

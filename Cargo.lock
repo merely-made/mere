@@ -2794,7 +2794,7 @@ dependencies = [
 [[package]]
 name = "cleromancy-core"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#afed17272aaf7f9132c5e0e814866c73a459a300"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#671e9bc4568a73f15c69edbe4dd62b4f6a81f9b6"
 dependencies = [
  "blake3",
  "chartulary",
@@ -9326,7 +9326,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "knot-catalog",
 ]
@@ -9334,7 +9334,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9347,7 +9347,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9367,7 +9367,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "cambium",
  "illume",
@@ -9384,7 +9384,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10708,7 +10708,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4686ce09d9ae2b7e1813a21e7aa2ab2fb3787e91"
+source = "git+https://github.com/merely-made/murm.git?branch=main#b80cf5890bfd2bbdc0108195627d7205c4870190"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10979,12 +10979,12 @@ dependencies = [
 [[package]]
 name = "mora"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 
 [[package]]
 name = "mora-cmudict"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "mora",
 ]
@@ -11082,7 +11082,7 @@ dependencies = [
 [[package]]
 name = "murm-sync"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4686ce09d9ae2b7e1813a21e7aa2ab2fb3787e91"
+source = "git+https://github.com/merely-made/murm.git?branch=main#b80cf5890bfd2bbdc0108195627d7205c4870190"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11121,7 +11121,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4686ce09d9ae2b7e1813a21e7aa2ab2fb3787e91"
+source = "git+https://github.com/merely-made/murm.git?branch=main#b80cf5890bfd2bbdc0108195627d7205c4870190"
 dependencies = [
  "bytes",
  "futures-util",
@@ -15614,7 +15614,7 @@ dependencies = [
 [[package]]
 name = "reference-data"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2dd254421422d636545cbb58a95b25655bab8e6d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
 dependencies = [
  "blake3",
  "serde",
@@ -18842,7 +18842,7 @@ dependencies = [
 [[package]]
 name = "turquet"
 version = "0.17.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#afed17272aaf7f9132c5e0e814866c73a459a300"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#671e9bc4568a73f15c69edbe4dd62b4f6a81f9b6"
 dependencies = [
  "hifitime",
  "sofars",

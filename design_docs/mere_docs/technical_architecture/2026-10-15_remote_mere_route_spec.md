@@ -396,7 +396,7 @@ Ordered; each step keeps every carrier working.
 4. **Retire the polls.** Once every first-party client reads pushed notices
    (Knot's overlay, Turnstone, Signalman, Graphshell's binaries), remove
    `AppMessage::TakeNotice` and `WaitNotice`, and `ResidentMereProxy`'s
-   nested polling (`graphshell_endpoint::door::resident_mere_proxy`) in
+   nested polling (`graphshell_door::resident_mere_proxy`) in
    favour of forwarding the pushed notices; keep `SessionCore`'s
    Discover-as-poll only for carriers that cannot push (none of the above).
 
