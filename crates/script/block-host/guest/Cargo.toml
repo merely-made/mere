@@ -1,0 +1,39 @@
+# The block-guest test fixture: a component that claims the class `fixture`. Standalone
+# workspace with its own toolchain pin, built to wasm32-wasip2 by the host's build.rs; the
+# host tests load the artifact. It is a Mere-built fixture: no test in Mere loads any other
+# project's guest.
+[workspace]
+
+[package]
+rust-version = "1.97.1"
+name = "block-fixture-guest"
+version = "0.0.1"
+edition = "2021"
+license = "MPL-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.58"
+sceno = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+vector-sheet = { git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+ciborium = "0.2"
+
+[profile.release]
+opt-level = "s"
+strip = true
+
+[workspace.package]
+rust-version = "1.97.1"
+
+[workspace.lints.clippy]
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+missing_safety_doc = "warn"
+undocumented_unsafe_blocks = "warn"
+too_many_lines = "warn"
+
+[lints]
+workspace = true

@@ -1318,6 +1318,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "block-host"
+version = "0.0.1"
+dependencies = [
+ "ciborium",
+ "graphshell-endpoint",
+ "pollster 0.4.0",
+ "sceno",
+ "serde",
+ "vector-sheet",
+ "wasmtime",
+ "wasmtime-wasi",
+]
+
+[[package]]
 name = "block-padding"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -1,0 +1,35 @@
+# The block-guest component host: the native side of the `block-guest` WIT world, the
+# guest block adapter a block pane loads under review. A sibling of app-host and
+# document-host over the same `mere:script` contract (one WIT package, in the Graphshell
+# repository, materialised at `crates/script/wit` by build.rs): three worlds, three hosts.
+# It is app-agnostic: it moves copied values across the boundary and knows no adapter.
+[package]
+name = "block-host"
+version = "0.0.1"
+edition = "2021"
+
+rust-version = "1.97.1"
+license.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# The WIT world lives in this package; its build script publishes the directory to this
+# crate's build script as DEP_GRAPHSHELL_ENDPOINT_WIT. The crate itself is not used.
+graphshell-endpoint = { workspace = true }
+# wasmtime 45, matching document-host and app-host (one engine version across the hosts).
+wasmtime = "45"
+wasmtime-wasi = "45"
+# Drives the async exports from sync callers; the lib stays executor-neutral.
+pollster = "0.4"
+
+[dev-dependencies]
+vector-sheet = { workspace = true }
+sceno = { workspace = true }
+ciborium = "0.2"
+serde = "1"
+
+[lints]
+workspace = true

@@ -32,6 +32,7 @@ members = [
     "crates/script/rhai",
     "crates/script/document-host",
     "crates/script/app-host",
+    "crates/script/block-host",
     # Native WIT bindings (capability door D17-D19): the runtime and its generator.
     # ─── Absorbed 2026-07-23 (design_docs/.../2026-07-23_repo_consolidation_plan.md) ───
     # Cambium and Conatus remain platform components. The 2026-10-19 foundation
