@@ -7360,6 +7360,7 @@ dependencies = [
  "genet-scripted-dom",
  "graphshell",
  "layout-dom-api",
+ "mandrake",
  "mere",
  "muniment",
  "netrender",
