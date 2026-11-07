@@ -602,6 +602,14 @@ revision and what crosses at frame rate.
   a `domain` module in `stickleback` (policy and authority hooks exist; grammar and fold traits
   do not); D10's pack header splits out of `PackManifest` in `eidetic::pack`. No new crate
   either way.
+- **D12 consumers, once Eidetic's branch is on its main.** Mere deletes `crates/system/state-witness`
+  and `crates/system/framing` and their member rows; `pictograph/Cargo.toml:140` and
+  `seiche/Cargo.toml:83` repin `state-witness` to eidetic.git `branch = "main"`; the root
+  `framing` row goes (nothing else in Mere needs it); Isocosm's `isometer-core/Cargo.toml:21` and
+  `cosmograph/Cargo.toml:31` repin the same way; Seiche's replay example then takes it from
+  eidetic.git and the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
+  would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
+  rule's universal header, the witness does not publish; both names stay.
 - **Misfin's home (C).** It sits in smolweb but serves `mere-comms`, which cycle-breaks D4
   sends to Murm. Whether it follows smolweb into Inker or goes to Murm.
 - **Pandect's traced parts (P4).** Owners for settings, view sidecars, worker declarations and
@@ -693,6 +701,11 @@ revision and what crosses at frame rate.
   `inker-p1-standalone` kept for the repository population. D15 to D18 recorded;
   the `gh repo create` calls for inker and seiche were refused by the harness and wait on Mark. Next lanes: Knot repin (D15),
   state-witness and mere-framing to Eidetic (D12), P1's F1 cut on its branch.
+- 2026-11-07: D12 lane landed in Eidetic: branch `receive/state-witness-framing` at `58cfafe` in
+  `Code/worktrees/eidetic-witness-framing`, copied from Mere `0adc6b1dc` with all 11 file hashes
+  matching, manifests byte-identical, 18 lock lines added, check and clippy green, 37 tests
+  pass; not merged, not pushed. Consumer steps are in Open. The wgpu-* squish audit opened in
+  the freed slot.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
