@@ -7355,9 +7355,14 @@ dependencies = [
  "block-host",
  "eidetic",
  "graphshell",
+ "netrender",
+ "paint_list_api",
+ "paint_list_render",
  "personae",
+ "png 0.17.16",
  "sceno",
  "serde_json",
+ "sprigging",
  "vector-sheet",
 ]
 
