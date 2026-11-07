@@ -36,3 +36,13 @@ Recording continuation (2026-10-30): S-PC was unreachable, so documentation only
 S-PC worktrees remain under `/home/markik/Code/worktrees/{mere,dramatis,eidetic}-stack-reduction-20261029` on the branches above. Preserve them for comparison. Push branches only. After comparison, retain any needed evidence and unique work, check ancestry and then explicitly choose which branches/worktrees to clean; no automatic deletion is scheduled.
 
 If builds resume, serialize through `/home/markik/Code/testing/machine-heavy.lock`: one Cargo job/test thread, MemoryMax=3G, MemorySwapMax=0, CPUQuota=150%, bounded commands. Do not raise caps. Existing target/output lanes and SSH authority remain in place. No new keys, toolchain changes or attribution trailers.
+
+**Named consumer, 2026-11-03: Moot relay pools.** The canonical plan is
+`gemot/design_docs/moothold_docs/implementation_strategy/2026-11-03_moot_relay_pools_plan.md`.
+Its private operator coordination is a concrete R25 p2panda-spaces comparison:
+nested contributor/device groups, revocation, key rotation and cold reopen,
+while Gemot retains constitution and bounded contribution consent. R26 may
+reduce generic causal/replay orchestration, but the pool uses current
+Stickleback admission/storage and Murm's extracted `murm-sync` sessions first.
+Use this consumer to measure reuse before adding group/key/runtime machinery;
+it does not authorize broad replacement or establish network anonymity.

@@ -503,6 +503,29 @@ Three more cross-cutting items:
   per account, rotating, and self-certifying (see the atproto bullet below).
   `did:web` is **PULL** and is carried as a handle only, because it is a
   domain's say-so with no history.
+  **Amended 2026-11-06 by Mark's rulings** (the
+  [linked-data platform lessons brief](mere_docs/research/2026-11-06_linked_data_platform_lessons_brief.md),
+  D4 and D5):
+  - **Rechecked.** did:web *can* rotate keys, by republishing `did.json`.
+    What it lacks is verifiable history.
+  - **did:webvh** (a DIF Ratified Specification, v1.0) adds a self-certifying
+    id, a hash-chained log, pre-rotation and witnesses, with did:web as its
+    fallback view. It is **ADOPT** as an anchor beside `did:plc`, confirmed
+    the same day: a host can withhold, roll back or delete the log but cannot
+    forge it, which is the same threat class as plc.directory. `didwebvh-rs`
+    0.8.2 is Apache-2.0, runs the shared test vectors and takes its crypto
+    from `ed25519-dalek` and `sha2`. The carriage rules are D17–D19:
+    - our resolver refuses rollbacks, and witnesses and third-party
+      watchers are optional and raise the trust grade;
+    - the anchors we mint are portable;
+    - no code is carried until `didwebvh-rs` reaches 1.0 or gains a
+      second maintainer.
+  - **WebID 1.0**, a Community Group draft, is **ADOPT** as the RDF profile
+    face (read and publish). It anchors only by linking to a did:webvh or
+    did:plc.
+  - **Maturity is not a gate** (doctrine Stack 3): a draft or community
+    report we have a use for is supported when cheap, and each claim is
+    labeled by its status.
   CardDAV and JMAP: SKIP, both server-tenancy. **Nostr NIP-01 is the load-bearing
   document, not NIP-05** — NIP-05 maps a name to a hex pubkey and is meaningless
   without the event/relay/signature model NIP-01 defines.

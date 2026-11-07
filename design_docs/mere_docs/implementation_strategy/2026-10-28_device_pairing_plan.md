@@ -8,6 +8,14 @@ real-machine items, the overlay restart gap (held for iroh-gossip's next release
 with its Linux launcher, D3 (SSH by key), D4 (host certificates approved by the master), D5 (one ceremony) and D6 (the other
 network's relay).
 
+**Fleet assessment, 2026-11-04:** the requested personal mesh is O-PC, T-PC,
+Q-PC, S-PC, Y-PC, iMac-M4 and X-PC. The D3 branch records O-PC as the common
+roster root; that decision is not a completed fleet enrollment receipt.
+Live O-PC status reports `sync: null`, and its current owner settings have no
+sync section. Root-bound device enrollment, consistent admission and
+revocation across the seven residents remain unqualified. Remote vault
+approval is the custody plan's separate VL-U feature.
+
 **For:** Mark's machines finding, reaching and trusting each other by device identity, not by address. Opened on 2026-10-01
 when the leases on his `/22` mesh Wi-Fi had moved again and finding machines took a sweep for port 22: "these are not
 static ip addresses. Is there a coordination strategy we can employ to pair devices easily?" Pairing a device becomes one
@@ -17,6 +25,9 @@ Not here:
   rather than identity; `2026-10-28_family_update_resident_plan.md`;
 - the custody rules the principal, session and key flows must compose with, and the Secret Service design that waits on D2's
   launcher: `repos/dramatis/design_docs/2026-10-28_custody_plan.md`; the LAN SSH and presence receipts do not complete D3 to D6;
+- vault unlock settings and approval from devices authorized under the owner's
+  root: the same custody plan's VL-U. Pairing supplies identity and reach;
+  custody grants and enforces unlock permission. Djinn owns its interface.
 - the Djinn self-update launcher: `2026-10-28_family_update_resident_plan.md` phase D;
 - alternative overlays (Tailscale with Headscale, Nebula): considered on 2026-10-12 and not installed in this slice; D3
   (Djinn and Iroh) is the stack-owned transport slice;
@@ -193,6 +204,23 @@ route between them.
   `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:1044-1049`
 
 ## Findings
+
+- 2026-11-04 (live local observation): the installed O-PC resident and separate
+  custodian are running; `djinn.exe --resident-status` reports ready, locked
+  and `sync: null`. The settings file named by its log,
+  `%LOCALAPPDATA%/Djinn/runtime-auth-20261023/Graphshell/settings/default.json`,
+  has no sync section. Noninteractive SSH using existing aliases and pinned
+  host keys fails authentication for T-PC, Q-PC, S-PC, Y-PC and X-PC. iMac-M4's
+  work address times out; its mesh alias responds but fails authentication.
+  These probes establish neither peer enrollment nor current peer service
+  state. No unlock, installation or trust change was attempted.
+- 2026-11-04 (source-confirmed): personal sync builds its admission roots from
+  configured roster/paired roots plus its own local identity
+  (`ports/mere-resident/src/personal_sync.rs`, initial setup and pairing watch).
+  This is configured root admission, not proof that every peer is an O-PC
+  delegate. Dramatis has signed grant enrollment and validation in
+  `repos/dramatis/crates/castellan/src/custody/wallet/enroll.rs`, but that does
+  not close D5's unified ceremony or establish a seven-device deployment.
 
 - 2026-10-02: four unrelated device identities existed: the wallet `DeviceRoster` entry, the personal-graph node id that
   `PairedDevice` keys on, Knot's `PairedWriter` key, and SSH's device id (a hash of the hostname). Host certificates were never

@@ -58,26 +58,38 @@ Links: draws on isocosm:962 · summary Identity and admitted connections come fr
 
 Seams stay clean even at some cost in speed: a missing boundary bites later,
 and hardware improves. Renderers swap behind a scene contract. Open formats
-come first; a product makes its own only where none holds the thing.
-Applications meet at the contract too. A producer offers surfaces or
-datagraphs, widgets and utilities included, and endpoints a host dials; a
-host owns a graph and loads producers at runtime, Graphshell its reference;
-a runner carries either or both and owns no graph. An installable app is a
-frame, a host with producers fixed at build. The producer's graph core is
-contract tier, published like scene crates; Mere consumes producers, never
-the reverse. Publication is still owed, so graph-owning producers currently
-compile in lockstep with Mere. Each capability names its supplier, who
-grants its use and who owns its lifetime. Extension follows four rungs:
-data (product-defined open sets), scripts (authored rules and packs lowered
-by digest), components (outside code on Wasmtime where supported), native
-crates (first-party cores). By call frequency times data volume, cold and
-narrow may be pluggable components; hot or wide stays native.
+come first, drafts and community reports included where we have a use and
+they are cheap, each claim labeled by its status; a product makes its own
+only where none holds the thing. Applications meet at the contract too. A
+producer offers surfaces or datagraphs, widgets and utilities included, and
+endpoints a host dials; a host owns a graph and loads producers at runtime,
+Graphshell its reference; a runner carries either or both and owns no graph.
+An installable app is a frame, a host with producers fixed at build. The
+producer's graph core is contract tier, published like scene crates; the
+host consumes producers, never the reverse, and graph-owning producers compile
+in lockstep with it until published. Each capability names its supplier, who
+grants its use and who owns its lifetime. Extension follows four rungs: data
+(vocabulary packs hold all recognition: predicates and classes are open names,
+each a row of axes the core dispatches on; it observes a finite set of values
+per axis, compiled as enums that carry the rest, and an unobserved value is
+kept and degrades by the pack's fallback chain, then the axis default; the
+predicate enums are owed to a core pack), scripts (authored rules and packs
+lowered by digest), components (outside code on Wasmtime where supported),
+native crates (first-party cores). By call frequency times data volume,
+cold and narrow may be pluggable components; hot or wide stays native.
 
-Links: draws on isocosm:27, isocosm:77, isocosm:78, isocosm:1000, distillery-extraction D8, distillery-extraction D9, distillery-extraction D15, house-style D15 · replaces stack.5 · summary Open contracts separate producers, hosts and runners; capabilities name supplier, grant and lifetime owner; extension follows data, scripts, components and native crates by call cost.
+Links: draws on isocosm:27, isocosm:77, isocosm:78, isocosm:1000, distillery-extraction D8, distillery-extraction D9, distillery-extraction D15, house-style D15, linked-data-platform-lessons D2, linked-data-platform-lessons D4, linked-data-platform-lessons D6, linked-data-platform-lessons D7, linked-data-platform-lessons D31, linked-data-platform-lessons D32, engine-split D1 · replaces stack.5 · summary Open contracts separate producers, hosts and runners; open formats first, useful cheap drafts included and labeled by status; capabilities name supplier, grant and lifetime owner; extension follows data (packs hold all recognition as open names over axes the core observes, compiled as enums that carry the rest), scripts, components and native crates by call cost.
 
-*Refined 2026-11-02 (house-style D15): "Consolidate within the
-seven-statement budget (Recommended)"; folds in Stack 5's extension rule.
-Distillery-extraction D8, D9 and D15 continue to apply.*
+*Refined 2026-11-06 (linked-data-platform-lessons D2, D4, D6, D7, D31,
+D32): "1, but check isocosm's efforts, genet's efforts… for consistency and
+making it consistent where that helps"; "i actually think we should just
+support community drafts if we have a reason to use them. And we clearly do!
+If it's cheap."; "Axes closed, names open (Recommended)"; "Same model for
+both (Recommended)"; then, on "i don't see why 'closed' is necessary, as
+opposed to 'observed' or 'utilized'": "Observed, not closed (Recommended)";
+"Both: chain first, core default last". Refined 2026-11-07 (engine-split D1):
+"I agree with the overall split"; the host, not Mere, consumes producers.
+House-style D15 and distillery-extraction D8, D9 and D15 continue to apply.*
 
 ### Stack 4. Platforms and the web
 

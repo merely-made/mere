@@ -539,6 +539,62 @@ summary = "The graph-writing workshop destinations are a pandect feature, not a 
 draws_on = ["distillery-extraction D12"]
 amends = ["distillery-extraction D16"]
 
+[decisions."engine-split D1"]
+title = ". The split (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D2"]
+title = ". Graphshell is the host, contract and hosting together (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D3"]
+title = ". The reservoir service lives in Mere, outside the engine (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D4"]
+title = ". Moves do not wait on the engine contract (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D5"]
+title = ". The spatial split is the runtime only (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D6"]
+title = ". The spatial repository is named seiche (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D7"]
+title = ". Consolidations (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D8"]
+title = ". The workspace kernel is incipit (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D9"]
+title = ". The reservoir service crate is catchment (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D10"]
+title = ". Squish the sprawl; free names before spending them (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D11"]
+title = ". Sweep the whole tree (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D12"]
+title = ". state-witness and mere-framing go to Eidetic (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D13"]
+title = ". The canvas takes the cartography name; pictograph shrinks to faces (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D14"]
+title = ". Retire the five dead registries now (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
@@ -859,8 +915,8 @@ draws_on = ["isocosm:962"]
 title = "Seams and formats"
 source = "design_docs/doctrine.md"
 area = "The stack"
-summary = "Open contracts separate producers, hosts and runners; capabilities name supplier, grant and lifetime owner; extension follows data, scripts, components and native crates by call cost."
-draws_on = ["distillery-extraction D8", "distillery-extraction D9", "distillery-extraction D15", "house-style D15", "isocosm:27", "isocosm:77", "isocosm:78", "isocosm:1000"]
+summary = "Open contracts separate producers, hosts and runners; open formats first, useful cheap drafts included and labeled by status; capabilities name supplier, grant and lifetime owner; extension follows data (packs hold all recognition as open names over axes the core observes, compiled as enums that carry the rest), scripts, components and native crates by call cost."
+draws_on = ["distillery-extraction D8", "distillery-extraction D9", "distillery-extraction D15", "engine-split D1", "house-style D15", "linked-data-platform-lessons D2", "linked-data-platform-lessons D4", "linked-data-platform-lessons D6", "linked-data-platform-lessons D7", "linked-data-platform-lessons D31", "linked-data-platform-lessons D32", "isocosm:27", "isocosm:77", "isocosm:78", "isocosm:1000"]
 replaces = ["stack.5"]
 
 [statements."stack.4"]
