@@ -197,6 +197,15 @@ impl BlockGuestHost {
         pollster::block_on(self.bindings.mere_script_block_adapter().call_describe(&mut self.store))
     }
 
+    pub fn rows(&mut self, block: &wit::Block) -> wasmtime::Result<Result<Vec<wit::Row>, String>> {
+        self.arm();
+        pollster::block_on(
+            self.bindings
+                .mere_script_block_adapter()
+                .call_rows(&mut self.store, block),
+        )
+    }
+
     pub fn choices(
         &mut self,
         block: &wit::Block,

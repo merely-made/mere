@@ -69,6 +69,8 @@ fn describe_claims_one_class_with_its_commands_and_views() {
 fn choices_apply_and_run_cross_as_copied_values_and_refusals_are_values() {
     let (mut host, _dog) = host(Some(100));
     let b = block(vec![0, 1]);
+    let rows = host.rows(&b).unwrap().unwrap();
+    assert_eq!(rows.iter().map(|r| r.label.as_str()).collect::<Vec<_>>(), ["one", "two"]);
     let changes = host.choices(&b, "mark").unwrap().unwrap();
     assert_eq!(changes.len(), 2);
     assert_eq!(changes[1].label, "Row 2");

@@ -17,7 +17,7 @@ wit_bindgen::generate!({
 });
 
 use exports::mere::script::block_adapter::{
-    Attr, Block, Change, Claim, Command, CommandKind, Example, Guest, RunResult, ViewAsk,
+    Attr, Block, Change, Claim, Command, CommandKind, Example, Guest, Row, RunResult, ViewAsk,
     ViewMode, ViewResult,
 };
 use sceno::{
@@ -59,6 +59,15 @@ impl Guest for Component {
                 attrs: vec![Attr { key: "class".into(), value: "fixture".into() }],
             }),
         }
+    }
+
+    fn rows(b: Block) -> Result<Vec<Row>, String> {
+        Ok(b.body
+            .lines()
+            .enumerate()
+            .filter(|(_, l)| !l.trim().is_empty())
+            .map(|(i, l)| Row { index: i as u32, label: l.to_string() })
+            .collect())
     }
 
     fn choices(b: Block, command: String) -> Result<Vec<Change>, String> {
