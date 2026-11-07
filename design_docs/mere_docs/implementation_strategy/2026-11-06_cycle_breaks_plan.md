@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D1, D2, D3 and D5 proceed.
+to do, and F1 is half answered. D1, D2, D3 proceed; D5 became D12 (Woodshed as a guest, design written, held for review).
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -139,16 +139,50 @@ and `ports/graphshell` (`comms` feature) consume it from `murm.git`; Murm's `sig
 `sceno` and `scenomise`, so the cycle is not broken until F1 is closed;** P6 is done when
 F1 is closed and the standard conditions hold with Murm's resolved graph free of `mere.git`.
 
-### P7. D5 Woodshed adapters move into Woodshed
+### P7. D5 and D12: Woodshed becomes a guest of Graphshell's block pane
 
-Done when `ports/graphshell/src/block_editing/bars.rs` (741 lines) and
-`ports/graphshell/src/web_tree/blocks.rs` (1,315 lines) move into Woodshed behind its own
-features (the seam they need from Graphshell is stated first, and is a Graphshell-side trait
-or the existing block interface, not a Mere type moved down); Graphshell's `editable-blocks`
-feature and the `woodshedding` / `woodshed-notation` rows leave `ports/graphshell/Cargo.toml`
-and `ports/graphshell/web/Cargo.toml`; `ports/graphshell/web/Cargo.lock` and the main lock
-hold no Woodshed package; Woodshed's tests of the adapters run in Woodshed against a Mere
-git dependency (Woodshed already depends on Mere, so that edge stays and is the legal one).
+**Reshaped 2026-11-06 by D12** (Mark: "D: Woodshed as a guest"). D5's first wording moved the
+two adapters into Woodshed behind its features. A read of the code showed that cannot be done
+by moving files: `ports/graphshell/src/block_editing/bars.rs` (741 lines, 8 tests) is a data
+adapter, but `ports/graphshell/src/web_tree/blocks.rs` (1,315 lines, no tests) is the whole
+block pane, wired into the private web page state (`TreePage`, `AppCtx`, `Logic`, `Child`,
+`ProbeSnapshot`) at nine call sites in `web_tree.rs`, `controls.rs` and `lane.rs`, and
+`graphshell-web` is a standalone cdylib with no crate above it to register anything. Woodshed
+therefore leaves as a runtime guest. The design is
+[guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md); **nothing moves until Mark
+has reviewed it**, as with P1.
+
+**The seam, stated first.** A guest block adapter is a typed request/response component, the
+WIT interface `block-adapter` in a new world `block-guest`. It receives the block's Djot class,
+body text, attribute map and the selected rows plus the pattern text; it returns choices as
+copied `change` records (the value shape of `block_editing::Change`, not that type), the
+complete desired attribute map, and a view as a `sceno` scene with accessible regions. On the
+host side Mere gets a Rust trait `block_editing::BlockAdapter` that the built-in rhyme adapter
+and the guest wrapper both implement, and the pane looks adapters up by claimed class. No Mere
+type moves down, and no Woodshed type is named by any Mere manifest.
+
+Done when (amended by D12):
+
+- the design is reviewed by Mark and its decisions answered;
+- `block_editing` carries the `BlockAdapter` trait and the pane (`web_tree/blocks.rs`, kept in
+  Mere and generalised) dispatches through it, with rhyme as the built-in implementation;
+- the `block-adapter` interface is in the one WIT world if Mark rules it a protocol item (the
+  design's first decision), or Mere-local if he rules otherwise;
+- Mere's applet host loads a reviewed, signed component pack as a block adapter (a new
+  `power:block-adapter` grant in `capsule_applet`);
+- `bars.rs` with its 8 tests and the notation-view portion of `blocks.rs` live in Woodshed,
+  built there as a signed wasm component pack, with the 8 tests passing in Woodshed (count
+  before and after), and a conformance test in Woodshed that loads the real pack through
+  Mere's host;
+- `editable-blocks` stays as the generic pane's feature but loses `dep:woodshedding`; the
+  `woodshedding` row in `ports/graphshell/Cargo.toml` and the `woodshed-notation` row and its
+  `product` entry in `ports/graphshell/web/Cargo.toml` are gone;
+- `ports/graphshell/web/Cargo.lock` and Mere's main lock hold no Woodshed package, and no Mere
+  test, dev-dependency or committed fixture names a Woodshed package or contains a Woodshed pack
+  (D6);
+- the web build (`ports/graphshell/web/scripts/build-viewer.py`, with its delivery budget)
+  still builds and its digest is checked the way the repo does;
+- the standard conditions hold.
 
 ### P8. Allowlist closed
 
@@ -266,6 +300,18 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   Links: area stack · draws on cycle_breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
 
+- **D12. Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06):** "D: Woodshed as a
+  guest". The generic block pane (Djot documents, rhyme schemes, save, undo, reopen) stays in
+  Mere. Woodshed's part (progression and bars, the example, the Chart/Tab/Score notation view,
+  MusicXML export) leaves Mere and is loaded at runtime as a reviewed guest component, so no Mere
+  manifest or lock names Woodshed. Chosen over moving both files into Woodshed (option A, which
+  needs the private web page state made public and a Woodshed-built product), moving only
+  `bars.rs` (B, which leaves the edge) and dropping editable blocks (C, which loses the pane).
+  Amends D5's means, not its end: Mere stops naming Woodshed. Outcome: new design, written first
+  and held for Mark's review.
+
+  Links: area stack · draws on cycle_breaks D5, D8, D9, host_guest_contract_brief · amends cycle_breaks D5 · plans cycle_breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
+
 ## Findings
 
 Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other repositories'
@@ -316,7 +362,8 @@ clones; its raw edges are not committed).
   (`gemot-site`, `204ee03`) and in `cleromancy/core/Cargo.toml` (`eidetic` at `86e78dd`).
   The check should treat `www.github.com` and `.git` suffix variants as one repository.
 - **Where the cycle map and the docs differ:** the map names `ports/graphshell/web_tree/blocks.rs`;
-  the file is `ports/graphshell/src/web_tree/blocks.rs`. The map says `mere-comms` has "tiny
+  the file is `ports/graphshell/src/web_tree/blocks.rs` (a private module of the `graphshell-web`
+  cdylib, not of the `graphshell` library; see P7 and D12). The map says `mere-comms` has "tiny
   blast radius: `mere-moot` in 2 files plus Signalman"; the consumers are the `moot` port
   (`ports/moot/Cargo.toml:60`) and Graphshell's `comms` and `workspace-editor` features
   (`ports/graphshell/Cargo.toml:76,235`). The map calls C4's `comms` half "Open" in one place
@@ -423,3 +470,5 @@ Illustrative design, not compile-ready code.
   host, `personal-facts`), where each app registers, the split of `embedded_reservoir_validation`
   (generic half stays, product half moves), and six decisions for Mark. Design only; for
   Mark's review before P2 and P3.
+- 2026-11-06: D12 recorded and P7 reshaped (Mark chose D, Woodshed as a guest); the design is
+  `technical_architecture/2026-11-06_guest_blocks.md`; nothing implemented, held for Mark's review.

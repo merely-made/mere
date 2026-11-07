@@ -473,7 +473,10 @@ one of Mere's defaults.
 function; it could ship as a WebAssembly component the owner installs, loaded sandboxed by
 the resident, on the family's own WIT idiom (host/guest brief, standards survey). Knot's lane
 cannot (it is iroh and a vault), and Cleromancy's validator would need its graph crates to
-build for wasm (unmeasured). Not proposed now; it is decision (d).
+build for wasm (unmeasured). Not proposed now; it is decision (d). Cycle breaks D12's
+[guest blocks design](2026-11-06_guest_blocks.md) already chooses a reviewed, signed wasm guest
+for Woodshed's parts; a validator component would share that delivery path, and (d) should be
+answered with it in view.
 
 ### 6. What the shared dev and test fixtures become
 
