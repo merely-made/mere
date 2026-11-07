@@ -726,3 +726,8 @@ Illustrative design, not compile-ready code.
   Mere. Cycle proof: Murm to Mere edges remain (Findings, P5 and P6 findings) and Mere to Murm
   unchanged in direction, so the cycle stands, held by `portable-scenes` and `signalman-desktop`.
   The F1 measurement and three options are in Findings; not ruled.
+- 2026-11-06: SHAs for the two entries above: Mere `28a0be22a` (the commit that carries them);
+  consumer Turnstone `f3a9e445` (relocked onto current mains, `mere-comms` now from `murm.git`; lib check
+  clean with and without `peers`, 10 `captured_collection` tests pass). No other family lock names
+  `mere-comms`, and `murm-resolve` has no consumer outside Murm.
+
