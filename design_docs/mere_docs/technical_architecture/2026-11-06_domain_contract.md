@@ -5,6 +5,9 @@ ruled one kind of store (O8) and C1 to C8 on 2026-11-06, and Cleromancy is
 checked against it. Written for M0 of
 [the domain adoption plan](../implementation_strategy/2026-11-05_domain_adoption_plan.md),
 which made every application's authored store a reservoir mere (D8).
+The last section, "Registration contract" (2026-11-06), is P1 of
+[the cycle breaks plan](../implementation_strategy/2026-11-06_cycle_breaks_plan.md):
+a design for review by Mark before P2 and P3, not a ruling.
 
 **For:** one written contract that every domain and every client builds
 against, so that Woodshed, Redshank, Hocket, Knot and the rest move into the
@@ -222,3 +225,693 @@ the old stores stay on disk untouched.
 This document names what a domain supplies and what a client may do,
 and Cleromancy is checked against it with any changes recorded. O8 and C1
 to C8 are ruled, and Cleromancy is checked. M0 is done.
+
+## Registration contract: how a domain reaches the resident (cycle breaks P1, 2026-11-06)
+
+**Status:** design for Mark's review; nothing implemented, no manifest touched. Written
+for P1 of [the cycle breaks plan](../implementation_strategy/2026-11-06_cycle_breaks_plan.md)
+under its D1 ("Resident stops depending"). Read against Mere `1a26ec4e6`, Eidetic
+`617f46a`, Knot and Cleromancy `main` of 2026-11-06. Line numbers are at those revisions
+and are citations, not contracts. Illustrative code below is illustrative, not compile-ready.
+
+**Not here:** the code moves (P2, P3), the Stickleback domain trait itself (C5, Eidetic's),
+replication (M4), the wire protocol (the Graphshell layer).
+
+### 1. What this builds on, and what does not exist yet
+
+- **The domain interface (C5) is a ruling, not code.** Eidetic's `stickleback` has the
+  admission half: `OperationPolicy<E>` (`eidetic/crates/stickleback/src/processor.rs:124`,
+  "Domain-owned admission policy") and the causal helpers in `causal.rs` ("Domains still own
+  their event grammar and fold"). No trait bundles grammar, fold and policy; Knot's
+  `KnotSyncPolicy` (`knot-editor/crates/knot-editor/src/sync.rs:312`) is the one real
+  implementation. So this design cannot wait on C5. It gives the registration a slot for
+  it (`Authority::Log`, below) and registers what exists today: a graph authority (pandect
+  validators) and a lane (Knot's resident composition).
+- **M1's registry is not built, but half of it exists.** The adoption plan's M1
+  ([domain adoption plan](../implementation_strategy/2026-11-05_domain_adoption_plan.md),
+  "M1. A domain registry for both compositions") says both compositions are "hard-coded to
+  install Cleromancy's authority", and that each domain names "its id, its validator and its
+  owning application". Still true: `bin/djinn.rs:1408` and `embedded_reservoir.rs:250` both
+  call `with_divination_authority()`. The existing seam: `MereRoutes::with_domain_validator`
+  (`resident_mere.rs:335`, a `BTreeMap<String, GraphValidator>` in `Routes`), the embedded
+  hook `ReservoirAttachment::open_with(.., configure)` (`embedded_reservoir.rs:260`, "the
+  owner's domain registration hook"), and `ResidentEndpointCatalog::register_erased`. M1 is
+  mostly generalising these. M2 (validators required) is the same code: `serve` refuses a
+  domain without a validator only for the literal list `"divination" | "personal-facts"`
+  (`resident_mere.rs:374`).
+- **The presenting half is already registered at runtime, out of process.** README "App-owned
+  projections" (`ports/mere-resident/README.md`): an application connects to the app door,
+  offers a projection, and the owner's `projection_providers` setting permits it. Knot's
+  `knot_endpoint projection-provider` does this with no Knot-specific registration in Djinn
+  ("Djinn neither opens it nor creates a Knot-specific registration"). Per the
+  [host/guest brief](../research/2026-11-06_host_guest_contract_brief.md) (c), that half
+  rides the contract's `projection-provider`; the rest is in-process Rust. This design is
+  about the rest.
+
+### 2. The contract
+
+**Registration is a value an app crate builds and the process that owns the store hands to
+the resident at composition, before any route is served.** The resident already enforces
+that order (`Arc::get_mut(..).expect("set validator before cloning or serving routes")`,
+`resident_mere.rs:340`); the contract makes it a typed error. Registration is not hot-plug.
+It confers no admission: the owner's grants and the app's declaration still decide who may
+open `mere/<domain>` (adoption plan D24, `applications::grant_for`).
+
+```rust
+// Illustrative. Lives in Mere (mere-resident, or a small crate it re-exports).
+pub struct DomainRegistration {
+    pub domain: DomainId,            // named for the data: "divination", "notes"
+    pub owner: AppId,                // owning application label (M1)
+    pub version: &'static str,       // grammar version, shown in status
+    pub authority: Authority,        // required: M2 refuses a registration without one
+    pub lane: Option<Box<dyn LaneFactory>>,
+    pub custody: CustodyNeeds,       // epoch derivations it asks for, from its own AppDeclaration
+}
+
+pub enum Authority {
+    /// Today: pure, no I/O, no clock, deterministic over the graph (item 4 above).
+    Graph { complete: pandect::GraphValidator,
+            admission: Option<pandect::GraphAdmissionValidator> },
+    /// When C5's Stickleback domain interface exists: grammar, fold, admission.
+    Log(Arc<dyn StickDomain>),       // StickDomain: Eidetic's, not yet written
+    /// A lane with no reservoir mere (the Knot document vault until `notes` exists).
+    None,
+}
+
+pub trait LaneFactory: Send + Sync {
+    fn label(&self) -> &'static str; // "knot": names the route and the lifecycle events
+    fn open(&self, cx: LaneContext) -> BoxFuture<'_, Result<Box<dyn Lane>, String>>;
+}
+pub trait Lane: Send {
+    fn route(&self) -> LaneRoute;    // route name, display label, notice cadence
+    fn session(&self, cx: &AdmittedEndpointContext) -> Result<Box<dyn ResidentEndpoint>, String>;
+    fn refresh(&mut self) -> BoxFuture<'_, Result<bool, String>>;  // pairing, readers, dial hints
+    fn close(self: Box<Self>) -> BoxFuture<'static, Result<(), String>>;
+    fn facts(&self) -> Vec<(&'static str, String)>;                // loggable, never keys
+}
+pub struct LaneContext {
+    pub persona: PersonaId, pub data_root: PathBuf,
+    pub settings: serde_json::Value, // owner's `lanes.<label>` entry, opaque to Mere
+    pub epochs: EpochKeys,           // custody release, limited to `custody`
+    pub blobs: BlobLease,            // the resident's one blob store, lent per scope
+}
+pub struct DomainRegistry;           // register(..) -> Result<Self, RegistryError>; mere_defaults()
+```
+
+**What a domain hands the resident:**
+1. Identity: `domain`, `owner`, `version`.
+2. Authority, the part Mere cannot supply: the complete-candidate validator (and the
+   optional before/after admission check) for a graph domain. The resident calls it for
+   "edits, archive save/open/compose and loaded sessions" (doc of `with_domain_validator`,
+   `resident_mere.rs:333`), and on receivers under C3 and C6, so it must read only the graph.
+3. A lane factory, only for a domain with a live component beside the store: a route, a sync
+   host, a vault. Cleromancy has none; Knot has one today.
+4. Its custody needs, taken from the app's own `AppDeclaration`, so the resident "asks for no
+   more than Knot states it needs" (`resident.rs:92-97`) without Mere naming `knot_editor`.
+5. A settings parser inside the lane (the lane receives opaque JSON and keeps its own
+   `deny_unknown_fields`, as `KnotResidentSettings` does at `settings.rs:538-545`).
+
+**What the resident hands back:**
+1. A served route `mere/<domain>` under that authority, same in the daemon and the embedded
+   resident, and a refusal for any product domain without a registration (M2, generalised
+   from `resident_mere.rs:374`). The refusal is typed (`domain-not-registered`, with the
+   registered ids) so a client shows "unavailable" and never embeds a second store (the
+   client rule above: a door that refuses never leads to embedding).
+2. For a lane, `LaneContext`, and a **gate owned by Mere**. Today `KnotGate` and
+   `GatedSession` (`resident_knot.rs:61`, `:122`) cut live sessions and refuse opens while
+   the vault is locked (vault lock ruling 48). Nothing in them is Knot's except `arm`
+   (`:77`); they generalise to a `LaneGate` the resident wraps around every lane's
+   `session`, so a domain cannot forget the lock rule. The resident calls `open` after
+   unlock, `refresh` on its tick (`djinn.rs:1513`, `:1610`), `close` on lock (`djinn.rs:1588`)
+   and `open` again on unlock (`:1597`).
+3. Custody: epoch keys only for the derivations in `custody`; anything else is refused
+   (the policy check in `resident.rs:101-103`).
+4. Blobs: a lease on the resident's single blob store, scoped per lane (today
+   `ResidentBlobCustody::authorizer`, `bind_scope`, `migrate_legacy_store`). Its type moves
+   to Eidetic under the resident split plan's S4; the contract names the lease, not the
+   crate.
+5. Status and events: each registration appears in resident status (id, owner, version,
+   lane open or closed). Lifecycle events keep their names, `"{label}-closed"` and
+   `"{label}-reopened"` (`djinn.rs:1593`, `:1600`), so the event file stays byte-identical
+   for the harness lifecycle, as the split plan's S6a requires.
+
+**Rules.** Duplicate `domain` or lane `label` is refused. A registration after the first
+`serve` is refused. A lane that fails `open` fails that domain only, loudly, as
+`resident.rs:185-196` does for Knot (it closes blob custody first, then reports).
+Registration comes from code linked into the process that owns the store. A connecting
+application cannot install authority, the property the comment at `resident_mere.rs:147-149`
+states ("applications cannot select a weaker callback"): an embedding application is its
+own store's owner, and the daemon's builder chooses what the daemon carries.
+
+### 3. What the resident needs from a domain today, by name
+
+**Knot** (the only lane). Quoted from `ports/mere-resident` at `1a26ec4e6`.
+
+| Need | Call site | Kind |
+|---|---|---|
+| Sync host over iroh and p2panda: `KnotSyncHost::open_with_scoped_evidence(&store, &signing_seed, host_config, blobs, readers, max_artifact_bytes)` | `resident_knot.rs:303-317`; config `sync_host_config` `:408`; `apply_authority` and `refresh_dial_hints` `:357-380`; `node_id`, `space_id` `:382-395`; `close` `:397`. Feature `peers`, `Cargo.toml:142-144` | lane |
+| Vault open from custody keys: `PersonalVaultKeys::requests()`, `from_released`, `StartupUnlockedPersonalVault::open`, `into_resident_source` | `resident_knot.rs:238-255` | lane |
+| Epoch derivation checked against Knot's declaration: `knot_editor::declaration::app_declaration().custody.epoch` | `resident.rs:95-97` | lane custody |
+| Retained evidence on the shared blob store: `migrate_legacy_store(.., LEGACY_KNOT_LEASE)`, `bind_scope`, `KnotContentRetentionPort::borrow_scoped`, `readers.retain` | `resident_knot.rs:257-300`; const `resident_blobs.rs:29` | lane blobs |
+| Route over a gate: `register_erased(RESIDENT_KNOT_ROUTE, "Knot", ..)`, `KnotGate::arm`, `close` | `resident_knot.rs:61-120`, `:335-343`; `resident.rs:466-475`; `djinn.rs:1359` | lane route (gate generic) |
+| Owner selection: `OwnerSettings.knot: Option<KnotResidentSettings>` | `settings.rs:151-152`, `:538-560` | lane settings |
+| Lifecycle: open, refresh, close on lock, reopen, log node and space | `resident.rs:41-44`, `:183-196`, `:259-262`, `:510-553`; `djinn.rs:1256`, `:1513`, `:1577-1614` | lane lifecycle |
+| Relation intake: `KnotRelationProjection::from_store`, `import_knot_relations` into a pandect `GraphSession` | `knot_relation_intake.rs:72`, `:138`; exported `lib.rs:22`; no caller in the resident | importer, see 4 |
+| `mere-overlay`: Knot's `MereOverlay` driving the route through the door | dev-dependency `Cargo.toml:295-296`; tests `resident_mere.rs:3691`, `:3789`, helper `knot_door` `:3625` | client test, see 4 |
+
+**Cleromancy** (authority only).
+
+| Need | Call site | Kind |
+|---|---|---|
+| `validate_divination_graph(graph).map_err(..)` installed for `"divination"` | `with_divination_authority`, `resident_mere.rs:150-158` (line 154 names the crate); `Cargo.toml:117` | graph authority |
+| The same hard-coded in both compositions | `bin/djinn.rs:1408`; `embedded_reservoir.rs:250` (the default of `open`) | composition |
+| Read-only replay check with the same validator | `bin/c1_receipt_host.rs:374`; install `:536` | receipt host, see 4 |
+| `with_personal_facts_authority` (installed by the same call) | `resident_mere.rs:162-168`, over `mere-facts` | Mere's own crate, not Cleromancy |
+| Cleromancy's own embedding call, the template for any app | `cleromancy/src/ui/worker.rs:165-167`: `open_application(options, &mut prompt, \|routes\| async { Ok(routes.with_divination_authority()) })` | app side |
+
+Not named by a cargo row but part of the same coupling: 29 references to `cleromancy_domain`
+in `resident_mere.rs` (one production, in `:154`; the rest in the four `natal_*` tests,
+`:2502`, `:2568`, `:2649`, `:2730`), and 28 in `tests/embedded_reservoir_validation.rs`.
+
+### 4. How each use maps, and what is not domain behaviour
+
+| Use | Maps to | After |
+|---|---|---|
+| Knot sync host, vault open, epochs, blobs, route, settings, lifecycle | `Lane` registered by Knot (`label` `"knot"`, `Authority::None`) | `ResidentKnot::open_through` (`resident_knot.rs:209-330`) and its settings type move to Knot as a lane factory; `KnotGate` and `GatedSession` generalise into Mere's `LaneGate`; `OwnerSettings.knot` becomes `lanes.knot` |
+| `knot_epochs` closure | the generic `EpochKeys` limited by the registration's `custody` | the Knot declaration stays in Knot; Mere's `resident.rs` loses its one Knot name |
+| Relation intake | **not domain behaviour.** An importer from Knot's verified projection into a Mere graph session; nothing in the resident calls it | leaves the resident, app-owned: `knot_relation_intake.rs` (349 lines) to Knot with its test file (817 lines, 6 tests). Knot already consumes Mere's graph crates for other reasons |
+| `mere-overlay` tests | **not domain behaviour.** Knot as a client of `mere/<domain>`; the route's archive and merge behaviour is covered at intent level in Mere (`resident_mere.rs:4966`, `:5213`) | the two tests and `knot_door` move to Knot as consumers of the resident; Mere loses the `mere-overlay` dev-dependency |
+| `knot-document` workspace row (`Cargo.toml:279`) | not used by Mere's graph except through `knot-editor` | leaves with the rows |
+| Cleromancy validator | `Authority::Graph { complete: validate_divination_graph, admission: None }` registered by Cleromancy | `with_divination_authority` leaves Mere; `djinn.rs:1408` and `embedded_reservoir.rs:250` read the registry |
+| `personal-facts` authority | **Mere's own domain**: `mere-facts` is `crates/domain/personal-facts` in Mere | stays; the registry's `mere_defaults()` installs it unconditionally, so it no longer rides inside the Cleromancy call. Cleromancy still depends on `mere-facts` from `mere.git`, which is the legal direction |
+| `c1_receipt_host` | **not resident behaviour.** "Explicit public synthetic resident for the Cleromancy C1 headed lane" (`:1`) | moves to Cleromancy as a binary consuming `mere-resident`; Mere keeps the `custody-receipt-host` feature for the other receipt hosts |
+| Cleromancy natal tests in `resident_mere.rs` (4) | product conformance of Cleromancy's authority through the resident | move to Cleromancy; Mere keeps the generic `domain_authority_checks_route_batches_archive_compose_and_first_edit_forks` (`:4851`) over a fixture validator |
+| `with_divination_authority()` used as a mere fixture | not Cleromancy: tests that need *some* validator for the domain id `divination` | switch to `with_domain_validator` with a fixture, at `tests/embedded_reservoir_two_process.rs:484`, `tests/mere_two_process.rs:162`, `tests/reservoir_access.rs:137`, `examples/knot_overmap_live_host.rs:169` (the example itself is Knot's), `resident_mere.rs:2392` |
+
+Also check in P2: `tests/declared_applications.rs` and `tests/app_projection_offers.rs` use
+`knot_editor::declaration` and `knot_editor::KnotEndpoint` as a guest fixture. They are
+Mere-door tests with Knot as a convenient guest; P2 replaces the guest with a fixture
+application in Mere (the repository has `tests/fixture_declarations`) and moves any
+Knot-specific assertion to Knot. String app ids (`"knot-editor"`, `"cleromancy"` in grants,
+`tests/fixtures/owner_applications.json`) are data, not dependencies, and stay.
+
+### 5. Where each app's registration call lives, and the process shapes
+
+The rule: **the registration call is in the binary or host crate that composes the
+resident**, and that crate depends on Mere (an app consumes its host). Mere's manifests name
+neither. Three launches exist today.
+
+**Embedded resident (Cleromancy).** The app binary links `mere-resident`
+(`cleromancy/Cargo.toml:44`) and passes the hook to `open_application`
+(`cleromancy/src/ui/worker.rs:165`). After P3 the hook body is
+`registry.register(cleromancy_core::registration())` instead of `with_divination_authority()`.
+The only change is whose name the call carries. The embedded default
+(`ReservoirAttachment::open`, `embedded_reservoir.rs:241-250`) stops installing anything.
+
+**The daemon (`djinn`).** `ports/mere-resident/src/bin/djinn.rs` (1,712 lines) composes
+everything in `run(args, events)` (`:1069`, about 580 lines), including the Knot lane
+(`resident.rs`) and the routes (`:1397-1408`). It is built from Mere's manifests, so it
+cannot link Knot or Cleromancy. Therefore:
+- the composition body moves into `mere_resident` as a library entry taking a
+  `DomainRegistry`;
+- Mere's own `bin/djinn.rs` becomes a thin `main` passing `mere_defaults()` (the
+  personal graph replica, personal facts): a resident with no product domains;
+- **the resident an owner installs is a distribution binary** that passes
+  `mere_defaults()` plus Knot's and Cleromancy's registrations. It lives where both domain
+  crates are legal dependencies, which is above Mere, Knot and Cleromancy (decision (a)
+  below). `install-linux.sh DJINN_BINARY VAULT_CLIENT_BINARY` already takes the binary as an
+  argument, and `--installed`, `--launch <app>` (descriptor 3 handle) and `--resident-status`
+  are unchanged.
+
+**graphshell-mere** (`ports/graphshell/mere`, bin `graphshell_mere`). Door client only: its
+manifest names `graphshell-door` (`projection-door`), `mere-overmap`, `mere-view`, not
+`mere-resident`. It has nothing to register and nothing changes. It views whichever meres
+the resident serves; a domain the resident does not carry shows as unavailable. The
+Graphshell reference host's own personal replica (`mere.graphshell/personal-graph/v1`) is
+one of Mere's defaults.
+
+**Can an app in a separate process register?**
+- **Presentation and declaration: yes, today.** The app offers a projection over the app
+  door (the `projection-provider` path above), declares custody epochs and routes in its
+  `AppDeclaration`, and the owner's settings permit it. It cancels when the app
+  disconnects. No change.
+- **Authority and lanes: no, by design.** The validator and the fold must run where the
+  store lives, on receivers that may sync while the app is closed (C3, C6). A callback across
+  a process boundary would make admission depend on a peer's liveness, and a lane is a
+  vault and a socket. The only way for such code to run in the resident is to be linked into
+  it.
+- **What changes about launching.** (1) Stock `djinn` built from Mere carries no Knot or
+  divination authority; the installed resident is the distribution binary. (2) A user who
+  runs stock `djinn` and Cleromancy gets "unavailable" for `divination`, not an embedded
+  fallback, because a door that answers never leads to embedding. This is a regression
+  against today and must be a done-condition of P3: the installed binary carries the
+  registration. (3) The two-process tests already show the pattern for apps' own tests:
+  they re-spawn the test binary as the daemon and register in the child
+  (`tests/embedded_reservoir_validation.rs:442-500`).
+
+**Later, separately: out-of-process authority as a component.** A graph validator is a pure
+function; it could ship as a WebAssembly component the owner installs, loaded sandboxed by
+the resident, on the family's own WIT idiom (host/guest brief, standards survey). Knot's lane
+cannot (it is iroh and a vault), and Cleromancy's validator would need its graph crates to
+build for wasm (unmeasured). Not proposed now; it is decision (d). Cycle breaks D12's
+[guest blocks design](2026-11-06_guest_blocks.md) already chooses a reviewed, signed wasm guest
+for Woodshed's parts; a validator component would share that delivery path, and (d) should be
+answered with it in view.
+
+### 6. What the shared dev and test fixtures become
+
+**`tests/embedded_reservoir_validation.rs` (1,370 lines, 9 test attributes) is two files.**
+It is not wholly Cleromancy's:
+
+| Part | Lines | Tests | After |
+|---|---|---|---|
+| Generic registration conformance: `registered_domain_validator_survives_ownership_and_refuses_complete_batches` over the fixture domain `validated-fixture`, and the child entry `child_serves_the_registered_domain` (shared with the product test) | `1-257`, `319-575` | 2 | stays in Mere over the registry, as the conformance test of this contract |
+| Product replay: `published_divination_authority_survives_three_real_resident_owner_processes` (`:258-318`) and `mod published_replay_regression` | `258-318`, `577-1370` | 1 + 6 | moves to Cleromancy as a consumer; needs the two-process child harness |
+
+The child harness (spawn self as owner, endpoint, durable-bytes check) is shared by both, so
+the split also moves it somewhere both can use: `crates/system/djinn-testkit`, which is "path
+only, unpublished, so packaging drops it" (`Cargo.toml` dev-dependencies), becomes a git
+dev-dependency of the app repositories (`branch = "main"`). A dev edge from an app to Mere is
+the legal direction under D6.
+
+**The Knot tests.** The plan says "five Knot tests"; the tree has four `tests/knot_*.rs`
+files plus three inline tests, so P2 recounts before moving and carries the count:
+`knot_app_route.rs` (152 lines, 1 test), `knot_checkpoint_receiving.rs` (330, 2),
+`knot_relation_intake.rs` (817, 6), `knot_residue.rs` (370, `harness = false`, its own runs,
+the `[[test]]` at `Cargo.toml:352`), the inline test in `resident_knot.rs`, the two
+`knot_overlay_*` tests, and `examples/knot_overmap_live_host.rs` (350 lines). They move to
+Knot as consumers of the resident, with `resident_knot.rs` going with the lane. Knot's lock
+already names Mere, so a dev edge to `mere-resident` adds no cycle.
+
+**What Mere keeps, and must gain (P1b's done-conditions):** conformance tests over a fixture
+graph domain and a fixture lane that prove: duplicate and late registration refused; a
+product domain without authority refused with the typed error; a lane's route refuses and its
+live sessions are cut on lock and serve again on unlock; settings reach the lane opaque;
+status lists registrations; events keep their names. Today only one inline test
+(`resident_knot.rs`) covers the lock behaviour, and it is Knot's.
+
+### 7. Against the resident split plan, the host/guest brief, and D7 to D11
+
+**Resident split plan** ([2026-11-05](../implementation_strategy/2026-11-05_resident_split_plan.md)).
+No slice is contradicted. Interactions:
+- *Constraint wording.* It says "concrete producer registration" stays in Mere, and its D2
+  outcome repeats it. Cycle breaks D1 (later, Mark's) narrows that: the registry
+  mechanism and Mere's own domains' registrations stay; Knot's and Cleromancy's leave.
+  Decision (e) asks Mark to amend the line.
+- *S4* moves `resident_blobs.rs` to Eidetic. P2 touches it (the `LEGACY_KNOT_LEASE` const at
+  `:29` and its test use at `:391`; the lane passes its lease name instead). Per the common
+  rules this is a file the split is moving: P2 waits for S4 or lands the lease-name
+  parameter first (decision (f)).
+- *S6a* moves `resident_events.rs` and requires byte-identical event output. The event
+  names stay `"{label}-closed"`; `diagnostics.rs` and the emit sites stay.
+- *S6* keeps `personal_sync_host.rs`, graph keys and carriage in Mere: the Mere defaults.
+  M4's replication of a `notes` mere will absorb the lane's sync host later; until then the
+  lane carries it.
+
+**Host/guest brief.** Consistent with its (c): the presenting half rides `projection-provider`
+and needs no new design; this section is the in-process rest. It does not widen the
+contract the brief wants narrow.
+
+**D7 to D11: where the registration contract belongs.** In Mere, not in
+`merely-made/graphshell`:
+- D8/D9 make the protocol layer a repository whose crates "may depend on nothing in Mere".
+  The registration's authority variant carries `pandect::GraphValidator`, the lane carries
+  `ResidentEndpoint` and `AdmittedEndpointContext` (`graphshell-host`) and `ResidentEndpointCatalog`,
+  all Mere types. It cannot move down without moving the resident's graph with it.
+- The layer already holds the part that is protocol: the `projection-provider` world in the
+  one WIT file (D9, D10) and the chirograph wire. Knot's `projection-provider` feature takes
+  `graphshell-door` from Mere (D11), the app-consumes-host shape this design repeats.
+- C5's data interface belongs to Stickleback in Eidetic, because domains must not depend on
+  Mere's graph crates. `Authority::Log` takes that trait when it exists.
+- If a wasm validator is ever chosen, its WIT world is the protocol layer's, and it joins the
+  one world file under D10's open question about renaming `mere:script@0.1.0`.
+
+**Where the plan's own citations drifted:** the root rows for Knot are now
+`Cargo.toml:278-279` (plan: `:283-284`); the resident rows are `:144` and `:296` (plan:
+`:143`, `:295`). The `[patch."https://github.com/merely-made/mere.git"]` section is at
+`:664`. Its comment says it redirects what Knot names; Cleromancy also names `mere.git`, so
+P2 and P3 decide what leaves by comparing the resolved graph, not by trusting the comment.
+Also: `crates/inker/knot-editor-host` (`Cargo.toml:84`, `:355`) is Mere's own crate and not
+the Knot repository; the check for "Mere names Knot" is the `knot-editor.git` source, not the
+string.
+
+### 8. Decisions for Mark
+
+Answer before P2 or P3 starts. Each has a recommendation.
+
+**(a) Where does the installed resident (the distribution binary) live?**
+1. A new thin repository above Mere, Knot and Cleromancy that builds `djinn` with every
+   first-party registration. One owner of the composition; apps release independently.
+2. In one existing app repository (Knot or Cleromancy). Smaller, but that app then names
+   the other app, an odd edge.
+3. Keep the stock `djinn` only, and wait for wasm validators. No new repository, but Knot's
+   lane cannot be loaded that way, so Knot would stay in Mere and D1 would not close.
+- Recommend 1. It is the only option that closes D1 for both apps, and the installer already
+  takes the binary as an argument.
+
+**(b) Who builds the registry, and when?** The plan has P2 and P3 independent and both
+reusing P1, but both edit `resident_mere.rs`, `resident.rs` and `djinn.rs`.
+1. A phase P1b before them: the registry and the library entry, Mere's own domains only,
+   plus the conformance tests of section 6. P2 and P3 then parallelise.
+2. Fold it into P3 (the smaller, graph-only half) and run P2 after it.
+3. Leave the order open and let two agents collide.
+- Recommend 1. It is M1 and M2 anyway, and keeps P2 and P3 to deletions plus registrations
+  in the app repositories.
+
+**(c) Where does the registration type live?**
+1. Mere (`mere-resident`), with C5's trait in Eidetic and the presenting half in the
+   protocol layer, as in section 7.
+2. Eidetic's Stickleback, including the lane.
+3. `merely-made/graphshell`, the protocol layer.
+- Recommend 1. Options 2 and 3 pull Mere's graph, door and endpoint types below Mere.
+
+**(d) Out-of-process authority.**
+1. Not now: apps register presentation out of process, authority only by linking.
+2. A sandboxed WebAssembly validator component, for graph domains only, later.
+3. A door callback to the app for validation.
+- Recommend 1, noting 2 as a later plan. Option 3 makes admission depend on a peer being
+  alive and breaks C3 and C6.
+
+**(e) The split plan's "concrete producer registration stays in Mere".**
+1. Amend the constraint and D2's outcome to: the registry mechanism and Mere-owned domains'
+   registrations stay.
+2. Leave it and record the exception only in this document.
+- Recommend 1, so two active plans do not disagree (DOC_POLICY §2).
+
+**(f) P2 against S4 (`resident_blobs.rs` moves to Eidetic).**
+1. P2 after S4.
+2. P2 first, with the lease name parameterised, so S4 moves a file that no longer names Knot.
+3. In parallel, coordinated by the lease name.
+- Recommend 2. It touches two lines, removes the Knot name from the file S4 moves, and does
+  not wait on S4's schedule.
+
+Settled in this design, not asked: `personal-facts` stays Mere's own domain and is installed
+by `mere_defaults()`; owner settings keep reading the existing top-level `knot` key as
+`lanes.knot` for one release because they are on users' disks (DOC_POLICY §3 allows the
+shim for real user data); the lifecycle event names do not change.
+
+## Drawing board: where a domain's authority runs (cycle breaks D14 (a), 2026-11-06)
+
+**Status:** design for Mark's review; nothing implemented. Mark answered the registration
+section's decision (a), where the installed resident lives, with "Hmmmm. Let's go back to the
+drawing board." (cycle breaks D14), rejecting all three options as framed. Decisions (b) to (f)
+stand, so P1b (the registry, without any Knot or Cleromancy change) can proceed. P2 and P3 wait
+on this section. Read against the same revisions as the section above, plus a locked
+`cargo check` of `cleromancy-core` on two wasm targets (section 2). Illustrative code is
+illustrative, not compile-ready. The WIT lines are a proposal.
+
+### 1. The premise all three options shared
+
+Every option in decision (a) assumed that a domain's authority is Rust code linked into the
+process that owns the store, so someone has to build a binary that names every domain: a
+distribution repository, one app's repository, or nothing (which fails D1). The code suggests
+that bundles two different things that want different answers:
+
+- **Authority:** what the resident asks a domain, *is this candidate admissible?* It is a
+  function of a graph or an operation, called at author and receiver (C3, C6).
+- **Lane:** a live component beside the store: a vault, a socket, a route. Only Knot has one.
+
+And the second turns out to be transitional (section 2). The registration section above
+specified both together, and `Lane`, `LaneContext` and `LaneGate` are the part of it this
+section puts in question.
+
+### 2. What the code says
+
+**Cleromancy's validator is a pure function over a graph, and mostly not data.**
+`src/host/domain.rs:46`:
+
+```rust
+pub fn validate_divination_graph(graph: &Graph) -> Result<(), HostError> {
+    // Build the replay reader without opening or writing a private backend.
+    let mut reader = CleromancyHost::empty(muniment::MemoryBackend::new());
+    reader.graph = graph.clone();
+    reader.validate_domain()
+}
+```
+
+It opens nothing and reads no clock. Its first block is structural and would fit a table: every
+`cleromancy.*` facet must be in `DOMAIN_FACETS` and sit on a real node; a node carries "exactly
+one domain record"; a record's node id must equal `Graph::node_namespace_id(node.url())`
+(`:62-96`). The rest is replay, not structure:
+
+```rust
+for reading in readings {
+    if self.replay_reading(&reading)? != reading {
+        return Err(ReadingError::ReceiptMismatch("sealed reading".to_string()).into());
+    }
+}
+...
+spread.validate()?;
+self.replay_three_card_spread(&spread)?;
+```
+
+It recomputes each reading from its recorded entropy, re-derives content addresses with
+per-record digest functions (`canonical_facet_values(.., AstrologyChart::digest, ..)`), checks
+spreads against sessions, and, per the resident's own tests, recomputes natal houses, aspects and
+motion (`natal_houses_authority_admits_both_systems_and_refuses_cusp_tamper`,
+`resident_mere.rs:2568`). `src/host` is 4,163 lines in 16 files. The input type is Mere's
+`kernel::graph::Graph`.
+
+**It does not build for wasm today.** Measured 2026-11-06 in the Cleromancy clone, locked,
+toolchain 1.97.1: `cargo check -p cleromancy-core --target wasm32-wasip2` fails in
+`redb 2.6.4` (`E0554`, `#![cfg_attr(target_os = "wasi", feature(wasi_ext))]`), reached through
+`muniment` with its `redb` feature, which `core/Cargo.toml` names. `--target
+wasm32-unknown-unknown` fails in `errno 0.3.14` (`compile_error!`, "The target OS is unknown or
+none"). Neither is Cleromancy's code. It shows that the crate holding the validator also holds
+native-only dependencies, so a guest build needs a validator-only crate or feature split first.
+That is not measured further; the size of the split is unknown.
+
+**Knot's authority is data.** `KnotSyncPolicy::admit`
+(`knot-editor/crates/knot-editor/src/sync.rs:312-366`) checks, in order: the operation's
+`space_id` equals the vault's; the encryption profile equals the vault's; the author is in
+`writers` (an `RwLock<BTreeSet<[u8; 32]>>` that pairing updates); a sealed body is present; under
+`CommonsDataV1` the body decodes strictly as Stickleback's `GroupCiphertext`;
+`validate_causal_metadata(.., KNOT_CAUSAL_LIMITS)`; then
+`Admission::keep(StoreTarget::new(Topic::from(self.space_id), LOG_ID))`. Five parameters (space,
+profile, writer set, limits, log id) and Stickleback's own checks. It is `OperationPolicy`-shaped
+because it is one.
+
+**Knot's lane is a standalone program the resident happens to host.** `resident_knot.rs:209-330`
+opens a persona vault from custody-released epoch keys, lends it the resident's blob store,
+starts an iroh and p2panda sync host, and registers a route over a gate. Knot already ships the
+same thing as separate programs:
+- `knot_sync_host` ("Resident Knot sync for one persona ... stays up and keeps the persona's
+  vault space joined, which is what makes an edit on one device reach the others without either
+  being opened at the time", `knot-editor/crates/knot-editor/src/bin/knot_sync_host.rs`);
+- `knot_endpoint projection-provider`, which offers the route through the app door under the
+  owner's `projection_providers` setting (README "App-owned projections", which also says
+  "Djinn's embedded Knot service remain separate compositions");
+- custody over the door: `resident_knot.rs`'s own header says the epoch release is "the same
+  release its custody route answers Knot's own processes with (dramatis DR-C)", and
+  `tests/declared_applications.rs:131-174` drives Knot as a declared application asking for it.
+
+**Knot's vault is not a reservoir mere.** The lane keeps Knot's own `KnotSyncFileStore` under
+`persona_vault_root(data_root, persona)`; the resident holds no Mere store for Knot. It hosts
+Knot for three conveniences: one shared blob store (split plan S4), one lock gate (ruling 48),
+one daemon. And the end state removes the lane: adoption plan D4 and the one-kind-of-store
+ruling make Knot's operation store the `notes` mere, whose sync is M4, blobs M5 and sealing M3.
+The lane exists until those land.
+
+### 3. The options
+
+Common to all: the registry of P1b and decisions (b), (c) and (f) stand. "D1 closed" means no
+Mere manifest names Knot or Cleromancy and both apps' behaviour is intact.
+
+**Baseline, for comparison: the registration section's linked distribution** (option 1 of the
+old (a)). Moves: nothing; a new repository links Mere, Knot and Cleromancy. Cost: a new
+repository, a `Lane` trait for something that is deleted when M3 to M5 land, release lockstep.
+Closes D1 for both. C3/C6, custody: unchanged from today. Synergy with D12: none.
+
+#### A. Authority as a guest
+
+- **Idea.** A graph domain's validator ships as a signed wasm component that the resident loads
+  at runtime. Proposal, beside `block-adapter` in the protocol layer's one WIT file (D10):
+
+  ```wit
+  interface domain-authority {
+      record claim { domain: string, version: string, graph-format: string }
+      describe: func() -> claim;
+      /// The complete candidate graph, copied, in the declared format.
+      validate: func(candidate: list<u8>) -> result<_, string>;
+      /// Optional before/after check (today's `GraphAdmissionValidator`).
+      admit: func(before: list<u8>, after: list<u8>) -> result<_, string>;
+  }
+  world authority-guest { import log; export domain-authority; }
+  ```
+
+  The protocol layer names no Mere type: the graph travels as bytes with a format tag, and the
+  guest links Mere's graph crates itself, which a guest above Mere may.
+- **What moves.** In Cleromancy: a thin component crate over `validate_divination_graph` (the
+  validator, which is already pure), a signed pack (the D12 path: `PackManifest`, `eidetic` pack
+  signing). In Mere: a wasmtime host in the resident (`crates/script/app-host` already carries
+  `wasmtime = "45"`, shared with `document-host`; `mere-resident` links none today), a loader,
+  and a native review and pin store (today's `CapsuleMount::review` is web only). Nothing in
+  Mere names Cleromancy; `Authority::Guest(ComponentRef)` joins `Authority::Graph(closure)`.
+- **Cost.** (1) The wasm port is blocked as measured in section 2. (2) The validator runs on a
+  *complete candidate* at every edit and load, so each call marshals the whole graph across the
+  boundary; per-call cost is unmeasured and must be, with a fuel limit, because the replay
+  recomputes ephemerides. (3) The 16 MiB component cap of D12 against this dependency closure
+  is unmeasured. (4) A new native host surface in the resident.
+- **C3/C6.** Intact and stronger. The resident runs the same component at author and receiver.
+  Wasm execution is deterministic where native floating point on x86 and arm is not; the replay
+  is an ephemeris recomputation, so C6's "every device reaches the same verdict" is better
+  served by a pinned component than by two native builds. Two new rules are needed: the
+  component's hash is pinned per domain in the reservoir index and must match across paired
+  devices, and an operation arriving where no authority is installed waits as pending (the C4
+  mechanism), never applies.
+- **Custody.** Better than today. The guest imports `log` only, so the validator cannot touch
+  keys or the vault; today linked code shares an address space with the custody client.
+- **Embedded and daemon.** One path for both: the daemon loads installed packs, so stock
+  `djinn` from Mere needs no distribution binary. An embedding app may still pass a native
+  closure built from the same source (same trust as today); a conformance test runs native and
+  wasm over the replay corpus (the seven tests that move from `embedded_reservoir_validation`)
+  and demands the same verdicts.
+- **D1.** Closes it for Cleromancy. Knot's authority also fits (B below), its lane does not.
+- **D12 and the protocol layer.** The same pack, review, grant and signing machinery and the same
+  WIT file. One asymmetry to rule on: a D12 guest is a view, and the host re-applies its result
+  so a lying guest can change only its block's attributes; an authority guest is the gate, and a
+  lying validator admits anything. Review must therefore bind the author's key to the domain and
+  pin the hash, and revoking it refuses the domain.
+
+#### B. Declarative authority
+
+- **Idea.** The domain registers data that the resident interprets: a Stickleback
+  `OperationPolicy` implementation parameterised, not coded.
+- **How much fits.** Knot's `admit` entirely: `DeclaredPolicy { space, encryption profile,
+  writers, causal limits, log id }`, with the writer set owned by pairing (a roster the
+  resident already reconciles, `key_paired_devices`). That is the C5 interface for log domains
+  in its smallest form. For Cleromancy, the structural prefix fits (facet allow-list, one record
+  per node, canonical node id from the url, refuse unknown versions, about 60 of the 380
+  lines of `domain.rs`) and none of the replay does: it is `replay_reading`, address
+  recomputation and cross-record checks, 4,163 lines of domain behaviour in the validator's
+  crate. A policy language that expressed it would be a second Cleromancy.
+- **What moves.** Knot: nothing but a policy value. Mere: a generic interpreter in Stickleback
+  (Eidetic), which C5 wants anyway.
+- **Cost.** Small for log domains; a language for graph domains is the cost that cannot be paid.
+- **C3/C6.** Perfect determinism, no code run. **Custody:** none needed. **Embedded and daemon:**
+  identical. **D1:** closes Knot's authority only. **D12:** none; it is the Stickleback side.
+- **Use.** As the cheap first stage in front of A: reject structurally invalid candidates without
+  a component call.
+
+#### C. App-owned stores
+
+- **Idea.** Knot and Cleromancy own their domains' stores; Mere's resident hosts only generic
+  domains.
+- **What breaks.**
+  - *The reservoir rulings.* Adoption plan D1 (the store owns its lifetimes, one owner under the
+    reservoir index lock), D8 (every application's authored store is held by the reservoir) and
+    the 2026-09-23 ruling ("two browsers should share a mere"). `music` shared by Woodshed and
+    Hocket (D5) cannot be owned by both.
+  - *Custody.* M3 seals every mere under the persona key through the resident; app-owned
+    stores each need their own custody path and sealing, uniform nowhere.
+  - *The door.* `mere/<domain>` would be served by the app's process, so it is absent when the
+    app is closed, and M4 replication would have to be built per app.
+  - *Cross-domain reads.* Cleromancy's facts live in Mere's `personal-facts` domain and its
+    profile-subject check reads the persona vault (`with_profile_subject_authority`,
+    `resident_mere.rs:171-179`); in an app-owned store both must be rebuilt app-side.
+- **D1.** Closes it by retreating from the architecture Cleromancy already uses as a client of
+  `mere/divination`. **D12:** none. Not recommended; it contradicts D8.
+
+#### D. Split authority from lane
+
+- **Idea.** Authority is A or B (guest or data). Knot's live sync lane stops being a resident
+  component and becomes an application the resident supervises.
+- **What moves.** `ResidentKnot::open_through` and its settings leave the resident. What replaces
+  them already exists in Knot: `knot_sync_host` (sync, no projection) and `knot_endpoint`
+  (the route, offered through the door). Mere gains a generic, small supervisor on machinery it
+  has: `application_launcher` (`bin/djinn.rs:412`), `djinn --launch` and the descriptor-3 handle.
+  An owner setting names an application to keep running while the vault is unlocked.
+- **Custody and lock.** The child asks custody over the door under its own `AppDeclaration`
+  (exists). On lock the resident refuses keys and ends the child. Process exit is a stronger cut
+  than `LaneGate` plus zeroizing (ruling 49 exists because seed residue in a live process is the
+  worry), and `knot_residue.rs` has no process left to judge.
+- **Cost.** (1) Blobs. Knot loses the resident's single blob store (split plan S4, "personal-graph
+  transfer and Knot evidence still share one store"): either the child keeps its own iroh blob
+  store, which is the state before S4 (two endpoints on one machine), or blob custody gains a door
+  route (Eidetic's S4 work, later). Users who already migrated need a copy out; S4 says legacy
+  stores are "copied and never deleted", so it is verifiable. (2) The resident's `refresh` tick
+  and `facts` logging become the child's own. (3) The supervisor is new generic machinery.
+- **C3/C6.** Untouched: the lane was never authority.
+- **Embedded.** The Knot desktop links `knot-editor` and runs `KnotSyncHost` itself; no lane is
+  needed in an embedded resident at all.
+- **Daemon.** Stock `djinn` from Mere, no distribution binary.
+- **D1.** With A or B, closes it for both apps. **D12:** with A, the same path for Cleromancy;
+  Knot's side stands alone.
+- **Is it the honest boundary?** Yes, on the evidence. Authority is the part Mere must control,
+  because it is the gate to Mere's store, and it is pure. The lane is the app's own live
+  behaviour on its own vault; Mere never owned that store, and the reservoir end state (M3 to M5)
+  deletes the lane. Building a `Lane` trait and a distribution repository for it would be
+  throwaway work.
+
+#### E. A supervised validator process (not asked, from the code)
+
+- **Idea.** A graph validator ships as a native executable the resident spawns and talks to over
+  stdio, pinned by hash. Precedent: the custodian is a separate process (`djinn-custodian`,
+  custody isolation plan).
+- **Cost.** A binary per platform per domain; an IPC round trip per edit with the whole candidate
+  graph; OS-level sandboxing only; native floating point (no determinism gain). Liveness is the
+  resident's (it spawns), so it avoids the objection to a callback to an app.
+- **C3/C6.** Intact, determinism no better than today. **D1:** closes it. **D12:** none.
+- **Use.** The fallback if the wasm port in A proves too costly.
+
+#### F. Trust the author (rejected)
+
+The resident runs only generic checks and relies on the app having validated before signing.
+C3 requires the full check at the receiver and the resident split plan's constraint is "no
+bypass": a buggy or hostile client could write invalid domain data. Not an option.
+
+#### Side by side
+
+| | Closes D1 | C3/C6 | New machinery | D12 synergy |
+|---|---|---|---|---|
+| Baseline (distribution repo) | both | unchanged | repo, `Lane` trait | none |
+| A. Guest authority | Cleromancy; Knot's policy | stronger (determinism) | wasmtime host, pin and review | full |
+| B. Declared authority | Knot's policy | exact | interpreter in Stickleback | none (C5) |
+| C. App-owned stores | both, by retreat | breaks D8 | per-app everything | none |
+| D. Authority split from lane | both (with A or B) | unchanged | small supervisor | with A |
+| E. Authority sidecar | both | unchanged | per-OS executables | none |
+
+### 4. Recommendation
+
+**D, with B in front of A for authority and E held as the fallback.** In order:
+1. **P1b now,** as D14 ruled, with `Authority` carrying `Graph(closure)` for embedding and Mere's
+   own domains, `Guest` and `Declared` as slots, and **no `Lane` trait**.
+2. **Spike before committing P3:** make a validator-only build of Cleromancy's authority for
+   `wasm32-wasip2` (split off `muniment/redb` and the other native dependencies) and measure
+   (i) it builds, (ii) component size against 16 MiB, (iii) a verdict-equal run over the
+   seven moving tests' corpus, (iv) per-call time on a realistic graph. If it fails, E.
+3. **P2 as a supervisor, not a lane:** Knot's authority is a `DeclaredPolicy`; its sync host
+   runs as the supervised `knot_sync_host`, deleting `resident_knot.rs` from Mere. It is
+   transitional by design.
+4. The distribution repository of the old (a) is not built. If the spike fails and Mark prefers
+   linking to E, the old (a) option 1 is the fallback for Cleromancy alone.
+
+What this changes in the registration section: sections 2 (`LaneFactory`, `Lane`, `LaneContext`,
+`LaneGate`) and 5 (the distribution binary) are superseded if Mark accepts D; sections 1, 3, 4,
+6 and 7 stand, the fixtures table with one change (Knot's resident tests move with the sync host
+into Knot as tests of a supervised process, not of a lane).
+
+### 5. Decisions for Mark
+
+**(g) Is the authority/lane split the boundary?**
+1. Yes: authority as guest or data, Knot's lane as a supervised app, until M3 to M5 retire it.
+2. Authority as guest or data, but keep a `Lane` trait and a distribution binary for Knot only.
+3. Keep the linked distribution of the old (a) after all.
+- Recommend 1: the lane is transitional and Knot already ships it as a program.
+
+**(h) The form of Cleromancy's authority.**
+1. A wasm guest, after the spike in the recommendation.
+2. A supervised native validator process (E).
+3. Linked code in a distribution binary.
+- Recommend 1 with 2 as the fallback. Rule at the same time whether an authority guest needs
+  stronger review than D12's views (author key bound to the domain, hash pinned across paired
+  devices) and whether operations awaiting an absent authority wait as pending: recommend yes to both.
+
+**(i) Knot's blobs while its sync host is supervised.**
+1. The child keeps its own blob store now (two iroh endpoints until M5), with a copy out for
+   users already migrated.
+2. Wait for the door route to the resident's blob custody (S4's follow-on) before moving Knot.
+3. Keep Knot's lane compiled into the resident until M4 absorbs it (leaves Knot named in Mere's
+   manifest, so D1 stays open for Knot).
+- Recommend 1: the cost is bounded and temporary, and it is the only option that closes D1 for
+  Knot without waiting on S4.
