@@ -2452,7 +2452,7 @@ dependencies = [
 [[package]]
 name = "castellan"
 version = "0.0.4"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "argon2",
  "base64 0.22.1",
@@ -2495,7 +2495,7 @@ dependencies = [
 [[package]]
 name = "castellan-client"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "base64 0.22.1",
  "chatelaine",
@@ -2670,7 +2670,7 @@ dependencies = [
 [[package]]
 name = "chartulary"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "muniment",
  "petgraph 0.8.3",
@@ -2684,7 +2684,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "serde",
  "uuid 1.27.0",
@@ -2792,7 +2792,7 @@ dependencies = [
 [[package]]
 name = "cleromancy-core"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#d74a08f8e84560544b33698126fdb55d39111343"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#da704e5c434c239e38789839913b24adc52e052b"
 dependencies = [
  "blake3",
  "chartulary",
@@ -2890,7 +2890,7 @@ dependencies = [
 [[package]]
 name = "commons-spine"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 dependencies = [
  "chartulary",
  "gemot",
@@ -4278,7 +4278,7 @@ dependencies = [
 [[package]]
 name = "cue-netrender"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/wgpu-cue.git?branch=main#7286d216aa6004935986b798674a51e03b872a06"
+source = "git+https://github.com/merely-made/wgpu-cue.git?branch=main#e497715a8d1541e22cf6c0a3e7973f0ead80425f"
 dependencies = [
  "netrender",
  "webcue",
@@ -4339,7 +4339,7 @@ dependencies = [
 [[package]]
 name = "custody-wire"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "base64 0.22.1",
  "dramatis",
@@ -4803,7 +4803,7 @@ dependencies = [
 [[package]]
 name = "distillery"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/distillery.git?branch=main#4ecfd28393dd197d059377231c015cef5c3c84cc"
+source = "git+https://github.com/merely-made/distillery.git?branch=main#ea125ce74508597b304d4a5dec293d091b962861"
 dependencies = [
  "apparatus-core",
  "armillary",
@@ -4863,7 +4863,7 @@ dependencies = [
 [[package]]
 name = "djinn-custodian"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -5018,7 +5018,7 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.5"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "gaz",
  "personae",
@@ -5052,7 +5052,7 @@ dependencies = [
 [[package]]
 name = "dramatis-resident"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -5283,7 +5283,7 @@ dependencies = [
 [[package]]
 name = "eidetic"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "async-trait",
  "blake3",
@@ -5301,7 +5301,7 @@ dependencies = [
 [[package]]
 name = "eidetic-search"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "eidetic",
  "esp",
@@ -5609,7 +5609,7 @@ dependencies = [
  "smallvec",
  "unicode-general-category",
  "unicode-segmentation",
- "vello_cpu 0.1.0",
+ "vello_cpu",
 ]
 
 [[package]]
@@ -5678,7 +5678,7 @@ checksum = "d817e038c30374a4bcb22f94d0a8a0e216958d4c3dcde369b1439fec4bdda6e6"
 [[package]]
 name = "esp"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/distillery.git?branch=main#4ecfd28393dd197d059377231c015cef5c3c84cc"
+source = "git+https://github.com/merely-made/distillery.git?branch=main#ea125ce74508597b304d4a5dec293d091b962861"
 dependencies = [
  "armillary",
  "burn",
@@ -6286,7 +6286,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "insigne",
  "serde",
@@ -6439,7 +6439,7 @@ dependencies = [
 [[package]]
 name = "gemot"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 dependencies = [
  "insigne",
  "mere-proofs",
@@ -6463,12 +6463,12 @@ dependencies = [
 [[package]]
 name = "gemot-address"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 
 [[package]]
 name = "gemot-site"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 dependencies = [
  "blake3",
  "eidetic",
@@ -6486,7 +6486,7 @@ dependencies = [
 [[package]]
 name = "gemot-site-host"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -7084,22 +7084,7 @@ dependencies = [
  "peniko",
  "skrifa",
  "smallvec",
- "vello_common 0.1.0",
-]
-
-[[package]]
-name = "glifo"
-version = "0.4.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
-dependencies = [
- "bytemuck",
- "foldhash 0.2.0",
- "hashbrown 0.17.1",
- "log",
- "peniko",
- "skrifa",
- "smallvec",
- "vello_common 0.3.0",
+ "vello_common",
 ]
 
 [[package]]
@@ -8579,7 +8564,7 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "blake3",
  "ed25519-dalek 3.0.0",
@@ -9345,7 +9330,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "knot-catalog",
 ]
@@ -9353,7 +9338,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9366,7 +9351,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9386,7 +9371,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "cambium",
  "illume",
@@ -9403,7 +9388,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9997,7 +9982,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10347,7 +10332,7 @@ dependencies = [
 [[package]]
 name = "mere-fjall"
 version = "2.11.2"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "byteorder",
  "byteview",
@@ -10477,7 +10462,7 @@ dependencies = [
 [[package]]
 name = "mere-lsm-tree"
 version = "2.10.4"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "byteorder",
  "crossbeam-skiplist",
@@ -10500,7 +10485,7 @@ dependencies = [
 [[package]]
 name = "mere-mesh"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/distillery.git?branch=main#4ecfd28393dd197d059377231c015cef5c3c84cc"
+source = "git+https://github.com/merely-made/distillery.git?branch=main#ea125ce74508597b304d4a5dec293d091b962861"
 dependencies = [
  "blake3",
  "esp",
@@ -10583,7 +10568,7 @@ version = "0.0.1"
 [[package]]
 name = "mere-proofs"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "blake3",
  "serde",
@@ -10736,7 +10721,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10794,7 +10779,7 @@ dependencies = [
 [[package]]
 name = "mien"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 dependencies = [
  "insigne",
  "muniment",
@@ -10997,7 +10982,7 @@ dependencies = [
 [[package]]
 name = "mooting"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/gemot.git?branch=main#f1108c10f061380f942014d5821f4766aa71aece"
+source = "git+https://github.com/merely-made/gemot.git?branch=main#d222235732c8042c1c392d507c4d3b22a81e716c"
 dependencies = [
  "p2mere-core",
  "serde",
@@ -11007,12 +10992,12 @@ dependencies = [
 [[package]]
 name = "mora"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 
 [[package]]
 name = "mora-cmudict"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "mora",
 ]
@@ -11056,7 +11041,7 @@ dependencies = [
 [[package]]
 name = "muniment"
 version = "0.2.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "async-trait",
  "blake3",
@@ -11073,7 +11058,7 @@ dependencies = [
 [[package]]
 name = "murm"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "async-trait",
  "blake3",
@@ -11097,7 +11082,7 @@ dependencies = [
 [[package]]
 name = "murm-ocapn"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "futures-util",
@@ -11110,7 +11095,7 @@ dependencies = [
 [[package]]
 name = "murm-sync"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11132,7 +11117,7 @@ dependencies = [
 [[package]]
 name = "murm-webrtc"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -11149,7 +11134,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11581,11 +11566,14 @@ dependencies = [
 [[package]]
 name = "netrender"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#f8811186cd82b0d4b6758b15c6bcecd415273d52"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ad4be200e997faf680cbc516c2427db222e7d3b6"
 dependencies = [
- "glifo 0.4.0",
  "log",
- "netrender-vello",
+ "netrender-glifo",
+ "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "netrender-vello-common",
+ "netrender-vello-cpu",
+ "netrender-vello-gpu",
  "netrender_device",
  "peniko",
  "postcard",
@@ -11593,12 +11581,42 @@ dependencies = [
  "serde_json",
  "skrifa",
  "tracing",
- "vello_common 0.3.0",
- "vello_cpu 0.3.0",
- "vello_gpu",
  "wasm-bindgen",
  "web-sys",
  "web-time",
+ "wgpu",
+]
+
+[[package]]
+name = "netrender-glifo"
+version = "0.4.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "foldhash 0.2.0",
+ "hashbrown 0.17.1",
+ "log",
+ "netrender-vello-common",
+ "peniko",
+ "skrifa",
+ "smallvec",
+]
+
+[[package]]
+name = "netrender-vello"
+version = "0.11.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "futures-intrusive",
+ "log",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "netrender-vello-shaders 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "peniko",
+ "png 0.18.1",
+ "skrifa",
+ "static_assertions",
+ "thiserror 2.0.21",
  "wgpu",
 ]
 
@@ -11610,14 +11628,52 @@ dependencies = [
  "bytemuck",
  "futures-intrusive",
  "log",
- "netrender-vello-encoding",
- "netrender-vello-shaders",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
+ "netrender-vello-shaders 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
  "peniko",
  "png 0.18.1",
  "skrifa",
  "static_assertions",
  "thiserror 2.0.21",
  "wgpu",
+]
+
+[[package]]
+name = "netrender-vello-common"
+version = "0.3.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "fearless_simd 0.7.0",
+ "guillotiere",
+ "log",
+ "peniko",
+ "smallvec",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "netrender-vello-cpu"
+version = "0.3.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "hashbrown 0.17.1",
+ "log",
+ "netrender-glifo",
+ "netrender-vello-common",
+]
+
+[[package]]
+name = "netrender-vello-encoding"
+version = "0.11.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "guillotiere",
+ "peniko",
+ "skrifa",
+ "smallvec",
 ]
 
 [[package]]
@@ -11633,6 +11689,47 @@ dependencies = [
 ]
 
 [[package]]
+name = "netrender-vello-gpu"
+version = "0.3.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "hashbrown 0.17.1",
+ "js-sys",
+ "log",
+ "netrender-glifo",
+ "netrender-vello-common",
+ "netrender-vello-gpu-shaders",
+ "thiserror 2.0.21",
+ "web-sys",
+ "wgpu",
+]
+
+[[package]]
+name = "netrender-vello-gpu-shaders"
+version = "0.3.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "naga",
+ "wesl",
+ "wesl-macros",
+ "wgsl-parse",
+ "wgsl-types",
+]
+
+[[package]]
+name = "netrender-vello-shaders"
+version = "0.11.0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+dependencies = [
+ "bytemuck",
+ "log",
+ "naga",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "netrender-vello-shaders"
 version = "0.11.0"
 source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
@@ -11640,14 +11737,14 @@ dependencies = [
  "bytemuck",
  "log",
  "naga",
- "netrender-vello-encoding",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
  "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "netrender_device"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#f8811186cd82b0d4b6758b15c6bcecd415273d52"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ad4be200e997faf680cbc516c2427db222e7d3b6"
 dependencies = [
  "log",
  "pollster 1.0.1",
@@ -11868,7 +11965,7 @@ dependencies = [
 [[package]]
 name = "notochord"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "blake3",
  "insigne",
@@ -13430,7 +13527,7 @@ dependencies = [
 [[package]]
 name = "paint_list_api"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#f8811186cd82b0d4b6758b15c6bcecd415273d52"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ad4be200e997faf680cbc516c2427db222e7d3b6"
 dependencies = [
  "euclid",
  "serde",
@@ -13439,7 +13536,7 @@ dependencies = [
 [[package]]
 name = "paint_list_render"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#f8811186cd82b0d4b6758b15c6bcecd415273d52"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ad4be200e997faf680cbc516c2427db222e7d3b6"
 dependencies = [
  "log",
  "netrender",
@@ -13905,7 +14002,7 @@ dependencies = [
 [[package]]
 name = "personae"
 version = "0.3.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "blake3",
  "chacha20poly1305 0.11.0",
@@ -14149,7 +14246,7 @@ dependencies = [
  "mere-forme",
  "mere-kernel",
  "netrender",
- "netrender-vello",
+ "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
  "netrender_device",
  "numen",
  "paint_list_api",
@@ -15530,7 +15627,7 @@ dependencies = [
 [[package]]
 name = "reference-data"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#6c0d7b02919a314972817843563589192caec12e"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#631e1a397bf6cde4404a1238dab2cb8733bdd48a"
 dependencies = [
  "blake3",
  "serde",
@@ -15721,7 +15818,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#76abe84a37932ed6084787bba0a443d91c1d1ab7"
+source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -16720,7 +16817,7 @@ dependencies = [
 [[package]]
 name = "servitor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "chartulary",
  "insigne",
@@ -17365,7 +17462,7 @@ dependencies = [
 [[package]]
 name = "sporran"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5ff7b6f8d2c7d9a24c88797522f8ae5d3347bfdd"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#849622073a1c38b75a9b5494e2f872f056a2cadd"
 dependencies = [
  "async-trait",
  "blake3",
@@ -17388,7 +17485,7 @@ name = "sprigging"
 version = "0.3.0"
 dependencies = [
  "accesskit 0.25.1",
- "netrender-vello",
+ "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
  "paint_list_api",
 ]
 
@@ -17508,7 +17605,7 @@ checksum = "33ae9eec00137a8eed469fb4148acd9fc6ac8c3f9b110f52cd34698c8b5bfa0e"
 [[package]]
 name = "stickleback"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#2df00e08ee5a6b94abc8ea9ef5bb2f67e40f154c"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
 dependencies = [
  "blake3",
  "cbor-core",
@@ -18762,7 +18859,7 @@ dependencies = [
 [[package]]
 name = "turquet"
 version = "0.17.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#d74a08f8e84560544b33698126fdb55d39111343"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#da704e5c434c239e38789839913b24adc52e052b"
 dependencies = [
  "hifitime",
  "sofars",
@@ -19458,70 +19555,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "vello_common"
-version = "0.3.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
-dependencies = [
- "bytemuck",
- "fearless_simd 0.7.0",
- "guillotiere",
- "log",
- "peniko",
- "smallvec",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "vello_cpu"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac7349e1f55f6b801c7c277958df4ea53e7f20f21e8014910ad888b2ecda93ea"
 dependencies = [
  "bytemuck",
- "glifo 0.2.0",
+ "glifo",
  "hashbrown 0.17.1",
- "vello_common 0.1.0",
-]
-
-[[package]]
-name = "vello_cpu"
-version = "0.3.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
-dependencies = [
- "bytemuck",
- "glifo 0.4.0",
- "hashbrown 0.17.1",
- "log",
- "vello_common 0.3.0",
-]
-
-[[package]]
-name = "vello_gpu"
-version = "0.3.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
-dependencies = [
- "bytemuck",
- "glifo 0.4.0",
- "hashbrown 0.17.1",
- "js-sys",
- "log",
- "thiserror 2.0.21",
- "vello_common 0.3.0",
- "vello_gpu_shaders",
- "web-sys",
- "wgpu",
-]
-
-[[package]]
-name = "vello_gpu_shaders"
-version = "0.3.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
-dependencies = [
- "naga",
- "wesl",
- "wesl-macros",
- "wgsl-parse",
- "wgsl-types",
+ "vello_common",
 ]
 
 [[package]]
@@ -21486,7 +21528,7 @@ dependencies = [
 [[package]]
 name = "woodshedding"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/woodshed.git?branch=main#3bce78e23fc15e473ffea74be1b36394f70603f8"
+source = "git+https://github.com/merely-made/woodshed.git?branch=main#93dad41443081870b08b791bd1c02e8bfe6f71a8"
 dependencies = [
  "roxmltree 0.21.1",
  "serde",
