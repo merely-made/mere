@@ -872,4 +872,27 @@ Illustrative design, not compile-ready code.
   `woodshed-core --features portable-scenes` 329 passed, `woodshed-views` 309 passed, `audio-pack-views` 5
   passed). Mere `f2af7218` is the commit that carries the D17 record. No other family repository names
   `scenomise::backdrops` or `::template`.
-
+- 2026-11-06: P7 (D12, D13, D16) implemented except the pieces named below. Graphshell `40cadadf`
+  (the `block-guest` world and `vector-sheet`; 291 to 299 tests), `d66d6495` (`rows`), `40e8c8df`
+  (argument and pattern fields). Mere, in order: `deb7bc974` (Pandect `Backend` impl non-`Send` on wasm,
+  the web wasm build was already broken there), `ea1103089` (BlockAdapter trait, registry, memo, rhyme as
+  the built-in adapter, sheet painter; also relocks the web lock's `md-5` and `sha1` to 0.10 because
+  `spareval` mixed digest versions on wasm), `88834c656` (`crates/script/block-host` with a Mere-built
+  fixture guest, 5 tests), `a8ab87b15` (`power:block-adapter`), `9749d7cac` and `a321a2ac8` (rows and
+  fields), `85a7d4f06` (WorkerAdapter and memo), `fc0278801` (the pane dispatches through the
+  registry; guest views painted from the vector sheet; unclaimed class disabled, named, with
+  "Review block adapters"), `261dcc689` (`graphshell-blocks`: `GuestAdapter` over block-host and a
+  reviewed mount, 4 tests), `4cc999786`, merge `2654967a8`, and `4bba47f72` (delete `bars.rs`, drop the
+  `woodshedding` and `woodshed-notation` rows, relock: neither Mere lock holds a Woodshed package).
+  Woodshed: `9cb2c053` (`woodshedding` feature `blocks`), `a6c45fba`, `0e6a69dd` and `73f3c901`
+  (`woodshed-notation` feature `block-guest`; the component is 1,652,723 bytes), `0e2f0450` (hocket
+  relock), `44617484` (the pack builder example and the conformance test through Mere's host).
+  Tests: `block_editing` 26 before, 37 after (8 `bars` tests left; adapter, worker, sheet leaf and
+  rhyme-scene tests joined); the 8 `bars` tests are 8 in Woodshed (5 unchanged and 3 rewritten in
+  `woodshedding`) plus 3 conformance tests and 9 guest tests. **Not done:** the host-neutral
+  `block_pane` extraction and a native Cambium window for `graphshell-blocks` (the crate has the
+  host and a headless render receipt, not a window); the web Worker's JavaScript side and the
+  headed web check (no node, jco or wasm-bindgen CLI on this Mac; the web wasm still checks and the
+  `WorkerAdapter` is tested against a scripted transport); the four notation scenarios under
+  `ports/graphshell/web/scenarios/` still name the old Woodshed controls. Details in
+  guest_blocks "Implementation status".

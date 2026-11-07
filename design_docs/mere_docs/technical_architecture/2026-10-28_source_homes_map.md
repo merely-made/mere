@@ -613,6 +613,10 @@ Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
   one isolated root: `signalman-desktop` (cycle breaks D17); `mere-comms` moved into Murm (D4, P6)
   and the `backdrops` slice of `scenomise` moved to Graphshell as `sceno-backdrops` (D17, 2026-11-06),
   so no Murm lock outside that root names Mere.
+  Mere↔Woodshed no longer works this way: Woodshed's progression adapter and notation view are a
+  guest component (`woodshedding` feature `blocks`, `woodshed-notation` feature `block-guest`)
+  that Mere's block pane loads under review through the `block-guest` world in the Graphshell
+  protocol; no Mere lock holds a Woodshed package (cycle breaks D5, D12, D13, D16, P7).
   - A separate workspace root inside the receiving repository keeps that
     repository's lockfile and CI scope free of Mere. Murm's
     `apps/signalman-desktop` already does this.
