@@ -561,6 +561,7 @@ persona-picker = { package = "persona-picker", path = "crates/cambium/persona-pi
 # slice, distinct from genet's full ScriptEngine seam). Pure Rust, sandboxed.
 script-rhai = { version = "0.0.1", path = "crates/script/rhai" }
 script-wire = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+vector-sheet = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 script-witgen = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 settings-wit = { version = "0.0.1", path = "crates/system/settings-wit" }
 
