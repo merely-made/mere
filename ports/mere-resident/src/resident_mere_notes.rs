@@ -164,7 +164,7 @@ impl MereEndpoint {
     /// Whether this mere's writes need a journaled domain candidate, which a
     /// note is not.
     fn domain_bound(&self) -> bool {
-        matches!(self.shared.domain.as_str(), "divination" | "personal-facts")
+        self.shared.domain_bound()
     }
 
     /// The graph's epoch, and the notes revision: the graph's revision moved
