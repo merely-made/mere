@@ -866,4 +866,10 @@ Illustrative design, not compile-ready code.
   counts in Findings (D17 findings): no Murm package depends on a Mere package outside
   `signalman-desktop`, the declared isolated root. P8's allowlist therefore keeps that second isolated
   entry. Woodshed follows in the next entry.
+- 2026-11-06: D17 follow-up: Woodshed `c35afb0e` (the one consumer outside Mere that used
+  `scenomise::backdrops`/`template`: `woodshed-core`, `woodshed-views`, `audio-pack-views` import from
+  `sceno-backdrops`; relocked onto current mains; workspace `--all-targets --all-features` check clean,
+  `woodshed-core --features portable-scenes` 329 passed, `woodshed-views` 309 passed, `audio-pack-views` 5
+  passed). Mere `f2af7218` is the commit that carries the D17 record. No other family repository names
+  `scenomise::backdrops` or `::template`.
 
