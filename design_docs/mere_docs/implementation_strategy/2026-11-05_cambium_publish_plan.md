@@ -2,7 +2,7 @@
 
 **Status:** 2026-11-06: in progress. P0 landed in Mere and every consumer (Woodshed and its
 Hocket/Redshank ports, Knot, Cleromancy, Isocosm, Turnstone, Signalman); P1's accesskit removal
-landed. Nothing is published yet.
+landed, and so did its Vello renames (Netrender ad4be200e). Nothing is published yet.
 
 **For:** publishing the Cambium desktop chain to crates.io so that applications outside Mere,
 first the Dramatis application (source homes map, ownership cut 1), depend on registry
@@ -114,6 +114,15 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
 
 ## Progress
 
+- 2026-11-06: P1's Vello item done (D5). The fork's sparse crates are `netrender-vello-common`,
+  `-cpu`, `-gpu`, `-gpu-shaders` (0.3.0) and `netrender-glifo` (0.4.0; Mark, 2026-11-06,
+  "netrender-glifo"), with library names unchanged, on `mark-ik/all-vellos` at `7784613` on top
+  of `dfb9b53b` (Mark: "Branch tip dfb9b53b"). Netrender `ad4be200e` takes them; its lock is a
+  pure rename. A combined `cargo publish --dry-run` packages and verifies all five against
+  cargo's temporary registry. Netrender's `vello-all` tests pass except three Classic-path GPU
+  tests that fail identically on the parent (`compose_into_01_identity_matches_render`, two
+  `cast_slice` alignment panics); no Netrender test triggers `CurveFlattening`, which only the
+  fork tests.
 - 2026-11-06: P0 done. The rename reached every consumer in the same round that restored the
   family source convention (family brief, "Family source convention", upheld 2026-11-06):
   Woodshed 17ff090d, Knot 40ac979, Cleromancy 4df159b, Turnstone 5be7608c, Murm/Signalman
