@@ -25,6 +25,7 @@ hest = { workspace = true }
 meristem = { version = "0.2.0", path = "../meristem" }
 sprigging = { version = "0.3.0", path = "../sprigging" }
 sceno = { workspace = true }
+sceno-backdrops = { workspace = true }
 scenograph = { workspace = true }
 scenomise = { workspace = true }
 genet-scripted-dom = { workspace = true }

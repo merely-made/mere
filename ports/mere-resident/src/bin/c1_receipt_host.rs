@@ -533,7 +533,8 @@ async fn main() {
         catalog.clone(),
         grants.clone(),
     )
-    .with_divination_authority();
+    .with_resident_defaults()
+    .unwrap();
     routes.load_access(&reservoir).await.unwrap();
     for mere in reservoir.meres().await {
         routes.serve(&mere).await.unwrap();

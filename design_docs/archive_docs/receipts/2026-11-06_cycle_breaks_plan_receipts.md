@@ -92,3 +92,28 @@
   lock text names no `murm` or `mere-comms`): Mere `guest-settings`, `native-id-consumer`,
   `luggage-comparison`, Murm `fuzz`. The cycle stands: P6 is open for F1.
 
+
+## D17 (F1 closed, P6 done): `sceno-backdrops`
+
+- History: `git filter-branch -f --prune-empty --index-filter` on a fresh clone at Mere `e19f47de2`
+  (index filter mapping `scenomise/src/backdrops.rs` to `crates/sceno-backdrops/src/lib.rs`, its
+  five submodules and `template.rs` to `src/`, the two tests to `tests/`), 7,730 commits rewritten,
+  19 kept. Blob ids equal donor for `backdrops.rs`/`lib.rs` `bd7aa432e0`, `template.rs` `5b926d3a9e`,
+  `backdrop_scenes.rs` `a36906be67`, `sequence_templates.rs` `84888ef560`.
+- Before, Mere `cargo +1.97.1 test --locked -p scenomise`: lib 199, `backdrop_scenes` 8,
+  `scene_documents` 3, `sequence_templates` 4, `span_edits` 3. After: scenomise lib 199,
+  `scene_documents` 3, `span_edits` 3; Graphshell `-p sceno-backdrops` `backdrop_scenes` 8,
+  `sequence_templates` 4; `cargo test --workspace` in Graphshell passes.
+- Consumers: `cambium --lib backdrop` 1; `pictograph --all-features --lib backdrop` 12; `graphshell
+  --features workspace-editor,editable-blocks --lib` 398 passed 1 failed (the same
+  `forme_workspace` physics test fails on Mere `0ec702496`, without this change);
+  `ports/graphshell/web` check clean (its lock needed `cargo update -p spareval` after
+  `-p sceno`, because the first relock picked `sha2` 0.10 beside `md-5` 0.11 for `spareval`, which
+  accepts both and then fails to compile).
+- Murm (`525d948b`): `signalman --features comms,portable-scenes` 77 lib tests and the other test
+  binaries pass; `signalman-desktop` check clean; `murm/Cargo.lock` has 0 `mere.git` packages.
+- Cycle proof (script `cycleproof.py`, all lock roots of Mere (17) and Murm (12) minus
+  `apps/signalman-desktop`, `cargo metadata --locked --all-features --offline`, direct and transitive):
+  Murm to Mere none; Mere to Murm in the Mere root, `ports/graphshell/web`, `testing/moot-ocapn-coop`.
+  Skipped: Mere `guest-settings`, `native-id-consumer`, `luggage-comparison`, Murm `fuzz` (stale
+  locks or network; none names `murm` or `mere-comms`).

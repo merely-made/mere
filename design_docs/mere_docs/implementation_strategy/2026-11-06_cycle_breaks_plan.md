@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress); P6's `mere-comms` half landed and F1's measurement is in Findings, the phase stays open. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -105,8 +105,16 @@ compositions serve their domains from the registry, a second (fixture) domain is
 editing either composition (M1), a product domain without authority is refused with the typed
 error and the hard-coded `"divination" | "personal-facts"` list is gone (M2), the conformance
 tests of the domain contract's section 6 pass over a fixture graph domain and a fixture lane,
-and the standard conditions hold. Which authority forms the registration carries (linked
-closure, guest, declared policy) waits on D14 (a).
+and the standard conditions hold. D15 settled the authority forms: `Authority::{Graph closure, Guest,
+Declared}`, the last two typed and refusing as "pending: no authority installed" until P2 and P3
+implement them; no `Lane`.
+
+**Interim (landed):** the registry's default for an unregistered, unreserved domain is
+`Unregistered::ServeGeneric` (served under generic graph authority, as before), and only reserved
+domains (`divination`) are refused with the typed `domain-not-registered` error when not
+registered. Strict refusal of every unregistered domain, `Unregistered::Refuse`, is one switch;
+flip it when the applications register, which flips the assertion of the
+`unvalidated-control` case in `embedded_reservoir_validation.rs`.
 
 ### P2a. A door route to the resident's blob custody
 
@@ -190,7 +198,7 @@ and `ports/graphshell` (`comms` feature) consume it from `murm.git`; Murm's `sig
 `sceno` and `scenomise`, so the cycle is not broken until F1 is closed;** P6 is done when
 F1 is closed and the standard conditions hold with Murm's resolved graph free of `mere.git`.
 
-**`mere-comms` half landed 2026-11-06; open for F1** (Progress; the F1 measurement and options are in Findings, P5 and P6 findings).
+**Done 2026-11-06.** `mere-comms` landed first; F1 closed by D17 (`sceno-backdrops`), and Murm's root lock holds no Mere package. The one exception is `apps/signalman-desktop`, its own isolated root (Findings, D17 findings).
 
 ### P7. D5 and D12: Woodshed becomes a guest of Graphshell's block pane
 
@@ -249,16 +257,9 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
 ## Open forks
 
-- **F1. Signalman's Mere scene crates.** `signalman`'s `portable-scenes` feature and
-  `signalman-desktop` (its own workspace root) name `sceno`, `scenomise` and the Cambium
-  chain from `mere.git`. D4 moves only `mere-comms`. Whether the scene crates become
-  upstream of Murm (published, per the Cambium publish plan), the feature moves out, or the
-  desktop's separate root is the accepted answer for the optional feature too, is not ruled.
-  The [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) offers a rule (scene vocabulary below Murm) and leaves
-  `scenomise::backdrops` open. Answered in part 2026-11-06 by D7 to D9: `sceno` and
-  `scenotime` are in `merely-made/graphshell`; `scenomise` stays in Mere (D9), so
-  `signalman`'s `portable-scenes` still names it through `mere.git` until its `backdrops`
-  slice is ruled a contract helper or the feature moves out.
+- **F1. Signalman's Mere scene crates. Closed 2026-11-06 by D17.** The measurement and options
+  stay in Findings (P5 and P6 findings); Mark chose option 1, `backdrops` to Graphshell, which amends
+  D9. `signalman-desktop`'s separate root is the one allowlisted isolated exception.
 - **F2. Gemot's dev edge into Distillery.** `distillery` takes `gemot`, `mien` and `mooting`
   as dev-dependencies, and `gemot` takes `eidetic-search` optionally. After P4 the loop
   Gemot, Eidetic, ESP, Eidetic is gone; whether a Gemot to Distillery dev edge is a cycle the
@@ -438,6 +439,17 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Outcome: D13's design is complete; implementation follows its order of work.
 
   Links: area stack · draws on cycle_breaks D13, guest_blocks · plans cycle_breaks P7 · summary The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin.
+
+- **D17. `backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06):** "backdrops → graphshell",
+  option 1 of F1. `scenomise::backdrops` and `template` (1,517 lines, 12 tests) move into
+  `merely-made/graphshell` as a contract helper, the crate `sceno-backdrops`. Amends D9, which had
+  said `scenomise` stays in Mere: the stay applies to the rest of `scenomise`, not to this slice.
+  Signalman's `portable-scenes` takes the crate from Graphshell and drops `scenomise`,
+  `scenograph` and `mere-curation`, so Murm's root lock holds no Mere package; `apps/signalman-desktop`
+  stays an isolated root on Mere and is the one allowlisted isolated Murm-to-Mere exception (this
+  plan, D17). Outcome: refines D9, closes F1, completes P6.
+
+  Links: area stack · draws on cycle_breaks D9, stack.3 · amends cycle_breaks D9 · plans cycle_breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
 
 ## Findings
 
@@ -684,6 +696,61 @@ Verified against Murm `45b1cf47`, Gemot `df6da4a`, Mere `ad63714ec` (before this
      per the Cambium publish plan so Murm names the registry, is the largest: four crates through
      publication, patched back to path or git inside Mere.
 
+### D17 findings (F1 closed), 2026-11-06
+
+Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the code commit).
+
+- **The crate: `sceno-backdrops`** (`graphshell/crates/sceno-backdrops`, 0.0.1, lib `sceno_backdrops`).
+  Named for what it is: the backdrop scene recipes over `sceno`, beside `sceno` and `scenotime`, which
+  Graphshell already names with the `sceno` prefix; `scenomise` is the Mere crate it leaves, and
+  `scene-` would break the prefix. The crate root is the old `backdrops` module and `template` is a
+  public submodule, so a path `scenomise::backdrops::X` becomes `sceno_backdrops::X` and
+  `scenomise::template::X` becomes `sceno_backdrops::template::X`.
+- **Dependencies:** `sceno`, `serde` and `serde_json` (the code parses disclosed JSON; `sceno` already
+  depends on `serde_json`), `scenotime` as a dev dependency. Nothing from Mere, dev edges included.
+- **History:** `git filter-branch --index-filter` on a fresh Mere clone at `e19f47de2`, 19 commits kept
+  of 7,730; the exported blobs equal the donor's (`backdrops.rs`, `template.rs` and both test files
+  compared by hash). Merged into Graphshell with unrelated histories. Cut first: Graphshell built and
+  ran the 12 tests before Mere deleted its copy.
+- **Two seams that needed a change.** `SceneInput::span_target` was an inherent method defined in
+  `scenomise::span_edit`; it cannot be implemented outside the crate that owns `SceneInput`, so it and
+  its `SpanTarget` result moved too (`sceno_backdrops::SpanTarget`; callers unchanged). `scenomise`'s
+  document reader needs `strict_core_records`, which became `pub`. The moved tests read three recipe
+  fixtures from `support/design-studies/backdrops/`; Graphshell holds copies (`tests/fixtures/`), Mere
+  keeps its own for the `scenomise` document and span tests.
+- **Mere's side, direct imports, no re-export.** `scenomise` no longer has `backdrops` or `template`
+  modules (D8's hard cut: no transitional copy). Files that changed an import: `cambium`
+  (`backdrop_scene.rs`), `pictograph` (`backdrop_surface.rs`, its tests, the `backdrop_receipt`
+  example), `ports/graphshell` (`block_editing/bars.rs`, `block_editing/rhyme.rs`,
+  `web_tree/backdrop.rs`, `web_tree/blocks.rs`), and `scenomise` itself (`document.rs`,
+  `document/djot.rs`, `span_edit.rs`, two tests). Manifests: the workspace row, and `scenomise`,
+  `cambium`, `pictograph` and `ports/graphshell` take `sceno-backdrops`. Another consumer outside Mere:
+  Woodshed (its Progress entry).
+- **Tests, before and after.** Moved: `backdrop_scenes` 8 and `sequence_templates` 4 (12), now in
+  Graphshell (`cargo test -p sceno-backdrops`: 8 and 4). `scenomise` stays: lib 199 and 199,
+  `scene_documents` 3 and 3, `span_edits` 3 and 3. `cambium --lib backdrop` 1 passed; `pictograph
+  --all-features --lib backdrop` 12 passed; `graphshell --features workspace-editor,editable-blocks
+  --lib`: 398 passed, 1 failed, the same failure on Mere main without this change
+  (`forme_workspace::lifecycle_tests::owner_lifecycle_successful_actual_metadata_completion_keeps_unpaused_physics_parked`).
+- **Murm.** `apps/signalman`: `portable-scenes = ["dep:sceno", "dep:sceno-backdrops"]`; the `scenomise`
+  row is gone; `survey/scene.rs` imports from `sceno_backdrops`. `murm/Cargo.lock` lost `scenomise`,
+  `scenograph`, `mere-curation` and `libm`; no `mere.git` source remains in it or in any other Murm lock
+  except `apps/signalman-desktop/Cargo.lock`. `signalman --features comms,portable-scenes`: 77 lib
+  tests pass, all-targets check clean; `signalman-desktop --locked --all-targets` clean.
+- **Cycle proof, mere↔murm** (every lock root of both repositories, `cargo metadata --locked
+  --all-features`, dev edges counted, direct and transitive, excluding only the declared isolated root
+  `murm/apps/signalman-desktop`): Murm to Mere: none, in any root. Mere to Murm: `mere-comms`,
+  `mere-transport`, `murm-sync`, `murm-webrtc`, `retinue`, `murm-ocapn`, `murm-ocapn-transport` in the Mere
+  root, `ports/graphshell/web` and `testing/moot-ocapn-coop`. No reverse pair: the cycle is gone.
+  Including the isolated root, Murm to Mere remains there only (eight direct rows, 24 packages).
+  Skipped as before (stale lock or network; no `murm` or `mere-comms` in them): Mere `guest-settings`,
+  `native-id-consumer`, `luggage-comparison`, Murm `fuzz`.
+- **The allowlist entry that remains** (P0 allowlist, not built yet): Mere↔Murm, isolated root
+  `murm/apps/signalman-desktop`, reason "its own `[workspace]` root, excluded from Murm's, so neither
+  lock holds the other; the source homes map's pattern for keeping a lock free of Mere", cites
+  cycle_breaks D17. It is the Genet/Murm entry's sibling and stays permanent, so P8's allowlist ends
+  with two isolated entries, not one.
+
 ## Keeping cycles out: the check
 
 `scripts/check_family_cycles.py`, with tests beside it in the `test_cargo_mode.py` style.
@@ -790,4 +857,19 @@ Illustrative design, not compile-ready code.
   clean with and without `peers`, 10 `captured_collection` tests pass). No other family lock names
   `mere-comms`, and `murm-resolve` has no consumer outside Murm.
 - 2026-11-06: D15 recorded (authority and lane split; wasm guest after a spike; the blob door route first); P1's Lane and distribution parts superseded; P2 and P3 reshaped; P2a added.
+- 2026-11-06: P1b landed: `mere_resident::domain_registry` (`DomainRegistry`, `DomainRegistration`, `Authority::{Graph, Guest, Declared}`, typed `domain-not-registered`), `MereRoutes::with_registry`, `bin/djinn.rs` and the embedded resident registering through it, `personal-facts` installed by `mere_defaults`, divination still registered by Mere until P3. mere-resident lib 259 to 261, new `tests/domain_registry.rs` 8, other targets unchanged; the same known failures; pandect 331. Interim: `ServeGeneric` plus reserved domains.
 - 2026-11-06: D16 recorded (Mark answered guest_blocks R1 to R3); implementation of P7 begins.
+- 2026-11-06: D17 / P6 closed. Graphshell `504097c1` and merge `5b25f351` (history import, crate
+  `sceno-backdrops`, with a doc fix `e00f7edf`), `2f771813` (`SpanTarget`, `strict_core_records`); Murm
+  `525d948b` (`portable-scenes` onto the crate, root lock free of Mere); Mere `794a88c77` (direct
+  imports, `scenomise` loses the two modules, relocked root and `ports/graphshell/web`). Cycle proof and
+  counts in Findings (D17 findings): no Murm package depends on a Mere package outside
+  `signalman-desktop`, the declared isolated root. P8's allowlist therefore keeps that second isolated
+  entry. Woodshed follows in the next entry.
+- 2026-11-06: D17 follow-up: Woodshed `c35afb0e` (the one consumer outside Mere that used
+  `scenomise::backdrops`/`template`: `woodshed-core`, `woodshed-views`, `audio-pack-views` import from
+  `sceno-backdrops`; relocked onto current mains; workspace `--all-targets --all-features` check clean,
+  `woodshed-core --features portable-scenes` 329 passed, `woodshed-views` 309 passed, `audio-pack-views` 5
+  passed). Mere `f2af7218` is the commit that carries the D17 record. No other family repository names
+  `scenomise::backdrops` or `::template`.
+

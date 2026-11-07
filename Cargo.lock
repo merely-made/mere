@@ -2242,6 +2242,7 @@ dependencies = [
  "mere-surface-api",
  "meristem",
  "sceno",
+ "sceno-backdrops",
  "scenograph",
  "scenomise",
  "serde",
@@ -7317,6 +7318,7 @@ dependencies = [
  "pollster 0.4.0",
  "rand_core 0.6.4",
  "sceno",
+ "sceno-backdrops",
  "scenograph",
  "scenomise",
  "scenotime",
@@ -14240,6 +14242,7 @@ dependencies = [
  "pandect",
  "petgraph 0.8.3",
  "sceno",
+ "sceno-backdrops",
  "scenograph",
  "scenomise",
  "scenotime",
@@ -16307,6 +16310,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sceno-backdrops"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#40e8c8df15915d86377117842c08cf10fd13c987"
+dependencies = [
+ "sceno",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "scenograph"
 version = "0.0.6"
 dependencies = [
@@ -16326,6 +16339,7 @@ dependencies = [
  "jotdown",
  "libm",
  "sceno",
+ "sceno-backdrops",
  "scenograph",
  "scenotime",
  "serde",

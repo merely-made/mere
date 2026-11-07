@@ -6,11 +6,11 @@
 //! Revision-qualified proposals for disclosed spans. No handles, IO, source
 //! authority, history or persistence are carried here. The owner accepts an
 //! intent against current data, then applies its own domain validation.
-use crate::{
-    backdrops::{SceneFacts, SceneInput},
+use sceno::SourceRef;
+use sceno_backdrops::{
+    SceneFacts, SceneInput,
     template::{Placement, Span},
 };
-use sceno::SourceRef;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -61,13 +61,6 @@ impl SpanEdit {
         })
     }
 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct SpanTarget {
-    pub lane: u16,
-    pub span: Span,
-    pub extent: u32,
-    pub ticks_per_unit: u16,
-}
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpanEditIntent {
@@ -77,37 +70,6 @@ pub struct SpanEditIntent {
     pub lane: u16,
     pub before: Span,
     pub after: Span,
-}
-impl SceneInput {
-    /// Only supplied, placed occurrences; expected roles/groups are not edit targets.
-    /// This discloses geometry, not permission to mutate its source.
-    pub fn span_target(&self, key: &str) -> Option<SpanTarget> {
-        match &self.facts {
-            SceneFacts::MetreGrid(grid) => grid.lines.iter().enumerate().find_map(|(row, line)| {
-                (0..line.syllables.len())
-                    .find(|i| key == format!("{}/syllable/{i}", line.key))
-                    .and_then(|i| grid.placement(row, i))
-                    .map(|span| SpanTarget {
-                        lane: row as u16,
-                        span,
-                        extent: grid.extent(),
-                        ticks_per_unit: 1,
-                    })
-            }),
-            SceneFacts::TemplatedSequence(seq) => seq
-                .occurrences
-                .iter()
-                .find(|o| o.key == key)
-                .and_then(|o| o.placement.as_ref())
-                .map(|p| SpanTarget {
-                    lane: p.lane,
-                    span: p.span,
-                    extent: seq.template.extent,
-                    ticks_per_unit: seq.template.ticks_per_unit,
-                }),
-            _ => None,
-        }
-    }
 }
 impl SpanEditIntent {
     pub fn propose(

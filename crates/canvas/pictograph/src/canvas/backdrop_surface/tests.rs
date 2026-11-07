@@ -62,7 +62,7 @@ fn progression_span_is_pickable_at_its_edge_and_refusal_preserves_attention() {
     surface.select(Some("bar-2")).unwrap();
     let before = surface.scene().clone();
     let mut invalid = input;
-    let scenomise::backdrops::SceneFacts::TemplatedSequence(sequence) = &mut invalid.facts else {
+    let sceno_backdrops::SceneFacts::TemplatedSequence(sequence) = &mut invalid.facts else {
         unreachable!()
     };
     sequence.occurrences[2]
@@ -107,7 +107,7 @@ fn timeline_rows_use_height_and_stretched_spans_remain_pickable() {
         .iter()
         .find(|m| m.key == "role-2")
         .unwrap();
-    let at = |m: &scenomise::backdrops::Mark| {
+    let at = |m: &sceno_backdrops::Mark| {
         surface.scene().scene.items[m.instance.0 as usize]
             .transform
             .translate

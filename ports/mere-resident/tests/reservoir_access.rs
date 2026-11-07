@@ -134,7 +134,8 @@ async fn fresh_resident_enforces_recorded_access() {
         catalog.clone(),
         grants.clone(),
     )
-    .with_divination_authority();
+    .with_resident_defaults()
+    .unwrap();
     // Serve fails closed if the composition forgets to load policy.
     let meres = reservoir.meres().await;
     assert!(routes.serve(&meres[0]).await.is_err());

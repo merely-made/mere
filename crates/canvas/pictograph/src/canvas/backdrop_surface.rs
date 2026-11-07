@@ -15,7 +15,7 @@ use paint_list_api::{
 };
 use paint_list_render::{CompositeLayer, composite_paint_layers};
 use sceno::{Footprint, Vec2};
-use scenomise::backdrops::{
+use sceno_backdrops::{
     BackdropScene, CoverageTier, MarkRole, SceneFacts, SceneInput, SceneInputError,
 };
 use std::collections::BTreeSet;
