@@ -2,8 +2,8 @@
 
 **Status:** 2026-11-06: design; Mark ruled the eight first-round decisions the same day
 (recorded as [cycle_breaks D13](../implementation_strategy/2026-11-06_cycle_breaks_plan.md), shown
-under "Rulings" below), and the view spike was run. **The spike fell short for painting (Spike), so
-ruling 2 is back with Mark (R1 below) and nothing moves.** Rulings 5 and 6 changed Delivery, What
+under "Rulings" below), and the view spike was run. **The spike fell short for painting (Spike); Mark answered R1 to R3
+(recorded as D16), and implementation follows the order of work.** Rulings 5 and 6 changed Delivery, What
 moves, Native and the Cycle check; those sections are rewritten. Nothing implemented. Written first,
 as P1 was, because [cycle_breaks D12](../implementation_strategy/2026-11-06_cycle_breaks_plan.md)
 (Mark: "D: Woodshed as a guest") chose a new mechanism. Cited by the plan's P7.
@@ -539,33 +539,12 @@ new, from the spike and from rulings 5 and 6.
 8. **Unclaimed class: ruled.** "Disable the command, name the class, and add a 'Review block
    adapters' entry." See Interim behaviour.
 
-### Open (for Mark)
+### R1 to R3 (ruled, D16)
 
-- **R1. How is the notation drawn, given the spike?**
-  - (a) Extend `sceno` with a drawing vocabulary (compound paths with a fill rule, stroke, theme-role
-    paint, text runs) and give Mere a generic scene painter. Honest to ruling 2, but it is a contract
-    change in merely-made/graphshell that reverses `sceno`'s "never carries rendered content", and
-    the painter becomes a second renderer beside `BackdropSurface`.
-  - (b) Keep the `sceno` scene for regions, order and names, and return the drawing as a second
-    payload in `view-result`: a small versioned vector sheet (compound fills, strokes, theme roles,
-    text runs), a new payload type in the graphshell protocol painted by one Mere painter. It is the
-    closest match to what `NotationLeaf` already emits (a paint list) and leaves `sceno`'s stance
-    alone. Recommended.
-  - (c) The drawing as paint commands or a retained applet surface (the first draft's options (c)
-    and (b)). Cheapest to port, but it names Sprigging or Cambium in the contract.
-- **R2. Where does the view and component entry live, given ruling 5?**
-  - (a) `woodshedding` feature `blocks` for the adapter logic and `woodshed-notation` feature
-    `block-guest` for the view and the entry, as in Delivery. Keeps the portable core free of Mere
-    and Graphshell and `examples/musicxml-timing`'s lock free of family packages. Recommended.
-  - (b) Move the engraving into `woodshedding` under the feature so everything is one feature of
-    one crate: about 735 lines and the 889 KB font in the portable core, and `woodshedding` takes
-    `sceno`, `scenomise` and the rest, so `examples/musicxml-timing` newly names Mere and
-    Graphshell.
-  - (c) A new crate. Ruling 5 declined it.
-- **R3. Which native shell?**
-  - (a) A new `graphshell-blocks` bin in `ports/graphshell`. Recommended: no coupling to coop or the
-    goal surface, and `block_pane` is reusable.
-  - (b) Add the pane to `graphshell-coop`. Less new code, but it ties a document editor to the coop
-    session.
-  - (c) Host `block_pane` in Knot's desktop app. The natural document shell, but another
-    repository's application and a Mere to Knot dependency the plan is removing (D1).
+- **R1: ruled.** "Scene + vector sheet." `view-result` carries the `sceno` scene (regions, names,
+  order) and a protocol-owned, versioned **vector sheet**: compound fills with a fill rule,
+  strokes, theme-role paint and text runs. The host paints the sheet; the guest never draws.
+  Direct manipulation, if wanted later, gets its own design.
+- **R2: ruled.** "Split across both." `woodshedding` feature `blocks`; `woodshed-notation` feature
+  `block-guest`, as in Delivery.
+- **R3: ruled.** "New graphshell-blocks bin." As in Native.

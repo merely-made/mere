@@ -239,8 +239,7 @@ Done when (amended by D12):
 - Mere has a host-neutral `block_pane`, a `crates/script/block-host` for the `block-guest` world
   and a native `graphshell-blocks` shell that loads the same pack under the same review (D13,
   ruling 6);
-- the guest-blocks open questions R1 (the drawing), R2 (the view's home) and R3 (the native shell)
-  are answered;
+- the guest-blocks open questions R1 to R3 are answered (D16);
 - `editable-blocks` stays as the generic pane's feature but loses `dep:woodshedding`; the
   `woodshedding` row in `ports/graphshell/Cargo.toml` and the `woodshed-notation` row and its
   `product` entry in `ports/graphshell/web/Cargo.toml` are gone;
@@ -434,6 +433,19 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   (R2) and the native shell (R3), which are put to Mark.
 
   Links: area stack · draws on cycle_breaks D12, guest_blocks · plans cycle_breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
+
+- **D16. Guest blocks: the three open questions answered (Mark, 2026-11-06):**
+  [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md) R1 to R3.
+  1. R1, the drawing: "Scene + vector sheet". The guest returns the `sceno` scene for regions plus a
+     protocol-owned, versioned vector sheet (compound fills with a fill rule, strokes, theme-role
+     paint and text runs), and the host paints it. Direct manipulation, if wanted later, gets its
+     own design.
+  2. R2, the view's home: "Split across both". `woodshedding` gets feature `blocks`;
+     `woodshed-notation` gets feature `block-guest`.
+  3. R3, the native shell: "New graphshell-blocks bin".
+  Outcome: D13's design is complete; implementation follows its order of work.
+
+  Links: area stack · draws on cycle_breaks D13, guest_blocks · plans cycle_breaks P7 · summary The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin.
 
 ## Findings
 
@@ -787,3 +799,4 @@ Illustrative design, not compile-ready code.
   `mere-comms`, and `murm-resolve` has no consumer outside Murm.
 - 2026-11-06: D15 recorded (authority and lane split; wasm guest after a spike; the blob door route first); P1's Lane and distribution parts superseded; P2 and P3 reshaped; P2a added.
 - 2026-11-06: P1b landed: `mere_resident::domain_registry` (`DomainRegistry`, `DomainRegistration`, `Authority::{Graph, Guest, Declared}`, typed `domain-not-registered`), `MereRoutes::with_registry`, `bin/djinn.rs` and the embedded resident registering through it, `personal-facts` installed by `mere_defaults`, divination still registered by Mere until P3. mere-resident lib 259 to 261, new `tests/domain_registry.rs` 8, other targets unchanged; the same known failures; pandect 331. Interim: `ServeGeneric` plus reserved domains.
+- 2026-11-06: D16 recorded (Mark answered guest_blocks R1 to R3); implementation of P7 begins.
