@@ -201,12 +201,12 @@ P1b removed the hard-coded list from `serve`: reserved domains
 (`divination`) are refused with the typed `domain-not-registered` error when
 not registered, and any other unregistered domain is still served under
 generic graph authority (`Unregistered::ServeGeneric`). Left: flip to
-`Unregistered::Refuse` once the applications register, and replace the three
-remaining `"divination" | "personal-facts"` name checks in
-`resident_mere.rs` (projection actions, node-targeted writes) and
-`resident_mere_notes.rs` (`domain_bound`) with a property of the
-registration, so a newly registered domain gets the same treatment. The text
-below is the original statement.
+`Unregistered::Refuse` once the applications register. The three
+`"divination" | "personal-facts"` name checks (projection actions,
+node-targeted writes, notes) were replaced on 2026-11-07 by
+`MereShared::domain_bound`, true for any mere under product authority, with
+the test `any_validated_domain_refuses_node_targeted_writes_and_actions`.
+The text below is the original statement.
 
 Before P1b, `serve` refused a domain without a validator only for `divination` and
 `personal-facts` (`resident_mere.rs`, around lines 357-364). Every other domain

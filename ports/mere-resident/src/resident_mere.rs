@@ -653,11 +653,7 @@ impl ProjectionSource for AccessEndpoint {
             return Err("ambient routes expose graph material only".into());
         }
         let mut snapshot = self.endpoint.snapshot(request)?;
-        if matches!(
-            self.endpoint.shared.domain.as_str(),
-            "divination" | "personal-facts"
-        ) && snapshot.session.0 == MERE_GRAPH
-        {
+        if self.endpoint.shared.domain_bound() && snapshot.session.0 == MERE_GRAPH {
             for binding in &snapshot.presentation.bindings {
                 if binding.instance != InstanceId(0) {
                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {
@@ -840,6 +836,14 @@ struct MereShared {
 }
 
 impl MereShared {
+    /// Whether this mere is under product authority: a registered domain, or
+    /// one given a validator directly. Its writes must be complete journaled
+    /// candidates, so node-targeted actions, presentation actions and notes
+    /// are refused (domain adoption plan M2).
+    fn domain_bound(&self) -> bool {
+        self.validator.is_some()
+    }
+
     fn validate(&self, graph: &pandect::graph_codicil::GraphCandidate) -> Result<(), String> {
         if let Some(validator) = &self.validator {
             validator(graph)?;
@@ -1813,9 +1817,7 @@ impl MereEndpoint {
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
-        if matches!(self.shared.domain.as_str(), "divination" | "personal-facts")
-            && intent.target != InstanceId(0)
-        {
+        if self.shared.domain_bound() && intent.target != InstanceId(0) {
             return Ok(IntentResult::Rejected {
                 reason: "domain writes require a complete journaled session candidate".into(),
             });
@@ -3278,6 +3280,35 @@ mod tests {
             matches!(product.invoke(forged).unwrap(), IntentResult::Rejected { reason } if reason.contains("complete journaled session candidate"))
         );
         assert_eq!(nodes(&graph(&mut product)), 1);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn any_validated_domain_refuses_node_targeted_writes_and_actions() {
+        // Not one of the names the resident used to hard-code: authority, not
+        // the domain's name, binds its writes to complete candidates.
+        let validator: pandect::GraphValidator = Arc::new(|_| Ok(()));
+        let fixture = fixture_with_validator(44, "music", Some(validator)).await;
+        let mut app = fixture.attach("turnstone").await;
+        let start = graph(&mut app);
+        assert_eq!(
+            app.invoke(apply(&start, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let after = graph(&mut app);
+        assert!(
+            after
+                .presentation
+                .offers_for(InstanceId(1))
+                .unwrap()
+                .iter()
+                .all(|offer| offer.semantics.actions.is_empty())
+        );
+        let mut forged = apply(&after, vec![node(2)]);
+        forged.target = InstanceId(1);
+        assert!(
+            matches!(app.invoke(forged).unwrap(), IntentResult::Rejected { reason } if reason.contains("complete journaled session candidate"))
+        );
+        assert_eq!(nodes(&graph(&mut app)), 1);
     }
 
     #[tokio::test(flavor = "multi_thread")]

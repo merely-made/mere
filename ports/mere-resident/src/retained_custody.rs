@@ -33,6 +33,7 @@ use personae::{PersonaId, ProfileId};
 /// The payload lane shared by Graphshell and Turnstone for retained page text.
 pub const RETAINED_LANE: &str = "mere.retained-page-text/shared-v1";
 
+const NO_KEY: &str = "The vault is unlocked, but no sealing key is staged for retained page text (no wallet or key epoch for this persona).";
 const LOCKED: &str = "The vault is locked; page text is not being kept or read.";
 
 /// How a resident seals retained page text: the sealer for the values and the
@@ -126,7 +127,11 @@ impl CustodialRetained {
         self.host
             .payload(&self.wallet_root, self.persona, request, scope)
             .map_err(|refusal| match refusal {
-                CustodyRefusal::Locked => eidetic::Error::new(LOCKED),
+                // The custodian answers "locked" for a missing sealing key as
+                // well (no wallet or staged epoch for the persona). An unlocked
+                // vault must not be reported as locked: say what is missing.
+                CustodyRefusal::Locked if self.host.is_locked() => eidetic::Error::new(LOCKED),
+                CustodyRefusal::Locked => eidetic::Error::new(NO_KEY),
                 other => eidetic::Error::new(format!("retained-content custody: {other}")),
             })
     }

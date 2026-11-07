@@ -514,6 +514,8 @@ mod accessibility_tests;
 mod capture;
 mod frame;
 mod host;
+#[cfg(test)]
+mod hover_tests;
 mod input;
 #[cfg(test)]
 mod mount_probe_tests;

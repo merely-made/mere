@@ -22,7 +22,7 @@ From the browser presentation tenants plan (`archive_docs/2026-10-28/2026-10-13_
 - The CPU dynamics route stays when compute is unavailable; an explicit request for unavailable compute reports its outcome (:23).
 - Resource owner or appearance, content revision, dimensions, alpha and encoding, and context generation are tracked independently (:24).
 - Required unsupported paint and resource imports produce attributed refusals, never omitted content. CPU and application state survive graphics loss, and old-generation handles and completions are rejected (:25-26).
-- The viewer Wasm cap is 3,460,300 B (3.30 MiB, gzip6) per route artifact, R157 as amended; no cap is raised silently (:242, 296).
+- The viewer Wasm cap is 4,194,304 B (4.00 MiB, gzip6) per route artifact, R157 as amended: Mark's 2026-11-07 "Ratchet down", first step (3.30 MiB on 2026-10-15, 3.50 MiB on 2026-10-16, 5.00 MiB on 2026-11-07 before the ratchet); the schedule is in the Graphshell host plan, T7; no cap is raised silently (:242, 296).
 - Static-state backend comparisons gate at RMS 1, max 16 and alpha 0 at scale 1; baseline tolerances are declared before a run (:250, 285).
 - The browser's asynchronous device-loss replacement boundary is preserved as a limit (:285).
 - Portable composition's shadow-mask admission is a separate scope from the native one (:425).
