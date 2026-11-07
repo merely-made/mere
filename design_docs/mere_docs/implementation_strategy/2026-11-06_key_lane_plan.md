@@ -17,8 +17,9 @@ Receipts go to `archive_docs/receipts/2026-11-06_key_lane_plan_receipts.md` (DOC
 - **Security code follows standards.** Key agreement stays p2panda-encryption (DCGKA) behind
   stickleback's `GroupSession`. This plan moves bytes between carriers; it writes no
   cryptography.
-- **Graph keys stay Mere's authority** (resident split, "Mere keeps graph authority").
-  `GraphKeyGroup` stays in `mere-resident`; it drives the lane instead of authoring graph events.
+- **Graph-key carriage follows the resident** (D4). `GraphKeyGroup` stays in `mere-resident`,
+  which engine-split P3 moves to Graphshell as the concrete assembly; it drives the lane instead
+  of authoring graph events.
 - **One record shape per carrier.** New key material never appears in the graph log after the
   cutover, and the lane never carries roster facts.
 
@@ -106,6 +107,15 @@ removed variants with a named error, not a decode panic.
   Outcome: new.
 
   Links: summary The PublishPrekey and GroupDispatch variants are removed; graphs keyed before the move are not carried forward.
+
+- **D4. Graph-key carriage follows the resident (Mark, 2026-11-07):** "Follow the resident", over
+  splitting it into a Mere profile crate and over leaving it to the engine-split drift audit.
+  Put to Mark on finding that engine-split moves `mere-resident` to Graphshell while this plan
+  assumed graph keys stayed in Mere. The personal-graph event types travel with
+  `ports/graphshell`, so carriage and events stay together. Outcome: refines the constraint
+  drawn from resident-split ("Mere keeps graph authority").
+
+  Links: plans engine-split P3 · summary GraphKeyGroup and key_paired_devices move with mere-resident to Graphshell; the lane adoption is unchanged.
 
 ## Forks
 

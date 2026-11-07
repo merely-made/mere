@@ -36,7 +36,8 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
   `cambium ^0.3.3`), `buckram`, `livery`, `cadency`, `genet-livery`, `genet-parley`,
   `genet-fontique`, `genet-host-api`, `genet-scripted-dom`, `genet-static-dom`,
   `layout-dom-api`, `taproot`, `netrender`, `netrender_device`, `paint_list_render`.
-- **Order:** Armillary → Netrender (with D5's crates) → Genet → Mere.
+- **Order:** Armillary → Netrender (with D5's crates) → Genet → Graphshell, after engine-split P3
+  moves the Cambium family there (D7). Mere-resident crates in the closure publish from Mere.
 - Source drift of crates "already published at matching deps" was not diffed.
 
 ## Phases
@@ -63,6 +64,7 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
   in order, and the accesskit canary test fails when a property is left unmapped.
 
 ### P2. Publish in order
+Waits on engine-split P3 (D7): the Cambium family publishes once, from Graphshell.
 - Done when: every crate in the closure is on crates.io at the planned version, consumers' exact
   pins are updated, and the Dramatis application builds from registry versions alone.
 
@@ -106,6 +108,15 @@ dependencies, and roughly seventeen published crates whose manifests drifted sin
   `caller-owned-toolkit-bench`; iced is an unreleased master rev. Outcome: new.
 
   Links: summary Toolkit-embedding benches live in a probe crate; published rootstock carries no git dependency.
+
+- **D7. Publish after the move, from Graphshell (Mark, 2026-11-07):** "After P3, from
+  Graphshell", over publishing from Mere now and over holding the wave. Put to Mark on finding
+  that engine-split P3 moves the Cambium family, `mandrake` and `persona-picker` included, to the
+  Graphshell repository. Consumers track git main meanwhile and repoint `mere.git` to
+  `graphshell.git` at P3. Outcome: refines D1 (registry first, git main as the interim) and
+  reorders the closure.
+
+  Links: plans engine-split P3 · summary The Cambium chain publishes once, from Graphshell, after engine-split P3; consumers track git main until then.
 
 ## Findings
 

@@ -125,6 +125,10 @@ title = ". Bench embeddings leave rootstock (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "Toolkit-embedding benches live in a probe crate; published rootstock carries no git dependency."
 
+[decisions."cambium-publish D7"]
+title = ". Publish after the move, from Graphshell (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+
 [decisions."capability-door D1"]
 title = "OS channels on one device"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
@@ -377,6 +381,38 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_
 title = ". Contract plus host-role kit (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 
+[decisions."cycle-breaks D10"]
+title = ". The WIT world reaches Mere's hosts through `links` metadata, for now (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D11"]
+title = ". The extraction's structural choices stand (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D12"]
+title = ". Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D13"]
+title = ". The guest-blocks decisions (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D14"]
+title = ". P1's decisions answered; the distribution binary reopened (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D15"]
+title = ". The drawing-board answers (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D16"]
+title = ". Guest blocks: the three open questions answered (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D17"]
+title = ". `backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
@@ -622,6 +658,10 @@ summary = "AdmitReader and RetireReader remain personal-graph events gated by Sy
 title = ". Clean break for old logs (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
 summary = "The PublishPrekey and GroupDispatch variants are removed; graphs keyed before the move are not carried forward."
+
+[decisions."key-lane D4"]
+title = ". Graph-key carriage follows the resident (Mark, 2026-11-07)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
 
 [decisions."node-body-face-model D1"]
 title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"

@@ -22,7 +22,8 @@ Receipts go to `archive_docs/receipts/2026-11-05_resident_split_plan_receipts.md
 - **Store lifetimes stay with the store** (distillery-extraction D19). Pandect's reservoir owns
   opening, durability and closing of every mere; Djinn and embedding hosts execute it. No slice
   assigns storage lifetime authority to a background process or to a receiving owner.
-- **Mere keeps graph authority.** Graph replica operations, graph keys, graph-specific
+- **Mere keeps graph authority.** (Engine-split P3 moves `mere-resident` itself to Graphshell as
+  the concrete assembly; graph-key carriage goes with it, key-lane D4.) Graph replica operations, graph keys, graph-specific
   acceptance, route grants, the doors, the reservoir service, the domain registry and
   the registration of Mere's own domains stay here. Knot's and Cleromancy's registrations do not:
   they live with those applications (cycle breaks D1, D14; the domain contract's registration

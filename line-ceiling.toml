@@ -300,10 +300,6 @@ path = "ports/graphshell/src/bin/graphshell_coop.rs"
 reason = "Native Graphshell co-op surface. Existing source-size debt; a responsibility split must preserve Command, Update, App and existing module visibility."
 
 [[exception]]
-path = "ports/graphshell/src/block_editing/bars.rs"
-reason = "Graphshell adapter over Woodshed's actual portable Set and arrangement. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
 path = "ports/graphshell/src/canvas_physics_tests.rs"
 reason = "Host acceptance tests of mere::canvas::physics_controls on Graphshell's reference fixture, as its tree page opens it. Existing source-size debt; a responsibility split must preserve NarrowedNumber and existing module visibility."
 
@@ -406,10 +402,6 @@ reason = "Graphshell's retained capsule review/reader, over its portable action 
 [[exception]]
 path = "ports/graphshell/src/web_tree/backdrop.rs"
 reason = "Graphshell's reference embedding. Existing source-size debt; a responsibility split must preserve ImportPicker, SpanDrag, Pane and existing module visibility."
-
-[[exception]]
-path = "ports/graphshell/src/web_tree/blocks.rs"
-reason = "One ordinary source editor, contextual operations, and an independent preview. Existing source-size debt; a responsibility split must preserve Display, Saved, Pane and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/web_tree/focus_card.rs"
