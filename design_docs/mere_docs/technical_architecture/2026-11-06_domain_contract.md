@@ -808,7 +808,7 @@ Closes D1 for both. C3/C6, custody: unchanged from today. Synergy with D12: none
     app is closed, and M4 replication would have to be built per app.
   - *Cross-domain reads.* Cleromancy's facts live in Mere's `personal-facts` domain and its
     profile-subject check reads the persona vault (`with_profile_subject_authority`,
-    `resident_mere.rs:176-184`); in an app-owned store both must be rebuilt app-side.
+    `resident_mere.rs:171-179`); in an app-owned store both must be rebuilt app-side.
 - **D1.** Closes it by retreating from the architecture Cleromancy already uses as a client of
   `mere/divination`. **D12:** none. Not recommended; it contradicts D8.
 

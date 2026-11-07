@@ -198,3 +198,4 @@ into a transport library.
 - 2026-11-05: inventory and D1 to D4; no source moved.
 - 2026-11-05: S5, S6 and F1 read by subagents and spot-checked; D5 to D7; no source moved.
 - 2026-11-06: D7's plan opened (`2026-11-06_key_lane_plan.md`).
+- 2026-11-06: constraint and D2's outcome narrowed (cycle breaks D1, D14): the registry and Mere's own domains' registration stay; Knot's and Cleromancy's registrations leave.
