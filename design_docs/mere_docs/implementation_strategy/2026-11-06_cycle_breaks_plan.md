@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b and left the distribution binary open. D1, D2, D3 proceed; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b and left the distribution binary open. D2 landed as P4 (2026-11-06, Progress). D1, D3 proceed; D5 became D12 (Woodshed as a guest, design written, held for review).
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -226,8 +226,11 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   as dev-dependencies, and `gemot` takes `eidetic-search` optionally. After P4 the loop
   Gemot, Eidetic, ESP, Eidetic is gone; whether a Gemot to Distillery dev edge is a cycle the
   check should refuse is a decision for the check's rule (dev edges), put to Mark when P0
-  runs. The rule is ruled by D6; the Gemot to Distillery edge itself is still to be judged
-  under it.
+  runs. The rule is ruled by D6. Judged under it at P4 (2026-11-06): there is no Gemot to
+  Distillery edge to refuse. No Gemot manifest names `distillery` or `esp`, `work-host`'s
+  only route was `eidetic-search`'s optional `esp` (now gone from Eidetic main), and none of
+  Gemot's five locks holds a `distillery.git` or `esp` package. Distillery to Gemot (dev) is
+  the one direction left, which is legal. Closed.
 
 ## Decisions
 
@@ -474,6 +477,50 @@ Verified against Mere `49571db83`, the Graphshell repository and the consumers.
   ask `mere.git` for `graphshell-endpoint` with `projection-door`, so Knot and Cleromancy
   took the source change first and Mere relocked onto them (Progress).
 
+### P4 findings, 2026-11-06
+
+- **Moved to ESP** (`esp::embed::goal_model`, feature `goal-model`, Distillery `e33bbaf`):
+  `goal_model_esp.rs` (92 lines; only its `use` lines and one doc link changed), the MiniLM
+  calibration test `goal_model_minilm.rs` (501 lines) with its `goal_calibration` corpus, the
+  lexical n-gram recall receipt `lexical_ngram_recall.rs` and its `measurements.rs` (the
+  "lexical fixture that used `esp` as a dev-dependency" had no trait form: it drives ESP's own
+  `LexicalEmbeddingProvider`, so it moved whole), and the `eidetic-recall` example (577 lines)
+  with its tests. Blobs compared with the donor's `HEAD`: corpus, lexical receipt, example and
+  its tests byte-identical; the others differ only in imports, doc paths, feature gates and
+  the `--lane`/`-p` hints in comments (and rustfmt's trailing-comma rule in Distillery).
+- **Seam.** `eidetic-search` keeps `GoalEmbedder` and the `ModelGoalAssessor` machinery. ESP gained
+  an optional `eidetic-search` dependency (the plan said ESP "already depends on
+  `eidetic-search` optionally"; it did not: `crates/distillery` did, ESP did not) and a dev
+  dependency for the moved tests, plus features `goal-model` (`persistence`,
+  `dep:eidetic-search`) and `recall-example` (`goal-model`, `bert`, `bert-wgpu`). The example's
+  `fjall` store needs `muniment/fjall` as an ESP dev feature (Fjall comes with Muniment's git
+  source, so Distillery's lock grew 159 lines and no manifest gained a patch row).
+- **Consumer.** Only Graphshell's `goal-surface-model` named `EspGoalEmbedder`
+  (`ports/graphshell/src/goal_surface/model_path.rs`); it now imports
+  `esp::embed::goal_model` and the feature reads `["goal-surface", "dep:esp", "esp/goal-model",
+  "esp/bert", "dep:sha2"]`. Its `esp` row was already
+  `git = distillery.git, branch = "main"`. A grep over Mere, Distillery, Gemot, Graphshell, Murm,
+  Cleromancy, Woodshed, Turnstone, Isocosm, Knot, Bole, Dramatis, Armillary, Errand,
+  merelyllc.com, Genet and netrender found no other user of `goal_model_esp`, the `bert` or
+  `recall-example` features of `eidetic-search`, or `EspGoalEmbedder`.
+- **Locks.** Eidetic's lock is 879 packages down to 411 (468 removed, none added) and holds no `esp`
+  (nor does `responsa` or `line-ceiling`). Distillery's root lock names one Eidetic source; its
+  probe locks resolve their own single source and none holds `esp` through Eidetic. Mere's root
+  and `ports/graphshell/web` locks were relocked with `cargo update -p eidetic -p esp`, one
+  Eidetic source each, `esp` no longer lists `eidetic-search`'s `esp` edge, 1 unused patch in web
+  (as before), none in the root.
+- **Where the plan was loose.** "A `Cargo.lock` records optional dependencies" is true for the
+  workspace members of a lock root, not for an optional dependency of a non-member that no
+  feature enables: Gemot's and Distillery's locks of `eidetic-search` never listed `esp`.
+  The latent loop therefore showed only in Eidetic's own lock, where `esp` is a member's dev
+  dependency.
+- **Calibration test, pre-existing failure.** On Eidetic `main` before the move,
+  `calibrate_match_similarity` already fails: the sweep picks 290, the recorded constant is 220
+  (`CALIBRATED_MILLI` and `MINILM_L6_V2_MATCH_SIMILARITY_MILLI`), best F1 0.810 at 280 to 290 for
+  the `Or` rule. It fails identically in ESP. Probably the stop-word S1 polish moved the S1
+  side of the sweep after 220 was chosen; the threshold was left alone, since changing it is a
+  calibration decision (Eidetic memory gates plan, Progress 2026-11-06). Not chased.
+
 ## Keeping cycles out: the check
 
 `scripts/check_family_cycles.py`, with tests beside it in the `test_cargo_mode.py` style.
@@ -540,3 +587,17 @@ Illustrative design, not compile-ready code.
   for painting (a `sceno` scene carries the event regions and names but not the engraving: holes
   lost, no colour, text or fill rule); the full guest component is 1,718,946 B against the 16 MiB
   cap. R1 to R3 are with Mark; nothing moved.
+- 2026-11-06: P4 / D2 landed. Distillery `e33bbaf` took the ESP adapter, the MiniLM calibration test, the
+  lexical recall receipt and the `eidetic-recall` example (cut first; ESP built and ran them against
+  the old Eidetic main); Eidetic `6b4ec49` dropped them, the `bert` and `recall-example` features, the
+  `esp` dependencies and the workspace `esp` row (lock 879 to 411 packages, no `esp`); Distillery
+  `ca9334d` relocked onto it (one Eidetic source); Mere (the commit carrying this entry) repointed
+  Graphshell's `goal-surface-model` to `esp/goal-model` and relocked the root and
+  `ports/graphshell/web`. Counts, before in Eidetic and after in ESP: lexical receipt 2 passed, 1
+  ignored (default) and 4 passed with `bert --include-ignored` (before 4, after 4);
+  `eidetic-recall` example tests 4 and 4; `goal_model_minilm` `adapter_end_to_end` ok and
+  `calibrate_match_similarity` failing the same way in both (Findings). `eidetic-search` default
+  tests unchanged after the move (74 lib passed, 1 ignored, and every integration binary that stayed).
+  Graphshell `goal-surface-model`: `--all-targets` check clean, 29 `goal_surface` tests passed, 1
+  ignored. The throwaway cycle proof is in the P4 receipts. The allowlist entry for C6 does not
+  exist yet (P0 is not built); delete it with P0's allowlist.

@@ -2671,7 +2671,7 @@ dependencies = [
 [[package]]
 name = "chartulary"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "muniment",
  "petgraph 0.8.3",
@@ -2876,7 +2876,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4748,7 +4748,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4794,7 +4794,7 @@ dependencies = [
 [[package]]
 name = "distillery"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/distillery.git?branch=main#ea125ce74508597b304d4a5dec293d091b962861"
+source = "git+https://github.com/merely-made/distillery.git?branch=main#ca9334d1db00e9cfcdc21e6a863bbdb0f53020eb"
 dependencies = [
  "apparatus-core",
  "armillary",
@@ -5275,7 +5275,7 @@ dependencies = [
 [[package]]
 name = "eidetic"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "async-trait",
  "blake3",
@@ -5293,10 +5293,9 @@ dependencies = [
 [[package]]
 name = "eidetic-search"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "eidetic",
- "esp",
  "genet-text",
  "serde",
  "serde_json",
@@ -5658,7 +5657,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5670,11 +5669,12 @@ checksum = "d817e038c30374a4bcb22f94d0a8a0e216958d4c3dcde369b1439fec4bdda6e6"
 [[package]]
 name = "esp"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/distillery.git?branch=main#ea125ce74508597b304d4a5dec293d091b962861"
+source = "git+https://github.com/merely-made/distillery.git?branch=main#ca9334d1db00e9cfcdc21e6a863bbdb0f53020eb"
 dependencies = [
  "armillary",
  "burn",
  "eidetic",
+ "eidetic-search",
  "getrandom 0.4.3",
  "half",
  "pollster 0.4.0",
@@ -9968,7 +9968,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10318,7 +10318,7 @@ dependencies = [
 [[package]]
 name = "mere-fjall"
 version = "2.11.2"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "byteorder",
  "byteview",
@@ -10448,7 +10448,7 @@ dependencies = [
 [[package]]
 name = "mere-lsm-tree"
 version = "2.10.4"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "byteorder",
  "crossbeam-skiplist",
@@ -10471,7 +10471,7 @@ dependencies = [
 [[package]]
 name = "mere-mesh"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/distillery.git?branch=main#ea125ce74508597b304d4a5dec293d091b962861"
+source = "git+https://github.com/merely-made/distillery.git?branch=main#ca9334d1db00e9cfcdc21e6a863bbdb0f53020eb"
 dependencies = [
  "blake3",
  "esp",
@@ -10554,7 +10554,7 @@ version = "0.0.1"
 [[package]]
 name = "mere-proofs"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "blake3",
  "serde",
@@ -10708,7 +10708,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#b80cf5890bfd2bbdc0108195627d7205c4870190"
+source = "git+https://github.com/merely-made/murm.git?branch=main#c0adc6745d5e2217418ea506ad7284460cc2ef47"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -11028,7 +11028,7 @@ dependencies = [
 [[package]]
 name = "muniment"
 version = "0.2.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "async-trait",
  "blake3",
@@ -11082,7 +11082,7 @@ dependencies = [
 [[package]]
 name = "murm-sync"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#b80cf5890bfd2bbdc0108195627d7205c4870190"
+source = "git+https://github.com/merely-made/murm.git?branch=main#c0adc6745d5e2217418ea506ad7284460cc2ef47"
 dependencies = [
  "bytes",
  "futures-util",
@@ -12014,7 +12014,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -14381,7 +14381,7 @@ dependencies = [
  "rustc_apfloat",
  "slotmap",
  "smallvec",
- "spin 0.12.3",
+ "spin 0.5.2",
  "thiserror 2.0.21",
  "utf8-chars",
 ]
@@ -15091,7 +15091,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16105,7 +16105,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16173,7 +16173,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16799,7 +16799,7 @@ dependencies = [
 [[package]]
 name = "servitor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "chartulary",
  "insigne",
@@ -17214,7 +17214,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17560,7 +17560,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17588,7 +17588,7 @@ checksum = "33ae9eec00137a8eed469fb4148acd9fc6ac8c3f9b110f52cd34698c8b5bfa0e"
 [[package]]
 name = "stickleback"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#617f46a51412c5844b46c01887bfbcab698b6485"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
 dependencies = [
  "blake3",
  "cbor-core",
@@ -18078,7 +18078,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -18124,7 +18124,7 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8c27177b12a6399ffc08b98f76f7c9a1f4fe9fc967c784c5a071fa8d93cf7e1"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -19098,7 +19098,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -20705,7 +20705,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]

@@ -605,6 +605,9 @@ Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
   none. Mere↔Knot and Mere↔Cleromancy already work this way, and
   their renames on 2026-10-25 showed the price: lockfiles regenerated before a
   push, and consumers updated in supplier-first order.
+  Eidetic↔ESP no longer works this way: `eidetic-search` keeps the `GoalEmbedder` trait and
+  the ESP adapter, its MiniLM calibration test and the `eidetic-recall` example live in ESP
+  (cycle breaks D2, P4, 2026-11-06).
   - A separate workspace root inside the receiving repository keeps that
     repository's lockfile and CI scope free of Mere. Murm's
     `apps/signalman-desktop` already does this.
