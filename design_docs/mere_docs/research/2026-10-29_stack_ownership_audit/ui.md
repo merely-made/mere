@@ -1,5 +1,7 @@
 # UI, editor, shell and execution ownership audit
 
+**Revision, 2026-10-29:** the [corrected audit](REPORT.md) controls the recommendations. This appendix retains source evidence at the revisions below. Established suppliers and source size do not establish net benefit. Compare the complete consumer feature/build/target cost, retained adapter work and actual behavior removed. Architectural substitutions below are withdrawn from the reuse queue; they would need a coherent stack-level argument. No new implementation is authorized by this appendix.
+
 Read-only source audit, 2026-10-29. No builds, runtime tests, repository edits, commits or checkout changes were performed. Sibling origin/main refs were refreshed. Findings below are replacement candidates and architectural assessments, not qualified adapters.
 
 ## Frozen evidence
@@ -17,11 +19,9 @@ Paths below are repository-relative and must be read with the revision above. Lo
 
 ## Main conclusion
 
-The biggest ownership question is ordinary UI machinery, not a new actor runtime. Cambium and Rootstock implement a substantial widget, input, focus, editing, scrolling, accessibility-composition and host stack. That is a strategic cost worth comparing against an established toolkit. A unified wgpu device does not automatically require owning every widget: Rootstock already includes egui and Iced embedding adapters using the caller's device and queue. Native-only configuration, admitted scene operations, focus/IME composition and accessibility are real remaining constraints.
+The review found possible local reuse in color arithmetic, duplicate fold undo and bounded text/protocol mechanics. Its proposed shell/toolkit comparison did not establish the stack's central projection contract and is withdrawn, along with the C++ DSP supplier recommendation.
 
-The clearest small cuts are color-science arithmetic and redundant snapshot undo. The next bounded evaluations are MCP protocol plumbing, the large-document editor buffer, and Knot's generic line-merge fallback. Domain-specific command declarations, source-preserving Djot behavior, scene projection identities and admission policy should remain local.
-
-One correction to the preliminary audit is material: Armillary's custom Pool is not shown to be a live product dependency. The inspected products call the separate actor harness, usually thread-per-actor. Defending the pool from its historical thread-local-cache rationale overstates current evidence.
+Retained component semantics and stable identity must cross Graphshell together with hit testing, input and accessibility. Existing native GPU embedding demonstrates only one part of that contract. Neither widget counts nor device sharing establishes that an alternative toolkit can project those semantics without retaining or rebuilding the same machinery.
 
 ## Ranked findings
 
@@ -31,14 +31,14 @@ One correction to the preliminary audit is material: Armillary's custom Pool is 
 | 2 | Woodshed view-local fold undo stacks | Replace duplicate with existing Backstep | High | `backstep::History<Vec<FoldRecord>>` with explicit cap 64 | Create/expand/undo/redo/reopen, new edits after undo, host selection reset, existing cap behavior |
 | 3 | MCP JSON-RPC stdio framing/version negotiation/resource/tool envelope | Evaluate official `rmcp` adapter | High that duplicated standards surface exists; medium drop-in fit | Keep route/carrier admission and tools; delegate MCP lifecycle/serialization/transport where SDK supports required eras | Legacy and 2026-07-28 discovery/version contract; notification/batch policy; unknown versions; EOF and grant expiry; tools/resources refusal equivalence |
 | 4 | Whole-string editor buffer plus repeated grapheme scans and whole-buffer snapshots | Evaluate rope-backed document path | High structural finding; medium replacement scope | `crop` byte-index rope or Ropey; preserve short text fields; retain grapheme/IME policy and Backstep grouping | Multi-MiB mid-document edit/caret/undo memory and latency, UTF-8 byte proposal boundary, ZWJ/combining/bidi, incremental highlight and exact save |
-| 5 | Ordinary widgets/chrome/focus/scroll/host assembly | Strategic expensive ownership | High maintenance-cost finding; medium benefit until prototype | Compare egui/Iced shell around retained graph/document producers; existing native adapters provide starting point | One real editor+graph+menus+split panes on shared GPU, focus/IME/a11y/reopen, native and browser target gates; compare removed code and UX regressions |
+| 5 | Ordinary widgets/chrome/focus/scroll/host assembly | **Withdrawn, R30 struck** | No compatible semantic projection established | Retain as an architectural observation, not a toolkit migration | Any future case must preserve stable identity and component semantics across Graphshell, hit testing, a11y, input and native/browser targets |
 | 6 | Knot generic line-based three-way merge fallback | Evaluate `diffy` | High duplicated primitive; medium semantic fit | Replace generic line reconciliation only, retain Djot block alignment and causal history | Same-position insertions, edits on range boundaries, identical edits, CRLF/no-final-newline, conflicts remain explicit, byte-preserving output and deterministic head hash |
 | 7 | Unused Armillary public adaptive Pool | Trim if complete consumer census confirms | Medium-high lexical census; no dynamic or external-user proof | Remove/restrict unsupported pool API, retain active actor harness; do not replace unused API with another executor | Consumer/API inventory at every supported pin, fixture migration, external publication review; if retained, rerun worker lifetime/churn/TLS reason |
 | 8 | Meristem fork of Xilem core | Evaluate upstream convergence, keep required extensions today | High source mismatch | Propose upstream splice moves, then consume upstream or keep small reviewed patch; avoid treating removed optional APIs as fork necessity | Keyed reorder/cross-parent portable move retains DOM/node/focus state; action routing; unchanged supported application behaviors |
 | 9 | Parley-related text navigation/editing | Evaluate narrower upstream editor reuse | Medium | Compare `parley::editing::PlainEditor` for simple fields or lower-level selection APIs | Single-style editor limitation, highlighting, preedit ghost state, undo boundaries, bidi/soft wrap and source-byte compatibility |
-| 10 | Woodshed WSOLA time stretching | Evaluate DSP supplier for quality | Medium | SoundTouch or Signalsmith Stretch if native C++ acceptable; preserve source-clock adapter | Blinded voice/percussion/music quality, rate transitions, very short EOF, sample clocks/source anchors, CPU/latency, licensing and Wasm build |
+| 10 | Woodshed WSOLA time stretching | **Withdrawn, R33 struck** | Proposed suppliers violate the language constraint | No SoundTouch/Signalsmith dependency or experiment proposed | Source-clock, quality and real-time behavior remain obligations of any separately argued alternative |
 | 11 | Woodshed WebVTT transcript subset | Evaluate parser library | Medium | `vtt` parser, keep transcript extraction policy, original payload and bounded fetching | Malformed-block recovery, BOM/CR/NUL, cue IDs/settings preserved, cue markup/entity behavior, overlaps, size limits and Wasm |
-| 12 | Workbench split/tab/float reducer | Keep under current toolkit; reassess with shell migration | High mismatch | egui_dock/egui_tiles only if shell uses egui; they are not host-neutral reducer drop-ins | Serialization and IDs, pane close/tearout effects, float docking, declarative authority separation, native/browser input |
+| 12 | Workbench split/tab/float reducer | Keep the host-neutral projected reducer | No compatible substitution shown | Toolkit-owned dock trees have not demonstrated the same identity and authority boundary | Serialization, stable IDs, close/tearout effects, docking and native/browser input |
 | 13 | Hest command declarations/menu choices/invocation outcomes | Keep; buy future fuzzy matching | High | `nucleo` if fuzzy palette is required; no reason to replace declarations | Preserve disabled reasons, destructive/effect metadata, MRU/personal ordering; search recall/latency if matcher changes |
 | 14 | Scene contracts, arrangements, layout/physics composition | Keep domain contracts; evaluate individual numeric kernels as needed | High | Existing Petgraph/Rapier/Taffy already provide substrate; do not replace with whole scene/game engine by default | Determinism, pinned/anchored/seeded semantics, source/instance identity, measured footprints, Wasm, exact saved scene reconstruction |
 | 15 | Firewheel bounded stream extension | Keep narrow fork while seeking upstream path | High current difference; retirement unqualified | Upstream stream nodes/streamed sampler plus fixed-resample fix when equivalent | Exact accepted/presented/queued source clocks, partial pushes, stale generations, EOF material, zero callback allocations/deallocations |
@@ -76,15 +76,13 @@ Knot `crates/knot-document/Cargo.toml:30-39` consumes Cambium and Mere source-ed
 
 [Parley PlainEditor](https://docs.rs/parley/latest/parley/editing/struct.PlainEditor.html) separately offers caret/selection/composition/layout support. It explicitly uses one style over all text. Highlight spans, source authority, transient ghost text and transaction boundaries are a possible mismatch. It is a candidate for simple fields or lower-level behavior reuse, not a proven replacement for Knot's document editor.
 
-### 5. UI toolkit ownership is the largest strategic cost
+### 5. UI toolkit recommendation withdrawn: R30 struck
 
-At the frozen Mere revision, source file inventories (unit tests included) are: Cambium 87 files/1,511,944 bytes, Rootstock 62/858,494, native host 12/182,984, browser host 19/186,497, Meristem 21/114,688, Sprigging 8/101,890. Rootstock `src/lib.rs:7-25` names retained layout, hit testing, input routing, focus/spatial navigation, pacing and accessibility. `src/owned_layout.rs:61-85` owns style/layout/text/scroll/image state. These are ordinary toolkit capabilities with recurring standards/platform costs, even when the graph model is distinctive.
+Cambium/Rootstock own retained layout, hit testing, input routing, focus, text/scroll/image state and accessibility. The original audit called these ordinary toolkit costs without accounting for why applications project retained component semantics into Graphshell.
 
-Rootstock already has `embedding-egui` and `embedding-iced` features (`Cargo.toml:21-27`); `src/embedding.rs:7-10` states caller-owned device/queue and admitted sparse scene scope, and `src/embedding/egui.rs:6-7` lets egui own encoding/submission and viewport/scissor. Both adapters are gated off Wasm (`embedding.rs:23-30`). This is concrete evidence that a shared GPU can coexist with another UI toolkit; it does not prove every graph paint operation or browser deployment works through it.
+Rootstock's native egui/Iced adapters establish caller-owned GPU embedding. They do not establish an external stable identity and semantic projection contract. A real substitute must let another host project and hit-test bought controls with stable identity, accessible roles/actions/state, focus and text input while preserving authority and the shared GPU resource lifecycle. An immediate-mode paint API or private toolkit widget tree does not establish this. No such adapter was demonstrated by this review.
 
-A decisive prototype should host one real graph plus editor, command palette, docked panes and theme controls in an established shell, use the existing domain projections, and measure how much bespoke input/widget/host code can retire. Include exact a11y subtree composition, IME, focus, scaling and browser behavior. Replacing the entire toolkit in one migration is not justified by a file count. Equally, an existing design decision to own the toolkit does not settle whether the ongoing cost is worth it.
-
-Mere Workbench `crates/cambium/workbench/lib.rs:5-21` is explicitly a host-neutral presentation reducer, with domain authority projected onto it. [egui_dock](https://docs.rs/egui_dock/latest/egui_dock/) and [egui_tiles](https://docs.rs/egui_tiles/latest/egui_tiles/) provide mature split/tab/docking interaction within egui. They become attractive with the shell prototype, not as an isolated dependency swap inside Cambium.
+The recommendation to prototype an egui/Iced shell is struck. Existing embedding features remain evidence of those features, not a basis for retiring Cambium or Workbench. A future architectural argument may challenge the design, but must account for the complete capability and migration cost first.
 
 ### 6. Knot's merge is not an in-house character CRDT
 
@@ -131,7 +129,7 @@ Retirement should be actively sought, but only an upstream API matching accepted
 
 ### Custom DSP and standards candidates
 
-Woodshed `crates/audio-primitives/src/stretch.rs` is a genuine own WSOLA time-stretch implementation, about 19.7KB including tests. It controls windows, correlation, overlap-add and streaming state with a bit-exact unity path (`:1-40`). [SoundTouch](https://docs.rs/soundtouch/latest/soundtouch/struct.SoundTouch.html) provides time/tempo/pitch processing; Signalsmith has a [dedicated C++ pitch/time library](https://github.com/Signalsmith-Audio/signalsmith-stretch). Evaluate sound quality and complexity, with native C++/license/Wasm constraints and a required source-time mapping adapter. Ordinary resampling libraries are not substitutes for pitch-preserving time stretch.
+Woodshed `crates/audio-primitives/src/stretch.rs` owns WSOLA windows, correlation, overlap-add and streaming state with a bit-exact unity path. **R33 is struck:** SoundTouch and Signalsmith were proposed despite their C++ requirement. They are excluded from this reuse queue. No compatible Rust supplier or quality/source-clock advantage was established. Ordinary resampling is not pitch-preserving time stretch.
 
 `audio-primitives/src/onset.rs:1-42` owns energy-envelope onset/BPM heuristics rather than a full MIR suite. Its own rationale is single-line attacks, allocation control and no FFT; that is a testable requirement, not a veto on spectral-flux or established DSP alternatives. Evaluate only if actual attack-detection quality or scope warrants the dependency. Click synthesis, peak/meter envelopes and calibration timing are small kernels; no clear replacement would erase more integration than it adds in this spotcheck.
 
@@ -139,12 +137,6 @@ Woodshed `crates/audio-primitives/src/stretch.rs` is a genuine own WSOLA time-st
 
 MIDI is already bought: `crates/audio-pattern/src/midi.rs:6` uses Midly; its README records strict parsing with Rayon excluded. Audio decoding/driving similarly uses CPAL, Symphonia/Firewheel, rtrb, pitch-detector and pitch-detection. Do not recommend adopting libraries already integrated.
 
-## Bounded next decisions
+## Candidate follow-up
 
-1. Replace numeric color conversion behind unchanged public Tinct policy and consolidate Woodshed fold undo into Backstep.
-2. Prototype SDK-backed MCP plus rope-backed document storage separately, with measurable deleted code and exact compatibility receipts.
-3. Establish the real Armillary Pool consumer list; remove unused runtime surface if supported rather than choosing a replacement executor.
-4. Run one concrete shell/toolkit comparison using the existing native embedding seam before expanding bespoke widget/host features.
-5. Keep source authority, causal admission, domain scenes and command policy local. Require each proposed supplier to meet the current behavior it replaces; do not turn documented rationale into permanent immunity from comparison.
-
-Memory assisted source discovery only: MEMORY.md:24-27 and 164-170 supplied the earlier retained-ownership judgement and Xilem provenance warning; all substantive UI findings above were checked against current frozen source.
+Prefer existing in-family reuse: inspect color conversion compatibility and Backstep fold undo, and finish the Pool caller census. MCP/text-buffer candidates need an actual benefit and complete consumer dependency cost before implementation. The toolkit and C++ DSP experiments are withdrawn. Small accepted substitutions need proportionate tests and ordinary commit notes; a new receipt hierarchy or mandatory independent review is not required for every helper.
