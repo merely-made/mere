@@ -249,6 +249,23 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   Links: area stack · draws on cycle_breaks D8 · plans cycle_breaks P6 · summary The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features.
 
+- **D10. The WIT world reaches Mere's hosts through `links` metadata, for now (Mark,
+  2026-11-06):** "Accept for now". `graphshell-endpoint` declares `links` metadata for its one
+  WIT world; `document-host` and `app-host` copy it into their git-ignored manifest-relative
+  path in `build.rs`, and `settings-wit` reads it directly, so these crates carry an otherwise
+  unused normal dependency on `graphshell-endpoint`. Revisit together with the open question
+  of renaming `mere:script@0.1.0`. Outcome: new.
+
+  Links: area stack · draws on cycle_breaks D9 · summary Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided.
+
+- **D11. The extraction's structural choices stand (Mark, 2026-11-06):** "Keep all three".
+  The endpoint's door features are the Mere crate `graphshell-door`, beside `graphshell-host`;
+  the frozen-scene tests that need Mere crates are the Mere crate `graphshell-client-tests`;
+  the AccessKit conversion is `uxtree::frozen::FrozenUxTree` behind `uxtree`'s `frozen`
+  feature. Outcome: new.
+
+  Links: area stack · draws on cycle_breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
+
 ## Findings
 
 Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other repositories'
