@@ -17,7 +17,7 @@ wit_bindgen::generate!({
 });
 
 use exports::mere::script::block_adapter::{
-    Attr, Block, Change, Claim, Command, CommandKind, Example, Guest, Row, RunResult, ViewAsk,
+    Attr, Block, Change, Claim, Command, CommandKind, Example, Field, Guest, Row, RunResult, ViewAsk,
     ViewMode, ViewResult,
 };
 use sceno::{
@@ -46,11 +46,12 @@ impl Guest for Component {
             class: "fixture".into(),
             source_key: "fixture".into(),
             source_versions: vec![1],
+            pattern: Some(Field { label: "Fixture pattern".into(), default: "xx".into() }),
             commands: vec![
-                Command { id: "mark".into(), label: "Mark rows".into(), kind: CommandKind::Choice },
-                Command { id: "stamp".into(), label: "Stamp".into(), kind: CommandKind::Write },
-                Command { id: "echo".into(), label: "Echo".into(), kind: CommandKind::Text },
-                Command { id: "spin".into(), label: "Spin".into(), kind: CommandKind::Write },
+                Command { id: "mark".into(), label: "Mark rows".into(), kind: CommandKind::Choice, arg: None },
+                Command { id: "stamp".into(), label: "Stamp".into(), kind: CommandKind::Write, arg: Some(Field { label: "Stamp text".into(), default: "s0".into() }) },
+                Command { id: "echo".into(), label: "Echo".into(), kind: CommandKind::Text, arg: None },
+                Command { id: "spin".into(), label: "Spin".into(), kind: CommandKind::Write, arg: None },
             ],
             views: vec![ViewMode { id: "plain".into(), label: "Plain".into() }],
             example: Some(Example {

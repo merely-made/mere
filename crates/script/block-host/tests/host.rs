@@ -62,6 +62,8 @@ fn describe_claims_one_class_with_its_commands_and_views() {
     assert_eq!(claim.source_key, "fixture");
     assert_eq!(claim.commands.iter().map(|c| c.id.as_str()).collect::<Vec<_>>(), ["mark", "stamp", "echo", "spin"]);
     assert_eq!(claim.views.len(), 1);
+    assert_eq!(claim.pattern.unwrap().default, "xx");
+    assert_eq!(claim.commands[1].arg.as_ref().unwrap().default, "s0");
     assert_eq!(claim.example.unwrap().title, "Fixture block");
 }
 
