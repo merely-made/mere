@@ -10,7 +10,6 @@ members = [
     "crates/incipit",
     "crates/system/pandect",
     "crates/system/fetch",
-    "crates/system/page-load",
     "crates/system/source-edit",
     "crates/system/registry",
     "crates/system/tabard",
@@ -21,12 +20,10 @@ members = [
     "crates/forme/uxtree",
     "crates/domain/personal-facts",
     "crates/platen/platen",
-    "crates/fleece",
     # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
     # left for their own repository on 2026-10-09 (dramatis repo plan, DR-D);
     # the shared persona picker belongs to the Cambium widget family.
     "crates/cambium/persona-picker",
-    "crates/script/rhai",
     "crates/script/document-host",
     "crates/script/app-host",
     "crates/script/block-host",
@@ -67,21 +64,12 @@ members = [
     # strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md,
     # the consumers-first half of P3) ───
     # Pelt is the reference-browser port. Tabard moved to `crates/system/`
-    # on 2026-10-07 after becoming the shared theme library. The document lanes
-    # are a content lane, not a widget, so they land in `crates/system/` beside
-    # `fetch`. Package names are unchanged.
-    # The Knot editor host moved to `crates/inker/knot-editor-host` on
-    # 2026-09-04, when Knot's own sources left this repository (knot-editor
-    # `design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`, E2).
-    # It is inker-family integration code, not Knot product source, so it
-    # stays here; `ports/knot/` does not survive as a directory holding only
-    # it.
+    # on 2026-10-07 after becoming the shared theme library. Package names are
+    # unchanged.
     "ports/tabard/desktop",
     "ports/pelt",
     "ports/pelt/core",
     "ports/pelt/desktop",
-    "crates/inker/knot-editor-host",
-    "crates/system/document-lanes",
     # ─── Landed 2026-09-03 from genet (the same plan, P2) ───
     # The Cambium family: the retained widget lane. It keeps its own crate
     # names and versions; only its repository home moved. The scene lane lives
@@ -115,22 +103,10 @@ members = [
     # The djinn test harness (djinn test harness plan, ruling 5): unpublished,
     # a path dev-dependency for djinn, castellan, personae and their siblings.
     "crates/system/djinn-testkit",
-    # ─── Landed 2026-09-03 from genet (the same plan, P3) ───
-    # The engine-management layer: inker selects and orchestrates content
-    # engines, document-canvas lays its documents out, the three engine
-    # adapters wrap a system WebView (scrying), a Servo embedding (graft) and
-    # CEF (weld); the engine flip that carries one address between engines is
-    # inker::flip (folded from verso-tile 2026-09-05). They keep their own
-    # crate names and versions; only their repository home moved.
-    "crates/inker/inker",
-    "crates/inker/document-canvas",
-    "crates/inker/engines/scrying-engine",
-    "crates/inker/engines/graft-engine",
-    "crates/inker/engines/weld-engine",
-    # The smolweb rendering lane: nematic lowers the small-web formats into
-    # inker's document model, illume lexes and highlights their text.
-    "crates/nematic/nematic",
-    "crates/nematic/illume",
+    # The engine-management layer (inker, document-canvas, the three engine
+    # adapters), the smolweb lane (nematic, illume), knot-editor-host, the
+    # document lanes, page-load, fleece and script-rhai left for
+    # merely-made/inker on 2026-11-07 (engine split plan, P1).
     # Errand now owns the continuing Smolweb family in merely-made/errand.
     # Fetch consumes its independently versioned integration crate.
 ]
@@ -307,7 +283,7 @@ wit-parser = "=0.263.0"
 mere = { path = "crates/mere" }
 
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
-page-load = { package = "mere-pageload", version = "0.0.1", path = "crates/system/page-load" }
+page-load = { package = "mere-pageload", version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 proofs = { package = "mere-proofs", version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 incipit = { version = "0.2.1", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
@@ -329,28 +305,22 @@ luggage = { default-features = false, git = "https://github.com/merely-made/eide
 ux-events = { path = "crates/system/ux-events" }
 registry = { package = "mere-registry", path = "crates/system/registry", default-features = false }
 
-# The engine-management family moved to genet 2026-07-10 (genet
-# docs/2026-07-09_inker_genet_adoption_plan.md) and came back on 2026-09-03
-# under the platform boundary plan's P3, this time as mere's own workspace
-# members. Path deps now: none of the ten may appear in .cargo/config.toml's
-# genet or crates-io patch tables, because patching a git or crates.io source
-# at a path that is also a workspace member is a hard lockfile collision.
-inker = { version = "0.1.1", path = "crates/inker/inker" }
-document-canvas = { version = "0.1.0", path = "crates/inker/document-canvas" }
-# `default-features = false` belongs on this declaration:
-# `crates/inker/knot-editor-host` opts back into `html-fragment` explicitly, and
-# so does the external knot-editor.
-nematic = { version = "0.1.1", path = "crates/nematic/nematic", default-features = false }
+# The engine-management family moved to genet 2026-07-10, came back on
+# 2026-09-03 under the platform boundary plan's P3, and left for
+# merely-made/inker on 2026-11-07 (engine split plan, P1), with the smolweb
+# lane, knot-editor-host, the document lanes, page-load, fleece and script-rhai.
+inker = { version = "0.1.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
+document-canvas = { version = "0.1.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
+# `default-features = false` belongs on this declaration: knot-editor-host
+# opts back into `html-fragment` explicitly, and so does the external knot-editor.
+nematic = { version = "0.1.1", git = "https://github.com/merely-made/inker.git", branch = "main", default-features = false }
 fleece-extract = { package = "fleece", version = "0.5.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
-fleece = { package = "mere-fleece", path = "crates/fleece", version = "0.0.1" }
+fleece = { package = "mere-fleece", version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
-# Landed here from genet 2026-09-03 (platform boundary plan, P3): a workspace
-# member now, so it is a path dep and must NOT appear in .cargo/config.toml's
-# genet patch table — patching a git source at a path that is also a workspace
-# member is a hard lockfile collision. `default-features = false` is kept
-# because knot-document opts back into `preview` explicitly.
-knot-editor-host = { version = "0.1.1", path = "crates/inker/knot-editor-host", default-features = false }
-illume = { version = "0.0.3", path = "crates/nematic/illume" }
+# `default-features = false` is kept because knot-document opts back into
+# `preview` explicitly.
+knot-editor-host = { version = "0.1.1", git = "https://github.com/merely-made/inker.git", branch = "main", default-features = false }
+illume = { version = "0.0.3", git = "https://github.com/merely-made/inker.git", branch = "main" }
 # ─── Landed from genet 2026-09-03 (platform boundary plan, P2) ──────────────
 # Workspace members, so path deps. None of the eleven may appear in
 # .cargo/config.toml's genet patch table: patching a git source at a path that
@@ -365,12 +335,10 @@ hest = { version = "0.2.1", git = "https://github.com/merely-made/graphshell.git
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.3.0", path = "crates/cambium/sprigging" }
-# The three engine adapters, unpublished. Their version was genet's
-# workspace 0.2.0, inlined on landing because mere's workspace version is
-# 0.0.1 and the move is not a version decision.
-scrying-engine = { version = "0.2.0", path = "crates/inker/engines/scrying-engine" }
-graft-engine = { version = "0.2.0", path = "crates/inker/engines/graft-engine" }
-weld-engine = { version = "0.2.0", path = "crates/inker/engines/weld-engine" }
+# The three engine adapters, unpublished, from merely-made/inker.
+scrying-engine = { version = "0.2.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
+graft-engine = { version = "0.2.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
+weld-engine = { version = "0.2.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
 
 # Centralized 2026-08-26. These were previously restated in each member with a
 # full git spec, so a genet bump meant editing fifteen files and a missed one
@@ -422,7 +390,7 @@ pelt-core = { path = "ports/pelt/core" }
 pelt-desktop = { path = "ports/pelt/desktop", default-features = false }
 tabard = { version = "0.0.2", path = "crates/system/tabard" }
 tabard-workshop = { path = "ports/tabard/workshop" }
-mere-lanes = { version = "0.1.0", path = "crates/system/document-lanes" }
+mere-lanes = { version = "0.1.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
 
 # Genet crates the landed ports reach. In genet these were relative paths into
 # `components/`; here they are git pins at the same single revision as every
@@ -556,7 +524,7 @@ persona-picker = { package = "persona-picker", path = "crates/cambium/persona-pi
 
 # Rhai backend for the knot block-evaluator lane (the thin BlockEvaluator
 # slice, distinct from genet's full ScriptEngine seam). Pure Rust, sandboxed.
-script-rhai = { version = "0.0.1", path = "crates/script/rhai" }
+script-rhai = { version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 script-wire = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 block-host = { version = "0.0.1", path = "crates/script/block-host" }
 vector-sheet = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
@@ -660,6 +628,13 @@ too_many_lines = "warn"
 [patch."https://github.com/merely-made/mere.git"]
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
+# Knot's pinned revision names these five through mere.git; they left for
+# merely-made/inker on 2026-11-07 (engine split plan, P1).
+illume = { git = "https://github.com/merely-made/inker.git", branch = "main" }
+inker = { git = "https://github.com/merely-made/inker.git", branch = "main" }
+knot-editor-host = { git = "https://github.com/merely-made/inker.git", branch = "main" }
+nematic = { git = "https://github.com/merely-made/inker.git", branch = "main" }
+script-rhai = { git = "https://github.com/merely-made/inker.git", branch = "main" }
 mere-edit = { path = "crates/system/source-edit" }
 mere-facts = { path = "crates/domain/personal-facts" }
 cambium = { path = "crates/cambium/cambium" }
@@ -672,15 +647,11 @@ gemot = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
 graphshell = { path = "ports/graphshell" }
 graphshell-door = { path = "crates/graphshell/graphshell-door" }
 graphshell-host = { path = "crates/graphshell/graphshell-host" }
-illume = { path = "crates/nematic/illume" }
-inker = { path = "crates/inker/inker" }
 insigne = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
-knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 mere-surface-api = { path = "crates/system/surface-api" }
 mere-transport = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 muniment = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
-nematic = { path = "crates/nematic/nematic" }
 notochord = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 pandect = { path = "crates/system/pandect" }
 personae = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
@@ -688,7 +659,6 @@ personae = { git = "https://github.com/merely-made/dramatis.git", branch = "main
 # `c966e31` pin (wing ruling 586, "With djinn's Knot repin (Recommended)").
 scenograph = { path = "crates/cambium/scenes/scenograph" }
 scenomise = { path = "crates/cambium/scenes/scenomise" }
-script-rhai = { path = "crates/script/rhai" }
 servitor = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 stickleback = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 
@@ -697,7 +667,6 @@ stickleback = { git = "https://github.com/merely-made/eidetic.git", branch = "ma
 cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
 cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-a11y = { path = "crates/cambium/cambium-winit-a11y" }
-document-canvas = { path = "crates/inker/document-canvas" }
 backstep = { path = "crates/cambium/backstep" }
 errand = { git = "https://github.com/merely-made/errand.git", branch = "main" }
 incipit = { path = "crates/incipit" }
@@ -706,11 +675,8 @@ mere = { path = "crates/mere" }
 mere-alembic = { path = "crates/distillery/alembic" }
 mere-cartography = { path = "crates/canvas/cartography" }
 mere-curation = { path = "crates/forme/curation" }
-mere-lanes = { path = "crates/system/document-lanes" }
-mere-fleece = { path = "crates/fleece" }
 mere-forme = { path = "crates/forme/forme" }
 mere-kernel = { path = "crates/graph/graph-kernel" }
-mere-pageload = { path = "crates/system/page-load" }
 mere-overmap = { path = "crates/cambium/mere-overmap" }
 mere-view = { path = "crates/cambium/mere-view" }
 murm-webrtc = { git = "https://github.com/merely-made/murm.git", branch = "main" }

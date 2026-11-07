@@ -328,9 +328,7 @@ fn probes_05_17_fold_headings_carry_expanded_state_and_hidden_blocks_are_omitted
     for (file, source, target, links, ancestors) in [
         (
             "probe-nav-05-closed-target.mu",
-            include_str!(
-                "../../../nematic/nematic/tests/fixtures/micron/nomadnet-1.4.2/navigation/probe-nav-05-closed-target.mu"
-            ),
+            include_str!("../tests/fixtures/micron/probe-nav-05-closed-target.mu"),
             (Role::Heading, "Hidden Target"),
             &[
                 "jump to the hidden heading",
@@ -340,9 +338,7 @@ fn probes_05_17_fold_headings_carry_expanded_state_and_hidden_blocks_are_omitted
         ),
         (
             "probe-nav-17-nested-closed-target.mu",
-            include_str!(
-                "../../../nematic/nematic/tests/fixtures/micron/nomadnet-1.4.2/navigation/probe-nav-17-nested-closed-target.mu"
-            ),
+            include_str!("../tests/fixtures/micron/probe-nav-17-nested-closed-target.mu"),
             (
                 Role::Paragraph,
                 "MARKER NESTED DEEP TARGET: bound inside both closed folds.",

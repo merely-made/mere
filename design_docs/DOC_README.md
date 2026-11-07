@@ -767,131 +767,11 @@ everywhere else. Both problems close together: everything below moved by
 - [local-genet-development](cambium_docs/testing/local-genet-development.md) — how to redirect Cambium's Genet seam dependencies to a local Genet checkout for testing unpublished changes via explicit `.cargo/config.local.toml` and a separate local lock; the two standing rules the hard way (a patch table must name every package the graph pulls from that source, and no workspace member may appear in it — `cambium`, `sprigging`, `workbench`, `mere-surface-api` and the rest of the landed family are permanently excluded). **2026-09-29 annotation:** records the resumed locked-source checks, exact cache restoration, content-preserving invalidation after a transient source collision, and the requirement to refresh evidence after merging newer main. **2026-09-29 a31b9a14 checkpoint:** adds the combined-tree lock/graph classification and source-mtime receipt practice; follow-on ee77bf23 checks remain required before publication. **2026-09-29 follow-on annotation:** records completed cone comparisons, fresh affected tests and all-feature native/web checks with stable hashes/mtimes; pre.4, S13 and downstream adoption remain separately gated.
 - [component catalog receipts](cambium_docs/testing/receipts/README.md) — the two committed self-contained HTML captures (420px narrow, 900px regular viewport) generated from the live component catalog and compared byte-for-byte by `committed_receipts_match_the_live_catalog`; regenerate with `cargo run -p cambium --example component_catalog -- --write-receipts`.
 
-## inker_docs/ — the engine controller
+## inker_docs/, nematic_docs/, verso_docs/ — moved to Inker 2026-11-07
 
-Area root, gone to genet 2026-08-24 with its subject and back 2026-09-03 with
-it, at the same name and with its history (platform boundary plan, P3). It
-describes `crates/inker/`: `inker`, `document-canvas`, the scrying/graft/weld
-engine adapters.
-
-### inker_docs/research/
-
-- [web_surface_contract_assessment](inker_docs/research/2026-09-03_web_surface_contract_assessment.md)
-  (the neutral `webcue`/`wgpu-cue` contract is implemented and published;
-  Genet/Servo and Turnstone have bounded Metal, Vulkan, Wayland and physical
-  IBus receiving evidence at their recorded sources. Other native bindings,
-  physical CJK methods, human accessibility and physical device-loss gates
-  retain their separate qualification. September's extraction assessment
-  remains historical; Mere/Inker owns orchestration above the shared boundary.)
-
-### inker_docs/implementation_strategy/
-
-
-
-  (**Phases 0–3 landed in meerkat and retired with it 2026-07-18**; `EngineRoutePolicy`, `is_surface_engine` and the graft/weld `SurfaceEngine` impls survive — route → activate → manage → pick. The
-  user-facing engine **picker** as an inker affordance, distinct from verso's
-  flip; the three-level pluggability model (in-build / registered-but-off /
-  active via `is_available = contains && enabled`), a global default with
-  per-session override, and the two content tiers as the two registries —
-  glass/black-box, wasm/native. No-handler fallback and local-file ingestion
-  are in scope but not yet shipped (Phase 4).
-  **Remaining**: Phase 4 (no-handler and local files), Phase 2b (per-host and
-  per-session), Phase 5 (the verso flip). **Page capture P1 landed 2026-08-30**:
-  Inker defines correlated viewport-only capture requests/results, but no
-  engine yet claims support. Its progress log names meerkat, which was deleted
-  2026-07-18; the Phase 0–3 host code left with it; the open phases have no host. Its body's
-  `components/inker/...` *(historical citation)* <!-- doc-audit: historical-path --> paths are genet's; the code is `crates/inker/` here.
-  **2026-10-07 current-browser family in progress:** main already carries the
-  shared Weld input and ordered Graft contracts; Genet's published decoder
-  repair is being adopted with current CEF, then Knot, Redshank and Turnstone
-  are qualified as one selected consumer family. Initial Mere/Graft neutral
-  all-target checks and seven adapter tests pass on the final Genet/Weld
-  source pair; CEF-enabled consumer, native and foreign accessibility gates
-  stay distinct.)
-
-- [presentation_engines_plan](inker_docs/implementation_strategy/2026-10-28_presentation_engines_plan.md) — **cut 2026-10-28**: engine routing and surface engines, the engine flip host, shared surface receiving, the polyglot block resolver.
-## nematic_docs/ — the smolweb engine and knot composition
-
-Same round trip as `inker_docs/` above. It describes `crates/nematic/`
-(`nematic`, `illume`) and Errand (then `crates/system/errand`; in
-[merely-made/errand](https://github.com/merely-made/errand) since 2026-10-19). Seven documents came back
-where eight left: genet archived the knot evaluation/export plan on 2026-09-02
-and it stays in `genet/design_docs/archive_docs/2026-09-02/`, cited by path.
-
-### nematic_docs/implementation_strategy/
-
-- [smolweb_fidelity_plan](nematic_docs/implementation_strategy/2026-10-28_smolweb_fidelity_plan.md) — **cut 2026-10-28**: WS2 trust, Micron lanes 1 and 4, Turnstone S1 to S3, fetch actor adoption.
-- [micron_navigation_plan](nematic_docs/implementation_strategy/2026-10-28_micron_navigation_plan.md) — **cut 2026-10-28**: A1's Turnstone half and R1; keeps its decisions.
-- [polyglot_knot_design](nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md)
-  (**implemented 2026-05-08/09**, retained as design rationale and format spec:
-  extends the `nematic.knot` note format from frontmatter-plus-markdown to a
-  polyglot composition where every other `nematic.*` protocol's blocks embed
-  fenced-code-block-style and round-trip back to the source protocol's syntax.)
-  (**planned**: collapse the three separate passes — `expand_fenced_blocks`,
-  `resolve_transclusions`, `evaluate_blocks`, each with its own dispatch and
-  trust handling — into one registry that resolves *any* fenced block by its
-  tag, and the new resolver kinds that makes pluggable: graph/eidetic query
-  blocks, diagram DSLs, sandboxed wasm blocks.)
-- [native_smolweb_rendering_plan](archive_docs/2026-10-06_completed_plans/2026-06-27_native_smolweb_rendering_plan.md)
-  (**implementation complete 2026-06-27; Mere host integration and interactive
-  eyeballing remain; historical record**: render every smolweb format natively
-  and idiomatically rather than flattening it into one model. The **two-family
-  model** — document family (djot/markdown/reader-HTML, native `Block`) versus
-  smolweb family (gemtext/gopher/feed/scroll/misfin, a per-format AST, views
-  shared with the host because they avoid `Block`). The views now live in
-  `cambium::nematic` with no consumer; **removed 2026-10-06** under S66 (the
-  fidelity plan's WS4, R0). Its §5 crate-home diagram is superseded
-  by the smolweb home decision; crate homes read through that.)
-  (**accepted, in progress (2026-10-06): C1 to P1c, Cambium's scroll request and A1's Knot half landed 2026-09-16; A1's Turnstone half next**: lane 2 of the fidelity plan. Anchors and
-  collapsible sections: stock captures for the open spellings first, then fold
-  extents and anchor resolution in Nematic, session-owned fold state and
-  scroll-to-anchor in the shared presentation, then both consumers and headed
-  receipts. Zero transport for an in-page anchor is a done-condition.)
-  (**in progress (2026-10-06)**: recovers the spec-faithfulness the flavour-neutral
-  pipeline collapses. Key code-verified finding — **the losses are at the parse
-  ASTs, not the box rendering**, so the fix is richer ASTs rather than a
-  different render regime. Three workstreams: enrich the parse ASTs (partial:
-  feed guid and enclosures, typed Spartan prompt); produce trust at the
-  transport and surface it in host chrome (both lanes now carry
-  `EngineDocument.trust`, unpopulated); and bespoke rendering only where the
-  line model is not box-shaped, gopher's fixed-width typed column being the
-  clear case, superseded 2026-10-06 by WS4, one render path (rulings S66 and
-  S70 to S75: a typed `Block::Menu`, `Block` non-exhaustive, the feed fields
-  and an article reader, the per-format views retiring; done 2026-10-06,
-  R0 to R5 in `b4f14f2c` and R6, gopher-protocol 0.2.0, in `1d87808a`). It also holds the Micron conformance lanes: reading slice,
-  consumers and forms (lane 3) landed 2026-09-13, navigation (lane 2) runs in
-  micron_navigation_plan, lanes 1 and 4 open. **WS1's enrichment lands
-  wherever the grammar lives at the time** — if a grammar has moved to a
-  smolweb crate, the enrichment goes there.)
-
-## verso_docs/ — rendering surfaces and the engine flip
-
-Same round trip again. It describes the engine flip, which since 2026-09-05 is
-the `flip` module of `crates/inker/inker` (`api`, `orchestrator`, `scry`, and
-the `genet-donor` feature); the `verso-tile` crate it had been was folded in
-because the flip is the dynamic counterpart of inker's per-address multiplexer
-and the crate had one external consumer. The docs keep their own root because
-the charter is a separate argument.
-
-### verso_docs/technical_architecture/
-
-- [compatibility_view_charter](verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md)
-  (**charter decision (Mark, 2026-06-10)**, pre-implementation: verso reborn as
-  the engine-flip / compatibility-view seam — portable view-state carriers and
-  the one-hop invariant, minted at the first genet→scrying flip.)
-
-### verso_docs/implementation_strategy/
-
-  (**design resolved; library-only in `inker::flip` since 2026-09-06
-  (`7a726657`)**: the first flip. The plan's crate layering — `verso-api` plus
-  per-engine `verso-genet`/`verso-scry`/`verso-weld`/`verso-graft` adapters
-  plus a `verso` orchestrator — was **consolidated into the single
-  `verso-tile` crate on 2026-07-09** (modules `api`, `flip`, `scry`, and the
-  `genet-donor` feature); read the plan's crate names as that crate's modules,
-  and its `components/verso-tile` *(historical citation)* <!-- doc-audit: historical-path --> path as `crates/inker/inker/src/flip/` here.
-  `FlipDonor`/`FlipBack`/`FlipReceiver` encode no-chain in the types. The
-  meerkat host wiring and per-node picker retired with meerkat (`c5f01064`), so
-  no host fires the flip; which host should is open.)
+- **inker_docs/** — in [merely-made/inker](https://github.com/merely-made/inker/tree/main/design_docs/inker_docs) since 2026-11-07 (engine split plan, P1), with `crates/inker/`.
+- **nematic_docs/** — in [merely-made/inker](https://github.com/merely-made/inker/tree/main/design_docs/nematic_docs) since 2026-11-07, with `crates/nematic/`.
+- **verso_docs/** — in [merely-made/inker](https://github.com/merely-made/inker/tree/main/design_docs/verso_docs) since 2026-11-07, with `inker::flip`.
 
 ## Component areas (collapsed from member crates 2026-08-24)
 
@@ -912,7 +792,7 @@ the charter is a separate argument.
 - **dramatis_docs/** — Castellan custody and Dramatis client integration. [Custody isolation and security hardening](archive_docs/2026-10-28/2026-10-21_custody_isolation_and_security_hardening_plan.md) (**H1 and H2 on main, 2026-10-26; platform receiving runs gate production**): source findings and the macOS native primitive evidence, including the same-user signing-authority escape. `djinn-custodian` is its own process behind one authenticated contract (`custody-wire`), with Linux, macOS and Windows launchers. Since H2 it holds Castellan's resident host, the wallet, the credential catalog and the SSH agent. A production Djinn links no castellan and reaches every vault use through it; the plan's inventory maps each consumer to its operation. Hocket adoption is stopped (an identity-format change), and the wallet's secret files move into custody only after a public/secret file split. The tests pass on macOS and Linux and Windows builds type-check. The Linux and signed-macOS receiving runs gate production use. The custodian integration (`repos/dramatis/design_docs/2026-10-22_castellan_custodian_integration.md`) and [residue repair](dramatis_docs/implementation_strategy/2026-10-22_castellan_residue_repair.md) record the custodian slice and the master-seed residue fix. Three authority tiers share worker infrastructure, with configured ingress before loopback publication. [Vault lock](archive_docs/2026-10-28/2026-10-05_vault_lock_plan.md) records landed L1–L4 historical receipts and their security continuation; [Dramatis app](dramatis_docs/implementation_strategy/2026-10-11_dramatis_app_plan.md) records the public client and native quarantine/authentication qualification; [Secret Service](archive_docs/2026-10-28/2026-10-08_secret_service_plan.md) remains parked by SS8. Portable tier/repo/threat/CXF documents remain owned by the external Dramatis repository and stay separately pinned.
 - **Historical Intel records, archived 2026-11-03** — [Sibylla founding proposal](archive_docs/2026-11-03/2026-07-07_sibylla_founding_proposal.md) · [Vates founding proposal](archive_docs/2026-11-03/2026-07-07_vates_founding_proposal.md) · [August feature/target matrix](archive_docs/2026-11-03/2026-08-09_feature_target_matrix.md) · [Standalone Sibylla README](archive_docs/2026-11-03/sibylla_README.md) · [Standalone Vates README](archive_docs/2026-11-03/vates_README.md) · [historical index Burn lift](archive_docs/2026-10-06_completed_plans/2026-07-08_index_burn_lift_plan.md). ESP’s current provider implementation belongs to Distillery; [continuing qualification and consumer cues](mere_docs/implementation_strategy/2026-10-28_resident_inference_plan.md#standalone-intel-records-and-continuing-qualification) remain explicit in the resident-inference plan.
 - **scenograph_docs/** — [scene_contract_note](scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md) (**historical 0.0.3 release baseline**, landed and consumed: written as rationale for the P2 type sketch before mere wired onto it; mere, isometry and graphshell now all consume the contract) · [scenotime_epoch_diff_note](scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md) (**landed and verified locally** as the Scenograph half of Graphshell G2: `SceneSnapshot` wraps a dense `sceno::Scene` in an explicit `SceneEpoch` and `Revision`, over stable source/space/item/relation/region tables).
-- **inker_docs/, nematic_docs/, verso_docs/ — back from genet 2026-09-03.** They left on 2026-08-24 because their subject lived in genet; the subject moved here under the platform boundary plan's P3 and the roots came with it, at the same names and with their history. They now have full sections of their own above, and are indexed only here. The eighth document, the knot evaluation/export plan, was archived in genet on 2026-09-02 and stays at `genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md`, cited by path per DOC_POLICY §5.
+- **inker_docs/, nematic_docs/, verso_docs/** — back from genet 2026-09-03 with their subject; left with it for [merely-made/inker](https://github.com/merely-made/inker) on 2026-11-07 (engine split plan, P1). Indexed there.
 - **Gemot repository** — [flora_tulpa_standing_plan](archive_docs/2026-10-06_completed_plans/2026-08-31_flora_tulpa_standing_plan.md) (**landed on main 2026-09-02; archived 2026-10-06** (integration branch complete 2026-08-31; Standing since moved to mien, `a1551086`): Standing migration, frozen-electorate Tulpa adoption, exact FLoRA social and tensor contracts, privacy boundaries, and the integrated adoption receipt) · [irc_mod_plan](archive_docs/2026-09-02_retired_plans/2026-05-05_irc_mod_plan.md) (IRC as the first T1 protocol mod) · [moot_publication_plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md) (**live plan, cut 2026-11-01** from the archived M1 plan: production publication and hosting records with historical authority, updates and honest retention, the remaining collection gates, application co-op, addressed mesh delivery, and host and consumer residue) · [bounty_verification_economy_plan](archive_docs/2026-10-06_retired_plans/2026-06-30_bounty_verification_economy_plan.md) (**archived 2026-10-06**; historical Tessera wording; outer-ring resource economy and verification receipts) · [boundary_identity_and_grant_composition](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/research/2026-08-09_boundary_identity_and_grant_composition.md) (design-session findings: grants live at the data layer so validity is honored-here-now; casts + cross-transport linkage policy; exercise vs transfer as separate rights; moot-as-participant under suzerainty; provenance vs legibility; the transport-tier counterpart is retinue's 2026-08-09 mesh-scaling doc) · [radio_scopes_as_moots](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/research/2026-08-12_radio_scopes_as_moots.md) (**ratified 2026-08-12**: retinue's civic-deployment scopes are moots — governance host-side, boards verify a cold signed policy artifact; miscible membership, suzerainty as consent-for-carriage, cast economics metering corroboration; the partition merge rule is now consumed by retinue CV4; corroboration envelope unifies with petition/pin shapes as the default design). *(tessera_plan archived 2026-06-09.)* **Archived 2026-09-02** — retired by the active-tree audit (subject deleted or abandoned); open points extracted to the [archived-plan tails](archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md).
 - **murm_docs/** — [MURM_AS_BILATERAL](murm_docs/technical_architecture/MURM_AS_BILATERAL.md) (murm's bilateral-comms role + boundaries; banner: substrate pivoted to p2panda).
 
@@ -1010,7 +890,7 @@ is historical evidence, not the current path or ownership inventory. For the wor
   unrelated records when aligning a workspace cohort. A targeted Cargo
   update can rewrite dependency edges while keeping package versions:
   compare whole registry records and resolved edges, and restore unrelated
-  valid selections before qualification. The [presentation engines plan](inker_docs/implementation_strategy/2026-10-28_presentation_engines_plan.md#findings)
+  valid selections before qualification. The [presentation engines plan](https://github.com/merely-made/inker/blob/main/design_docs/inker_docs/implementation_strategy/2026-10-28_presentation_engines_plan.md#findings)
   records the Netrender device case.
 
 - **Workshop composition (2026-10-28):** Alembic/Athanor own the workshop inside Distillery; Servitor stays in Eidetic and supplies admission/run semantics, while Armillary supplies execution. Products retain commit and durability authority. The [Alembic plan](mere_docs/implementation_strategy/2026-10-28_alembic_implementation_plan.md) owns the concrete two-host workflow and its qualification gates; the [harness brief](mere_docs/research/2026-07-03_agent_harness_brief.md) separates durable ownership, peer execution and model computation.

@@ -213,7 +213,7 @@ added, moved, or archived; the command must report full current-path coverage.
 
 ### Area roots
 
-Updated 2026-10-19 after the foundation family promotion. Eidetic, Armillary
+Updated 2026-11-07 when the Inker crates left (below); before that, 2026-10-19 after the foundation family promotion. Eidetic, Armillary
 and community governance documentation now live with their owning repositories.
 
 ```
@@ -227,15 +227,9 @@ mere/design_docs/
 │                                     (Meristem, Cambium, Sprigging, Workbench)
 ├── dramatis_docs/                 ← castellan's custody (vault lock, Secret
 │                                     Service); the tier itself is in dramatis
-├── inker_docs/                    ← the engine controller (inker,
-│                                     document-canvas, the engine adapters)
 ├── intel_docs/                    ← Mere inference integrations (Vates, Sibylla)
 ├── murm_docs/                     ← bilateral comms
-├── nematic_docs/                  ← the smolweb engine and knot composition
-│                                     (nematic, illume, errand)
 ├── scenograph_docs/               ← the scene contract
-├── verso_docs/                    ← the engine flip's charter
-│                                     (inker::flip, was verso-tile)
 └── archive_docs/                  ← superseded checkpoints
 ```
 
@@ -290,6 +284,14 @@ Secret Service plans) stay with it, as do gazette and the persona picker
 (D7). Links from here to the moved documents became path citations
 (`repos/dramatis/...`, core §5), and code-font paths into the moved crates
 in active documents were repointed the same way.
+
+**Three roots left for Inker on 2026-11-07.** `inker_docs/`, `nematic_docs/` and
+`verso_docs/` (six documents) followed their subject to `merely-made/inker` under the
+engine split plan's P1, with their history, and are indexed in that repository's
+`design_docs/DOC_README.md`. Their D2 records stay here and map to the new home in
+`support/doc-audit/d2/moved_out.json`. Markdown links from active documents into the
+moved crates were repointed to the Inker repository; code-font paths into them were
+not yet (the engine split plan's Open items carry the count).
 
 **Member-crate scatter was collapsed 2026-08-24.** Nine `crates/*/design_docs/`
 directories held 20 documents, 18 of which `DOC_README.md` did not index. They
