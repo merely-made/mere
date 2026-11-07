@@ -2,7 +2,7 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D22 are ruled (D21 reverts D20); the plan is on origin's main
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D23 are ruled (D21 reverts D20); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
 `merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
@@ -71,7 +71,8 @@ Receipts go to `archive_docs/receipts/2026-11-07_engine_split_plan_receipts.md` 
 | Home | Holds | Intention |
 |---|---|---|
 | `merely-made/mere` | the `mere` engine crate; the reservoir service; `pandect` as the graph-domain revision lifecycle | dereference, parse, model, interpret; the person's profile of it |
-| `merely-made/graphshell` | the host contract (cycle-breaks D9's leaves) and the hosting: workspace kernel, Cambium family, projections, chrome, resident assembly, ports | how a person holds, arranges and moves through graphs |
+| `merely-made/graphshell` | the host layer as a library (D23): the contract root below (cycle-breaks D9's leaves plus tinct) and the hosting above (workspace kernel, Cambium family, projections, chrome, resident assembly); no application | how a person holds, arranges and moves through graphs |
+| `merely-made/turnstone` | the reference host duties (D23): the Graphshell reference application, its loopback acceptance view and the MCP server, beside Pelt | the product that exercises the host layer end to end |
 | `merely-made/inker` | engine selection, readers, document canvas, smolweb, lexing, clipping | what a page says and how it reads |
 | `merely-made/seiche` (D6) | bodies, voxels, fields, force integration, lit tenant | the reusable spatial runtime |
 | unchanged | Genet (web engine), Eidetic (store substrate, domain interface, pack header), Armillary (Djinn), Dramatis (custody), Distillery (works), Gemot, Murm | as today |
@@ -125,10 +126,11 @@ view and composition crates; no new facade), `mere-cartography`, `pictograph`, `
 feature in P0; a registry may carry several owners' contracts but makes none of their
 decisions), `mere-surface-api`, `settings-wit`, `ux-events`, `mere-fetch` (the host's fetch
 service, keeping cookies and the engine-flip state; RDF resolution policy is the engine's),
-`graphshell-host`, `graphshell-mcp`, `djinn-testkit`, `mere:script` with `script-wire` and
-`script-witgen`, `app-host`, `document-host`, `scenograph`, `scenomise`, and the ports
-`graphshell`, `mere-resident` (the concrete assembly), `pelt`, `tabard`, `dramatis`,
-`gazette-ledger`, `moot`, `distillery`. The contract leaves cycle-breaks D9 already assigns
+`graphshell-host`, `djinn-testkit`, `mere:script` with `script-wire` and `script-witgen`,
+`app-host`, `document-host`, `scenograph`, `scenomise`, and the ports `mere-resident` (the
+concrete assembly), `pelt`, `tabard`, `dramatis`, `gazette-ledger`, `moot`, `distillery`.
+Under D23 the reference host application (`ports/graphshell`) and `graphshell-mcp` go to
+Turnstone instead, so the Graphshell repository holds no application. The contract leaves cycle-breaks D9 already assigns
 (`chirograph`, `graphshell-client`, `graphshell-endpoint`'s default surface, `sceno`,
 `scenotime`, the WIT world) are the same repository's bottom layer.
 
@@ -616,6 +618,20 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D12, engine-split D19, domain-contract C5 · summary The stack has a data root and a presentation root; a leaf goes to the root of its nature; Stack 9 says so.
 
+- **D23. Graphshell is the host layer as a library; Turnstone takes the reference-host duties
+  (Mark, 2026-11-07):** asked whether to make Graphshell infrastructure with Turnstone taking
+  its duties, or expand Cambium and make Graphshell only a host: "Graphshell is the host layer
+  as a library; Turnstone takes the reference-host duties (Recommended)". The repository keeps
+  the contract root below and the toolkit, kernel, projections and resident assembly above,
+  with no application; the reference host application, its loopback acceptance view and the
+  MCP server move to Turnstone, which already composes Pelt and Graphshell. The toolkit's home
+  is fixed by its consumers (Knot's desktop, Woodshed, Cleromancy and Isocosm pin Cambium,
+  Tabard and mere-view), so it cannot live in a product repository. Outcome: refines D2 and
+  cycle-breaks D8 ("graphshell = the protocol" becomes "graphshell = the host layer"); the
+  name stops meaning an application.
+
+  Links: area The stack · amends engine-split D2, cycle-breaks D8 · draws on mere:stack.3 · plans engine-split P3 · summary The Graphshell repository is the host layer as a library, contract root below and hosting above, with no application; Turnstone holds the reference host and the MCP server.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -835,6 +851,9 @@ revision and what crosses at frame rate.
   evidence.
 - 2026-11-07: tinct pushed to graphshell main (`d80316db`). The relock committed on main. D22
   recorded; Stack 9 written with the eighth slot.
+- 2026-11-07: D23 recorded. The Mere consumer-cuts lane (tinct, state-witness, framing out of
+  Mere) first landed in a Graphshell worktree by a working-directory slip and did nothing;
+  relaunched from Mere. P1 continuing on the palette over tinct.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the

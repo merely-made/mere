@@ -454,7 +454,10 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   *D8 and D9 refined 2026-11-07 (engine-split D2): the repository keeps the contract as its
   bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.
   D9 refined again the same day by engine-split D19: the contract root gains `tinct` and is a
-  leaf layer Inker may name, with the drift toward "the family's leaves" named as a cost.*
+  leaf layer Inker may name, with the drift toward "the family's leaves" named as a cost.
+  D8 refined by engine-split D23: the repository is the host layer as a library, contract root
+  below and hosting above, with no application; the reference host and MCP server go to
+  Turnstone.*
 
 ## Findings
 
