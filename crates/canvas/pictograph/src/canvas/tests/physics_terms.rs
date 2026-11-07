@@ -11,6 +11,7 @@
 
 use std::rc::Rc;
 
+use seiche::SceneFieldTerms as _;
 use seiche::instruments::{self, Candidate, Probe, Reading};
 use seiche::{
     AffinitySpring, AnchorSpring, Class, CouplingForce, Currency, Declared, Force, Layout, Metric,
