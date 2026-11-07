@@ -23,7 +23,7 @@ Sources are lines of `archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.
 - Design responsibility (design language record, section 9.14, 2026-10-10): field behaviour and the node, link and field editors belong to the projection grammar lane; theme and typography to the Tabard lane; visible dynamics explanations and script and motion authoring to the dynamics lane. Lines 675-686.
 - Graph semantics: anything touching resources and assertions goes through graph semantics' owner (SE74); node facets dissolve into attribute, resource and tag (SE75). Lines 234-236.
 - Mosaic keeps its steady behaviour on a pannable infinite canvas; Partition is the viewport-bounded subdivision (Mark, 2026-10-16). Suggestions are derived graph members saved only once kept, with per-host suggestion settings off by default (2026-10-16). Lines 1289, 1294, 1306.
-- The viewer's per-route wasm cap is 3.50 MiB (3,670,016 bytes), raised on Mark's call 2026-10-16. Lines 1304-1305.
+- The viewer's per-route wasm cap is 5.00 MiB (5,242,880 bytes), raised on Mark's call 2026-11-07 (3.50 MiB from 2026-10-16). Lines 1304-1305.
 - Draft delivery: drafts may be pushed straight to main for other machines to review (Mark, 2026-10-10); an unrun check stays unrun, and publishing a draft does not complete the plan's acceptance gate. Lines 908-920.
 
 ## Phases

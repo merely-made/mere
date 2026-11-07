@@ -25,6 +25,8 @@ pub enum Effect {
 
 #[derive(Clone, Debug, Default)]
 pub struct Snapshot {
+    /// A view that stores nothing: it offers only Reconcile, and the notice.
+    pub read_only: bool,
     pub available: bool,
     pub editing: bool,
     pub dirty: bool,
@@ -59,6 +61,9 @@ impl PresentationEditor {
         if s.busy || !s.available {
             return false;
         }
+        if s.read_only && effect != Effect::Reload {
+            return false;
+        }
         match effect {
             Effect::Begin => !s.editing && !s.can_reload,
             Effect::AddNode | Effect::AddRelation | Effect::AddField | Effect::Discard => s.editing,
@@ -78,7 +83,9 @@ impl PresentationEditor {
 pub fn view(editor: &PresentationEditor) -> Element {
     let s = &editor.snapshot;
     let mut children = Vec::<Element>::new();
-    if s.editing {
+    if s.read_only {
+        // Only Reconcile, below, is offered.
+    } else if s.editing {
         for (label, effect) in [
             ("Add node rule", Effect::AddNode),
             ("Add link rule", Effect::AddRelation),
@@ -112,7 +119,10 @@ pub fn view(editor: &PresentationEditor) -> Element {
             },
             Effect::Redo,
         ),
-    ] {
+    ]
+    .into_iter()
+    .filter(|_| !s.read_only)
+    {
         children.push(action(label, effect, editor.permits(effect)));
     }
     if s.can_reload {
@@ -136,4 +146,37 @@ fn action(label: &'static str, effect: Effect, enabled: bool) -> Element {
         move |editor: &mut PresentationEditor, _| editor.push(effect),
     );
     Box::new(focusable_if(element, enabled).attr("aria-disabled", (!enabled).to_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_read_only_snapshot_permits_only_reconcile() {
+        let mut editor = PresentationEditor::default();
+        editor.set_snapshot(Snapshot {
+            read_only: true,
+            available: true,
+            editing: true,
+            dirty: true,
+            can_undo: true,
+            can_redo: true,
+            can_reload: true,
+            ..Snapshot::default()
+        });
+        for effect in [
+            Effect::Begin,
+            Effect::AddNode,
+            Effect::Apply,
+            Effect::Discard,
+            Effect::Undo,
+            Effect::Redo,
+        ] {
+            editor.push(effect);
+            assert!(!editor.has_effects(), "{effect:?}");
+        }
+        editor.push(Effect::Reload);
+        assert_eq!(editor.take_effect(), Some(Effect::Reload));
+    }
 }
