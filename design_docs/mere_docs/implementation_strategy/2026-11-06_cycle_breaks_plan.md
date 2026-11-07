@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b and left the distribution binary open. D2 landed as P4 and D3 as P5 (2026-11-06, Progress); P6's `mere-comms` half landed and F1's measurement is in Findings, the phase stays open. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress); P6's `mere-comms` half landed and F1's measurement is in Findings, the phase stays open. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -68,6 +68,10 @@ allowlist entry.
 
 ### P1. D1 seam design (before any code moves)
 
+**Partly superseded by D15 (2026-11-06):** the `Lane`, `LaneFactory`, `LaneContext` and `LaneGate`
+parts of the domain contract's registration section and its distribution-binary section are
+superseded. The registry, authority, M2 refusal, fixtures and layer analysis stand.
+
 The registration contract between the resident and a domain, written and reviewed first.
 Done when a dated section in `../technical_architecture/2026-11-06_domain_contract.md` (or a
 sibling record it links) states:
@@ -104,22 +108,52 @@ tests of the domain contract's section 6 pass over a fixture graph domain and a 
 and the standard conditions hold. Which authority forms the registration carries (linked
 closure, guest, declared policy) waits on D14 (a).
 
-### P2. D1 Mere stops naming Knot
+### P2a. A door route to the resident's blob custody
 
-Done when `ports/mere-resident` and every Mere manifest drop `knot-editor` and `knot-document`
-(`Cargo.toml` rows, the `[patch]` redirect section for `mere.git` packages Knot names, the
-`peers` and `mere-overlay` features); Knot registers itself at runtime through P1's contract;
-Knot's lock names Mere (an app consumes its host) but Mere's resolves without `knot-editor`;
-Knot's resident tests run in Knot's repository; the standard conditions hold.
+Added by D15 (i): Knot's lane is not split off until this exists. Today the resident lends one
+iroh blob store to personal-graph transfers and Knot evidence in process
+(`resident_blobs.rs`: `ResidentBlobCustody::authorizer`, `bind_scope`, `migrate_legacy_store`,
+`BlobLease`). Done when an admitted application can hold a scoped lease on that store through the
+app door (route, grant and revocation shape stated first in the domain contract and reviewed),
+with the lease's readers, scope binding and legacy-store migration behaving as the in-process
+calls do; the in-process callers (personal replica) are unchanged; the resident split plan's S4
+(the file moves to Eidetic) is sequenced against it, and decision (f)'s lease-name
+parameterisation lands first. Tests keep their counts and the door route has its own.
 
-### P3. D1 Mere stops naming Cleromancy
+### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
 
-Done when `mere-resident` drops `cleromancy-core` (renamed `cleromancy-domain`);
-`validate_divination_graph` is installed by Cleromancy's registration, not by
-`with_divination_authority` naming the crate; `embedded_reservoir_validation` runs in
-Cleromancy; Cleromancy's `core/Cargo.toml` stays an app-side manifest; the standard
-conditions hold. P3 may follow P2 or run beside it; both need P1b and neither depends on the
-other.
+In this order. **(1)** P2a. **(2)** Knot's `DeclaredPolicy` (its `OperationPolicy`, a data value,
+in Knot) registered as `Authority::Declared`, which P1b leaves as a typed variant that refuses
+with "pending: no authority installed"; implementing the interpreter in Stickleback is part of
+this step. **(3)** The supervised sync host: Knot's `knot_sync_host` (and `knot_endpoint` for the
+route) run as an application the resident keeps running while the vault is unlocked, over the
+door's custody and blob routes; a generic owner setting names the application; on lock the
+resident refuses keys and ends the child; the lifecycle event names (`knot-closed`,
+`knot-reopened`) are kept. **(4)** Drop the rows. Done when `ports/mere-resident` and every Mere
+manifest drop `knot-editor` and `knot-document` (`Cargo.toml` rows, the `[patch]` redirect
+section for `mere.git` packages Knot names, the `peers` and `mere-overlay` features), compared by
+the resolved graph and not by the manifest comment; `resident_knot.rs`, `OwnerSettings.knot`
+(read as the supervised-app setting for one release, since owner settings are on users' disks)
+and the Knot tests listed in the domain contract move to Knot as consumers or are replaced by
+fixtures; Knot's lock names Mere but Mere's resolves without `knot-editor`; the standard
+conditions hold. No `Lane` trait and no distribution binary.
+
+### P3. D1 Mere stops naming Cleromancy (reshaped by D14 and D15)
+
+In this order. **(1)** A validator-only crate split in Cleromancy: the authority's closure leaves
+`muniment/redb` and the other native-only dependencies (the locked checks on
+`wasm32-wasip2` and `wasm32-unknown-unknown` failed in `redb 2.6.4` and `errno 0.3.14`).
+**(2)** The wasm feasibility spike: it builds as a component, its size against the 16 MiB cap, a
+verdict-equal run native versus wasm over the corpus of the seven tests that move from
+`embedded_reservoir_validation`, and per-call time on a realistic graph. If it fails, the
+supervised native validator process is the fallback (D15 (h)). **(3)** The guest: the
+`domain-authority` WIT world in the protocol layer, the resident's wasmtime host,
+`Authority::Guest`, review binding the author's key to the domain and pinning the component hash
+across paired devices, operations pending while no authority is installed. **(4)** Drop the
+dependency. Done when `mere-resident` drops `cleromancy-core` (renamed `cleromancy-domain`);
+`with_divination_authority` is gone and Mere registers no divination authority; `embedded_reservoir_validation`'s
+product half (1 + 6 tests) runs in Cleromancy; Cleromancy's `core/Cargo.toml` stays an app-side
+manifest; the standard conditions hold. P3 needs P1b; steps (1) and (2) can run beside P2.
 
 ### P4. D2 ESP adapter leaves Eidetic
 
@@ -343,6 +377,19 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   it. Outcome: new; amends P1, adds P1b.
 
   Links: area stack · draws on cycle_breaks D1, domain-contract C5 · amends cycle_breaks P1 · plans cycle_breaks P1, P1b, P2, P3 · summary P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board.
+
+- **D15. The drawing-board answers (Mark, 2026-11-06):** on the domain contract's drawing-board
+  section. (g) "Yes, split them": authority runs as a guest or as declared data, Knot's live sync
+  lane becomes a supervised application until M3 to M5 retire it, with no distribution binary and no
+  `Lane` trait. This closes D14's open (a). (h) "Wasm guest after a spike", with the supervised
+  native validator process as the fallback; on both sub-points, "Yes to both": an authority guest
+  gets stronger review than D12's view guests (the author's key bound to the domain, the component
+  hash pinned across paired devices), and operations wait as pending while no authority is
+  installed. (i) "Wait for a door route": against the recommendation, Knot's lane is not split
+  off until a door route to the resident's blob custody exists, so that route is a prerequisite
+  phase (P2a). Supersedes the Lane and distribution parts of P1; reshapes P2 and P3. Outcome: new.
+
+  Links: area stack · draws on cycle_breaks D1, D12, D14 · amends cycle_breaks P1, P2, P3 · plans cycle_breaks P1b, P2a, P2, P3 · summary Authority is a guest or declared data, Knot's lane a supervised app after a blob door route exists, no Lane trait and no distribution binary.
 
 - **D12. Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06):** "D: Woodshed as a
   guest". The generic block pane (Djot documents, rhyme schemes, save, undo, reopen) stays in
@@ -730,4 +777,4 @@ Illustrative design, not compile-ready code.
   consumer Turnstone `f3a9e445` (relocked onto current mains, `mere-comms` now from `murm.git`; lib check
   clean with and without `peers`, 10 `captured_collection` tests pass). No other family lock names
   `mere-comms`, and `murm-resolve` has no consumer outside Murm.
-
+- 2026-11-06: D15 recorded (authority and lane split; wasm guest after a spike; the blob door route first); P1's Lane and distribution parts superseded; P2 and P3 reshaped; P2a added.

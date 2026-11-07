@@ -268,6 +268,12 @@ replication (M4), the wire protocol (the Graphshell layer).
   rides the contract's `projection-provider`; the rest is in-process Rust. This design is
   about the rest.
 
+**Superseded in part (cycle breaks D15, 2026-11-06):** the lane parts of this section (`LaneFactory`,
+`Lane`, `LaneContext`, `LaneGate`, the lane rows of sections 3 to 6) and the distribution binary of
+section 5 are superseded by the drawing-board section: Knot's lane becomes a supervised
+application, authority is a guest or declared data, and there is no `Lane` trait and no
+distribution binary. The registry, `Authority`, the M2 refusal and the rest stand.
+
 ### 2. The contract
 
 **Registration is a value an app crate builds and the process that owns the store hands to
