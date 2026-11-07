@@ -452,7 +452,9 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Links: area stack · draws on cycle_breaks D9, stack.3 · amends cycle_breaks D9 · plans cycle_breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
 
   *D8 and D9 refined 2026-11-07 (engine-split D2): the repository keeps the contract as its
-  bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.*
+  bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.
+  D9 refined again the same day by engine-split D19: the contract root gains `tinct` and is a
+  leaf layer Inker may name, with the drift toward "the family's leaves" named as a cost.*
 
 ## Findings
 

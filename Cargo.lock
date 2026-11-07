@@ -9371,7 +9371,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "knot-catalog",
 ]
@@ -9379,7 +9379,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9392,13 +9392,14 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "blake3",
  "knot-capture",
  "quick-xml 0.39.4",
  "reference-data",
  "sceno",
+ "sceno-backdrops",
  "scenograph",
  "scenomise",
  "scenotime",
@@ -9412,7 +9413,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "cambium",
  "illume",
@@ -9429,7 +9430,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -11017,12 +11018,12 @@ dependencies = [
 [[package]]
 name = "mora"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 
 [[package]]
 name = "mora-cmudict"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "mora",
 ]
@@ -15629,7 +15630,7 @@ dependencies = [
 [[package]]
 name = "reference-data"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#abffd2d54e21c7083eb975f7130ae01299c75aad"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
 dependencies = [
  "blake3",
  "serde",

@@ -2,7 +2,7 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D20 are ruled; the plan is on origin's main
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D21 are ruled (D21 reverts D20); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
 `merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
@@ -396,9 +396,9 @@ with history preserved as the 2026-10-19 promotion did. `smolweb` (the protocol 
 `nematic` and `inker` are its consumers; `misfin` is the exception to check, since
 `mere-comms` is its other consumer and Murm may be its home. `emblem` (IconVG) into
 Graphshell with P3, since `pictograph` is its only consumer. `wavicle` (WavPack) into
-Woodshed, its only consumer, on Woodshed's own schedule. `wgpu-scry` and `wgpu-weld` into
-Inker as feature-gated engine members with P1 (D20); `wgpu-cue` and `wgpu-graft` stay.
-Inside each wgpu repository the audit's folds apply: the `grafting-servo` rename finished,
+Woodshed, its only consumer, on Woodshed's own schedule. The four `wgpu-*` repositories
+stay (D7, D21), with Inker recorded as the owner of scrying and welding. Inside each wgpu
+repository the audit's folds apply: the `grafting-servo` rename finished,
 the scry and weld demo crates folded, the three `keyutils.rs` copies deduplicated.
 - Done when: each folded repository is archived with a pointer to its new home; its crates
   publish from the receiver under their existing names; every consumer resolves them from
@@ -571,7 +571,12 @@ revision and what crosses at frame rate.
   `tinct` moves into the Graphshell repository's Mere-free contract root (cycle-breaks D9's
   leaves); Inker takes `tinct` and `hest` from that root, which names nothing above it; the
   palette moves into the lanes over Tinct and `script-rhai` keeps its `command` module.
-  Outcome: refines cycle-breaks D9 (the root gains tinct) and settles P1's F4 and F6.
+  Outcome: refines cycle-breaks D9 (the root gains tinct) and settles P1's F4 and F6. Cost
+  named on 2026-11-07: the contract root drifts from "the host/guest contract" toward "the
+  family's leaves" (hest, now tinct), tolerable while it names nothing above it, so the next
+  leaf is a decision, not a habit; and Inker naming graphshell.git while the Graphshell host
+  names Inker is a repository-level back edge with no package cycle, which fixes the lockfile
+  order as bottom root, then Inker, then host.
 
   Links: area The stack · amends cycle-breaks D9 · draws on engine-split D2, engine-split D16 · plans engine-split P1, engine-split P3 · summary The Graphshell contract root gains tinct and is a leaf layer Inker may name; the palette lives in the lanes over Tinct.
 
@@ -585,6 +590,19 @@ revision and what crosses at frame rate.
   longer all stay); the family nets 22 repositories from 25.
 
   Links: area The stack · amends engine-split D7 · draws on mere:stack.3 · plans engine-split C · summary wgpu-scry and wgpu-weld fold into Inker as feature-gated engine members; wgpu-cue and wgpu-graft stay below Inker.
+
+- **D21. D20 reverted: scrying and welding stay separate, Inker named as their owner (Mark,
+  2026-11-07):** on the pushback that a Cargo workspace member cannot be feature-gated (it is
+  always resolved, and `cargo check --workspace` builds it), so welding's `cef-dll-sys` build
+  script, which downloads the CEF bundle, and scrying's WebKitGTK and WPE system libraries
+  would land on every machine that touches the reader, and two published crates at 0.7 and
+  0.15 would be tied to Inker's cadence, for two fewer repositories: "Revert D20: scry and
+  weld stay separate, Inker named as their owner (Recommended)". D7 stands for all four wgpu
+  repositories; Inker's docs list scrying and welding as the engines it orchestrates; the
+  audit's demo folds and the `grafting-servo` rename happen inside each. The family nets 24
+  repositories from 25. Outcome: replaces D20; applies D7.
+
+  Links: area The stack · replaces engine-split D20 · draws on engine-split D7 · plans engine-split C · summary The wgpu repositories all stay; Inker is recorded as the owner of the scrying and welding engines.
 
 ## Open questions
 
@@ -789,6 +807,20 @@ revision and what crosses at frame rate.
   (no Rust on this side, nothing to gate) and pushed at `9e790a152`, so the plan is upstream.
   Mere's relock to Knot started. D19 and D20 recorded; a lane opened to move `tinct` into
   the Graphshell contract root.
+- 2026-11-07: tinct lane landed: `merely-made/graphshell` cloned to `Code/repos/graphshell`;
+  branch `receive/tinct` at `d80316db` in `Code/worktrees/graphshell-tinct`, an exact copy from
+  Mere `9e790a152` (five of six blobs identical, the manifest inheriting workspace serde and
+  repository), one lock entry added, workspace check and 308 tests green, README's History
+  table updated; not pushed. Consumer row once on main: `tinct = { git =
+  "https://github.com/merely-made/graphshell.git", branch = "main" }` (`tincture = { package =
+  "tinct", ... }` for registry and pictograph). Mere then drops the member, the patch row and
+  repoints two workspace rows; five outside repositories repoint their own row.
+- 2026-11-07: Mere's relock to Knot `2c703c43`: `cargo update -p knot-editor` kept refreshing
+  every other `branch = "main"` family source it touched (genet, eidetic, dramatis, gemot,
+  bole, murm in turn), so the lock was restored and the eight Knot entries moved by hand, cargo
+  then adding the one `sceno-backdrops` dependency line offline; `--locked` metadata is
+  consistent and the clippy gate is running. D21 recorded, reverting D20 on the build-surface
+  evidence.
 - 2026-11-07: P2 lane (worktree, nothing moved): P0 lines for the spatial crates; the
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
