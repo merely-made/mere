@@ -7371,6 +7371,7 @@ dependencies = [
  "sceno",
  "serde_json",
  "sprigging",
+ "taproot",
  "vector-sheet",
 ]
 
