@@ -24,7 +24,7 @@ frames decisions for a later phase.
 - [capability gate catalogue brief](2026-05-14_capability_gate_catalogue_brief.md) —
   contacts are persona-scoped, so they sit under the gate chain.
 - [lexicon brief](../../2026-05-04_lexicon_brief.md) — *kith / kin* contact tiers.
-- Code: [`comms/src/model.rs`](../../../crates/shell/comms/src/model.rs),
+- Code: `murm/native/crates/comms/src/model.rs`,
    [`murm/gazette`](../../../crates/murm/gazette/src/lib.rs) *(historical citation)* <!-- doc-audit: historical-link -->,
    [`murm/misfin`](../../../crates/murm/misfin/src/lib.rs) *(historical citation)* <!-- doc-audit: historical-link -->,
    [`persona/identity`](../../../crates/persona/identity/src/lib.rs) *(historical citation)* <!-- doc-audit: historical-link -->.
@@ -41,7 +41,7 @@ Two docs touch identity; neither owns the remote party.
 - The comms plan deferred the cross-protocol identity model to P5 and only
   half-landed it. P5 built the per-protocol leaf
   `Identity { protocol, address, display_name }` in
-  [`model.rs`](../../../crates/shell/comms/src/model.rs), with no contact rollup and
+  `murm/native/crates/comms/src/model.rs`, with no contact rollup and
   no stable middle. The label is "display_name or the raw address", so today two
   addresses for one human are two unrelated rows.
 

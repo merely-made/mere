@@ -56,7 +56,7 @@ transports and devices ... not knowing the costs, being naive, i'll say all of
 `conversations` domain holds every conversation the person can link to their
 identity or a derived identity, whatever the transport (Murm's carriers,
 Misfin, Reticulum through Outrider). It is the persistence home that
-`crates/shell/comms` lacks. The person's copy moves; channel keys and other
+`murm/native/crates/comms` lacks. The person's copy moves; channel keys and other
 secrets stay in custody, and radio, station and device journals stay local.
 The costs are unmeasured.
 

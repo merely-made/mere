@@ -55,3 +55,40 @@
 - After, Mere (`b20da96`): `cargo check -p graphshell --features goal-surface-model --all-targets
   --locked` clean, `cargo test -p graphshell --features goal-surface-model --lib goal_surface` 29
   passed 1 ignored; default `-p graphshell --locked` check and `ports/graphshell/web` check clean.
+
+## P5 (D3) and P6 (D4, mere-comms half)
+
+- Cycle proof, P5 (throwaway script, `cargo +1.97.1 metadata --format-version 1 --locked
+  --all-features --offline` in every lock root of Gemot (5) and Murm (12), packages resolved to
+  repositories, path packages owned by the root's repository, dev edges counted, direct and
+  transitive): Gemot to Murm in Gemot `.`, `crates/site-host`, `crates/site-model`,
+  `probes/spaces-eval` (from `gemot`, `gemot-site-host`, `commons-spine`, `mien`: `murm-sync`,
+  `mere-transport`, `murm`, `murm-resolve`, `retinue`); `crates/address` none. Murm to Gemot: none,
+  direct or transitive, in any root. `murm/fuzz` refuses `--locked` (stale lock, no Gemot name in
+  it); `testing/webrtc-evaluation` needed the network and was checked from lock text (no Gemot).
+- Murm before (`b80cf589`), `cargo +1.97.1 test --locked -p murm-resolve -p murm-holder`:
+  `murm-holder` 8 passed, `murm-resolve` 7 passed. After (`c0adc674`): the same, and `--all-features`
+  9 and 8. Gemot after (`df6da4a`): `cargo test --locked --features murm-resolve --test
+  release_address` 4 passed; `cargo check --locked --all-targets` clean with and without
+  `--all-features`.
+- P6, history: `git filter-branch -f --prune-empty --index-filter` (index filter mapping
+  `crates/shell/comms/` and `crates/graphshell/shell/domain/comms/` to `native/crates/comms/`) on a
+  fresh clone at Mere `016927d79`, 7,724 commits rewritten in 451 seconds, 128 kept; `git rev-parse
+  main:native/crates/comms` and `016927d79:crates/shell/comms` both `69dbd66fc1cb`. Imported into Murm
+  with `git merge --allow-unrelated-histories` (`559470b6`).
+- P6 tests: Mere before, `cargo +1.97.1 test --locked -p mere-comms`: 28 passed, 1 doctest; with
+  `--all-features` 38 passed, 1 doctest. Murm after, `-p mere-comms`: the same counts. Signalman
+  (`-p signalman --features comms`): 75 lib passed, the other binaries pass; `signalman-desktop
+  --locked --all-targets` (1.99.1) check clean. Mere after: `-p mere-moot` lib 25 passed;
+  `-p graphshell --features workspace-editor --all-targets` check clean, `--lib comms` 3 passed;
+  `ports/graphshell/web` `cargo check --locked` clean; `cargo metadata --locked` twice, no lock diff.
+  Not run: `mere-moot` tests that load the `guest-settings` guest (its build fails here with exit 101,
+  pre-existing, a warning from `app-host`'s build script).
+- P6 cycle proof (same script, Mere 17 roots, Murm 12): Murm to Mere direct edges: `signalman` to
+  `scenomise` (root); `signalman-desktop` to `cambium`, `cambium-desktop`, `mandrake`, `scenomise`,
+  `seiche`, `sprigging`, `tabard`, `tabard-workshop`. Mere to Murm: `mere-comms`, `mere-transport`,
+  `murm-sync`, `murm-webrtc`, `retinue`, `murm-ocapn`, `murm-ocapn-transport` in the Mere root,
+  `ports/graphshell/web` and `testing/moot-ocapn-coop`. Skipped (`--locked` refuses or needs the network;
+  lock text names no `murm` or `mere-comms`): Mere `guest-settings`, `native-id-consumer`,
+  `luggage-comparison`, Murm `fuzz`. The cycle stands: P6 is open for F1.
+

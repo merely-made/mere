@@ -10242,15 +10242,10 @@ dependencies = [
 [[package]]
 name = "mere-comms"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "async-trait",
- "mere-transport",
- "misfin",
- "murm",
- "personae",
  "serde",
- "serde_json",
- "tokio",
 ]
 
 [[package]]
@@ -10708,7 +10703,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#c0adc6745d5e2217418ea506ad7284460cc2ef47"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10894,7 +10889,6 @@ source = "git+https://github.com/merely-made/errand.git?branch=main#91ae0a6731c1
 dependencies = [
  "log",
  "rcgen 0.13.2",
- "redb 2.6.3",
  "rustls",
  "rustls-pki-types",
  "serde",
@@ -10903,7 +10897,6 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "url",
- "x509-parser",
 ]
 
 [[package]]
@@ -11043,33 +11036,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "murm"
-version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
-dependencies = [
- "async-trait",
- "blake3",
- "hex",
- "mere-proofs",
- "mere-transport",
- "muniment",
- "murm-sync",
- "p2mere-core",
- "p2mere-encryption",
- "personae",
- "serde",
- "serde_bytes",
- "stickleback",
- "thiserror 1.0.69",
- "tokio",
- "tokio-stream",
- "zeroize",
-]
-
-[[package]]
 name = "murm-ocapn"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "futures-util",
@@ -11082,7 +11051,7 @@ dependencies = [
 [[package]]
 name = "murm-sync"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#c0adc6745d5e2217418ea506ad7284460cc2ef47"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11104,7 +11073,7 @@ dependencies = [
 [[package]]
 name = "murm-webrtc"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -11121,7 +11090,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#b80cf5890bfd2bbdc0108195627d7205c4870190"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "bytes",
  "futures-util",
@@ -14368,7 +14337,7 @@ dependencies = [
  "combine",
  "downcast-rs 2.0.2",
  "dyn-clone",
- "hashbrown 0.17.1",
+ "hashbrown 0.13.2",
  "hi_sparse_bitset",
  "indexmap",
  "inventory",
@@ -15805,7 +15774,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#ae0bb12a7dce2cc7501606369c32aa18f1e13d8a"
+source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",

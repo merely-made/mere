@@ -67,7 +67,7 @@ Four readings of the table:
   appear only in the kernel's descriptor table and ux-events' diagnostics map,
   with no open or dismiss seam. The panes themselves are built unevenly and
   outside the Graphshell port: Comms is a view-model crate
-  (`crates/shell/comms/src/pane.rs`), gloss is swatch geometry in pictograph,
+  (`murm/native/crates/comms/src/pane.rs`), gloss is swatch geometry in pictograph,
   diagnostic observations come from Registry (`crates/system/registry`)
   through Armillary's `apparatus-core`, and product views own their inspection
   UI. Cambium's detail panel and sectioned list name Apparatus rows beside
@@ -284,7 +284,7 @@ the tree at `d969028be`:
 |---|---|---|
 | panes | the panes doc: Gloss, Roster, Inspector, Index, Steward, Apparatus, Comms. TERMINOLOGY: roster, gloss, inspector, apparatus, comms. `SurfaceId`: those plus TreeSpine, NavigatorHost, WorkbenchPane. Kernel `ToolPaneState` (`pane.rs`, from April): Diagnostics, HistoryManager, AccessibilityInspector, FileTree, Settings. Built: Comms as a view-model crate, gloss as pictograph swatch geometry, Apparatus as a domain crate, Roster and Inspector named in Graphshell, Steward as rows in Cambium's detail panel | five lists; `ToolPaneState`'s five names appear in no catalog |
 | Navigator and gloss | TERMINOLOGY ruled the Navigator is gloss expanded (2026-06-07) | `SurfaceId` carries both `GlossPane` and `NavigatorHost`; kernel `pane.rs`, chrome routing, forme's lens, `mere::glossary` and pictograph's gloss docs still say Navigator |
-| dock contract | the panes doc proposes one (kind, open, side, width, focus, context binding) | it exists twice and is shared by neither: `DockState` and `DockSide` in `crates/shell/comms/src/pane.rs`, whose module doc says they graduate to a shared dock, and the kernel's `PanePresentationMode` |
+| dock contract | the panes doc proposes one (kind, open, side, width, focus, context binding) | it exists twice and is shared by neither: `DockState` and `DockSide` in `murm/native/crates/comms/src/pane.rs`, whose module doc says they graduate to a shared dock, and the kernel's `PanePresentationMode` |
 | pane surfaces | `SurfaceId`'s doc says each surface is one variant and one emission site at its open and dismiss seams | four variants are emitted at real seams (CommandPalette, NodeFinder, ConfirmDialog, ContextMenu); every pane variant appears only in the descriptor table and ux-events' diagnostics map |
 | workbench | TERMINOLOGY's tile entry, the `workbench` crate ("split-and-tab workspace organization") and Mark's list: a tile tree | the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md), canonical for the arrangement ontology, makes the tree one of six projections and says the tree was masquerading as the ontology |
 | cards | the summoning doc's family: preview, unvisited, connections swatch, object card | none of the four names is in code; Graphshell's card identifiers are `focus_card`, `PortableCard`, `receipt_card`, `card_offer`, `card_response`; Cambium's nearest is the detail popover |
@@ -407,7 +407,7 @@ interaction spine's three lanes classify how either reaches the screen. Knot
 documents are already presented by nematic's Knot reader (`ENGINE_KNOT`,
 `ENGINE_KNOT_DJOT`), and edits cross back through the shared source-edit
 proposals. The Comms pane is an adapter model: a `ProtocolAdapter`
-(`crates/shell/comms/src/adapter.rs`) presents one backend as conversations
+(`murm/native/crates/comms/src/adapter.rs`) presents one backend as conversations
 and accepts a draft. Misfin is both a reader (`ENGINE_MISFIN`) and a comms
 adapter, and nothing says which a node that references a mailbox opens into.
 The mod manifest (`crates/system/registry/src/mod_loader/loader/types.rs`)
@@ -506,7 +506,7 @@ ruling as §7 does.
    or by `message/x-misfin`. So inker's default `misfin` scheme rule
    (`crates/inker/inker/src/routing.rs`) and the registry's middlenet scheme
    list (`viewer.rs`) reach a reader with nothing to read. The comms adapter
-   (`crates/shell/comms/src/misfin_adapter.rs`) presents one mailbox from the
+   (`murm/native/crates/comms/src/misfin_adapter.rs`) presents one mailbox from the
    receive server's `MailboxStore`, one conversation per correspondent, and
    its bodies are gemtext. The kernel's `AddressKind` has no misfin variant.
    Ruled: a misfin address names a correspondent, not a document. Opening a

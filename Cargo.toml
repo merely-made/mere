@@ -7,7 +7,6 @@ members = [
     "crates/graph/graph-kernel",
     "crates/graph/linked-data",
     "crates/shell/chrome",
-    "crates/shell/comms",
     "crates/incipit",
     "crates/system/pandect",
     "crates/system/fetch",
@@ -314,7 +313,7 @@ page-load = { package = "mere-pageload", version = "0.0.1", path = "crates/syste
 proofs = { package = "mere-proofs", version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 incipit = { version = "0.2.1", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
-comms = { package = "mere-comms", path = "crates/shell/comms" }
+comms = { package = "mere-comms", version = "0.0.1", git = "https://github.com/merely-made/murm.git", branch = "main" }
 pandect = { version = "0.2.0", path = "crates/system/pandect" }
 # Self-update over signed manifests (the cargo-packager-updater fork; ruled
 # 2026-07-24: name luggage, home mere). Apps consume it via git dep like the
@@ -503,7 +502,6 @@ stickleback = { version = "0.2.0", git = "https://github.com/merely-made/eidetic
 # callback-lifetime fix, and 38e9c9b8, `TransportKind::InProcess`, so Djinn's
 # local doors hand admission an `AcceptedSession`; lift plan pass (b)).
 # Named through the `www` alias; see the Murm patch table below.
-murm = { version = "0.0.1", git = "https://github.com/merely-made/murm.git", branch = "main" }
 transport = { package = "mere-transport", version = "0.0.2", git = "https://github.com/merely-made/murm.git", branch = "main" }
 murm-ocapn = { version = "0.1.0", git = "https://github.com/merely-made/murm.git", branch = "main" }
 # The Wasm-clean half of the browser WebRTC carrier: bounded frames, invite
@@ -666,7 +664,6 @@ too_many_lines = "warn"
 commons-spine = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
 mere-edit = { path = "crates/system/source-edit" }
 mere-facts = { path = "crates/domain/personal-facts" }
-murm = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
@@ -872,5 +869,4 @@ opt-level = 3
 [patch."https://github.com/merely-made/retinue.git"]
 mere-transport = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 murm-webrtc = { git = "https://github.com/merely-made/murm.git", branch = "main" }
-murm = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 retinue = { git = "https://github.com/merely-made/murm.git", branch = "main" }

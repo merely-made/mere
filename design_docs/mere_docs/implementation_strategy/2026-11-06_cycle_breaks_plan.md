@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b and left the distribution binary open. D2 landed as P4 (2026-11-06, Progress). D1, D3 proceed; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b and left the distribution binary open. D2 landed as P4 and D3 as P5 (2026-11-06, Progress); P6's `mere-comms` half landed and F1's measurement is in Findings, the phase stays open. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -143,6 +143,8 @@ chooses at implementation, since Gemot already depends on Murm); `murm-resolve`'
 signature change is carried through its consumers; Murm's lock no longer names Gemot. If
 Murm still reaches Gemot through another edge, the check names it and the phase is not done.
 
+**Landed 2026-11-06** (Progress; Findings, P5 and P6 findings).
+
 ### P6. D4 mere-comms moves into Murm
 
 **Paused 2026-11-06 (Mark) pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); unpaused the same day by D7 to D9.** The scene vocabulary (`sceno`, `scenotime`) now lives in `merely-made/graphshell`, below Murm, so Signalman's `sceno` edge is legal. What is left of P6 is `mere-comms` and F1's `scenomise` edge.
@@ -153,6 +155,8 @@ and `ports/graphshell` (`comms` feature) consume it from `murm.git`; Murm's `sig
 `comms` from its own workspace. **Signalman's `portable-scenes` feature still names Mere
 `sceno` and `scenomise`, so the cycle is not broken until F1 is closed;** P6 is done when
 F1 is closed and the standard conditions hold with Murm's resolved graph free of `mere.git`.
+
+**`mere-comms` half landed 2026-11-06; open for F1** (Progress; the F1 measurement and options are in Findings, P5 and P6 findings).
 
 ### P7. D5 and D12: Woodshed becomes a guest of Graphshell's block pane
 
@@ -521,6 +525,106 @@ Verified against Mere `49571db83`, the Graphshell repository and the consumers.
   side of the sweep after 220 was chosen; the threshold was left alone, since changing it is a
   calibration decision (Eidetic memory gates plan, Progress 2026-11-06). Not chased.
 
+### P5 and P6 findings (D3, D4), 2026-11-06
+
+Verified against Murm `45b1cf47`, Gemot `df6da4a`, Mere `ad63714ec` (before this change).
+
+- **P5, the trait.** `murm-resolve` (`native/crates/resolve/src/address.rs`) defines
+  `ReleaseAddress` with the four things `Resolver` read from an address (`host`,
+  `collection`, `pin`, `path`), the `AddressHost` enum and `MootCollection` (owned page), plus a
+  plain `LogAddress` (key, path, optional pin) for a caller that already holds a key.
+  `Resolver::resolve` takes `&(impl ReleaseAddress + ?Sized)`. The `knot://` parser, `Display`
+  and `KnotAddress::collection` stay in `gemot-address`; nothing in Murm parses an address.
+- **P5, where Gemot implements it: `gemot-site-host`, feature `murm-resolve`
+  (`release_address::ReleaseAddressRef`, a borrowing newtype).** Neither the trait nor
+  `KnotAddress` is local to a third crate, so the orphan rule allows the implementation only in
+  `gemot-address` or on a wrapper. `gemot-address` is documented as having no carrier or storage
+  dependency and is a standalone root under `gemot-site`; an optional `murm-resolve` there would put
+  Murm's whole native graph into its lock and make the grammar crate name Murm. `gemot-site-host`
+  already names Murm (`retinue`) and carries the `[patch]` table that graph needs.
+  Cost: a caller wraps (`ReleaseAddressRef(&address)`), once per call.
+- **P5, consumers.** The only user of `murm-resolve` is `murm-holder` (`publish = false`); a code
+  search over `merely-made` found no other. `Holder::acquire` now builds a `LogAddress`; no
+  behaviour change.
+- **P5, counts.** `murm-resolve` tests 7 before, 7 after (default features; 9 with `--all-features`),
+  `murm-holder` 8 and 8. The governed-form test built a `KnotAddress` from text, so it now uses a
+  fixture implementation in Murm and runs again against the real parser in Gemot, where four new
+  `gemot-site-host` tests (`tests/release_address.rs`, feature `murm-resolve`) cover the log form,
+  the governed form and the resolver's two refusals.
+- **P5, the lock.** `murm/native/Cargo.lock` lost `gemot-address` (6 lines, nothing else changed);
+  no other Murm lock names a Gemot package. Gemot's `crates/site-host/Cargo.lock` gained
+  `murm-resolve` and its graph (relocked onto Murm, Eidetic and Dramatis mains).
+- **P6, mere-comms.** Moved to `native/crates/comms` (package `mere-comms`, lib `comms`, version 0.0.1
+  unchanged), a member of Murm's native workspace beside `murm`, whose adapter it wraps; Signalman
+  takes it by path from its own repository. The root workspace could not hold it without putting
+  `murm`'s iroh graph into the default lock, because a workspace member locks every optional
+  dependency; as a path dependency of the root, only `serde` and `async-trait` enter the root lock.
+  History: `git filter-branch --index-filter` on a fresh Mere clone at `016927d79` (`--prune-empty`,
+  merges kept, the pre-dissolve path `crates/graphshell/shell/domain/comms` mapped too), 128 commits;
+  the exported tree equals the donor's (`69dbd66fc`). Tests: 28 default, 38 with all features and one
+  doctest each, in Mere before and in Murm after. `misfin` is taken from Errand's git source
+  (Mere reached it through a `[patch.crates-io]` row); `murm`, `transport` and `identity` are the
+  native workspace's.
+- **P6, Mere's side.** `ports/moot` and `ports/graphshell` (`comms` feature) take `mere-comms` from
+  `murm.git` (`branch = "main"`); `crates/shell/comms` is deleted. The only Mere user of the `murm`
+  crate was `mere-comms`'s optional adapter, so the root lock no longer holds `murm`; its workspace row
+  and the two `[patch]` rows for it left with it (otherwise two unused patches). `ports/graphshell/web`
+  relocked. `mere-moot` lib 25 passed; `graphshell --features workspace-editor --all-targets` clean and
+  the three `comms` lib tests pass; `ports/graphshell/web` check clean. Murm: `signalman --features
+  comms` all-targets check clean, 75 lib tests pass; `signalman-desktop --locked --all-targets` check
+  clean.
+- **P6, mere.git edges left in Murm's resolved graph (F1's measurement).** Only the `portable-scenes`
+  feature and `signalman-desktop` still name Mere. `murm/native` and every other Murm lock: none.
+  - `murm/Cargo.lock` (root): three packages from Mere at `18c0f24a`: `scenomise` 0.0.7,
+    `scenograph` 0.0.6, `mere-curation` 0.1.1. One direct edge, `apps/signalman/Cargo.toml:62`
+    (`scenomise`, optional); `scenograph` and `mere-curation` are `scenomise`'s dependencies. `sceno`
+    comes from `graphshell.git` and is legal.
+  - `apps/signalman-desktop/Cargo.lock` (its own root): 24 Mere packages (the Cambium desktop host:
+    `cambium`, `cambium-desktop`, `cambium-a11y`, `-rootstock`, `-winit`, `document-canvas`,
+    `illume`, `inker`, `mandrake`, `mere-fleece`, `mere-lanes`, `mere-surface-api`, `meristem`,
+    `numen`, `seiche`, `sprigging`, `tabard`, `tabard-workshop`, `tinct`, `workbench`, `backstep`,
+    and `scenograph`, `scenomise`, `mere-curation`). Eight direct rows: `cambium`,
+    `cambium-desktop`, `sprigging`, `scenomise`, `seiche`, `tabard`, `tabard-workshop`, `mandrake`.
+    Its sources use `cambium` (19 files), `tabard` and `tabard-workshop` (4 each), `seiche` (3),
+    `mandrake` (2), `sprigging` (1). Its `sceno` and `scenomise` rows are named by no source file
+    (`scenomise` is also reached through the other Mere crates).
+  - **What `portable-scenes` uses of `scenomise`:** one file, `apps/signalman/src/survey/scene.rs`
+    (203 lines, plus the 77-line `signalman-survey-scene` binary calling it), and only
+    `scenomise::backdrops::{BACKDROP_SCENE_VERSION, RadioDevice, SceneFacts, SceneInput,
+    TerrainCoverage}`. `backdrops` is 1,311 lines in `backdrops.rs` and five submodules, and
+    imports only `crate::template` (206 lines, no further crate-internal edge), `sceno` and `serde`.
+    Inside Mere, `scenomise::backdrops` is also used by `cambium/src/backdrop_scene.rs`,
+    `pictograph` (`backdrop_surface.rs`, its tests, the `backdrop_receipt` example),
+    `ports/graphshell` (`block_editing/rhyme.rs`, `web_tree/backdrop.rs`, `web_tree/blocks.rs`) and by
+    `scenomise`'s own `document.rs`, `document/djot.rs` and `span_edit.rs`; its tests are 8 in
+    `tests/backdrop_scenes.rs` and 4 in `tests/sequence_templates.rs`.
+- **P6, mere↔murm: exactly which edges remain** (cycle proof, all lock roots, dev edges counted).
+  Murm to Mere: in `murm/Cargo.lock`, `signalman` to `scenomise`; in `apps/signalman-desktop`, the
+  eight rows above. Mere to Murm (legal direction): `mere-comms`, `mere-transport`, `murm-sync`,
+  `murm-webrtc`, `retinue`, `murm-ocapn`, `murm-ocapn-transport`, in the Mere root,
+  `ports/graphshell/web` and `testing/moot-ocapn-coop`. The cycle is therefore not broken, by one
+  optional feature and one isolated root.
+- **F1 options, not ruled** (each leaves Murm's root lock free of `mere.git` except where noted):
+  1. *The `backdrops` slice moves into `merely-made/graphshell` as a contract helper.* Moves
+     `backdrops` and `template` (1,517 lines, 12 tests) with `sceno` and `serde` as its only
+     dependencies, so Graphshell gains no Mere edge. Signalman then takes it from Graphshell and drops
+     `scenomise`, `scenograph` and `mere-curation`; the root Murm lock holds no Mere package.
+     Cost: about ten Mere files change an import path, or `scenomise` re-exports the module for
+     one release; D9 said `scenomise` stays in Mere, so this amends D9; Graphshell needs the module's
+     version policy. `signalman-desktop` still names Mere (isolated root, allowlisted).
+  2. *The feature moves out of Murm.* `survey/scene.rs` and its binary (280 lines) go to
+     `signalman-desktop`, whose root already names Mere, or to a Mere-side consumer of Murm's survey
+     types. Cost: the headless `signalman-survey-scene` binary and its scene export leave the root
+     workspace, so scene export builds only in the desktop's root (a heavy Genet graph); a Mere-side
+     home would need Mere to depend on the `signalman` application crate, a legal direction but a
+     large one. Cheapest in lines, largest in who can build it.
+  3. *The separate root is the accepted answer, and the feature takes the same isolation.* Same
+     file move as option 2, to a root of its own beside `signalman-desktop`, and the allowlist keeps
+     two Murm-to-Mere isolated entries instead of one. Cost: a second lock to maintain, no Mere code
+     changes. A fourth route, publishing `scenomise`, `scenograph`, `mere-curation` (and `sceno`)
+     per the Cambium publish plan so Murm names the registry, is the largest: four crates through
+     publication, patched back to path or git inside Mere.
+
 ## Keeping cycles out: the check
 
 `scripts/check_family_cycles.py`, with tests beside it in the `test_cargo_mode.py` style.
@@ -601,3 +705,24 @@ Illustrative design, not compile-ready code.
   Graphshell `goal-surface-model`: `--all-targets` check clean, 29 `goal_surface` tests passed, 1
   ignored. The throwaway cycle proof is in the P4 receipts. The allowlist entry for C6 does not
   exist yet (P0 is not built); delete it with P0's allowlist.
+
+- 2026-11-06: P5 / D3 landed. Murm `c0adc674` (`murm-resolve` owns `ReleaseAddress`; `murm-holder`
+  and the resolve tests moved onto it; `native/Cargo.lock` lost `gemot-address`); Gemot `df6da4a`
+  (`gemot-site-host` feature `murm-resolve`, `ReleaseAddressRef`, four tests, relocked). Murm's
+  default-feature tests: `murm-resolve` 7 and `murm-holder` 8, unchanged. Cycle proof (throwaway script,
+  every lock root of Gemot and Murm, `cargo metadata --locked --all-features`, dev edges counted):
+  Gemot to Murm edges in the root, `crates/site-host`, `crates/site-model` and `probes/spaces-eval`
+  (`murm-sync`, `mere-transport`, `murm`, `murm-resolve`, `retinue`); no Murm package depends on a
+  Gemot package, directly or through any third repository, in any root. Murm's `fuzz` lock is stale
+  against its manifest (`--locked` refuses; untouched, names no Gemot package); `webrtc-evaluation`
+  was read from its lock text. Receipts record the output. The C5 allowlist entry does not exist
+  yet (P0 is not built); delete it with P0's allowlist.
+- 2026-11-06: P6 / D4, `mere-comms` half landed; F1 and P6 stay open. Murm `559470b6` (history merge,
+  128 commits, tree equal to the donor's) and `45b1cf47` (workspace member, Signalman by path, both
+  locks); this Mere commit deletes `crates/shell/comms`, points `ports/moot` and `ports/graphshell`
+  at `murm.git`, drops the now-unused `murm` row and its two patch rows, and relocks the root and
+  `ports/graphshell/web`. Mere-moot lib 25 passed, `graphshell --features workspace-editor` clean, the
+  three `comms` tests pass; `mere-comms` 28 default and 38 all-features tests pass in Murm as in
+  Mere. Cycle proof: Murm to Mere edges remain (Findings, P5 and P6 findings) and Mere to Murm
+  unchanged in direction, so the cycle stands, held by `portable-scenes` and `signalman-desktop`.
+  The F1 measurement and three options are in Findings; not ruled.

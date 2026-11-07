@@ -58,7 +58,7 @@ each package's coupling measured in files.
 | Packages | Used inside Mere by | Used outside Mere by | Coupling to Mere | Home that fits | Standing |
 | --- | --- | --- | --- | --- | --- |
 | `station-custody` | nothing | Murm `apps/signalman-desktop` | `pandect` in 9 files, `graphshell_endpoint` in 6 | Murm, beside `signalman-desktop` and outside Murm's root workspace (Murm already takes Pandect from Mere there) | No ruling found. It is the only route by which Mere's graph resolves `retinue`, `outrider`, `radio-hand` and `tulle` (Reticulum License); without it, 20 more packages leave Mere's resolution, among them `postilion`, `seneschal`, `selvage`, `radio-face` and the serial stack. |
-| `mere-comms` | `mere-moot` (2 files) | Murm `apps/signalman` (`comms` feature) | none: its dependencies are `serde`, `async-trait`, and optional `murm` and `misfin` | Murm, or Mere as a capability contract | Open. The murm runtime plan (M7) puts the Sennet, Tucket and Signalman adapters at the Comms consumer boundary, and all three live in Murm. Mark's scope sentence keeps capability contracts in Mere. |
+| `mere-comms` | `mere-moot` (2 files) | Murm `apps/signalman` (`comms` feature) | none: its dependencies are `serde`, `async-trait`, and optional `murm` and `misfin` | Murm | Moved 2026-11-06 (cycle breaks D4, P6) to `murm/native/crates/comms`, history kept; Mere's `ports/moot` and `ports/graphshell` take it from `murm.git`. |
 | `distillery`, `mere-athanor`, `mere-alembic`, `mere-mesh` | Djinn and Graphshell (Distillery, Mesh); Pandect (Alembic) | Turnstone (Athanor, Distillery), Cleromancy and merelyllc.com (Alembic) | Mesh: none. Distillery uses Mere in five adapter files (2026-10-27 count). Two edges point back: Pandect imports Alembic's `EvictionPolicy` (`persona_settings_store.rs`), and Graphshell depends on Distillery for a test and the optional `distillery-chronicle-fixture` feature. | ESP's repository, as Distillery's (the 2026-10-27 proposal) | Proposal, not ruled. Family promotion F3. |
 | `djinn`, `djinn-testkit`, `castellan`, `djinn-custodian`, `custody-wire`, `graphshell-mcp` | Djinn is the only user of the other five | Cleromancy (Djinn, Castellan) | Inherent: `graphshell_endpoint` in 45 Djinn files, `graphshell_host` in 23, `chirograph` in 23, `pandect` in 18 (2026-10-27) | A resident repository, or Armillary's (the 2026-10-27 proposal) | F3 and the custody plan. The custody packages move together. |
 | `mere-moot` (`ports/moot`), `mere-site` | `mere-site`: Djinn | Turnstone (`moot`) | Moot: `app_host` in 1 file, `comms` in 2, `fleece` in 1. Site: none (`mien`, `muniment`, `mere-proofs`, `servitor`) | Gemot, the governed-space family | No ruling. The murm runtime plan withdrew a separate Moot repository (its Phase G) but kept its two requirements: Mere builds offline, and no manifest carries a local path. Moot in Gemot would give Gemot a Mere edge for `app-host` and `fleece`. |
@@ -608,6 +608,10 @@ Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
   Eidetic↔ESP no longer works this way: `eidetic-search` keeps the `GoalEmbedder` trait and
   the ESP adapter, its MiniLM calibration test and the `eidetic-recall` example live in ESP
   (cycle breaks D2, P4, 2026-11-06).
+  Gemot↔Murm no longer works this way: `murm-resolve` owns the `ReleaseAddress` trait and Gemot
+  implements it in `gemot-site-host` (cycle breaks D3, P5, 2026-11-06). Mere↔Murm still does, by
+  one optional feature and one isolated root: Signalman's `portable-scenes` (`scenomise`) and
+  `signalman-desktop`; `mere-comms` moved into Murm (D4, P6) and F1 is open.
   - A separate workspace root inside the receiving repository keeps that
     repository's lockfile and CI scope free of Mere. Murm's
     `apps/signalman-desktop` already does this.
