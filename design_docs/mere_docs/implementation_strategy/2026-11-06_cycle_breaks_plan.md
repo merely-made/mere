@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review). D18 to D23 (Mark, 2026-11-08) ruled the P0 check's unlisted cycles: the resident seam binds wherever the resident lives, `inker -> mere` is allowlisted until engine-split P5, `murm-wire` and `murm-rtc` moved into Genet (D20, done), Dramatis's app may become a producer (tentative, still flagged), the viewer's one build, and the real Cleromancy guest.
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -1001,7 +1001,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   2. **Inker↔Mere.** `inker/crates/fleece/Cargo.toml:37` (optional `linked-data`, which is Mere's
      `crates/graph/linked-data`) against about 30 normal Mere rows naming Inker (`inker`, `fleece`, `illume`,
      `mere-lanes`, ...). Resolved inside `inker/Cargo.lock` (`mere-fleece -> mere-rdf -> inker`).
-  3. **Genet/Murm/Eidetic/Dramatis ring.** Cutting the two rows above and the D1 edges leaves one
+  3. **Genet/Murm/Eidetic/Dramatis ring (cleared 2026-11-08 by D20, below).** Cutting the two rows above and the D1 edges leaves one
      component: `genet -> murm` (`genet/components/genet-webrtc` `murm-rtc` and the optional
      `components/netfetcher` `murm-wire`, "independent wire leaf"), `murm -> eidetic` and `murm -> dramatis`
      (`murm/native/crates/holder`, `murm/crates/station-custody`), `eidetic -> genet`
@@ -1011,6 +1011,29 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
      `signalman-desktop`.
   4. **Dev-only, D6:** `dramatis -> eidetic` (`dramatis/apps/dramatis` dev `luggage`), which closes against
      Eidetic's normal rows to Dramatis.
+- **After D18 to D20, 2026-11-08 (the same check, `--remote`, Genet `8f13bb7e6`, Murm `c6b31e702`, Inker
+  `6643e7174`, Mere with this entry; exit 1):**
+  - **The ring is gone.** `murm-wire` and `murm-rtc` moved into Genet as `genet-wire` and `genet-rtc` (D20),
+    so no Genet row names Murm and Genet is on no cycle. Cleromancy is off the normal graph too (P3, Mere
+    `0e33b02e4`); Knot stays held by its `mere -> knot-editor` entry (D1, D18).
+  - **Inker↔Mere is allowlisted** (`inker -> mere`, D19, until engine-split P5).
+  - **Still flagged, no allowlist entry (D21):** Dramatis↔Mere. Every remaining normal cycle in the report (seven
+    repositories: Distillery, Dramatis, Eidetic, Gemot, Inker, Mere, Murm) passes through `dramatis -> mere`
+    (`dramatis/apps/dramatis/Cargo.toml:55-58`); a throwaway allowlist with that one edge added leaves only
+    the dev-only `dramatis -> eidetic -> dramatis` pair (`luggage`, item 4 above). The dev-only list, with
+    Dramatis↔Mere open, adds `inker -> murm` (a `fleece` dev row on `transport`), `seiche -> eidetic` and
+    `distillery -> gemot`; each closes only through `dramatis -> mere`.
+  - **Downstream locks not relocked (blocked, not ruled out).** Mere, Knot, Cleromancy, Turnstone and
+    Woodshed's `ports/redshank` still pin Genet `d634ee0c4`, which names `murm-wire` from `murm.git` at a revision
+    that stays fetchable, so their `cargo check --locked` is unchanged. Relocking any of them to Genet `8f13bb7e6`
+    (`cargo update -p netfetcher`: removes `murm-wire`, adds `genet-wire`, no other package moves but the Genet source
+    and `bole`'s `rev` pin) fails to compile in all five: Genet `fe7523697` moved `document-session-api` to 0.1.2, so the
+    lock holds two copies (registry 0.1.1 through `webcue =0.1.2`, and Genet's 0.1.2) and Inker's `cue.rs` mixes their
+    types (E0308). Inker, which already has `webcue 0.1.3`, relocked and passes `cargo check --workspace --locked`
+    (Inker `6643e7174`). The five roots need `webcue` 0.1.3 and `wgpu-cue` 0.1.4 first; `wgpu-cue` main
+    requires `wgpu-cue =0.1.4`, which is not on crates.io (0.1.3 is the latest), and Mere's root pins
+    `webcue =0.1.2` and `wgpu-cue =0.1.3`. That is the webcue lane's loop, not this decision's. Until it lands,
+    the `--strict-locks` warnings for these roots remain.
 - **Resolved-lock warnings (stale pins, not ruled):** `cleromancy`, `mere`, `turnstone` (a Distillery
   revision that named Mere, and the loops above), `inker`, `dramatis/apps/dramatis` and seven more roots
   (twelve in all) holding `dramatis` and `eidetic` together. Re-run with `--strict-locks` after the family's relock loop.
@@ -1204,3 +1227,20 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   and (2) done and pushed (Cleromancy `046bd58`): `core/Cargo.toml` drops muniment's `redb` feature, the portable core checks
   on `wasm32-wasip2`; the component is 7.45 MiB of 16, verdict-equal over 577 of 577 corpus cases, about 2 times native per
   call (p50 20 ms, max 101 ms). The real guest is held for Mark's review (D15 (h)). Cleromancy's own plan has a short entry.
+- 2026-11-08: D18 to D23 recorded (Mark's rulings after The P0 result); `inker -> mere` allowlisted (D19). D20 done:
+  `murm-wire` and `murm-rtc` moved into Genet as `genet-wire` and `genet-rtc` (`components/genet-wire`,
+  `components/genet-rtc`; nothing outside Genet named them, so they were renamed). History kept: 42 commits of Murm's
+  `wire/crates/{wire,rtc}` (a tree-per-commit export, authors and dates kept, each message ends with its Murm SHA; Murm
+  `df3e2939924`), merged as Genet `0f38f9d2c`; the rename and wiring are Genet `8f13bb7e6`. Murm `58d068a04` removed the `wire/`
+  workspace and its README, DOC_README, gitignore, gitattributes and exclude rows; `merely-made/rtc` `789c434b6`
+  repointed its README. Inker `6643e7174` relocked onto Genet. Tests, before in Murm and after in Genet: `murm-wire`
+  7 and `genet-wire` 7; `murm-rtc` with `--features dns,udp` (after adding the `libc` dependency its `dns` feature
+  already used) 22 passed and 6 failed in the lib, 1, 1, 1, 1 and 4 in the integration binaries, 3 ignored, and the
+  same in `genet-rtc` (the six lib failures are the macOS mDNS-port ones, identical before and after);
+  `netfetcher` 98 passed; `genet-webrtc` lib 6 passed and `browser` 26 passed, 12 failed on `AddrInUse` and
+  `AddrNotAvailable` (mDNS port 5353 and loopback aliases; the baseline could not be built, `murm-rtc` lacked `libc`, so
+  the same failure shape is shown only by the `genet-rtc` twins). Netfetcher's `hyper-transport`, `h3` and `websocket`
+  features each check alone; `ortet` and `genet-wpt` check with `--all-targets`. Genet commits no `Cargo.lock`, so
+  its checks are unlocked. Murm default and `native` check `--locked`; `native` lib tests pass (28, 97, 69, 15, 44 and
+  small binaries). Five downstream roots could not relock (The P0 result). Receipts are in the P0 result section.
+
