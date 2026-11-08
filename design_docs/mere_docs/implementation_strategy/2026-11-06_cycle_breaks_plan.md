@@ -1022,3 +1022,17 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   a resolved-lock cycle) and `support/family-cycles/allowed.toml` (D1 `mere -> knot-editor`, `mere -> cleromancy`; D17
   isolated `murm/apps/signalman-desktop`). The result on the real family is under "The P0 result": three cycle groups this
   plan did not list, which the check reports and does not allowlist. Not wired into a gate yet.
+- 2026-11-08: P2a landed (the blob door route). Decision (f) first: `LEGACY_KNOT_LEASE` left `resident_blobs.rs` for
+  `resident_knot.rs` (the lane passes its own lease name; the shared file names no application). Then the route
+  `blob-custody-v1`: shape stated first in the domain contract ("The blob door route", sections 1 to 5), built the same
+  day (section 6). Server `ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `djinn`); wire
+  and client `graphshell-door` feature `blob-door` (`BlobDoorClient`); `ResidentBlobCustody` gained the durable scope
+  owner record (`claim_scope`, `reserve_scope`, `withdraw_serving`). Grant: the route in the application's declaration
+  and the owner's grant, plus first-binder scope ownership (the resident's own personal scope is reserved). Revocation:
+  `BlobDoor::revoke` cuts live sessions and withdraws serving, keeps leases and ownership; `restore` plus re-bind
+  rebuilds serving from the leases. Tests: `resident_blob_door::tests` 8 new, `tests/blob_door.rs` 1 new over the real
+  door, `resident_blobs` 2 unchanged, `graphshell-door` 2 new wire tests; mere-resident lib 264 to 272 (the same
+  `the_dialable_host` failure), and the same known failing binaries (`custodian_client`, `cxf_import`,
+  `quarantine_review`); everything else in `mere-resident` passes. The in-process callers (personal replica, Knot lane)
+  are unchanged except that `personal_sync` reserves its graph scope. Not wired: `djinn` has no live grant-removal
+  path to call `revoke`. The route does not move serving; P2's blocker is in Findings.

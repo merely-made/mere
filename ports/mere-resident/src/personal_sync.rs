@@ -161,6 +161,10 @@ pub async fn start<P: IdentityProvider + ?Sized>(
             .join(format!("{}.redb", owner_settings::hex32(&graph)))
     });
     let blob_scope = transport::BlobScope::new(graph);
+    // The graph's scope is the resident's own: no door application may claim it.
+    blob_custody
+        .reserve_scope(blob_scope)
+        .map_err(|error| DeviceSyncError::Host(PersonalSyncHostError::Transport(error)))?;
     let legacy_blob_root = store_path.with_extension("blobs");
     match blob_custody
         .migrate_legacy_store(&legacy_blob_root, blob_scope, LEGACY_PERSONAL_LEASE)

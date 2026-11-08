@@ -924,8 +924,8 @@ into Knot as tests of a supervised process, not of a lane).
 
 ## The blob door route (cycle breaks P2a, 2026-11-08)
 
-**Status:** route, grant and revocation shape stated first, as P2a requires; the code follows in
-the same session and is described in "As built" below. For Mark's review alongside D15 (i).
+**Status:** route, grant and revocation shape stated first, as P2a requires; built the same day
+(section 6, "As built"). For Mark's review alongside D15 (i).
 Read against Mere `a2c41e933`. Mark's D15 (i) ("Wait for a door route") made this the
 prerequisite for moving Knot's lane out of the resident.
 
@@ -1012,3 +1012,34 @@ and copies only blobs the legacy store retains.
   (f) is done first: `LEGACY_KNOT_LEASE` left that file and is now `resident_knot`'s.
 - The client and the wire types are in `graphshell-door` (feature `blob-door`), so a supervised
   application links a door client and not the resident.
+
+### 6. As built (2026-11-08)
+
+- **Server:** `ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `bin/djinn.rs`
+  beside the published-site route; `BlobDoor::revoke` and `restore`). **Wire and client:**
+  `crates/graphshell/graphshell-door/src/blob_door.rs`, feature `blob-door`
+  (`BlobDoorClient`: `bind_scope`, `put`, `lease`, `release`, `lease_hash`, `retain`, `unretain`,
+  `allow_reader`, `deny_reader`, `replace_readers`, `allows`, `migrate_legacy`, `read`, `ledger`).
+  **Custody:** `ResidentBlobCustody` gained `claim_scope`, `reserve_scope`, `scope_owner`,
+  `scopes_of` and `withdraw_serving`, and the durable owner record `content/scope-owners.json`;
+  `personal_sync` reserves the personal graph's scope as `resident`. The Knot lane claims nothing:
+  it is the in-process caller until P2 removes it, and the supervised application then claims the
+  same scope.
+- **The one narrowing against the in-process calls** (beyond the namespace and path rules in 3):
+  `retain` is refused unless the scope holds a lease on the hash, because the door otherwise lets an
+  application authorize serving of bytes it does not hold by naming another scope's hash.
+- **Not wired:** nothing in `djinn` calls `BlobDoor::revoke` yet, since the daemon has no live
+  grant-removal path (owner grants are read at start and on the consent dialog's yes). Revoking by
+  removing the grant therefore takes effect at the next connection and the next restart; the
+  live cut is the API, tested.
+- **Open for P2 (not this route's):** the route moves custody administration and reads. It does not
+  move *serving*. Knot's sync host builds its iroh endpoint with
+  `P2pandaTransport::builder.scoped_blobs(&blobs, scope, readers)`
+  (`knot-editor/crates/knot-editor/src/resident/operations.rs:131-135`), so the endpoint that
+  peers dial serves bytes out of the `BlobStore` in its own process. A supervised child cannot hold
+  the resident's store, so P2 step 3 needs a ruling; the options are in the cycle breaks plan's
+  Findings.
+- **Tests:** `resident_blob_door::tests` 8 (the lib's `resident_blobs` 2 unchanged), `tests/blob_door.rs`
+  1 (the real door: put in parts, read in chunks, lease, release, serving authority, migration,
+  a second application refused, an ungranted application refused, revocation, restore), and
+  `graphshell-door` 2 wire tests (4 total in the crate with the feature).

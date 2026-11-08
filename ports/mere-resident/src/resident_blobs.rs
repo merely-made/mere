@@ -12,8 +12,9 @@
 //! never deleted. A lane names its own legacy lease namespace and passes it in
 //! (cycle breaks D14 (f)): this file names no application.
 
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
@@ -50,11 +51,24 @@ struct MigrationMarker {
     hashes: Vec<String>,
 }
 
+/// The owner a scope has when the resident itself uses it. A door
+/// application can never claim such a scope.
+pub const RESIDENT_SCOPE_OWNER: &str = "resident";
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+struct ScopeOwners {
+    schema: String,
+    /// Scope (hex) to the application that owns it.
+    owners: BTreeMap<String, String>,
+}
+
 /// The device host's single physical iroh store and serving authorizer.
 #[derive(Clone)]
 pub struct ResidentBlobCustody {
     root: PathBuf,
     migration_root: PathBuf,
+    owners_path: PathBuf,
+    owners: Arc<Mutex<ScopeOwners>>,
     blobs: Arc<BlobStore>,
     readers: BlobReadAuthorizer,
 }
@@ -77,12 +91,94 @@ impl ResidentBlobCustody {
             BlobStore::open_collecting(&root, Duration::from_secs(settings.gc_interval_seconds))
                 .await
                 .map_err(|error| format!("could not open resident blob store: {error}"))?;
+        let owners_path = content_root.join("scope-owners.json");
+        let owners = load_owners(&owners_path)?;
         Ok(Self {
             root,
             migration_root: content_root.join("migrations"),
+            owners_path,
+            owners: Arc::new(Mutex::new(owners)),
             blobs: Arc::new(blobs),
             readers: BlobReadAuthorizer::new(),
         })
+    }
+
+    /// Record that `owner` holds `scope`, for the blob door route. The first
+    /// claimant keeps it; another application naming it is refused with the
+    /// owner named. A repeat claim by the owner is a no-op. The record is
+    /// durable, so a restart does not hand a scope to whoever connects first.
+    pub fn claim_scope(&self, scope: BlobScope, owner: &str) -> Result<(), String> {
+        let key = hex32(&scope.to_bytes());
+        let mut owners = self.owners.lock().map_err(|_| "scope owners poisoned".to_string())?;
+        match owners.owners.get(&key) {
+            Some(held) if held == owner => return Ok(()),
+            Some(held) => {
+                return Err(format!("scope {key} is held by {held}, not {owner}"));
+            },
+            None => {},
+        }
+        let mut next = owners.clone();
+        next.owners.insert(key, owner.to_string());
+        save_owners(&self.owners_path, &next)?;
+        *owners = next;
+        Ok(())
+    }
+
+    /// Mark `scope` as the resident's own, whatever an application had claimed:
+    /// the resident's in-process lanes always win a scope, and the application
+    /// then finds its calls refused.
+    pub fn reserve_scope(&self, scope: BlobScope) -> Result<(), String> {
+        let key = hex32(&scope.to_bytes());
+        let mut owners = self.owners.lock().map_err(|_| "scope owners poisoned".to_string())?;
+        if owners.owners.get(&key).is_some_and(|held| held == RESIDENT_SCOPE_OWNER) {
+            return Ok(());
+        }
+        let mut next = owners.clone();
+        next.owners.insert(key, RESIDENT_SCOPE_OWNER.to_string());
+        save_owners(&self.owners_path, &next)?;
+        *owners = next;
+        Ok(())
+    }
+
+    /// Who holds `scope`, if anyone has claimed it.
+    pub fn scope_owner(&self, scope: BlobScope) -> Option<String> {
+        let owners = self.owners.lock().ok()?;
+        owners.owners.get(&hex32(&scope.to_bytes())).cloned()
+    }
+
+    /// Every scope `owner` holds.
+    pub fn scopes_of(&self, owner: &str) -> Vec<BlobScope> {
+        let Ok(owners) = self.owners.lock() else {
+            return Vec::new();
+        };
+        owners
+            .owners
+            .iter()
+            .filter(|(_, held)| held.as_str() == owner)
+            .filter_map(|(key, _)| parse_hex32(key).ok().map(BlobScope::new))
+            .collect()
+    }
+
+    /// Withdraw `owner`'s serving authority: no reader of any scope it holds
+    /// may fetch anything, and every hash is unretained. Leases and the owner
+    /// record stay, so nothing is deleted; the owner re-binds its scopes to
+    /// serve again. Returns the hashes unretained.
+    pub async fn withdraw_serving(&self, owner: &str) -> Result<usize, String> {
+        let mut released = 0;
+        for scope in self.scopes_of(owner) {
+            self.readers.replace_readers(scope, std::iter::empty());
+            let hashes = self
+                .blobs
+                .leased_hashes(scope)
+                .await
+                .map_err(|error| format!("could not read resident blob leases: {error}"))?;
+            for hash in hashes {
+                if self.readers.release(scope, &hash) {
+                    released += 1;
+                }
+            }
+        }
+        Ok(released)
     }
 
     pub fn blobs(&self) -> Arc<BlobStore> {
@@ -258,6 +354,33 @@ impl ResidentBlobCustody {
             .await
             .map_err(|error| format!("could not shut down resident blob store: {error}"))
     }
+}
+
+fn load_owners(path: &Path) -> Result<ScopeOwners, String> {
+    match std::fs::read(path) {
+        Ok(bytes) => serde_json::from_slice(&bytes)
+            .map_err(|error| format!("could not decode blob scope owners: {error}")),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(ScopeOwners {
+            schema: "mere.graphshell/blob-scope-owners/v1".into(),
+            owners: BTreeMap::new(),
+        }),
+        Err(error) => Err(format!("could not read blob scope owners: {error}")),
+    }
+}
+
+fn save_owners(path: &Path, owners: &ScopeOwners) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)
+            .map_err(|error| format!("could not create blob content directory: {error}"))?;
+    }
+    let mut bytes = serde_json::to_vec_pretty(owners)
+        .map_err(|error| format!("could not encode blob scope owners: {error}"))?;
+    bytes.push(b'\n');
+    let temporary = path.with_extension("json.tmp");
+    std::fs::write(&temporary, bytes)
+        .map_err(|error| format!("could not write blob scope owners: {error}"))?;
+    std::fs::rename(&temporary, path)
+        .map_err(|error| format!("could not install blob scope owners: {error}"))
 }
 
 fn normalized_path(path: &Path) -> Result<String, String> {

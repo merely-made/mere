@@ -17,6 +17,7 @@
 //! application connection, and the endpoint that forwards over it),
 //! `projection-offer` (the portable messages for the provider route),
 //! `projection-provider` (the native runner for a projection offer) and
+//! `blob-door` (the client and wire of the resident's blob custody route),
 //! `profile` (the Graphshell application's identity, as Djinn releases it).
 //! Projection and identity adapters use the independent Djinn door; native
 //! adapters are unavailable on Wasm.
@@ -29,6 +30,12 @@ pub mod profile;
     not(target_arch = "wasm32")
 ))]
 pub mod projection;
+#[cfg(all(
+    feature = "blob-door",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
+pub mod blob_door;
 #[cfg(feature = "projection-offer")]
 pub mod projection_offer;
 #[cfg(all(

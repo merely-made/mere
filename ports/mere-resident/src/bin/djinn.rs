@@ -1366,6 +1366,15 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .update(|catalog| resident.register_published_site_route(catalog))
                 .await?;
             grants.update(|routes| routes.serve(route));
+            // Scoped leases on the resident's blob store, for the declared
+            // applications whose grant names `blob-custody-v1` (P2a).
+            let route = catalog
+                .update(|catalog| {
+                    mere_resident::resident_blob_door::BlobDoor::new(resident.blobs())
+                        .register(catalog)
+                })
+                .await?;
+            grants.update(|routes| routes.serve(route));
             // Owner-only and read-only: where each paired device is now.
             let route = catalog
                 .update(|catalog| DeviceDirectoryEndpoint::register(device_directory, catalog))

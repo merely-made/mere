@@ -26,6 +26,7 @@ pub mod pairing;
 pub mod personal_sync;
 pub mod personal_facts;
 pub mod resident;
+pub mod resident_blob_door;
 pub mod resident_blobs;
 pub mod resident_devices;
 pub mod resident_distillery;
