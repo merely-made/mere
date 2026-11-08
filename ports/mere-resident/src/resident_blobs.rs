@@ -6,9 +6,11 @@
 
 //! Djinn-owned physical blob custody.
 //!
-//! Personal graph transfers and Knot evidence have distinct domain leases and
-//! serving authority, but they borrow one iroh store from the process owner.
-//! Old per-lane stores are copied and verified here; they are never deleted.
+//! Personal graph transfers and an application's evidence have distinct domain
+//! leases and serving authority, but they borrow one iroh store from the
+//! process owner. Old per-lane stores are copied and verified here; they are
+//! never deleted. A lane names its own legacy lease namespace and passes it in
+//! (cycle breaks D14 (f)): this file names no application.
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -25,8 +27,6 @@ pub const PERSONAL_STAGE_LEASE: &str = "graphshell.transfer";
 pub const PERSONAL_FETCH_LEASE: &str = "graphshell.fetch";
 /// Namespace used while importing the old per-graph blob store.
 pub const LEGACY_PERSONAL_LEASE: &str = "legacy.personal";
-/// Namespace used while importing the old per-persona evidence store.
-pub const LEGACY_KNOT_LEASE: &str = "legacy.knot";
 
 /// Result of considering one legacy store.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -388,7 +388,7 @@ mod tests {
                 .migrate_legacy_store(
                     &temp.path().join("missing"),
                     BlobScope::new([0x91; 32]),
-                    LEGACY_KNOT_LEASE,
+                    "legacy.evidence",
                 )
                 .await
                 .unwrap(),
