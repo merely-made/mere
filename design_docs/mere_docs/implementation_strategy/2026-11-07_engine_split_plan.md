@@ -1326,4 +1326,18 @@ revision and what crosses at frame rate.
   port exists in any repository to carry `ClipboardRequest::Write` out, so that leg is a fork. Left:
   rootstock's egui embedding (Copy and Cut wait on the same selection query). Locks gain only the
   `backstep` edges (rootstock, `graphshell-web`).
-
+- 2026-11-08: D29 carried out (branch `p0/frame-model-hest`, worktree `worktrees/mere-frame-model-hest`,
+  not merged). `mere-chrome` takes `hest` (already a workspace row; the lock gains only that edge, at
+  graphshell `d80316db`). `FrameHostInput::clipboard_completions` and the backstep pair's re-export
+  are gone; `FrameHostInput::outcomes: Vec<(String, hest::Outcome)>` carries the host's terminal
+  results keyed by invocation id in arrival order, and the new `FrameStep { view_model, invocations }`
+  is the runtime's per-frame output, the invocations beside the view model rather than in it. No
+  runtime in Mere, Graphshell or Turnstone constructs `FrameViewModel` or consumes `FrameHostInput`
+  (`GraphshellRuntime` survives only in doc comments), so `FrameStep` is the declared exit, like the
+  input it answers. The new `chrome::effects` declares `clipboard:write_text` (`namespace:name`, as
+  hest's catalogue and rootstock's `window:*` ids are written; outside the shared catalogue until a
+  second host offers it) under argument schema `chrome.effects/v1`, the text as plain UTF-8 bytes:
+  the schema id is the version header, and one string gains nothing from postcard, which chrome does
+  not otherwise take. `read_clipboard_write_text` is the host's decode, refusing a foreign id, schema
+  or effect. hest's `Invocation::id` is the command id, not a per-call id, so two writes in flight are
+  told apart only by issue order. backstep is untouched; no in-repo constructor used the removed field.

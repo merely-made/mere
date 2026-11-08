@@ -10162,6 +10162,7 @@ name = "mere-chrome"
 version = "0.0.1"
 dependencies = [
  "backstep",
+ "hest",
  "incipit",
  "mere-kernel",
  "serde",

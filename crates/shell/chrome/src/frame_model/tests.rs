@@ -9,9 +9,10 @@ use std::time::Duration;
 use kernel::graph::NodeKey;
 use kernel::time::PortableInstant;
 
-use super::{
-    ClipboardError, ClipboardEvent, ClipboardRequest, FocusRingCurve, FocusRingSpec, FrameHostInput,
-};
+use hest::{EffectClass, Outcome};
+
+use super::{FocusRingCurve, FocusRingSpec, FrameHostInput, FrameStep};
+use crate::effects;
 
 fn spec(node: NodeKey, started: PortableInstant, duration_ms: u64) -> FocusRingSpec {
     FocusRingSpec {
@@ -129,23 +130,38 @@ fn frame_host_input_default_is_empty() {
     assert!(!input.wants_keyboard);
     assert!(!input.wants_pointer);
     assert!(!input.had_input_events);
-    assert!(input.clipboard_completions.is_empty());
+    assert!(input.outcomes.is_empty());
 }
 
 #[test]
-fn a_clipboard_write_is_answered_through_the_host_input() {
-    // The runtime's port payload, and the host's answer to it.
-    let write = ClipboardRequest::Write("https://example.org".into());
-    let refused = write.fail(ClipboardError::Refused);
+fn a_clipboard_write_leaves_as_an_invocation_and_its_outcome_returns() {
+    // The runtime's frame step issues the write beside the view model.
+    let step = FrameStep {
+        invocations: vec![effects::clipboard_write_text("https://example.org")],
+        ..FrameStep::default()
+    };
+    let issued = &step.invocations[0];
+    assert_eq!(issued.effect, EffectClass::ExternalEffect);
+    assert!(step.view_model.active_pane_rects.is_empty());
+
+    // The host enacts it, then answers this write and refuses a second.
+    let text = effects::read_clipboard_write_text(issued).expect("chrome's declaration");
+    assert_eq!(text, "https://example.org");
     let input = FrameHostInput {
-        clipboard_completions: vec![ClipboardEvent::Written(Ok(())), refused],
+        outcomes: vec![
+            (issued.id.clone(), Outcome::Done),
+            (
+                issued.id.clone(),
+                Outcome::Refused {
+                    reason: "clipboard unavailable".into(),
+                },
+            ),
+        ],
         ..FrameHostInput::default()
     };
     assert_eq!(
-        input.clipboard_completions,
-        vec![
-            ClipboardEvent::Written(Ok(())),
-            ClipboardEvent::Written(Err(ClipboardError::Refused)),
-        ]
+        input.outcomes[0],
+        (effects::ids::CLIPBOARD_WRITE_TEXT.into(), Outcome::Done)
     );
+    assert!(matches!(input.outcomes[1].1, Outcome::Refused { .. }));
 }
