@@ -295,3 +295,42 @@ fn the_display_rate_sets_half_its_frame_as_the_budget() {
     assert_eq!(us(&canvas), 8_333);
     assert_eq!(canvas.physics_step_budget().unwrap().margin, Duration::ZERO);
 }
+
+/// The same law, built inline from boxed forces and built on an actor thread
+/// from the descriptor the canvas sends an offloaded backend, settles a
+/// `ticks`-tick run to the same bits.
+fn offloaded_law_run(law: PhysicsLaw, offload: bool, ticks: u32) -> Vec<(usize, u32, u32)> {
+    let mut canvas = canvas(30, law);
+    if offload {
+        // Halted first: a law that never rests (Orbit) would otherwise start
+        // ticking on the actor before the halt below reached it.
+        canvas.physics.halt();
+        canvas.offload_physics(std::sync::Arc::new(|| {}));
+        assert!(!canvas.physics.runs_inline());
+        // The offload carried the boxed forces over; rebuild now sends the law as data.
+        canvas.rebuild_law_forces();
+    }
+    canvas.physics.halt();
+    canvas.physics.settle(ticks);
+    let deadline = std::time::Instant::now() + Duration::from_secs(30);
+    while canvas.physics_pace().ticks < u64::from(ticks) {
+        assert!(std::time::Instant::now() < deadline, "{} never ran", law.id());
+        canvas.physics.advance_frame(&mut canvas.view);
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    canvas.physics.refresh(&mut canvas.view);
+    bits(&canvas)
+}
+
+#[test]
+fn an_offloaded_canvas_sends_the_law_as_data_and_settles_where_the_inline_one_does() {
+    for law in [
+        PhysicsLaw::Springs,
+        PhysicsLaw::Charge,
+        PhysicsLaw::Kinds,
+        PhysicsLaw::Orbit,
+    ] {
+        let inline = offloaded_law_run(law, false, 40);
+        assert_eq!(offloaded_law_run(law, true, 40), inline, "{}", law.id());
+    }
+}

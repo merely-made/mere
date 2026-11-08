@@ -351,7 +351,8 @@ impl Canvas {
     }
 
     /// Rebuild the law + overlay force set against the current graph and hand it
-    /// to the physics backend. Position-preserving.
+    /// to the physics backend, as boxed forces in-thread and as a descriptor
+    /// otherwise. Position-preserving.
     pub(crate) fn rebuild_law_forces(&mut self) {
         #[cfg(test)]
         {
@@ -376,7 +377,14 @@ impl Canvas {
         let sources = self.law_sources();
         // The site channel from the registry, once per structure and URL grouping.
         self.channels.sites(&self.graph);
-        let forces = {
+        // An in-thread backend builds the forces here, reading the physics
+        // channels through the registry, which caches one computation per view
+        // key. Any other backend is sent the law as data and computes the
+        // channels on its own side, uncached: a descriptor would give up the
+        // cache on the in-thread path, so that path stays on boxed forces
+        // (Graphshell host plan, T7, step 2b milestone 3).
+        let inline = self.physics.runs_inline();
+        {
             let inputs = law_inputs_without_relation_edges(
                 &self.graph,
                 if wants_clusters {
@@ -395,14 +403,24 @@ impl Canvas {
             );
             let inputs = with_occurrence_edges(inputs, self.occurrence_edges.as_deref());
             let inputs = with_meaning(inputs, self.meaning.snapshot());
-            let inputs = with_registry(inputs, &self.channels, self.physics_view_key());
-            self.composed_forces(&inputs, sources)
-        };
+            if inline {
+                let inputs = with_registry(inputs, &self.channels, self.physics_view_key());
+                let forces = self.composed_forces(&inputs, sources);
+                self.physics.set_forces(forces);
+            } else {
+                let descriptor = inputs.describe(
+                    self.physics_law,
+                    self.physics_composition.as_ref(),
+                    &self.physics_overlays,
+                    sources,
+                );
+                self.physics.set_force_set(descriptor);
+            }
+        }
         #[cfg(test)]
         if self.physics_reads(PhysicsKindSource::Meaning) {
             self.meaning.built_from = self.meaning.snapshot().map(|s| s.run);
         }
-        self.physics.set_forces(forces);
     }
 
     /// Whether the live law or overlays read `source` through the kind or the

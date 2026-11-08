@@ -415,13 +415,15 @@ impl PhysicsBoard {
             focus: None,
             seed: self.seed,
         };
-        let forces = inputs.composed(
+        // The board reads no channel registry (its inputs carry none), so the law
+        // goes to the backend as data: the descriptor builds the same forces
+        // where the backend runs, and computes the same channels, uncached either way.
+        self.physics.set_force_set(inputs.describe(
             self.choice.law,
             self.composition.as_ref(),
             &self.choice.overlays,
             sources,
-        );
-        self.physics.set_forces(forces);
+        ));
     }
 
     /// Ask the backend for a settle: the normal burst, or — under a law or
