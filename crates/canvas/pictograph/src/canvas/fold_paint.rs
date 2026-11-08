@@ -167,7 +167,7 @@ impl Canvas {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use curation::{FoldId, FoldRecord, FoldStandIn};
+    use incipit::curation::{FoldId, FoldRecord, FoldStandIn};
     use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::{EdgeAssertion, Graph, RelationKind, SemanticSubKind};
 

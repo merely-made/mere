@@ -66,7 +66,7 @@ pub enum SubgraphBinding {
 
 // The specification and its kinds live in the curation crate (Scenograph
 // editor plan, SE67); re-exported so callers are unchanged.
-pub use curation::{SubgraphKind, SubgraphSpec};
+pub use incipit::curation::{SubgraphKind, SubgraphSpec};
 
 // ---------------------------------------------------------------------------
 // Edge projection spec (consumed from subgraph_projection_binding_spec.md §3)

@@ -80,7 +80,7 @@ pub fn root(state: &State) -> Child {
                 ));
             }
             // Reuse the suite's roster row convention; create is outside this slice.
-            let rows = persona_picker::roster_items(&snapshot.roster);
+            let rows = cambium::persona_picker::roster_items(&snapshot.roster);
             for (profile, row) in snapshot.roster.entries.iter().zip(rows.iter()) {
                 let name = &row.label;
                 let label = format!("{}{}", name, if profile.chosen { " · in use" } else { "" });

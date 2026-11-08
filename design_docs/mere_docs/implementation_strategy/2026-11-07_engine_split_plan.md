@@ -122,9 +122,9 @@ resource references by UUIDv5; the graph and session ids stay reachable behind a
 default feature so Cleromancy and Fleece keep depending on ids alone),
 the `mere` facade's navigation, trail and roster logic (its visual and workbench APIs to the
 view and composition crates; no new facade), `mere-cartography`, `pictograph`, `mere-forme`,
-`mere-curation`, `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
+`mere-curation` (merged into `incipit`, P0 done), `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
 `cambium-rootstock`, `cambium-winit`, `cambium-a11y`, `cambium-desktop`, `cambium-web`,
-`workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker`,
+`workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
 `mere-view`, `mere-overmap`), `tabard`, `mere-chrome`, `mere-registry` (examined feature by
 feature in P0; a registry may carry several owners' contracts but makes none of their
 decisions), `mere-surface-api`, `settings-wit`, `ux-events`, `mere-fetch` (the host's fetch
@@ -1161,3 +1161,18 @@ revision and what crosses at frame rate.
   Murm's signalman-desktop and mer3ly `seiche` rows, Woodshed's `tinct` rows (then Turnstone's tinct
   redirect leaves). Rust compiles hit out-of-memory three times while other sessions built; the
   machine is at its limit with every session running.
+- 2026-11-07: P0 squish lane (branch `p0/squish`, worktree `worktrees/mere-p0-squish`, not merged).
+  `mere-curation` merged into `incipit` as `incipit::curation` (585 lines and their tests moved, the
+  crate's manifest deleted; five consumers repathed, pictograph by import paths only). incipit went to
+  0.2.2, not 0.3.0: the external distillery repo takes incipit `^0.2` through the crates-io patch, and
+  0.3.0 put a second incipit in the lock. `persona-picker` merged into `cambium` as
+  `cambium::persona_picker` (256 lines and tests moved) behind a new optional `persona-picker` feature,
+  so cambium's other consumers do not build the personae identity stack (about 160 crates); no cycle,
+  since neither dramatis nor personae reaches cambium. Names freed: `mere-curation` (on crates.io only
+  once its 0.1.1 publish is yanked or left) and `persona-picker`. D14 is held at a fork: `mod_loader`
+  emits through `diagnostics` (`emit_event`, `DiagnosticEvent`, eight `CHANNEL_MOD_*` constants; its
+  tests use `diagnostic_channel`, `scoped_thread_sender`, `IngressLimits`), diagnostics is 4,346 lines
+  and not 956, and Turnstone names `mere-registry` with only the `diagnostics` feature, so moving
+  diagnostics into the resident would make document-host and Turnstone depend on a port.
+  `mere-registry` is not yet freed. Before the branch reaches main: Knot, Turnstone and Woodshed name
+  `mere-curation`, and Woodshed and Dramatis name `persona-picker`, from `mere.git` main.

@@ -28,11 +28,10 @@ name = "dramatis-ui"
 path = "src/main.rs"
 
 [dependencies]
-cambium.workspace = true
+cambium = { workspace = true, features = ["persona-picker"] }
 mandrake.workspace = true
 taproot.workspace = true
 cambium-desktop.workspace = true
-persona-picker.workspace = true
 # The custody client and quarantine types, without the Graphshell port
 # (stack lift plan, L1).
 ostiary = { workspace = true, features = ["native"] }
