@@ -51,10 +51,10 @@ fn fold_selection_projects_a_summary_and_click_expands_without_mutating_graph() 
         .expect("two selected nodes make a fold");
     let projection = canvas.fold_projections().pop().expect("the fold projects");
     let records = canvas.fold_records().to_vec();
-    assert_eq!(records[0].rule, Some(curation::FoldRule::Selection));
+    assert_eq!(records[0].rule, Some(incipit::curation::FoldRule::Selection));
     assert_eq!(
         records[0].stand_in,
-        curation::FoldStandIn::Summary { label: None }
+        incipit::curation::FoldStandIn::Summary { label: None }
     );
     assert_eq!(projection.members.len(), 2);
     assert_eq!(projection.stand_in, None, "a selection folds to a summary");
@@ -170,10 +170,10 @@ fn several_folds_stand_in_as_members_with_badges_and_undo_as_a_set() {
     assert_eq!(canvas.fold_records().len(), 2);
     assert_eq!(
         canvas.fold_records()[0].rule,
-        Some(curation::FoldRule::Descendants {
+        Some(incipit::curation::FoldRule::Descendants {
             root: root.to_string(),
             family: "containment".into(),
-            direction: curation::FoldDirection::Outgoing,
+            direction: incipit::curation::FoldDirection::Outgoing,
         })
     );
     assert!(
@@ -281,12 +281,12 @@ fn a_collapse_absorbs_a_fold_inside_it_and_restore_refuses_stale_or_overlapping_
 
     let kept = canvas.fold_records()[0].clone();
     let mut overlapping = kept.clone();
-    overlapping.id = curation::FoldId::new("overlap");
+    overlapping.id = incipit::curation::FoldId::new("overlap");
     let mut stale = kept.clone();
-    stale.id = curation::FoldId::new("stale");
+    stale.id = incipit::curation::FoldId::new("stale");
     stale.members[1] = uuid::Uuid::from_u128(7).to_string();
     stale.members.sort();
-    stale.stand_in = curation::FoldStandIn::Summary { label: None };
+    stale.stand_in = incipit::curation::FoldStandIn::Summary { label: None };
     stale.rule = None;
     let refused = canvas.restore_folds([kept.clone(), overlapping, stale]);
     assert_eq!(
@@ -302,15 +302,15 @@ fn a_collapse_absorbs_a_fold_inside_it_and_restore_refuses_stale_or_overlapping_
 #[test]
 fn restore_refuses_duplicate_fold_identity_even_with_disjoint_members() {
     let (mut canvas, [root, x, _, other, z]) = two_hierarchies();
-    let id = curation::FoldId::new("same-fold");
-    let first = curation::FoldRecord::selection(
+    let id = incipit::curation::FoldId::new("same-fold");
+    let first = incipit::curation::FoldRecord::selection(
         id.clone(),
         "canvas:test",
         [root, x].map(|id| id.to_string()),
     )
     .unwrap();
     let duplicate =
-        curation::FoldRecord::selection(id, "canvas:test", [other, z].map(|id| id.to_string()))
+        incipit::curation::FoldRecord::selection(id, "canvas:test", [other, z].map(|id| id.to_string()))
             .unwrap();
     assert_eq!(
         canvas.restore_folds([first.clone(), duplicate.clone()]),

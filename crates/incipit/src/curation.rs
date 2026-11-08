@@ -12,7 +12,8 @@
 //! without forme's layout stack (scenograph's swatch scope among them) can
 //! name a subgraph (forme re-exports them, so its callers are unchanged), and
 //! the native fold record ([`fold`]), which left forme in S5's native phase
-//! (Rulings 163 and 164).
+//! (Rulings 163 and 164). It was the `mere-curation` crate until 2026-11-07
+//! (engine split D10).
 
 use serde::{Deserialize, Serialize};
 

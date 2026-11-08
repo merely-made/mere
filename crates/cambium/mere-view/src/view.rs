@@ -193,7 +193,7 @@ pub enum MereViewEvent {
 pub struct MereViewState {
     /// Host-owned catalog curation. Layout still uses every source member;
     /// only the final catalog Swatch is folded, before the resident tier.
-    pub folds: Vec<curation::FoldRecord>,
+    pub folds: Vec<incipit::curation::FoldRecord>,
     pub hovered: Option<String>,
     pub focused: Option<String>,
     /// Presentation-only selection for an explicit Compose request.

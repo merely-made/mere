@@ -12,7 +12,7 @@
 //! The source owner resolves the reference when a recipient opens the record,
 //! and reports a missing source, stale cursor, or denied disclosure explicitly.
 
-use curation::FOLD_RECORD_VERSION;
+use incipit::curation::FOLD_RECORD_VERSION;
 use eidetic::{
     BlobSource, Error, ManifestId, NoFetcher, PayloadSealer, PrivacyClass, ProvenanceOrigin,
     ProvenanceRecord, Result, SchemaRef, Store, Timestamp, TrustEnvelope, TypedPayload,
@@ -293,7 +293,7 @@ pub async fn open_live_view_record<R: LiveViewSourceResolver>(
 mod tests {
     use std::collections::BTreeSet;
 
-    use curation::{FoldId, FoldRecord};
+    use incipit::curation::{FoldId, FoldRecord};
     use muniment::MemoryBackend as InMemoryStore;
     use uuid::Uuid;
 

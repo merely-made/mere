@@ -11,7 +11,7 @@
 //! relabelling are one reversible history, and none of them touches the
 //! graph or its physics.
 
-use curation::{FoldId, FoldRecord, FoldRule, FoldStandIn};
+use incipit::curation::{FoldId, FoldRecord, FoldRule, FoldStandIn};
 use kernel::geometry::PortablePoint;
 use kernel::graph::{EdgeFamily, NodeKey};
 

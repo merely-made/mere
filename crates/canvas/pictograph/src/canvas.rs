@@ -389,7 +389,7 @@ pub struct ContextRequest {
 /// cells, and physics positions deliberately do not participate.
 #[derive(Clone)]
 struct FoldViewState {
-    folds: Vec<curation::FoldRecord>,
+    folds: Vec<incipit::curation::FoldRecord>,
     selected: HashSet<NodeKey>,
     selected_links: HashSet<LinkKey>,
     selected_link_appearances: HashMap<LinkKey, (NodeKey, NodeKey)>,
@@ -849,11 +849,11 @@ pub struct Canvas {
     /// the source graph and the physics layout; only this Canvas projection
     /// replaces them visually. (Graph view curation C3; mer3ly site plan,
     /// Rulings 165 and 166.)
-    folds: Vec<curation::FoldRecord>,
+    folds: Vec<incipit::curation::FoldRecord>,
     /// A pending stand-in click (a summary body or a badge). Keeping this
     /// separate from node dragging lets a click expand the fold without ever
     /// making the synthetic summary a source-graph node.
-    fold_press: Option<(curation::FoldId, (f32, f32))>,
+    fold_press: Option<(incipit::curation::FoldId, (f32, f32))>,
     /// The "+N" badge elements in the node document, made as folds need
     /// them and reused; each with its text node and the text it shows.
     fold_badge_nodes: Vec<(DomNodeId, DomNodeId, String)>,
