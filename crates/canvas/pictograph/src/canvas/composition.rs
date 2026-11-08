@@ -34,31 +34,6 @@ use super::physics_catalog::{
     PhysicsOverlay,
 };
 
-impl PhysicsLaw {
-    /// The law's forces over no graph: enough to read its declared terms.
-    fn bare_forces(self) -> Vec<Box<dyn Force>> {
-        LawInputs::from_parts(Vec::new(), Vec::new(), HashMap::new())
-            .law_forces(self, LawSources::bare())
-    }
-
-    /// How the law's motion enters the step, from its declared terms.
-    pub fn currency(self) -> Currency {
-        compose::currency_of(&self.bare_forces())
-    }
-
-    /// What the law does with `overlay`: compose it, convert it, or refuse
-    /// it. Density takes only the overlays that hold its bar converted (F73).
-    pub fn admits(self, overlay: PhysicsOverlay) -> Admission {
-        if self == PhysicsLaw::Density && !DENSITY_ADMITS.contains(&overlay) {
-            return Admission::Refuse(DENSITY_REFUSAL);
-        }
-        let inputs = LawInputs::from_parts(Vec::new(), Vec::new(), HashMap::new());
-        let force = inputs.overlay_force(overlay, LawSources::bare());
-        compose::admit_force(self.currency(), force.as_ref())
-    }
-}
-
-/// What runs in the law slot instead of the picked law.
 #[derive(Clone, Debug, PartialEq)]
 pub enum PhysicsComposition {
     /// Force laws at weights; 1 is the law as calibrated, 0 leaves it out.
@@ -302,5 +277,45 @@ impl LawInputs<'_> {
                 .map(|overlay| self.overlay_force(*overlay, sources)),
         );
         forces
+    }
+}
+
+/// The law currency and overlay admission tables in `seiche-model` against what
+/// the built forces declare: the tables are only safe while this holds.
+#[cfg(test)]
+mod law_facts_drift {
+    use super::*;
+
+    fn bare_forces(law: PhysicsLaw) -> Vec<Box<dyn Force>> {
+        LawInputs::from_parts(Vec::new(), Vec::new(), HashMap::new())
+            .law_forces(law, LawSources::bare())
+    }
+
+    #[test]
+    fn the_law_currency_table_matches_the_declared_terms() {
+        for law in PhysicsLaw::ALL {
+            assert_eq!(
+                law.currency(),
+                compose::currency_of(&bare_forces(law)),
+                "{law:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_overlay_admission_table_matches_the_composer() {
+        let inputs = LawInputs::from_parts(Vec::new(), Vec::new(), HashMap::new());
+        for law in PhysicsLaw::ALL {
+            for overlay in PhysicsOverlay::ALL {
+                let expected = if law == PhysicsLaw::Density && !DENSITY_ADMITS.contains(&overlay)
+                {
+                    Admission::Refuse(DENSITY_REFUSAL)
+                } else {
+                    let force = inputs.overlay_force(overlay, LawSources::bare());
+                    compose::admit_force(compose::currency_of(&bare_forces(law)), force.as_ref())
+                };
+                assert_eq!(law.admits(overlay), expected, "{law:?} with {overlay:?}");
+            }
+        }
     }
 }
