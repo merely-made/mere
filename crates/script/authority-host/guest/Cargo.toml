@@ -1,0 +1,23 @@
+# The authority-guest test fixture: a component that is the authority for the domain
+# `fixture`. Standalone workspace with its own toolchain pin, built to wasm32-wasip2 by the
+# host's build.rs. A Mere-built fixture: no test in Mere loads any other project's guest.
+[workspace]
+
+[package]
+rust-version = "1.97.1"
+name = "authority-fixture-guest"
+version = "0.0.1"
+edition = "2021"
+license = "MPL-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.58"
+
+[profile.release]
+opt-level = "s"
+strip = true
+panic = "abort"
