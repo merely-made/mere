@@ -1044,6 +1044,112 @@ and copies only blobs the legacy store retains.
   a second application refused, an ungranted application refused, revocation, restore), and
   `graphshell-door` 2 wire tests (4 total in the crate with the feature).
 
+## Serving through the door: the source trait and the verified read (cycle breaks P2 step 3, 2026-11-08)
+
+**Status:** designed first, then built the same day (section 7). Mark's ruling on the cycle breaks plan's
+"P2 findings" serving question: "(2) Transport change". The blob door route above moves custody
+administration and reads; this section moves *serving*, so a supervised application that does not hold
+the resident's store still answers peers' iroh-blobs requests with verified streams.
+
+### 1. The problem, with the code
+
+Knot's host binds its endpoint with `P2pandaTransport::builder.scoped_blobs(&blobs, scope, readers)`
+(`knot-editor/.../resident/operations.rs`). In Murm (`native/crates/transport/src/p2panda_transport.rs`)
+that registered a `ScopedBlobsProtocol` holding the iroh `Store` and the in-process `BlobReadAuthorizer`
+and delegated each allowed request to iroh-blobs' `handle_get`, which calls `store.export_bao(hash, ranges)`:
+the BLAKE3 outboard (hash pairs) and the data, verified as they are read, written to the QUIC stream as the
+iroh-blobs response (an 8-byte little-endian size, hash pairs in pre-order, leaves). iroh's file store is
+single-process, and the door's reads (`read_range` over carrier chunks) carry data but not the pairs.
+
+### 2. The source trait (Murm, crate `mere-transport`, module `blob_source`)
+
+`BlobSource` is what a scoped provider reads from, in three questions:
+
+- `allows(scope, peer, hash) -> bool`: may this peer have this hash from this scope now.
+- `children(hash) -> Vec<BlobHash>`: the hashes a complete hash sequence names.
+- `export_bao(hash, ranges) -> BaoReader`: the response bytes for those chunk ranges of that blob, in pieces.
+
+`P2pandaTransportBuilder::scoped_source(Arc<dyn BlobSource>, scope)` registers the provider over any source.
+`scoped_blobs(&store, scope, authorizer)` keeps its signature and is now a one-line wrapper that builds a
+`StoreBlobSource`, so there is one provider, not two: every in-process caller (the personal replica, the
+Moot example, the old Knot lane) runs through the code the child uses. The provider's rules are the
+store-backed one's: read-only; every named hash, and every child a hash-sequence request reaches, authorised
+before any byte is written; pushes and unknown requests refused. **One narrowing:** `Observe` requests are
+refused (the store-backed provider answered them; no caller in the family issues one, and `fetch` observes
+the local store, not the remote).
+
+### 3. What the door adds: the verified read
+
+Two ops on `blob-custody-v1`, in the existing intent-then-ledger-then-resource pattern, no change to the carrier:
+
+- `bao-open { scope, peer, hash, ranges }`: `ranges` is a list of `(start, end)` chunk intervals (`end`
+  absent for open-ended), the wire form of iroh's `ChunkRanges`. The resident checks the policy below, then
+  makes a stream cursor and answers `bao { resource, total_len }` in the ledger. `resource` is a content-address
+  label (BLAKE3 of the route name, scope, peer, hash and ranges), unique per request.
+- `bao-close { resource }`: drop a cursor.
+- **Bytes out** are the carrier's resource chunks at that `resource`, read in order from offset 0. The resident
+  produces them from its own store's `export_bao` (so they are verified by the store as they are read, not
+  recomputed anywhere), the child writes each chunk straight to the QUIC stream, and the fetching peer verifies the
+  stream against the hash it asked for. A read out of order is refused (streams are sequential; a restart is a
+  new `bao-open`). `total_len` is computed at open by counting one pass of the export, so the client can use the
+  ordinary chunk assembly without a cap beyond a stream's length.
+
+Child side: `graphshell-door` (feature `blob-door`) carries the wire and the client methods (`bao_open`,
+`bao_chunk`, `bao_close`) and no iroh type. The `BlobSource` implementation over a `BlobDoorClient` is in
+the application that serves (Knot), on its own door session (`DoorBlobSource`): `allows` is the route's
+existing `allows` call, `children` reads the sequence through the verified `read`, and `export_bao` is
+`bao-open` plus chunks.
+
+### 4. Security properties
+
+1. **Only leased or retained hashes.** `bao-open` is refused unless the scope holds a lease on the hash (the
+   rule `retain` already has) **and** the resident's authorizer allows `(scope, peer, hash)`: retained by the
+   scope and the peer a reader. A hash the store holds for another scope, or leased but not retained, cannot be
+   streamed.
+2. **Scope ownership.** `scope` must be owned by the calling application (`owned`, the durable owner ledger). The
+   resident's own scopes (the personal graph) are reserved, so no door application can name them.
+3. **Revocation.** Every chunk read re-checks that the application is not revoked and that the authorizer still
+   allows `(scope, peer, hash)`. `BlobDoor::revoke` cuts the session and withdraws retention and readers, so an
+   open cursor stops at its next chunk, an unretained hash or a removed reader stops the same way, and a new
+   `bao-open` is refused. Leases are kept (custody data is never deleted by revocation).
+4. **The child is trusted for availability only.** It names the peer (it holds the transport and authenticates
+   it), so a compromised child can stream any of *its own scope's* retained hashes to a key it chooses; it
+   cannot reach another scope's, a leased-only hash, or the resident's. The bytes it forwards are verified by the
+   store that read them and by the peer that receives them.
+5. **Bounded.** At most 4 open cursors per session, each a streaming read (no whole-blob buffer in the resident);
+   chunks are at most the carrier's `MAX_RESOURCE_CHUNK_BYTES`.
+6. **Lock.** On lock the resident refuses new sessions and ends live ones, as for custody; with the session gone the
+   child has no source and serves nothing, and the supervisor ends the child (cycle breaks P2 step 3).
+
+### 5. What stays as it is
+
+Knot's evidence reference (`KnotClipEvidenceRef`, whose hash is the blob hash) and its dial hints are unchanged:
+the peer still dials the Knot device's node id and asks for the hash, which is now answered by the child. The
+resident's own iroh endpoint is not asked to serve Knot's evidence, so no new node id enters the references.
+
+### 6. Rejected
+
+- A copy of the store in the child (the state before S4: two stores and two endpoints).
+- Recomputing the outboard in the child from `read_range` bytes (the child reads the whole blob to serve any range).
+- The resident serving Knot's evidence from its own node (changes evidence references and dial hints).
+
+### 7. As built (2026-11-08)
+
+- **Murm** (`merely-made/murm` `c6b31e70`, on main): `mere-transport` module `blob_source` (`BlobSource`,
+  `BaoReader`, `StoreBlobSource`, interval helpers), `P2pandaTransportBuilder::scoped_source`, and `scoped_blobs`
+  rewritten as the store-source wrapper. Tests: `blob_source` 1 new, and
+  `a_source_serves_verified_streams_without_a_store_in_the_provider` (a provider with no store, a forwarding
+  source, a 200 KB multi-leaf blob verified by the fetching peer, a leased-but-unretained hash refused, a
+  non-reader refused, a source cut-off refusing without a stream request); the existing scoped-serving and
+  revocation tests now run through the same provider.
+- **Mere**, branch `agent/p2-door-serving` (not on main, see the plan's Findings, "P2 relock blocker"):
+  `graphshell-door` feature `blob-serve` (`DoorBlobSource`, `BlobDoorClient::bao_open`, `bao_next`, `bao_close`,
+  wire `BaoOpen`, `BaoClose`, `Bao`, `ChunkInterval`); `resident_blob_door.rs` (`BaoCursor`, `bao_chunk`, the
+  per-chunk re-check); `tests/blob_door.rs` gains
+  `an_application_without_the_store_serves_verified_streams_through_the_door`.
+
+||||||| 24f8bbf5a
+
 ## The authority guest (cycle breaks P3, 2026-11-08)
 
 Mark ruled "Build the real guest" after the spike (cycle breaks D15 (h)). This section records the
