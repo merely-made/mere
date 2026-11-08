@@ -162,8 +162,13 @@ conditions hold. No `Lane` trait and no distribution binary.
 
 ### P3. D1 Mere stops naming Cleromancy (reshaped by D14 and D15)
 
-**Status 2026-11-08: steps (1) and (2) done; the spike passes (Findings, "P3 spike"). Stopped for Mark's review
-(D15 (h)); steps (3) and (4) are not started.**
+**Status 2026-11-08: steps (1) to (3) and (4) done on the Mere side; Cleromancy's own root lock could not follow
+(Findings, "P3 guest").** Mark ruled "Build the real guest" (D23). The `domain-authority` world is in the protocol
+layer (`authority-guest`), the resident hosts it (`authority-host`, `authority_guest`), `mere-resident` names no
+Cleromancy crate, the `mere -> cleromancy` allowlist edge is gone, and the guest conforms: 577 of 577 corpus verdicts
+and refusal texts equal native, and the seven multi-process owner tests plus the four natal tests pass through it. Held:
+Cleromancy's root lock cannot take the new Mere (webcue and wgpu-cue are moving; Findings), so its conformance
+tests wait on a branch.
 
 In this order. **(1)** A validator-only crate split in Cleromancy: the authority's closure leaves
 `muniment/redb` and the other native-only dependencies (the locked checks on
@@ -960,6 +965,65 @@ tests' multi-process owner behaviour through a guest (step 3's conformance), the
 (stubbed; divination registers none). The fallback (supervised native process, D15 (h)) is not needed on this evidence.
 Mark's review of the spike gates step (3).
 
+### P3 guest (2026-11-08)
+
+**What was built.** Protocol layer (Graphshell `4d971f3`): `authority-guest` world and `domain-authority` interface in
+`world.wit`, with a test beside `block_guest_world`. Mere: `crates/script/authority-host` (the wasmtime host, 9 tests
+over a fixture guest), `ports/mere-resident/src/authority_guest.rs` (candidate encoding, `GuestRuntime`, owner review,
+pin, `GuestStore`) and `Authority::Guest` carrying a running guest; `tests/authority_guest.rs` 6, a route test in
+`resident_mere` 1. Cleromancy: `authority-guest/` (own lock root, toolchain pin, `cleromancy-core`'s
+`validate_divination_graph` unchanged behind the WIT). Design is in the domain contract, "The authority guest".
+
+**Choices this step made** (none contradicts D15; the plan did not rule them):
+- A fresh instance per call, not a reused one with re-instantiation after a trap. A trapped instance cannot be re-entered
+  and a reused one could carry state between verdicts; instantiating is under a millisecond.
+- Fuel is the budget, not a wall clock. WASI is closed: clocks fixed at zero, fixed-seed random, no preopens or stdio.
+- The claim gained `admission: bool`, so a guest with no before/after check costs no encoding of before and after.
+- No on-disk precompiled artifact: `Component::deserialize` is `unsafe` and a stored file would bypass the pinned hash.
+  The component compiles once per process (about a second, optimised).
+- The review reuses D12's signed pack (`eidetic` pack signing) and the one power `power:domain-authority`, but not
+  `CapsuleMount::review` itself: that lives in `ports/graphshell` and is tied to Moot capsule disclosures. The
+  resident's `AuthorityReview::prepare`/`approve` does the same checks and adds the author-key binding and the pin.
+- Guests install through a per-persona store under the shared root, read by `MereRoutes::with_resident_defaults`, so
+  every composition picks them up and none names an application. `resident_defaults` now takes the store.
+- `mere_defaults` still reserves the domain id `divination` (a name for data, not a dependency). Without it an
+  unreviewed machine would serve the domain unchecked. A reserved domain with no pin is refused `domain-not-registered`;
+  a pinned domain whose guest is revoked, missing, altered, or signed by another key is registered and refuses every
+  candidate as `pending: no authority installed for <domain> (<reason>)`.
+
+**Measurements** (Apple silicon, the spike's corpus of 577 cases: six product graphs and 571 tampers):
+
+| Measure | Result |
+|---|---|
+| Component size | 5,396,056 bytes (5.15 MiB), against the 16 MiB cap; the spike's 7.45 MiB had more dependencies. Test ceiling 8 MiB |
+| Verdicts | 577 of 577 equal native, 577 of 577 identical refusal text (526 admitted, 51 refused), 0 traps |
+| Fuel per call | max 1.775e9 (spike 1.74e9) |
+| Guest memory | max 6.4 MiB (spike 6.6) |
+| Candidate | up to 296,077 bytes |
+| Per call, release | native p50 9.6 ms, p90 25.8 ms, max 27.2 ms; resident total (encode + guest) p50 25.6 ms, p90 111 ms, max 121 ms |
+| Encode (resident side) | mean 0.19 ms, max 0.47 ms release (mean 7.7 ms, max 46 ms in a debug build): about 1 percent of the call |
+| Budget chosen | fuel 2e10 (11 times the corpus max, about 1 s of guest time), memory 128 MiB (19 times), candidate 16 MiB (54 times) |
+| Cold compile | about 1 s once per process, optimised; tens of seconds in an unoptimised debug build, which is why Cleromancy's dev profile optimises Cranelift |
+
+**Conformance.** The seven multi-process owner tests (embedded, daemon, embedded) pass through the guest: 7 of 7, 42 s.
+The four natal tests that moved out of `resident_mere` pass: 4 of 4. The corpus test (guest versus native) passes.
+The tests ran in a scratch member of Mere's workspace over Mere's lock (see below) with Cleromancy's sources.
+`mere-resident` counts: lib 272 to 269 (four natal tests moved, one guest route test added), `embedded_reservoir_validation`
+from 8 to 1 (the product half's 1 + 6 moved), `tests/authority_guest.rs` 6 new, `domain_registry` 8. Failures are the known
+ones only (`the_dialable_host`, `custodian_client` 2, `cxf_import`, `quarantine_review`).
+
+**Blocker: Cleromancy's root lock.** Moving Cleromancy's root lock to a Mere that has the guest host fails: Mere's
+graphshell requires `wgpu-cue = "=0.1.3"` while wgpu-cue `main` names an unpublished 0.1.4 (and webcue 0.1.3 against
+inker's `=0.1.2`), the same five-root blocker the P0 result lists. Moving a git source's revision always re-resolves its
+dependencies, so no `cargo update -p` keeps `cue-netrender` where it was. Cleromancy's test and example changes, which need
+the new resident API, wait on branch `agent/p3-guest-conformance` until that lane lands; the guest crate (its own lock root,
+which resolves) is on main.
+
+**Not done.** The pin across paired devices (`Pin::compare` exists, nothing carries a pin over the roster); a review
+dialog; the cross-architecture determinism check (one aarch64 machine; fuel and the closed WASI are the means, not the
+proof); `Component` caching across processes. `c1_receipt_host` no longer re-runs a product validator in its inspect
+client (the resident validated before serving).
+
 ## Keeping cycles out: the check
 
 `scripts/check_family_cycles.py`, with tests beside it in `scripts/test_check_family_cycles.py`
@@ -1293,4 +1357,11 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   features each check alone; `ortet` and `genet-wpt` check with `--all-targets`. Genet commits no `Cargo.lock`, so
   its checks are unlocked. Murm default and `native` check `--locked`; `native` lib tests pass (28, 97, 69, 15, 44 and
   small binaries). Five downstream roots could not relock (The P0 result). Receipts are in the P0 result section.
-
+- 2026-11-08: P3 step 3 to 5 (Mark: "Build the real guest", D23). Graphshell `4d971f3`: the `authority-guest` world and
+  `domain-authority` interface (claim has `admission`). Mere: `authority-host` (9 tests), `authority_guest` review, pin and store
+  (6 tests plus a route test), `Authority::Guest` runs a reviewed component, `mere-resident` drops `cleromancy-core`
+  (`divination_registration` and `with_resident_defaults`' divination are gone; `with_resident_defaults` reads the guest store),
+  the `mere -> cleromancy` allowlist entry is removed, the product half of `embedded_reservoir_validation` and the four natal
+  lib tests leave for Cleromancy. Cleromancy: `authority-guest/` (5.15 MiB), 577 of 577 verdicts and refusal texts equal native,
+  the seven owner tests and four natal tests pass through it. Cleromancy's root lock is blocked on webcue and wgpu-cue, so its tests
+  are on a branch. Measurements and choices: Findings, "P3 guest".

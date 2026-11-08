@@ -462,11 +462,12 @@ every copy is one more edge for a move to carry.
   registration, not the full proposed app manifest, custody salt grants or
   extraction of embedded resident lanes. See the [implementation plan](../implementation_strategy/2026-10-30_app_projection_offers.md)
   and [qualification](../testing/receipts/2026-10-30_app_projection_offers.md).
-- Djinn and Cleromancy form a repository cycle:
-  - Djinn installs Cleromancy's divination validator in the mere route
-    (`resident_mere.rs:131-138`).
-  - Djinn depends on `cleromancy-core` by git.
-  - Cleromancy links `djinn`.
+- Djinn and Cleromancy formed a repository cycle, **closed 2026-11-08** (cycle breaks P3):
+  - Djinn used to install Cleromancy's divination validator in the mere route and
+    depend on `cleromancy-core` by git. It now loads an owner-approved wasm authority
+    guest from the persona's guest store (`ports/mere-resident/src/authority_guest.rs`,
+    host `crates/script/authority-host`); the guest source is Cleromancy's `authority-guest/`.
+  - Cleromancy links `mere-resident`; Mere's resident names no Cleromancy crate.
 - The door could carry an app manifest: routes, projections, salt namespaces
   and persona use. With one, each piece above could live with its owner, and
   Djinn's home would be a question about its 6k-line core rather than all
