@@ -377,11 +377,6 @@ mod tests {
         assert_eq!(*authority.focus_ring_started_at, None);
     }
 
-    // Note: `focus_authority_ring_alpha_*` tests removed alongside the
-    // `ring_alpha`/`ring_alpha_with_curve` methods (2026-04-23).
-    // Production alpha derivation lives on `FocusRingSpec::alpha_at_with_curve`
-    // which has its own dedicated test coverage in `frame_model.rs`.
-
     #[test]
     fn focus_authority_clear_hint_if_matches_fires_only_on_match() {
         let mut focused_node_hint = Some(NodeKey::new(7));

@@ -1,11 +1,12 @@
 # chrome
 
-The application's outer interface for the [mere](https://crates.io/crates/mere)
-browser: toolbar, address bar / omnibar, focus authorities,
-window frame. View-models and their state machines; rendering stays host-side.
+Host-neutral browser chrome state for the [mere](https://crates.io/crates/mere)
+family: location-bar classification and suggestions, the omnibar search
+session, toolbar draft and load state, focus authorities and overlay return
+targets. Rendering and effects stay host-side.
 
-Package name is `mere-chrome`; the library is `chrome`. Its four dependencies
-are `forme`, `kernel`, `serde`, and `url`, so every module is WASM-clean and
+Package name is `mere-chrome`; the library is `chrome`. Its dependencies are
+`backstep`, `kernel`, `serde` and `url`, so every module is WASM-clean and
 testable without booting a host.
 
 ## Modules
@@ -13,9 +14,7 @@ testable without booting a host.
 | Module | Public items |
 | --- | --- |
 | `authorities` | `GraphSearchAuthorityMut`, `FocusAuthorityMut` |
-| `frame_model` | `FrameViewModel`, `FrameHostInput`, `FocusViewModel`, `FocusRingSpec`, `FocusRingCurve`, `ToolbarViewModel`, `OmnibarViewModel`, `GraphSearchViewModel`, `DialogsViewModel`, `ToastSpec`, `ToastSeverity`, `DegradedReceiptSpec`, plus `settings`: `SettingsViewModel`, `FocusRingSettingsView`, `ThumbnailSettingsView`, `AccessibilityViewModel` |
-| `host_intent` | `HostIntent`, the host to runtime intent shape |
-| `nav` | `NavTarget`, `classify`, `classify_with`, `resolve_href`, `History`, `DEFAULT_COMMAND_SIGIL` |
+| `nav` | `NavTarget`, `classify`, `classify_with`, `resolve_href`, `History` (re-exported from `backstep`), `DEFAULT_COMMAND_SIGIL` |
 | `omnibar` | `OmnibarSearchSession`, `OmnibarMatch`, `OmnibarSearchMode`, `OmnibarSessionKind`, `SearchProviderKind`, `HistoricalNodeMatch`, `ProviderSuggestionMailbox`, `ProviderSuggestionStatus`, `ProviderSuggestionError`, `ProviderSuggestionFetchOutcome` |
 | `routing` | `ToolSurfaceReturnTarget` |
 | `suggest` | `suggestions`, `match_label`, `resolve_match` |
@@ -23,9 +22,12 @@ testable without booting a host.
 
 The crate root also exports `VERSION` and `STAGE`.
 
+The frame model (`FrameViewModel`, `FrameHostInput`, `FrameStep`), its
+`effects` and the `host_intent` shape were retired on 2026-11-08 with the
+pre-pivot shell they served (engine-split D30); git keeps them.
+
 ## Where it is used
 
-Turnstone consumes Chrome directly for navigation. `ux-events` depends on this
-crate for `routing::ToolSurfaceReturnTarget`. The unused `shell-state`
-compatibility re-exports were removed; consumers import `chrome::*` directly.
+`ux-events` depends on this crate for `routing::ToolSurfaceReturnTarget` alone.
+Turnstone uses `nav::History`, which now lives in `backstep`.
 Command menus and their session state live in Hest.
