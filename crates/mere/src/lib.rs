@@ -23,7 +23,7 @@
 pub mod routing;
 
 #[cfg(feature = "graph")]
-pub use forme;
+pub use incipit::forme;
 #[cfg(feature = "canvas")]
 pub use pictograph::canvas;
 #[cfg(feature = "graph")]

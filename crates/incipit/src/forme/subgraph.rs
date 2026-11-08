@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::MemberId;
+use crate::forme::MemberId;
 use serde::{Deserialize, Serialize};
 
 /// Subgraph identity. Lightweight integer index within a single GraphTree.
@@ -66,7 +66,7 @@ pub enum SubgraphBinding {
 
 // The specification and its kinds live in the curation crate (Scenograph
 // editor plan, SE67); re-exported so callers are unchanged.
-pub use incipit::curation::{SubgraphKind, SubgraphSpec};
+pub use crate::curation::{SubgraphKind, SubgraphSpec};
 
 // ---------------------------------------------------------------------------
 // Edge projection spec (consumed from subgraph_projection_binding_spec.md §3)

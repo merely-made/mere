@@ -24,7 +24,7 @@
 //! Replaces the legacy `FrameState` / `PaneBinding` frame model (the pre-spine
 //! pane-binding workbench), per the 2026-06-04 platen taffy-retarget plan.
 
-use forme::GraphMemberId;
+use incipit::forme::GraphMemberId;
 use workbench::SplitAxis;
 
 use crate::ProjectionKind;

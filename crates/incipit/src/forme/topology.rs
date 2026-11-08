@@ -4,9 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::MemberId;
-use crate::subgraph::SubgraphId;
-use crate::lens::ProjectionLens;
+use crate::forme::MemberId;
+use crate::forme::subgraph::SubgraphId;
+use crate::forme::lens::ProjectionLens;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 
@@ -522,7 +522,6 @@ pub enum PlacementPolicy {
 ///
 /// Nodes reachable from multiple roots are assigned to whichever root's BFS
 /// reaches them first. Unreachable nodes are ignored.
-#[cfg(feature = "petgraph")]
 pub fn derive_topology<N, E, Ix>(
     graph: &petgraph::Graph<N, E, petgraph::Directed, Ix>,
     roots: &[petgraph::graph::NodeIndex<Ix>],

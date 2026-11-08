@@ -6,10 +6,10 @@
 
 use std::collections::HashMap;
 
-use crate::MemberId;
-use crate::Rect;
-use crate::layout::{LayoutMode, LayoutResult, OwnedTreeRow, SplitBoundary, TabEntry};
-use crate::member::{Provenance, SplitDirection};
+use crate::forme::MemberId;
+use crate::forme::Rect;
+use crate::forme::layout::{LayoutMode, LayoutResult, OwnedTreeRow, SplitBoundary, TabEntry};
+use crate::forme::member::{Provenance, SplitDirection};
 
 use super::GraphTree;
 
@@ -294,7 +294,7 @@ impl<N: MemberId> GraphTree<N> {
         rects: &mut HashMap<N, Rect>,
         boundaries: &mut Vec<SplitBoundary<N>>,
     ) {
-        use crate::layout::SplitBoundary;
+        use crate::forme::layout::SplitBoundary;
 
         let layout = taffy.layout(node).expect("taffy layout");
         let abs_x = parent_x + layout.location.x;

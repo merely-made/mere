@@ -11,10 +11,10 @@
 //! bridges these to AccessKit (egui), platform a11y (mobile), or DOM
 //! aria attributes (extension/PWA).
 
-use crate::MemberId;
-use crate::layout::LayoutMode;
-use crate::member::Lifecycle;
-use crate::tree::GraphTree;
+use crate::forme::MemberId;
+use crate::forme::layout::LayoutMode;
+use crate::forme::member::Lifecycle;
+use crate::forme::tree::GraphTree;
 
 /// A node in the UxTree — structural description for accessibility/automation.
 #[derive(Clone, Debug)]
@@ -218,10 +218,10 @@ fn emit_split_container<N: MemberId>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::LayoutMode;
-    use crate::lens::ProjectionLens;
-    use crate::member::Provenance;
-    use crate::nav::NavAction;
+    use crate::forme::layout::LayoutMode;
+    use crate::forme::lens::ProjectionLens;
+    use crate::forme::member::Provenance;
+    use crate::forme::nav::NavAction;
     use std::collections::HashSet;
 
     fn make_ux_tree(mode: LayoutMode) -> GraphTree<u64> {

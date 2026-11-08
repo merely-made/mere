@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use kernel::graph::fixtures::GraphFixtures;
 
+#[test]
 fn attach_and_query() {
     let mut topo = TreeTopology::<u64>::new();
     assert!(topo.attach_root(1));
@@ -226,10 +226,9 @@ fn reparent_rejects_missing_member() {
     topo.assert_invariants();
 }
 
-#[cfg(feature = "petgraph")]
 mod petgraph_tests {
     use super::*;
-    use crate::topology::derive_topology;
+    use crate::forme::topology::derive_topology;
 
     #[test]
     fn derive_child_of_connection() {

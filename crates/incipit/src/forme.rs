@@ -40,10 +40,10 @@
 pub mod arrangement;
 pub mod forme_document;
 
-/// Native on-disk persistence of [`FormeDocument`]s. Gated by the `store`
+/// Native on-disk persistence of [`FormeDocument`]s. Gated by incipit's `arrangement-store`
 /// feature so portable consumers stay `std::fs`-free; the native host enables
 /// it.
-#[cfg(feature = "store")]
+#[cfg(feature = "arrangement-store")]
 pub mod store;
 
 pub use arrangement::{

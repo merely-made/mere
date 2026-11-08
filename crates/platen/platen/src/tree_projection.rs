@@ -22,7 +22,7 @@
 
 use std::collections::HashMap;
 
-use forme::{
+use incipit::forme::{
     Arrangement, ArrangementEdgeKind, ArrangementNode, ArrangementNodeId, ArrangementNodeKind,
     GraphMemberId,
 };

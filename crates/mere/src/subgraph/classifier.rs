@@ -13,7 +13,7 @@
 
 use std::collections::HashSet;
 
-use forme::SubgraphKind;
+use incipit::forme::SubgraphKind;
 use kernel::graph::Graph;
 
 /// One ranked shape candidate: the kind, a fit score in `[0, 1]`, and a short chip label.

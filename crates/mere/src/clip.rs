@@ -13,7 +13,7 @@
 //! their browsing surfaces by the graph's public relation read APIs.
 
 use fleece::clip::{ClipFragment, clip_title};
-use forme::GraphMemberId;
+use incipit::forme::GraphMemberId;
 use kernel::graph::{EdgeAssertion, Graph, NodeKey, ProvenanceSubKind};
 use kernel::types::{ImageRef, ImageRole};
 

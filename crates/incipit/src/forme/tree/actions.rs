@@ -4,11 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::MemberId;
-use crate::layout::LayoutMode;
-use crate::lens::ProjectionLens;
-use crate::member::{LayoutOverride, Lifecycle, MemberEntry, Provenance};
-use crate::nav::{FocusCycleRegion, FocusDirection, NavAction, NavResult, TreeIntent};
+use crate::forme::MemberId;
+use crate::forme::layout::LayoutMode;
+use crate::forme::lens::ProjectionLens;
+use crate::forme::member::{LayoutOverride, Lifecycle, MemberEntry, Provenance};
+use crate::forme::nav::{FocusCycleRegion, FocusDirection, NavAction, NavResult, TreeIntent};
 
 use super::GraphTree;
 

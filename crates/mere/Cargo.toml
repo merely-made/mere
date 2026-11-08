@@ -17,7 +17,7 @@ image-decode = ["pictograph?/image-decode"]
 # the composed desktop facade so browser hosts can take graph truth without
 # presentation or host-workbench dependencies.
 graph = [
-    "dep:forme",
+    "dep:incipit",
     "dep:kernel",
     "dep:serde",
     "dep:serde_json",
@@ -68,7 +68,8 @@ tabard = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 uxtree = { workspace = true, optional = true }
-forme = { workspace = true, optional = true }
+# forme, the arrangement authority, is incipit's `arrangement` feature (D28).
+incipit = { workspace = true, optional = true, features = ["arrangement"] }
 # The engine-management layer (genet component since 2026-07-10): the facade
 # composes mere's routing vocabulary over inker's host-neutral policy.
 inker = { workspace = true, optional = true }

@@ -31,10 +31,10 @@
 
 use std::collections::HashMap;
 
-use crate::MemberId;
-use crate::member::Lifecycle;
-use crate::nav::NavAction;
-use crate::tree::GraphTree;
+use crate::forme::MemberId;
+use crate::forme::member::Lifecycle;
+use crate::forme::nav::NavAction;
+use crate::forme::tree::GraphTree;
 
 /// Origin identifier. Opaque string — could be a domain ("example.com"),
 /// a protocol+domain ("gemini://station.smolweb"), or a synthetic group
@@ -260,9 +260,9 @@ pub fn warm_pressure_by_origin<N: MemberId>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::LayoutMode;
-    use crate::lens::ProjectionLens;
-    use crate::member::Provenance;
+    use crate::forme::layout::LayoutMode;
+    use crate::forme::lens::ProjectionLens;
+    use crate::forme::member::Provenance;
 
     fn origin_for_test(member: &u64) -> Origin {
         match member {

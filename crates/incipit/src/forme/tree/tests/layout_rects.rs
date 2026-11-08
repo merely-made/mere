@@ -126,7 +126,7 @@ fn split_panes_respects_min_width() {
     tree.apply(NavAction::SetLifecycle(2, Lifecycle::Active));
 
     // Set min_width on member 1
-    tree.get_mut(&1).unwrap().layout_override = Some(crate::member::LayoutOverride {
+    tree.get_mut(&1).unwrap().layout_override = Some(crate::forme::member::LayoutOverride {
         min_width: Some(400.0),
         min_height: None,
         flex_grow: Some(1.0),
@@ -158,12 +158,12 @@ fn split_panes_vertical_direction() {
     tree.apply(NavAction::SetLifecycle(2, Lifecycle::Active));
 
     // Set vertical split
-    tree.get_mut(&1).unwrap().layout_override = Some(crate::member::LayoutOverride {
+    tree.get_mut(&1).unwrap().layout_override = Some(crate::forme::member::LayoutOverride {
         min_width: None,
         min_height: None,
         flex_grow: None,
         flex_shrink: None,
-        preferred_split: Some(crate::member::SplitDirection::Vertical),
+        preferred_split: Some(crate::forme::member::SplitDirection::Vertical),
         split_ratio: None,
     });
 

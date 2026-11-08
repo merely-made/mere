@@ -4,12 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::Rect;
-use crate::subgraph::{SubgraphKind, SubgraphRef};
-use crate::layout::LayoutMode;
-use crate::lens::ProjectionLens;
-use crate::member::{LayoutOverride, Lifecycle, Provenance, SplitDirection};
-use crate::nav::{FocusDirection, NavAction, TreeIntent};
+use crate::forme::Rect;
+use crate::forme::subgraph::{SubgraphKind, SubgraphRef};
+use crate::forme::layout::LayoutMode;
+use crate::forme::lens::ProjectionLens;
+use crate::forme::member::{LayoutOverride, Lifecycle, Provenance, SplitDirection};
+use crate::forme::nav::{FocusDirection, NavAction, TreeIntent};
 
 use super::GraphTree;
 

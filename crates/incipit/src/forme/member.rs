@@ -4,8 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::MemberId;
-use crate::subgraph::SubgraphId;
+use crate::forme::MemberId;
+use crate::forme::subgraph::SubgraphId;
 use serde::{Deserialize, Serialize};
 
 /// What each member of the tree carries.

@@ -18,7 +18,7 @@
 //! algorithms here (split beside, stack into, remove + collapse, divider fractions) are
 //! the geometry-free tiling logic; layout is the host's genet/taffy job.
 
-use forme::GraphMemberId;
+use incipit::forme::GraphMemberId;
 use workbench::SplitAxis;
 
 /// A tab group: members sharing one cell, `active` the visible one.
