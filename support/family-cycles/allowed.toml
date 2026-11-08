@@ -18,18 +18,12 @@
 # entries left out fails.
 
 # D1 (Mark, 2026-11-06): "Resident stops depending". Mere's resident is the down edge to
-# remove. Open until P2 (Knot, behind P2a) and P3 (Cleromancy).
+# remove. Open until P2 (Knot, behind P2a); P3 (Cleromancy) closed its edge on 2026-11-08.
 [[edge]]
 from = "mere"
 to = "knot-editor"
 decision = "D1"
 reason = "ports/mere-resident names knot-editor (peers, mere-overlay); Knot names Mere crates. Plan C1, P2."
-
-[[edge]]
-from = "mere"
-to = "cleromancy"
-decision = "D1"
-reason = "ports/mere-resident names cleromancy-core; Cleromancy names Mere crates. Plan C2, P3."
 
 # D17 (Mark, 2026-11-06): the one isolated Murm root.
 [[isolated]]

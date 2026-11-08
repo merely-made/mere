@@ -1043,3 +1043,75 @@ and copies only blobs the legacy store retains.
   1 (the real door: put in parts, read in chunks, lease, release, serving authority, migration,
   a second application refused, an ungranted application refused, revocation, restore), and
   `graphshell-door` 2 wire tests (4 total in the crate with the feature).
+
+## The authority guest (cycle breaks P3, 2026-11-08)
+
+Mark ruled "Build the real guest" after the spike (cycle breaks D15 (h)). This section records the
+form as built. The measurements are in the plan's Findings, "P3 guest".
+
+### 1. The world
+
+`authority-guest` in the protocol layer's one WIT file (`graphshell-endpoint/wit/world.wit`, next to
+`block-guest`): imports `log` only, exports `domain-authority` with `describe`, `validate(list<u8>)`
+and `admit(list<u8>, list<u8>)`. The claim is `{domain, version, graph-format, admission}`; the one
+addition to the drawing board's proposal is `admission`, which says whether `admit` is a real check so
+the host never calls it, and never pays to encode before and after, when it is not (divination has
+none). The WIT names no Mere type: the world is the interface, the format is a tag.
+
+**The candidate format** is `mere.graph-snapshot-and-facets/json`: one JSON object `{snapshot, facets}`,
+the kernel's `Graph::to_snapshot_at(0)` and `Graph::facets()`; the guest restores it with
+`try_from_snapshot` and `install_facets`. A snapshot alone is not a complete candidate. A guest that
+claims another format is refused at review. The snapshot's serde shape belongs to the kernel at the
+guest's pinned Mere revision: a resident whose kernel changed the shape sends candidates an older guest
+cannot decode, and the guest refuses them. A change to that shape therefore needs a new format tag.
+
+### 2. The host
+
+`crates/script/authority-host` (wasmtime 45; the sibling of `block-host`) runs one component:
+
+- **A fresh instance per call**, from the once-compiled, pre-linked component. A fuel cut-off or a panic
+  traps the instance and a trapped instance cannot be re-entered, and an instance that kept state
+  could let one candidate shape the next verdict; instantiating costs under a millisecond, so the host
+  re-instantiates by never reusing. A trap is reported as a refusal. An authority never fails open.
+- **A budget per call** (`Budget::default()`): fuel 2e10, memory 128 MiB, candidate 16 MiB. They are the
+  spike's corpus maxima (1.74e9 fuel, 6.6 MiB, 296 KB) with headroom: 11, 19 and 54 times. Fuel and not
+  a wall clock, because fuel is the same on every device.
+- **A closed WASI.** Rust's standard library on `wasm32-wasip2` imports WASI, so "log only" is a
+  statement about the world, not about the binary. The host links WASI with no preopens, environment,
+  arguments, network or stdio, wall and monotonic clocks fixed at zero, and fixed-seed random, so the
+  guest can read neither the time nor entropy and hashed-collection order is the same everywhere.
+- **Compiled once per load, never deserialised from disk** (`Component::deserialize` is `unsafe` and
+  trusts its bytes, so a stored artifact would let anyone who can write the data directory bypass the
+  pinned hash). About a second per process.
+
+### 3. Review, pin and pending (`mere_resident::authority_guest`)
+
+The pack is the D12 signed pack and asks for `power:domain-authority` and nothing else. The review
+(`AuthorityReview::prepare`) verifies the pack's address and signature, that it holds exactly one
+component matching its inventory, loads the component and reads its claim; it installs nothing. The
+owner's `approve` binds the **author's key to the domain** and **pins the component hash**, writing
+`<shared root>/authority-guests/<persona>/<domain>/{pin.json, pack.json, component.wasm}`, the pin
+last. A later review for the domain must come from the bound key or the owner must rebind on purpose
+(`rebind`); each new component is a new review. Every load re-checks the signature, the key against
+the pin, the inventory, the hash against the pin and the claim's domain and format.
+
+`DomainRegistry::resident_defaults(persona, store)` is Mere's defaults plus one `Authority::Guest`
+registration per pin, and `MereRoutes::with_resident_defaults` builds it from the store under its
+shared root, so every composition (daemon, embedded, an application's) picks up approved guests
+without naming an application. A guest cannot take a domain Mere registers itself.
+
+**Pending while absent.** A pinned domain whose guest is revoked (`GuestStore::revoke`), missing,
+altered, signed by another key or unloadable is still registered and refuses every candidate with
+`pending: no authority installed for <domain> (<reason>)`. A domain with no pin that is reserved
+(`divination`) is refused at `serve` as `domain-not-registered`, as P1b specified.
+
+### 4. Not built
+
+- **The pin across paired devices.** `Pin::compare` states the agreement (agree, component differs,
+  author differs); nothing carries a pin over the device roster yet, so two devices agree only if
+  their owners approved the same pack.
+- **A review surface.** `AuthorityReview` carries what a review shows (domain, version, format, author
+  key, component address, size, the one power asked); no dialog presents it. Tests approve in code.
+- **The reserved-domain string.** `mere_defaults` still reserves the id `divination`, a name for data
+  and no dependency, so an unreviewed machine refuses the domain instead of serving it unchecked.
+  Flipping `Unregistered::Refuse` (P1b's switch) would retire the string.

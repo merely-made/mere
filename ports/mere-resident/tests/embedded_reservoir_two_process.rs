@@ -68,7 +68,7 @@ fn options(root: &Path, endpoint: &str) -> ReservoirAttachmentOptions {
             .to_vec(),
         shared_root: root.into(),
         persona: persona(),
-        domain: DomainId::new("divination").unwrap(),
+        domain: DomainId::new("fixture-domain").unwrap(),
         session_duration: Duration::from_secs(60),
     }
 }

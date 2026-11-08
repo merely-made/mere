@@ -13,9 +13,10 @@ use std::sync::Arc;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_resident::domain_registry::{
-    Authority, DeclaredAuthority, DomainRegistration, DomainRegistry, GuestAuthority, PENDING,
+    Authority, DeclaredAuthority, DomainRegistration, DomainRegistry, GuestAuthority,
     RegistryError, Unregistered,
 };
+use mere_resident::authority_guest::GuestStore;
 use mere_resident::door::app_broker::AppEndpointCatalog;
 use mere_resident::resident_mere::MereRoutes;
 use mere_resident::resident_reservoir::ResidentReservoir;
@@ -83,10 +84,13 @@ fn mere_defaults_install_personal_facts_and_reserve_divination() {
     let defaults = DomainRegistry::mere_defaults(persona());
     assert_eq!(defaults.domains(), ["personal-facts"]);
     assert_eq!(defaults.get("personal-facts").unwrap().authority.kind(), "graph");
-    // Divination is Cleromancy's: reserved, not registered, until P3.
+    // Divination is an application's: reserved, not registered. Its authority arrives as
+    // an approved guest (`tests/authority_guest.rs`), never as code Mere links.
     assert!(defaults.get("divination").is_none());
-    let resident = DomainRegistry::resident_defaults(persona());
-    assert_eq!(resident.domains(), ["divination", "personal-facts"]);
+    let root = tempfile::tempdir().unwrap();
+    let store = GuestStore::at(root.path(), persona());
+    let resident = DomainRegistry::resident_defaults(persona(), &store).unwrap();
+    assert_eq!(resident.domains(), ["personal-facts"], "no guest approved, none registered");
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -100,18 +104,21 @@ async fn a_reserved_domain_without_a_registration_is_refused_with_the_typed_erro
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn resident_defaults_serve_divination_and_personal_facts() {
-    let (_root, routes, meres, _catalog) =
-        routes_with(&["divination", "personal-facts"], DomainRegistry::resident_defaults).await;
-    for mere in &meres {
-        routes.serve(mere).await.unwrap();
-    }
+async fn resident_defaults_serve_personal_facts_and_refuse_divination_without_a_guest() {
+    let root = tempfile::tempdir().unwrap();
+    let store = GuestStore::at(root.path(), persona());
+    let (_root, routes, meres, _catalog) = routes_with(&["divination", "personal-facts"], |persona| {
+        DomainRegistry::resident_defaults(persona, &store).unwrap()
+    })
+    .await;
+    routes.serve(named(&meres, "personal-facts")).await.unwrap();
+    let refusal = routes.serve(named(&meres, "divination")).await.unwrap_err();
+    assert!(refusal.starts_with("domain-not-registered: divination"), "{refusal}");
     let shown = routes.registered_domains();
     assert_eq!(
         shown.iter().map(|d| d.domain.as_str()).collect::<Vec<_>>(),
-        ["divination", "personal-facts"]
+        ["personal-facts"]
     );
-    assert_eq!(shown[0].owner.as_deref(), Some("cleromancy"));
 }
 
 #[tokio::test(flavor = "multi_thread")]
