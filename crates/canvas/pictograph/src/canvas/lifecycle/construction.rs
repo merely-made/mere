@@ -186,11 +186,20 @@ impl Canvas {
     /// process when `None`.
     fn from_graph_on(graph: Graph, transport: Option<Box<dyn seiche::Transport>>) -> Self {
         let (physics, view) = match transport {
+            #[cfg(feature = "physics-engine")]
             None => {
                 let sim = build_simulation(&graph);
                 let view = sim.view();
                 (Physics::inline(sim, SETTLE_TICKS), view)
             },
+            // No engine in this build and no transport named: the physics is
+            // unavailable, and the canvas keeps its seed layout and says so.
+            #[cfg(not(feature = "physics-engine"))]
+            None => crate::canvas::seiche_bridge::remote_physics(
+                &graph,
+                Box::new(crate::canvas::seiche_bridge::UnavailableTransport::default()),
+                SETTLE_TICKS,
+            ),
             Some(transport) => {
                 crate::canvas::seiche_bridge::remote_physics(&graph, transport, SETTLE_TICKS)
             },

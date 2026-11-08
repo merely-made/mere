@@ -8,9 +8,12 @@
 //! Arrangement validation occurs here, before a controller is changed.
 
 use scenograph::DynamicsSlot;
+#[cfg(feature = "physics-engine")]
 use seiche::{DynamicsRunner, SettleError, Speed};
+#[cfg(feature = "physics-engine")]
 pub use seiche::{SettleEnd, SettleReport};
 
+#[cfg(any(test, feature = "physics-engine"))]
 use super::Canvas;
 use super::dynamics_spec::{self, BindError, DynamicsSpec, Node};
 use super::physics_catalog::PhysicsLaw;
@@ -61,6 +64,7 @@ pub fn preset_slot(id: &str) -> Result<DynamicsSlot, String> {
     DynamicsSlot::from_json(scenograph::DYNAMICS_SLOT_VERSION, &json)
 }
 
+#[cfg(feature = "physics-engine")]
 #[derive(Default)]
 pub(crate) struct Progress {
     settles: u64,
@@ -69,6 +73,7 @@ pub(crate) struct Progress {
     velocity_rest: bool,
 }
 
+#[cfg(feature = "physics-engine")]
 impl Progress {
     pub(crate) fn start(
         &mut self,
@@ -139,10 +144,12 @@ impl Progress {
     }
 }
 
+#[cfg(feature = "physics-engine")]
 struct CanvasRunner<'a> {
     canvas: &'a mut Canvas,
     progress: Progress,
 }
+#[cfg(feature = "physics-engine")]
 impl DynamicsRunner for CanvasRunner<'_> {
     type Error = BindError;
     fn prepare(&mut self, spec: &DynamicsSpec) -> Result<(), BindError> {
@@ -157,6 +164,7 @@ impl DynamicsRunner for CanvasRunner<'_> {
     }
 }
 
+#[cfg(feature = "physics-engine")]
 impl Canvas {
     /// Run an explicitly bounded preview through the live layout controller.
     /// Use a separate preview canvas: this advances its bodies and recipe.

@@ -362,6 +362,7 @@ impl Canvas {
             // F28: two directly encoded axes admit contact separation only.
             let cutoff = 2.0 * seiche::NODE_BODY_RADIUS;
             if self.physics.runs_inline() {
+                #[cfg(feature = "physics-engine")]
                 self.physics.set_forces(vec![Box::new(seiche::NodeExclusion {
                     cutoff,
                     ..Default::default()
@@ -412,9 +413,12 @@ impl Canvas {
             let inputs = with_occurrence_edges(inputs, self.occurrence_edges.as_deref());
             let inputs = with_meaning(inputs, self.meaning.snapshot());
             if inline {
-                let inputs = with_registry(inputs, &self.channels, self.physics_view_key());
-                let forces = self.composed_forces(&inputs, sources);
-                self.physics.set_forces(forces);
+                #[cfg(feature = "physics-engine")]
+                {
+                    let inputs = with_registry(inputs, &self.channels, self.physics_view_key());
+                    let forces = self.composed_forces(&inputs, sources);
+                    self.physics.set_forces(forces);
+                }
             } else {
                 // The view key names the node and edge lists, so a backend
                 // that keeps the physics channels keeps them across law changes.

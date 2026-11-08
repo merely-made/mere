@@ -349,7 +349,10 @@ impl Canvas {
         // poke the same loop when its worker result lands, so it needs no separate host wiring.
         // `Some` here is also the "native + offloaded" signal that gates community off-thread.
         self.offthread_wake = Some(wake.clone());
+        #[cfg(feature = "physics-engine")]
         self.physics.offload(wake);
+        #[cfg(not(feature = "physics-engine"))]
+        let _ = wake;
     }
 
     /// Park this canvas's physics: stop any in-progress settle so a backgrounded

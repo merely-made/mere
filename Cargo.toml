@@ -151,7 +151,7 @@ wgpu-cue = "=0.1.3"
 # Seiche and numen come from merely-made/seiche (engine split plan, P2). The
 # default field evaluation path stays portable; optional Burn/Rhai/Resident
 # carriage is selected at the owning crate.
-seiche = { version = "0.0.6", git = "https://github.com/merely-made/seiche.git", branch = "main" }
+seiche = { version = "0.0.6", git = "https://github.com/merely-made/seiche.git", branch = "main", default-features = false }
 cartography = { package = "mere-cartography", version = "0.0.2", path = "crates/canvas/cartography" }
 linked-data = { package = "mere-rdf", version = "0.0.1", path = "crates/graph/linked-data" }
 kernel = { package = "mere-kernel", version = "0.0.3", path = "crates/graph/graph-kernel" }

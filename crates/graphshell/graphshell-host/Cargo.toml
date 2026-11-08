@@ -17,7 +17,10 @@ publish = false
 # projection host and the policy file. It is compiled out on wasm32 even with
 # the feature on.
 [features]
-default = ["webrtc-join"]
+default = ["webrtc-join", "physics-engine"]
+# The board's force engine in this process (pictograph `physics-engine`). Off,
+# a board's physics is a Worker's (`PhysicsBoard::with_transport`).
+physics-engine = ["pictograph?/physics-engine"]
 # The Graphshell action triple, the hello builders, and the sans-I/O
 # admission with its action check.
 admission = ["dep:insigne", "dep:notochord", "dep:personae"]

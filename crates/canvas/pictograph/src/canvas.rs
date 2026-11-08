@@ -60,6 +60,7 @@ use build::{
     sample_graph, surface_bg,
 };
 use paint_list_api::ColorF;
+#[cfg(feature = "physics-engine")]
 use seiche_bridge::build_simulation;
 
 /// Build the seiche [`AffinitySpring`] from a cartography [`AffinityScores`](crate::signals::AffinityScores)
@@ -251,6 +252,7 @@ mod law_inputs;
 pub mod physics_catalog;
 mod physics_view;
 mod projection_backdrops;
+#[cfg(feature = "physics-engine")]
 pub mod projection_dynamics;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
@@ -304,6 +306,9 @@ pub const SIZE_TIERS: [f32; 5] = [24.0, 36.0, 56.0, 84.0, 120.0];
 /// Per-tick timestep handed to the seiche simulation: seiche's own constant,
 /// re-exported so `crate::canvas::TICK_DT` keeps resolving canvas-wide.
 pub use seiche::TICK_DT;
+/// A transport with no far side, for a build without the engine whose page
+/// cannot start a Worker: the backend fails closed and the layout stays seeded.
+pub use seiche_bridge::UnavailableTransport;
 /// The byte transport a canvas whose physics runs in a Web Worker is given
 /// ([`Canvas::with_graph_remote`]).
 pub use seiche::Transport as PhysicsTransport;

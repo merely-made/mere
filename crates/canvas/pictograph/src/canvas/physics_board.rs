@@ -34,9 +34,9 @@ use std::collections::{HashMap, HashSet};
 
 use euclid::default::Point2D;
 use kernel::graph::NodeKey;
-use seiche::{
-    AnchorSpring, Axes, DEFAULT_ANCHOR_STIFFNESS, LayoutView, Physics, Role, RoleTable, Simulation,
-};
+#[cfg(feature = "physics-engine")]
+use seiche::Simulation;
+use seiche::{AnchorSpring, Axes, DEFAULT_ANCHOR_STIFFNESS, LayoutView, Physics, Role, RoleTable};
 
 use crate::canvas::SETTLE_TICKS;
 use crate::canvas::actions::{self, AdvertisedAction, ArrangementAction, PermittedActions};
@@ -112,8 +112,12 @@ impl Default for PhysicsBoard {
 
 impl PhysicsBoard {
     pub fn new() -> Self {
+        #[cfg(feature = "physics-engine")]
+        let physics = Physics::inline(Simulation::new(), 0);
+        #[cfg(not(feature = "physics-engine"))]
+        let physics = Physics::remote(Box::new(crate::canvas::seiche_bridge::UnavailableTransport::default()));
         Self {
-            physics: Physics::inline(Simulation::new(), 0),
+            physics,
             view: LayoutView::new(),
             keys: HashMap::new(),
             next_key: 0,
@@ -154,7 +158,10 @@ impl PhysicsBoard {
     /// Move the board's simulation onto an actor thread (native hosts; a
     /// no-op once offloaded). `wake` pokes the host's event loop.
     pub fn offload(&mut self, wake: armillary::Wake) {
+        #[cfg(feature = "physics-engine")]
         self.physics.offload(wake);
+        #[cfg(not(feature = "physics-engine"))]
+        let _ = wake;
     }
 
     /// Stage the board's repulsion on the host's device, or (`None`) return
@@ -399,11 +406,19 @@ impl PhysicsBoard {
         if self.encoded == Axes::BOTH {
             // Both axes encoded: physics only separates overlaps (F28), by an
             // exclusion that reaches no further than contact.
-            self.physics
-                .set_forces(vec![Box::new(seiche::NodeExclusion {
-                    cutoff: 2.0 * seiche::NODE_BODY_RADIUS,
+            let cutoff = 2.0 * seiche::NODE_BODY_RADIUS;
+            if self.physics.runs_inline() {
+                #[cfg(feature = "physics-engine")]
+                self.physics.set_forces(vec![Box::new(seiche::NodeExclusion {
+                    cutoff,
                     ..Default::default()
                 })]);
+            } else {
+                self.physics.set_force_set(seiche::ForceSetDescriptor {
+                    contact_cutoff: Some(cutoff),
+                    ..crate::canvas::seiche_bridge::springs_descriptor()
+                });
+            }
             return;
         }
         let inputs = LawInputs::from_parts(nodes, self.edges(), sites);

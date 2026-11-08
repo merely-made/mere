@@ -65,6 +65,7 @@ impl Canvas {
     }
 
     /// The law slot's forces (the law, or the composition), then the overlays.
+    #[cfg_attr(not(feature = "physics-engine"), allow(dead_code))]
     pub(crate) fn composed_forces(
         &self,
         inputs: &LawInputs<'_>,

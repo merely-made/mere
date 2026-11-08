@@ -19,7 +19,9 @@ use euclid::default::Point2D;
 use kernel::graph::{Graph, NodeKey, RelationKey};
 use numen::FieldRegistry;
 use scenograph::link::{LinkKey, LinkStratum};
-use seiche::{Boundary, CouplingForce, EdgeSpring, NodeExclusion, Simulation};
+use seiche::CouplingForce;
+#[cfg(feature = "physics-engine")]
+use seiche::{Boundary, EdgeSpring, NodeExclusion, Simulation};
 
 /// The relation-cell edges that feed the layout **springs**, respecting this instance's
 /// hidden-cell visibility (swatch-primitive P5 — hiding relaxes the spring in that
@@ -101,6 +103,7 @@ impl VisibleRelationTopology {
             .collect()
     }
 
+    #[cfg_attr(not(feature = "physics-engine"), allow(dead_code))]
     pub(crate) fn len(&self) -> usize {
         self.rows.len()
     }
@@ -192,6 +195,7 @@ pub(crate) fn visible_relation_topology_with_assertion_hides(
 /// edge per visible source row as topology (see [`visible_relation_topology`]),
 /// the standard force trio (exclusion + edge-springs + a centering boundary), seeded
 /// into a tight central spiral so the first settle is visible.
+#[cfg(feature = "physics-engine")]
 pub(crate) fn build_simulation(graph: &Graph) -> Simulation {
     let mut sim = Simulation::new();
     sync_sim_with_graph(&mut sim, graph);
@@ -226,6 +230,28 @@ pub(crate) fn springs_descriptor() -> seiche::ForceSetDescriptor {
         sources: seiche::catalog::LawSources::bare(),
         inputs: seiche::LawInputsData::default(),
         contact_cutoff: None,
+    }
+}
+
+/// A [`seiche::Transport`] with no far side: it takes what it is sent and
+/// answers once, with a handshake the backend refuses, so the remote backend
+/// fails closed (it queues nothing, sends nothing and folds no update) and the
+/// canvas or board keeps the layout it was seeded with. What an engine-free
+/// build holds when no Worker can be started.
+#[derive(Default)]
+pub struct UnavailableTransport {
+    answered: bool,
+}
+
+impl seiche::Transport for UnavailableTransport {
+    fn send(&mut self, _message: Vec<u8>) {}
+
+    fn receive(&mut self) -> Option<Vec<u8>> {
+        if std::mem::replace(&mut self.answered, true) {
+            return None;
+        }
+        // A protocol version no host speaks.
+        Some(seiche::wire::encode(&seiche::wire::FromWorker::Ready { version: 0 }))
     }
 }
 
@@ -266,6 +292,7 @@ pub(crate) fn remote_physics(
 /// seed_positions`] (a spiral seed, or the host's cartography facets). Existing
 /// bodies keep their simulated position. (Was `seiche::Simulation::sync_with_graph`
 /// before the seiche extraction.)
+#[cfg(feature = "physics-engine")]
 pub(crate) fn sync_sim_with_graph(sim: &mut Simulation, graph: &Graph) {
     sim.sync_nodes(graph.nodes().map(|(key, _node)| (key, Point2D::zero())));
 }

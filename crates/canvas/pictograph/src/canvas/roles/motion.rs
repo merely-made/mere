@@ -188,12 +188,14 @@ impl Canvas {
         self.roles.rest.parked_count()
     }
 
+    #[cfg_attr(not(feature = "physics-engine"), allow(dead_code))]
     pub(crate) fn returning_home(&self) -> bool {
         self.roles.rest.gliding()
     }
 
     /// A fresh bounded recipe may begin already at rest (Still, empty or
     /// fully pinned). Its first fixed tick must be eligible to record that.
+    #[cfg_attr(not(feature = "physics-engine"), allow(dead_code))]
     pub(crate) fn arm_settle_detection(&mut self) {
         self.roles.rest.arm();
     }
@@ -201,6 +203,7 @@ impl Canvas {
     /// The frame's layout stage alone, without composing a scene: the
     /// physics snapshot, the paused placement, and the roles. For receipts
     /// that run thousands of frames.
+    #[cfg_attr(not(feature = "physics-engine"), allow(dead_code))]
     pub(crate) fn step_layout(&mut self) {
         self.physics.advance_frame(&mut self.view);
         self.apply_strategy_to_view();
@@ -209,6 +212,7 @@ impl Canvas {
 
     /// A bounded preview cannot infer a position-writing kernel's rest from
     /// body velocity. Explicit schedules still advance on every fixed tick.
+    #[cfg_attr(not(feature = "physics-engine"), allow(dead_code))]
     pub(crate) fn step_dynamics_layout(&mut self, velocity_rest: bool) {
         if velocity_rest {
             self.step_layout();

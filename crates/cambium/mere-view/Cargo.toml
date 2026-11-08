@@ -34,7 +34,7 @@ uuid = { workspace = true }
 
 [dev-dependencies]
 scenograph = { workspace = true, features = ["editor"] }
-pictograph = { workspace = true, features = ["canvas"] }
+pictograph = { workspace = true, features = ["canvas", "physics-engine"] }
 serde_json.workspace = true
 netrender.workspace = true
 
