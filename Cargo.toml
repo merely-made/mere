@@ -48,7 +48,6 @@ members = [
     "ports/graphshell/mere",
     "ports/graphshell/blocks",
     "ports/mere-resident",
-    "ports/dramatis",
     "ports/moot",
     "ports/distillery/athanor",
     "ports/gazette-ledger",
