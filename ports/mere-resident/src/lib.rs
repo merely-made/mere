@@ -14,6 +14,7 @@
 #![doc(html_no_source)]
 
 pub mod applications;
+pub mod authority_guest;
 pub mod conditions;
 pub mod custody;
 pub mod domain_registry;

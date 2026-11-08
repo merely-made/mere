@@ -100,7 +100,9 @@ armillary = { workspace = true, features = ["tokio"] }
 # `native` with the stack lift plan's P5.
 base64.workspace = true
 chartulary.workspace = true
-eidetic.workspace = true
+eidetic = { workspace = true, features = ["pack-signing"] }
+# The reviewed wasm guests that decide a domain's authority (cycle breaks P3).
+authority-host.workspace = true
 p2panda-core = { package = "p2mere-core", version = "0.9" }
 p2panda-store = { package = "p2mere-store", version = "0.9", default-features = false }
 stickleback.workspace = true
@@ -112,9 +114,6 @@ chatelaine.workspace = true
 castellan = { workspace = true, features = ["keeper", "os-presence"], optional = true }
 djinn-custodian = { workspace = true, optional = true }
 chirograph.workspace = true
-# Divination replay authority is supplied by the product's portable package;
-# the native Cleromancy executable may itself embed Djinn without a crate cycle.
-cleromancy-domain = { package = "cleromancy-core", git = "https://github.com/merely-made/cleromancy.git", branch = "main" }
 # The identity tier's plain types: views, intents, the roster (DR-A, DR-C).
 dramatis.workspace = true
 personal-facts.workspace = true

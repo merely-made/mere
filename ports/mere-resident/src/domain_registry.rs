@@ -39,18 +39,70 @@ pub type AdmissionBuilder =
 /// What refuses an edit when a domain's authority is not yet installed.
 pub const PENDING: &str = "pending: no authority installed";
 
-/// A wasm component that will supply a graph domain's authority (cycle breaks
-/// P3). Typed here and not yet implemented.
-#[derive(Clone, Debug, PartialEq, Eq)]
+/// A wasm component that supplies a graph domain's authority (cycle breaks P3). The pin is
+/// always there; the running guest is there only when the component is installed and
+/// verified. Without it the authority refuses every candidate as [`PENDING`].
+#[derive(Clone)]
 #[non_exhaustive]
 pub struct GuestAuthority {
     /// Hash of the component, pinned across paired devices (D15 (h)).
     pub component: [u8; 32],
+    runtime: Option<Arc<crate::authority_guest::GuestRuntime>>,
+    /// Why the guest is absent (revoked, missing, altered), for the refusal text.
+    reason: Option<String>,
 }
 
+impl fmt::Debug for GuestAuthority {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("GuestAuthority")
+            .field("component", &self.component)
+            .field("installed", &self.runtime.is_some())
+            .field("reason", &self.reason)
+            .finish()
+    }
+}
+
+impl PartialEq for GuestAuthority {
+    fn eq(&self, other: &Self) -> bool {
+        self.component == other.component
+            && self.runtime.is_some() == other.runtime.is_some()
+            && self.reason == other.reason
+    }
+}
+
+impl Eq for GuestAuthority {}
+
 impl GuestAuthority {
+    /// A pinned guest that is not installed: the domain refuses as pending.
     pub fn new(component: [u8; 32]) -> Self {
-        Self { component }
+        Self {
+            component,
+            runtime: None,
+            reason: None,
+        }
+    }
+
+    /// A pinned guest that could not be loaded, with the reason the refusal carries.
+    pub fn absent(component: [u8; 32], reason: impl Into<String>) -> Self {
+        Self {
+            component,
+            runtime: None,
+            reason: Some(reason.into()),
+        }
+    }
+
+    /// A verified, running guest.
+    pub fn installed(component: [u8; 32], runtime: Arc<crate::authority_guest::GuestRuntime>) -> Self {
+        Self {
+            component,
+            runtime: Some(runtime),
+            reason: None,
+        }
+    }
+
+    /// The running guest, when one is installed.
+    pub fn runtime(&self) -> Option<&Arc<crate::authority_guest::GuestRuntime>> {
+        self.runtime.as_ref()
     }
 }
 
@@ -79,7 +131,7 @@ pub enum Authority {
         complete: pandect::GraphValidator,
         admission: Option<AdmissionBuilder>,
     },
-    /// A signed wasm guest. Unimplemented: edits are refused as pending.
+    /// A reviewed wasm guest. Without an installed guest, edits are refused as pending.
     Guest(GuestAuthority),
     /// Declared data. Unimplemented: edits are refused as pending.
     Declared(DeclaredAuthority),
@@ -104,25 +156,35 @@ impl Authority {
     }
 
     /// The complete-candidate check the resident runs on edits, archive
-    /// save, open and compose, and loaded sessions. A guest or declared
-    /// authority refuses every candidate until its implementation lands: an
-    /// operation waits, it is never applied unchecked (D15 (h)).
+    /// save, open and compose, and loaded sessions. A guest authority without an
+    /// installed guest, and a declared one until its interpreter lands, refuse every
+    /// candidate as pending: an operation waits, it is never applied unchecked (D15 (h)).
     pub(crate) fn validator(&self, domain: &str) -> pandect::GraphValidator {
         match self {
             Self::Graph { complete, .. } => complete.clone(),
-            Self::Guest(_) | Self::Declared(_) => {
-                let message = format!("{PENDING} for {domain}");
-                Arc::new(move |_| Err(message.clone()))
+            Self::Guest(guest) => match &guest.runtime {
+                Some(runtime) => runtime.validator(),
+                None => pending(domain, guest.reason.as_deref()),
             },
+            Self::Declared(_) => pending(domain, None),
         }
     }
 
     pub(crate) fn admission(&self) -> Option<AdmissionBuilder> {
         match self {
             Self::Graph { admission, .. } => admission.clone(),
-            _ => None,
+            Self::Guest(guest) => guest.runtime.as_ref().and_then(|runtime| runtime.admission()),
+            Self::Declared(_) => None,
         }
     }
+}
+
+fn pending(domain: &str, reason: Option<&str>) -> pandect::GraphValidator {
+    let message = match reason {
+        Some(reason) => format!("{PENDING} for {domain} ({reason})"),
+        None => format!("{PENDING} for {domain}"),
+    };
+    Arc::new(move |_| Err(message.clone()))
 }
 
 /// One domain's registration.
@@ -150,6 +212,15 @@ impl DomainRegistration {
             version,
             authority,
         }
+    }
+}
+
+impl DomainRegistration {
+    /// Run this registration's complete-candidate check over `graph`, as a route would
+    /// on an edit or a load. A guest authority without an installed guest refuses with
+    /// [`PENDING`].
+    pub fn validate(&self, graph: &kernel::graph::Graph) -> Result<(), String> {
+        (self.authority.validator(&self.domain))(graph)
     }
 }
 
@@ -222,9 +293,10 @@ impl DomainRegistry {
         Self::default()
     }
 
-    /// Mere's own domains for `persona`: `personal-facts`. `divination` is
-    /// reserved, so a resident that does not register it refuses it rather
-    /// than serving it unchecked.
+    /// Mere's own domains for `persona`: `personal-facts`. `divination` is a
+    /// reserved domain id (a name for data, no dependency), so a resident
+    /// with no authority registered for it refuses it rather than serving it
+    /// unchecked.
     pub fn mere_defaults(persona: PersonaId) -> Self {
         Self::new()
             .reserve("divination")
@@ -232,13 +304,15 @@ impl DomainRegistry {
             .expect("a fresh registry takes personal-facts")
     }
 
-    /// [`Self::mere_defaults`] plus Cleromancy's divination authority, which
-    /// Mere still names until cycle breaks P3 moves that registration into
-    /// Cleromancy.
-    pub fn resident_defaults(persona: PersonaId) -> Self {
-        Self::mere_defaults(persona)
-            .register(crate::resident_mere::divination_registration())
-            .expect("divination is not yet registered")
+    /// [`Self::mere_defaults`] plus every authority guest the owner has approved for this
+    /// persona (cycle breaks P3): one `Authority::Guest` registration per pin in `store`,
+    /// pending when the guest cannot be loaded. A guest cannot take a domain Mere already
+    /// registers itself; that is refused as a duplicate.
+    pub fn resident_defaults(persona: PersonaId, store: &crate::authority_guest::GuestStore) -> Result<Self, RegistryError> {
+        store
+            .registrations()
+            .into_iter()
+            .try_fold(Self::mere_defaults(persona), |registry, registration| registry.register(registration))
     }
 
     /// Add a registration. A duplicate domain is refused.
@@ -339,8 +413,8 @@ mod tests {
     fn guest_and_declared_validators_refuse_every_candidate_as_pending() {
         let graph = kernel::graph::Graph::new();
         for authority in [
-            Authority::Guest(GuestAuthority { component: [1; 32] }),
-            Authority::Declared(DeclaredAuthority { policy: "p".into() }),
+            Authority::Guest(GuestAuthority::new([1; 32])),
+            Authority::Declared(DeclaredAuthority::new("p")),
         ] {
             let refusal = authority.validator("fixture")(&graph).unwrap_err();
             assert_eq!(refusal, format!("{PENDING} for fixture"));

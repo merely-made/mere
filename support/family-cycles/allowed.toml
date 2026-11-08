@@ -18,18 +18,22 @@
 # entries left out fails.
 
 # D1 (Mark, 2026-11-06): "Resident stops depending". Mere's resident is the down edge to
-# remove. Open until P2 (Knot, behind P2a) and P3 (Cleromancy).
+# remove. Open until P2 (Knot, behind P2a); P3 (Cleromancy) closed its edge on 2026-11-08.
 [[edge]]
 from = "mere"
 to = "knot-editor"
 decision = "D1"
 reason = "ports/mere-resident names knot-editor (peers, mere-overlay); Knot names Mere crates. Plan C1, P2."
 
+# D19 (Mark, 2026-11-08): "Allowlist until P5". Inker's optional fleece row on Mere's
+# linked-data (mere-fleece -> mere-rdf, engine-split F3) closes against Mere's rows naming
+# Inker. Leaves when engine-split P5 folds linked-data into a `mere` crate that does not
+# depend on inker.
 [[edge]]
-from = "mere"
-to = "cleromancy"
-decision = "D1"
-reason = "ports/mere-resident names cleromancy-core; Cleromancy names Mere crates. Plan C2, P3."
+from = "inker"
+to = "mere"
+decision = "D19"
+reason = "fleece's optional linked-data row (engine-split F3); mere-rdf names inker, so Inker cannot name the engine until engine-split P5. Leaves with P5."
 
 # D17 (Mark, 2026-11-06): the one isolated Murm root.
 [[isolated]]

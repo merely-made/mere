@@ -369,10 +369,10 @@ async fn inspect_connected(
     {
         return Err("inspect material has another schema/application/session/position".into());
     }
-    // Replay validation is a read-only check, using the same product-owned
-    // validator as the resident; it never installs or persists a graph.
-    cleromancy_domain::host::validate_divination_graph(&material.clone().into_graph()?)
-        .map_err(|e| e.to_string())?;
+    // The resident ran the domain's installed authority guest over this graph before it
+    // served it (cycle breaks P3); this host no longer re-runs a product validator, since
+    // Mere does not link the application that owns the domain. It still reads the graph.
+    material.clone().into_graph()?;
     let ui_sessions = source_cards(&sessions, &cards, session_item::SESSIONS_SOURCE)?
         .into_iter()
         .filter_map(|(id, card)| {

@@ -58,7 +58,7 @@ const MARKER: &str = "PUBLIC-TEST-KEYS-NOT-A-PERSONAL-WALLET";
 const MARKER_CONTENTS: &[u8] =
     b"Synthetic acceptance authority only; all keys are public test constants.\n";
 const PUBLIC_SEED: [u8; 32] = [0x4b; 32];
-const DOMAIN: &str = "divination";
+const DOMAIN: &str = "fixture-domain";
 const DEVICE: &str = "knot-overmap-live";
 
 fn persona() -> PersonaId {
