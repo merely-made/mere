@@ -301,15 +301,12 @@ registry = { package = "mere-registry", path = "crates/system/registry", default
 # lane, knot-editor-host, the document lanes, page-load, fleece and script-rhai.
 inker = { version = "0.1.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 document-canvas = { version = "0.1.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
-# `default-features = false` belongs on this declaration: knot-editor-host
-# opts back into `html-fragment` explicitly, and so does the external knot-editor.
+# `default-features = false` belongs on this declaration: the external
+# knot-editor opts back into `html-fragment` explicitly.
 nematic = { version = "0.1.1", git = "https://github.com/merely-made/inker.git", branch = "main", default-features = false }
 fleece-extract = { package = "fleece", version = "0.5.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
 fleece = { package = "mere-fleece", version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
-# `default-features = false` is kept because knot-document opts back into
-# `preview` explicitly.
-knot-editor-host = { version = "0.1.1", git = "https://github.com/merely-made/inker.git", branch = "main", default-features = false }
 illume = { version = "0.0.3", git = "https://github.com/merely-made/inker.git", branch = "main" }
 # ─── Landed from genet 2026-09-03 (platform boundary plan, P2) ──────────────
 # Workspace members, so path deps. None of the eleven may appear in
@@ -618,13 +615,6 @@ too_many_lines = "warn"
 [patch."https://github.com/merely-made/mere.git"]
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
-# Knot's pinned revision names these five through mere.git; they left for
-# merely-made/inker on 2026-11-07 (engine split plan, P1).
-illume = { git = "https://github.com/merely-made/inker.git", branch = "main" }
-inker = { git = "https://github.com/merely-made/inker.git", branch = "main" }
-knot-editor-host = { git = "https://github.com/merely-made/inker.git", branch = "main" }
-nematic = { git = "https://github.com/merely-made/inker.git", branch = "main" }
-script-rhai = { git = "https://github.com/merely-made/inker.git", branch = "main" }
 # The Knot and Cleromancy revisions in this graph name seiche through mere.git,
 # as Murm, Isocosm and mer3ly do, until they repin; numen and seiche left for
 # merely-made/seiche on 2026-11-07 (engine split plan, P2).

@@ -805,14 +805,16 @@ revision and what crosses at frame rate.
 - **Host follow-ups under D16 and D17 (recorded by the P1 lane, with file paths in its P1
   block).** Turnstone converts at 13 boundary calls in `content_pool.rs`,
   `shell_effect_control_content.rs` and `reader_observe.rs` and keeps persisting Tabard's
-  anchor; the Graphshell port converts at 5 sites in `retained_content.rs`; Knot's
-  `knot-document` takes `KnotEditor`, `EditOutcome` and `KnotReadout` with their tests and
-  drops `knot-editor-host`; Turnstone and the port import from `knot-document`; then
-  `knot-editor-host` retires. `tabard-workshop` was converted by the lane already.
-- **After P1's cut (2026-11-07).** Knot (`Cargo.toml` 80, 107 to 111 at `2c703c4`) names
-  `script-rhai`, `illume`, `inker`, `knot-editor-host` and `nematic` from `mere.git`; Mere
-  redirects them in its `mere.git` patch table until Knot takes them from `inker.git`, and
-  then those five rows leave. Turnstone repins its own Inker rows to `inker.git`. Inker
+  anchor; the Graphshell port converts at 5 sites in `retained_content.rs`. Done on
+  2026-11-07: Knot's `knot-document` holds `KnotEditor` in `retained` (Knot `a58ba28`) and
+  the port imports it from there. Open: Turnstone's `src/knot_authoring.rs` and its
+  `knot-editor-host` row; with that, `knot-editor-host` has no consumer and retires from
+  Inker. `tabard-workshop` was converted by the lane already.
+- **After P1's cut (2026-11-07).** Knot at `2c703c4` named `script-rhai`, `illume`, `inker`,
+  `knot-editor-host` and `nematic` from `mere.git`; Knot `a58ba28` takes them from
+  `inker.git`, and Mere's five redirect rows left with its relock (Progress, 2026-11-07).
+  Knot still names `seiche` through `mere.git` (its `Cargo.toml` 79), so the two Seiche
+  redirects stay. Turnstone repins its own Inker rows to `inker.git`. Inker
   names `cambium` (and through it the Cambium family) and `mere-rdf` from `mere.git`, which
   every consumer must redirect to one source; the host's half of F2 ends that edge. Active
   Mere documents still carry 28 code-font paths into the moved crates in 16 documents (the
@@ -1113,3 +1115,16 @@ revision and what crosses at frame rate.
   owed by consumers: Isocosm (conatus, modulus, tenant, nisus rows and state-witness), Cleromancy,
   Knot, Murm's signalman-desktop and mer3ly repoint `seiche` rows to `seiche.git`; Isocosm's
   `.cargo/tabletop-local.toml` overlays numen and seiche onto deleted paths.
+- 2026-11-07: Mere relocked to Knot `a58ba28` (worktree branch, not pushed). The eight `knot-editor.git`
+  lock entries moved together from `2c703c4` by hand, one `cargo fetch`; no other source moved.
+  Cargo printed no unused-patch warning for the five Inker redirects (their targets sit in the graph
+  under their own source, so Cargo counts them used), but Knot `a58ba28` names none of the five
+  through `mere.git`; removed, the graph resolves `--locked` unchanged. The Graphshell port takes
+  `KnotEditor` from `knot_document::retained` (`block_editing.rs:14`; manifest 56 and 219 name
+  `knot-document`), and the root `knot-editor-host` rows left with the package (1823 to 1822). The
+  web workspace: `knot-document` replaces `knot-editor-host`, with a `mere-edit` path redirect
+  beside its Cambium ones (1139 to 1141, `mere-edit` and `windows-sys` 0.59 added). Gates
+  (locked, offline, debug info off): workspace check green; `graphshell` with `editable-blocks`
+  green, `block_editing` 42 passed; clippy 0 errors; the web workspace checks green for wasm.
+  `knot-editor-host` has no consumer left in Mere; after Turnstone's `knot_authoring` moves it
+  retires from Inker.
