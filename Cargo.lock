@@ -2233,6 +2233,7 @@ version = "0.6.1"
 dependencies = [
  "backstep",
  "chartulary",
+ "dramatis",
  "genet-events",
  "genet-scripted-dom",
  "genet-text",
@@ -2241,6 +2242,7 @@ dependencies = [
  "layout-dom-api",
  "mere-surface-api",
  "meristem",
+ "personae",
  "sceno",
  "sceno-backdrops",
  "scenograph",
@@ -5038,7 +5040,6 @@ dependencies = [
  "luggage",
  "mandrake",
  "ostiary",
- "persona-picker",
  "personae",
  "serde_json",
  "sha2 0.11.0",
@@ -13751,15 +13752,6 @@ name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
-
-[[package]]
-name = "persona-picker"
-version = "0.0.1"
-dependencies = [
- "cambium",
- "dramatis",
- "personae",
-]
 
 [[package]]
 name = "personae"
