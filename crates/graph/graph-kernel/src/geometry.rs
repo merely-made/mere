@@ -9,12 +9,7 @@
 //! All three aliases are thin wrappers over `euclid::default::*<f32>`.
 //! They appear on:
 //!
-//! - `FrameHostInput.pointer_hover: Option<PortablePoint>` — hover
-//!   position relative to the host viewport.
-//! - `FrameHostInput.viewport_size: PortableSize` — current viewport
-//!   extents.
-//! - `FrameViewModel.active_pane_rects: Vec<(PaneId, NodeKey, PortableRect)>`
-//!   — pane layout rects.
+//! - host input and layout: hover position, viewport extents, pane rects.
 //! - `DegradedReceiptSpec.tile_rect: PortableRect` — degraded-mode
 //!   overlay placement.
 //!

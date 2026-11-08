@@ -9,9 +9,8 @@ registry.
 It sits alongside two other event layers: code-level `tracing` spans, and the
 `register-diagnostics` channel registry.
 
-Depends on `chrome` (for `routing::ToolSurfaceReturnTarget`), `kernel` (for
-`accessibility::SurfaceId`, `actions::ActionId`, `graph::NodeKey`,
-`pane::PaneId`), and `serde`.
+Depends on `kernel` (for `accessibility::SurfaceId`, `actions::ActionId`,
+`graph::{GraphViewId, NodeKey}`, `pane::{PaneId, ToolPaneState}`), and `serde`.
 
 ## Modules
 
@@ -21,6 +20,7 @@ Depends on `chrome` (for `routing::ToolSurfaceReturnTarget`), `kernel` (for
 | `ux_diagnostics` | `DiagnosticsSeverity`, `ChannelEmission`, `DiagnosticsChannelSink`, `event_channel`, `all_channel_ids`, `UxChannelObserver`, `NoopChannelSink`, `RecordingChannelSink` |
 | `ux_probes` | `UxProbe`, `ProbeFailure`, `probe_as_observer`, and the four canonical probes |
 | `command_surface_telemetry` | `CommandSurfaceTelemetry` plus its snapshot and counter types |
+| `routing` | `ToolSurfaceReturnTarget`, where focus returns when an overlay dismisses |
 
 The crate root also exports `VERSION` and `STAGE`.
 

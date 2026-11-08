@@ -125,7 +125,8 @@ view and composition crates; no new facade), `mere-cartography`, `pictograph`, `
 `cambium-rootstock`, `cambium-winit`, `cambium-a11y`, `cambium-desktop`, `cambium-web`,
 `workbench`, `hest`, `backstep` (kept and grown under D27 into the editor's ephemeral state: snapshot undo, the
 host clipboard contract, chrome's linear back/forward; P0 lane `p0/backstep`, not merged), `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
-`mere-view`, `mere-overmap`), `tabard`, `mere-chrome`, `mere-registry` (examined feature by
+`mere-view`, `mere-overmap`), `tabard`, `mere-chrome` (dissolved under D31, P0 done: `routing` into `ux-events`,
+`nav::History` is backstep's, the rest retired; `mere-chrome` freed), `mere-registry` (examined feature by
 feature in P0; a registry may carry several owners' contracts but makes none of their
 decisions; P0 done: trimmed to `diagnostics` and `observations` under its own name, the five
 dead registries deleted, the mod loader moved into `document-host`), `mere-surface-api`, `settings-wit`, `ux-events`, `mere-fetch` (the host's fetch
@@ -1419,4 +1420,14 @@ revision and what crosses at frame rate.
   `nav::History` is backstep's; `authorities`, `omnibar`, `suggest`, `toolbar` and the rest of `nav`
   have none, Turnstone carrying its own omnibar and address normalising. `mere-chrome` 0.0.1 is not on
   crates.io. Dispositions are pending Mark's ruling.
+- 2026-11-08: D31 carried out (branch `p0/chrome-dissolve`, worktree `worktrees/mere-chrome-dissolve`,
+  not merged). `routing` (`ToolSurfaceReturnTarget` and its three tests) moved into `ux-events` as
+  `ux_events::routing` with history; `crates/shell/chrome` *(historical citation)* <!-- doc-audit: historical-path -->
+  is deleted with `authorities`, `omnibar`, `suggest`, `toolbar` and `nav` (`History` was backstep's
+  re-export; the classifier had no importer). The member and workspace rows go; the lock loses
+  `mere-chrome` and ux-events' edge to it, and ux-events gains `serde_json` as a dev-dependency for the
+  moved tests. Doc comments naming the retired frame-model types in the kernel and ux-events are
+  reworded. `mere-chrome` is freed. Turnstone still names `mere-chrome` for `chrome::nav::History`
+  at four sites; its lock pins an older Mere, so nothing breaks until a Turnstone lane swaps them for
+  `backstep::nav::History`.
 
