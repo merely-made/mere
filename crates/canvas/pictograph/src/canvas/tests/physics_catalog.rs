@@ -485,3 +485,59 @@ fn density_refuses_all_but_its_three_overlays_with_a_reason() {
 
 #[path = "physics_catalog/profiles.rs"]
 mod profiles;
+
+/// A descriptor made from the canvas's own inputs (the registry-served ones, over
+/// a real graph with a hub, a multiple relation and an island) builds the same
+/// forces as the in-process path, for every law and overlay and over every
+/// source: the declared terms and the force counts match. The engine's own test
+/// runs the bodies; this one keeps the graph-reading constructors honest.
+#[test]
+fn a_force_set_descriptor_builds_what_law_forces_builds_over_a_real_graph() {
+    use seiche::catalog::{LawSources, build_force_set};
+    let (canvas, keys) = wired(
+        &[
+            "https://a.test/x",
+            "https://b.test/y",
+            "https://c.test/z",
+            "https://hub.test/h",
+            "https://iso.test/i",
+        ],
+        &[(0, 3), (1, 3), (2, 3), (0, 1), (0, 1)],
+    );
+    let inputs = canvas.law_inputs();
+    let terms = |forces: &[Box<dyn seiche::Force>]| -> Vec<Vec<seiche::Term>> {
+        forces.iter().map(|f| f.terms().to_vec()).collect()
+    };
+    let check = |law: PhysicsLaw, overlays: &[PhysicsOverlay], sources: LawSources| {
+        let direct = inputs.composed(law, None, overlays, sources);
+        let descriptor = inputs.describe(law, None, overlays, sources);
+        let built = build_force_set(&descriptor);
+        assert_eq!(direct.len(), built.len(), "{law:?} {overlays:?}");
+        assert_eq!(terms(&direct), terms(&built), "{law:?} {overlays:?}");
+    };
+    let sources = LawSources {
+        focus: Some(keys[0]),
+        ..LawSources::bare()
+    };
+    for law in PhysicsLaw::ALL {
+        check(law, &[], sources);
+        for overlay in PhysicsOverlay::ALL {
+            check(law, &[overlay], sources);
+        }
+    }
+    for kind in PhysicsKindSource::ALL {
+        for mass in PhysicsMassSource::ALL {
+            for depth in PhysicsDepthSource::ALL {
+                let s = LawSources {
+                    kind,
+                    groups: kind,
+                    mass,
+                    depth,
+                    ..sources
+                };
+                check(PhysicsLaw::Kinds, &PhysicsOverlay::ALL, s);
+                check(PhysicsLaw::Orbit, &PhysicsOverlay::ALL, s);
+            }
+        }
+    }
+}
