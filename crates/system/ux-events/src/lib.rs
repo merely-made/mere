@@ -13,6 +13,7 @@
 #![doc(html_root_url = "https://docs.rs/ux-events/0.0.1")]
 
 pub mod command_surface_telemetry;
+pub mod routing;
 pub mod ux_diagnostics;
 pub mod ux_observability;
 pub mod ux_probes;

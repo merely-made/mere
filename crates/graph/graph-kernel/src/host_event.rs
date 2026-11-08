@@ -13,8 +13,7 @@
 //! `shell/desktop/workbench/ux_replay.rs` next to the replay session
 //! driver; the session itself (`UxReplaySession`) carries a
 //! `UxTreeSnapshot` that stays shell-side, but the event vocabulary
-//! is portable and moves here so `FrameHostInput.events: Vec<HostEvent>`
-//! can live in kernel.
+//! is portable and lives in kernel, where any host can carry it.
 //!
 //! The shell crate re-exports these types from `ux_replay.rs` so
 //! existing import paths resolve unchanged.
