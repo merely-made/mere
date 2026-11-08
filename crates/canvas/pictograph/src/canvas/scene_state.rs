@@ -9,7 +9,7 @@
 //! out, so a restored scene finds its nodes by identity; members the graph
 //! no longer holds are skipped on the way in.
 
-use forme::GraphMemberId;
+use incipit::forme::GraphMemberId;
 use kernel::geometry::PortablePoint;
 
 use super::Canvas;

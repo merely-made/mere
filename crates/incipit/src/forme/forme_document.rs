@@ -12,16 +12,17 @@
 //! A graph carries many formes (curated workbenches, compare benches, …) plus
 //! the implicit identity arrangement the orrery uses.
 //!
-//! Ownership: `forme` owns these *types* + the [`crate::Arrangement`] schema +
-//! pure mutation + the on-disk store ([`crate::store`], behind the `store`
-//! feature so portable consumers stay `std::fs`-free). The *host* supplies
+//! Ownership: `forme` owns these *types* + the [`crate::forme::Arrangement`]
+//! schema + pure mutation + the on-disk store ([`crate::forme::store`], behind
+//! incipit's `arrangement-store` feature so portable consumers stay
+//! `std::fs`-free). The *host* supplies
 //! persistence policy — which session directory, and when to save. Geometry is
 //! **not** here — it is a sibling store keyed `(FormeRef, ProjectionKind)`.
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::arrangement::Arrangement;
+use crate::forme::arrangement::Arrangement;
 
 /// Stable id for a stored forme.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]

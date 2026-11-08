@@ -8461,10 +8461,13 @@ checksum = "6e44b0a4eaa4c82f441d50a963f2d5f05a787240aeee097597033e72accfd22f"
 
 [[package]]
 name = "incipit"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
+ "petgraph 0.8.3",
+ "proptest",
  "serde",
  "serde_json",
+ "taffy",
  "uuid",
 ]
 
@@ -10091,9 +10094,9 @@ version = "0.0.2"
 dependencies = [
  "accesskit 0.25.1",
  "euclid",
+ "incipit",
  "inker",
  "mere-fleece",
- "mere-forme",
  "mere-kernel",
  "mere-rdf",
  "netrender",
@@ -10157,7 +10160,7 @@ dependencies = [
 name = "mere-chrome"
 version = "0.0.1"
 dependencies = [
- "mere-forme",
+ "incipit",
  "mere-kernel",
  "serde",
  "serde_json",
@@ -10263,20 +10266,6 @@ dependencies = [
  "tokio",
  "tracing",
  "url",
-]
-
-[[package]]
-name = "mere-forme"
-version = "0.2.0"
-dependencies = [
- "incipit",
- "mere-kernel",
- "petgraph 0.8.3",
- "proptest",
- "serde",
- "serde_json",
- "taffy",
- "uuid",
 ]
 
 [[package]]
@@ -13962,7 +13951,6 @@ dependencies = [
  "layout-dom-api",
  "libm",
  "mere-cartography",
- "mere-forme",
  "mere-kernel",
  "netrender",
  "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
@@ -14080,8 +14068,8 @@ dependencies = [
  "accesskit 0.25.1",
  "backstep",
  "document-canvas",
+ "incipit",
  "inker",
- "mere-forme",
  "mere-kernel",
  "serde",
  "serde_json",

@@ -16,9 +16,9 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::MemberId;
-use crate::member::Lifecycle;
-use crate::tree::GraphTree;
+use crate::forme::MemberId;
+use crate::forme::member::Lifecycle;
+use crate::forme::tree::GraphTree;
 
 /// A snapshot of external (e.g. egui_tiles) tree state, flattened
 /// into the fields that parity checks need. The host constructs this
@@ -295,10 +295,10 @@ pub fn compare<N: MemberId>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::layout::LayoutMode;
-    use crate::lens::ProjectionLens;
-    use crate::member::Provenance;
-    use crate::nav::NavAction;
+    use crate::forme::layout::LayoutMode;
+    use crate::forme::lens::ProjectionLens;
+    use crate::forme::member::Provenance;
+    use crate::forme::nav::NavAction;
 
     fn build_tree() -> GraphTree<u64> {
         let mut tree = GraphTree::new(LayoutMode::TreeStyleTabs, ProjectionLens::Traversal);

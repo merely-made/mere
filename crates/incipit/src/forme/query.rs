@@ -10,9 +10,9 @@
 //! into common patterns. They exist so callers don't need to reach
 //! through `tree.topology()` for everyday questions.
 
-use crate::MemberId;
-use crate::member::Lifecycle;
-use crate::tree::GraphTree;
+use crate::forme::MemberId;
+use crate::forme::member::Lifecycle;
+use crate::forme::tree::GraphTree;
 
 /// Members filtered by lifecycle.
 pub fn members_by_lifecycle<'a, N: MemberId>(
@@ -133,25 +133,25 @@ fn collect_visible_dfs<N: MemberId>(tree: &GraphTree<N>, nodes: &[N], result: &m
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::member::Provenance;
+    use crate::forme::member::Provenance;
 
     fn make_tree() -> GraphTree<u64> {
         let mut tree = GraphTree::new(
-            crate::layout::LayoutMode::TreeStyleTabs,
-            crate::lens::ProjectionLens::Traversal,
+            crate::forme::layout::LayoutMode::TreeStyleTabs,
+            crate::forme::lens::ProjectionLens::Traversal,
         );
-        tree.apply(crate::nav::NavAction::Attach {
+        tree.apply(crate::forme::nav::NavAction::Attach {
             member: 1,
             provenance: Provenance::Anchor,
         });
-        tree.apply(crate::nav::NavAction::Attach {
+        tree.apply(crate::forme::nav::NavAction::Attach {
             member: 2,
             provenance: Provenance::Traversal {
                 source: 1,
                 edge_kind: None,
             },
         });
-        tree.apply(crate::nav::NavAction::Attach {
+        tree.apply(crate::forme::nav::NavAction::Attach {
             member: 3,
             provenance: Provenance::Traversal {
                 source: 1,
@@ -159,9 +159,9 @@ mod tests {
             },
         });
         // Set lifecycles
-        tree.apply(crate::nav::NavAction::SetLifecycle(1, Lifecycle::Active));
-        tree.apply(crate::nav::NavAction::SetLifecycle(2, Lifecycle::Active));
-        tree.apply(crate::nav::NavAction::SetLifecycle(3, Lifecycle::Warm));
+        tree.apply(crate::forme::nav::NavAction::SetLifecycle(1, Lifecycle::Active));
+        tree.apply(crate::forme::nav::NavAction::SetLifecycle(2, Lifecycle::Active));
+        tree.apply(crate::forme::nav::NavAction::SetLifecycle(3, Lifecycle::Warm));
         tree
     }
 

@@ -37,7 +37,7 @@ inker.workspace = true
 workbench.workspace = true
 # Platen projects a forme arrangement into a presentation plan (the
 # tree projection — its core role under the composition spine).
-forme.workspace = true
+incipit = { workspace = true, features = ["arrangement"] }
 serde = { version = "1.0", features = ["derive"] }
 # Tile-layout state persists as JSON (the bridge's (Arrangement, geometry) pair);
 # the host writes the string beside the session graph.

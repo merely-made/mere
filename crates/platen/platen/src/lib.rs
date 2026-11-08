@@ -7,7 +7,7 @@
 //! # Platen
 //!
 //! The **pane home** for the [`mere`](https://crates.io/crates/mere)
-//! browser: platen compiles a forme [`forme::Arrangement`] into the
+//! browser: platen compiles a forme [`incipit::forme::Arrangement`] into the
 //! presentation plans a host renders panes from — the tiled-layout
 //! model, its tree projection, the pane geometry sidecar, and the
 //! document-canvas scene input for a pane that holds a document tile.
@@ -48,7 +48,7 @@ pub mod document_scene;
 /// AccessKit/uxtree projection of Platen-owned structure.
 pub mod accessibility;
 
-/// The tiled-workbench model: slots of tab-stacks over a forme [`forme::Arrangement`],
+/// The tiled-workbench model: slots of tab-stacks over a forme [`incipit::forme::Arrangement`],
 /// the active tab per stack, and the projection mode. platen's canonical tiling state
 /// (it replaces the legacy `FrameState` / `PaneBinding` frame model), projected to
 /// side-by-side placed slots via [`tree_projection`] (concrete rects come from
@@ -59,7 +59,7 @@ pub mod workbench;
 #[cfg(feature = "workspace-editor")]
 pub mod workspace;
 
-/// Tree projection — compiles a forme [`forme::Arrangement`] into a
+/// Tree projection — compiles a forme [`incipit::forme::Arrangement`] into a
 /// [`tree_projection::WorkbenchPlan`] (splits of tab-stacks), platen's core
 /// role under the composition spine. Sibling projections (cartography,
 /// lattice) are added when a surface needs one.

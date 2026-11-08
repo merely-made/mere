@@ -1,11 +1,11 @@
 [package]
 rust-version = "1.97.1"
 name = "incipit"
-version = "0.2.2"
+version = "0.2.3"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Workspace identity vocabulary for Mere: the stable ids of a graph and a session, and view-local curation (subgraph specifications and folds), with no dependency on the graph itself."
+description = "Workspace identity vocabulary for Mere: the stable ids of a graph and a session, and view-local curation (subgraph specifications and folds), and, behind the `arrangement` feature, forme: the workbench arrangement authority. No dependency on the graph itself."
 documentation = "https://docs.rs/incipit"
 keywords = ["identity", "graph", "session", "mere"]
 categories = ["data-structures"]
@@ -13,12 +13,31 @@ categories = ["data-structures"]
 [lib]
 path = "src/lib.rs"
 
+[features]
+default = []
+# `incipit::forme`, the workbench arrangement authority (the former
+# `mere-forme` crate, merged 2026-11-08 under engine split D28). The default
+# stays ids and curation on serde and uuid alone.
+arrangement = ["dep:serde_json", "dep:taffy", "dep:petgraph"]
+# Native on-disk persistence of `FormeDocument`s (`incipit::forme::store`).
+# Off so wasm consumers stay `std::fs`-free; the native host enables it.
+arrangement-store = ["arrangement"]
+
 [dependencies]
 serde.workspace = true
 uuid.workspace = true
+serde_json = { version = "1.0", optional = true }
+# Forme's persisted arrangement vocabulary still uses the stable-0.11
+# `Dimension` API. This is independent of Livery/Buckram's current Taffy slot;
+# migrate it only with a serialization review.
+taffy = { version = "=0.11.0-experimental-cache-fix.3", optional = true }
+# `forme::derive_topology` walks a petgraph graph. Every arrangement consumer
+# already builds petgraph 0.8 through the kernel, so it is not gated further.
+petgraph = { version = "0.8", features = ["serde-1"], optional = true }
 
 [dev-dependencies]
 serde_json = "1"
+proptest = "1.11"
 
 [lints]
 workspace = true

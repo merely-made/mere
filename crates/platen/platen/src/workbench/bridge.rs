@@ -25,7 +25,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use forme::{Arrangement, ArrangementNodeId, GraphMemberId};
+use incipit::forme::{Arrangement, ArrangementNodeId, GraphMemberId};
 use serde::{Deserialize, Serialize};
 
 use super::TileLayout;
@@ -374,7 +374,7 @@ mod tests {
         // 2 and 3 are StackedWith; 1 is not stacked with anything.
         let stacked = arr
             .edges()
-            .filter(|e| e.kind == forme::ArrangementEdgeKind::StackedWith)
+            .filter(|e| e.kind == incipit::forme::ArrangementEdgeKind::StackedWith)
             .count();
         assert_eq!(stacked, 1, "exactly the (2,3) tab pair is stacked");
     }

@@ -8,7 +8,7 @@
 //! sibling file per the 600-LOC ceiling.
 
 use crate::subgraph::*;
-use forme::{SubgraphBinding, SubgraphKind, SubgraphSpec};
+use incipit::forme::{SubgraphBinding, SubgraphKind, SubgraphSpec};
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{EdgeFamily, Graph};
 

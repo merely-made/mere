@@ -30,7 +30,7 @@
 //! is the semantic + re-projection truth; this is the layout refinement over the
 //! arrangement's default flat projection ([`crate::project_tree`]).
 
-use forme::GraphMemberId;
+use incipit::forme::GraphMemberId;
 use serde::{Deserialize, Serialize};
 use workbench::SplitAxis;
 

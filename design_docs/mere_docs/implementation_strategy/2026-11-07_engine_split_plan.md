@@ -121,7 +121,8 @@ grows out of `incipit` and takes its name (D8: surfaces, trails, arrangements, b
 resource references by UUIDv5; the graph and session ids stay reachable behind a minimal
 default feature so Cleromancy and Fleece keep depending on ids alone),
 the `mere` facade's navigation, trail and roster logic (its visual and workbench APIs to the
-view and composition crates; no new facade), `mere-cartography`, `pictograph`, `mere-forme`,
+view and composition crates; no new facade), `mere-cartography`, `pictograph`, `mere-forme`
+(merged into `incipit` as `incipit::forme`, P0 done),
 `mere-curation` (merged into `incipit`, P0 done), `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
 `cambium-rootstock`, `cambium-winit`, `cambium-a11y`, `cambium-desktop`, `cambium-web`,
 `workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
@@ -1259,3 +1260,14 @@ revision and what crosses at frame rate.
   No family consumer names a moved crate through `mere.git` any more, and no `[patch]` redirect
   for one remains in Mere, Turnstone or Cleromancy. Pre-existing failures unchanged: Knot's three
   `site_generation` tests (same at `a58ba28`), Turnstone's 46 "Access is denied", Cleromancy's two.
+- 2026-11-08: P0 forme lane (branch `p0/forme-incipit`, worktree `worktrees/mere-forme-incipit`, not
+  merged). D28 carried out: `mere-forme` (6,692 lines of Rust, tests included) moved into `incipit` as
+  `incipit::forme` behind a new `arrangement` feature carrying `serde_json`, `taffy` and `petgraph`
+  (forme's never-enabled `petgraph` feature folded in, since every consumer already builds petgraph 0.8
+  through the kernel; its `store` feature is now `arrangement-store`); incipit's default stays ids and
+  curation on serde and uuid, and it is 0.2.3. forme's kernel dev-dependency is gone (its one use was
+  an unused import), so incipit gains no kernel edge, dev or normal; a topology test that had lost its
+  `#[test]` attribute runs again. Repathed: the `mere` facade (`mere::forme` re-exports
+  `incipit::forme`), `mere-chrome`, `platen` and `pictograph`; no other repository names the crate.
+  Both locks change only by the removal and incipit's new edges. Name freed: `mere-forme` (on
+  crates.io only once its 0.2.0 publish, `publish = true` in its manifest, is yanked or left).

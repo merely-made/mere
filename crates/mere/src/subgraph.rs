@@ -27,7 +27,7 @@
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
-use forme::{
+use incipit::forme::{
     GraphMemberId, SubgraphBinding, SubgraphId, SubgraphKind, SubgraphMemberDelta, SubgraphRef,
     SubgraphSpec,
 };

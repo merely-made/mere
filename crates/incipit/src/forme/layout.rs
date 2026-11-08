@@ -4,11 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::MemberId;
-use crate::Rect;
-use crate::subgraph::SubgraphId;
-use crate::member::{Lifecycle, SplitDirection};
-use crate::topology::TreeRow;
+use crate::forme::MemberId;
+use crate::forme::Rect;
+use crate::forme::subgraph::SubgraphId;
+use crate::forme::member::{Lifecycle, SplitDirection};
+use crate::forme::topology::TreeRow;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -113,21 +113,21 @@ pub trait GraphTreeRenderer<N: MemberId> {
 
     fn render_tree_tabs(
         &mut self,
-        tree: &crate::tree::GraphTree<N>,
+        tree: &crate::forme::tree::GraphTree<N>,
         rows: &[OwnedTreeRow<N>],
         ctx: &mut Self::Ctx,
     ) -> Self::Out;
 
     fn render_flat_tabs(
         &mut self,
-        tree: &crate::tree::GraphTree<N>,
+        tree: &crate::forme::tree::GraphTree<N>,
         tabs: &[TabEntry<N>],
         ctx: &mut Self::Ctx,
     ) -> Self::Out;
 
     fn render_pane_chrome(
         &mut self,
-        tree: &crate::tree::GraphTree<N>,
+        tree: &crate::forme::tree::GraphTree<N>,
         rects: &HashMap<N, Rect>,
         ctx: &mut Self::Ctx,
     ) -> Self::Out;

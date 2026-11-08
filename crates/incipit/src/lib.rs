@@ -24,6 +24,9 @@
 //! [`curation`] holds what a view chooses to show of a graph: subgraph
 //! specifications and folds.
 //!
+//! `forme`, behind the `arrangement` feature, is the workbench arrangement
+//! authority: what a workbench is, projected from graph members and edges.
+//!
 //! [`frisket`]: https://docs.rs/frisket
 
 #![doc(html_root_url = "https://docs.rs/incipit/0.0.1")]
@@ -33,6 +36,8 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 pub mod curation;
+#[cfg(feature = "arrangement")]
+pub mod forme;
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

@@ -24,7 +24,7 @@ use std::collections::{HashMap, HashSet};
 
 use cartography::Projection;
 use cartography::projection::{PositionedEdge, PositionedNode, ProjectionMetadata};
-use forme::{Arrangement, GraphMemberId};
+use incipit::forme::{Arrangement, GraphMemberId};
 use kernel::geometry::{PortablePoint, PortableRect, PortableSize};
 use kernel::graph::{Graph, NodeKey, RelationView};
 use paint_list_api::DeviceIntSize;

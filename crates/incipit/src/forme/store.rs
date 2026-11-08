@@ -4,8 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Native on-disk persistence of curated [`FormeDocument`]s (the `store`
-//! feature).
+//! Native on-disk persistence of curated [`FormeDocument`]s (incipit's
+//! `arrangement-store` feature).
 //!
 //! A session carries *many* formes (curated workbenches, compare benches, …) —
 //! unlike a single `graph.json` — so they live in a `formes/` directory, one
@@ -14,7 +14,7 @@
 //!
 //! Ownership (composition spine §15): `forme` owns the [`FormeDocument`] types,
 //! the arrangement schema, pure mutation, **and** this native store (gated by
-//! the `store` feature so portable consumers stay `std::fs`-free). The *host*
+//! the `arrangement-store` feature so portable consumers stay `std::fs`-free). The *host*
 //! supplies policy — which session directory, and *when* to save. The clock is
 //! injected (`now_ms`) so the store stays testable.
 
@@ -22,7 +22,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use crate::{FormeDocument, FormeId};
+use crate::forme::{FormeDocument, FormeId};
 
 /// Subdirectory under a session dir holding one JSON file per forme.
 pub const FORMES_DIR: &str = "formes";

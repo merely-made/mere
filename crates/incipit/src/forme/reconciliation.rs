@@ -14,14 +14,14 @@
 
 use std::collections::HashSet;
 
-use crate::MemberId;
-use crate::subgraph::{
+use crate::forme::MemberId;
+use crate::forme::subgraph::{
     SubgraphBinding, SubgraphId, SubgraphMemberDelta, SubgraphSpec, ReconciliationChoice,
     ReconciliationProposal,
 };
-use crate::member::Lifecycle;
-use crate::nav::TreeIntent;
-use crate::tree::GraphTree;
+use crate::forme::member::Lifecycle;
+use crate::forme::nav::TreeIntent;
+use crate::forme::tree::GraphTree;
 
 /// Compute the roster delta between a linked subgraph's expected members
 /// (from graph truth) and the tree's current members for that subgraph.
@@ -98,9 +98,9 @@ pub fn apply_reconciliation<N: MemberId>(
             // Add new members to the tree with subgraph membership.
             for member in &proposal.delta.added {
                 if tree.get(member).is_none() {
-                    tree.apply(crate::nav::NavAction::Attach {
+                    tree.apply(crate::forme::nav::NavAction::Attach {
                         member: member.clone(),
-                        provenance: crate::member::Provenance::Derived {
+                        provenance: crate::forme::member::Provenance::Derived {
                             connection: None,
                             derivation: format!("subgraph-reconciliation:{}", gid),
                         },
@@ -127,7 +127,7 @@ pub fn apply_reconciliation<N: MemberId>(
                     .map(|e| e.subgraph_membership.is_empty() && e.lifecycle == Lifecycle::Cold)
                     .unwrap_or(false);
                 if should_detach {
-                    tree.apply(crate::nav::NavAction::Detach {
+                    tree.apply(crate::forme::nav::NavAction::Detach {
                         member: member.clone(),
                         recursive: false,
                     });
@@ -157,7 +157,7 @@ pub fn apply_reconciliation<N: MemberId>(
                         kind: subgraph
                             .kind
                             .clone()
-                            .unwrap_or(crate::subgraph::SubgraphKind::Session),
+                            .unwrap_or(crate::forme::subgraph::SubgraphKind::Session),
                         anchors: Vec::new(),
                         primary_anchor: None,
                         selectors: Vec::new(),
@@ -286,14 +286,14 @@ pub fn derive_containment_topology<N: MemberId>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::subgraph::{SubgraphKind, SubgraphRef};
-    use crate::member::Provenance;
-    use crate::nav::NavAction;
+    use crate::forme::subgraph::{SubgraphKind, SubgraphRef};
+    use crate::forme::member::Provenance;
+    use crate::forme::nav::NavAction;
 
     fn make_tree_with_linked_subgraph(members: &[u64], subgraph_members: &[u64]) -> GraphTree<u64> {
         let mut tree = GraphTree::new(
-            crate::layout::LayoutMode::TreeStyleTabs,
-            crate::lens::ProjectionLens::Traversal,
+            crate::forme::layout::LayoutMode::TreeStyleTabs,
+            crate::forme::lens::ProjectionLens::Traversal,
         );
         for &m in members {
             tree.apply(NavAction::Attach {
@@ -484,8 +484,8 @@ mod tests {
     #[test]
     fn containment_topology_groups_members() {
         let mut tree = GraphTree::new(
-            crate::layout::LayoutMode::TreeStyleTabs,
-            crate::lens::ProjectionLens::Traversal,
+            crate::forme::layout::LayoutMode::TreeStyleTabs,
+            crate::forme::lens::ProjectionLens::Traversal,
         );
         for i in 1..=6u64 {
             tree.apply(NavAction::Attach {

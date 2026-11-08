@@ -10,7 +10,7 @@
 use super::model::{FormeWorkspace, NoPreferences, WorkspacePreferences};
 use crate::projection_geometry::TreeGeometry;
 use backstep::History;
-use forme::Arrangement;
+use incipit::forme::Arrangement;
 use kernel::graph::Graph;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, OnceLock};
@@ -779,7 +779,7 @@ mod tests {
     }
 
     fn member_identities(workspace: &FormeWorkspace) -> Vec<(Uuid, Uuid)> {
-        use forme::ArrangementNodeKind;
+        use incipit::forme::ArrangementNodeKind;
         workspace
             .document
             .arrangement

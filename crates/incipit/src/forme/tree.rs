@@ -4,12 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::MemberId;
-use crate::subgraph::{SubgraphId, SubgraphRef};
-use crate::layout::LayoutMode;
-use crate::lens::ProjectionLens;
-use crate::member::MemberEntry;
-use crate::topology::TreeTopology;
+use crate::forme::MemberId;
+use crate::forme::subgraph::{SubgraphId, SubgraphRef};
+use crate::forme::layout::LayoutMode;
+use crate::forme::lens::ProjectionLens;
+use crate::forme::member::MemberEntry;
+use crate::forme::topology::TreeTopology;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 
