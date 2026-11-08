@@ -1397,3 +1397,13 @@ revision and what crosses at frame rate.
   written as future; the Graphshell leaves that already live in its contract root; the P1 repin marked done; the
   `smolweb` repository name (`errand`); DOC_README's family table rows for Inker, Nematic, Fleece, Mesh, Intel
   and the persona picker. Contradictions that need a ruling were reported to Mark with evidence, not edited.
+
+- 2026-11-08: D30's retirement carried out (branch `p0/chrome-retire`, worktree
+  `worktrees/mere-chrome-retire`, not merged; `df0141622`). `frame_model`, `effects` and `host_intent`
+  are deleted (1,023 lines); chrome drops `hest` and `incipit`, and the lock only those two edges. The
+  audit of what remains is in the receipts: no module has two consumers; `routing` has one
+  (ux-events, `ToolSurfaceReturnTarget` alone, not `toolbar` as D30's evidence says); Turnstone's
+  `nav::History` is backstep's; `authorities`, `omnibar`, `suggest`, `toolbar` and the rest of `nav`
+  have none, Turnstone carrying its own omnibar and address normalising. `mere-chrome` 0.0.1 is not on
+  crates.io. Dispositions are pending Mark's ruling.
+

@@ -384,10 +384,16 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_
 [decisions."cycle-breaks D10"]
 title = ". The WIT world reaches Mere's hosts through `links` metadata, for now (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided."
+draws_on = ["cycle-breaks D9"]
 
 [decisions."cycle-breaks D11"]
 title = ". The extraction's structural choices stand (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere."
+draws_on = ["cycle-breaks D9"]
 
 [decisions."cycle-breaks D12"]
 title = ". Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06)"

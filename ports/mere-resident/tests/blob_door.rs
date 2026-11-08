@@ -31,6 +31,10 @@ use personae::{IdentityError, InMemoryProvider, RetainedKeys};
 #[cfg(not(windows))]
 struct SocketPath(std::path::PathBuf);
 
+/// Windows has no socket path to remove; the type exists so `socket()` has one shape.
+#[cfg(windows)]
+struct SocketPath;
+
 #[cfg(not(windows))]
 impl Drop for SocketPath {
     fn drop(&mut self) {

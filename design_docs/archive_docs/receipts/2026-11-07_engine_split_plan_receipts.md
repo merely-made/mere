@@ -741,3 +741,51 @@ policy that has no counterpart in the other three.
   --all-targets --offline`: green, 10m 07s. `cargo test -p graphshell --offline --lib --
   retained_content reading`: 19 passed, 1 ignored (needs a real wgpu adapter), 317 filtered,
   including `reading_controls_keep_held_accesses_and_search_independent`.
+
+## 2026-11-08: D30 lane, chrome's frame model retired and the rest audited
+
+Branch `p0/chrome-retire`, worktree `worktrees/mere-chrome-retire`, cut from main `a1a61df2f`.
+
+- Consumer check before deleting: `grep -rn --include=*.rs -E
+  '\b(FrameHostInput|FrameViewModel|FrameStep|HostEvent|DegradedReceiptSpec|HostIntent|host_intent|effects::)'
+  crates ports` outside chrome finds no code that names chrome's types. The hits are the kernel's
+  own `HostEvent` (`graph-kernel/src/host_event.rs`), winit-host's private `HostEvent`, a local
+  `effects` module in the kernel's legacy migration, and doc comments only: kernel `geometry.rs`,
+  `overlay.rs`, `graph/identity.rs`, `actions.rs`, `host_event.rs`, and ux-events
+  `ux_observability.rs`, `ux_probes/productive_selection.rs`. Those comments now name deleted types
+  and were left for the kernel's and ux-events' owners. Turnstone and Knot (read-only): no hit;
+  Knot does not depend on `mere-chrome`.
+- Deleted: `frame_model.rs` (483), `frame_model/settings.rs` (152), `frame_model/tests.rs` (167),
+  `effects.rs` (82), `host_intent.rs` (139), 1,023 lines; plus a five-line test comment in
+  `authorities.rs` pointing at `frame_model.rs`. The crate doc, README and manifest description
+  were rewritten for what remains. Commit `df0141622` totals: 24 insertions, 1,052 deletions.
+- Manifest: `hest` and `incipit` (with `arrangement`) removed, both used only by the retired
+  modules. The lock drops exactly those two edges from `mere-chrome`; nothing else moved.
+- `cargo check --offline -p mere-chrome -p ux-events -p graphshell`: green, 6m 23s (graphshell's
+  nine warnings are its own). `cargo test --offline -p mere-chrome -p ux-events`: 44 and 40 passed.
+
+### Audit of what remains (read-only; dispositions are a fork for Mark)
+
+Searched `mere/crates`, `mere/ports`, `turnstone/src`, `knot-editor`, `isocosm`, `cleromancy`,
+`woodshed`, `graphshell/crates` by module path (`chrome::<module>`) and by braced import
+(`chrome::{...}`), excluding `target/` and `.claude/worktrees`. Only two manifests depend on
+`mere-chrome`: ux-events and Turnstone. The braced hits (`cambium/src/workspace.rs`,
+`mesocosm-genet`, `tabard::theme::chrome`) are local modules named `chrome`, unrelated.
+
+| Module | Lines | Importers outside chrome | Own version elsewhere | Disposition under D10 |
+| --- | --- | --- | --- | --- |
+| `authorities` | 400 | none | none found | retire |
+| `omnibar` | 398 | none (only `suggest`, inside chrome) | Turnstone's omnibar (`observe/omnibar_view.rs`, `shell_services.rs` `OmnibarConfig`/`OmnibarScope`, `a11y/omnibar_rows.rs`); no omnibar in the Graphshell port | retire |
+| `suggest` | 326 | none | Turnstone's `observe/suggestion_line.rs` and its omnibar rows | retire |
+| `toolbar` | 215 | none | Pelt core's own load and history state (`ports/pelt/core`) | retire |
+| `routing` | 69 | ux-events, `command_surface_telemetry.rs:29` | none; built from kernel types (`GraphViewId`, `NodeKey`, `ToolPaneState`), and kernel `pane.rs:109` already documents it | move to ux-events (one consumer), or to the kernel beside the types it is made of |
+| `nav` | 259 | Turnstone, `chrome::nav::History` at four sites (`app/mod.rs:219`, `app/fixtures.rs:124`, `app_boot.rs:107`, `app_adopt_session.rs:386`) | `History` is `backstep::nav::History` re-exported; Turnstone has its own classifier (`ui/normalize_address.rs`) and uses `genet_documents::resolve_href` | `History`: Turnstone repoints to `backstep` (one consumer, already its home); `NavTarget`, `classify`, `resolve_href`: retire |
+
+- ux-events takes exactly one item: `chrome::routing::ToolSurfaceReturnTarget`. It takes nothing
+  from `toolbar`; D30's evidence line naming `toolbar` as a ux-events import does not match the tree.
+- No module has two consumers, so D10 keeps none. If the dispositions stand, chrome dissolves:
+  `routing` moves (69 lines), Turnstone swaps one dependency row and four paths for `backstep`, and
+  1,598 lines retire.
+- Freed: the package name `mere-chrome` (0.0.1 from the workspace version, no `publish` field,
+  not on crates.io: the API answers "crate `mere-chrome` does not exist") and the workspace row
+  `chrome = { package = "mere-chrome", ... }` in Mere's root manifest.
