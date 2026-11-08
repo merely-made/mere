@@ -1,0 +1,38 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
+# Ruled, documented repository back edges for scripts/check_family_cycles.py.
+# Plan: design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md
+#
+# [[edge]]     a directed repository pair (from names to) that the plan has ruled to
+#              break but has not yet. The check runs with these edges left out.
+# [[isolated]] a manifest root (repository/path) whose rows are left out of the
+#              family-wide graph because its own [workspace] keeps its lock free of the
+#              other repository.
+#
+# Each entry cites the decision that rules it. An entry on no cycle fails the check, so
+# delete an entry in the same commit that breaks its cycle. A cycle that remains with the
+# entries left out fails.
+
+# D1 (Mark, 2026-11-06): "Resident stops depending". Mere's resident is the down edge to
+# remove. Open until P2 (Knot, behind P2a) and P3 (Cleromancy).
+[[edge]]
+from = "mere"
+to = "knot-editor"
+decision = "D1"
+reason = "ports/mere-resident names knot-editor (peers, mere-overlay); Knot names Mere crates. Plan C1, P2."
+
+[[edge]]
+from = "mere"
+to = "cleromancy"
+decision = "D1"
+reason = "ports/mere-resident names cleromancy-core; Cleromancy names Mere crates. Plan C2, P3."
+
+# D17 (Mark, 2026-11-06): the one isolated Murm root.
+[[isolated]]
+root = "murm/apps/signalman-desktop"
+decision = "D17"
+reason = "its own [workspace] root, excluded from Murm's, so neither lock holds the other; the source homes map's pattern for keeping a lock free of Mere."

@@ -432,9 +432,8 @@ crates.
 contract").** `mere-chrome`'s frame model (`FrameHostInput`, `FrameViewModel`, now `FrameStep` with
 hest `Invocation`s out and `Outcome`s in, and `chrome::effects`) has no consumer: nothing in Mere,
 Graphshell or Turnstone constructs the view model or consumes the host input, and `GraphshellRuntime`
-exists only in doc comments. When P3 moves chrome into Graphshell's hosting layer, the lane either
-builds the runtime step that consumes the input and produces the step, or retires the types; D29's
-shape is the contract it builds to. Until then the types stay as the declared contract.
+exists only in doc comments. Superseded the same day by D30: the frame model retires and chrome is
+audited for dissolution; D29's shape is the rule for rootstock's embedding and any future runtime step.
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
@@ -821,6 +820,30 @@ revision and what crosses at frame rate.
   Stack 9 (chrome names the contract root's vocabulary rather than minting its own).
 
   Links: area The stack · draws on engine-split D27, engine-split D22 · plans engine-split P3 · summary chrome asks its host to enact an effect with a hest Invocation and reads a hest Outcome; the frame model carries no clipboard-specific type.
+
+- **D30. The frame model retires; chrome is audited for dissolution (Mark, 2026-11-08):** the D29
+  lane found that nothing in Mere, Graphshell or Turnstone constructs `FrameViewModel` or consumes
+  `FrameHostInput`. First ruled "Record it as a P3 drift line; keep the contract"; then, asked what
+  to do with the contract: "I'm alright with retirement but want to know if we would need the
+  contract and the runtime in the future. What was going to depend on it? Does something need to
+  become that shape?" The answer, from the tree: the pre-pivot desktop shell depended on it (the types
+  lived in `shell/desktop/ui/frame_model.rs` in April; meerkat's egui shell painted a view model each
+  frame and fed the host input back; they moved to graphshell-core on 2026-06-07, two days before the
+  2026-06-09 pivot to Cambium over Genet retired that shell, and no consumer followed). The shape is
+  live twice already, built where its consumer is: chirograph's projection sessions across a process
+  or wire, and cambium-rootstock's embedding (per-toolkit `Input` in, `OwnerInput` out, the clipboard
+  as request and completion) inside a foreign immediate-mode host. A future embedding takes
+  rootstock's shape, and D29's hest Invocation and Outcome apply there. By module path the only chrome
+  code any crate imports is `routing::ToolSurfaceReturnTarget` and `toolbar` (ux-events) and
+  `nav::History` (Turnstone; now backstep's); omnibar, suggest, authorities and host_intent (1,270
+  lines) have no importer and Turnstone carries its own omnibar view. "Retire the frame model now;
+  audit the rest of chrome for dissolution (Recommended)": `frame_model`, `effects` and `host_intent`
+  are deleted (git keeps them); a read-only audit confirms the other modules' consumers, after which
+  chrome dissolves under D10 (routing and toolbar to their users; the name freed). Outcome: refines
+  D29 (its shape is the rule for rootstock's embedding and any future runtime step, not for a kept
+  type) and replaces the P3 drift line above; applies D10.
+
+  Links: area The stack · draws on engine-split D29, engine-split D10 · plans engine-split P0 · summary The frame model retires with the shell that needed it; rootstock's embedding and chirograph are the living shapes; chrome is audited for dissolution.
 
 ## Open questions
 

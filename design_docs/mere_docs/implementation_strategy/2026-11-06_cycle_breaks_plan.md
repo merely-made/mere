@@ -66,6 +66,11 @@ that date (C1 to C6 below, plus the permanent isolated Genet/Murm entry) with th
 per entry; a synthetic two-repository fixture proves it fails on a new cycle and on a stale
 allowlist entry.
 
+**Built 2026-11-08** (see Progress and "The P0 result"); it is not yet wired into a gate (no
+gate script exists in Mere to carry it), and its allowlist holds only the ruled, still-open D1
+back edges and the D17 isolated root, because C3, C5 and C6 are already broken and the
+checker found cycles this plan did not list.
+
 ### P1. D1 seam design (before any code moves)
 
 **Partly superseded by D15 (2026-11-06):** the `Lane`, `LaneFactory`, `LaneContext` and `LaneGate`
@@ -761,8 +766,26 @@ Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the c
 
 ## Keeping cycles out: the check
 
-`scripts/check_family_cycles.py`, with tests beside it in the `test_cargo_mode.py` style.
-Illustrative design, not compile-ready code.
+`scripts/check_family_cycles.py`, with tests beside it in `scripts/test_check_family_cycles.py`
+(`test_cargo_mode.py` style). The text below is the original design; **as built (2026-11-08)** it
+differs in three ways, each because a lock cannot tell the kind of an edge:
+
+- The family-wide scope reads **manifests**, not locks: every `git = ".../merely-made/<repo>"` row
+  (dependencies, build-dependencies, dev-dependencies, target tables, and `workspace = true`
+  inheritance; an unused `[workspace.dependencies]` row is no edge) is an edge tagged normal, build or
+  dev, and optional rows count. Normal and build cycles fail; dev-only cycles fail too (D6), or warn
+  with `--dev-warn`. A repository dependency on itself is ignored.
+- The per-root scope still reads each `Cargo.lock` (one resolved graph, kind unknown). A cycle inside one
+  lock is a **warning** by default, because a stale pin of a donor (a lock still holding Distillery at a
+  revision that named Mere) shows as one; `--strict-locks` makes it fail.
+- The allowlist is `[[edge]]` (a directed pair `from -> to` that a decision rules to break, left out of the
+  graph, so what remains must be acyclic) and `[[isolated]]` (a manifest root left out of the family-wide
+  graph), each with `decision` and `reason`. An entry on no cycle fails.
+
+Run it: `python3 scripts/check_family_cycles.py` (checkouts beside Mere; each directory is named by its
+`origin`, so worktree names do not matter), `--family-dir DIR`, or `--remote` (shallow-clones every
+`merely-made` repository; about 80 s). It needs `tomllib` (Python 3.11) and falls back to `tomli` or
+pip's vendored copy, which is what runs on this Mac's system Python 3.9. The original design follows.
 
 - **Input.** Every lock root of every family repository. Family repositories are the clones
   named by `--family-dir` (default: sibling directories of the Mere checkout; in CI, shallow
@@ -792,6 +815,44 @@ Illustrative design, not compile-ready code.
   optional edge; an isolated root that must stay out of the union via the allowlist; a stale
   allowlist entry; `www.github.com` and `.git` spellings of one repository; a dev-only edge
   (F2 settles its rule).
+
+### The P0 result, 2026-11-08
+
+Run with `--remote` against the `main` of all 35 `merely-made` repositories (Mere `a2c41e933`,
+Murm `df3e29399`, Graphshell `d80316db1`, Genet `fe7523697`, Eidetic `71188bb66`, Distillery
+`94e4fb2d2`, Dramatis `772cce491`, Inker `174ae7b14`, Knot `afac0818f`, Cleromancy `164b4f0d2`,
+Seiche `4109f0b01`, Gemot `9a5c7d405`; the full list is in the check's first line of output), 1,211
+cross-repository manifest edges, 91 lock roots. Exit 1.
+
+- **Broken as the plan says:** C3 Mere↔Woodshed (Woodshed names Mere only as dependent; no Mere row names
+  Woodshed), C4 Mere↔Murm (Murm names Mere only in `apps/signalman-desktop`, the D17 isolated root), C5
+  Gemot↔Murm (no Murm row names Gemot) and C6 Eidetic↔Distillery (no Eidetic row names ESP or Distillery).
+  Nothing listed for them, as P0 and the done-conditions require.
+- **Allowlisted, ruled, still open:** `mere -> knot-editor` and `mere -> cleromancy` (D1, P2 and P3), and
+  the isolated root `murm/apps/signalman-desktop` (D17).
+- **Not in the plan's C1 to C6 and not ruled (the check fails on them):**
+  1. **Dramatis↔Mere.** `dramatis/apps/dramatis/Cargo.toml:55-58` takes Mere's `cambium`,
+     `cambium-desktop` and `mandrake` (its own lock root, `dramatis/apps/dramatis/Cargo.lock`, resolved
+     cycle `dramatis, mere`); Mere names Dramatis in about 50 normal rows (`castellan-client`, `insigne`, `personae`,
+     `dramatis-resident`, `notochord`, `identity`).
+  2. **Inker↔Mere.** `inker/crates/fleece/Cargo.toml:37` (optional `linked-data`, which is Mere's
+     `crates/graph/linked-data`) against about 30 normal Mere rows naming Inker (`inker`, `fleece`, `illume`,
+     `mere-lanes`, ...). Resolved inside `inker/Cargo.lock` (`mere-fleece -> mere-rdf -> inker`).
+  3. **Genet/Murm/Eidetic/Dramatis ring.** Cutting the two rows above and the D1 edges leaves one
+     component: `genet -> murm` (`genet/components/genet-webrtc` `murm-rtc` and the optional
+     `components/netfetcher` `murm-wire`, "independent wire leaf"), `murm -> eidetic` and `murm -> dramatis`
+     (`murm/native/crates/holder`, `murm/crates/station-custody`), `eidetic -> genet`
+     (`eidetic-search`'s `genet-text`), `eidetic -> dramatis` (`identity`, `insigne`) and `dramatis -> genet`
+     (the Dramatis app's `taproot`). Removing any one of `genet -> murm`, `eidetic -> genet` or both `murm`
+     rows clears it. This is the Genet/Murm pair the plan treated as isolated: the isolation holds only for
+     `signalman-desktop`.
+  4. **Dev-only, D6:** `dramatis -> eidetic` (`dramatis/apps/dramatis` dev `luggage`), which closes against
+     Eidetic's normal rows to Dramatis.
+- **Resolved-lock warnings (stale pins, not ruled):** `cleromancy`, `mere`, `turnstone` (a Distillery
+  revision that named Mere, and the loops above), `inker`, `dramatis/apps/dramatis` and seven more roots
+  (twelve in all) holding `dramatis` and `eidetic` together. Re-run with `--strict-locks` after the family's relock loop.
+- The plan's "Findings" cycle list C1 to C6 predates the Dramatis, Inker and Genet rows; whether these
+  are new rows or were missed is not known (the cycle map's raw edges are not committed).
 
 ## Progress
 
@@ -955,3 +1016,9 @@ Illustrative design, not compile-ready code.
   no longer carries the unused `netrender-vello-shaders` patch (the graph takes shaders at the rev
   `netrender-vello-encoding` names), and its lock lost the matching `patch.unused` entry. Each touched root passes
   `metadata --locked` twice with no diff and `check --locked`. Distillery `94e4fb2`; Mere `b27e07466`, merged to main as `25b19570e`. Woodshed needed no change (the guest paints labels in ink; its conformance test builds `SheetTheme` literals, which this change leaves as they were).
+- 2026-11-08: P0 built. `scripts/check_family_cycles.py`, `scripts/test_check_family_cycles.py` (15 tests on synthetic
+  repositories: clean, two- and three-repository cycles, optional, build, dev (D6 and `--dev-warn`), target tables,
+  workspace inheritance, spelling variants, skipped fixture directories, allowed and stale edge entries, an isolated root,
+  a resolved-lock cycle) and `support/family-cycles/allowed.toml` (D1 `mere -> knot-editor`, `mere -> cleromancy`; D17
+  isolated `murm/apps/signalman-desktop`). The result on the real family is under "The P0 result": three cycle groups this
+  plan did not list, which the check reports and does not allowlist. Not wired into a gate yet.
