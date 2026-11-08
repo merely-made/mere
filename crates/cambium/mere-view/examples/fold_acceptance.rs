@@ -106,7 +106,7 @@ impl App {
         let truth = truth(&canvas);
         let fresh_process = if let Some(path) = std::env::var_os("FOLD_ACCEPTANCE_RESTORE") {
             let saved = std::fs::read(path).unwrap();
-            let records: Vec<curation::FoldRecord> = serde_json::from_slice(&saved).unwrap();
+            let records: Vec<incipit::curation::FoldRecord> = serde_json::from_slice(&saved).unwrap();
             assert!(canvas.restore_folds(records.clone()).is_empty());
             assert_eq!(canvas.fold_records(), records);
             true
@@ -182,7 +182,7 @@ impl App {
                 if let Some(path) = std::env::var_os("FOLD_ACCEPTANCE_STATE") {
                     std::fs::write(path, &json).unwrap();
                 }
-                let records: Vec<curation::FoldRecord> = serde_json::from_slice(&json).unwrap();
+                let records: Vec<incipit::curation::FoldRecord> = serde_json::from_slice(&json).unwrap();
                 assert!(self.canvas.restore_folds([]).is_empty());
                 assert!(self.canvas.restore_folds(records).is_empty());
                 self.reopened = true;

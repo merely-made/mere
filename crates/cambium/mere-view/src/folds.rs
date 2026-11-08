@@ -7,11 +7,11 @@
 //! Fold the final catalog projection, retaining the full source layout.
 use crate::{MereNodeKind, NodeState};
 use cambium::{GraphCanvasNode, GraphCanvasSwatch};
-use curation::{FoldRecord, FoldStandIn};
+use incipit::curation::{FoldRecord, FoldStandIn};
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 /// Synthetic target identity. Source/catalog keys must never use this key.
-pub fn fold_node_key(id: &curation::FoldId) -> String {
+pub fn fold_node_key(id: &incipit::curation::FoldId) -> String {
     format!("curation:fold:{}", id.as_str())
 }
 
@@ -142,7 +142,7 @@ pub(super) fn project(
 mod tests {
     use super::*;
     use cambium::{GraphCanvasRelation, GraphCanvasSubgraph};
-    use curation::FoldId;
+    use incipit::curation::FoldId;
     fn fixture() -> GraphCanvasSwatch<String, MereNodeKind> {
         let nodes = ["a", "b", "c", "d"]
             .into_iter()

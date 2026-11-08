@@ -122,9 +122,9 @@ resource references by UUIDv5; the graph and session ids stay reachable behind a
 default feature so Cleromancy and Fleece keep depending on ids alone),
 the `mere` facade's navigation, trail and roster logic (its visual and workbench APIs to the
 view and composition crates; no new facade), `mere-cartography`, `pictograph`, `mere-forme`,
-`mere-curation`, `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
+`mere-curation` (merged into `incipit`, P0 done), `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
 `cambium-rootstock`, `cambium-winit`, `cambium-a11y`, `cambium-desktop`, `cambium-web`,
-`workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker`,
+`workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
 `mere-view`, `mere-overmap`), `tabard`, `mere-chrome`, `mere-registry` (examined feature by
 feature in P0; a registry may carry several owners' contracts but makes none of their
 decisions), `mere-surface-api`, `settings-wit`, `ux-events`, `mere-fetch` (the host's fetch
@@ -622,7 +622,8 @@ revision and what crosses at frame rate.
 - **D14. Retire the five dead registries now (Mark, 2026-11-07):** audit fork F17, 3,876 lines
   with no consumer in six repositories: "Retire now (Recommended)". `input`, `knowledge`,
   `layout`, `lens` and `protocol` are deleted; git keeps them; `mod-loader`, `observations` and
-  `diagnostics` move to their owners and `mere-registry` is freed. Outcome: applies D10.
+  `diagnostics` move to their owners and `mere-registry` is freed. Outcome: applies D10. Refined by D26: the crate keeps its name as
+  the diagnostics and observations library.
 
   Links: area The stack · draws on engine-split D10 · plans engine-split P3 · summary The five never-enabled registries are deleted; the three live ones move to their owners; mere-registry is freed.
 
@@ -738,6 +739,23 @@ revision and what crosses at frame rate.
   from both. Outcome: applies DOC_POLICY §4 (docs live with the owner of the subject).
 
   Links: area The stack · draws on engine-split D5 · plans engine-split P2 · summary Seiche's first design area holds the conatus engine plan and its two briefs; the dynamics grammar and physics catalog plans stay in Mere.
+
+- **D26. Diagnostics stays a library; mere-registry keeps its name as that library (Mark,
+  2026-11-08):** D14 met a cycle in the lane: `mod_loader` (2,385 lines) calls `diagnostics`'
+  `emit_event`, `DiagnosticEvent` and eight `CHANNEL_MOD_*` constants, Turnstone names
+  `mere-registry` for `diagnostics` alone, and `diagnostics` is 4,346 lines with its
+  subdirectories, not the 956 the audit counted. Moving it to the resident would make
+  `document-host` and Turnstone depend on a port. Offered a module of `document-host` or a small
+  crate under the freed name: "either 1 or 2 are ok with me, whatever makes life easier". The
+  easier is the crate: `mere-registry` stays, trimmed to `diagnostics` and `observations`; the five
+  dead registries are deleted; `mod_loader` moves to `document-host`; no consumer row changes.
+  Outcome: refines D14 (the name is not freed; the retirement of the five and the loader's move
+  stand). The same round confirmed two lane choices under D10: `incipit` 0.2.2 rather than 0.3.0
+  (Distillery needs `^0.2`) and `persona_picker` behind an optional `cambium` feature (its
+  dependencies add about 160 identity and crypto crates to a crate 23 manifests depend on):
+  "Both stand".
+
+  Links: area The stack · draws on engine-split D10, engine-split D14 · plans engine-split P0 · summary mere-registry stays as the diagnostics and observations library; the five dead registries go and mod_loader moves to document-host; incipit bumps compatibly and persona_picker is a cambium feature.
 
 ## Open questions
 
@@ -1161,3 +1179,18 @@ revision and what crosses at frame rate.
   Murm's signalman-desktop and mer3ly `seiche` rows, Woodshed's `tinct` rows (then Turnstone's tinct
   redirect leaves). Rust compiles hit out-of-memory three times while other sessions built; the
   machine is at its limit with every session running.
+- 2026-11-07: P0 squish lane (branch `p0/squish`, worktree `worktrees/mere-p0-squish`, not merged).
+  `mere-curation` merged into `incipit` as `incipit::curation` (585 lines and their tests moved, the
+  crate's manifest deleted; five consumers repathed, pictograph by import paths only). incipit went to
+  0.2.2, not 0.3.0: the external distillery repo takes incipit `^0.2` through the crates-io patch, and
+  0.3.0 put a second incipit in the lock. `persona-picker` merged into `cambium` as
+  `cambium::persona_picker` (256 lines and tests moved) behind a new optional `persona-picker` feature,
+  so cambium's other consumers do not build the personae identity stack (about 160 crates); no cycle,
+  since neither dramatis nor personae reaches cambium. Names freed: `mere-curation` (on crates.io only
+  once its 0.1.1 publish is yanked or left) and `persona-picker`. D14 is held at a fork: `mod_loader`
+  emits through `diagnostics` (`emit_event`, `DiagnosticEvent`, eight `CHANNEL_MOD_*` constants; its
+  tests use `diagnostic_channel`, `scoped_thread_sender`, `IngressLimits`), diagnostics is 4,346 lines
+  and not 956, and Turnstone names `mere-registry` with only the `diagnostics` feature, so moving
+  diagnostics into the resident would make document-host and Turnstone depend on a port.
+  `mere-registry` is not yet freed. Before the branch reaches main: Knot, Turnstone and Woodshed name
+  `mere-curation`, and Woodshed and Dramatis name `persona-picker`, from `mere.git` main.

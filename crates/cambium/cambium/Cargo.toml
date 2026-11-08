@@ -11,6 +11,8 @@ publish = true
 
 [features]
 highlight = ["dep:illume", "dep:tinct"]
+# The shared "which persona am I?" list over a personae roster.
+persona-picker = ["dep:dramatis", "dep:identity"]
 
 [dependencies]
 tracing = { workspace = true }
@@ -42,6 +44,9 @@ layout_dom_api = { workspace = true }
 genet-text = { workspace = true }
 illume = { workspace = true, optional = true }
 tinct = { workspace = true, optional = true }
+# The roster's plain types, which an application reads from djinn (DR-C).
+dramatis = { workspace = true, optional = true }
+identity = { workspace = true, optional = true }
 
 [lints]
 workspace = true

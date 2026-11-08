@@ -15,15 +15,13 @@ members = [
     "crates/system/tabard",
     "crates/distillery/alembic",
     "crates/system/ux-events",
-    "crates/forme/curation",
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/personal-facts",
     "crates/platen/platen",
     # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
     # left for their own repository on 2026-10-09 (dramatis repo plan, DR-D);
-    # the shared persona picker belongs to the Cambium widget family.
-    "crates/cambium/persona-picker",
+    # the shared persona picker is a module of cambium (engine split D10).
     "crates/script/document-host",
     "crates/script/app-host",
     "crates/script/block-host",
@@ -275,7 +273,7 @@ mere = { path = "crates/mere" }
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
 page-load = { package = "mere-pageload", version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 proofs = { package = "mere-proofs", version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
-incipit = { version = "0.2.1", path = "crates/incipit" }
+incipit = { version = "0.2.2", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
 comms = { package = "mere-comms", version = "0.0.1", git = "https://github.com/merely-made/murm.git", branch = "main" }
 pandect = { version = "0.2.0", path = "crates/system/pandect" }
@@ -424,7 +422,6 @@ paint_list_render = { version = "=0.1.2", git = "https://github.com/merely-made/
 # Published as `mere-forme`: the crates.io name `forme` is owned by someone else
 # (an HTML template engine). The `package =` alias keeps every `use forme::...`
 # in the tree working, so this rename is one line, not a sweep.
-curation = { package = "mere-curation", version = "0.1.1", path = "crates/forme/curation" }
 forme = { package = "mere-forme", version = "0.2.0", path = "crates/forme/forme" }
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
@@ -505,9 +502,6 @@ insigne = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.gi
 chatelaine = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The custody route's application side (Armillary's djinn-slimming S3).
 castellan-client = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", branch = "main", default-features = false }
-# The shared "which persona am I?" list. A Cambium view over the personae
-# roster, so the four applications with a GUI draw one picker rather than four.
-persona-picker = { package = "persona-picker", path = "crates/cambium/persona-picker" }
 
 # Rhai backend for the knot block-evaluator lane (the thin BlockEvaluator
 # slice, distinct from genet's full ScriptEngine seam). Pure Rust, sandboxed.
@@ -659,7 +653,6 @@ luggage = { git = "https://github.com/merely-made/eidetic.git", branch = "main" 
 mere = { path = "crates/mere" }
 mere-alembic = { path = "crates/distillery/alembic" }
 mere-cartography = { path = "crates/canvas/cartography" }
-mere-curation = { path = "crates/forme/curation" }
 mere-forme = { path = "crates/forme/forme" }
 mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-overmap = { path = "crates/cambium/mere-overmap" }

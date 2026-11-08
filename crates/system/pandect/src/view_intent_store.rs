@@ -33,7 +33,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use curation::FoldRecord;
+use incipit::curation::FoldRecord;
 use sceno::LinkKey;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -395,7 +395,7 @@ mod tests {
         let mut intent = ViewIntent::new();
         intent.folds.push(
             FoldRecord::selection(
-                curation::FoldId::new(Uuid::from_u128(1).to_string()),
+                incipit::curation::FoldId::new(Uuid::from_u128(1).to_string()),
                 "session:alpha/graph:current",
                 [Uuid::from_u128(7), Uuid::from_u128(3)].map(|id| id.to_string()),
             )
@@ -431,12 +431,12 @@ mod tests {
         .unwrap();
         let restored = load_view_intent(&dir, &frame, 3).unwrap().unwrap();
         let migrated = &restored.folds[0];
-        assert_eq!(migrated.version, curation::FOLD_RECORD_VERSION);
+        assert_eq!(migrated.version, incipit::curation::FOLD_RECORD_VERSION);
         assert_eq!(migrated.id.as_str(), fold.to_string());
         assert_eq!(migrated.members, vec![a.to_string(), b.to_string()]);
         assert_eq!(
             migrated.stand_in,
-            curation::FoldStandIn::Summary { label: None }
+            incipit::curation::FoldStandIn::Summary { label: None }
         );
         assert_eq!((&migrated.rule, &migrated.label), (&None, &None));
         save_view_intent(&dir, &frame, 3, &restored).unwrap();

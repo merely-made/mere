@@ -21,6 +21,9 @@
 //! vocabulary with the pane model. The panes are now [`frisket`]; the ids are
 //! here.
 //!
+//! [`curation`] holds what a view chooses to show of a graph: subgraph
+//! specifications and folds.
+//!
 //! [`frisket`]: https://docs.rs/frisket
 
 #![doc(html_root_url = "https://docs.rs/incipit/0.0.1")]
@@ -28,6 +31,8 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+
+pub mod curation;
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

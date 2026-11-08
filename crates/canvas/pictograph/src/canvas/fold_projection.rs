@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Root-canvas projection of one view-local [`curation::FoldRecord`].
+//! Root-canvas projection of one view-local [`incipit::curation::FoldRecord`].
 //!
 //! [`project_fold`] is the native check (mer3ly site plan, Ruling 166): a
 //! record projects only when it is current and every member resolves against
@@ -16,7 +16,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
-use curation::{FoldDirection, FoldId, FoldRecord, FoldStandIn};
+use incipit::curation::{FoldDirection, FoldId, FoldRecord, FoldStandIn};
 use kernel::geometry::PortablePoint;
 use kernel::graph::{EdgeFamily, Graph, NodeKey};
 

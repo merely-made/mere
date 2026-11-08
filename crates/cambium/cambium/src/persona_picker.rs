@@ -17,6 +17,10 @@
 //! (keyboard navigation, selection, dismissal) already. This crate is the
 //! view-model: roster in, rows out, chosen persona back.
 //!
+//! Behind the `persona-picker` feature, so Cambium's other consumers do not
+//! build the personae identity stack. It was the `persona-picker` crate until
+//! 2026-11-07 (engine split D10).
+//!
 //! The shape an application takes, illustrative rather than compile-ready:
 //!
 //! ```text
@@ -28,7 +32,7 @@
 
 #![warn(missing_docs)]
 
-use cambium::{
+use crate::{
     Action, CommandEvent, CommandItem, CommandState, GenetCtx, GenetElement, View, command_picker,
     map_action, request_focus,
 };
@@ -138,7 +142,7 @@ pub fn persona_picker(
 ///
 /// The request fires once, when the view first appears; holding it does not
 /// steal the caret back on later rebuilds (see
-/// [`request_focus`](cambium::request_focus)). A picker raised over a working
+/// [`request_focus`](crate::request_focus)). A picker raised over a working
 /// screen usually wants [`persona_picker`] instead, so that focus stays where
 /// the user put it.
 pub fn persona_picker_focused(

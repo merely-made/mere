@@ -62,6 +62,8 @@ mod graph_canvas;
 mod grid;
 #[cfg(feature = "highlight")]
 mod highlight;
+#[cfg(feature = "persona-picker")]
+pub mod persona_picker;
 mod hover;
 mod key;
 mod keyed;

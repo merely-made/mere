@@ -14,7 +14,7 @@
 //! scene with a space per cell. Only the view is portable here; editing
 //! inside a swatch waits for an interaction intent (SE65).
 
-use curation::SubgraphSpec;
+use incipit::curation::SubgraphSpec;
 use serde::{Deserialize, Serialize};
 
 use crate::{ValidationIssue, link::LinkKey};
@@ -193,7 +193,7 @@ impl Facet {
 
 #[cfg(test)]
 mod tests {
-    use curation::SubgraphKind;
+    use incipit::curation::SubgraphKind;
 
     use super::*;
 

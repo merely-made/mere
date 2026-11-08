@@ -181,7 +181,7 @@ fn visible_fit_frames_every_summary_without_hidden_extents() {
 
 #[test]
 fn member_stand_ins_remain_visible_and_selectable_for_framing() {
-    use curation::{FoldId, FoldRecord, FoldStandIn};
+    use incipit::curation::{FoldId, FoldRecord, FoldStandIn};
     let (mut canvas, keys) = placed(&[(-200.0, 0.0), (-9000.0, 0.0), (200.0, 0.0), (9000.0, 0.0)]);
     let records = keys
         .chunks(2)
