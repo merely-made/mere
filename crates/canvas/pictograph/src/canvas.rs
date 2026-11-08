@@ -304,6 +304,9 @@ pub const SIZE_TIERS: [f32; 5] = [24.0, 36.0, 56.0, 84.0, 120.0];
 /// Per-tick timestep handed to the seiche simulation: seiche's own constant,
 /// re-exported so `crate::canvas::TICK_DT` keeps resolving canvas-wide.
 pub use seiche::TICK_DT;
+/// The byte transport a canvas whose physics runs in a Web Worker is given
+/// ([`Canvas::with_graph_remote`]).
+pub use seiche::Transport as PhysicsTransport;
 /// Minimum structural-Jaccard similarity for a pair to enter the affinity force. Prunes the
 /// long tail of weakly-similar pairs so the force list stays lean and only meaningful clusters
 /// pull. (Graph signals — P4.)

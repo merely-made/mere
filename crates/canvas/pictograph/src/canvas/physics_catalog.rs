@@ -360,11 +360,19 @@ impl Canvas {
         }
         if self.roles.encoded == seiche::Axes::BOTH {
             // F28: two directly encoded axes admit contact separation only.
-            self.physics
-                .set_forces(vec![Box::new(seiche::NodeExclusion {
-                    cutoff: 2.0 * seiche::NODE_BODY_RADIUS,
+            let cutoff = 2.0 * seiche::NODE_BODY_RADIUS;
+            if self.physics.runs_inline() {
+                self.physics.set_forces(vec![Box::new(seiche::NodeExclusion {
+                    cutoff,
                     ..Default::default()
                 })]);
+            } else {
+                self.physics
+                    .set_force_set(seiche::ForceSetDescriptor {
+                        contact_cutoff: Some(cutoff),
+                        ..crate::canvas::seiche_bridge::springs_descriptor()
+                    });
+            }
             return;
         }
         let wants_clusters = self.physics_reads(PhysicsKindSource::Cluster);
@@ -408,7 +416,15 @@ impl Canvas {
                 let forces = self.composed_forces(&inputs, sources);
                 self.physics.set_forces(forces);
             } else {
-                let descriptor = inputs.describe(
+                // The view key names the node and edge lists, so a backend
+                // that keeps the physics channels keeps them across law changes.
+                let revision = {
+                    use std::hash::{Hash, Hasher};
+                    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+                    self.physics_view_key().hash(&mut hasher);
+                    hasher.finish()
+                };
+                let descriptor = inputs.with_revision(Some(revision)).describe(
                     self.physics_law,
                     self.physics_composition.as_ref(),
                     &self.physics_overlays,

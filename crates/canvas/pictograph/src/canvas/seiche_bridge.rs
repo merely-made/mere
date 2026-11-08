@@ -215,6 +215,50 @@ pub(crate) fn build_simulation(graph: &Graph) -> Simulation {
     sim
 }
 
+/// The law slot `build_simulation` fills (exclusion, edge springs and a centring
+/// boundary: the Springs law, bare) as a descriptor, for a backend that is sent
+/// data and not boxed forces.
+pub(crate) fn springs_descriptor() -> seiche::ForceSetDescriptor {
+    seiche::ForceSetDescriptor {
+        law: seiche::PhysicsLaw::Springs,
+        composition: None,
+        overlays: Vec::new(),
+        sources: seiche::catalog::LawSources::bare(),
+        inputs: seiche::LawInputsData::default(),
+        contact_cutoff: None,
+    }
+}
+
+/// The remote counterpart of [`build_simulation`]: a backend over `transport`
+/// that is sent, as data, what `build_simulation` builds in process (the
+/// bodies, the topology, the Springs law, the couplings, the spiral seed and
+/// the opening settle), and the layout view the canvas draws until the far
+/// side answers: the seed, with the topology. No simulation is built here.
+pub(crate) fn remote_physics(
+    graph: &Graph,
+    transport: Box<dyn seiche::Transport>,
+    settle: u32,
+) -> (seiche::Physics, seiche::LayoutView) {
+    let mut physics = seiche::Physics::remote(transport);
+    physics.sync_nodes(graph.nodes().map(|(key, _node)| (key, Point2D::zero())).collect());
+    let topology = visible_relation_topology(graph, &HashSet::new()).edge_topology();
+    physics.sync_edge_topology(topology.clone());
+    physics.set_force_set(springs_descriptor());
+    physics.set_coupling_forces(
+        graph
+            .couplings()
+            .filter_map(|c| coupling_force_from_graph(c, graph))
+            .collect(),
+    );
+    let seeds = seed_cluster(graph);
+    physics.seed(seeds.clone());
+    physics.settle(settle);
+    let mut view =
+        seiche::LayoutView::from_parts(seeds, std::iter::empty(), seiche::NODE_BODY_RADIUS);
+    view.set_edge_topology(topology);
+    (physics, view)
+}
+
 /// Reconcile a simulation's bodies to a kernel [`Graph`]'s nodes — the canvas-side
 /// bridge now that seiche is kernel-free. seiche's [`Simulation::sync_nodes`] takes
 /// a `(NodeKey, position)` list; positions are no longer graph truth (S2), so new

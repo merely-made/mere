@@ -29,7 +29,20 @@ impl Canvas {
     /// seeding without the sim re-scrambling first. Positions are no longer graph
     /// truth (S2), so they no longer ride the graph snapshot. (Persistence host seam, S3.)
     pub fn with_graph(graph: Graph) -> Self {
-        let mut canvas = Self::from_graph(graph);
+        Self::with_graph_on(graph, None)
+    }
+
+    /// [`with_graph`](Canvas::with_graph) with the simulation on the far side of
+    /// `transport` (a Web Worker) and no engine built here: every physics call
+    /// the canvas makes becomes a data command, and the layout comes back as
+    /// updates, folded when the host advances a frame. Until the far side is
+    /// ready the canvas draws its seed and the commands queue in order.
+    pub fn with_graph_remote(graph: Graph, transport: Box<dyn seiche::Transport>) -> Self {
+        Self::with_graph_on(graph, Some(transport))
+    }
+
+    fn with_graph_on(graph: Graph, transport: Option<Box<dyn seiche::Transport>>) -> Self {
+        let mut canvas = Self::from_graph_on(graph, transport);
         let positions: Vec<(NodeKey, Point2D<f32>)> = canvas
             .graph
             .nodes()
@@ -166,9 +179,22 @@ impl Canvas {
     /// [`with_sample_graph`](Canvas::with_sample_graph), and
     /// [`with_graph`](Canvas::with_graph).
     pub(crate) fn from_graph(graph: Graph) -> Self {
-        let sim = build_simulation(&graph);
-        let view = sim.view();
-        let physics = Physics::inline(sim, SETTLE_TICKS);
+        Self::from_graph_on(graph, None)
+    }
+
+    /// [`from_graph`](Canvas::from_graph) on the backend `transport` names: in
+    /// process when `None`.
+    fn from_graph_on(graph: Graph, transport: Option<Box<dyn seiche::Transport>>) -> Self {
+        let (physics, view) = match transport {
+            None => {
+                let sim = build_simulation(&graph);
+                let view = sim.view();
+                (Physics::inline(sim, SETTLE_TICKS), view)
+            },
+            Some(transport) => {
+                crate::canvas::seiche_bridge::remote_physics(&graph, transport, SETTLE_TICKS)
+            },
+        };
         let (node_dom, gnode_of, stage_node) = build_pool_dom(&graph);
         let node_document = genet_livery::LiveryDocument::new(
             node_dom,

@@ -334,3 +334,106 @@ fn an_offloaded_canvas_sends_the_law_as_data_and_settles_where_the_inline_one_do
         assert_eq!(offloaded_law_run(law, true, 40), inline, "{}", law.id());
     }
 }
+
+/// The same law on a canvas whose simulation runs on the far side of a
+/// transport (a Worker in process): the canvas sends every physics call as a
+/// data command, and settles a `ticks`-tick run to the same bits.
+fn remote_law_run(law: PhysicsLaw, ticks: u32) -> Vec<(usize, u32, u32)> {
+    let hub = super::loopback::Loopback::new();
+    let mut canvas = Canvas::with_graph_remote(chorded(30), hub.transport());
+    assert!(!canvas.physics.runs_inline());
+    canvas.set_layout_strategy(None);
+    canvas.resize(W, H);
+    let mut keys: Vec<NodeKey> = canvas.graph().nodes().map(|(k, _)| k).collect();
+    keys.sort_by_key(|k| k.index());
+    canvas.physics.seed(
+        keys.iter()
+            .enumerate()
+            .map(|(i, &k)| {
+                let a = i as f32 * 2.399_963;
+                let r = 40.0 * (i as f32 + 0.5).sqrt();
+                (k, Point2D::new(r * a.cos(), r * a.sin()))
+            })
+            .collect(),
+    );
+    canvas.pick_law(law).unwrap();
+    canvas.physics.halt();
+    canvas.physics.settle(ticks);
+    for _ in 0..100 * ticks {
+        hub.pump();
+        canvas.physics.advance_frame(&mut canvas.view);
+        if canvas.physics_pace().ticks >= u64::from(ticks) {
+            break;
+        }
+    }
+    assert_eq!(canvas.physics_pace().ticks, u64::from(ticks), "{} never ran", law.id());
+    canvas.physics.refresh(&mut canvas.view);
+    bits(&canvas)
+}
+
+#[test]
+fn a_remote_canvas_settles_where_the_inline_one_does() {
+    // Every law in the catalog, not only the four the offloaded test samples.
+    for law in PhysicsLaw::ALL {
+        let inline = offloaded_law_run(law, false, 40);
+        assert_eq!(remote_law_run(law, 40), inline, "{}", law.id());
+    }
+}
+
+/// FNV-1a over the bits of every position in key order: the settle fingerprint.
+fn fingerprint(bits: &[(usize, u32, u32)]) -> u64 {
+    let mut hash = 0xcbf2_9ce4_8422_2325u64;
+    for &(key, x, y) in bits {
+        for word in [key as u32, x, y] {
+            for byte in word.to_le_bytes() {
+                hash = (hash ^ u64::from(byte)).wrapping_mul(0x0100_0000_01b3);
+            }
+        }
+    }
+    hash
+}
+
+/// A 600-tick Springs settle of 8, 60 and 200 nodes lands on one fingerprint
+/// inline and over the transport. (The values are printed so a browser run can
+/// be compared with them.)
+#[test]
+fn the_settle_fingerprints_at_8_60_and_200_nodes_agree_inline_and_remote() {
+    for nodes in [8usize, 60, 200] {
+        let run = |remote: bool| {
+            let hub = super::loopback::Loopback::new();
+            let mut canvas = if remote {
+                Canvas::with_graph_remote(chorded(nodes), hub.transport())
+            } else {
+                Canvas::with_graph(chorded(nodes))
+            };
+            canvas.set_layout_strategy(None);
+            canvas.resize(W, H);
+            let mut keys: Vec<NodeKey> = canvas.graph().nodes().map(|(k, _)| k).collect();
+            keys.sort_by_key(|k| k.index());
+            canvas.physics.seed(
+                keys.iter()
+                    .enumerate()
+                    .map(|(i, &k)| {
+                        let a = i as f32 * 2.399_963;
+                        let r = 40.0 * (i as f32 + 0.5).sqrt();
+                        (k, Point2D::new(r * a.cos(), r * a.sin()))
+                    })
+                    .collect(),
+            );
+            canvas.pick_law(PhysicsLaw::Springs).unwrap();
+            canvas.physics.halt();
+            canvas.physics.settle(600);
+            for _ in 0..100_000 {
+                hub.pump();
+                if !canvas.physics.advance_frame(&mut canvas.view) {
+                    break;
+                }
+            }
+            canvas.physics.refresh(&mut canvas.view);
+            fingerprint(&bits(&canvas))
+        };
+        let inline = run(false);
+        println!("settle fingerprint {nodes} nodes: {inline:016x}");
+        assert_eq!(run(true), inline, "{nodes} nodes");
+    }
+}
