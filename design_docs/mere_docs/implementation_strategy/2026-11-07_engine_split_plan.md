@@ -1273,9 +1273,6 @@ revision and what crosses at frame rate.
   Both locks change only by the removal and incipit's new edges. Name freed: `mere-forme` (on
   crates.io only once its 0.2.0 publish, `publish = true` in its manifest, is yanked or left).
 
-||||||| e29f1f226
-
-
 
 - 2026-11-08: D27 carried out (branch `p0/backstep`, worktree `worktrees/mere-backstep`, not merged).
   `backstep` 0.2.0 (0.1.0 is the published version; this one is not), still dependency-free, now
