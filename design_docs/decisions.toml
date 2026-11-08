@@ -665,6 +665,10 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 title = ". The frame model retires; chrome is audited for dissolution (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 
+[decisions."engine-split D31"]
+title = ". chrome dissolves (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

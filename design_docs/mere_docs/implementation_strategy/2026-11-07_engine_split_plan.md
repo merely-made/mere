@@ -849,6 +849,19 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D29, engine-split D10 · plans engine-split P0 · summary The frame model retires with the shell that needed it; rootstock's embedding and chirograph are the living shapes; chrome is audited for dissolution.
 
+- **D31. chrome dissolves (Mark, 2026-11-08):** the D30 audit (receipt file, 2026-11-08) found no
+  chrome module with two consumers: `authorities` (400 lines), `omnibar` (398), `suggest` (326) and
+  `toolbar` (215) have no importer and Turnstone and Pelt carry their own; `routing` (69) serves one
+  type, `ToolSurfaceReturnTarget`, to ux-events alone; `nav` (259) serves Turnstone four uses of
+  `History`, which is backstep's re-exported. The crate is 0.0.1 and unpublished. "Yes, dissolve
+  chrome": the four modules and nav's classifier retire (1,598 lines; git keeps them), `routing`
+  goes "Into ux-events, its only consumer", Turnstone swaps its `mere-chrome` row and four paths
+  for `backstep`, the member and workspace row go, and `mere-chrome` is freed. Doc comments in the
+  kernel and ux-events that name the retired types are cleaned in the same lane. Outcome: applies
+  D10 and D30; chrome joins the names freed in P0.
+
+  Links: area The stack · draws on engine-split D10, engine-split D30 · plans engine-split P0 · summary chrome dissolves: routing to ux-events, nav::History is backstep's, the rest retires; mere-chrome is freed.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
