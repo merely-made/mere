@@ -4,28 +4,15 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Mere's late-binding registries, one module and one feature each.
+//! Mere's diagnostics channels and apparatus observations, one feature each.
 //!
-//! These were nine `register-*` crates until 2026-09-23. They are components
-//! of one registry system, so they are modules of one crate: a consumer turns
-//! off the default features and enables the registries it uses, and pays for
-//! nothing else. `mod-loader` pulls in `diagnostics`. The theme registry moved
-//! to tabard on 2026-09-24, and the viewer registry retired into inker's
-//! presentation declaration on 2026-10-27.
+//! These were nine `register-*` crates until 2026-09-23, then one crate of
+//! registries. The theme registry moved to tabard on 2026-09-24 and the viewer
+//! registry retired into inker on 2026-10-27. On 2026-11-08 (engine split D14)
+//! the five never-enabled registries were deleted and the mod loader moved to
+//! document-host; the name stays because Turnstone and the resident use it.
 
 #[cfg(feature = "diagnostics")]
 pub mod diagnostics;
-#[cfg(feature = "input")]
-pub mod input;
-#[cfg(feature = "knowledge")]
-pub mod knowledge;
-#[cfg(feature = "layout")]
-pub mod layout;
-#[cfg(feature = "lens")]
-pub mod lens;
-#[cfg(feature = "mod-loader")]
-pub mod mod_loader;
 #[cfg(feature = "observations")]
 pub mod observations;
-#[cfg(feature = "protocol")]
-pub mod protocol;

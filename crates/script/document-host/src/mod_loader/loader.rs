@@ -14,7 +14,7 @@ pub mod free_fns;
 pub use free_fns::*;
 
 pub mod registry;
-pub use registry::*;
+pub use self::registry::*;
 
 #[cfg(test)]
 mod contributes_tests;

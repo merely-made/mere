@@ -83,7 +83,7 @@ impl ModRegistry {
         self
     }
 
-    #[cfg(any(test, feature = "test-utils"))]
+    #[cfg(test)]
     pub fn from_manifests_for_tests(manifests: Vec<ModManifest>) -> Self {
         Self::from_manifests_with_disabled(manifests, &HashSet::new())
     }
@@ -102,8 +102,8 @@ impl ModRegistry {
     /// Resolve dependencies and compute load order.
     /// Returns error if dependencies are missing or cyclic.
     pub fn resolve_dependencies(&mut self) -> Result<(), ModDependencyError> {
-        use crate::diagnostics::channels::CHANNEL_MOD_DEPENDENCY_MISSING;
-        use crate::diagnostics::{DiagnosticEvent, emit_event};
+        use ::registry::diagnostics::channels::CHANNEL_MOD_DEPENDENCY_MISSING;
+        use ::registry::diagnostics::{DiagnosticEvent, emit_event};
 
         let manifests_vec: Vec<_> = self
             .manifests
@@ -224,11 +224,11 @@ impl ModRegistry {
         ) -> Result<Vec<ModExtensionRecord>, ModActivationError>,
         R: FnMut(ModExtensionRecord) -> Result<(), String>,
     {
-        use crate::diagnostics::channels::{
+        use ::registry::diagnostics::channels::{
             CHANNEL_MOD_LOAD_FAILED, CHANNEL_MOD_LOAD_STARTED, CHANNEL_MOD_LOAD_SUCCEEDED,
             CHANNEL_MOD_QUARANTINED, CHANNEL_MOD_ROLLBACK_FAILED, CHANNEL_MOD_ROLLBACK_SUCCEEDED,
         };
-        use crate::diagnostics::{DiagnosticEvent, emit_event};
+        use ::registry::diagnostics::{DiagnosticEvent, emit_event};
 
         let mut loaded = Vec::new();
 
@@ -319,8 +319,10 @@ impl ModRegistry {
     where
         F: FnMut(ModExtensionRecord) -> Result<(), String>,
     {
-        use crate::diagnostics::channels::{CHANNEL_MOD_QUARANTINED, CHANNEL_MOD_UNLOAD_FAILED};
-        use crate::diagnostics::{DiagnosticEvent, emit_event};
+        use ::registry::diagnostics::channels::{
+            CHANNEL_MOD_QUARANTINED, CHANNEL_MOD_UNLOAD_FAILED,
+        };
+        use ::registry::diagnostics::{DiagnosticEvent, emit_event};
 
         let normalized = mod_id.trim().to_ascii_lowercase();
         let Some(status) = self.status.get(&normalized).copied() else {

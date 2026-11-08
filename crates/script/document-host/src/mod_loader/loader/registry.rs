@@ -67,7 +67,7 @@ pub(crate) fn compute_active_capabilities() -> HashSet<String> {
     registry.active_capability_ids()
 }
 
-#[cfg(any(test, feature = "test-utils"))]
+#[cfg(test)]
 pub fn compute_active_capabilities_with_disabled(disabled: &HashSet<String>) -> HashSet<String> {
     let mut registry = ModRegistry::new_with_disabled(disabled);
     let _ = registry.resolve_dependencies();

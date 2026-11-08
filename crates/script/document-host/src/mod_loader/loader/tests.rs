@@ -11,11 +11,11 @@ use std::path::PathBuf;
 
 use super::registry::compute_active_capabilities;
 
-use crate::diagnostics::channels::{
+use ::registry::diagnostics::channels::{
     CHANNEL_MOD_QUARANTINED, CHANNEL_MOD_ROLLBACK_FAILED, CHANNEL_MOD_ROLLBACK_SUCCEEDED,
     CHANNEL_MOD_UNLOAD_FAILED,
 };
-use crate::diagnostics::{
+use ::registry::diagnostics::{
     DiagnosticEvent, IngressLimits, diagnostic_channel, scoped_thread_sender,
 };
 
