@@ -622,7 +622,8 @@ revision and what crosses at frame rate.
 - **D14. Retire the five dead registries now (Mark, 2026-11-07):** audit fork F17, 3,876 lines
   with no consumer in six repositories: "Retire now (Recommended)". `input`, `knowledge`,
   `layout`, `lens` and `protocol` are deleted; git keeps them; `mod-loader`, `observations` and
-  `diagnostics` move to their owners and `mere-registry` is freed. Outcome: applies D10.
+  `diagnostics` move to their owners and `mere-registry` is freed. Outcome: applies D10. Refined by D26: the crate keeps its name as
+  the diagnostics and observations library.
 
   Links: area The stack · draws on engine-split D10 · plans engine-split P3 · summary The five never-enabled registries are deleted; the three live ones move to their owners; mere-registry is freed.
 
@@ -738,6 +739,23 @@ revision and what crosses at frame rate.
   from both. Outcome: applies DOC_POLICY §4 (docs live with the owner of the subject).
 
   Links: area The stack · draws on engine-split D5 · plans engine-split P2 · summary Seiche's first design area holds the conatus engine plan and its two briefs; the dynamics grammar and physics catalog plans stay in Mere.
+
+- **D26. Diagnostics stays a library; mere-registry keeps its name as that library (Mark,
+  2026-11-08):** D14 met a cycle in the lane: `mod_loader` (2,385 lines) calls `diagnostics`'
+  `emit_event`, `DiagnosticEvent` and eight `CHANNEL_MOD_*` constants, Turnstone names
+  `mere-registry` for `diagnostics` alone, and `diagnostics` is 4,346 lines with its
+  subdirectories, not the 956 the audit counted. Moving it to the resident would make
+  `document-host` and Turnstone depend on a port. Offered a module of `document-host` or a small
+  crate under the freed name: "either 1 or 2 are ok with me, whatever makes life easier". The
+  easier is the crate: `mere-registry` stays, trimmed to `diagnostics` and `observations`; the five
+  dead registries are deleted; `mod_loader` moves to `document-host`; no consumer row changes.
+  Outcome: refines D14 (the name is not freed; the retirement of the five and the loader's move
+  stand). The same round confirmed two lane choices under D10: `incipit` 0.2.2 rather than 0.3.0
+  (Distillery needs `^0.2`) and `persona_picker` behind an optional `cambium` feature (its
+  dependencies add about 160 identity and crypto crates to a crate 23 manifests depend on):
+  "Both stand".
+
+  Links: area The stack · draws on engine-split D10, engine-split D14 · plans engine-split P0 · summary mere-registry stays as the diagnostics and observations library; the five dead registries go and mod_loader moves to document-host; incipit bumps compatibly and persona_picker is a cambium feature.
 
 ## Open questions
 
