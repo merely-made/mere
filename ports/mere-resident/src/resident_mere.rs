@@ -110,22 +110,6 @@ fn install(registration: &DomainRegistration) -> Installed {
     }
 }
 
-/// Cleromancy's divination authority, which Mere still names until cycle
-/// breaks P3 moves this registration into Cleromancy. The supplier owns the
-/// record and replay semantics; the resident owns installation and durability
-/// (distillery D19), so applications cannot select a weaker callback.
-pub fn divination_registration() -> DomainRegistration {
-    DomainRegistration::new(
-        "divination",
-        AppId::new("cleromancy"),
-        "v1",
-        crate::domain_registry::Authority::graph(Arc::new(|graph| {
-            cleromancy_domain::host::validate_divination_graph(graph)
-                .map_err(|error| error.to_string())
-        })),
-    )
-}
-
 /// Serves each mere on its own route: shared by the lane, which serves the
 /// meres already there, and the reservoir route, which serves each new one.
 #[derive(Clone)]
@@ -198,11 +182,13 @@ impl MereRoutes {
         Ok(self)
     }
 
-    /// Install Mere's own domains and, until cycle breaks P3 moves that
-    /// registration into Cleromancy, the divination authority:
-    /// [`DomainRegistry::resident_defaults`] for this persona.
+    /// Install Mere's own domains and every authority guest the owner approved for this
+    /// persona: [`DomainRegistry::resident_defaults`] over the guest store under this
+    /// routes' shared root. An application that brings its own domain brings its guest
+    /// through the owner's review (`authority_guest`); nothing here names an application.
     pub fn with_resident_defaults(self) -> Result<Self, RegistryError> {
-        let registry = DomainRegistry::resident_defaults(self.persona());
+        let store = crate::authority_guest::GuestStore::at(&self.inner.shared_root, self.persona());
+        let registry = DomainRegistry::resident_defaults(self.persona(), &store)?;
         self.with_registry(&registry)
     }
 
@@ -2370,6 +2356,18 @@ mod tests {
         routes: MereRoutes,
     }
 
+    /// The stand-in authority for a fixture domain: refuses a candidate carrying a
+    /// facet version no grammar here knows (`v999`).
+    fn standin_authority() -> pandect::GraphValidator {
+        Arc::new(|graph| {
+            if serde_json::to_string(graph.facets()).is_ok_and(|facets| facets.contains("v999")) {
+                Err("unsupported domain facet".into())
+            } else {
+                Ok(())
+            }
+        })
+    }
+
     async fn fixture(persona_n: u128, domain: &str) -> Fixture {
         fixture_with_validator(persona_n, domain, None).await
     }
@@ -2456,8 +2454,16 @@ mod tests {
         let routes = routes
             .with_custody_endpoint("unused-in-unit-tests".into())
             .with_profile_subject_authority(owner);
+        // Mere links no application's authority (cycle breaks P3). A fixture that names no
+        // validator gets Mere's defaults and, for its domain, a stand-in that refuses a
+        // facet it does not know, so the tests of the route's own behaviour keep a gate.
         let routes = if let Some(validator) = validator {
             routes.with_domain_validator(domain, validator)
+        } else if domain == "divination" {
+            routes
+                .with_resident_defaults()
+                .unwrap()
+                .with_domain_validator(domain, standin_authority())
         } else {
             routes.with_resident_defaults().unwrap()
         };
@@ -2568,371 +2574,34 @@ mod tests {
         snapshot.scene.active_items_in_order().len() - 1
     }
 
+    /// A reviewed guest decides a route's edits exactly as a linked validator does: the
+    /// whole candidate is encoded, the guest refuses it, and nothing changes.
     #[tokio::test(flavor = "multi_thread")]
-    async fn natal_product_authority_admits_replay_and_refuses_tampering_across_apps() {
-        let fixture = fixture(0x4e4154, "divination").await;
-        let mut product = fixture.attach("turnstone").await;
-        let mut other = fixture.attach("knot-editor").await;
-        let initial = graph(&mut product);
-        let mut candidate = disclosed_graph(&mut product, &initial)
-            .into_graph()
-            .unwrap();
-        let captured = Arc::new(std::sync::Mutex::new(Vec::new()));
-        let held = captured.clone();
-        candidate.set_recorder(Some(Arc::new(move |delta| {
-            held.lock().unwrap().push(delta.clone())
-        })));
-        let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({"schema":"dramatis.birth-facts/v1","subject":{"Profile":{"id":"public-natal-subject"}},"date":{"year":2000,"month":1,"day":1},"time":{"Known":{"hour":12,"minute":0,"second":0}},"place":null,"timezone":"UTC","source":{"label":"Public product-authority fixture","reference":null}})).unwrap();
-        let birth = personal_facts::birth_resource(&facts).unwrap();
-        let record = cleromancy_domain::natal::NatalReading::new(
-            "public-source-persona".into(),
-            "Public natal subject".into(),
-            birth,
-            "A synthetic natal question".into(),
-            cleromancy_domain::natal::FoldChoice::Refuse,
-            1792149302000,
-            "00000000000000000000000000000008".into(),
-        )
-        .unwrap();
-        let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();
-        host.insert_natal_reading(&record).unwrap();
-        assert_eq!(
-            product
-                .invoke(apply(&initial, captured.lock().unwrap().clone()))
+    async fn a_guest_authority_gates_route_edits_like_any_validator() {
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../crates/script/authority-host/guest/target/wasm32-wasip2/release/authority_fixture_guest.wasm"
+        );
+        let bytes = std::fs::read(path).expect("the fixture guest is built by authority-host's build.rs");
+        let runtime = Arc::new(
+            crate::authority_guest::GuestRuntime::load("fixture", &bytes, &crate::authority_guest::component_hash(&bytes))
                 .unwrap(),
+        );
+        let fixture = fixture_with_validator(0x6775, "fixture", Some(runtime.validator())).await;
+        let mut app = fixture.attach("turnstone").await;
+        let initial = graph(&mut app);
+        assert_eq!(
+            app.invoke(apply(&initial, vec![node(1)])).unwrap(),
             IntentResult::Accepted
         );
-        let shared = graph(&mut other);
-        let current = disclosed_graph(&mut other, &shared);
-        let host =
-            cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())
-                .unwrap();
-        assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);
-        let mut bad = record.clone();
-        bad.question = "Tampered under the sealed id".into();
+        let current = graph(&mut app);
         assert!(matches!(
-            other
-                .invoke(apply(
-                    &shared,
-                    vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
-                        node_id: kernel::graph::Graph::node_namespace_id(&format!(
-                            "cleromancy://natal/{}",
-                            record.id
-                        ))
-                        .to_string(),
-                        facet: cleromancy_domain::natal::NATAL_FACET.into(),
-                        value_json: serde_json::to_string(&bad).unwrap()
-                    }]
-                ))
-                .unwrap(),
-            IntentResult::Rejected { .. }
+            app.invoke(apply(&current, vec![node(2), retitle(1, "Forbidden")])).unwrap(),
+            IntentResult::Rejected { reason } if reason.contains("fixture forbids")
         ));
-        let after = graph(&mut other);
-        assert_eq!(
-            serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),
-            serde_json::to_value(current).unwrap()
-        );
-    }
-
-    #[tokio::test(flavor = "multi_thread")]
-    async fn natal_houses_authority_admits_both_systems_and_refuses_cusp_tamper() {
-        for system in [
-            cleromancy_domain::natal_houses::HouseSystem::WholeSign,
-            cleromancy_domain::natal_houses::HouseSystem::Equal,
-        ] {
-            let fixture = fixture(0x4e4155, "divination").await;
-            let mut product = fixture.attach("turnstone").await;
-            let mut other = fixture.attach("knot-editor").await;
-            let initial = graph(&mut product);
-            let mut candidate = disclosed_graph(&mut product, &initial)
-                .into_graph()
-                .unwrap();
-            let captured = Arc::new(std::sync::Mutex::new(Vec::new()));
-            let held = captured.clone();
-            candidate.set_recorder(Some(Arc::new(move |delta| {
-                held.lock().unwrap().push(delta.clone())
-            })));
-            let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({"schema":"dramatis.birth-facts/v1","subject":{"Profile":{"id":"public-natal-subject"}},"date":{"year":2000,"month":1,"day":1},"time":{"Known":{"hour":12,"minute":0,"second":0}},"place":{"label":"Public coordinate fixture","latitude_microdegrees":40712800,"longitude_microdegrees":-74006000,"precision":"Public synthetic"},"timezone":"UTC","source":{"label":"Public product-authority fixture","reference":null}})).unwrap();
-            let birth = personal_facts::birth_resource(&facts).unwrap();
-            let record = cleromancy_domain::natal::NatalReading::new(
-                "public-source-persona".into(),
-                "Public natal subject".into(),
-                birth,
-                "A synthetic natal question".into(),
-                cleromancy_domain::natal::FoldChoice::Refuse,
-                1792149302000,
-                "00000000000000000000000000000008".into(),
-            )
-            .unwrap()
-            .with_houses(system)
-            .unwrap();
-            let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();
-            host.insert_natal_reading(&record).unwrap();
-            assert_eq!(
-                product
-                    .invoke(apply(&initial, captured.lock().unwrap().clone()))
-                    .unwrap(),
-                IntentResult::Accepted
-            );
-            let shared = graph(&mut other);
-            let current = disclosed_graph(&mut other, &shared);
-            let host =
-                cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())
-                    .unwrap();
-            assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);
-            let mut bad = record.clone();
-            if let cleromancy_domain::natal_houses::HouseOutcome::Calculated {
-                cusps_microdegrees,
-                ..
-            } = &mut bad.houses.as_mut().unwrap().outcome
-            {
-                cusps_microdegrees[0] = (cusps_microdegrees[0] + 1) % 360_000_000;
-            } else {
-                panic!("expected actual houses");
-            }
-            assert!(matches!(
-                other
-                    .invoke(apply(
-                        &shared,
-                        vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
-                            node_id: kernel::graph::Graph::node_namespace_id(&format!(
-                                "cleromancy://natal/{}",
-                                record.id
-                            ))
-                            .to_string(),
-                            facet: cleromancy_domain::natal::NATAL_FACET.into(),
-                            value_json: serde_json::to_string(&bad).unwrap()
-                        }]
-                    ))
-                    .unwrap(),
-                IntentResult::Rejected { .. }
-            ));
-            let after = graph(&mut other);
-            assert_eq!(
-                serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),
-                serde_json::to_value(current).unwrap()
-            );
-        }
-    }
-
-    #[tokio::test(flavor = "multi_thread")]
-    async fn natal_cap_authority_admits_retained_observations_and_refuses_motion_tamper() {
-        for observed in [false, true] {
-            let fixture = fixture(0x4e4155, "divination").await;
-            let mut product = fixture.attach("turnstone").await;
-            let mut other = fixture.attach("knot-editor").await;
-            let initial = graph(&mut product);
-            let mut candidate = disclosed_graph(&mut product, &initial)
-                .into_graph()
-                .unwrap();
-            let captured = Arc::new(std::sync::Mutex::new(Vec::new()));
-            let held = captured.clone();
-            candidate.set_recorder(Some(Arc::new(move |delta| {
-                held.lock().unwrap().push(delta.clone())
-            })));
-            let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({"schema":"dramatis.birth-facts/v1","subject":{"Profile":{"id":"public-natal-subject"}},"date":{"year":2000,"month":1,"day":1},"time":{"Known":{"hour":12,"minute":0,"second":0}},"place":{"label":"Public coordinate fixture","latitude_microdegrees":40712800,"longitude_microdegrees":-74006000,"precision":"Public synthetic"},"timezone":"UTC","source":{"label":"Public product-authority fixture","reference":null}})).unwrap();
-            let birth = personal_facts::birth_resource(&facts).unwrap();
-            let record = cleromancy_domain::natal::NatalReading::new(
-                "public-source-persona".into(),
-                "Public natal subject".into(),
-                birth,
-                "A synthetic natal question".into(),
-                cleromancy_domain::natal::FoldChoice::Refuse,
-                1792149302000,
-                "00000000000000000000000000000008".into(),
-            )
-            .unwrap()
-            .with_supplement(
-                Some(cleromancy_domain::natal_cap::HouseChoice::Placidus),
-                observed.then(|| cleromancy_domain::natal_cap::OrientationSnapshot {
-                    finals2000a: include_str!("../tests/fixtures/natal-cap-finals2000a.txt").into(),
-                }),
-            )
-            .unwrap();
-            let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();
-            host.insert_natal_reading(&record).unwrap();
-            assert_eq!(
-                product
-                    .invoke(apply(&initial, captured.lock().unwrap().clone()))
-                    .unwrap(),
-                IntentResult::Accepted
-            );
-            let shared = graph(&mut other);
-            let current = disclosed_graph(&mut other, &shared);
-            let host =
-                cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())
-                    .unwrap();
-            assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);
-            let mut bad = record.clone();
-            if let cleromancy_domain::natal_cap::MotionOutcome::Calculated { planets, .. } =
-                &mut bad.supplement.as_mut().unwrap().motion
-            {
-                planets[0].microdegrees_per_tt_day += 1;
-            } else {
-                panic!("expected motion")
-            };
-            assert!(matches!(
-                other
-                    .invoke(apply(
-                        &shared,
-                        vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
-                            node_id: kernel::graph::Graph::node_namespace_id(&format!(
-                                "cleromancy://natal/{}",
-                                record.id
-                            ))
-                            .to_string(),
-                            facet: cleromancy_domain::natal::NATAL_FACET.into(),
-                            value_json: serde_json::to_string(&bad).unwrap()
-                        }]
-                    ))
-                    .unwrap(),
-                IntentResult::Rejected { .. }
-            ));
-            let after = graph(&mut other);
-            assert_eq!(
-                serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),
-                serde_json::to_value(current).unwrap()
-            );
-        }
-    }
-
-    #[tokio::test(flavor = "multi_thread")]
-    async fn natal_aspects_authority_admits_cross_app_and_refuses_resealed_results_and_rules() {
-        use cleromancy_domain::natal_aspects::{AspectOutcome, AspectRules};
-
-        let fixture = fixture(0x4e4156, "divination").await;
-        let mut product = fixture.attach("turnstone").await;
-        let mut other = fixture.attach("knot-editor").await;
-        let initial = graph(&mut product);
-        let mut candidate = disclosed_graph(&mut product, &initial)
-            .into_graph()
-            .unwrap();
-        let captured = Arc::new(std::sync::Mutex::new(Vec::new()));
-        let held = captured.clone();
-        candidate.set_recorder(Some(Arc::new(move |delta| {
-            held.lock().unwrap().push(delta.clone())
-        })));
-        let facts: dramatis::birth::BirthFacts = serde_json::from_value(serde_json::json!({
-            "schema": "dramatis.birth-facts/v1",
-            "subject": {"Profile": {"id": "public-natal-subject"}},
-            "date": {"year": 2000, "month": 1, "day": 1},
-            "time": {"Known": {"hour": 12, "minute": 0, "second": 0}},
-            "place": null,
-            "timezone": "UTC",
-            "source": {"label": "Public product-authority fixture", "reference": null}
-        }))
-        .unwrap();
-        let record = cleromancy_domain::natal::NatalReading::new(
-            "public-source-persona".into(),
-            "Public natal subject".into(),
-            personal_facts::birth_resource(&facts).unwrap(),
-            "A synthetic natal aspects question".into(),
-            cleromancy_domain::natal::FoldChoice::Refuse,
-            1792149302000,
-            "00000000000000000000000000000008".into(),
-        )
-        .unwrap()
-        .with_aspects(AspectRules::default())
-        .unwrap();
-        let AspectOutcome::Calculated { hits, .. } = &record.aspects.as_ref().unwrap().outcome
-        else {
-            panic!("expected actual aspects");
-        };
-        assert!(!hits.is_empty(), "fixture must exercise calculated results");
-        assert!(hits.iter().any(|hit| hit.orb_millidegrees > 0));
-        let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();
-        host.insert_natal_reading(&record).unwrap();
-        assert_eq!(
-            product
-                .invoke(apply(&initial, captured.lock().unwrap().clone()))
-                .unwrap(),
-            IntentResult::Accepted
-        );
-        let shared = graph(&mut other);
-        let current = disclosed_graph(&mut other, &shared);
-        let host =
-            cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())
-                .unwrap();
-        assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);
-        let mere = fixture.reservoir.meres().await.remove(0);
-        let sessions = mere_dir(fixture._root.path(), persona(0x4e4156), mere.id).join("sessions");
-        let product_snapshot = graph(&mut product);
-        let product_current = disclosed_graph(&mut product, &product_snapshot);
-        let durable = session_tree_bytes(&sessions);
-        assert!(durable.keys().any(|path| path.ends_with("changes.jsonl")));
-
-        for fault in ["output", "rules"] {
-            let mut value = serde_json::to_value(&record).unwrap();
-            match fault {
-                "output" => {
-                    value["aspects"]["outcome"]["hits"][0]["orb_millidegrees"] =
-                        serde_json::json!(99999)
-                },
-                _ => {
-                    value["aspects"]["rules"] = serde_json::to_value(AspectRules {
-                        conjunction_millidegrees: 0,
-                        opposition_millidegrees: 0,
-                        trine_millidegrees: 0,
-                        square_millidegrees: 0,
-                        sextile_millidegrees: 0,
-                    })
-                    .unwrap()
-                },
-            }
-            // Forge a valid content seal and matching canonical node identity.
-            // Refusal must come from replay, rather than an old id or URL.
-            value.as_object_mut().unwrap().remove("id");
-            let id = blake3::hash(&serde_json::to_vec(&value).unwrap())
-                .to_hex()
-                .to_string();
-            value["id"] = serde_json::json!(id);
-            let bad: cleromancy_domain::natal::NatalReading =
-                serde_json::from_value(value).unwrap();
-            assert_eq!(
-                bad.validate().unwrap_err(),
-                "Natal aspects differ from their retained rules and chart",
-                "{fault}"
-            );
-            let url = format!("cleromancy://natal/{}", bad.id);
-            let node_id = kernel::graph::Graph::node_namespace_id(&url).to_string();
-            let before = graph(&mut other);
-            let result = other
-                .invoke(apply(
-                    &before,
-                    vec![
-                        pandect::CapturedDelta::ReplayAddNodeWithIdIfMissing {
-                            id: node_id.clone(),
-                            url,
-                            position: [0.0, 0.0],
-                        },
-                        pandect::CapturedDelta::ReplaySetNodeFacetById {
-                            node_id,
-                            facet: cleromancy_domain::natal::NATAL_FACET.into(),
-                            value_json: serde_json::to_string(&bad).unwrap(),
-                        },
-                    ],
-                ))
-                .unwrap();
-            assert!(
-                matches!(&result, IntentResult::Rejected { reason }
-                    if reason.contains("Natal aspects differ from their retained rules and chart")),
-                "{fault}: {result:?}"
-            );
-            for (app, expected) in [(&mut product, &product_current), (&mut other, &current)] {
-                let after = graph(app);
-                assert_eq!(after.scene.revision, before.scene.revision, "{fault}");
-                assert_eq!(
-                    serde_json::to_value(disclosed_graph(app, &after)).unwrap(),
-                    serde_json::to_value(expected).unwrap(),
-                    "{fault}"
-                );
-            }
-            assert_eq!(
-                session_tree_bytes(&sessions),
-                durable,
-                "{fault}: durable session changed"
-            );
-        }
+        assert_eq!(nodes(&graph(&mut app)), 1, "the refused batch changed nothing");
+        let stats = runtime.stats();
+        assert!(stats.calls >= 2 && stats.refused >= 1 && stats.trapped == 0, "{stats:?}");
     }
 
     #[tokio::test(flavor = "multi_thread")]

@@ -419,6 +419,47 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_
 title = ". `backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 
+[decisions."cycle-breaks D18"]
+title = ". The resident seam applies wherever `mere-resident` lives (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D19"]
+title = ". Inker↔Mere: allowlisted until P5 (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D20"]
+title = ". The ring: `murm-wire` and `murm-rtc` move into Genet (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D21"]
+title = ". Dramatis's application may become a producer (Mark, 2026-11-08; tentative)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D22"]
+title = ". The viewer ships one build, `webgl2/` (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The viewer ships the single webgl2 build; WebGL2 costs 1.4 to 1.85 times WebGPU's page CPU per frame and ANGLE on Metal differs by 10 pixels in the compare images, both recorded in T7 and the audit brief."
+draws_on = ["stack.3"]
+
+[decisions."cycle-breaks D23"]
+title = ". P3: build the real Cleromancy guest (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+
+[decisions."cycle-breaks D24"]
+title = ". Declared authority stays a pending slot until M4 (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Authority::Declared stays a typed pending slot until M4; no interpreter is built."
+draws_on = ["cycle-breaks D1", "cycle-breaks D15"]
+
+[decisions."cycle-breaks D25"]
+title = ". Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store."
+draws_on = ["cycle-breaks D15"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"

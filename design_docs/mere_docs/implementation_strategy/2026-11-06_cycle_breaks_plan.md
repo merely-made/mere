@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review).
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review). D18 to D23 (Mark, 2026-11-08) ruled the P0 check's unlisted cycles: the resident seam binds wherever the resident lives, `inker -> mere` is allowlisted until engine-split P5, `murm-wire` and `murm-rtc` moved into Genet (D20, done), Dramatis's app may become a producer (tentative, still flagged), the viewer's one build, and the real Cleromancy guest.
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -138,8 +138,10 @@ parameterisation lands first. Tests keep their counts and the door route has its
 
 ### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
 
-**Status 2026-11-08: step (1) done; steps (2) and (3) stopped on two design questions the plan and rulings do
-not settle (Findings, "P2 findings"); step (4) depends on them.** The brief's repository name `merely-made/knot` does
+**Status 2026-11-08 (later): step (1) done; step (2) settled by D24 (a pending slot until M4; nothing to build);
+step (3) ruled by D25 and half built: Murm's source trait is on main, the door's verified read and `DoorBlobSource`
+are built and tested on Mere branch `agent/p2-door-serving`, held for a relock blocker (Findings, "P2 relock
+blocker"); Knot's side (door-backed evidence host, the supervisor, the multi-process test) and step (4) are not done.** The brief's repository name `merely-made/knot` does
 not exist on GitHub; Knot is `merely-made/knot-editor`, which is also what Mere's manifests and lock name.
 
 In this order. **(1)** P2a. **(2)** Knot's `DeclaredPolicy` (its `OperationPolicy`, a data value,
@@ -160,8 +162,13 @@ conditions hold. No `Lane` trait and no distribution binary.
 
 ### P3. D1 Mere stops naming Cleromancy (reshaped by D14 and D15)
 
-**Status 2026-11-08: steps (1) and (2) done; the spike passes (Findings, "P3 spike"). Stopped for Mark's review
-(D15 (h)); steps (3) and (4) are not started.**
+**Status 2026-11-08: steps (1) to (3) and (4) done on the Mere side; Cleromancy's own root lock could not follow
+(Findings, "P3 guest").** Mark ruled "Build the real guest" (D23). The `domain-authority` world is in the protocol
+layer (`authority-guest`), the resident hosts it (`authority-host`, `authority_guest`), `mere-resident` names no
+Cleromancy crate, the `mere -> cleromancy` allowlist edge is gone, and the guest conforms: 577 of 577 corpus verdicts
+and refusal texts equal native, and the seven multi-process owner tests plus the four natal tests pass through it. Held:
+Cleromancy's root lock cannot take the new Mere (webcue and wgpu-cue are moving; Findings), so its conformance
+tests wait on a branch.
 
 In this order. **(1)** A validator-only crate split in Cleromancy: the authority's closure leaves
 `muniment/redb` and the other native-only dependencies (the locked checks on
@@ -473,6 +480,91 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   D8 refined by engine-split D23: the repository is the host layer as a library, contract root
   below and hosting above, with no application; the reference host and MCP server go to
   Turnstone.*
+
+- **D18. The resident seam applies wherever `mere-resident` lives (Mark, 2026-11-08):** "(a) Seam
+  goes wherever it lives". The P2 and P3 registration seam (D1, D14, D15) is not tied to the
+  repository that holds the resident. Whether `mere-resident` stays in Mere or moves to Graphshell
+  with the engine split (engine-split D23), the resident names neither Knot nor Cleromancy in its
+  manifests, and Knot and Cleromancy register themselves at runtime through the Stickleback domain
+  seam. The allowlisted `mere -> knot-editor` and `mere -> cleromancy` edges stay allowed until P2
+  and P3 land and, if the resident moves first, become `graphshell -> knot-editor` and
+  `graphshell -> cleromancy`, closed by the same steps. Outcome: refines D1 (where the seam lives
+  does not change what it rules).
+
+  Links: area stack · draws on cycle-breaks D1, cycle-breaks D14, stack.3 · amends cycle-breaks D1 · plans cycle-breaks P2, P3 · summary The registration seam binds the resident wherever it lives, Mere or Graphshell, so neither repository's Cargo names Knot or Cleromancy.
+
+- **D19. Inker↔Mere: allowlisted until P5 (Mark, 2026-11-08):** "Allowlist until P5". Inker's
+  optional `fleece` row on Mere's `linked-data` (`mere-fleece -> mere-rdf`, engine-split F3) is the
+  only edge from Inker to Mere. Engine-split F3 records that `mere-rdf` depends on `inker`, so Inker
+  cannot name the engine without a cycle until engine-split P5 folds `linked-data` and the resource
+  half of `graph-kernel` into one `mere` crate with no host dependency. `inker -> mere` is allowlisted
+  in `support/family-cycles/allowed.toml` with this decision and leaves when P5 lands (the entry on
+  no cycle fails the check, so P5 deletes it). No code moves now. Outcome: new; the check's second
+  unlisted finding (The P0 result).
+
+  Links: area stack · draws on cycle-breaks D6, stack.3 · plans engine-split P5 · summary inker to mere is allowlisted as a temporary back edge until engine-split P5 separates the engine from inker; the entry leaves with P5.
+
+- **D20. The ring: `murm-wire` and `murm-rtc` move into Genet (Mark, 2026-11-08):** Mark asked:
+  "Why wouldn't rtc just be a genet capability then? Given it's w3c, wpt… http(s) isn't in murm
+  either, but it's a protocol too." He then ruled "Move both into Genet". `murm-wire` (HTTP/1-3 and
+  WebSocket carriage, originally split out of Genet's Netfetcher with its history kept) and
+  `murm-rtc` (the pinned WebRTC protocol leaf) become Genet capabilities, in `components/`
+  beside `netfetcher` and `genet-webrtc`. Genet is their only consumer: no Murm crate outside
+  `murm/wire/` names them, and no manifest outside Genet names them, so they are renamed
+  `genet-wire` and `genet-rtc`. The `murm/wire` workspace leaves Murm. This removes the
+  `genet -> murm` edge, which the P0 check found closing the Genet, Murm, Eidetic and Dramatis ring
+  (The P0 result, item 3). Reverses the Findings' reading that the Genet/Murm pair needed no break.
+  Outcome: new.
+
+  Links: area stack · draws on stack.3 · plans cycle-breaks P0 · summary murm-wire and murm-rtc move into Genet as genet-wire and genet-rtc, since Genet is their only consumer; the Genet to Murm edge and the four-repository ring go with them.
+
+- **D21. Dramatis's application may become a producer (Mark, 2026-11-08; tentative):** "Maybe those
+  lib's apps should be producers if hosts already depend on them either way." A tentative direction,
+  not a final ruling: `apps/dramatis` may become a producer that hosts present, instead of an
+  application that names Mere's Cambium (`cambium`, `cambium-desktop`, `mandrake`). A separate
+  agent is writing the design. The Dramatis to Mere cycle (The P0 result, item 1) stays flagged by
+  the check, with no allowlist entry, until the design is ruled. Outcome: direction recorded, no
+  decision taken; nothing moves.
+
+  Links: area stack · draws on cycle-breaks D6, stack.3 · plans cycle-breaks P0 · summary Dramatis's app may become a producer that hosts present rather than an app naming Cambium; tentative, design pending, and the Dramatis to Mere cycle stays flagged.
+
+- **D22. The viewer ships one build, `webgl2/` (Mark, 2026-11-08):** "Keep one build". Recorded in
+  the Graphshell host plan (T7) and in the
+  [viewer build audit brief](../research/2026-11-07_viewer_build_audit_brief.md), Rulings 3. The
+  viewer ships `webgl2/` only; `webgpu/` is an opt-in comparison build. Two findings travel with
+  the ruling: WebGL2 uses 1.4 to 1.85 times WebGPU's page CPU time per frame (21 nodes 5.0 against
+  2.7 ms paused and 17.4 against 9.8 live; 200 nodes 11.0 against 6.8 and 36.1 against 25.6), so a
+  slower device has less headroom than the measured Mac; and ANGLE on Metal draws two overlapping
+  diamonds in one pictograph glyph in the other order, a 10-pixel difference in the compare
+  images, accepted and not fixed. Outcome: records an engine and host decision here so the
+  cycle-breaks numbering carries all of Mark's 2026-11-08 rulings.
+
+  Links: area stack · draws on stack.3 · summary The viewer ships the single webgl2 build; WebGL2 costs 1.4 to 1.85 times WebGPU's page CPU per frame and ANGLE on Metal differs by 10 pixels in the compare images, both recorded in T7 and the audit brief.
+
+- **D23. P3: build the real Cleromancy guest (Mark, 2026-11-08):** after the P3 spike (Findings,
+  "P3 spike"), Mark ruled to build the real guest, step (3). Another agent is doing that work.
+  Recorded here only; the plan's P3 steps stand. Outcome: settles the spike's open question for P3.
+
+  Links: area stack · draws on cycle-breaks D1, cycle-breaks D14, stack.3 · plans cycle-breaks P3 · summary Mark ruled to build the real Cleromancy guest (P3 step 3); another agent is doing it.
+
+- **D24. Declared authority stays a pending slot until M4 (Mark, 2026-11-08):** "(A) Pending slot until M4",
+  on the P2 findings' step (2) question. `Authority::Declared` stays a typed slot that refuses as "pending: no
+  authority installed"; no interpreter, no extension trait and no delivery path are built before M4 (the
+  replicated `notes` mere), its first resident-side consumer. Knot's `KnotSyncPolicy` keeps running inside
+  Knot's own sync host. P2 step (2) is therefore done by this ruling: the slot and its test
+  (`guest_and_declared_validators_refuse_every_candidate_as_pending`) exist, and its doc comment says so.
+  Outcome: settles the P2 findings' step (2) question as option A.
+
+  Links: area stack · draws on cycle-breaks D1, D15 · plans cycle-breaks P2 · summary Authority::Declared stays a typed pending slot until M4; no interpreter is built.
+
+- **D25. Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08):**
+  "(2) Transport change", on the P2 findings' step (3) question. Murm's scoped blob provider takes a source
+  trait (`BlobSource`) instead of a store; the blob door route gains a verified read so a child that holds no store
+  serves iroh-blobs-compatible verified streams sourced from the resident. Knot's evidence reference and dial
+  hints are unchanged. Design in the domain contract, "Serving through the door".
+  Outcome: settles the P2 findings' step (3) question as option 2.
+
+  Links: area stack · draws on cycle-breaks D15 (i), domain-contract blob door route · plans cycle-breaks P2 · summary The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store.
 
 ## Findings
 
@@ -818,6 +910,18 @@ Knot-as-guest fixtures can move to Knot as consumers (domain contract, section 4
 `graph-kernel`, a dev edge to `mere-resident` and a relock against Mere first, and none of it advances the manifests until
 (3) is answered.
 
+### P2 relock blocker (2026-11-08)
+
+Mere cannot take a Murm revision past `58d068a04d4` (the `wire/` removal) without moving Genet, and cannot move
+Genet while it pins `webcue = "=0.1.2"`. Evidence: `cargo update -p mere-transport` fails with "no matching package
+named `murm-wire`" required by `netfetcher` at Genet `d634ee0c`; moving `netfetcher` too takes every Genet package to
+`8f13bb7e`, where `document-session-api` is `0.1.2` (the selected-text query), while crates.io `webcue 0.1.2` requires
+`document-session-api = "=0.1.1"`, so the lock holds both (the `[patch.crates-io]` entry for it no longer applies)
+and `inker` stops compiling (`document_session_api::CapabilityStatus` against `webcue`'s). It is the wire-removal
+lane's relock to settle (a webcue release against `0.1.2`, or Genet's version held at `0.1.1`). My Mere door code was
+verified with a throwaway `[patch]` of Murm to a local checkout of the pre-removal Murm plus my two commits, and is
+pushed on branch `agent/p2-door-serving` without a relock; it merges to main once Mere's lock can take Murm main.
+
 ### P3 spike (2026-11-08)
 
 **Step (1), the split.** The blocker was one manifest line. `core/Cargo.toml` (the `cleromancy-core` package Mere names as
@@ -860,6 +964,65 @@ Candidate sizes 14 KB to 296 KB. Time follows the replayed content (ephemeris re
 tests' multi-process owner behaviour through a guest (step 3's conformance), the resident-side encode cost, and `admit`
 (stubbed; divination registers none). The fallback (supervised native process, D15 (h)) is not needed on this evidence.
 Mark's review of the spike gates step (3).
+
+### P3 guest (2026-11-08)
+
+**What was built.** Protocol layer (Graphshell `4d971f3`): `authority-guest` world and `domain-authority` interface in
+`world.wit`, with a test beside `block_guest_world`. Mere: `crates/script/authority-host` (the wasmtime host, 9 tests
+over a fixture guest), `ports/mere-resident/src/authority_guest.rs` (candidate encoding, `GuestRuntime`, owner review,
+pin, `GuestStore`) and `Authority::Guest` carrying a running guest; `tests/authority_guest.rs` 6, a route test in
+`resident_mere` 1. Cleromancy: `authority-guest/` (own lock root, toolchain pin, `cleromancy-core`'s
+`validate_divination_graph` unchanged behind the WIT). Design is in the domain contract, "The authority guest".
+
+**Choices this step made** (none contradicts D15; the plan did not rule them):
+- A fresh instance per call, not a reused one with re-instantiation after a trap. A trapped instance cannot be re-entered
+  and a reused one could carry state between verdicts; instantiating is under a millisecond.
+- Fuel is the budget, not a wall clock. WASI is closed: clocks fixed at zero, fixed-seed random, no preopens or stdio.
+- The claim gained `admission: bool`, so a guest with no before/after check costs no encoding of before and after.
+- No on-disk precompiled artifact: `Component::deserialize` is `unsafe` and a stored file would bypass the pinned hash.
+  The component compiles once per process (about a second, optimised).
+- The review reuses D12's signed pack (`eidetic` pack signing) and the one power `power:domain-authority`, but not
+  `CapsuleMount::review` itself: that lives in `ports/graphshell` and is tied to Moot capsule disclosures. The
+  resident's `AuthorityReview::prepare`/`approve` does the same checks and adds the author-key binding and the pin.
+- Guests install through a per-persona store under the shared root, read by `MereRoutes::with_resident_defaults`, so
+  every composition picks them up and none names an application. `resident_defaults` now takes the store.
+- `mere_defaults` still reserves the domain id `divination` (a name for data, not a dependency). Without it an
+  unreviewed machine would serve the domain unchecked. A reserved domain with no pin is refused `domain-not-registered`;
+  a pinned domain whose guest is revoked, missing, altered, or signed by another key is registered and refuses every
+  candidate as `pending: no authority installed for <domain> (<reason>)`.
+
+**Measurements** (Apple silicon, the spike's corpus of 577 cases: six product graphs and 571 tampers):
+
+| Measure | Result |
+|---|---|
+| Component size | 5,396,056 bytes (5.15 MiB), against the 16 MiB cap; the spike's 7.45 MiB had more dependencies. Test ceiling 8 MiB |
+| Verdicts | 577 of 577 equal native, 577 of 577 identical refusal text (526 admitted, 51 refused), 0 traps |
+| Fuel per call | max 1.775e9 (spike 1.74e9) |
+| Guest memory | max 6.4 MiB (spike 6.6) |
+| Candidate | up to 296,077 bytes |
+| Per call, release | native p50 9.6 ms, p90 25.8 ms, max 27.2 ms; resident total (encode + guest) p50 25.6 ms, p90 111 ms, max 121 ms |
+| Encode (resident side) | mean 0.19 ms, max 0.47 ms release (mean 7.7 ms, max 46 ms in a debug build): about 1 percent of the call |
+| Budget chosen | fuel 2e10 (11 times the corpus max, about 1 s of guest time), memory 128 MiB (19 times), candidate 16 MiB (54 times) |
+| Cold compile | about 1 s once per process, optimised; tens of seconds in an unoptimised debug build, which is why Cleromancy's dev profile optimises Cranelift |
+
+**Conformance.** The seven multi-process owner tests (embedded, daemon, embedded) pass through the guest: 7 of 7, 42 s.
+The four natal tests that moved out of `resident_mere` pass: 4 of 4. The corpus test (guest versus native) passes.
+The tests ran in a scratch member of Mere's workspace over Mere's lock (see below) with Cleromancy's sources.
+`mere-resident` counts: lib 272 to 269 (four natal tests moved, one guest route test added), `embedded_reservoir_validation`
+from 8 to 1 (the product half's 1 + 6 moved), `tests/authority_guest.rs` 6 new, `domain_registry` 8. Failures are the known
+ones only (`the_dialable_host`, `custodian_client` 2, `cxf_import`, `quarantine_review`).
+
+**Blocker: Cleromancy's root lock.** Moving Cleromancy's root lock to a Mere that has the guest host fails: Mere's
+graphshell requires `wgpu-cue = "=0.1.3"` while wgpu-cue `main` names an unpublished 0.1.4 (and webcue 0.1.3 against
+inker's `=0.1.2`), the same five-root blocker the P0 result lists. Moving a git source's revision always re-resolves its
+dependencies, so no `cargo update -p` keeps `cue-netrender` where it was. Cleromancy's test and example changes, which need
+the new resident API, wait on branch `agent/p3-guest-conformance` until that lane lands; the guest crate (its own lock root,
+which resolves) is on main.
+
+**Not done.** The pin across paired devices (`Pin::compare` exists, nothing carries a pin over the roster); a review
+dialog; the cross-architecture determinism check (one aarch64 machine; fuel and the closed WASI are the means, not the
+proof); `Component` caching across processes. `c1_receipt_host` no longer re-runs a product validator in its inspect
+client (the resident validated before serving).
 
 ## Keeping cycles out: the check
 
@@ -935,7 +1098,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   2. **Inker↔Mere.** `inker/crates/fleece/Cargo.toml:37` (optional `linked-data`, which is Mere's
      `crates/graph/linked-data`) against about 30 normal Mere rows naming Inker (`inker`, `fleece`, `illume`,
      `mere-lanes`, ...). Resolved inside `inker/Cargo.lock` (`mere-fleece -> mere-rdf -> inker`).
-  3. **Genet/Murm/Eidetic/Dramatis ring.** Cutting the two rows above and the D1 edges leaves one
+  3. **Genet/Murm/Eidetic/Dramatis ring (cleared 2026-11-08 by D20, below).** Cutting the two rows above and the D1 edges leaves one
      component: `genet -> murm` (`genet/components/genet-webrtc` `murm-rtc` and the optional
      `components/netfetcher` `murm-wire`, "independent wire leaf"), `murm -> eidetic` and `murm -> dramatis`
      (`murm/native/crates/holder`, `murm/crates/station-custody`), `eidetic -> genet`
@@ -945,6 +1108,29 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
      `signalman-desktop`.
   4. **Dev-only, D6:** `dramatis -> eidetic` (`dramatis/apps/dramatis` dev `luggage`), which closes against
      Eidetic's normal rows to Dramatis.
+- **After D18 to D20, 2026-11-08 (the same check, `--remote`, Genet `8f13bb7e6`, Murm `c6b31e702`, Inker
+  `6643e7174`, Mere with this entry; exit 1):**
+  - **The ring is gone.** `murm-wire` and `murm-rtc` moved into Genet as `genet-wire` and `genet-rtc` (D20),
+    so no Genet row names Murm and Genet is on no cycle. Cleromancy is off the normal graph too (P3, Mere
+    `0e33b02e4`); Knot stays held by its `mere -> knot-editor` entry (D1, D18).
+  - **Inker↔Mere is allowlisted** (`inker -> mere`, D19, until engine-split P5).
+  - **Still flagged, no allowlist entry (D21):** Dramatis↔Mere. Every remaining normal cycle in the report (seven
+    repositories: Distillery, Dramatis, Eidetic, Gemot, Inker, Mere, Murm) passes through `dramatis -> mere`
+    (`dramatis/apps/dramatis/Cargo.toml:55-58`); a throwaway allowlist with that one edge added leaves only
+    the dev-only `dramatis -> eidetic -> dramatis` pair (`luggage`, item 4 above). The dev-only list, with
+    Dramatis↔Mere open, adds `inker -> murm` (a `fleece` dev row on `transport`), `seiche -> eidetic` and
+    `distillery -> gemot`; each closes only through `dramatis -> mere`.
+  - **Downstream locks not relocked (blocked, not ruled out).** Mere, Knot, Cleromancy, Turnstone and
+    Woodshed's `ports/redshank` still pin Genet `d634ee0c4`, which names `murm-wire` from `murm.git` at a revision
+    that stays fetchable, so their `cargo check --locked` is unchanged. Relocking any of them to Genet `8f13bb7e6`
+    (`cargo update -p netfetcher`: removes `murm-wire`, adds `genet-wire`, no other package moves but the Genet source
+    and `bole`'s `rev` pin) fails to compile in all five: Genet `fe7523697` moved `document-session-api` to 0.1.2, so the
+    lock holds two copies (registry 0.1.1 through `webcue =0.1.2`, and Genet's 0.1.2) and Inker's `cue.rs` mixes their
+    types (E0308). Inker, which already has `webcue 0.1.3`, relocked and passes `cargo check --workspace --locked`
+    (Inker `6643e7174`). The five roots need `webcue` 0.1.3 and `wgpu-cue` 0.1.4 first; `wgpu-cue` main
+    requires `wgpu-cue =0.1.4`, which is not on crates.io (0.1.3 is the latest), and Mere's root pins
+    `webcue =0.1.2` and `wgpu-cue =0.1.3`. That is the webcue lane's loop, not this decision's. Until it lands,
+    the `--strict-locks` warnings for these roots remain.
 - **Resolved-lock warnings (stale pins, not ruled):** `cleromancy`, `mere`, `turnstone` (a Distillery
   revision that named Mere, and the loops above), `inker`, `dramatis/apps/dramatis` and seven more roots
   (twelve in all) holding `dramatis` and `eidetic` together. Re-run with `--strict-locks` after the family's relock loop.
@@ -1138,3 +1324,44 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   and (2) done and pushed (Cleromancy `046bd58`): `core/Cargo.toml` drops muniment's `redb` feature, the portable core checks
   on `wasm32-wasip2`; the component is 7.45 MiB of 16, verdict-equal over 577 of 577 corpus cases, about 2 times native per
   call (p50 20 ms, max 101 ms). The real guest is held for Mark's review (D15 (h)). Cleromancy's own plan has a short entry.
+- 2026-11-08: P2 steps (2) and (3) rulings built as far as they go (D24, D25). **Declared:** nothing to build; the typed
+  pending slot and its test exist (`domain_registry.rs`). **Transport:** Murm `c6b31e70` (main): `blob_source`
+  (`BlobSource`, `BaoReader`, `StoreBlobSource`, chunk-interval helpers), `scoped_source`, `scoped_blobs` now the
+  store-source wrapper; tests `mere-transport` lib `blobs::` and `blob_source` 20 pass (1 new interval test, 1 new
+  `a_source_serves_verified_streams_without_a_store_in_the_provider`; the existing scoped-serving and revocation tests run
+  through the unified provider); the whole-crate run had one failure,
+  `p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers`, which hangs for over 150 s
+  and does not touch blobs (not compared against a baseline). **Door:** Mere branch `agent/p2-door-serving`: ops `bao-open`
+  and `bao-close`, `DoorBlobSource` (`graphshell-door` feature `blob-serve`), resident `BaoCursor`; tests `blob_door` 1 to 2
+  (the new one: a provider with no store serves a 200 KB multi-leaf blob to a peer through the door, verified by the peer;
+  ranges at the door; leased-but-unretained refused; non-reader refused; a scope the application does not own refused;
+  denying the reader cuts serving; revocation cuts serving and keeps custody), `resident_blob_door` lib 8 and
+  `graphshell-door` 4 unchanged and passing. **Not on main:** Mere cannot take Murm main yet (Findings, "P2 relock blocker").
+  Not done: Knot's side (a door-backed evidence host is drafted on Knot branch `agent/p2-knot-door-evidence`, uncompiled
+  against the relock), the supervisor, the multi-process Knot test, step (4), the independent moves, and the checker entry
+  `mere -> knot-editor`, which stays.
+||||||| 588fb8ea6
+- 2026-11-08: D18 to D23 recorded (Mark's rulings after The P0 result); `inker -> mere` allowlisted (D19). D20 done:
+  `murm-wire` and `murm-rtc` moved into Genet as `genet-wire` and `genet-rtc` (`components/genet-wire`,
+  `components/genet-rtc`; nothing outside Genet named them, so they were renamed). History kept: 42 commits of Murm's
+  `wire/crates/{wire,rtc}` (a tree-per-commit export, authors and dates kept, each message ends with its Murm SHA; Murm
+  `df3e2939924`), merged as Genet `0f38f9d2c`; the rename and wiring are Genet `8f13bb7e6`. Murm `58d068a04` removed the `wire/`
+  workspace and its README, DOC_README, gitignore, gitattributes and exclude rows; `merely-made/rtc` `789c434b6`
+  repointed its README. Inker `6643e7174` relocked onto Genet. Tests, before in Murm and after in Genet: `murm-wire`
+  7 and `genet-wire` 7; `murm-rtc` with `--features dns,udp` (after adding the `libc` dependency its `dns` feature
+  already used) 22 passed and 6 failed in the lib, 1, 1, 1, 1 and 4 in the integration binaries, 3 ignored, and the
+  same in `genet-rtc` (the six lib failures are the macOS mDNS-port ones, identical before and after);
+  `netfetcher` 98 passed; `genet-webrtc` lib 6 passed and `browser` 26 passed, 12 failed on `AddrInUse` and
+  `AddrNotAvailable` (mDNS port 5353 and loopback aliases; the baseline could not be built, `murm-rtc` lacked `libc`, so
+  the same failure shape is shown only by the `genet-rtc` twins). Netfetcher's `hyper-transport`, `h3` and `websocket`
+  features each check alone; `ortet` and `genet-wpt` check with `--all-targets`. Genet commits no `Cargo.lock`, so
+  its checks are unlocked. Murm default and `native` check `--locked`; `native` lib tests pass (28, 97, 69, 15, 44 and
+  small binaries). Five downstream roots could not relock (The P0 result). Receipts are in the P0 result section.
+- 2026-11-08: P3 step 3 to 5 (Mark: "Build the real guest", D23). Graphshell `4d971f3`: the `authority-guest` world and
+  `domain-authority` interface (claim has `admission`). Mere: `authority-host` (9 tests), `authority_guest` review, pin and store
+  (6 tests plus a route test), `Authority::Guest` runs a reviewed component, `mere-resident` drops `cleromancy-core`
+  (`divination_registration` and `with_resident_defaults`' divination are gone; `with_resident_defaults` reads the guest store),
+  the `mere -> cleromancy` allowlist entry is removed, the product half of `embedded_reservoir_validation` and the four natal
+  lib tests leave for Cleromancy. Cleromancy: `authority-guest/` (5.15 MiB), 577 of 577 verdicts and refusal texts equal native,
+  the seven owner tests and four natal tests pass through it. Cleromancy's root lock is blocked on webcue and wgpu-cue, so its tests
+  are on a branch. Measurements and choices: Findings, "P3 guest".

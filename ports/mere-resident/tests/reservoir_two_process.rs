@@ -111,7 +111,7 @@ async fn a_second_process_is_refused_while_the_first_owns_the_reservoir() {
         .into_iter()
         .map(|mere| mere.domain.to_string())
         .collect();
-    assert_eq!(domains, ["divination"]);
+    assert_eq!(domains, ["fixture-domain"]);
 }
 
 /// The second process. It runs only when the parent above starts it.
@@ -142,7 +142,7 @@ async fn child_attempts_to_own_the_reservoir() {
                     observed_epoch: snapshot.scene.epoch,
                     observed_revision: snapshot.scene.revision,
                     intent: RESERVOIR_ENSURE_MERE_INTENT.into(),
-                    payload: serde_json::to_vec(&EnsureMereV1::new("divination")).unwrap(),
+                    payload: serde_json::to_vec(&EnsureMereV1::new("fixture-domain")).unwrap(),
                 })
                 .unwrap();
             assert_eq!(result, IntentResult::Accepted);

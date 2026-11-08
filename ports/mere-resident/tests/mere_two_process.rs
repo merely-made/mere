@@ -48,7 +48,7 @@ const ENDPOINT_ENV: &str = "DJINN_MERE_RECEIPT_ENDPOINT";
 const APP_ENV: &str = "DJINN_MERE_RECEIPT_APP";
 const ROLE_ENV: &str = "DJINN_MERE_RECEIPT_ROLE";
 const CHILD_TEST: &str = "child_edits_the_shared_session";
-const DOMAIN: &str = "divination";
+const DOMAIN: &str = "fixture-domain";
 const PATIENCE: Duration = Duration::from_secs(60);
 
 fn persona() -> PersonaId {

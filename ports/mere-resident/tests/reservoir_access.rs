@@ -38,7 +38,7 @@ async fn access_survives_a_fresh_resident_process() {
     let root = tempfile::tempdir().unwrap();
     let backend = open_reservoir_backend(root.path(), persona()).unwrap();
     let mut store = ReservoirStore::open(backend, persona()).await.unwrap();
-    for domain in ["divination", "notes"] {
+    for domain in ["fixture-domain", "notes"] {
         let (mere, _) = store
             .ensure(DomainId::new(domain).unwrap(), 1)
             .await
@@ -50,7 +50,7 @@ async fn access_survives_a_fresh_resident_process() {
             )
             .await
             .unwrap();
-        if domain == "divination" {
+        if domain == "fixture-domain" {
             for (app, denied) in [("turnstone", true), ("knot-editor", false)] {
                 store
                     .set_application_access(
@@ -157,7 +157,7 @@ async fn fresh_resident_enforces_recorded_access() {
         request
     };
     for ambient in [false, true] {
-        let denied = request("turnstone", "divination", ambient);
+        let denied = request("turnstone", "fixture-domain", ambient);
         assert!(
             grants
                 .current()
@@ -176,14 +176,14 @@ async fn fresh_resident_enforces_recorded_access() {
         );
     }
     for app in ["cleromancy", "knot-editor"] {
-        for domain in ["divination", "notes"] {
+        for domain in ["fixture-domain", "notes"] {
             assert!(grants.current().admit(&request(app, domain, false)).is_ok());
         }
     }
     assert!(
         grants
             .current()
-            .admit(&request("knot-editor", "divination", true))
+            .admit(&request("knot-editor", "fixture-domain", true))
             .is_ok()
     );
     assert!(
@@ -195,19 +195,19 @@ async fn fresh_resident_enforces_recorded_access() {
     assert!(
         grants
             .current()
-            .admit(&request("cleromancy", "divination", true))
+            .admit(&request("cleromancy", "fixture-domain", true))
             .is_err()
     );
     assert!(
         grants
             .current()
-            .admit(&request("unknown", "divination", false))
+            .admit(&request("unknown", "fixture-domain", false))
             .is_err()
     );
     let context = AdmittedEndpointContext::new(ProjectionSession("v4:ambient".into()), [4; 32])
         .with_application("knot-editor");
     let mut endpoint = catalog
-        .update(|catalog| catalog.open(&ambient_mere_route_id("divination"), &context))
+        .update(|catalog| catalog.open(&ambient_mere_route_id("fixture-domain"), &context))
         .await
         .unwrap();
     let request = endpoint.describe().projections[0].request.clone();
