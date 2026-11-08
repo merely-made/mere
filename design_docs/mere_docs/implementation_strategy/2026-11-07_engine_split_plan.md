@@ -1,15 +1,13 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
-contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D25 are ruled (D21 reverts D20); `merely-made/inker` holds the twelve
-crates with history (main `3109942`, pushed); the plan is on origin's main
-(pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
-repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
-`merely-made/seiche` holds the seven spatial crates (main `a6b8641`) and Mere takes `seiche` and
-`numen` from it (P2's cut, below); `merely-made/inker` holds the twelve Inker crates (main `436c841`) and Mere
-takes them from it (P1's cut, below); the engine-to-workspace contract
-is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
+**Status:** 2026-11-08: D1 to D30 are ruled (D21 reverts D20; D30 supersedes D29's frame-model shape). Moved:
+`merely-made/inker` holds eleven crates with history (the twelfth, `knot-editor-host`, retired under D17; main
+`174ae7b` at 2026-11-08) and `merely-made/seiche` holds the seven spatial crates, `seiche-model` included (main
+`4109f0b` at 2026-11-08); Mere takes both as `branch = "main"` git dependencies and every family consumer
+named in Open is repinned (P1 and P2, below). P0's squishes have landed in part (D14, D26 to D28). P3 (the
+hosting in Graphshell), P4 to P8 and the consolidations C have not started: `errand`, `emblem` and `wavicle`
+are still separate repositories. The engine-to-workspace contract is deferred by D4; the Pandect sidecar
+owners and the lanes' forks are open.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
 linked-data graph, in the posture Genet takes toward the web platform: dereference, parse,
@@ -112,9 +110,9 @@ the pack loader (new).
 fold, branch, merge, replay; its reservoir half becomes the reservoir service crate, its
 sessions, manifests, view sidecars, worker declarations, settings and furnace paths are traced
 to their owners in P4), the reservoir service (new crate from `pandect::reservoir`:
-persona and domain catalog, access, store lifetimes, sealing, replication), `mere-framing`,
-`state-witness`, `mere-facts` (the persona's facts domain; its admission policy stays with
-the domain owner, as the contract says). The reservoir service crate is `catchment` (D9).
+persona and domain catalog, access, store lifetimes, sealing, replication), `mere-facts` (the persona's facts domain; its admission policy stays with
+the domain owner, as the contract says). The reservoir service crate is `catchment` (D9). `mere-framing` and `state-witness`
+moved to Eidetic under D12 and are no longer Mere's.
 
 **Graphshell: the host.** Workspace half of `graph-kernel` as the workspace kernel, which
 grows out of `incipit` and takes its name (D8: surfaces, trails, arrangements, bindings to
@@ -138,24 +136,26 @@ concrete assembly), `pelt`, `tabard`, `dramatis`, `gazette-ledger`, `moot`, `dis
 Under D23 the reference host application (`ports/graphshell`) and `graphshell-mcp` go to
 Turnstone instead, so the Graphshell repository holds no application. The contract leaves cycle-breaks D9 already assigns
 (`chirograph`, `graphshell-client`, `graphshell-endpoint`'s default surface, `sceno`,
-`scenotime`, the WIT world) are the same repository's bottom layer.
+`scenotime`, the WIT world) are the same repository's bottom layer. Several crates named above are
+already in that repository (2026-11-08): `chirograph`, `graphshell-client`, `graphshell-endpoint`, `hest`,
+`sceno`, `scenotime`, `script-wire`, `script-witgen`, `tinct` (D19), and, from cycle-breaks D17 and P7,
+`sceno-backdrops` and `vector-sheet`; the hosting list above names what still moves there from Mere.
 
 **Inker.** `inker`, `document-canvas`, `graft-engine`, `scrying-engine`, `weld-engine`,
-`nematic`, `illume`, `knot-editor-host` (after its Cambium editor integration is split off to
-the host), `mere-lanes` (taking reader styles and owning its reading-anchor type; the host
+`nematic`, `illume`, `mere-lanes` (taking reader styles and owning its reading-anchor type; the host
 adapts Tabard at the edge), `mere-pageload`, `mere-fleece` (generic traversal, clipping and
-capture; its `crawl-graph` intake adapter goes to the host), `script-rhai`. Inker emits a
+capture; its `crawl-graph` intake adapter goes to the host), `script-rhai` (eleven crates; `knot-editor-host` retired under D17, its lexers in `illume` and its editor in Knot's
+`knot-document`). Inker emits a
 document, a predicate-bearing link or a JSON-LD block with its base address; the engine
 consumes RDF; the host decides what to keep.
 
-**Seiche** (the spatial repository, D6). `conatus`, `modulus`, `nisus`, `tenant`,
-`quint-shaders`, `numen`, `seiche`. Isocosm's Eponym and Mesocosm already consume the family
-`numen`, `seiche`. Isocosm's Eponym and Mesocosm already consume the family
-without the graph.
+**Seiche** (the spatial repository, D6). `conatus`, `modulus`, `nisus`, `tenant`, `numen`, `seiche`
+and `seiche-model` (`quint-shaders` no longer exists; it folded into `conatus::resident`). Isocosm's Eponym
+and Mesocosm already consume the family without the graph.
 
 **Elsewhere.** `mere-alembic` to Distillery (it says it is Distillery's component);
-`mere-comms` per cycle-breaks D4 when unpaused; `chirograph` per D9. Empty directories
-`crates/crawl` and `crates/import` are removed. Forks in `Code/crates`: `boa`, `bole`,
+`mere-comms` is in Murm (cycle-breaks D4, landed); `chirograph` is in Graphshell (D9, landed). The empty
+directories `crates/crawl` and `crates/import` are gone. Forks in `Code/crates`: `boa`, `bole`,
 `vano` follow Genet's scripting adapters; `xilem` follows Cambium; `nexus`, `kiss3d`,
 `vello` follow Conatus and the canvas; none enter the engine. New under `Code/crates`: the
 W3C `rdf-tests`, SPARQL, `json-ld-api`, `data-shapes` and RDFC-1.0 suites, vendored the way
@@ -294,6 +294,10 @@ Knot to the canonical source. Mere receives Inker as a supplier.
   `mere.git`, so Mere's `mere.git` patch table redirects those five to `inker.git`;
   Inker names the Cambium family through `mere.git`, so the Graphshell web workspace now
   restates eight Cambium-family path redirects. Turnstone and Knot repin is open.
+  *Update 2026-11-08: done.* Knot `a58ba28` and Turnstone take every Inker crate from `inker.git`; Mere's
+  `mere.git` patch table holds no Inker or Seiche redirect row; Inker (`174ae7b`) no longer names Cambium (it
+  dropped the unused workspace row when `knot-editor-host` retired), so its one remaining Mere edge is the
+  optional `mere-fleece -> linked-data` row (F3). `knot-editor-host` has no consumer in any manifest.
 
 **Lane state, 2026-11-07 (worktree branch `worktree-agent-a61f20e98db5486a2`; receipts in the
 plan's receipt file).** Landed in the worktree: Fleece's `crawl` takes `Fetched` from
@@ -490,9 +494,9 @@ rules stay in the workspace.
 
 ### C. Consolidations (D7)
 
-Three repositories fold into their consumers, each as a workspace member of the receiver
-with history preserved as the 2026-10-19 promotion did. `smolweb` (the protocol family:
-`errand`, `gemini-protocol`, `gopher-protocol` and the rest) into Inker with P1, since
+Three repositories fold into their consumers (none has yet, 2026-11-08), each as a workspace member of the receiver
+with history preserved as the 2026-10-19 promotion did. `smolweb` (the protocol family: the repository is `merely-made/errand`, holding
+`errand`, `gemini-protocol`, `gopher-protocol`, `misfin` and ten more crates; no repository is named smolweb) into Inker with P1, since
 `nematic` and `inker` are its consumers; `misfin` is the exception to check, since
 `mere-comms` is its other consumer and Murm may be its home. `emblem` (IconVG) into
 Graphshell with P3, since `pictograph` is its only consumer. `wavicle` (WavPack) into
@@ -1384,3 +1388,12 @@ revision and what crosses at frame rate.
   `selected_text`; bole by `rev = ddf4e31`) is a fork, because webcue 0.1.2 from crates.io pins
   `document-session-api = "=0.1.1"`, the git patch then misses it, and inker's `cue.rs` mixes the
   two copies (seven E0308); until webcue moves, owners have no `selected_text()` to call.
+- 2026-11-08: audit of this plan, the doctrine and the cycle-breaks plan against the `main` of all 35 `merely-made`
+  repositories (Mere `fc15139f7`; the checker's output is in the cycle-breaks plan, "The P0 result"). Corrected
+  in place as stale fact, no decision changed: the Status block (two blocks, one saying nothing had moved);
+  `mere-framing` and `state-witness` listed as staying in Mere after D12 moved them; the Seiche crate list
+  (`quint-shaders` gone, `seiche-model` missing, one sentence duplicated); Inker's crate count (eleven, since
+  `knot-editor-host` retired); `mere-comms`, `chirograph` and the empty `crates/crawl` and `crates/import`
+  written as future; the Graphshell leaves that already live in its contract root; the P1 repin marked done; the
+  `smolweb` repository name (`errand`); DOC_README's family table rows for Inker, Nematic, Fleece, Mesh, Intel
+  and the persona picker. Contradictions that need a ruling were reported to Mark with evidence, not edited.
