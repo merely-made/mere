@@ -802,13 +802,13 @@ revision and what crosses at frame rate.
 - **D12 and D19 consumers.** Mere's side is done (Progress, 2026-11-07): the three crates are
   deleted, `pictograph` and `seiche` take `state-witness` from eidetic.git, the root `framing`
   row is gone, `tinct` and `tincture` come from graphshell.git and the `tinct` patch row is
-  dropped. Still open, outside Mere: Isocosm's `shared/isometer/crates/isometer-core/Cargo.toml:21`
-  and `shared/cosmograph/Cargo.toml:31` repin `state-witness` to eidetic.git; the five tinct
-  consumers repoint their own `tinct` row to graphshell.git in the same relock that moves their
-  mere.git past this change, or the graph carries two `Tinct`s (Cleromancy `Cargo.toml:83`,
-  Isocosm `shared/isomere/Cargo.toml:33`, Knot `apps/desktop/Cargo.toml:51`, Woodshed
-  `Cargo.toml:142`, `ports/redshank/Cargo.toml:20` and `ports/hocket/Cargo.toml:119`; mer3ly
-  has no row and only relocks). Seiche's replay example takes the witness from eidetic.git
+  dropped. Outside Mere, done by 2026-11-08: Isocosm (`753d9702`) repinned `state-witness` to
+  eidetic.git at `shared/isometer/crates/isometer-core/Cargo.toml:21` and
+  `shared/cosmograph/Cargo.toml:31`; the five tinct consumers repointed their own `tinct` row to
+  graphshell.git in the relock that moved their mere.git past this change (Cleromancy `e79576b`,
+  Isocosm `753d9702`, Knot `189487c1`, Woodshed `648ae565` across its root, redshank and hocket
+  rows; mer3ly `47599d6` had no row and only relocked). Still open: Turnstone's `tinct` redirect,
+  which leaves now that Woodshed has repinned (in flight). Seiche's replay example takes the witness from eidetic.git
   (Seiche `a6b8641`), and with Mere's copies deleted (P2's cut) the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
   would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
   rule's universal header, the witness does not publish; both names stay.
@@ -854,8 +854,10 @@ revision and what crosses at frame rate.
   Murm `apps/signalman-desktop/Cargo.toml` 67 (`seiche`); mer3ly
   `crates/repo-graph/Cargo.toml` 27 (`seiche`, now `branch = "main"`, no longer the
   `www.github.com` rev pin P2's block records). Isocosm's `.cargo/tabletop-local.toml` 62 and 63
-  overlay `numen` and `seiche` onto Mere's deleted paths. Until Knot and Cleromancy repin,
-  Mere's `mere.git` patch table redirects `numen` and `seiche`; then those two rows leave.
+  overlay `numen` and `seiche` onto Mere's deleted paths. Done 2026-11-08: Cleromancy (`e79576b`),
+  Knot (`189487c1`), Murm (`df3e293`) and mer3ly (`47599d6`) repinned these rows, and Mere's
+  `numen` redirect left. Mere's `seiche` row stays while `mere-resident` locks Cleromancy
+  `671e9bc4`, which still names `seiche` through `mere.git`; it leaves when that lock moves.
   Active Mere documents still carry 21 code-font lines into `crates/conatus/` in 10 documents;
   the one Markdown link was repointed.
 - **Knot repin (D15) on the branch.** Four of nine tests in `knot-editor`'s
@@ -1207,3 +1209,13 @@ revision and what crosses at frame rate.
   it. `mere-registry` is kept under its name as the diagnostics and observations crate rather than
   freed: moving diagnostics into the resident would make document-host and Turnstone depend on a port,
   and Turnstone and the resident name the crate today, so trimming in place costs them nothing.
+
+- 2026-11-08: P2's consumers repinned and pushed: Murm `df3e293`, mer3ly `47599d6`, Knot `189487c1`
+  and Woodshed `648ae565`. Each takes `seiche` from `seiche.git`, `tinct` from `graphshell.git`,
+  curation as `incipit::curation` and the persona picker as cambium's `persona-picker` feature, with
+  a Mere relock to `1aa838c2` wherever its lock pinned a pre-split Mere. Mere relocked Knot from
+  `a58ba28` to `189487c1` (eight root entries and one web entry, by hand, one `cargo fetch`, no other
+  source moved) and dropped the `numen` redirect row; the lock holds one `seiche`, one `numen`, one
+  `incipit` and no `mere-curation`. The `seiche` row stays: `mere-resident` locks Cleromancy
+  `671e9bc4`, whose `cleromancy-core` names `seiche` through `mere.git` (Cleromancy repinned it in
+  `e79576b`). Turnstone's `tinct` redirect and Dramatis's `persona-picker` row are in flight.
