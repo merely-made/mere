@@ -16,6 +16,8 @@ name = "chrome"
 path = "src/lib.rs"
 
 [dependencies]
+# The linear back/forward history lives in backstep (engine-split D27).
+backstep.workspace = true
 forme.workspace = true
 kernel.workspace = true
 serde = { version = "1.0", features = ["derive"] }

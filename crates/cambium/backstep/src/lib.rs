@@ -12,6 +12,7 @@
 //! is a different layer and lives with the mere's session journal.
 
 pub mod clipboard;
+pub mod nav;
 
 pub use clipboard::{Clipboard, ClipboardError, NoClipboard};
 
