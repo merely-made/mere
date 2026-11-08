@@ -1137,3 +1137,14 @@ revision and what crosses at frame rate.
   green, `block_editing` 42 passed; clippy 0 errors; the web workspace checks green for wasm.
   `knot-editor-host` has no consumer left in Mere; after Turnstone's `knot_authoring` moves it
   retires from Inker.
+- 2026-11-07: D17 complete everywhere. Mere's relock lane (`030633e0a`) merged as `a2c1cf8a5` and pushed
+  with origin's catalog work as `462686e66`: Knot at `a58ba28`, the five Inker redirects gone, the port
+  on `knot_document::retained`, the web workspace relocked with a `mere-edit` path redirect. Inker main
+  `174ae7b` retires `knot-editor-host` and drops the unused Cambium row (627 tests, 0 failed); Inker's
+  one remaining edge into Mere is Fleece's optional `mere-rdf` (F3). Two lessons for the receipts: the
+  Seiche donor merge unlocked `sha2` to 0.11 beside `md-5` 0.10 and broke the full web build, which
+  another session fixed in `eec6050c7` (the donor gates checked the web workspace, they did not build
+  it); and the main checkout's shared `target/` was being rewritten by another session's cargo, so the
+  merge gates now run in an isolated build directory with `CARGO_BUILD_JOBS=4`, after a fresh-directory
+  check showed the earlier "can't find crate" errors were a parallel-build race, not code. Other
+  sessions are already developing Seiche (`d6f44d8`, `seiche-model` catalog tables).
