@@ -30,6 +30,7 @@ use std::time::Duration;
 use incipit::forme::{OwnedTreeRow, SplitBoundary, TabEntry};
 
 use crate::toolbar::ToolbarDraft;
+pub use backstep::{ClipboardError, ClipboardEvent, ClipboardRequest};
 use kernel::content::ContentLoadState;
 use kernel::geometry::{PortablePoint, PortableRect, PortableSize};
 use kernel::graph::NodeKey;
@@ -413,7 +414,10 @@ pub struct DegradedReceiptSpec {
 /// The runtime consumes this, advances state, and produces a view
 /// model. Any host-specific side effects (webview creation requests,
 /// clipboard writes, focus handoffs) travel back through host ports
-/// rather than through the view model.
+/// rather than through the view model. A clipboard write is a
+/// [`ClipboardRequest::Write`]; the host's answer comes back here as
+/// [`ClipboardEvent::Written`] in
+/// [`clipboard_completions`](Self::clipboard_completions).
 #[derive(Debug, Clone, Default)]
 pub struct FrameHostInput {
     /// Host-neutral events translated from native input (keyboard,
@@ -454,6 +458,12 @@ pub struct FrameHostInput {
     /// after `ingest_frame_input` so any view-model the tick
     /// projects reflects the applied intents.
     pub host_intents: Vec<crate::host_intent::HostIntent>,
+
+    /// The host's answers to clipboard requests the runtime made
+    /// through host ports, in the order the host received them
+    /// (engine-split D27). A refused write arrives as
+    /// `Written(Err(..))`, never as silence.
+    pub clipboard_completions: Vec<ClipboardEvent>,
 }
 
 mod settings;

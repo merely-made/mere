@@ -9,7 +9,9 @@ use std::time::Duration;
 use kernel::graph::NodeKey;
 use kernel::time::PortableInstant;
 
-use super::{FocusRingCurve, FocusRingSpec, FrameHostInput};
+use super::{
+    ClipboardError, ClipboardEvent, ClipboardRequest, FocusRingCurve, FocusRingSpec, FrameHostInput,
+};
 
 fn spec(node: NodeKey, started: PortableInstant, duration_ms: u64) -> FocusRingSpec {
     FocusRingSpec {
@@ -127,4 +129,23 @@ fn frame_host_input_default_is_empty() {
     assert!(!input.wants_keyboard);
     assert!(!input.wants_pointer);
     assert!(!input.had_input_events);
+    assert!(input.clipboard_completions.is_empty());
+}
+
+#[test]
+fn a_clipboard_write_is_answered_through_the_host_input() {
+    // The runtime's port payload, and the host's answer to it.
+    let write = ClipboardRequest::Write("https://example.org".into());
+    let refused = write.fail(ClipboardError::Refused);
+    let input = FrameHostInput {
+        clipboard_completions: vec![ClipboardEvent::Written(Ok(())), refused],
+        ..FrameHostInput::default()
+    };
+    assert_eq!(
+        input.clipboard_completions,
+        vec![
+            ClipboardEvent::Written(Ok(())),
+            ClipboardEvent::Written(Err(ClipboardError::Refused)),
+        ]
+    );
 }

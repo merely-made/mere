@@ -31,6 +31,9 @@ iced_wgpu = { git = "https://github.com/iced-rs/iced", rev = "ab336f6d6403d7206d
 # runner. Named here so the conversion lives on this side of the seam rather
 # than in each event-source adapter.
 cambium = { version = "0.6.1", path = "../cambium" }
+# The clipboard request/completion pair an embedding's toolkit carries
+# (engine-split D27).
+backstep = { workspace = true }
 # Retained Livery/Buckram layout and its visual caret vocabulary are core host
 # machinery, not an event-source concern.
 genet-livery = { workspace = true }

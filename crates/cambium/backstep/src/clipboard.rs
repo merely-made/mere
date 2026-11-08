@@ -4,10 +4,15 @@
 
 //! The clipboard contract: the host implements it, editors code against it.
 //!
-//! Text only, synchronous. A desktop host binds its platform clipboard; a host
-//! with none passes [`NoClipboard`]. A clipboard that answers later (a browser
-//! inside a user gesture, a toolkit that replies with an event) is not this
-//! trait's shape.
+//! Text only, in two shapes. A host whose clipboard answers a call (a desktop
+//! platform clipboard) implements [`Clipboard`]; a host with none passes
+//! [`NoClipboard`]. A host whose clipboard answers later (a browser promise
+//! started inside a user gesture, a toolkit that replies with an event, a
+//! runtime whose side effects travel through host ports) carries a
+//! [`ClipboardRequest`] and answers it with a [`ClipboardEvent`]: `Read` with
+//! `Read`, `Write` with `Written`. [`ClipboardRequest::serve`] carries a request
+//! through a call-shaped clipboard, so one editor can code against the pair and
+//! run on either host.
 
 use core::fmt;
 
@@ -57,9 +62,66 @@ impl Clipboard for NoClipboard {
     }
 }
 
+/// A clipboard operation for a host that answers later.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum ClipboardRequest {
+    /// Read the clipboard's text; answered by [`ClipboardEvent::Read`].
+    Read,
+    /// Replace the clipboard's contents; answered by [`ClipboardEvent::Written`].
+    Write(String),
+}
+
+/// A host's answer to an earlier [`ClipboardRequest`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ClipboardEvent {
+    /// The clipboard was read.
+    Read(Result<String, ClipboardError>),
+    /// The clipboard was written.
+    Written(Result<(), ClipboardError>),
+}
+
+impl ClipboardRequest {
+    /// The answer that refuses this request with `error`.
+    pub fn fail(&self, error: ClipboardError) -> ClipboardEvent {
+        match self {
+            Self::Read => ClipboardEvent::Read(Err(error)),
+            Self::Write(_) => ClipboardEvent::Written(Err(error)),
+        }
+    }
+
+    /// Carry this request through a call-shaped `clipboard`, answering at once.
+    pub fn serve(&self, clipboard: &mut dyn Clipboard) -> ClipboardEvent {
+        match self {
+            Self::Read => ClipboardEvent::Read(clipboard.read_text()),
+            Self::Write(text) => ClipboardEvent::Written(clipboard.write_text(text)),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn each_request_is_answered_by_its_own_event() {
+        let write = ClipboardRequest::Write("x".into());
+        assert_eq!(
+            ClipboardRequest::Read.fail(ClipboardError::Refused),
+            ClipboardEvent::Read(Err(ClipboardError::Refused))
+        );
+        assert_eq!(
+            write.fail(ClipboardError::Unavailable),
+            ClipboardEvent::Written(Err(ClipboardError::Unavailable))
+        );
+        assert_eq!(
+            write.serve(&mut NoClipboard),
+            ClipboardEvent::Written(Err(ClipboardError::Refused))
+        );
+        assert_eq!(
+            ClipboardRequest::Read.serve(&mut NoClipboard),
+            ClipboardEvent::Read(Err(ClipboardError::Refused))
+        );
+    }
 
     #[test]
     fn no_clipboard_refuses_both_ways() {
@@ -85,5 +147,33 @@ mod tests {
         assert_eq!(clipboard.read_text(), Err(ClipboardError::Empty));
         clipboard.write_text("copied").unwrap();
         assert_eq!(clipboard.read_text().as_deref(), Ok("copied"));
+    }
+
+    #[test]
+    fn a_call_shaped_clipboard_serves_the_pair() {
+        #[derive(Default)]
+        struct Memory(Option<String>);
+        impl Clipboard for Memory {
+            fn read_text(&mut self) -> Result<String, ClipboardError> {
+                self.0.clone().ok_or(ClipboardError::Empty)
+            }
+            fn write_text(&mut self, text: &str) -> Result<(), ClipboardError> {
+                self.0 = Some(text.to_owned());
+                Ok(())
+            }
+        }
+        let mut memory = Memory::default();
+        assert_eq!(
+            ClipboardRequest::Read.serve(&mut memory),
+            ClipboardEvent::Read(Err(ClipboardError::Empty))
+        );
+        assert_eq!(
+            ClipboardRequest::Write("copied".into()).serve(&mut memory),
+            ClipboardEvent::Written(Ok(()))
+        );
+        assert_eq!(
+            ClipboardRequest::Read.serve(&mut memory),
+            ClipboardEvent::Read(Ok("copied".into()))
+        );
     }
 }
