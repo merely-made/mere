@@ -446,6 +446,20 @@ draws_on = ["stack.3"]
 title = ". P3: build the real Cleromancy guest (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 
+[decisions."cycle-breaks D24"]
+title = ". Declared authority stays a pending slot until M4 (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Authority::Declared stays a typed pending slot until M4; no interpreter is built."
+draws_on = ["cycle-breaks D1", "cycle-breaks D15"]
+
+[decisions."cycle-breaks D25"]
+title = ". Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store."
+draws_on = ["cycle-breaks D15"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"

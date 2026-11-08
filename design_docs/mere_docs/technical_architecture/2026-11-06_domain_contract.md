@@ -1135,7 +1135,18 @@ resident's own iroh endpoint is not asked to serve Knot's evidence, so no new no
 
 ### 7. As built (2026-11-08)
 
-See the cycle breaks plan's Progress entry for SHAs and tests.
+- **Murm** (`merely-made/murm` `c6b31e70`, on main): `mere-transport` module `blob_source` (`BlobSource`,
+  `BaoReader`, `StoreBlobSource`, interval helpers), `P2pandaTransportBuilder::scoped_source`, and `scoped_blobs`
+  rewritten as the store-source wrapper. Tests: `blob_source` 1 new, and
+  `a_source_serves_verified_streams_without_a_store_in_the_provider` (a provider with no store, a forwarding
+  source, a 200 KB multi-leaf blob verified by the fetching peer, a leased-but-unretained hash refused, a
+  non-reader refused, a source cut-off refusing without a stream request); the existing scoped-serving and
+  revocation tests now run through the same provider.
+- **Mere**, branch `agent/p2-door-serving` (not on main, see the plan's Findings, "P2 relock blocker"):
+  `graphshell-door` feature `blob-serve` (`DoorBlobSource`, `BlobDoorClient::bao_open`, `bao_next`, `bao_close`,
+  wire `BaoOpen`, `BaoClose`, `Bao`, `ChunkInterval`); `resident_blob_door.rs` (`BaoCursor`, `bao_chunk`, the
+  per-chunk re-check); `tests/blob_door.rs` gains
+  `an_application_without_the_store_serves_verified_streams_through_the_door`.
 
 ||||||| 24f8bbf5a
 

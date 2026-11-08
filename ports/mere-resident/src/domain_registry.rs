@@ -112,8 +112,12 @@ impl DeclaredAuthority {
     }
 }
 
-/// Declared data a Stickleback `OperationPolicy`-shaped interpreter will run
-/// (cycle breaks P2). Typed here and not yet implemented.
+/// Declared data a Stickleback `OperationPolicy`-shaped interpreter will run.
+///
+/// A typed pending slot until M4, its first resident-side consumer (Mark,
+/// cycle breaks D24 (A), 2026-11-08): no interpreter is built, a domain that
+/// registers it is refused as pending, and Knot's policy keeps running in
+/// Knot's own sync host.
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct DeclaredAuthority {
@@ -133,7 +137,7 @@ pub enum Authority {
     },
     /// A reviewed wasm guest. Without an installed guest, edits are refused as pending.
     Guest(GuestAuthority),
-    /// Declared data. Unimplemented: edits are refused as pending.
+    /// Declared data. A pending slot until M4: edits are refused as pending.
     Declared(DeclaredAuthority),
 }
 

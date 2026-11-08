@@ -319,7 +319,7 @@ graphshell-mcp = { path = "../../crates/graphshell/graphshell-mcp" }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop", "goal-surface"] }
 mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint = { workspace = true, features = ["projection"] }
-graphshell-door = { workspace = true, features = ["projection-door", "projection-provider", "profile", "blob-door"] }
+graphshell-door = { workspace = true, features = ["projection-door", "projection-provider", "profile", "blob-door", "blob-serve"] }
 djinn = { workspace = true, features = ["resident", "door-serve"] }
 ostiary = { workspace = true, features = ["native"] }
 castellan-client = { workspace = true, features = ["client"] }

@@ -138,8 +138,10 @@ parameterisation lands first. Tests keep their counts and the door route has its
 
 ### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
 
-**Status 2026-11-08: step (1) done; steps (2) and (3) stopped on two design questions the plan and rulings do
-not settle (Findings, "P2 findings"); step (4) depends on them.** The brief's repository name `merely-made/knot` does
+**Status 2026-11-08 (later): step (1) done; step (2) settled by D24 (a pending slot until M4; nothing to build);
+step (3) ruled by D25 and half built: Murm's source trait is on main, the door's verified read and `DoorBlobSource`
+are built and tested on Mere branch `agent/p2-door-serving`, held for a relock blocker (Findings, "P2 relock
+blocker"); Knot's side (door-backed evidence host, the supervisor, the multi-process test) and step (4) are not done.** The brief's repository name `merely-made/knot` does
 not exist on GitHub; Knot is `merely-made/knot-editor`, which is also what Mere's manifests and lock name.
 
 In this order. **(1)** P2a. **(2)** Knot's `DeclaredPolicy` (its `OperationPolicy`, a data value,
@@ -540,6 +542,25 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   Links: area stack · draws on cycle-breaks D1, cycle-breaks D14, stack.3 · plans cycle-breaks P3 · summary Mark ruled to build the real Cleromancy guest (P3 step 3); another agent is doing it.
 
+- **D24. Declared authority stays a pending slot until M4 (Mark, 2026-11-08):** "(A) Pending slot until M4",
+  on the P2 findings' step (2) question. `Authority::Declared` stays a typed slot that refuses as "pending: no
+  authority installed"; no interpreter, no extension trait and no delivery path are built before M4 (the
+  replicated `notes` mere), its first resident-side consumer. Knot's `KnotSyncPolicy` keeps running inside
+  Knot's own sync host. P2 step (2) is therefore done by this ruling: the slot and its test
+  (`guest_and_declared_validators_refuse_every_candidate_as_pending`) exist, and its doc comment says so.
+  Outcome: settles the P2 findings' step (2) question as option A.
+
+  Links: area stack · draws on cycle-breaks D1, D15 · plans cycle-breaks P2 · summary Authority::Declared stays a typed pending slot until M4; no interpreter is built.
+
+- **D25. Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08):**
+  "(2) Transport change", on the P2 findings' step (3) question. Murm's scoped blob provider takes a source
+  trait (`BlobSource`) instead of a store; the blob door route gains a verified read so a child that holds no store
+  serves iroh-blobs-compatible verified streams sourced from the resident. Knot's evidence reference and dial
+  hints are unchanged. Design in the domain contract, "Serving through the door".
+  Outcome: settles the P2 findings' step (3) question as option 2.
+
+  Links: area stack · draws on cycle-breaks D15 (i), domain-contract blob door route · plans cycle-breaks P2 · summary The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store.
+
 ## Findings
 
 Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other repositories'
@@ -884,6 +905,18 @@ Knot-as-guest fixtures can move to Knot as consumers (domain contract, section 4
 `graph-kernel`, a dev edge to `mere-resident` and a relock against Mere first, and none of it advances the manifests until
 (3) is answered.
 
+### P2 relock blocker (2026-11-08)
+
+Mere cannot take a Murm revision past `58d068a04d4` (the `wire/` removal) without moving Genet, and cannot move
+Genet while it pins `webcue = "=0.1.2"`. Evidence: `cargo update -p mere-transport` fails with "no matching package
+named `murm-wire`" required by `netfetcher` at Genet `d634ee0c`; moving `netfetcher` too takes every Genet package to
+`8f13bb7e`, where `document-session-api` is `0.1.2` (the selected-text query), while crates.io `webcue 0.1.2` requires
+`document-session-api = "=0.1.1"`, so the lock holds both (the `[patch.crates-io]` entry for it no longer applies)
+and `inker` stops compiling (`document_session_api::CapabilityStatus` against `webcue`'s). It is the wire-removal
+lane's relock to settle (a webcue release against `0.1.2`, or Genet's version held at `0.1.1`). My Mere door code was
+verified with a throwaway `[patch]` of Murm to a local checkout of the pre-removal Murm plus my two commits, and is
+pushed on branch `agent/p2-door-serving` without a relock; it merges to main once Mere's lock can take Murm main.
+
 ### P3 spike (2026-11-08)
 
 **Step (1), the split.** The blocker was one manifest line. `core/Cargo.toml` (the `cleromancy-core` package Mere names as
@@ -1204,3 +1237,19 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   and (2) done and pushed (Cleromancy `046bd58`): `core/Cargo.toml` drops muniment's `redb` feature, the portable core checks
   on `wasm32-wasip2`; the component is 7.45 MiB of 16, verdict-equal over 577 of 577 corpus cases, about 2 times native per
   call (p50 20 ms, max 101 ms). The real guest is held for Mark's review (D15 (h)). Cleromancy's own plan has a short entry.
+- 2026-11-08: P2 steps (2) and (3) rulings built as far as they go (D24, D25). **Declared:** nothing to build; the typed
+  pending slot and its test exist (`domain_registry.rs`). **Transport:** Murm `c6b31e70` (main): `blob_source`
+  (`BlobSource`, `BaoReader`, `StoreBlobSource`, chunk-interval helpers), `scoped_source`, `scoped_blobs` now the
+  store-source wrapper; tests `mere-transport` lib `blobs::` and `blob_source` 20 pass (1 new interval test, 1 new
+  `a_source_serves_verified_streams_without_a_store_in_the_provider`; the existing scoped-serving and revocation tests run
+  through the unified provider); the whole-crate run had one failure,
+  `p2panda_transport::tests::both_sides_dialling_at_once_stays_connected_while_the_link_delivers`, which hangs for over 150 s
+  and does not touch blobs (not compared against a baseline). **Door:** Mere branch `agent/p2-door-serving`: ops `bao-open`
+  and `bao-close`, `DoorBlobSource` (`graphshell-door` feature `blob-serve`), resident `BaoCursor`; tests `blob_door` 1 to 2
+  (the new one: a provider with no store serves a 200 KB multi-leaf blob to a peer through the door, verified by the peer;
+  ranges at the door; leased-but-unretained refused; non-reader refused; a scope the application does not own refused;
+  denying the reader cuts serving; revocation cuts serving and keeps custody), `resident_blob_door` lib 8 and
+  `graphshell-door` 4 unchanged and passing. **Not on main:** Mere cannot take Murm main yet (Findings, "P2 relock blocker").
+  Not done: Knot's side (a door-backed evidence host is drafted on Knot branch `agent/p2-knot-door-evidence`, uncompiled
+  against the relock), the supervisor, the multi-process Knot test, step (4), the independent moves, and the checker entry
+  `mere -> knot-editor`, which stays.
