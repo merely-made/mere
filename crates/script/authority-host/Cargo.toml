@@ -1,0 +1,30 @@
+# The authority-guest component host: the native side of the `authority-guest` WIT world, the
+# gate a domain's authority runs behind (cycle breaks P3, D15 (h)). A sibling of app-host,
+# document-host and block-host over the same `mere:script` contract (one WIT package, in the
+# Graphshell repository, materialised at `crates/script/wit` by build.rs). It is
+# domain-agnostic: it moves a copied candidate across the boundary and knows no domain and no
+# Mere type. The resident (`mere-resident`) wraps it in `Authority::Guest`.
+[package]
+name = "authority-host"
+version = "0.0.1"
+edition = "2021"
+
+rust-version = "1.97.1"
+license.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# The WIT world lives in this package; its build script publishes the directory to this
+# crate's build script as DEP_GRAPHSHELL_ENDPOINT_WIT. The crate itself is not used.
+graphshell-endpoint = { workspace = true }
+# wasmtime 45, matching document-host, app-host and block-host (one engine version).
+wasmtime = "45"
+wasmtime-wasi = "45"
+# The deterministic generator behind the guest's WASI random (the trait wasmtime-wasi names).
+rand = { version = "0.10", default-features = false }
+
+[lints]
+workspace = true
