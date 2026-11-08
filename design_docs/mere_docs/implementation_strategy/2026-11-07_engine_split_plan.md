@@ -127,7 +127,8 @@ view and composition crates; no new facade), `mere-cartography`, `pictograph`, `
 `workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
 `mere-view`, `mere-overmap`), `tabard`, `mere-chrome`, `mere-registry` (examined feature by
 feature in P0; a registry may carry several owners' contracts but makes none of their
-decisions), `mere-surface-api`, `settings-wit`, `ux-events`, `mere-fetch` (the host's fetch
+decisions; P0 done: trimmed to `diagnostics` and `observations` under its own name, the five
+dead registries deleted, the mod loader moved into `document-host`), `mere-surface-api`, `settings-wit`, `ux-events`, `mere-fetch` (the host's fetch
 service, keeping cookies and the engine-flip state; RDF resolution policy is the engine's),
 `graphshell-host`, `djinn-testkit`, `mere:script` with `script-wire` and `script-witgen`,
 `app-host`, `document-host`, `scenograph`, `scenomise`, and the ports `mere-resident` (the
@@ -1176,3 +1177,15 @@ revision and what crosses at frame rate.
   diagnostics into the resident would make document-host and Turnstone depend on a port.
   `mere-registry` is not yet freed. Before the branch reaches main: Knot, Turnstone and Woodshed name
   `mere-curation`, and Woodshed and Dramatis name `persona-picker`, from `mere.git` main.
+- 2026-11-08: P0 registries lane (branch `p0/registries`, worktree `worktrees/mere-p0-registries`, not
+  merged). D14 carried out in its amended form. Deleted from `mere-registry`: `input`, `knowledge`,
+  `layout`, `lens` and `protocol` with their features (4,192 lines of Rust plus the 162-line UDC seed
+  under `assets/knowledge`); default features are now `["diagnostics"]`; manifest dependencies dropped:
+  hest, http, inker, inventory, kernel, nucleo, parking_lot, petgraph, serde, serde_json, tabard,
+  tincture, toml, tower, and the dev-dependencies serde_json and tempfile. `mod_loader` (2,385 lines,
+  tests included) moved into `document-host` as `document_host::mod_loader`, its only consumer; the
+  `mod-loader` and `test-utils` features are gone (no consumer in the tree; the test-only helpers are
+  now `cfg(test)`). document-host takes `registry` with `diagnostics` because the loader emits through
+  it. `mere-registry` is kept under its name as the diagnostics and observations crate rather than
+  freed: moving diagnostics into the resident would make document-host and Turnstone depend on a port,
+  and Turnstone and the resident name the crate today, so trimming in place costs them nothing.

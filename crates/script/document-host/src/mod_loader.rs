@@ -58,5 +58,5 @@ pub use loader::{
     resolve_mod_load_order, runtime_has_capability,
 };
 
-// `compute_active_capabilities_with_disabled` is test-utils gated in
-// the loader module; not re-exported at the crate root.
+// `compute_active_capabilities_with_disabled` is test-only in
+// the loader module; not re-exported here.

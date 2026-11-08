@@ -4,9 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! P2.4 — the `registry::mod_loader` `WasmModRuntime` bridge.
+//! P2.4 — the `crate::mod_loader` `WasmModRuntime` bridge.
 //!
-//! Implements `registry::mod_loader`'s `WasmModRuntime` DI trait **without editing
+//! Implements `crate::mod_loader`'s `WasmModRuntime` DI trait **without editing
 //! that crate** (it is deliberately runtime-free — the trait exists precisely so
 //! Wasmtime stays host-side, §11.1). A host wires
 //!
@@ -52,7 +52,7 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-use registry::mod_loader::{ModCapability, ModManifest, WasmModRuntime, WasmModSource};
+use crate::mod_loader::{ModCapability, ModManifest, WasmModRuntime, WasmModSource};
 use wasmtime::{Engine, Store, StoreLimits};
 
 use crate::{DocumentCore, Grant, ScriptHost, build_instance, seed_dom};
@@ -64,7 +64,7 @@ struct ActiveMod {
     bindings: DocumentCore,
 }
 
-/// The document-host's implementation of `registry::mod_loader`'s `WasmModRuntime`.
+/// The document-host's implementation of `crate::mod_loader`'s `WasmModRuntime`.
 /// Owns one Wasmtime `Engine` (cheap, `Arc`-backed) and a `mod_id`-keyed table of
 /// activated instances. Construct it with the set of host capabilities the surface
 /// is willing to grant; `activate` enforces that set before instantiating.
