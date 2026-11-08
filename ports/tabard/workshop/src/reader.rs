@@ -23,6 +23,33 @@ pub const READER_ADDRESS: &str = "https://garden.example/after-rain";
 
 /// One independently laid-out appearance of the fixed, genuinely extracted
 /// article. A palette change preserves the original portable source packet.
+/// Tabard's theme typography as the lanes' reader styles (engine split D16):
+/// Tabard resolves each family to its CSS list with fallback; the interface
+/// role has no document counterpart.
+fn reader_styles(typography: &tabard::Typography) -> mere_document_lanes::ReaderStyles {
+    use mere_document_lanes::{ReaderFontStyle, ReaderRole};
+    use tabard::FontRole;
+    let mut styles = mere_document_lanes::ReaderStyles::default();
+    for (role, style) in &typography.0 {
+        let reader = match role {
+            FontRole::Reading => ReaderRole::Reading,
+            FontRole::Heading => ReaderRole::Heading,
+            FontRole::Code => ReaderRole::Code,
+            FontRole::Label => ReaderRole::Label,
+            FontRole::Interface => continue,
+        };
+        styles.0.insert(
+            reader,
+            ReaderFontStyle {
+                family: style.css_family(*role),
+                size_px: style.size_px,
+                line_height: style.line_height,
+            },
+        );
+    }
+    styles
+}
+
 pub struct ReaderSpecimen {
     source: Arc<EngineDocument>,
     document: SmolwebDocument,
@@ -131,7 +158,7 @@ impl ReaderSpecimen {
     fn apply_typography_style(&mut self) {
         let style = mere_document_lanes::document_style_with_typography(
             &self.baseline_style,
-            &self.typography,
+            &reader_styles(&self.typography),
         )
         .expect("validated typography");
         self.document.set_style_sheet(style);

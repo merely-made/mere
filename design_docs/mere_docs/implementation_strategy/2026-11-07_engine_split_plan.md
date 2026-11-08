@@ -2,10 +2,13 @@
 
 **Status:** 2026-11-07: plan. Nothing has moved. D1 to D10 are ruled; the engine-to-workspace
 contract is deferred by D4; the Pandect sidecar owners are open.
-**Status:** 2026-11-07: plan. Nothing has moved. D1 to D23 are ruled (D21 reverts D20); the plan is on origin's main
+**Status:** 2026-11-07: plan. Nothing has moved. D1 to D25 are ruled (D21 reverts D20); `merely-made/inker` holds the twelve
+crates with history (main `3109942`, pushed); the plan is on origin's main
 (pushed 2026-11-07 at `9e790a152`); Eidetic main carries D12 (`71188bb`) and Knot main the D15
 repin (`2c703c4`); P1 and P2 lanes have proved their crates standalone in worktrees (nothing merged);
-`merely-made/inker` and `merely-made/seiche` exist, empty (Mark created them from the M4); the engine-to-workspace contract
+`merely-made/seiche` holds the seven spatial crates (main `a6b8641`) and Mere takes `seiche` and
+`numen` from it (P2's cut, below); `merely-made/inker` holds the twelve Inker crates (main `436c841`) and Mere
+takes them from it (P1's cut, below); the engine-to-workspace contract
 is deferred by D4; the Pandect sidecar owners and the lanes' forks are open.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -197,6 +200,49 @@ holds six layout strategies, not only contracts, while `pictograph` is 93% graph
   recorded.
 - Needs: nothing.
 
+**Inker crates** (P1 lane, 2026-11-07; lines of Rust under `src`, consumers across Mere,
+Turnstone and Knot manifests). Proposals for Mark to confirm or refuse; F1 to F4 are P1's forks.
+
+- `inker` (9.8k; 9 Mere crates, Turnstone, Knot): fits, selecting engines and carrying the
+  document model, surface-engine contract, cue, sniff, flip and the pure `statements` walk the
+  engine ingests. Stays whole; frees nothing.
+- `document-canvas` (6.5k; lanes, platen, tabard-workshop): fits, laying out
+  `inker::EngineDocument`. Stays: folding it into `inker` would put parley and netrender under
+  every engine-controller consumer (fetch, platen, uxtree, linked-data). Frees nothing.
+- `graft-engine` (1.0k), `scrying-engine` (1.5k), `weld-engine` (1.9k) (Turnstone optional;
+  pelt-desktop takes scrying): each is one `inker::SurfaceEngine` adapter over one foreign
+  producer, a module's worth. Merge into `inker` as feature-gated `surface` modules, keeping
+  `inker`'s default graph wgpu-free; frees three names, none claimed on crates.io (all
+  `publish = false`). No distinct purpose in this plan needs them.
+- `nematic` (10.5k; lanes, uxtree, document-canvas dev, Turnstone, Knot): fits, lowering
+  smolweb formats to inker documents over `errand` (its only direct smolweb crate). Stays;
+  frees nothing.
+- `illume` (2.0k; cambium optional, graphshell, Knot): fits, the portable lexer. Took
+  `knot-editor-host`'s Markdown reuse-lexer and `full_pack` with their two tests, behind the
+  new `markdown` feature (D17).
+- `knot-editor-host` (0.3k; graphshell port, Turnstone, Knot's `knot-document`): retiring
+  (D17). The lexers are in Illume and re-exported here; `KnotEditor` and `KnotReadout` go to
+  Knot's `knot-document`; when the consumers have moved, the crate retires and frees
+  `knot-editor-host` (published 0.1.1).
+- `mere-lanes` (8.4k; graphshell, pelt, tabard-workshop, Turnstone): fits, the reader and
+  smolweb lanes over the document canvas. Owns its `ReadingPreferences`, `ReadingAnchor` and
+  reader styles (D16) and the smolweb palette over Graphshell's `tinct` (D19); no Tabard
+  dependency remains. Its `remote` fetcher
+  (netfetcher and errand, 0.4k) overlaps `mere-fetch`'s transport and is traced in P3. Stays;
+  frees nothing.
+- `mere-pageload` (0.8k; mere-fetch re-exports it, pelt-core, Turnstone, now Fleece's crawl):
+  fits, the sans-IO page load and fetch vocabulary. Stays: folding it into `inker` would make
+  `mere-fetch`'s optional `inker` edge mandatory. Frees nothing.
+- `mere-fleece` (7.0k; lanes, moot, pelt, graphshell, the facade, Turnstone): fits, bounded
+  traversal, retained traversal, clipping, capture and the Eidetic bridge. P1 cut its
+  `crawl-graph` intake (below). `structured-data` (0.6k, no consumer in any manifest) projects
+  JSON-LD blocks into graph contributions through `mere-rdf`, which is the engine's job by this
+  plan's own sentence (F3). Stays; frees nothing.
+- `script-rhai` (1.2k; graphshell, Knot): fits, the Rhai `BlockEvaluator` and `ValueEngine`.
+  Its `command` module collects `hest::Invocation`s from a host-offered `CommandSet` over
+  `hest` from Graphshell's contract root, which Inker may name (D19 settles F4). Stays whole;
+  frees nothing.
+
 **Spatial crates (P2 lane, 2026-11-07).** Lines are `src` lines; dependents are manifests in
 Mere, Isocosm, Cleromancy, Knot, Murm and mer3ly.
 - `conatus` (5,959): fits. Host-neutral 3D bodies, collision, queries and fixed step over a
@@ -237,6 +283,14 @@ Knot to the canonical source. Mere receives Inker as a supplier.
   headed receipts that exist today pass from the new home; the moved packages keep their
   names.
 - Needs: P0's lines for the Inker crates.
+- State (2026-11-07): **Mere's half is cut.** Mere deleted its twelve copies and the three
+  design areas and takes the crates from `inker.git` (`branch = "main"`, locked at
+  `3109942`; `436c841` above it adds only Inker's DOC_POLICY and DOC_README). Every moved
+  file matched Inker's copy except `document-canvas`'s text test, which reads Inker's own
+  Roboto (F5, settled there). Knot's pinned revision still names five of them through
+  `mere.git`, so Mere's `mere.git` patch table redirects those five to `inker.git`;
+  Inker names the Cambium family through `mere.git`, so the Graphshell web workspace now
+  restates eight Cambium-family path redirects. Turnstone and Knot repin is open.
 
 **Lane state, 2026-11-07 (worktree branch `worktree-agent-a61f20e98db5486a2`; receipts in the
 plan's receipt file).** Landed in the worktree: Fleece's `crawl` takes `Fetched` from
@@ -245,41 +299,72 @@ graph binding became the generic `crawl::session::CrawlSession<D, T>`, retiring 
 `crawl-graph` feature and its `incipit` and `mere-rdf` edges (no consumer enabled it); the
 single-hop lowering moved with its test to `mere-fetch`'s new `fleece-crawl` feature; the
 Scenograph rule-runner test moved from `script-rhai` to `scenograph` as a consumer test, so
-the dev edge back to the host is gone. A standalone workspace of the twelve crates (copied to
-the system temp directory, Genet and smolweb, `merely-made/errand`, from their canonical
-URLs) checks and tests green (761 tests; one timing test failed under a concurrent build and
-passed three of three alone). Mere checks green except `mere-resident`, whose Knot dependency
-is broken on this tree before P1; Knot and Turnstone check green with the twelve packages
-patched to the standalone workspace, each resolving from one source. Four edges into Mere or Graphshell remain, each held by a fork,
-plus one file edge:
+the dev edge back to the host is gone. Under D16 `mere-lanes` owns `ReadingPreferences`,
+`ReadingAnchor` and reader styles (`ReaderRole`, `ReaderFontStyle`, `ReaderStyles`, with
+family lists the host resolves); `tabard-workshop` converts Tabard's typography at its edge.
+Under D17 the Markdown reuse-lexer and `full_pack` moved with their tests to Illume's new
+`markdown` feature; `knot-editor-host` re-exports them and is marked for retirement. A
+standalone workspace of the twelve crates (copied to the system temp directory, Genet and
+smolweb, `merely-made/errand`, from their canonical URLs) checks and tests green (769 tests).
+On main after D15 (`4b99ce9f2`) Mere checks green; the Graphshell port converts at its five
+D16 boundary sites in `retained_content.rs` (Mark's option (a)), its persisted anchors staying
+Tabard's. Two Inker edges into Mere remain, plus one file edge; `mere-lanes -> tinct`
+and `script-rhai -> hest` reach Graphshell's contract root, which D19 allows:
 
-- F1, `mere-lanes -> tabard`. The lanes' public API takes and returns
-  `tabard::ReadingPreferences` and `tabard::ReadingAnchor`, re-exports Tabard's smolweb palette
-  (which carries `tinct::ModeProfile`), and maps `tabard::Typography`;
-  `ReadingPreferences::typography()` returns Tabard's type. Turnstone names the two Tabard
-  types in over forty places and persists the anchor. Options: (a) the types move into the
-  lanes and Tabard re-exports them (consumers unchanged; Tabard, a theme library under Pandect,
-  the registry and wasm hosts, gains the lanes' netrender and parley graph); (b) the lanes own
-  their own types and each host converts Tabard's at the edge, cut first: new API beside the
-  old, consumers move, then the Tabard edge goes; (c) the types go to `inker`, which both
-  depend on. Recommended: (b), the plan's own wording.
-- F2, `knot-editor-host -> cambium`. `KnotEditor` wraps Cambium's own `TextInput`, and Mere's
-  graphshell port, Turnstone and Knot's `knot-document` all import
-  `knot_editor_host::KnotEditor`, so the edge cannot go without consumer edits. Options for
-  the editor: (a) Knot's `knot-document`, which already wraps it; (b) `cambium` behind a
-  feature; (c) a host crate taking a freed name; (d) generic over a buffer trait Cambium
-  implements. The lexers go to Illume either way. Recommended: (a).
-- F3, `mere-fleece -> mere-rdf` (optional, `structured-data`, no consumer in any manifest).
+- F6, settled by D19 (Mark's smallest option): the smolweb palette (`SmolwebTheme`,
+  `SmolwebPalette`, `ModeProfile`) moved into `mere-lanes` (`src/smolweb/palette.rs`, with its
+  four tests) over `tinct` from graphshell.git; the lanes no longer depend on Tabard, which
+  keeps its own smolweb module for the hosts. Mere's graphshell.git rows moved together to
+  `d80316db` (ten packages), since the lanes' `tinct` exists only from there and Cargo cannot
+  hold one branch at two revisions offline.
+
+Host follow-up under D16 (not edited here). Each host keeps persisting Tabard's types and
+converts at the lanes' boundary:
+
+- Turnstone: 22 uses of `tabard::ReadingAnchor` or `tabard::ReadingPreferences` in 11 files;
+  the boundary calls are `src/shell/content_pool.rs` lines 221 and 229
+  (`restore_reading_anchor`), 260 and 267 (`reading_preferences()` compared with the host's),
+  282 and 289 (`set_reading_preferences`); `src/shell/effects/shell_effect_control_content.rs`
+  264 and 268 (`restore_reading_anchor`); `src/shell/reader_observe.rs` 135 and 139
+  (`reading_anchor()`) and 188 (`reading_preferences()`); and the test
+  `src/shell/content_pool/tests/hidden_finite_livery_work_schedules_ticks_until_settled_cases.rs`
+  211 and 215. The persisted anchor stays Tabard's: `src/scope_navigation.rs:26`
+  (`Scope.reading`), its deserializer `src/scope_navigation/impl_de_deserialize_de_for_scope.rs`
+  13 and 19 (including the legacy shape), `src/reading_view.rs` (the `anchors` map, line 40)
+  and `src/action/effect.rs:17` (`RestoreReadingAnchor`).
+- Graphshell port (converted, option (a)): the compiler named five sites, all in `ports/graphshell/src/retained_content.rs`
+  (299, 305, 306, 313, 315: `reading_anchor`, `restore_reading_anchor`, `reading_preferences`
+  over the reader and smolweb sessions); 22 uses of the Tabard types in 6 files stay as they
+  are. The persisted anchors are `ports/graphshell/src/forme_workspace.rs` 27
+  (`reading_anchors`) and 31 (`scope_navigation`).
+- Turnstone's 12 palette sites (`ModeProfile`, `SmolwebTheme`) name the lanes' own types and
+  need no edit. Its one meeting point is `src/shell/shell_publish_engine_inventory.rs` 374 to
+  384, where `tabard_mode().profile()` (Tinct's `ModeProfile` through Tabard) is assigned to
+  the lanes' `color_mode`: the same type once Tabard and Turnstone take `tinct` from
+  graphshell.git (D19's repoint), a two-field conversion (`dark`, `high_contrast`) until then.
+- Neither host uses `document_style_with_typography`; `tabard-workshop`'s one site is converted
+  (`ports/tabard/workshop/src/reader.rs`, `reader_styles`).
+
+Follow-up under D17 (not edited here): Knot's `crates/knot-document/src/editor.rs` takes
+`KnotEditor`, `EditOutcome` and `KnotReadout` from `crates/inker/knot-editor-host/src/{model,editor}.rs`
+(with `model.rs`'s three tests) and depends on `cambium` and `illume` (feature `markdown`)
+instead of `knot-editor-host` (root `Cargo.toml` line 106, `crates/knot-document/Cargo.toml`
+line 38); Turnstone's `src/knot_authoring.rs:43` and Mere's `ports/graphshell/src/block_editing.rs:14`
+then import `KnotEditor` from `knot-document`, and their manifests drop `knot-editor-host`
+(Turnstone `Cargo.toml` line 268). Then `knot-editor-host` retires and leaves Inker.
+
+- F2 (ruled D17, Knot's `knot-document`), `knot-editor-host -> cambium`: stays until Knot
+  takes the editor (above).
+- F3 (open), `mere-fleece -> mere-rdf` (optional, `structured-data`, no consumer in any manifest).
   It projects JSON-LD blocks into graph contributions, the engine's job. Options: the engine,
   taking plain block text and base address; the host; retirement. Recommended: the engine.
   Finding: `mere-rdf` depends on `mere-kernel` and on `inker`, so Inker cannot depend on the
   engine without a cycle until P5 separates it.
-- F4, `script-rhai -> hest` (graphshell.git, a serde-only leaf). Its `command` module turns a
+- F4, settled by D19: `script-rhai -> hest` (graphshell.git, a serde-only leaf). Its `command` module turns a
   Rhai batch into `hest::Invocation`s against a host-offered `CommandSet`; Mere's graphshell
-  port and Knot's endpoint tests consume it. Options: move `command` to the host; or rule
-  `hest` a contract leaf Inker may name, amending "nothing lower names anything higher".
-  Recommended: move it.
-- F5, a file edge: `document-canvas`'s text test includes Cambium's
+  port and Knot's endpoint tests consume it. `hest` is in Graphshell's contract root, which
+  Inker may name; nothing changes.
+- F5 (settled in Inker 2026-11-07: Inker carries the font with its Apache-2.0 notice), a file edge: `document-canvas`'s text test includes Cambium's
   `examples/genet_web_smoke/assets/Roboto-Regular.ttf` (168 KB, no licence file beside it,
   ten users in Mere). The standalone proof placed a copy at that path in the scratch
   workspace. Options: Inker carries its own copy with the licence, or the family gets one
@@ -287,9 +372,7 @@ plus one file edge:
 
 The `fleece-crawl` home in `mere-fetch` is a reversible choice (it lowers `fetch::crawler`);
 Mere's graph instantiation of the session, `CrawlSession<GraphId, GraphContribution>`, is
-written by the first host that needs it. Commits are blocked: the repository's clippy hook
-fails on this tree before any P1 change, in Knot's locked `knot-composition` (`abffd2d`),
-which names `scenomise::backdrops`, moved out by `794a88c77` (cycle breaks D17).
+written by the first host that needs it. The branch is rebased onto main after D15 and committed there with the clippy hook run.
 
 ### P2. Seiche
 
@@ -305,6 +388,12 @@ projection crates that consume the workspace kernel stay with the host.
   replay rerun from it equals the 2026-10-20 recorded traces witness for witness; Mere's
   canvas checks; Isocosm's Eponym and Mesocosm check against the standalone crates with one
   source each. Not done: the repository, the move, the repins.
+- State (2026-11-07, Mere's cut on a worktree branch): Seiche main `a6b8641` holds the seven
+  crates (`seiche-model` included) with history and D25's two documents; Mere deleted
+  `crates/conatus/`, takes `seiche` and `numen` from `seiche.git` (`pictograph` and
+  `graph-kernel` inherit), and redirects both in its `mere.git` patch table until the outside
+  consumers repin (Open, After P2's cut). Not done: those repins, and Isocosm resolving
+  Eponym and Mesocosm from `seiche.git`.
 - Edges the move keeps: `armillary` (family git, optional `actor`), the kiss3d fork by rev,
   and Mere's `cubek-matmul` patch, which the standalone graph lacks (Burn features only).
 - Forks, open: (1) `state-witness`, seiche's one edge into Mere, dev-only, for the replay
@@ -632,6 +721,24 @@ revision and what crosses at frame rate.
 
   Links: area The stack · amends engine-split D2, cycle-breaks D8 · draws on mere:stack.3 · plans engine-split P3 · summary The Graphshell repository is the host layer as a library, contract root below and hosting above, with no application; Turnstone holds the reference host and the MCP server.
 
+- **D24. Fleece's fixtures copy into the Graphshell port (Mark, 2026-11-07):** when Mere deletes
+  `crates/fleece`, the port's tests and fixture example read Fleece's portable-clip fixtures
+  (`knot.json`, `redshank.json`, `voice.wav`) by relative path in eight places: "Copy the three
+  fixtures into the port (Recommended)", over reading them from Inker's checkout or a shared
+  test-asset home (the family-wide answer F5 also raised). Outcome: applies P1; the shared
+  asset home stays an open fork.
+
+  Links: area The stack · draws on engine-split D1 · plans engine-split P1 · summary The Graphshell port carries its own copies of Fleece's three portable-clip fixtures.
+
+- **D25. The conatus engine plan and its two briefs move to Seiche as its first area (Mark,
+  2026-11-07):** they sat in `mere_docs/` with no area root, so by the letter they stayed, while
+  their subject is now entirely Seiche: "Move the conatus plan and its two briefs to Seiche as its
+  first area (Recommended)". Mere's addendum rule, when code moves out its docs move with it. The
+  dynamics grammar and physics catalog plans have consumers on both sides and stay in Mere, cited
+  from both. Outcome: applies DOC_POLICY §4 (docs live with the owner of the subject).
+
+  Links: area The stack · draws on engine-split D5 · plans engine-split P2 · summary Seiche's first design area holds the conatus engine plan and its two briefs; the dynamics grammar and physics catalog plans stay in Mere.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -640,7 +747,7 @@ revision and what crosses at frame rate.
   engine's own: `linked-data/src/statements.rs` makes the engine depend on `inker`, which a
   2026-07-10 ruling placed there so Inker stayed kernel-free; under the split it belongs with
   Inker's emitted statements or the host's intake adapter.
-- **P2 forks (Seiche lane).** `state-witness`: seiche's dev-edge back into Mere is a
+- **P2 forks (Seiche lane).** `state-witness` (settled by D12; Seiche takes it from eidetic.git): seiche's dev-edge back into Mere is a
   mere/seiche cycle under cycle-breaks D6, and Isocosm consumes it directly; Seiche takes it
   from `mere.git`, or it and `mere-framing` move to Seiche, or the replay examples move to
   the host as consumer tests. `nisus` into `conatus` behind a voxel feature would free the
@@ -656,7 +763,7 @@ revision and what crosses at frame rate.
   `structured-data` feature turns JSON-LD blocks into graph contributions with no consumer:
   to the engine (recommended), the host, or retired; Inker cannot depend on `mere-rdf` until
   P5 without a cycle. F4 `script-rhai`'s `command` module builds `hest` invocations: to the host
-  (recommended), or `hest` ruled a contract leaf Inker may name. F5 `document-canvas`'s text
+  (recommended), or `hest` ruled a contract leaf Inker may name. F5 (settled: Inker carries its own) `document-canvas`'s text
   test reads Cambium's bundled Roboto font with no licence file: Inker carries its own with a
   licence, or the family gets one home for test assets. Also: the repository's pre-commit
   clippy fails on main before any P1 change (Knot's locked `knot-composition` still uses
@@ -673,16 +780,21 @@ revision and what crosses at frame rate.
   a `domain` module in `stickleback` (policy and authority hooks exist; grammar and fold traits
   do not); D10's pack header splits out of `PackManifest` in `eidetic::pack`. No new crate
   either way.
-- **D12 consumers, once Eidetic's branch is on its main.** Mere deletes `crates/system/state-witness`
-  and `crates/system/framing` and their member rows; `pictograph/Cargo.toml:140` and
-  `seiche/Cargo.toml:83` repin `state-witness` to eidetic.git `branch = "main"`; the root
-  `framing` row goes (nothing else in Mere needs it); Isocosm's `isometer-core/Cargo.toml:21` and
-  `cosmograph/Cargo.toml:31` repin the same way; Seiche's replay example then takes it from
-  eidetic.git and the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
+- **D12 and D19 consumers.** Mere's side is done (Progress, 2026-11-07): the three crates are
+  deleted, `pictograph` and `seiche` take `state-witness` from eidetic.git, the root `framing`
+  row is gone, `tinct` and `tincture` come from graphshell.git and the `tinct` patch row is
+  dropped. Still open, outside Mere: Isocosm's `shared/isometer/crates/isometer-core/Cargo.toml:21`
+  and `shared/cosmograph/Cargo.toml:31` repin `state-witness` to eidetic.git; the five tinct
+  consumers repoint their own `tinct` row to graphshell.git in the same relock that moves their
+  mere.git past this change, or the graph carries two `Tinct`s (Cleromancy `Cargo.toml:83`,
+  Isocosm `shared/isomere/Cargo.toml:33`, Knot `apps/desktop/Cargo.toml:51`, Woodshed
+  `Cargo.toml:142`, `ports/redshank/Cargo.toml:20` and `ports/hocket/Cargo.toml:119`; mer3ly
+  has no row and only relocks). Seiche's replay example takes the witness from eidetic.git
+  (Seiche `a6b8641`), and with Mere's copies deleted (P2's cut) the mere/seiche cycle is gone. Audit fork F9 (merge framing into the witness)
   would be clean in code but not in metadata: framing publishes at 0.0.2 as the data-formats
   rule's universal header, the witness does not publish; both names stay.
-- **P1 forks F4 and F6: settled by D19.** `tinct` must reach the Graphshell contract root before
-  the lanes can take it; until then P1's palette line stays as it is.
+- **P1 forks F4 and F6: settled by D19.** `tinct` is in the Graphshell contract root and Mere
+  takes it from there; the lanes may take it now.
 - **P1 fork F6, the smolweb palette (new, 2026-11-07, now settled by D19; kept for the record).** `SmolwebTheme::Site` derives each site's
   palette through Tinct at construction and on every colour-mode change, and `ModeProfile` is
   Tinct's type in the lanes' public API (Turnstone names it 12 times). Options: the lanes own
@@ -697,6 +809,34 @@ revision and what crosses at frame rate.
   `knot-document` takes `KnotEditor`, `EditOutcome` and `KnotReadout` with their tests and
   drops `knot-editor-host`; Turnstone and the port import from `knot-document`; then
   `knot-editor-host` retires. `tabard-workshop` was converted by the lane already.
+- **After P1's cut (2026-11-07).** Knot (`Cargo.toml` 80, 107 to 111 at `2c703c4`) names
+  `script-rhai`, `illume`, `inker`, `knot-editor-host` and `nematic` from `mere.git`; Mere
+  redirects them in its `mere.git` patch table until Knot takes them from `inker.git`, and
+  then those five rows leave. Turnstone repins its own Inker rows to `inker.git`. Inker
+  names `cambium` (and through it the Cambium family) and `mere-rdf` from `mere.git`, which
+  every consumer must redirect to one source; the host's half of F2 ends that edge. Active
+  Mere documents still carry 28 code-font paths into the moved crates in 16 documents (the
+  doc audit's `missing_known_root_paths`, 428 before the cut and 434 after); Markdown links
+  were repointed, these were not. `graft-engine` and `weld-engine` have no Mere consumer,
+  so they left the lock with `welding` 0.15.0; their two workspace rows stay for the
+  hosts that inherit them. `.cargo/config.toml.example` lines 71 and 72 still describe
+  `knot-editor-host` as a workspace member.
+- **After P2's cut (2026-11-07).** Rows that name the spatial crates through `mere.git` and
+  repoint to `git = "https://github.com/merely-made/seiche.git", branch = "main"`, checked
+  against each repository's current tree: Isocosm `eponym/Cargo.toml` 54 (`conatus`), 55
+  (`modulus`), 57 (`tenant`); `mesocosm/Cargo.toml` 29 (`tenant`), 37 (`nisus`), 46
+  (`conatus`); `shared/isometer/crates/isometer-lens/Cargo.toml` 26 (`modulus`), 44
+  (`conatus`); `mesocosm/crates/probes/parry-ground/Cargo.toml` 17 (`conatus`); and, to
+  eidetic.git under D12, `state-witness` at `shared/isometer/crates/isometer-core/Cargo.toml` 21
+  and `shared/cosmograph/Cargo.toml` 31. Cleromancy `Cargo.toml` 74 and `core/Cargo.toml` 40
+  (`seiche`, serde, no defaults); Knot `Cargo.toml` 79 (`seiche` 0.0.6, serde, no defaults);
+  Murm `apps/signalman-desktop/Cargo.toml` 67 (`seiche`); mer3ly
+  `crates/repo-graph/Cargo.toml` 27 (`seiche`, now `branch = "main"`, no longer the
+  `www.github.com` rev pin P2's block records). Isocosm's `.cargo/tabletop-local.toml` 62 and 63
+  overlay `numen` and `seiche` onto Mere's deleted paths. Until Knot and Cleromancy repin,
+  Mere's `mere.git` patch table redirects `numen` and `seiche`; then those two rows leave.
+  Active Mere documents still carry 21 code-font lines into `crates/conatus/` in 10 documents;
+  the one Markdown link was repointed.
 - **Knot repin (D15) on the branch.** Four of nine tests in `knot-editor`'s
   `composition_retention` fail on Windows with `CheckpointStorage("legacy checkpoint storage
   replacement is supported only on Unix")`, from the `#[cfg(not(unix))]` arm in
@@ -858,3 +998,125 @@ revision and what crosses at frame rate.
   standalone workspace checks and tests green (372 passed, 11 ignored); the binding replay
   holds its recorded figures; canvas, Eponym and Mesocosm check against it. Stopped at the
   forks under P2, `state-witness` first.
+- 2026-11-07: D12 and D19 donor side landed on a worktree branch: Mere deleted
+  `state-witness`, `mere-framing` and `tinct` (each content-identical to Eidetic `71188bb` and
+  Graphshell `d80316db`; tinct's manifest differs only in its comment and workspace serde) and
+  their member, `framing` and patch rows; `pictograph` and `seiche` take the witness from
+  eidetic.git, `tinct` and `tincture` come from graphshell.git. The lock was edited by hand:
+  eidetic.git moved `6b4ec49` to `71188bb` (10 entries, plus the two moved crates) and
+  graphshell.git `40e8c8d` to `d80316d` (10, plus tinct); upstream between those revisions only
+  added the moved crates, nothing else moved, `--locked` metadata is consistent.
+  `ports/graphshell/web/Cargo.lock` moved graphshell.git the same way (8, plus tinct);
+  `support/family-promotion/source-*` are the 2026-10-19 checkpoint and stay. Workspace check,
+  the pictograph, seiche, tabard and registry tests (460 passed, 12 ignored) and clippy green.
+  Outside consumers are in Open.
+
+
+- 2026-11-07: P1 lane rebased onto main `4b99ce9f2` (D15 landed). F6 settled by D19: the
+  smolweb palette moved into `mere-lanes` over Graphshell's `tinct`, so the lanes no longer
+  depend on Tabard; Mere's graphshell.git rows moved together to `d80316db`; F4 settled by D19
+  (no change). Standalone Inker checks and tests green (769). Inker's edges into Mere are
+  `knot-editor-host -> cambium` (until Knot takes the editor) and `mere-fleece -> mere-rdf`
+  optional (F3), plus the Roboto font (F5). Mere checks green except the Graphshell port's
+  five D16 sites, which hold the commit (the hook checks the whole workspace).
+- 2026-11-07: P1 lane: the Graphshell port converts at its five D16 sites
+  (`retained_content.rs`, two local anchor helpers and an inline preferences copy; no manifest
+  change, persisted anchors still Tabard's); `cargo check -p graphshell --all-targets` green,
+  the 19 reading and retained-content lib tests pass. Committed on the lane branch with the
+  clippy hook run; not pushed.
+- 2026-11-07: both code lanes merged into main through the hooks and pushed (`1ace7b211`): the
+  consumer cuts (`209ebe6ff`, as `4bc6a2244`) and P1 (`9ae4df0f8`, as `c14a3c8ef`), each merge
+  checked clean of conflicts except one Progress block kept from both sides. Three lane
+  worktrees and their branches removed. Another session landed, in the same hour, a genet relock
+  (`d634ee0c485`), a `seiche-model` split (the rapier-free model re-exported under the old paths)
+  and the graphshell host plan's T7; the Seiche population must take `seiche-model` with the six
+  crates. The Inker history lane is running (filter-repo on the twelve paths); its first push
+  waits on Mark.
+- 2026-11-07: Inker populated with history: `git clone --no-local` of Mere `f8c06097e`, filter-repo on
+  the twelve crate paths and three design areas (477 commits kept, tree identical for 270
+  files), root files added (workspace manifest from the proved standalone, lock reduced from
+  1849 to 891 packages, toolchain, licences, README naming D21), the Roboto test font carried
+  with its Apache-2.0 text (F5 closed for Inker); check green, 769 tests with P1's features,
+  clippy warnings only; pushed to `merely-made/inker` main at `3109942` on Mark's word. Mark
+  ruled the canonical DOC_POLICY core plus an Inker addendum and a DOC_README (a lane is
+  writing them) and D24. The Mere donor lane for the twelve directories opened.
+- 2026-11-07: P1 cut in Mere (worktree branch, not pushed). Deleted the twelve Inker crate
+  directories and `inker_docs`, `nematic_docs`, `verso_docs` (blobs compared against
+  `inker.git` `3109942`: identical but for the Roboto path in `document-canvas`'s text test);
+  the root members, the twelve `[workspace.dependencies]` rows now `inker.git` with
+  `branch = "main"`, nine `mere.git` patch rows dropped and five re-added as `inker.git`
+  redirects for Knot. Lock edited by hand, one `cargo fetch` of `inker.git`: ten packages
+  moved from path to `inker.git#3109942`, `graft-engine`, `weld-engine` and `welding` left
+  (no consumer), no other source moved. The web workspace's two rows moved the same way
+  (seven packages) with eight Cambium-family path redirects. The port's three portable-clip
+  fixtures are copied to `ports/graphshell/tests/fixtures/portable_clip/` (Mark's ruling
+  of 2026-11-07). `line-ceiling.toml` lost six Inker rows; `LICENSES.md`, DOC_README, DOC_POLICY
+  and `moved_out.json` record the move; `support/family-promotion/source-*` is the
+  2026-10-19 checkpoint and stays. The first check found a second file edge: `uxtree`'s
+  probe test reads two Micron navigation probes from `nematic`; they are copied to
+  `crates/forme/uxtree/tests/fixtures/micron/` under the same ruling. Gates (locked, offline,
+  debug info off): workspace check green; `graphshell` lib 330 passed, 7 ignored, and the
+  `retained_content_fixture` example builds; the `uxtree` probe test passes; clippy green
+  (0 errors); the web workspace checks green.
+- 2026-11-07: P1 complete on both sides. The donor cut (`bdd8f7ee7`) merged into main as `cd8490fa2`
+  through the hooks and pushed: 289 files, 63,710 lines left Mere; Mere's rows name `inker.git`;
+  five `mere.git` patch redirects stay until Knot repins; the port and uxtree carry their own
+  fixtures (D24 applied twice). Inker main is `436c841` with its DOC_POLICY and DOC_README. The
+  empty `crates/crawl` and `crates/import` directories removed. Opened next: Seiche population
+  with history (seven crates, `seiche-model` included), Knot's repin to `inker.git` with the
+  editor move (D17), Turnstone's repin with its D16 boundary conversions.
+- 2026-11-07: Seiche populated with history at `Code/worktrees/seiche-history`: clone of Mere `4fa1686da`,
+  filter-repo on the seven crate paths and the conatus README (159 commits kept, trees
+  hash-identical, 197 files), root files as Inker's, no patch table needed (the `cubek-matmul`
+  patch is Mere's own path and not carried), lock reduced 1847 to 859 packages; check, all-features
+  check and clippy green, 372 tests pass (seiche-model's 9 split from seiche's 215), binding replay
+  byte-identical to the recorded trace; main `a545239`, not yet pushed. Mark ruled: push after a
+  second commit fixing the seven `repository` fields and the conatus README's links, and D25.
+  Knot's lane committed `6f2ac20` (rows to inker.git, editor into `knot_document::retained`, 61
+  and 78 knot-document tests, six Windows `cfg(not(unix))` failures apart); Mark ruled the lane
+  repins Mere to current main so the lock holds one source per package, keeps the `retained`
+  path, and the stale `.cargo/scope-navigation-local.toml` overlay in Knot's checkout is deleted.
+- 2026-11-07: Seiche pushed to `merely-made/seiche` main `a6b8641` (161 commits; second commit set the
+  seven `repository` fields, fixed the conatus README's links and founded `seiche_docs` with the
+  conatus engine plan and the conatus/Nexus alignment brief under D25; the field system extraction
+  note stays in Mere, it spans the kernel and the host). Mere's donor lane for the seven crates
+  opened. Knot main `a58ba28`: Inker from `inker.git`, the editor as `knot_document::retained::KnotEditor`
+  (D17), Mere repinned to current main with one source per package, the stale local overlay
+  deleted. Turnstone main `841c8117`: nine rows to `inker.git`, D16 conversions in
+  `src/shell/reading_edge.rs`, Knot's lock moved to `2c703c4`, five Inker and one tinct redirect
+  rows in its mere.git patch table until Knot and Woodshed repin; one CEF download happened through
+  the repository's own verify script and was deleted with the build directory. Both pushed on
+  Mark's word; lane worktrees and branches removed. Free disk 481 GB after cleanup; Mark handles the
+  rest himself. Next: Mere relocks to Knot `a58ba28` and drops its five redirects and the port's
+  `knot-editor-host` use (after the Seiche donor merge); Turnstone's `knot_authoring` moves to
+  `knot-document`; then `knot-editor-host` retires from Inker.
+- 2026-11-07: P2 cut in Mere (worktree branch, not pushed). Deleted `crates/conatus/` (the seven
+  crates and its README, trees as Seiche `a545239` took them) and D25's two documents; the
+  member rows and the `seiche-model`, `nisus`, `modulus` and `conatus` workspace rows (no Mere
+  consumer) are gone, `seiche` and `numen` name `seiche.git` on `branch = "main"`, and the two
+  `mere.git` patch rows became `seiche.git` redirects for Knot and Cleromancy. The physics dev
+  opt-level table stays: all six packages remain in both graphs. Lock edited by hand, one
+  `cargo fetch` of `seiche.git`: `seiche`, `seiche-model`, `numen` and `conatus` moved from path
+  to `seiche.git#a6b8641`; `nisus`, `modulus`, `tenant`, the kiss3d fork, `rapier3d` and 13
+  registry packages only they reached left (1843 to 1823); no other source moved. The web
+  workspace moved the same four and needed no patch rows (1139 packages either way).
+  `LICENSES.md`, DOC_README, DOC_POLICY, `moved_out.json` and the seiche-replay README record
+  the move; `line-ceiling.toml` named no moved file. Gates (locked, offline, debug info off):
+  workspace check green; `pictograph` and `mere-kernel` tests 553 passed, 3 ignored, and
+  `pictograph` with `canvas,gpu` 676 passed, 19 ignored; clippy 0 errors; the web workspace
+  checks green. Outside repins are in Open (After P2's cut).
+- 2026-11-07: P2 complete on both sides. The Seiche donor cut (`44f1dc0cb`) merged into main as
+  `18e612dff` through the hooks and pushed: `crates/conatus` gone (197 files, 49k lines), `seiche` and
+  `numen` from `seiche.git` `a6b8641` with two `mere.git` redirects for Knot and Cleromancy, twenty
+  packages left the lock, pictograph and the kernel green (553 and 676 tests), the two D25 documents
+  deleted with DOC_README pointers. An untracked `quint-shaders` remnant directory removed. Still
+  owed by consumers: Isocosm (conatus, modulus, tenant, nisus rows and state-witness), Cleromancy,
+  Knot, Murm's signalman-desktop and mer3ly repoint `seiche` rows to `seiche.git`; Isocosm's
+  `.cargo/tabletop-local.toml` overlays numen and seiche onto deleted paths.
+- 2026-11-07: Turnstone main `6c4d278b`: `KnotEditor` from `knot_document::retained` at Knot `a58ba28`,
+  `knot-document` with its `engine` feature, the `knot-editor-host` row and the five Inker redirect
+  rows gone (clean resolve, no unused patch); the `tinct` redirect stays while Woodshed names it
+  through `mere.git`. Mere's matching cut opened (relock to Knot `a58ba28`, drop the five redirects,
+  port's `block_editing` onto `knot-document`). Outside repins opened for Isocosm (conatus family
+  to `seiche.git`, state-witness to `eidetic.git`, tinct to `graphshell.git`) and Cleromancy (seiche,
+  tinct).

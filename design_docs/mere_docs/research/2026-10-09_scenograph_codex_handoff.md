@@ -129,7 +129,7 @@ Source findings checked against that published tree:
   runtime contribution back to the exact field, coupling and occurrence; a
   vector index or endpoints alone cannot supply durable identity. The current
   graph-node bridge is distinct from the occurrence preview adapter.
-- [Coupling execution](../../../crates/conatus/seiche/src/coupling_force.rs)
+- [Coupling execution](https://github.com/merely-made/seiche/blob/main/crates/conatus/seiche/src/coupling_force.rs)
   adds force for attraction, repulsion and `ContainmentWall`. The wall response
   is a depth-scaled force, not an exact positional exclusion. `AlignVelocity`
   overwrites velocity; `DampenInside` multiplies velocity by its factor and

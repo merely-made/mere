@@ -283,6 +283,8 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    #[cfg(panic = "abort")]
+    crate::lifetime::watch_for_panic();
     lifetime.check()?;
     // A caller-supplied core is a shared WebGPU device: it presents through
     // the host surface and the group recovery owner, never a private driver.

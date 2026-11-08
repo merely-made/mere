@@ -7,6 +7,16 @@ retains the exact input and output documents. Node transports the Rust JSON as a
 string; Python reads the 64-bit witness integers without JavaScript number
 rounding.
 
+**The seiche half now runs from Seiche.** The `seiche` crate, its
+`binding_replay` examples and `binding_replay.json` left for
+[merely-made/seiche](https://github.com/merely-made/seiche) on 2026-11-07
+(engine split plan, P2), at the same paths under `crates/conatus/seiche/`.
+`run.py` reads every fixture relative to the repository that holds it, so from
+Mere it runs the four Pictograph cases (`occurrence`, `occurrence-mix`,
+`grouped`, `schedule`); the `binding` case and the seiche build and test
+commands below run from a Seiche checkout. Pictograph's cases build `seiche`
+from the `seiche.git` revision Mere's lock records.
+
 - Seiche's `binding_replay.json` declares 600 fixed ticks, a seed, stable body
   labels and registration order. Its narrow diagnostic catalog admits one
   explicit spec for seeded Anneal plus a host-bound animated FlowAdvect field.
@@ -49,15 +59,17 @@ Pass the final Cargo target directory to the runner, even when a separate
 
 ```sh
 export CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=4
+# In a Seiche checkout (the binding case):
 cargo build --locked -p seiche --no-default-features --features serde --example binding_replay
 cargo build --locked -p seiche --no-default-features --features serde --example binding_replay_wasm --target wasm32-unknown-unknown
+# In Mere (the Pictograph cases):
 cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay
 cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay_wasm --target wasm32-unknown-unknown
 cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay
 cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay_wasm --target wasm32-unknown-unknown
 cargo build --locked -p pictograph --no-default-features --features canvas --example schedule_replay
 cargo build --locked -p pictograph --no-default-features --features canvas --example schedule_replay_wasm --target wasm32-unknown-unknown
-python3 support/seiche-replay/run.py --target-dir target --output /tmp/seiche-replay
+python3 support/seiche-replay/run.py --target-dir target --output /tmp/seiche-replay --case occurrence --case occurrence-mix --case grouped --case schedule
 ```
 
 Use `--case schedule` or `--case grouped` (or repeat `--case` with other case names) for a focused
@@ -73,7 +85,7 @@ render dependency narrowing remain separate.
 Related focused native tests:
 
 ```sh
-cargo test --locked -p seiche --features serde --lib
+cargo test --locked -p seiche --features serde --lib   # in a Seiche checkout
 cargo test --locked -p pictograph --no-default-features --features canvas --lib projection_dynamics
 cargo test --locked -p pictograph --no-default-features --features canvas --lib physics_registry
 ```

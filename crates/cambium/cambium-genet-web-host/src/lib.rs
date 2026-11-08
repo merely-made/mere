@@ -46,7 +46,7 @@ pub mod portable;
 #[cfg(any(target_arch = "wasm32", test))]
 mod lifetime;
 #[cfg(target_arch = "wasm32")]
-pub use lifetime::{MountLifetime, MountPhase, MountStatus};
+pub use lifetime::{MountLifetime, MountPhase, MountStatus, stopped_by_panic};
 
 /// DOM delta modes are pixels (0), lines (1) and pages (2). Preserve the
 /// DOM sign while resolving units into the host's logical scroll pixels.

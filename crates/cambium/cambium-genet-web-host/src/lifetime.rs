@@ -14,6 +14,37 @@ use std::pin::Pin;
 use std::rc::Rc;
 use std::task::{Context, Poll, Waker};
 
+// A wasm32 panic aborts: nothing unwinds, so every borrow the panicking
+// callback held stays taken and its state may be half-applied. Re-entering
+// would only panic again on those borrows (`RefCell already borrowed`) or act
+// on that state, so the first panic ends admission for every mount on its
+// thread. Thread-local, as the mounts are.
+thread_local! {
+    static STOPPED: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Whether a panic has stopped this thread's mounts. Their listeners, frames
+/// and wakes no longer run; a page can read this to show its own failure
+/// state. The panic itself is reported once, by the application's hook.
+pub fn stopped_by_panic() -> bool {
+    STOPPED.with(Cell::get)
+}
+
+/// Record panics ahead of the hook installed now (for example
+/// `console_error_panic_hook`). Mounting installs this once; an application
+/// hook set after the first mount replaces it.
+#[cfg(any(all(target_arch = "wasm32", panic = "abort"), test))]
+pub(crate) fn watch_for_panic() {
+    static WATCH: std::sync::Once = std::sync::Once::new();
+    WATCH.call_once(|| {
+        let previous = std::panic::take_hook();
+        std::panic::set_hook(Box::new(move |info| {
+            let _ = STOPPED.try_with(|stopped| stopped.set(true));
+            previous(info);
+        }));
+    });
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MountPhase {
     New,
@@ -92,15 +123,19 @@ impl MountLifetime {
         self.0.status.set(status);
     }
     pub(crate) fn admitted(&self) -> bool {
-        matches!(
-            self.status().phase,
-            MountPhase::Starting | MountPhase::Active
-        )
+        !stopped_by_panic()
+            && matches!(
+                self.status().phase,
+                MountPhase::Starting | MountPhase::Active
+            )
     }
     fn is_live(&self) -> bool {
         self.0.liveness.as_ref().is_none_or(|predicate| predicate())
     }
     pub(crate) fn check(&self) -> Result<(), String> {
+        if stopped_by_panic() {
+            return Err("a panic stopped this thread's mounts".into());
+        }
         if !self.admitted() {
             return Err("mount disposed".into());
         }
@@ -408,6 +443,32 @@ mod tests {
         assert_eq!(lifetime.status().phase, MountPhase::Disposed);
         assert_eq!(lifetime.status().listeners, 0);
         assert!(!lifetime.status().raf_pending);
+    }
+
+    /// On wasm32 the panic aborts with the host still borrowed; the next
+    /// listener, frame or wake must not borrow it again.
+    #[test]
+    fn a_panic_ends_admission_for_every_mount_on_its_thread() {
+        let mount = MountLifetime::new();
+        mount.begin().unwrap();
+        mount.activate().unwrap();
+        watch_for_panic();
+        std::thread::spawn(|| {
+            assert!(std::panic::catch_unwind(|| panic!("another thread")).is_err());
+            assert!(stopped_by_panic());
+        })
+        .join()
+        .unwrap();
+        assert!(mount.admitted(), "another thread's panic leaves this mount");
+
+        assert!(std::panic::catch_unwind(|| panic!("listener")).is_err());
+        assert!(stopped_by_panic());
+        assert!(!mount.admitted(), "callbacks stop at the first panic");
+        assert_eq!(
+            mount.check(),
+            Err("a panic stopped this thread's mounts".into())
+        );
+        assert_eq!(mount.status().phase, MountPhase::Active);
     }
 
     #[test]

@@ -32,5 +32,15 @@ editor = ["dep:backstep"]
 # condition is data and always present, and `resolve` refuses a set carrying one.
 scripts = ["dep:script-engine-api"]
 
+[dev-dependencies]
+# The rule runner on a real engine: a consumer test of script-rhai, kept here
+# so the reading-side crate carries no dev edge back to the host (engine split P1).
+script-rhai = { workspace = true }
+libm = { workspace = true }
+
+[[test]]
+name = "script_rhai_rules"
+required-features = ["scripts"]
+
 [lints]
 workspace = true

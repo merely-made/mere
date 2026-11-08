@@ -85,7 +85,7 @@ table, invisible to genet-internal counting).
 
 `arrangements` and `workbench` are single-consumer by architecture (the
 composition spine); `seiche` ← mere-canvas only, which is exactly the seat
-the [conatus/nexus brief](mere_docs/research/2026-08-10_conatus_nexus_alignment_brief.md)
+the [conatus/nexus brief](https://github.com/merely-made/seiche/blob/main/design_docs/seiche_docs/research/2026-08-10_conatus_nexus_alignment_brief.md)
 makes pluggable; `mooting` ← gemot; `murm` ← mere-comms (which itself has
 no consumer — the comms chain ends in the air and should be verified
 top-down). Isometry consumes sceno + scenomise but **not scenotime**: no

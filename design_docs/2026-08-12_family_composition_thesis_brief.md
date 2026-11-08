@@ -1109,7 +1109,7 @@ completed general clip system:
   distinguish source identity from projected occurrences.
 - [`write_clip_node`](../crates/mere/src/clip.rs) records a caller-formatted clip
   and asserts resource `ClippedFrom` provenance. Semantic clip lowering belongs
-  to [Fleece](../crates/fleece/src/clip.rs); the receiving document owns formatting.
+  to [Fleece](https://github.com/merely-made/inker/blob/main/crates/fleece/src/clip.rs); the receiving document owns formatting.
   Image storage remains caller-owned. This does not establish the proposed
   captured-version policy or a general compound media package.
 - Fleece (`genet/components/fleece/README.md` and
@@ -1201,13 +1201,13 @@ pass runs documentation checks and establishes no fresh runtime acceptance.
 |---|---|
 | [Chartulary capabilities](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](https://github.com/merely-made/graphshell/blob/main/crates/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
 | [Eidetic manifests](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/manifest.rs), [bundles](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
-| [Schema definitions](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/schema_def.rs), [opaque facets](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
+| [Schema definitions](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/schema_def.rs), [opaque facets](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/facet.rs), [Fleece acquisition and annotation records](https://github.com/merely-made/inker/blob/main/crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
 | [Chirograph](https://github.com/merely-made/graphshell/blob/main/crates/chirograph/src/lib.rs), [Pandect live-view records](../crates/system/pandect/src/live_view.rs) | Advertised actions, payload schemas, scene revision checks, explicit session states and source-owned live/historical cursors. A persisted reference or advertised action supplies no grant. |
 
 The [completed Fleece/Eidetic plan](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md)
 records authenticated annotation-plus-source transfer and receiver-only disk
 reopen, alongside native and wasm checks. Its transfer test constructs a
-[specific envelope](../crates/fleece/tests/eidetic_peer_transfer.rs) containing
+[specific envelope](https://github.com/merely-made/inker/blob/main/crates/fleece/tests/eidetic_peer_transfer.rs) containing
 both manifests and both byte payloads. This proves that bounded path; it does
 not establish a family clip package or arbitrary dependency traversal. The
 recorded consumer pins qualify `5758724e`, before later Mere dependency work.

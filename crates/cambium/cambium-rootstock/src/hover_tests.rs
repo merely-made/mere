@@ -14,8 +14,8 @@ use cambium::{AnyView, GenetCtx, GenetElement, button, el};
 use layout_dom_api::LayoutDom as _;
 
 use crate::{
-    Host, HostHooks, HostOptions, HostState, HostTree as _, HostWake, NodeId, Runner,
-    ScriptedDom, WindowDom,
+    Host, HostHooks, HostOptions, HostState, HostTree as _, HostWake, NodeId, Runner, ScriptedDom,
+    WindowDom,
 };
 
 type Child = Box<dyn AnyView<bool, (), GenetCtx, GenetElement>>;
@@ -91,7 +91,11 @@ fn hover_over_undrained_mutations_waits_for_the_next_relayout() {
     );
     host.relayout(320.0, 200.0);
     point_at(&mut host, "header");
-    assert_eq!(height(&host, "header"), 50.0, "a settled DOM restyles at once");
+    assert_eq!(
+        height(&host, "header"),
+        50.0,
+        "a settled DOM restyles at once"
+    );
 
     host.s.runner.as_mut().unwrap().update(|open| *open = true);
     point_at(&mut host, "aside");
@@ -100,7 +104,11 @@ fn hover_over_undrained_mutations_waits_for_the_next_relayout() {
         (50.0, 30.0),
         "the hover restyle waits for the relayout"
     );
-    assert_eq!(rect(&host, "nav"), None, "the panel is not laid out unstyled");
+    assert_eq!(
+        rect(&host, "nav"),
+        None,
+        "the panel is not laid out unstyled"
+    );
 
     host.relayout(320.0, 200.0);
     assert_eq!(

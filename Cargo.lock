@@ -9,7 +9,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "01c0457472c38ea5bd1c3b5ada5e368271cb550be7a4ca4a0b4634e9913f6cc2"
 dependencies = [
  "ab_glyph_rasterizer",
- "owned_ttf_parser 0.25.1",
+ "owned_ttf_parser",
 ]
 
 [[package]]
@@ -75,7 +75,7 @@ dependencies = [
  "hashbrown 0.17.1",
  "objc2 0.5.2",
  "objc2-foundation 0.2.2",
- "objc2-ui-kit 0.2.2",
+ "objc2-ui-kit",
 ]
 
 [[package]]
@@ -2968,19 +2968,11 @@ checksum = "6e8ccc4ea9f6acc32d102c0f6d471d11d913ad15f20c04de743374861fa1d414"
 [[package]]
 name = "conatus"
 version = "0.1.0"
+source = "git+https://github.com/merely-made/seiche.git?branch=main#a6b86413d82b891af81889c54867adf91868ccdd"
 dependencies = [
- "burn",
- "burn-wgpu",
  "bytemuck",
  "cubecl",
- "euclid",
  "getrandom 0.4.3",
- "nisus",
- "pollster 0.4.0",
- "rapier3d",
- "seiche",
- "serde",
- "serde_json",
  "wgpu",
 ]
 
@@ -4934,15 +4926,14 @@ dependencies = [
 [[package]]
 name = "document-canvas"
 version = "0.1.0"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "genet-parley",
  "inker",
- "nematic",
  "netrender",
  "paint_list_api",
  "paint_list_render",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -7061,7 +7052,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0990707078259d76f65619a692e87c82645be66cbee224173cd1af151e54ba2"
 dependencies = [
  "approx",
- "bytemuck",
  "libm",
 ]
 
@@ -7072,7 +7062,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28d74079318e3a077bd3d15faa90fde24fa37bb9f157f92f853e6019a15fd413"
 dependencies = [
  "approx",
- "bytemuck",
  "glam 0.33.8",
  "nalgebra",
  "num-traits",
@@ -7126,45 +7115,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gltf"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3ce1918195723ce6ac74e80542c5a96a40c2b26162c1957a5cd70799b8cacf7"
-dependencies = [
- "base64 0.13.1",
- "byteorder",
- "gltf-json",
- "image",
- "lazy_static",
- "serde_json",
- "urlencoding",
-]
-
-[[package]]
-name = "gltf-derive"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14070e711538afba5d6c807edb74bcb84e5dbb9211a3bf5dea0dfab5b24f4c51"
-dependencies = [
- "inflections",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "gltf-json"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6176f9d60a7eab0a877e8e96548605dedbde9190a7ae1e80bbcc1c9af03ab14"
-dependencies = [
- "gltf-derive",
- "serde",
- "serde_derive",
- "serde_json",
-]
-
-[[package]]
 name = "glutin_wgl_sys"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7206,15 +7156,6 @@ dependencies = [
  "presser",
  "thiserror 2.0.21",
  "windows",
-]
-
-[[package]]
-name = "graft-engine"
-version = "0.2.0"
-dependencies = [
- "accesskit 0.25.1",
- "inker",
- "tracing",
 ]
 
 [[package]]
@@ -7800,16 +7741,6 @@ dependencies = [
  "rustc_version",
  "serde",
  "spin 0.9.9",
- "stable_deref_trait",
-]
-
-[[package]]
-name = "heapless"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bfb9eb618601c89945a70e254898da93b13be0388091d42117462b265bb3fad"
-dependencies = [
- "hash32 0.3.1",
  "stable_deref_trait",
 ]
 
@@ -8475,9 +8406,11 @@ dependencies = [
 [[package]]
 name = "illume"
 version = "0.0.3"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "jotdown",
  "logos",
+ "pulldown-cmark",
 ]
 
 [[package]]
@@ -8559,16 +8492,14 @@ checksum = "a257582fdcde896fd96463bf2d40eefea0580021c0712a0e2b028b60b47a837a"
 [[package]]
 name = "inker"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "accesskit 0.25.1",
  "document-session-api",
- "genet-scripted-dom",
  "getrandom 0.4.3",
- "layout-dom-api",
  "petgraph 0.8.3",
  "serde",
  "serde_json",
- "toml 0.8.23",
  "tracing",
  "uuid",
  "webcue",
@@ -9329,48 +9260,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
-name = "kiss3d"
-version = "0.47.0"
-source = "git+https://github.com/mark-ik/kiss3d.git?rev=c362cd5855c01a525d1091589a0e38135007692f#c362cd5855c01a525d1091589a0e38135007692f"
-dependencies = [
- "android-activity",
- "bitflags 2.13.2",
- "bytemuck",
- "getrandom 0.3.4",
- "getrandom 0.4.3",
- "glamx",
- "gltf",
- "image",
- "kiss3d-macro",
- "log",
- "num-traits",
- "objc2 0.6.4",
- "objc2-foundation 0.3.2",
- "objc2-ui-kit 0.3.2",
- "oneshot",
- "pollster 1.0.1",
- "rgb",
- "rusttype",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "web-time",
- "wesl",
- "wgpu",
- "winit",
-]
-
-[[package]]
-name = "kiss3d-macro"
-version = "0.36.1"
-source = "git+https://github.com/mark-ik/kiss3d.git?rev=c362cd5855c01a525d1091589a0e38135007692f#c362cd5855c01a525d1091589a0e38135007692f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
 name = "knot-capture"
 version = "0.0.1"
 source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2c703c4397ee2b6ac4b84e1f1c0b7ecf7bb632ce"
@@ -9497,12 +9386,12 @@ dependencies = [
 [[package]]
 name = "knot-editor-host"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "cambium",
  "illume",
  "inker",
  "nematic",
- "pulldown-cmark",
 ]
 
 [[package]]
@@ -9854,12 +9743,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "linked-hash-map"
-version = "0.5.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
-
-[[package]]
 name = "linkme"
 version = "0.3.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10016,7 +9899,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#6b4ec493db9aad86b96510520ddc3ca1b1d14049"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#71188bb66d15bdd3618db12f148bc42e5cbef284"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10338,6 +10221,7 @@ dependencies = [
  "futures-util",
  "genet-host-api",
  "inker",
+ "mere-fleece",
  "mere-pageload",
  "mere-transport",
  "mockito",
@@ -10377,6 +10261,7 @@ dependencies = [
 [[package]]
 name = "mere-fleece"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "armillary",
  "eidetic",
@@ -10385,19 +10270,10 @@ dependencies = [
  "genet-host-api",
  "genet-static-dom",
  "image",
- "incipit",
  "inker",
- "mere-fetch",
- "mere-rdf",
- "mere-transport",
- "muniment",
- "nematic",
- "oxjsonld",
- "oxrdf",
- "pollster 0.4.0",
+ "mere-pageload",
  "serde",
  "serde_json",
- "tempfile",
  "tokio",
  "tracing",
  "url",
@@ -10420,6 +10296,7 @@ dependencies = [
 [[package]]
 name = "mere-framing"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#71188bb66d15bdd3618db12f148bc42e5cbef284"
 dependencies = [
  "postcard",
  "serde",
@@ -10460,8 +10337,8 @@ dependencies = [
 [[package]]
 name = "mere-lanes"
 version = "0.1.0"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
- "async-trait",
  "bytes",
  "document-canvas",
  "document-session-api",
@@ -10472,20 +10349,15 @@ dependencies = [
  "image",
  "inker",
  "mere-fleece",
- "mockito",
- "muniment",
  "nematic",
  "netfetcher",
  "netrender",
- "pollster 0.4.0",
- "serde",
  "serde_json",
- "tabard",
  "tempfile",
+ "tinct",
  "tokio",
  "url",
  "uuid",
- "wgpu",
 ]
 
 [[package]]
@@ -10593,6 +10465,7 @@ dependencies = [
 [[package]]
 name = "mere-pageload"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 
 [[package]]
 name = "mere-proofs"
@@ -10977,13 +10850,6 @@ name = "moddef"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a0b3262dc837d2513fe2ef31ff8461352ef932dcca31ba0c0abe33547cf6b9b"
-
-[[package]]
-name = "modulus"
-version = "0.1.0"
-dependencies = [
- "bytemuck",
-]
 
 [[package]]
 name = "monostate"
@@ -11391,6 +11257,7 @@ dependencies = [
 [[package]]
 name = "nematic"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "errand",
  "genet-static-dom",
@@ -11813,14 +11680,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nisus"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "no-std-compat"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12234,13 +12093,9 @@ dependencies = [
 [[package]]
 name = "numen"
 version = "0.2.1"
+source = "git+https://github.com/merely-made/seiche.git?branch=main#a6b86413d82b891af81889c54867adf91868ccdd"
 dependencies = [
- "burn",
- "burn-wgpu",
- "getrandom 0.4.3",
- "rhai",
  "serde",
- "serde_json",
  "strum 0.28.0",
  "uuid",
 ]
@@ -12349,7 +12204,7 @@ dependencies = [
  "bitflags 2.13.2",
  "block2 0.5.1",
  "objc2 0.5.2",
- "objc2-core-location 0.2.2",
+ "objc2-core-location",
  "objc2-foundation 0.2.2",
 ]
 
@@ -12481,16 +12336,6 @@ dependencies = [
  "objc2 0.5.2",
  "objc2-contacts",
  "objc2-foundation 0.2.2",
-]
-
-[[package]]
-name = "objc2-core-location"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca347214e24bc973fc025fd0d36ebb179ff30536ed1f80252706db19ee452009"
-dependencies = [
- "objc2 0.6.4",
- "objc2-foundation 0.3.2",
 ]
 
 [[package]]
@@ -12775,34 +12620,13 @@ dependencies = [
  "objc2-cloud-kit 0.2.2",
  "objc2-core-data 0.2.2",
  "objc2-core-image 0.2.2",
- "objc2-core-location 0.2.2",
+ "objc2-core-location",
  "objc2-foundation 0.2.2",
  "objc2-link-presentation",
  "objc2-quartz-core 0.2.2",
  "objc2-symbols",
  "objc2-uniform-type-identifiers 0.2.2",
- "objc2-user-notifications 0.2.2",
-]
-
-[[package]]
-name = "objc2-ui-kit"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d87d638e33c06f577498cbcc50491496a3ed4246998a7fbba7ccb98b1e7eab22"
-dependencies = [
- "bitflags 2.13.2",
- "block2 0.6.2",
- "objc2 0.6.4",
- "objc2-cloud-kit 0.3.2",
- "objc2-core-data 0.3.2",
- "objc2-core-foundation",
- "objc2-core-graphics",
- "objc2-core-image 0.3.2",
- "objc2-core-location 0.3.2",
- "objc2-core-text",
- "objc2-foundation 0.3.2",
- "objc2-quartz-core 0.3.2",
- "objc2-user-notifications 0.3.2",
+ "objc2-user-notifications",
 ]
 
 [[package]]
@@ -12835,18 +12659,8 @@ dependencies = [
  "bitflags 2.13.2",
  "block2 0.5.1",
  "objc2 0.5.2",
- "objc2-core-location 0.2.2",
+ "objc2-core-location",
  "objc2-foundation 0.2.2",
-]
-
-[[package]]
-name = "objc2-user-notifications"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9df9128cbbfef73cda168416ccf7f837b62737d748333bfe9ab71c245d76613e"
-dependencies = [
- "objc2 0.6.4",
- "objc2-foundation 0.3.2",
 ]
 
 [[package]]
@@ -13008,20 +12822,11 @@ dependencies = [
 
 [[package]]
 name = "owned_ttf_parser"
-version = "0.15.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05e6affeb1632d6ff6a23d2cd40ffed138e82f1532571a26f527c8a284bb2fbb"
-dependencies = [
- "ttf-parser 0.15.2",
-]
-
-[[package]]
-name = "owned_ttf_parser"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36820e9051aca1014ddc75770aab4d68bc1e9e632f0f5627c4086bc216fb583b"
 dependencies = [
- "ttf-parser 0.25.1",
+ "ttf-parser",
 ]
 
 [[package]]
@@ -13693,35 +13498,6 @@ dependencies = [
  "slab",
  "smallvec",
  "spade",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "parry3d"
-version = "0.31.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b626edc0b497dba4bdf6e1e0797895294ed9f61dac2bd28cb5d34d37ad2ca7e"
-dependencies = [
- "approx",
- "arrayvec",
- "bitflags 2.13.2",
- "downcast-rs 2.0.2",
- "either",
- "ena",
- "foldhash 0.2.0",
- "glamx",
- "hashbrown 0.17.1",
- "indexmap",
- "log",
- "num-derive 0.5.1",
- "num-traits",
- "ordered-float",
- "rstar",
- "simba",
- "slab",
- "smallvec",
- "spade",
- "static_assertions",
  "thiserror 2.0.21",
 ]
 
@@ -15348,28 +15124,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rapier3d"
-version = "0.36.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2e2b20538584bb3ba5bfe6a66c2d9a242ee17d15e5398be0fa35279c7d73739"
-dependencies = [
- "approx",
- "arrayvec",
- "bitflags 2.13.2",
- "glamx",
- "log",
- "nalgebra",
- "num-traits",
- "parry3d",
- "profiling",
- "serde",
- "simba",
- "static_assertions",
- "thiserror 2.0.21",
- "wide",
-]
-
-[[package]]
 name = "raunch"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15854,9 +15608,6 @@ name = "rgb"
 version = "0.8.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47b34b781b31e5d73e9fbc8689c70551fd1ade9a19e3e28cfec8580a79290cc4"
-dependencies = [
- "bytemuck",
-]
 
 [[package]]
 name = "rhai"
@@ -16021,17 +15772,6 @@ checksum = "091dca2e1d6fd3098417b5ec88e77e80d1ba5945750943419dc976858082c296"
 dependencies = [
  "rustc-hash 1.1.0",
  "spirv",
-]
-
-[[package]]
-name = "rstar"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5912b862fa5ffb462607bfd1e35036c458c537921f508c8235a83d5f3987edfe"
-dependencies = [
- "heapless 0.8.0",
- "num-traits",
- "smallvec",
 ]
 
 [[package]]
@@ -16212,21 +15952,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rusttype"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ff8374aa04134254b7995b63ad3dc41c7f7236f69528b28553da7d72efaa967"
-dependencies = [
- "ab_glyph_rasterizer",
- "crossbeam-deque",
- "crossbeam-utils",
- "linked-hash-map",
- "num_cpus",
- "owned_ttf_parser 0.15.2",
- "rustc-hash 1.1.0",
-]
-
-[[package]]
 name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16340,9 +16065,11 @@ name = "scenograph"
 version = "0.0.6"
 dependencies = [
  "backstep",
+ "libm",
  "mere-curation",
  "sceno",
  "script-engine-api",
+ "script-rhai",
  "serde",
  "serde_json",
 ]
@@ -16428,16 +16155,14 @@ source = "git+https://github.com/merely-made/genet.git?branch=main#d634ee0c485db
 [[package]]
 name = "script-rhai"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
- "getrandom 0.3.4",
  "hest",
  "inker",
  "libm",
  "rhai",
- "scenograph",
  "script-engine-api",
  "serde_json",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -16523,6 +16248,7 @@ dependencies = [
 [[package]]
 name = "scrying-engine"
 version = "0.2.0"
+source = "git+https://github.com/merely-made/inker.git?branch=main#31099423b0990874c025981623c2bc4757995bd5"
 dependencies = [
  "dpi",
  "inker",
@@ -16622,32 +16348,25 @@ dependencies = [
 [[package]]
 name = "seiche"
 version = "0.0.6"
+source = "git+https://github.com/merely-made/seiche.git?branch=main#a6b86413d82b891af81889c54867adf91868ccdd"
 dependencies = [
  "armillary",
- "burn",
- "burn-wgpu",
  "conatus",
  "euclid",
- "getrandom 0.4.3",
  "numen",
  "petgraph 0.8.3",
- "pollster 0.4.0",
  "rapier2d",
  "seiche-model",
  "serde",
- "serde_json",
  "serde_path_to_error",
- "state-witness",
- "toml 0.8.23",
  "tracing",
- "uuid",
- "wasm-bindgen",
  "wgpu",
 ]
 
 [[package]]
 name = "seiche-model"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/seiche.git?branch=main#a6b86413d82b891af81889c54867adf91868ccdd"
 dependencies = [
  "euclid",
  "petgraph 0.8.3",
@@ -17605,11 +17324,11 @@ dependencies = [
 [[package]]
 name = "state-witness"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#71188bb66d15bdd3618db12f148bc42e5cbef284"
 dependencies = [
  "mere-framing",
  "postcard",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -18140,15 +17859,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tenant"
-version = "0.0.1"
-dependencies = [
- "kiss3d",
- "pollster 0.4.0",
- "wgpu",
-]
-
-[[package]]
 name = "tendril"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -18333,6 +18043,7 @@ dependencies = [
 [[package]]
 name = "tinct"
 version = "0.2.0"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#d80316db1115077a76d62aff8ca156852ed7924d"
 dependencies = [
  "serde",
 ]
@@ -18850,12 +18561,6 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "ttf-parser"
-version = "0.15.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b3e06c9b9d80ed6b745c7159c40b311ad2916abb34a49e9be2653b90db0d8dd"
-
-[[package]]
-name = "ttf-parser"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
@@ -19348,12 +19053,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "urlencoding"
-version = "2.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
-
-[[package]]
 name = "usdt"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -19546,7 +19245,7 @@ checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 [[package]]
 name = "vector-sheet"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/graphshell.git?branch=main#40e8c8df15915d86377117842c08cf10fd13c987"
+source = "git+https://github.com/merely-made/graphshell.git?branch=main#d80316db1115077a76d62aff8ca156852ed7924d"
 dependencies = [
  "ciborium",
  "serde",
@@ -20390,37 +20089,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a28ac98ddc8b9274cb41bb4d9d4d5c425b6020c50c46f25559911905610b4a88"
 
 [[package]]
-name = "weld-engine"
-version = "0.2.0"
-dependencies = [
- "dpi",
- "inker",
- "tracing",
- "welding",
-]
-
-[[package]]
-name = "welding"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e94298e32686b5d447c2abade5bb4594d4e2c4467a7116d3eb253fc7d230fed7"
-dependencies = [
- "dpi",
- "grafting",
- "libc",
- "libloading 0.9.0",
- "log",
- "objc2 0.6.4",
- "objc2-foundation 0.3.2",
- "objc2-io-surface",
- "objc2-metal 0.3.2",
- "thiserror 2.0.21",
- "wgpu",
- "wgpu-hal",
- "windows",
-]
-
-[[package]]
 name = "wesl"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -21225,7 +20893,7 @@ dependencies = [
  "objc2 0.5.2",
  "objc2-app-kit 0.2.2",
  "objc2-foundation 0.2.2",
- "objc2-ui-kit 0.2.2",
+ "objc2-ui-kit",
  "orbclient",
  "percent-encoding",
  "pin-project",
