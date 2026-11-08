@@ -10062,17 +10062,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-chrome"
-version = "0.0.1"
-dependencies = [
- "backstep",
- "mere-kernel",
- "serde",
- "serde_json",
- "url",
-]
-
-[[package]]
 name = "mere-comms"
 version = "0.0.1"
 source = "git+https://github.com/merely-made/murm.git?branch=main#45b1cf47467b85bc07d7c70b0b36937fb9ffe0ae"
@@ -18906,9 +18895,9 @@ name = "ux-events"
 version = "0.0.1"
 dependencies = [
  "hest",
- "mere-chrome",
  "mere-kernel",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

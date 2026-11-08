@@ -77,7 +77,7 @@ pub type GraphIndex = petgraph::graph::DefaultIx;
 ///
 /// Pre-M4 slice 10 (2026-04-22) this lived in `app/graph_views.rs`;
 /// moved here alongside the other graph-level identity types so
-/// portable runtime code (`ToolSurfaceReturnTarget`, `FrameViewModel`,
+/// portable runtime code (`ux_events::routing::ToolSurfaceReturnTarget`,
 /// etc.) can reference it without reaching across the app boundary.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct GraphViewId(Uuid);

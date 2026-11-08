@@ -89,14 +89,14 @@ pub enum UxEvent {
         surface: SurfaceId,
         reason: DismissReason,
     },
-    /// `HostIntent::Action` (or `ActionOnNode`) was dispatched. The
+    /// A host dispatched an action, optionally on a node. The
     /// optional `target` is the resolved NodeKey when the dispatch
     /// pre-positioned focus.
     ActionDispatched {
         action_id: ActionId,
         target: Option<NodeKey>,
     },
-    /// `HostIntent::OpenNode` was dispatched.
+    /// A host dispatched a request to open a node.
     OpenNodeDispatched { node_key: NodeKey },
 }
 
