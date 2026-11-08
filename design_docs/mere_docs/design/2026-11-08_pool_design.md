@@ -1,7 +1,7 @@
 # The Pool: a swatch you drop things into (design brief)
 
 **Date**: 2026-11-08
-**Status**: design brief from a Mark session. Mark recalled "design work on something called a pool, as a clipboard utility", then described it: "something of a sharing utility as like a little card or perhaps swatch that you could drag data into meant to be used as a clipboard". No document in the family carries it (searched every `design_docs/`, `TERMINOLOGY.md`, the naming ledger and memory on 2026-11-08; every *pool* in the tree is a producer, fetcher or gnode pool), so this is its first writing. It states the model, what the tree already has for it, and the forks that are Mark's. It is not a plan.
+**Status**: design brief from a Mark session. Mark recalled "design work on something called a pool, as a clipboard utility", then described it: "something of a sharing utility as like a little card or perhaps swatch that you could drag data into meant to be used as a clipboard". No document in the family carries it (searched every `design_docs/`, `TERMINOLOGY.md`, the naming ledger and memory on 2026-11-08; every *pool* in the tree is a producer, fetcher or gnode pool), so this is its first writing. It states the model, what the tree already has for it, and the forks, ruled the same day in §7. It is not a plan.
 **Related**: [swatch primitive design](2026-06-27_swatch_primitive_design.md) (the fourth primitive; §3 the instance config, §11 "field as a scope" as a grab-bag), [nodes and cards](2026-07-01_node_card_summoning_design.md) (the card family and summoning), [subgraph derivation from selection](2026-06-13_subgraph_derivation_from_selection.md) (what a selection becomes), [one state, n windows](2026-07-05_one_state_n_windows_design.md) (view instances over shared truth), the [graph view curation plan](../implementation_strategy/2026-10-28_graph_view_curation_plan.md) (U2's shared drag machine; "share a proven view"), the [engine split plan](../implementation_strategy/2026-11-07_engine_split_plan.md) D27 (backstep's clipboard contract) and the scenograph editor plan's SE63, SE65 and SE83 (scope, the edit layer as intents, `Scope::Selection`).
 
 ## 1. What Mark described, in the tree's words
@@ -70,6 +70,15 @@ So D27's F2 proceeds as ruled; the pool does not replace it or rename it.
 - **F5. Cap and overflow.** A cap per pool with what it sheds shown (recommended), set by the person; or unbounded, where a pool becomes a second roster.
 - **F6. Order of work.** D27's F2 request/completion pair proceeds now and the pool follows as its own plan when greenlit (recommended); or the pool's plan goes first and the request pair is designed as its binding.
 
-## 7. When a build is greenlit
+## 7. Decisions (Mark, 2026-11-08, one card round of four and one of two)
+
+- **P1. Identity:** "A swatch with a kept, droppable Selection scope (Recommended)". No new type; `Scope::Selection` (SE83) carries it and the host marks which selection swatches accept drops and persist. Outcome: applies the swatch design (§3) and SE83.
+- **P2. Lifetime and reach:** "Durable with the session in pandect, seen by every window (Recommended)". A view instance over shared truth; shareable to another person as a view. Outcome: applies one-state-n-windows and the curation plan's "share a proven view".
+- **P3. Foreign drops:** "Intake first; the pool holds the new node's id (Recommended)". Provenance lives on the node; a refused intake leaves the pool unchanged. Outcome: applies the two-planes rule (curation, not truth) and SE65.
+- **P4. Drawing out:** "Per pool, a person's setting". Each pool declares copy-out or move-out; the default is copy, so the holds-many inference is the default and cut is a choice. Outcome: applies the configurability rule (expose the design space rather than pick one).
+- **P5. Cap and overflow:** "A cap per pool, what it sheds shown (Recommended)". Set by the person with a default; the oldest member sinks out visibly. Outcome: new to this brief.
+- **P6. Order of work:** "Request pair now; pool as its own plan when greenlit (Recommended)". D27's request/completion pair, the Genet selected-text query and the backstep publish proceed; the pool's plan follows with P1 to P5 as its rulings. Outcome: applies engine split D27.
+
+## 8. When a build is greenlit
 
 A plan under `mere_docs/implementation_strategy/` (or Graphshell's, since the surface is the host's) with done-conditions of this shape: a selection swatch in Turnstone accepts a drop from the orrery and from a web page's text, the text becomes a node through intake and the pool shows it; the pool is visible in a second window of the same state; drawing a member out onto the canvas leaves the pool unchanged; a cap sheds visibly; a share hands the pool to a second person as a view. Receipts headed, in the harness, not synthetic input.
