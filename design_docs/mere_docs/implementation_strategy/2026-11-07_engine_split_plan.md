@@ -1341,3 +1341,16 @@ revision and what crosses at frame rate.
   not otherwise take. `read_clipboard_write_text` is the host's decode, refusing a foreign id, schema
   or effect. hest's `Invocation::id` is the command id, not a per-call id, so two writes in flight are
   told apart only by issue order. backstep is untouched; no in-repo constructor used the removed field.
+- 2026-11-08: rootstock's egui embedding binds Copy and Cut (branch `p0/egui-clipboard`, worktree
+  `worktrees/mere-egui-clipboard`, not merged). `Input::clipboard_command` maps egui's `Event::Copy`
+  and `Event::Cut`; `Input::clipboard(command, selection, &mut dyn backstep::Clipboard)` writes the
+  selection, which the owner reads from the session's `selected_text()` and passes in (the input
+  never holds the session; `None` refuses `Unavailable`, as iced does), through `EguiClipboard`, a
+  call-shaped `Clipboard` over egui's `CopyText` output command (egui answers no write, so a queued
+  write is `Ok`; it serves no reads, its paste already arriving as `Event::Paste`). A Cut whose
+  write succeeded also yields an unmodified Delete press and release, which Genet's livery and
+  scripted sessions apply to a focused control's non-collapsed range; a document range is copied
+  and stays. Left: the Genet relock to fe752369 (`document-session-api` 0.1.2 with
+  `selected_text`; bole by `rev = ddf4e31`) is a fork, because webcue 0.1.2 from crates.io pins
+  `document-session-api = "=0.1.1"`, the git patch then misses it, and inker's `cue.rs` mixes the
+  two copies (seven E0308); until webcue moves, owners have no `selected_text()` to call.

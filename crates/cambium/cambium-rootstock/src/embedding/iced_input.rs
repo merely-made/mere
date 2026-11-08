@@ -99,9 +99,9 @@ impl Input {
     /// The request a clipboard `command` makes of iced's runtime; hand it over
     /// with [`Self::carry`]. Paste reads, and its answer reaches the owner as
     /// pasted text. Copy and Cut write `selection`, the document's selected
-    /// text, which the host supplies: Genet's document-session-api has no
-    /// selection query yet, so `None` refuses with `Unavailable`. A Cut's
-    /// deletion is the owner's, on `ClipboardEvent::Written(Ok(()))`.
+    /// text, which the owner reads from the session's `selected_text()`;
+    /// `None` refuses with `Unavailable`. A Cut's deletion is the owner's, on
+    /// `ClipboardEvent::Written(Ok(()))`.
     pub fn clipboard_request(
         &mut self,
         command: ClipboardCommand,

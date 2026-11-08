@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 //! Native egui-wgpu 0.36.2/wgpu 30 callback. The UI owner captures a Frame;
 //! egui owns command encoding/submission and sets viewport/scissor at painting.
-pub use super::egui_input::Input;
+pub use super::egui_input::{EguiClipboard, Input};
 use super::{Frame, Gpu, TargetConfig};
 pub use ::egui as toolkit;
 pub use egui_wgpu as backend;

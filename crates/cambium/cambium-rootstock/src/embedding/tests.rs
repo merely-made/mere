@@ -229,6 +229,92 @@ fn egui_keyboard_text_and_paste_keep_distinct_owners() {
             .is_empty()
     );
 }
+#[cfg(all(feature = "embedding-egui", not(target_arch = "wasm32")))]
+#[test]
+fn egui_copy_and_cut_write_the_selection_and_cut_deletes_it() {
+    use super::egui::{EguiClipboard, toolkit};
+    use backstep::{ClipboardError, ClipboardEvent, NoClipboard};
+    use cambium::ClipboardCommand;
+    use document_session_api::{SessionButtonState, SessionKey, SessionModifiers};
+    let input = super::egui::Input::default();
+    let units = ScrollUnits {
+        line: [1., 1.],
+        page: [1., 1.],
+    };
+    // One frame: carry `command` through egui's output and read back what it queued.
+    let frame = |command, selection: Option<&str>| {
+        let mut answer = None;
+        let mut output = toolkit::Context::default().run_ui(Default::default(), |ui| {
+            answer = Some(input.clipboard(command, selection, &mut EguiClipboard(ui.ctx())));
+        });
+        // egui asserts that a frame's texture uploads are handled; no painter here.
+        output.textures_delta.clear();
+        let copied: Vec<_> = output
+            .platform_output
+            .commands
+            .into_iter()
+            .filter_map(|c| match c {
+                toolkit::OutputCommand::CopyText(text) => Some(text),
+                _ => None,
+            })
+            .collect();
+        (answer.unwrap(), copied)
+    };
+    let written = OwnerInput::Clipboard(ClipboardEvent::Written(Ok(())));
+    for (event, command) in [
+        (toolkit::Event::Copy, ClipboardCommand::Copy),
+        (toolkit::Event::Cut, ClipboardCommand::Cut),
+    ] {
+        assert_eq!(super::egui::Input::clipboard_command(&event), Some(command));
+        // The event alone carries no session input; the owner routes it here.
+        assert_eq!(super::egui::Input::default().event(&event, units), Ok(vec![]));
+        // Nothing selected is refused as iced refuses it, and nothing is queued.
+        assert_eq!(frame(command, None), (Err(ClipboardError::Unavailable), vec![]));
+    }
+    assert_eq!(
+        super::egui::Input::clipboard_command(&toolkit::Event::Paste("p".into())),
+        None
+    );
+    // Copy queues the selection and leaves the document alone.
+    assert_eq!(
+        frame(ClipboardCommand::Copy, Some("chosen")),
+        (Ok(vec![written.clone()]), vec!["chosen".to_owned()])
+    );
+    // Cut queues it, then deletes the selection with an unmodified Delete.
+    let delete = |state| {
+        OwnerInput::Session(SessionInput::Key {
+            key: SessionKey::Delete,
+            state,
+            modifiers: SessionModifiers::default(),
+            repeat: false,
+        })
+    };
+    assert_eq!(
+        frame(ClipboardCommand::Cut, Some("cedar")),
+        (
+            Ok(vec![
+                written,
+                delete(SessionButtonState::Pressed),
+                delete(SessionButtonState::Released),
+            ]),
+            vec!["cedar".to_owned()]
+        )
+    );
+    // A Cut whose write is refused keeps the selection.
+    assert_eq!(
+        input.clipboard(ClipboardCommand::Cut, Some("cedar"), &mut NoClipboard),
+        Ok(vec![OwnerInput::Clipboard(ClipboardEvent::Written(Err(
+            ClipboardError::Refused
+        )))])
+    );
+    // egui serves no reads: its paste arrives as `Event::Paste`.
+    assert_eq!(
+        frame(ClipboardCommand::Paste, None).0,
+        Ok(vec![OwnerInput::Clipboard(ClipboardEvent::Read(Err(
+            ClipboardError::Refused
+        )))])
+    );
+}
 #[cfg(all(feature = "embedding-iced", not(target_arch = "wasm32")))]
 #[test]
 fn iced_ime_bytes_and_caller_wheel_units_survive_translation() {
