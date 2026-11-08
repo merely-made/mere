@@ -3,11 +3,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
+use backstep::ClipboardEvent;
 use document_session_api::SessionInput;
 #[derive(Clone, Debug, PartialEq)]
 pub enum OwnerInput {
     Session(SessionInput),
     Wheel { position: [f32; 2], delta: [f32; 2] },
+    /// The answer to a clipboard request the owner made, other than pasted
+    /// text (which arrives as a session input): a failure, or a write done.
+    Clipboard(ClipboardEvent),
 }
 /// Caller-configured logical pixels per line/page. Toolkits supply wheel units;
 /// the owner chooses their meaning instead of a toolkit adapter fixing a speed.

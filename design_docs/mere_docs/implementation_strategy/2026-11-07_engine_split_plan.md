@@ -1291,4 +1291,20 @@ revision and what crosses at frame rate.
   `Event::Clipboard` carries `Read` and `Written` results of earlier requests), chrome's frame
   model (writes travel back through host ports) and the Graphshell web share (a browser promise
   inside a user gesture). Knot's `backstep = "0.1.0"` requirement needs 0.2.0 when it next repins.
+- 2026-11-08: D27's fork F2 carried out, "request and completion pair" (branch
+  `p0/clipboard-requests`, worktree `worktrees/mere-clipboard-requests`, not merged). `backstep` 0.2.0
+  (still unpublished, still dependency-free) gains `ClipboardRequest { Read, Write(String) }` and
+  `ClipboardEvent { Read(Result<String, ClipboardError>), Written(Result<(), ClipboardError>) }`, with
+  `ClipboardRequest::fail` (the answer that refuses a request) and `ClipboardRequest::serve` (carry a
+  request through a call-shaped `Clipboard`); the sync trait stays. Bound: rootstock's iced embedding
+  (iced's `Event::Clipboard` maps to `ClipboardEvent`, answers to other widgets' requests are ignored by
+  a pending count, a Paste's text arrives as `SessionInput::Text`, other answers as the new
+  `OwnerInput::Clipboard`; Copy and Cut write a selection the host supplies and refuse `Unavailable`
+  without one, until Genet's selection query lands) and the Graphshell web share (`web_share::clipboard`
+  takes the request inside the gesture and completes with `Written`; the status line now names the
+  `ClipboardError` rather than the browser's message). Half-bound: chrome's frame model accepts
+  `Written` answers in `FrameHostInput::clipboard_completions` and re-exports the pair, but no host
+  port exists in any repository to carry `ClipboardRequest::Write` out, so that leg is a fork. Left:
+  rootstock's egui embedding (Copy and Cut wait on the same selection query). Locks gain only the
+  `backstep` edges (rootstock, `graphshell-web`).
 

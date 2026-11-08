@@ -328,3 +328,76 @@ fn iced_printable_key_pairs_text_without_enter_control_text() {
         })]
     ));
 }
+#[cfg(all(feature = "embedding-iced", not(target_arch = "wasm32")))]
+#[test]
+fn iced_clipboard_requests_pair_with_their_answers() {
+    use super::iced::backend::core::{Clipboard, Event, clipboard, keyboard};
+    use backstep::{ClipboardError, ClipboardEvent, ClipboardRequest};
+    use cambium::ClipboardCommand;
+    use std::sync::Arc;
+    let mut input = super::iced::Input::default();
+    let units = ScrollUnits {
+        line: [1., 1.],
+        page: [1., 1.],
+    };
+    let key = keyboard::Key::Character("v".into());
+    let paste = Event::Keyboard(keyboard::Event::KeyPressed {
+        key: key.clone(),
+        modified_key: key,
+        physical_key: keyboard::key::Physical::Code(keyboard::key::Code::KeyV),
+        location: keyboard::Location::Standard,
+        modifiers: keyboard::Modifiers::CTRL,
+        text: None,
+        repeat: false,
+    });
+    assert_eq!(
+        super::iced::Input::clipboard_command(&paste),
+        Some(ClipboardCommand::Paste)
+    );
+    let read = |text: &str| {
+        Event::Clipboard(clipboard::Event::Read(Ok(Arc::new(
+            clipboard::Content::Text(text.into()),
+        ))))
+    };
+    // An answer to another widget's request is not this owner's.
+    assert_eq!(input.event(&read("theirs"), units), Ok(vec![]));
+    // Paste: a read request, answered by pasted text.
+    let request = input.clipboard_request(ClipboardCommand::Paste, None);
+    assert_eq!(request, Ok(ClipboardRequest::Read));
+    let mut requests = Clipboard::new();
+    super::iced::Input::carry(request.unwrap(), &mut requests);
+    assert_eq!(requests.reads, vec![clipboard::Kind::Text]);
+    assert_eq!(
+        input.event(&read("pasted"), units),
+        Ok(vec![OwnerInput::Session(SessionInput::Text("pasted".into()))])
+    );
+    // Copy without a selection the host can supply is refused, not requested.
+    assert_eq!(
+        input.clipboard_request(ClipboardCommand::Copy, None),
+        Err(ClipboardError::Unavailable)
+    );
+    let request = input.clipboard_request(ClipboardCommand::Cut, Some("cut"));
+    assert_eq!(request, Ok(ClipboardRequest::Write("cut".into())));
+    super::iced::Input::carry(request.unwrap(), &mut requests);
+    assert_eq!(requests.write, Some(clipboard::Content::Text("cut".into())));
+    let written = Event::Clipboard(clipboard::Event::Written(Err(
+        clipboard::Error::ClipboardOccupied,
+    )));
+    assert_eq!(
+        input.event(&written, units),
+        Ok(vec![OwnerInput::Clipboard(ClipboardEvent::Written(Err(
+            ClipboardError::Unavailable
+        )))])
+    );
+    // A failed read reaches the owner as a failure; non-text reads as empty.
+    input.clipboard_request(ClipboardCommand::Paste, None).unwrap();
+    let files = Event::Clipboard(clipboard::Event::Read(Ok(Arc::new(
+        clipboard::Content::Files(vec![]),
+    ))));
+    assert_eq!(
+        input.event(&files, units),
+        Ok(vec![OwnerInput::Clipboard(ClipboardEvent::Read(Err(
+            ClipboardError::Empty
+        )))])
+    );
+}

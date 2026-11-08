@@ -4,15 +4,44 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 use super::{OwnerInput, ScrollUnits};
+use backstep::{ClipboardError, ClipboardEvent, ClipboardRequest};
+use cambium::ClipboardCommand;
 use document_session_api::{
     SessionButtonState, SessionIme, SessionInput, SessionKey, SessionModifiers,
     SessionPointerButton,
 };
-use iced_wgpu::core::{Event, input_method, keyboard, mouse};
+use iced_wgpu::core::{Event, clipboard, input_method, keyboard, mouse};
 #[derive(Default)]
 pub struct Input {
     cursor: Option<[f32; 2]>,
     modifiers: SessionModifiers,
+    /// Clipboard requests this input made that iced has not answered yet.
+    reads: usize,
+    writes: usize,
+}
+fn clipboard_error(error: &clipboard::Error) -> ClipboardError {
+    use clipboard::Error as E;
+    match error {
+        E::ContentNotAvailable | E::ConversionFailure => ClipboardError::Empty,
+        E::ClipboardUnavailable | E::ClipboardOccupied | E::Unknown { .. } => {
+            ClipboardError::Unavailable
+        },
+    }
+}
+/// iced's answer as backstep's [`ClipboardEvent`]; non-text content reads as empty.
+fn clipboard_event(event: &clipboard::Event) -> ClipboardEvent {
+    match event {
+        clipboard::Event::Read(result) => ClipboardEvent::Read(match result {
+            Ok(content) => match content.as_ref() {
+                clipboard::Content::Text(text) => Ok(text.clone()),
+                _ => Err(ClipboardError::Empty),
+            },
+            Err(error) => Err(clipboard_error(error)),
+        }),
+        clipboard::Event::Written(result) => {
+            ClipboardEvent::Written(result.as_ref().map(|_| ()).map_err(clipboard_error))
+        },
+    }
 }
 fn modifiers(v: keyboard::Modifiers) -> SessionModifiers {
     SessionModifiers {
@@ -47,6 +76,66 @@ fn key(v: &keyboard::Key) -> SessionKey {
     }
 }
 impl Input {
+    /// Ctrl/Cmd+C/X/V on `event` as a clipboard command; `None` otherwise.
+    pub fn clipboard_command(event: &Event) -> Option<ClipboardCommand> {
+        let Event::Keyboard(keyboard::Event::KeyPressed {
+            key: keyboard::Key::Character(value),
+            modifiers: m,
+            ..
+        }) = event
+        else {
+            return None;
+        };
+        if !(m.control() || m.logo()) || m.alt() || m.shift() {
+            return None;
+        }
+        match value.to_ascii_lowercase().as_str() {
+            "c" => Some(ClipboardCommand::Copy),
+            "x" => Some(ClipboardCommand::Cut),
+            "v" => Some(ClipboardCommand::Paste),
+            _ => None,
+        }
+    }
+    /// The request a clipboard `command` makes of iced's runtime; hand it over
+    /// with [`Self::carry`]. Paste reads, and its answer reaches the owner as
+    /// pasted text. Copy and Cut write `selection`, the document's selected
+    /// text, which the host supplies: Genet's document-session-api has no
+    /// selection query yet, so `None` refuses with `Unavailable`. A Cut's
+    /// deletion is the owner's, on `ClipboardEvent::Written(Ok(()))`.
+    pub fn clipboard_request(
+        &mut self,
+        command: ClipboardCommand,
+        selection: Option<&str>,
+    ) -> Result<ClipboardRequest, ClipboardError> {
+        let request = match command {
+            ClipboardCommand::Paste => ClipboardRequest::Read,
+            ClipboardCommand::Copy | ClipboardCommand::Cut => {
+                ClipboardRequest::Write(selection.ok_or(ClipboardError::Unavailable)?.to_owned())
+            },
+        };
+        match request {
+            ClipboardRequest::Read => self.reads += 1,
+            ClipboardRequest::Write(_) => self.writes += 1,
+        }
+        Ok(request)
+    }
+    /// Add `request` to iced's request set (`Shell::clipboard_mut`); iced
+    /// answers with an `Event::Clipboard` that [`Self::event`] maps.
+    pub fn carry(request: ClipboardRequest, requests: &mut clipboard::Clipboard) {
+        match request {
+            ClipboardRequest::Read => requests.reads.push(clipboard::Kind::Text),
+            ClipboardRequest::Write(text) => requests.write = Some(text.into()),
+        }
+    }
+    /// The answer to a request this input made; `None` for another widget's.
+    fn complete(&mut self, event: &clipboard::Event) -> Option<ClipboardEvent> {
+        let pending = match event {
+            clipboard::Event::Read(_) => &mut self.reads,
+            clipboard::Event::Written(_) => &mut self.writes,
+        };
+        *pending = pending.checked_sub(1)?;
+        Some(clipboard_event(event))
+    }
     /// Focus(true) belongs to the actual containing widget's focus owner.
     pub fn event(
         &mut self,
@@ -161,7 +250,16 @@ impl Input {
                 },
             }),
             Event::Window(iced_wgpu::core::window::Event::Unfocused) => SessionInput::Focus(false),
-            Event::Clipboard(_) => return Err("clipboard requests remain host operations"),
+            Event::Clipboard(event) => {
+                return Ok(self
+                    .complete(event)
+                    .map(|event| match event {
+                        ClipboardEvent::Read(Ok(text)) => OwnerInput::Session(SessionInput::Text(text)),
+                        other => OwnerInput::Clipboard(other),
+                    })
+                    .into_iter()
+                    .collect());
+            },
             _ => return Ok(vec![]),
         };
         Ok(vec![OwnerInput::Session(session)])
