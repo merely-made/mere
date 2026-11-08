@@ -24,6 +24,7 @@ use graphshell_client::frozen::Satisfaction;
 use pictograph::canvas::dynamics_spec::DynamicsSpec;
 use pictograph::canvas::{
     BoardBackdrop, BoardCard, BoardFootprint, BoardRect, BoardRelation, BoardScene, PhysicsBoard,
+    PhysicsTransport,
     Speed,
 };
 use sceno::{InstanceId, StandIn};
@@ -164,6 +165,10 @@ pub fn board_scene(mounted: &MountedScene) -> BoardScene {
     }
 }
 
+/// The transport a board's physics is to run behind, when the host has one to
+/// give (a Web Worker): called once, when the board first holds a scene.
+type StartTransport = Box<dyn FnOnce() -> Option<Box<dyn PhysicsTransport>>>;
+
 /// The board a host keeps for its remote session.
 #[derive(Default)]
 pub struct RemoteBoard {
@@ -172,11 +177,34 @@ pub struct RemoteBoard {
     position: Option<(scenotime::SceneEpoch, Option<u64>, Option<String>)>,
     /// The viewer's speed, as last mirrored.
     speed: Speed,
+    /// Starts the far side of a board that runs in a Worker, on first use.
+    start: Option<StartTransport>,
 }
 
 impl RemoteBoard {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// A board whose physics runs on the far side of `transport`, from the start.
+    pub fn with_transport(transport: Box<dyn PhysicsTransport>) -> Self {
+        Self {
+            board: PhysicsBoard::with_transport(transport),
+            ..Self::default()
+        }
+    }
+
+    /// A board that asks `start` for a transport the first time it holds a
+    /// scene, so a page that never joins a session starts no Worker. `start`
+    /// answering `None` leaves the board with its own backend (in process, or
+    /// unavailable where the build has no engine).
+    pub fn when_needed(
+        start: impl FnOnce() -> Option<Box<dyn PhysicsTransport>> + 'static,
+    ) -> Self {
+        Self {
+            start: Some(Box::new(start)),
+            ..Self::default()
+        }
     }
 
     /// Stage the board's repulsion on the host's device (P5c).
@@ -231,6 +259,13 @@ impl RemoteBoard {
         stage: Option<&DynamicsSpec>,
         speed: Speed,
     ) {
+        if mounted.is_some()
+            && let Some(start) = self.start.take()
+            && let Some(transport) = start()
+        {
+            self.board = PhysicsBoard::with_transport(transport);
+            self.board.set_speed(self.speed);
+        }
         if let Some(stage) = stage {
             let _ = self.board.set_stage(stage);
         }

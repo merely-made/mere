@@ -82,6 +82,17 @@ impl PhysicsBoard {
         self.end_withdrawn_drag();
         // So a host that syncs and draws in one frame sees the fresh item.
         self.physics.refresh(&mut self.view);
+        // A far side that has not answered yet has not seen the new bodies:
+        // they are where the inline backend would have put them, at their slots.
+        if matches!(self.physics, seiche::Physics::Remote(_)) {
+            for item in &self.items {
+                let key = self.keys[&item.id];
+                if self.view.position_of(key).is_none() {
+                    self.view
+                        .set_position(key, Point2D::new(item.slot.0, item.slot.1));
+                }
+            }
+        }
         fresh
     }
 

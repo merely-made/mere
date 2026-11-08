@@ -114,8 +114,25 @@ impl PhysicsBoard {
     pub fn new() -> Self {
         #[cfg(feature = "physics-engine")]
         let physics = Physics::inline(Simulation::new(), 0);
+        // No engine in this build: the physics is unavailable (a backend that
+        // fails closed), and the cards stay at their slots.
         #[cfg(not(feature = "physics-engine"))]
-        let physics = Physics::remote(Box::new(crate::canvas::seiche_bridge::UnavailableTransport::default()));
+        let physics = Physics::remote(Box::new(
+            crate::canvas::seiche_bridge::UnavailableTransport::default(),
+        ));
+        Self::over(physics)
+    }
+
+    /// A board whose physics runs on the far side of `transport` (a Web
+    /// Worker): the board sends the bodies, the edges, the force set (already
+    /// data) and the drag as commands through the same [`Physics`] methods,
+    /// folds the layouts that come back, and draws a card at its slot until the
+    /// far side has answered. Builds no simulation.
+    pub fn with_transport(transport: Box<dyn seiche::Transport>) -> Self {
+        Self::over(Physics::remote(transport))
+    }
+
+    fn over(physics: Physics) -> Self {
         Self {
             physics,
             view: LayoutView::new(),

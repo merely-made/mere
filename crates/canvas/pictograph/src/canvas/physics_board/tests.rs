@@ -229,3 +229,135 @@ fn the_board_takes_a_stage_and_refuses_a_schedule() {
     assert!(board.set_stage(&schedule).is_err());
     assert_eq!(board.stage(), &held, "a refused stage changes nothing");
 }
+
+fn card_items() -> Vec<BoardItem> {
+    (0..14)
+        .map(|i| BoardItem {
+            id: format!("card{i}"),
+            slot: ((i % 5) as f32 * 40.0, (i / 5) as f32 * 40.0),
+            site: format!("site{}", i % 3),
+        })
+        .collect()
+}
+
+fn card_links() -> Vec<(String, String)> {
+    (1..14)
+        .map(|i| (format!("card{i}"), format!("card{}", i * 7 % i.max(1))))
+        .filter(|(a, b)| a != b)
+        .collect()
+}
+
+/// The bits of every card's position, in item order.
+fn card_bits(board: &PhysicsBoard) -> Vec<(u32, u32)> {
+    card_items()
+        .iter()
+        .map(|item| {
+            let (x, y) = board.position(&item.id).expect("a card the board holds");
+            (x.to_bits(), y.to_bits())
+        })
+        .collect()
+}
+
+/// A board of 14 cards in three sites, linked, under `law`, run for `ticks`
+/// ticks: in process, or on the far side of a transport (a Worker in
+/// process, moving the bytes `postMessage` would).
+fn board_run(law: PhysicsLaw, remote: bool, ticks: u64) -> Vec<(u32, u32)> {
+    let hub = super::super::tests::loopback::Loopback::new();
+    let mut board = if remote {
+        PhysicsBoard::with_transport(hub.transport())
+    } else {
+        PhysicsBoard::new()
+    };
+    board.sync(card_items());
+    board.set_links(card_links());
+    board
+        .set_stage(
+            &PhysicsChoice {
+                law,
+                ..PhysicsChoice::default()
+            }
+            .into_spec(),
+        )
+        .unwrap();
+    if remote {
+        let mut turns = 0;
+        while board.pace().ticks < ticks {
+            hub.pump();
+            board.tick();
+            turns += 1;
+            assert!(turns < 100 * ticks, "{} never ran", law.id());
+        }
+        assert_eq!(board.pace().ticks, ticks, "{}", law.id());
+    } else {
+        for _ in 0..ticks {
+            board.tick();
+        }
+        assert_eq!(board.pace().ticks, ticks, "{}", law.id());
+    }
+    card_bits(&board)
+}
+
+/// The board's physics on the far side of a transport settles to the bits the
+/// in-process board reaches, over every law in the catalog: the board sends
+/// the bodies, the topology, the force set (as data) and the settle as
+/// commands, and the far side builds the same forces.
+#[test]
+fn a_remote_board_settles_where_the_inline_one_does() {
+    let slots: Vec<(u32, u32)> = card_items()
+        .iter()
+        .map(|item| (item.slot.0.to_bits(), item.slot.1.to_bits()))
+        .collect();
+    let mut moved = 0;
+    for law in PhysicsLaw::ALL {
+        let inline = board_run(law, false, 40);
+        assert_eq!(board_run(law, true, 40), inline, "{}", law.id());
+        moved += usize::from(inline != slots);
+    }
+    // Not a vacuous comparison: most laws move the cards in 40 ticks.
+    assert!(moved >= PhysicsLaw::ALL.len() / 2, "{moved} laws moved the cards");
+}
+
+/// Before the far side has answered, a card is drawn at its slot, where the
+/// inline backend would have put it; a drag pins and moves it through the same
+/// commands, and the far side then holds it there.
+#[test]
+fn a_remote_board_draws_at_the_slots_and_drags_through_commands() {
+    let hub = super::super::tests::loopback::Loopback::new();
+    let mut board = PhysicsBoard::with_transport(hub.transport());
+    assert_eq!(board.sync(card_items()), 14);
+    assert_eq!(board.position("card3"), Some((120.0, 0.0)), "its slot, unanswered");
+    for _ in 0..10 {
+        hub.pump();
+        board.tick();
+    }
+    assert!(board.drag_start("card3"));
+    assert!(board.drag_move(500.0, 300.0));
+    for _ in 0..4 {
+        hub.pump();
+        board.tick();
+    }
+    let held = board.position("card3").unwrap();
+    assert!(
+        (held.0 - 500.0).abs() < 1.0 && (held.1 - 300.0).abs() < 1.0,
+        "held under the pointer: {held:?}"
+    );
+    assert!(board.drag_end());
+    board.sync(Vec::new());
+    assert!(board.position("card3").is_none());
+}
+
+/// A board built without an engine and with no Worker holds its cards at their
+/// slots and never moves them: the transport that fails closed.
+#[test]
+fn a_board_with_an_unavailable_transport_keeps_the_slots() {
+    let mut board = PhysicsBoard::with_transport(Box::new(
+        crate::canvas::UnavailableTransport::default(),
+    ));
+    board.sync(card_items());
+    for _ in 0..30 {
+        board.tick();
+    }
+    for item in card_items() {
+        assert_eq!(board.position(&item.id), Some(item.slot), "{}", item.id);
+    }
+}

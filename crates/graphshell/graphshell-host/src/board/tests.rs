@@ -46,6 +46,30 @@ mod mapping {
         ));
     }
 
+    /// A board that runs in a Worker asks for its transport once, when it first
+    /// holds a scene: a page that never joins a session starts no Worker.
+    #[test]
+    fn a_board_started_on_demand_asks_for_its_transport_at_the_first_scene() {
+        use std::cell::Cell;
+        use std::rc::Rc;
+        let asked = Rc::new(Cell::new(0));
+        let mut endpoint = LiveEndpoint::new();
+        let (client, session) = mount(&mut endpoint);
+        let counter = Rc::clone(&asked);
+        let mut remote = RemoteBoard::when_needed(move || {
+            counter.set(counter.get() + 1);
+            Some(Box::new(pictograph::canvas::UnavailableTransport::default()))
+        });
+        let stage = pictograph::canvas::PhysicsChoice::default().into_spec();
+        remote.sync(None, None, Some(&stage), Speed::REAL_TIME);
+        assert_eq!(asked.get(), 0, "no scene, no Worker");
+        remote.sync(client.mounted(&session), Some(1), Some(&stage), Speed::REAL_TIME);
+        assert_eq!(asked.get(), 1);
+        assert_eq!(remote.board().len(), 1);
+        remote.sync(client.mounted(&session), Some(2), Some(&stage), Speed::REAL_TIME);
+        assert_eq!(asked.get(), 1, "asked once");
+    }
+
     #[test]
     fn the_board_resyncs_only_when_the_revision_moves() {
         let mut endpoint = LiveEndpoint::new();

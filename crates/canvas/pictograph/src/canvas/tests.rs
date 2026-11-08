@@ -51,7 +51,7 @@ mod node_face;
 mod node_minting;
 mod node_state;
 mod permitted_actions;
-mod loopback;
+pub(crate) mod loopback;
 mod physics_catalog;
 mod physics_form;
 mod physics_registry;
