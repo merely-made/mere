@@ -1148,3 +1148,16 @@ revision and what crosses at frame rate.
   merge gates now run in an isolated build directory with `CARGO_BUILD_JOBS=4`, after a fresh-directory
   check showed the earlier "can't find crate" errors were a parallel-build race, not code. Other
   sessions are already developing Seiche (`d6f44d8`, `seiche-model` catalog tables).
+- 2026-11-07: outside repins landed on Mark's word. Isocosm main `753d9702`: twelve rows to `seiche.git`,
+  `eidetic.git` and `graphshell.git`, nine locks moved (Mere to current main as well, since the old pins
+  named the moved crates through `mere.git`), all nine workspaces green with all features, 1,036 tests,
+  plus a one-line fix for the world-graph viewer's `prepare_presentation` hook that was already
+  broken on main; its untracked `.cargo/tabletop-local.toml` overlay still names deleted Mere paths.
+  Cleromancy main `e79576b`: `seiche` and `tinct` rows, two `seiche.git` redirects for Knot, Mere at
+  current main, `with_resident_defaults` in the worker and one example (Mere `022560ff1` moved the
+  divination registration; cycle-breaks P3 moves it into Cleromancy); core 60 tests green, root 147
+  pass with two failures identical on unmodified main (an authored-layout aria state, a missing notes
+  route fixture). Still owed: Knot's `seiche` row (then Mere's and Cleromancy's two redirects leave),
+  Murm's signalman-desktop and mer3ly `seiche` rows, Woodshed's `tinct` rows (then Turnstone's tinct
+  redirect leaves). Rust compiles hit out-of-memory three times while other sessions built; the
+  machine is at its limit with every session running.
