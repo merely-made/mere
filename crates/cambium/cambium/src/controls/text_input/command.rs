@@ -65,8 +65,8 @@ pub enum TextCommand {
 /// Translate a focused Cambium event into an editing command.
 ///
 /// Primary-modifier shortcuts not owned by the editor return `None`, so
-/// Ctrl/Cmd+C/V/X can be handled by the host clipboard instead of inserting
-/// literal `c`, `v`, or `x` into the field.
+/// Ctrl/Cmd+C/V/X go to [`clipboard_command_from_key`](super::clipboard_command_from_key)
+/// instead of inserting literal `c`, `v`, or `x` into the field.
 pub fn text_command_from_key(event: &KeyEvent, mode: TextFieldMode) -> Option<TextCommand> {
     let extend = event.mods.shift;
     let primary = event.mods.ctrl || event.mods.meta;
@@ -261,7 +261,7 @@ impl TextInput {
         text_command_from_key(event, mode).is_some_and(|command| self.apply(command))
     }
 
-    fn apply_committed_edit(
+    pub(super) fn apply_committed_edit(
         &mut self,
         coalesce_insert: bool,
         edit: impl FnOnce(&mut TextInput),

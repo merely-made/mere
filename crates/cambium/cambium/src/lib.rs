@@ -163,11 +163,14 @@ pub use setting_row_session::{
 // needs no second direct `sprigging` dependency. The grid widget's home
 // is here; its column model rides along.
 pub use controls::{
-    CaretAffinity, CaretMove, CaretPosition, CaretSelection, CheckElement, Checkbox, Composition,
-    SINGLE_LINE_FIELD_STYLE, TextCommand, TextField, TextFieldMode, TextInput, button, button_with,
-    checkbox, checkbox_disabled, checkbox_typed, text_command_from_key, text_field, text_field_typed, textarea,
+    CaretAffinity, CaretMove, CaretPosition, CaretSelection, CheckElement, Checkbox,
+    ClipboardCommand, Composition, SINGLE_LINE_FIELD_STYLE, TextCommand, TextField, TextFieldMode,
+    TextInput, button, button_with, checkbox, checkbox_disabled, checkbox_typed,
+    clipboard_command_from_key, text_command_from_key, text_field, text_field_typed, textarea,
     textarea_typed, toggle,
 };
+// The host-implemented clipboard the text fields code against.
+pub use backstep::{Clipboard, ClipboardError, NoClipboard};
 pub use element::{El, Element, ElementView, el};
 pub use event::{OnClick, OnClickState, PointerClick, clickable, on_click};
 pub use events::{CAMBIUM_OWNER, NativeOwner};

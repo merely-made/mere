@@ -11,6 +11,10 @@
 //! projection editor both use it. Durable, attributed undo over saved facts
 //! is a different layer and lives with the mere's session journal.
 
+pub mod clipboard;
+
+pub use clipboard::{Clipboard, ClipboardError, NoClipboard};
+
 /// Undo/redo over whole-document snapshots, never inverse commands.
 ///
 /// The caller records the pre-edit snapshot *before* each mutation. A record
