@@ -316,7 +316,7 @@ cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-web = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
 hest = { version = "0.2.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
-backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
+backstep = { version = "0.2.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.3.0", path = "crates/cambium/sprigging" }
 # The three engine adapters, unpublished, from merely-made/inker.

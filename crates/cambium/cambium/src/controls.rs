@@ -25,7 +25,7 @@ pub use field::{
 pub(crate) use field::{edit, edit_multiline};
 pub(crate) use text_input::TextSnapshot;
 pub use text_input::{
-    CaretAffinity, CaretMove, CaretPosition, CaretSelection, Composition, TextCommand,
-    TextFieldMode, TextInput, text_command_from_key,
+    CaretAffinity, CaretMove, CaretPosition, CaretSelection, ClipboardCommand, Composition,
+    TextCommand, TextFieldMode, TextInput, clipboard_command_from_key, text_command_from_key,
 };
 pub use toggle::{CheckElement, Checkbox, checkbox, checkbox_disabled, checkbox_typed, toggle};

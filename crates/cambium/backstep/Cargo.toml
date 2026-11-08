@@ -1,17 +1,19 @@
 [package]
 name = "backstep"
-version = "0.1.0"
-description = "Undo and redo over whole-document snapshots, with keyed coalescing on a host clock and a saved marker."
+version = "0.2.0"
+description = "An editor's ephemeral state: snapshot undo with keyed coalescing and a saved marker, a host-implemented clipboard contract, and linear back/forward navigation."
 authors.workspace = true
 edition.workspace = true
 
 rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
-keywords = ["undo", "redo", "history", "editor"]
+keywords = ["undo", "redo", "history", "editor", "clipboard"]
 categories = ["gui", "data-structures"]
 # Renamed from `edit-history` on 2026-10-15 (Mark), who then cleared it for
 # publishing; `backstep` was free on crates.io at that date. No dependencies.
+# 0.1.0 is published; 0.2.0 (unpublished) adds the clipboard contract and
+# chrome's linear history (engine-split D27, 2026-11-08).
 
 [lib]
 name = "backstep"

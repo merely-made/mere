@@ -2,14 +2,28 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! Undo and redo over whole-document snapshots, never inverse commands.
+//! An editor's ephemeral state: what it forgets when it closes. Three jobs,
+//! no dependencies.
 //!
-//! An editor keeps a [`History`] of the snapshots it records before each edit.
-//! Records that share a key within a window, on a clock the host supplies,
-//! coalesce into one step; a saved marker tells the editor whether the
-//! document differs from its last save. Cambium's text field and the
-//! projection editor both use it. Durable, attributed undo over saved facts
-//! is a different layer and lives with the mere's session journal.
+//! - **Snapshot undo.** [`History`] keeps the whole-document snapshots an
+//!   editor records before each edit, never inverse commands. Records that
+//!   share a key within a window, on a clock the host supplies, coalesce into
+//!   one step; a saved marker says whether the document differs from its last
+//!   save. Cambium's text field and the projection editor use it.
+//! - **The clipboard contract.** [`Clipboard`] is implemented by the host
+//!   (a platform clipboard, or [`NoClipboard`]) and coded against by editors,
+//!   so no editor links a clipboard library.
+//! - **Linear navigation.** [`nav::History`] is a toolbar's back/forward list,
+//!   which chrome re-exports.
+//!
+//! Durable, attributed undo over saved facts is a different layer and lives
+//! with Mere's session journal; a shared browse trail lives with the graph
+//! kernel.
+
+pub mod clipboard;
+pub mod nav;
+
+pub use clipboard::{Clipboard, ClipboardError, NoClipboard};
 
 /// Undo/redo over whole-document snapshots, never inverse commands.
 ///
