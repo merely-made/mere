@@ -33,50 +33,25 @@
 //!
 //! Plan: `design_docs/archive_docs/2026-10-28/2026-09-02_physics_catalog_plan.md`.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-use kernel::graph::{Graph, NodeKey};
-use seiche::{
-    Anneal, BarnesHutRepulsion, Boids, Boundary, CounterDamping, DegreeRepulsion, Density,
-    DepthGravity, DomainCluster, EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold,
-    HubGravity, Kuramoto, LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
+use kernel::graph::NodeKey;
+
+use crate::canvas::law_inputs::{
+    law_inputs_without_relation_edges, with_link_hides, with_meaning, with_occurrence_edges,
+    with_registry,
 };
-
-#[cfg(test)]
-use crate::canvas::seiche_bridge::visible_relation_edges;
-use crate::canvas::seiche_bridge::visible_relation_edges_with_assertion_hides;
 use crate::canvas::{Canvas, SETTLE_TICKS};
-use crate::signals::ChannelRegistry;
-use crate::signals::physics::{self, PhysicsView, PhysicsViewKey};
+use crate::signals::physics::PhysicsViewKey;
 
-/// The seed every seeded law (Kinds' rule matrix, Anneal's walk) starts from,
-/// so a scene reopens to the same rules.
-pub(crate) const LAW_SEED: u64 = 0x5EED_CA7A_1064;
-/// The Skeleton overlay's tree-edge stiffness, against `EdgeSpring`'s 10.
-const SKELETON_STIFFNESS: f32 = 60.0;
-/// Charge's repulsion, calibrated so that at contact (a node diameter, 36)
-/// the `1/d` push matches `NodeExclusion`'s inverse-square one
-/// (`220_000 / 36² ≈ 170`): the seiche default of 2 400 left bodies
-/// touching under the edge springs. (Physics catalog — the Charge receipt.)
-pub(crate) const CHARGE_STRENGTH: f32 = 6_000.0;
-/// Orbit's exclusion reaches two node diameters: a guard at contact, where
-/// Springs' reach of 1,000 outweighed gravitation at every range inside it
-/// and threw the graph apart. Orbit's centring is a weak well that holds what
-/// the orbits spread. (Ruled 2026-10-04, "Frictionless orbits + centring".)
-pub(crate) const ORBIT_EXCLUSION_REACH: f32 = 4.0 * seiche::NODE_BODY_RADIUS;
-pub(crate) const ORBIT_CENTRING: f32 = 0.02;
-/// Density's grid resolution on the CPU tier (cells per side): 64², ruled
-/// 2026-10-02 (the same ranks as 128² at about a sixteenth of the cost).
-pub const DENSITY_RESOLUTION: usize = 64;
-/// Density's convergence test (ruled 2026-10-02): passes end once the mean
-/// node shift stays under a twentieth of a spacing for three passes in a
-/// row; the pass cap ends them if the test never does.
-pub const DENSITY_STOP: seiche::DensityStop = seiche::DensityStop::Shift(0.05);
-pub const DENSITY_PATIENCE: u32 = 3;
-pub const DENSITY_MAX_PASSES: u32 = 120;
-/// The fewest passes before the stop test may end them (ruled 2026-10-03,
-/// "Min 60, bar: all >= 0.7").
-pub const DENSITY_MIN_PASSES: u32 = 60;
+pub(crate) use seiche::catalog::{LawInputs, LawSources};
+#[cfg(test)]
+pub(crate) use seiche::catalog::{
+    CHARGE_STRENGTH, LAW_SEED, ORBIT_CENTRING, ORBIT_EXCLUSION_REACH, density_law,
+};
+pub use seiche::catalog::{
+    DENSITY_MAX_PASSES, DENSITY_MIN_PASSES, DENSITY_PATIENCE, DENSITY_RESOLUTION, DENSITY_STOP,
+};
 
 pub use seiche::{
     DENSITY_ADMITS, DENSITY_REFUSAL, OverlayRefusal, PhysicsDepthSource, PhysicsKindSource,
@@ -307,539 +282,6 @@ pub fn physics_profile(id: &str) -> Option<&'static PhysicsProfile> {
         .find(|profile| profile.id == id)
 }
 
-/// Density at the catalog's defaults (ruled 2026-10-02 and 2026-10-03): 64²,
-/// one-second passes, blur 0.25 spacings, at least 60 passes, then passes
-/// repeated until the shift test stops them, the pass cap as the fallback.
-pub(crate) fn density_law(masses: Vec<(NodeKey, f32)>) -> Density {
-    let mut law = Density::new(masses, DENSITY_RESOLUTION);
-    law.seconds = 1.0;
-    law.initial_blur = 0.25;
-    law.stop = DENSITY_STOP;
-    law.patience = DENSITY_PATIENCE;
-    law.max_passes = DENSITY_MAX_PASSES;
-    law.min_passes = DENSITY_MIN_PASSES;
-    law
-}
-
-/// The sources a build reads attributes through.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct LawSources {
-    pub kind: PhysicsKindSource,
-    /// Group pull's groups: any kind channel, unfolded.
-    pub groups: PhysicsKindSource,
-    pub mass: PhysicsMassSource,
-    pub depth: PhysicsDepthSource,
-    /// The focused node, for the Focus depth source.
-    pub focus: Option<NodeKey>,
-    /// The seed Kinds' matrix and Anneal's walk draw from: the spec's
-    /// (F156), [`LAW_SEED`] by default, so no default run moves.
-    pub seed: u64,
-}
-
-impl LawSources {
-    /// The default sources and no focus: enough to build any law over no
-    /// graph, to read its declared terms.
-    pub(crate) fn bare() -> Self {
-        Self {
-            kind: PhysicsKindSource::Site,
-            groups: PhysicsKindSource::Site,
-            mass: PhysicsMassSource::Degree,
-            depth: PhysicsDepthSource::Roots,
-            focus: None,
-            seed: LAW_SEED,
-        }
-    }
-}
-
-/// The graph inputs a law or overlay snapshots at build: the node set, the
-/// visible spring edges, and (on demand) the site grouping, the Louvain
-/// partition, the Meaning snapshot and the physics view's channels.
-///
-/// The physics channels come from the producers in
-/// [`signals::physics`](crate::signals::physics). Over the physics view,
-/// handed a registry and the view's key ([`Self::with_registry`]), they are
-/// the registry's, one computation per key (G2c; F178, F179); over anything
-/// else (a grouping's subgraphs, the board's items, the catalog's nominal)
-/// they are computed here.
-pub(crate) struct LawInputs<'a> {
-    nodes: Vec<NodeKey>,
-    edges: Vec<(NodeKey, NodeKey)>,
-    /// Each node's site (the URL host for a graph node; whatever grouping a
-    /// board's host names), the Kinds law's and the group overlay's default:
-    /// the canvas's registry's `groups.site` when it hands them in.
-    sites: std::borrow::Cow<'a, HashMap<NodeKey, String>>,
-    clusters: Option<&'a crate::signals::ClusterSet>,
-    meaning: Option<&'a crate::canvas::meaning::MeaningSnapshot>,
-    /// The registry serving the physics view, and the view's key.
-    registry: Option<(&'a ChannelRegistry, PhysicsViewKey)>,
-}
-
-impl<'a> LawInputs<'a> {
-    /// A controller's explicit transient topology, without source assertions.
-    fn with_occurrence_edges(mut self, edges: Option<&[(NodeKey, NodeKey)]>) -> Self {
-        if let Some(edges) = edges {
-            self.edges = edges.to_vec();
-        }
-        self
-    }
-
-    pub(crate) fn with_link_hides(
-        mut self,
-        graph: &Graph,
-        hidden_edges: &HashSet<crate::canvas::EdgeCell>,
-        hidden_links: &HashSet<scenograph::link::LinkKey>,
-        hidden_assertions: &HashSet<String>,
-    ) -> Self {
-        self.edges = visible_relation_edges_with_assertion_hides(
-            graph,
-            hidden_edges,
-            hidden_links,
-            hidden_assertions,
-        );
-        self
-    }
-    /// The inputs over `graph`, reading `sites` when the caller's registry
-    /// holds them (computing them here otherwise, as a stats reader does).
-    #[cfg(test)]
-    pub(crate) fn new(
-        graph: &Graph,
-        hidden_edges: &HashSet<crate::canvas::EdgeCell>,
-        clusters: Option<&'a crate::signals::ClusterSet>,
-        sites: Option<&'a HashMap<NodeKey, String>>,
-    ) -> Self {
-        Self::new_with_edges(
-            graph,
-            visible_relation_edges(graph, hidden_edges),
-            clusters,
-            sites,
-        )
-    }
-
-    /// Construct graph inputs for Canvas callers that immediately install the
-    /// complete link/assertion-hide-aware topology with `with_link_hides`.
-    /// This avoids materializing and discarding the older cell-only grouping.
-    pub(crate) fn new_without_relation_edges(
-        graph: &Graph,
-        clusters: Option<&'a crate::signals::ClusterSet>,
-        sites: Option<&'a HashMap<NodeKey, String>>,
-    ) -> Self {
-        Self::new_with_edges(graph, Vec::new(), clusters, sites)
-    }
-
-    fn new_with_edges(
-        graph: &Graph,
-        edges: Vec<(NodeKey, NodeKey)>,
-        clusters: Option<&'a crate::signals::ClusterSet>,
-        sites: Option<&'a HashMap<NodeKey, String>>,
-    ) -> Self {
-        let mut inputs = Self::from_parts(
-            graph.nodes().map(|(key, _)| key).collect(),
-            edges,
-            HashMap::new(),
-        );
-        inputs.sites = match sites {
-            Some(sites) => std::borrow::Cow::Borrowed(sites),
-            None => std::borrow::Cow::Owned(
-                graph
-                    .nodes()
-                    .map(|(key, node)| (key, crate::canvas::channels::site_of(node).to_string()))
-                    .collect(),
-            ),
-        };
-        inputs.clusters = clusters;
-        inputs
-    }
-
-    /// Graph-free inputs: a node list, an edge list, and a site per node —
-    /// what a [`PhysicsBoard`](crate::canvas::PhysicsBoard) has for a scene's items.
-    pub(crate) fn from_parts(
-        mut nodes: Vec<NodeKey>,
-        edges: Vec<(NodeKey, NodeKey)>,
-        sites: HashMap<NodeKey, String>,
-    ) -> Self {
-        nodes.sort_by_key(|key| key.index());
-        Self {
-            nodes,
-            edges,
-            sites: std::borrow::Cow::Owned(sites),
-            clusters: None,
-            meaning: None,
-            registry: None,
-        }
-    }
-
-    /// Read Meaning groups from `snapshot` (site until one exists).
-    pub(crate) fn with_meaning(
-        mut self,
-        snapshot: Option<&'a crate::canvas::meaning::MeaningSnapshot>,
-    ) -> Self {
-        self.meaning = snapshot;
-        self
-    }
-
-    /// Read the physics channels from `registry`, these inputs being the
-    /// physics view at `key` (F178).
-    pub(crate) fn with_registry(
-        mut self,
-        registry: &'a ChannelRegistry,
-        key: PhysicsViewKey,
-    ) -> Self {
-        self.registry = Some((registry, key));
-        self
-    }
-
-    /// The registry and the view it serves, when these inputs are the view.
-    fn served(&self) -> Option<(&'a ChannelRegistry, PhysicsView<'_>)> {
-        self.registry.map(|(registry, key)| {
-            (
-                registry,
-                PhysicsView {
-                    key,
-                    nodes: &self.nodes,
-                    edges: &self.edges,
-                },
-            )
-        })
-    }
-
-    /// The visible spring edges the forces pull along.
-    pub(crate) fn edges(&self) -> &[(NodeKey, NodeKey)] {
-        &self.edges
-    }
-
-    /// Each node's site, for inputs built over a subset of the nodes.
-    pub(crate) fn sites(&self) -> &HashMap<NodeKey, String> {
-        &self.sites
-    }
-
-    /// Every node's group by site, as a dense id in first-seen order.
-    fn site_groups(&self) -> Vec<(NodeKey, u32)> {
-        let mut ids: HashMap<String, u32> = HashMap::new();
-        self.nodes
-            .iter()
-            .map(|&key| {
-                let site = self.sites.get(&key).cloned().unwrap_or_default();
-                let next = ids.len() as u32;
-                (key, *ids.entry(site).or_insert(next))
-            })
-            .collect()
-    }
-
-    /// Every node's Louvain community index (`None` without a partition).
-    fn cluster_groups(&self) -> Option<Vec<(NodeKey, u32)>> {
-        let clusters = self.clusters?;
-        let mut groups = Vec::new();
-        for (i, cluster) in clusters.clusters.iter().enumerate() {
-            for &member in &cluster.members {
-                groups.push((member, i as u32));
-            }
-        }
-        Some(groups)
-    }
-
-    /// Every node's Meaning cluster (`None` without a snapshot). A node the
-    /// snapshot does not know yet (added since it was taken) joins one extra
-    /// group until the next snapshot lands.
-    fn meaning_groups(&self) -> Option<Vec<(NodeKey, u32)>> {
-        let snapshot = self.meaning?;
-        let of: HashMap<NodeKey, u32> = snapshot.groups.iter().copied().collect();
-        let unknown = snapshot.clusters.clusters.len() as u32;
-        Some(
-            self.nodes
-                .iter()
-                .map(|&key| (key, of.get(&key).copied().unwrap_or(unknown)))
-                .collect(),
-        )
-    }
-
-    /// Degree bands: isolated, leaf, connected, hub.
-    fn degree_groups(&self) -> Vec<(NodeKey, u32)> {
-        match self.served() {
-            Some((registry, view)) => registry.groups_degree(view),
-            None => physics::degree_bands(&self.nodes, &self.edges),
-        }
-    }
-
-    /// The groups channel: every node's group from any kind channel, as a
-    /// dense id, unfolded. Cluster and Meaning read site until their
-    /// partition exists.
-    pub(crate) fn groups(&self, source: PhysicsKindSource) -> Vec<(NodeKey, u32)> {
-        match source {
-            PhysicsKindSource::Site => self.site_groups(),
-            PhysicsKindSource::Cluster => {
-                self.cluster_groups().unwrap_or_else(|| self.site_groups())
-            },
-            PhysicsKindSource::Coloring => self.coloring_groups(),
-            PhysicsKindSource::Component => self.component_groups(),
-            PhysicsKindSource::Degree => self.degree_groups(),
-            PhysicsKindSource::Meaning => {
-                self.meaning_groups().unwrap_or_else(|| self.site_groups())
-            },
-        }
-    }
-
-    /// A proper colouring of the visible graph (DSATUR): adjacent nodes never
-    /// share a group.
-    pub(crate) fn coloring_groups(&self) -> Vec<(NodeKey, u32)> {
-        match self.served() {
-            Some((registry, view)) => registry.groups_coloring(view),
-            None => physics::coloring_groups(&self.nodes, &self.edges),
-        }
-    }
-
-    /// Every node's connected component (island), as a dense id.
-    pub(crate) fn component_groups(&self) -> Vec<(NodeKey, u32)> {
-        match self.served() {
-            Some((registry, view)) => registry.groups_component(view),
-            None => physics::component_groups(&self.nodes, &self.edges),
-        }
-    }
-
-    /// PageRank over the directed view, scaled so the mean weight is one
-    /// (comparable to log degree on a sparse graph).
-    pub(crate) fn page_rank_weights(&self) -> Vec<(NodeKey, f32)> {
-        match self.served() {
-            Some((registry, view)) => registry.mass_pagerank(view),
-            None => physics::page_rank_weights(&self.nodes, &self.edges),
-        }
-    }
-
-    /// The mass channel's values before any reader's transform: degree, or
-    /// PageRank with the mean rank one. Orbit reads `1 +` these; the hub
-    /// overlays read `ln(1 + degree)` (seiche's default) or the rank itself.
-    pub(crate) fn mass_values(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
-        match source {
-            PhysicsMassSource::Degree => match self.served() {
-                Some((registry, view)) => registry.mass_degree(view),
-                None => physics::mass_degree(&self.nodes, &self.edges),
-            },
-            PhysicsMassSource::PageRank => self.page_rank_weights(),
-        }
-    }
-
-    /// The depth channel's values.
-    pub(crate) fn depth_values(
-        &self,
-        source: PhysicsDepthSource,
-        focus: Option<NodeKey>,
-    ) -> Vec<(NodeKey, u32)> {
-        self.depths(source, focus)
-    }
-
-    /// Masses for Orbit and Density: `1 + degree`, or `1 + rank` with the
-    /// mean rank one.
-    pub(crate) fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
-        self.mass_values(source)
-            .into_iter()
-            .map(|(key, value)| (key, 1.0 + value))
-            .collect()
-    }
-
-    /// A kind per node for the Kinds law, from the chosen source, plus how many
-    /// kinds there are.
-    pub(crate) fn kinds(&self, source: PhysicsKindSource) -> (Vec<(NodeKey, u8)>, usize) {
-        let groups = self.groups(source);
-        // Particle life reads best with a handful of kinds; fold a long tail of
-        // sites into eight, keeping a small catalog its own size.
-        let distinct = groups
-            .iter()
-            .map(|(_, g)| *g)
-            .max()
-            .map_or(0, |g| g as usize + 1);
-        let kind_count = distinct.clamp(1, 8);
-        let kinds = groups
-            .into_iter()
-            .map(|(key, g)| (key, (g as usize % kind_count) as u8))
-            .collect();
-        (kinds, kind_count)
-    }
-
-    /// BFS depth from the roots — the nodes with no incoming visible edge, or
-    /// every node when the graph is all cycles.
-    pub(crate) fn root_depths(&self) -> Vec<(NodeKey, u32)> {
-        match self.served() {
-            Some((registry, view)) => registry.depth_roots(view),
-            None => physics::root_depths(&self.nodes, &self.edges),
-        }
-    }
-
-    /// Sugiyama's layer step: cut a greedy feedback arc set so the directed
-    /// view is acyclic, then longest-path layering in topological order.
-    pub(crate) fn layer_depths(&self) -> Vec<(NodeKey, u32)> {
-        match self.served() {
-            Some((registry, view)) => registry.depth_layers(view),
-            None => physics::layer_depths(&self.nodes, &self.edges),
-        }
-    }
-
-    /// Dominator-tree depth from `focus`: the number of nodes every path from
-    /// the focus must pass through. Unreachable nodes sit one level below the
-    /// deepest reachable one; without a focus, the roots.
-    pub(crate) fn focus_depths(&self, focus: Option<NodeKey>) -> Vec<(NodeKey, u32)> {
-        let Some(focus) = focus else {
-            return self.root_depths();
-        };
-        match self.served() {
-            Some((registry, view)) => registry.depth_focus(view, focus),
-            None => physics::focus_depths(&self.nodes, &self.edges, focus),
-        }
-    }
-
-    fn depths(&self, source: PhysicsDepthSource, focus: Option<NodeKey>) -> Vec<(NodeKey, u32)> {
-        match source {
-            PhysicsDepthSource::Roots => self.root_depths(),
-            PhysicsDepthSource::Layers => self.layer_depths(),
-            PhysicsDepthSource::Focus => self.focus_depths(focus),
-        }
-    }
-
-    /// The minimum spanning tree's edges over the undirected view (a pair
-    /// with more relations is a shorter edge, so the tree prefers it):
-    /// `edges.spanning`, Stress's skeleton.
-    pub(crate) fn skeleton_edges(&self) -> Vec<(NodeKey, NodeKey)> {
-        match self.served() {
-            Some((registry, view)) => registry.edges_spanning(view),
-            None => physics::spanning_edges(&self.nodes, &self.edges),
-        }
-    }
-
-    /// Shortest-path distances in hops over the undirected view, each hop
-    /// costing `1 / multiplicity`, every connected pair once.
-    pub(crate) fn weighted_distances(&self) -> Vec<(NodeKey, NodeKey, f32)> {
-        match self.served() {
-            Some((registry, view)) => registry.distances_hops(view),
-            None => physics::hop_distances(&self.nodes, &self.edges),
-        }
-    }
-
-    /// The law's forces when `overlays` join it: Density's conversion is on
-    /// once it takes an overlay, and off alone (F73).
-    pub(crate) fn law_forces_taking(
-        &self,
-        law: PhysicsLaw,
-        sources: LawSources,
-        overlays: &[PhysicsOverlay],
-    ) -> Vec<Box<dyn Force>> {
-        if law == PhysicsLaw::Density && !overlays.is_empty() {
-            let mut density = density_law(self.masses(sources.mass));
-            density.converts = true;
-            return vec![Box::new(density)];
-        }
-        self.law_forces(law, sources)
-    }
-
-    /// Build the law's own forces against these inputs.
-    pub(crate) fn law_forces(&self, law: PhysicsLaw, sources: LawSources) -> Vec<Box<dyn Force>> {
-        match law {
-            PhysicsLaw::Springs => vec![
-                Box::new(NodeExclusion::default()),
-                Box::new(EdgeSpring::default()),
-                Box::new(Boundary::default()),
-            ],
-            PhysicsLaw::Charge => vec![
-                Box::new(BarnesHutRepulsion {
-                    strength: CHARGE_STRENGTH,
-                    ..BarnesHutRepulsion::default()
-                }),
-                Box::new(EdgeSpring::default()),
-                Box::new(Boundary::default()),
-            ],
-            PhysicsLaw::Stress => vec![
-                Box::new(NodeExclusion::default()),
-                Box::new(StressSpring::from_weighted_distances(
-                    self.weighted_distances(),
-                    EdgeSpring::default().rest_length,
-                )),
-                Box::new(Boundary::default()),
-            ],
-            PhysicsLaw::Energy => vec![
-                Box::new(NodeExclusion::default()),
-                Box::new(LinLogForce::default()),
-            ],
-            PhysicsLaw::Orbit => vec![
-                Box::new(NodeExclusion {
-                    cutoff: ORBIT_EXCLUSION_REACH,
-                    ..NodeExclusion::default()
-                }),
-                Box::new(Gravity::new(
-                    self.masses(sources.mass),
-                    CounterDamping::Tangential,
-                )),
-                Box::new(Boundary {
-                    strength: ORBIT_CENTRING,
-                }),
-            ],
-            PhysicsLaw::Kinds => {
-                let (kinds, kind_count) = self.kinds(sources.kind);
-                vec![
-                    Box::new(NodeExclusion::default()),
-                    Box::new(ParticleLife::seeded(kinds, kind_count, sources.seed)),
-                ]
-            },
-            PhysicsLaw::Flock => vec![
-                Box::new(NodeExclusion::default()),
-                Box::new(Boids::default()),
-            ],
-            PhysicsLaw::Sync => {
-                // Every node on one ring; communities become arcs of it.
-                let radii = self.nodes.iter().map(|&key| (key, 240.0));
-                vec![
-                    Box::new(NodeExclusion::default()),
-                    Box::new(Kuramoto::new(radii)),
-                ]
-            },
-            PhysicsLaw::Flow => vec![
-                Box::new(NodeExclusion::default()),
-                Box::new(MagneticSpring::default()),
-                Box::new(Boundary::default()),
-            ],
-            PhysicsLaw::Anneal => vec![Box::new(Anneal::seeded(sources.seed))],
-            // Held, not empty: with no force at all rapier's contact solver
-            // blasts an overlapping seed apart (the Still receipt found it).
-            PhysicsLaw::Still => vec![Box::new(Hold)],
-            PhysicsLaw::Density => vec![Box::new(density_law(self.masses(sources.mass)))],
-        }
-    }
-
-    /// Build one overlay's force against these inputs.
-    pub(crate) fn overlay_force(
-        &self,
-        overlay: PhysicsOverlay,
-        sources: LawSources,
-    ) -> Box<dyn Force> {
-        match overlay {
-            PhysicsOverlay::DegreeRepulsion => match sources.mass {
-                PhysicsMassSource::Degree => Box::new(DegreeRepulsion::default()),
-                PhysicsMassSource::PageRank => {
-                    Box::new(DegreeRepulsion::default().with_weights(self.page_rank_weights()))
-                },
-            },
-            PhysicsOverlay::DomainCluster => {
-                Box::new(DomainCluster::new(self.groups(sources.groups)))
-            },
-            PhysicsOverlay::HubGravity => match sources.mass {
-                PhysicsMassSource::Degree => Box::new(HubGravity::default()),
-                PhysicsMassSource::PageRank => {
-                    Box::new(HubGravity::default().with_weights(self.page_rank_weights()))
-                },
-            },
-            PhysicsOverlay::DepthGravity => {
-                Box::new(DepthGravity::new(self.depths(sources.depth, sources.focus)))
-            },
-            PhysicsOverlay::GridSnap => Box::new(GridSnap::default()),
-            PhysicsOverlay::GravityLocus => Box::new(GravityLocus::at((0.0, 0.0))),
-            PhysicsOverlay::Tide => Box::new(GravityLocus::tidal((0.0, 0.0), 240.0, 24.0)),
-            PhysicsOverlay::Skeleton => Box::new(
-                StressSpring::from_distances(
-                    self.skeleton_edges().into_iter().map(|(a, b)| (a, b, 1)),
-                    EdgeSpring::default().rest_length,
-                )
-                .with_stiffness(SKELETON_STIFFNESS),
-            ),
-        }
-    }
-}
-
 impl Canvas {
     pub(crate) fn controller_topology_reading(
         &self,
@@ -935,7 +377,7 @@ impl Canvas {
         // The site channel from the registry, once per structure and URL grouping.
         self.channels.sites(&self.graph);
         let forces = {
-            let inputs = LawInputs::new_without_relation_edges(
+            let inputs = law_inputs_without_relation_edges(
                 &self.graph,
                 if wants_clusters {
                     self.channels.community_held()
@@ -943,16 +385,17 @@ impl Canvas {
                     None
                 },
                 self.channels.sites_fresh(&self.graph),
-            )
-            .with_link_hides(
+            );
+            let inputs = with_link_hides(
+                inputs,
                 &self.graph,
                 &self.hidden_edges,
                 &self.hidden_links,
                 &self.hidden_assertions,
-            )
-            .with_occurrence_edges(self.occurrence_edges.as_deref())
-            .with_meaning(self.meaning.snapshot())
-            .with_registry(&self.channels, self.physics_view_key());
+            );
+            let inputs = with_occurrence_edges(inputs, self.occurrence_edges.as_deref());
+            let inputs = with_meaning(inputs, self.meaning.snapshot());
+            let inputs = with_registry(inputs, &self.channels, self.physics_view_key());
             self.composed_forces(&inputs, sources)
         };
         #[cfg(test)]
@@ -1074,15 +517,16 @@ impl Canvas {
     /// The attribute builders over the current graph and visible edges,
     /// the physics channels read from the registry.
     fn law_inputs_now(&self) -> LawInputs<'_> {
-        LawInputs::new_without_relation_edges(&self.graph, None, None)
-            .with_link_hides(
-                &self.graph,
-                &self.hidden_edges,
-                &self.hidden_links,
-                &self.hidden_assertions,
-            )
-            .with_occurrence_edges(self.occurrence_edges.as_deref())
-            .with_registry(&self.channels, self.physics_view_key())
+        let inputs = law_inputs_without_relation_edges(&self.graph, None, None);
+        let inputs = with_link_hides(
+            inputs,
+            &self.graph,
+            &self.hidden_edges,
+            &self.hidden_links,
+            &self.hidden_assertions,
+        );
+        let inputs = with_occurrence_edges(inputs, self.occurrence_edges.as_deref());
+        with_registry(inputs, &self.channels, self.physics_view_key())
     }
 
     /// The physics view's key: the graph's structure and the view revision

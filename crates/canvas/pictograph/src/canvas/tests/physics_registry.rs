@@ -23,7 +23,7 @@ use crate::canvas::dynamics_spec::{
     RAW_SLOT_MASSES, RAW_SLOT_PAIRS, RAW_SLOTS, RawTerm,
 };
 use crate::canvas::physics_catalog::{
-    LawInputs, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
+    PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
 };
 use crate::canvas::tests::ThroughView;
 use crate::signals::PhysicsRuns;
@@ -147,7 +147,7 @@ fn every_physics_channel_runs_once_with_its_readers_live_and_once_more_when_its_
     {
         let focus = canvas.focused_key();
         let served = canvas.law_inputs();
-        let bare = LawInputs::new(canvas.graph(), &canvas.hidden_edges, None, None);
+        let bare = crate::canvas::law_inputs::law_inputs_over(canvas.graph(), &canvas.hidden_edges, None, None);
         for mass in PhysicsMassSource::ALL {
             assert_eq!(served.mass_values(mass), bare.mass_values(mass));
             assert_eq!(served.masses(mass), bare.masses(mass));

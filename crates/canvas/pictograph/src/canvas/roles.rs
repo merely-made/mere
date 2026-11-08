@@ -21,7 +21,10 @@
 use super::actions::{ArrangementAction, PermittedActions};
 use super::at_rest::AtRest;
 use super::channels::Channel;
-use super::physics_catalog::{LawInputs, PhysicsKindSource};
+use super::law_inputs::{
+    law_inputs_without_relation_edges, with_link_hides, with_meaning, with_registry,
+};
+use super::physics_catalog::PhysicsKindSource;
 use super::reader::KeyMove;
 use super::*;
 use seiche::{Role, RoleTable};
@@ -226,19 +229,20 @@ impl Canvas {
             return None;
         }
         let channel = Channel::Groups(source).id();
-        let inputs = LawInputs::new_without_relation_edges(
+        let inputs = law_inputs_without_relation_edges(
             &self.graph,
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
-        )
-        .with_link_hides(
+        );
+        let inputs = with_link_hides(
+            inputs,
             &self.graph,
             &self.hidden_edges,
             &self.hidden_links,
             &self.hidden_assertions,
-        )
-        .with_meaning(self.meaning.snapshot())
-        .with_registry(&self.channels, self.physics_view_key());
+        );
+        let inputs = with_meaning(inputs, self.meaning.snapshot());
+        let inputs = with_registry(inputs, &self.channels, self.physics_view_key());
         // A group is named by its smallest member's stable id (F134), which
         // survives the partition renumbering its groups.
         let groups = inputs.groups(source);

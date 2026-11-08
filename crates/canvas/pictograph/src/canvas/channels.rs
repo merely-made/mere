@@ -51,6 +51,9 @@
 
 use kernel::graph::{Graph, Node, NodeKey};
 
+use super::law_inputs::{
+    law_inputs_without_relation_edges, with_link_hides, with_meaning, with_registry,
+};
 use super::physics_catalog::{LawInputs, PhysicsDepthSource, PhysicsKindSource, PhysicsMassSource};
 use super::{
     AFFINITY_MIN_SIMILARITY, AffinityBlend, BRIDGE_THRESHOLD, Canvas, blend_affinity_pairs,
@@ -357,19 +360,20 @@ impl Canvas {
     /// and the Meaning snapshot as they stand.
     fn channel_inputs(&mut self) -> LawInputs<'_> {
         self.channels.sites(&self.graph);
-        LawInputs::new_without_relation_edges(
+        let inputs = law_inputs_without_relation_edges(
             &self.graph,
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
-        )
-        .with_link_hides(
+        );
+        let inputs = with_link_hides(
+            inputs,
             &self.graph,
             &self.hidden_edges,
             &self.hidden_links,
             &self.hidden_assertions,
-        )
-        .with_meaning(self.meaning.snapshot())
-        .with_registry(&self.channels, self.physics_view_key())
+        );
+        let inputs = with_meaning(inputs, self.meaning.snapshot());
+        with_registry(inputs, &self.channels, self.physics_view_key())
     }
 
     /// Resolve a channel against the current graph and the registry. It reads
@@ -429,6 +433,21 @@ impl Canvas {
             _ => {},
         }
         let focus = self.focused_key();
+        if let Channel::Pairs(blend) = channel {
+            // The inputs hold the registry, so they are dropped before the
+            // affinity reads; building them still fills the site cache.
+            drop(self.channel_inputs());
+            let structural = (blend != AffinityBlend::ContentOnly)
+                .then(|| {
+                    self.channels
+                        .structural_affinity_fresh(&self.graph, AFFINITY_MIN_SIMILARITY)
+                })
+                .flatten();
+            let content = (blend != AffinityBlend::StructuralOnly)
+                .then_some(self.content_affinity.as_deref())
+                .flatten();
+            return ChannelValues::Pairs(blend_affinity_pairs(structural, content));
+        }
         let inputs = self.channel_inputs();
         match channel {
             Channel::Kind(source) => ChannelValues::Groups(
@@ -442,21 +461,10 @@ impl Canvas {
             Channel::Groups(source) => ChannelValues::Groups(inputs.groups(source)),
             Channel::Mass(source) => ChannelValues::Weights(inputs.mass_values(source)),
             Channel::Depth(source) => ChannelValues::Depths(inputs.depth_values(source, focus)),
-            Channel::Pairs(blend) => {
-                let structural = (blend != AffinityBlend::ContentOnly)
-                    .then(|| {
-                        self.channels
-                            .structural_affinity_fresh(&self.graph, AFFINITY_MIN_SIMILARITY)
-                    })
-                    .flatten();
-                let content = (blend != AffinityBlend::StructuralOnly)
-                    .then_some(self.content_affinity.as_deref())
-                    .flatten();
-                ChannelValues::Pairs(blend_affinity_pairs(structural, content))
-            },
             Channel::Distances => ChannelValues::Pairs(inputs.weighted_distances()),
             Channel::Edges(EdgeSubset::Spanning) => ChannelValues::Edges(inputs.skeleton_edges()),
-            Channel::Order(_)
+            Channel::Pairs(_)
+            | Channel::Order(_)
             | Channel::Rings
             | Channel::Coords
             | Channel::Weight(_)

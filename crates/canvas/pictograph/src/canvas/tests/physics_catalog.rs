@@ -217,6 +217,7 @@ fn page_rank_weights_favour_the_linked_to() {
     );
     let inputs = canvas.law_inputs();
     let weights = inputs.page_rank_weights();
+    drop(inputs);
     let hub = lookup(&weights, keys[3]);
     assert!(
         hub > lookup(&weights, keys[0]) * 2.0,
