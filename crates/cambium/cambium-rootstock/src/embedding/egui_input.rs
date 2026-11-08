@@ -4,10 +4,28 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 use super::{OwnerInput, ScrollUnits};
+use backstep::{Clipboard, ClipboardError, ClipboardEvent, ClipboardRequest};
+use cambium::ClipboardCommand;
 use document_session_api::{
     SessionButtonState, SessionIme, SessionInput, SessionKey, SessionModifiers,
     SessionPointerButton,
 };
+/// egui's clipboard as backstep's call-shaped [`Clipboard`]. A write queues
+/// egui's `CopyText` output command, which the integration carries to the
+/// platform at the end of the frame; egui reports no failure, so a queued write
+/// is `Ok`. Use it inside a frame (the output resets when one begins). Reads are
+/// refused: egui reads the platform clipboard itself and delivers
+/// `Event::Paste`, which [`Input::event`] passes on as session text.
+pub struct EguiClipboard<'a>(pub &'a egui::Context);
+impl Clipboard for EguiClipboard<'_> {
+    fn read_text(&mut self) -> Result<String, ClipboardError> {
+        Err(ClipboardError::Refused)
+    }
+    fn write_text(&mut self, text: &str) -> Result<(), ClipboardError> {
+        self.0.copy_text(text.to_owned());
+        Ok(())
+    }
+}
 #[derive(Default)]
 pub struct Input {
     cursor: Option<[f32; 2]>,
@@ -48,7 +66,59 @@ fn key(v: egui::Key) -> SessionKey {
         },
     }
 }
+/// An unmodified Delete press and release: Genet's sessions delete a focused
+/// control's non-collapsed range on it, and do nothing for a document range.
+fn delete_selection() -> [OwnerInput; 2] {
+    [SessionButtonState::Pressed, SessionButtonState::Released].map(|state| {
+        OwnerInput::Session(SessionInput::Key {
+            key: SessionKey::Delete,
+            state,
+            modifiers: SessionModifiers::default(),
+            repeat: false,
+        })
+    })
+}
 impl Input {
+    /// egui's Copy or Cut event as a clipboard command; `None` otherwise.
+    /// Paste is not one: its text already arrives as `Event::Paste`.
+    pub fn clipboard_command(event: &egui::Event) -> Option<ClipboardCommand> {
+        match event {
+            egui::Event::Copy => Some(ClipboardCommand::Copy),
+            egui::Event::Cut => Some(ClipboardCommand::Cut),
+            _ => None,
+        }
+    }
+    /// Carry a clipboard `command` through `clipboard` ([`EguiClipboard`], or
+    /// the host's own) and answer at once, as iced's pair answers later.
+    /// Copy and Cut write `selection`, the session's `selected_text()`: the
+    /// owner holds the `DocumentSession` and this input does not, so the owner
+    /// passes it, and `None` refuses with `Unavailable` as iced does. A Cut
+    /// whose write succeeded also yields an unmodified Delete, which deletes a
+    /// focused control's range; a document range is copied and stays. Paste
+    /// reads and yields session text. Other answers come back as
+    /// [`OwnerInput::Clipboard`].
+    pub fn clipboard(
+        &self,
+        command: ClipboardCommand,
+        selection: Option<&str>,
+        clipboard: &mut dyn Clipboard,
+    ) -> Result<Vec<OwnerInput>, ClipboardError> {
+        let request = match command {
+            ClipboardCommand::Paste => ClipboardRequest::Read,
+            ClipboardCommand::Copy | ClipboardCommand::Cut => {
+                ClipboardRequest::Write(selection.ok_or(ClipboardError::Unavailable)?.to_owned())
+            },
+        };
+        Ok(match request.serve(clipboard) {
+            ClipboardEvent::Read(Ok(text)) => vec![OwnerInput::Session(SessionInput::Text(text))],
+            ClipboardEvent::Written(Ok(())) if command == ClipboardCommand::Cut => {
+                let mut events = vec![OwnerInput::Clipboard(ClipboardEvent::Written(Ok(())))];
+                events.extend(delete_selection());
+                events
+            },
+            other => vec![OwnerInput::Clipboard(other)],
+        })
+    }
     /// The caller separately grants per-appearance Focus from its egui Response.
     /// Window activation cannot grant keyboard authority to every appearance.
     #[allow(deprecated)]
@@ -173,9 +243,7 @@ impl Input {
                     })
                     .unwrap_or_default());
             },
-            egui::Event::Copy | egui::Event::Cut => {
-                return Err("clipboard copy/cut remains a host operation");
-            },
+            // Copy and Cut need the session's selection; see `clipboard`.
             _ => return Ok(vec![]),
         };
         Ok(vec![OwnerInput::Session(session)])
