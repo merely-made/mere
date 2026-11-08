@@ -11,8 +11,9 @@ to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered t
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
 boundaries" (source homes map, `mere_docs/technical_architecture/2026-10-28_source_homes_map.md`,
-"Costs every move carries"). Doctrine Stack 3 (`../../doctrine.md`): "Mere consumes
-producers, never the reverse". Until now the cycles were acknowledged as transitional and
+"Costs every move carries"). Doctrine Stack 3 (`../../doctrine.md`), as worded 2026-11-06: "Mere consumes
+producers, never the reverse" (engine-split D1 reworded it on 2026-11-07 to "the host
+consumes producers, never the reverse"). Until now the cycles were acknowledged as transitional and
 paid for in two-phase repins (`../../2026-08-12_family_composition_thesis_brief.md`, the Knot,
 Cleromancy and Murm repin sections); this plan removes the back edges instead.
 
@@ -286,7 +287,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   repository. Outcome: applies Stack 3 ("Mere consumes producers, never the reverse") and
   refines the source homes map's "Mere↔Knot and Mere↔Cleromancy already work this way".
 
-  Links: area stack · draws on domain-contract C5, stack.3 · amends source-homes-map "Repository cycles" · plans cycle_breaks P1, P2, P3 · summary The resident hosts domains through a Stickleback seam and apps register at runtime, so Mere's Cargo names neither Knot nor Cleromancy.
+  Links: area stack · draws on domain-contract C5, stack.3 · amends source-homes-map "Repository cycles" · plans cycle-breaks P1, P2, P3 · summary The resident hosts domains through a Stickleback seam and apps register at runtime, so Mere's Cargo names neither Knot nor Cleromancy.
 
 - **D2. Eidetic↔Distillery: the ESP adapter moves to ESP (Mark, 2026-11-06):** "Move adapter
   to ESP". `eidetic-search` keeps only the `GoalEmbedder` trait; the ESP adapter
@@ -294,14 +295,14 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   stops depending on ESP. Put to Mark against leaving it and recording that `persistence`
   stays off in Eidetic's root. Outcome: new.
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P4 · summary eidetic-search keeps the GoalEmbedder trait; the ESP adapter, calibration tests and recall example live in ESP.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P4 · summary eidetic-search keeps the GoalEmbedder trait; the ESP adapter, calibration tests and recall example live in ESP.
 
 - **D3. gemot↔Murm: an address trait (Mark, 2026-11-06):** "gemot↔Murm: trait". An address
   trait in `murm-resolve`, implemented by Gemot, so Murm stops depending on `gemot-address`.
   Put to Mark against Murm duplicating Gemot's grammar, which conflicts with Gemot owning it.
   Outcome: new.
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P5 · summary murm-resolve owns an address trait that Gemot implements; Murm no longer names gemot-address.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P5 · summary murm-resolve owns an address trait that Gemot implements; Murm no longer names gemot-address.
 
 - **D4. Mere↔Murm: mere-comms goes down (Mark, 2026-11-06):** "Mere↔Murm: mere-comms down".
   `mere-comms` moves into Murm, so signalman stops depending on Mere. Outcome: applies the
@@ -311,27 +312,27 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   **Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); unpaused by D7 to D9, which moved the scene vocabulary below Murm.**
 
-  Links: area stack · draws on resident-split S6, stack.3 · plans cycle_breaks P6 · summary mere-comms moves into Murm so signalman's comms feature no longer names Mere.
+  Links: area stack · draws on resident-split S6, stack.3 · plans cycle-breaks P6 · summary mere-comms moves into Murm so signalman's comms feature no longer names Mere.
 
 - **D5. Mere↔Woodshed: adapters go up (Mark, 2026-11-06):** "Mere↔Woodshed: adapters up".
   The Woodshed adapters move out of Graphshell into Woodshed behind its own features, so Mere
   stops naming Woodshed. Outcome: applies the source homes map's reading of Pandect/Graphshell
   adapters as "adapters for other owners".
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P7 · summary Woodshed's block-editing adapters move out of Graphshell into Woodshed behind its features; Mere no longer names Woodshed.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P7 · summary Woodshed's block-editing adapters move out of Graphshell into Woodshed behind its features; Mere no longer names Woodshed.
 
 - **D6. Dev-only edges count (Mark, 2026-11-06):** "Count them". Dev-dependency edges are cycles in
   the family check: tests use fixtures, or live in the higher repository. Settles F2's check rule
   and the dev-only fixture in P0's tests (a dev-only cycle fails). Outcome: new.
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P0 · summary Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P0 · summary Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository.
 
 - **D7. Extract the contract leaves first (Mark, 2026-11-06):** "D: hybrid, leaves first", on
   `../research/2026-11-06_host_guest_contract_brief.md`. The clean contract crates move to a
   bottom layer now; the full host/guest split is decided later. Unpauses D4/P6 once the leaves are
   out. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D4 · plans cycle_breaks P6 · summary The host/guest contract's leaf crates are extracted to a bottom layer first; the full split waits.
+  Links: area stack · draws on cycle-breaks D4 · plans cycle-breaks P6 · summary The host/guest contract's leaf crates are extracted to a bottom layer first; the full split waits.
 
 - **D8. The bottom layer is the revived Graphshell repository, named for the protocol (Mark,
   2026-11-06):** "we can use it as the bottom layer. unarchive, hard cut, i'm ok with that" and
@@ -340,7 +341,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   left in Mere. The Graphshell reference host (`ports/graphshell`, `graphshell-mere`,
   `graphshell-host`) stays above Mere. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D7 · plans cycle_breaks P6 · summary The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere.
+  Links: area stack · draws on cycle-breaks D7 · plans cycle-breaks P6 · summary The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere.
 
 - **D9. Contract plus host-role kit (Mark, 2026-11-06):** "Contract + kit". The bottom layer holds
   `chirograph`, one WIT world with `script/wire` and `witgen`, `sceno`, `scenotime`, `hest` (and
@@ -348,7 +349,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   `graphshell-client`; the endpoint's `door`, `profile` and projection-provider features, and
   `scenomise`, stay in Mere. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D8 · plans cycle_breaks P6 · summary The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features.
+  Links: area stack · draws on cycle-breaks D8 · plans cycle-breaks P6 · summary The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features.
 
 - **D10. The WIT world reaches Mere's hosts through `links` metadata, for now (Mark,
   2026-11-06):** "Accept for now". `graphshell-endpoint` declares `links` metadata for its one
@@ -357,7 +358,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   unused normal dependency on `graphshell-endpoint`. Revisit together with the open question
   of renaming `mere:script@0.1.0`. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D9 · summary Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided.
+  Links: area stack · draws on cycle-breaks D9 · summary Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided.
 
 - **D11. The extraction's structural choices stand (Mark, 2026-11-06):** "Keep all three".
   The endpoint's door features are the Mere crate `graphshell-door`, beside `graphshell-host`;
@@ -365,7 +366,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   the AccessKit conversion is `uxtree::frozen::FrozenUxTree` behind `uxtree`'s `frozen`
   feature. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
+  Links: area stack · draws on cycle-breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
 
 - **D14. P1's decisions answered; the distribution binary reopened (Mark, 2026-11-06):** on the
   [domain contract](../technical_architecture/2026-11-06_domain_contract.md) section 8.
@@ -381,7 +382,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   domain's authority is Rust code linked into the store-owning process; P2 and P3 stay held on
   it. Outcome: new; amends P1, adds P1b.
 
-  Links: area stack · draws on cycle_breaks D1, domain-contract C5 · amends cycle_breaks P1 · plans cycle_breaks P1, P1b, P2, P3 · summary P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board.
+  Links: area stack · draws on cycle-breaks D1, domain-contract C5 · amends cycle-breaks P1 · plans cycle-breaks P1, P1b, P2, P3 · summary P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board.
 
 - **D15. The drawing-board answers (Mark, 2026-11-06):** on the domain contract's drawing-board
   section. (g) "Yes, split them": authority runs as a guest or as declared data, Knot's live sync
@@ -394,7 +395,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   off until a door route to the resident's blob custody exists, so that route is a prerequisite
   phase (P2a). Supersedes the Lane and distribution parts of P1; reshapes P2 and P3. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D1, D12, D14 · amends cycle_breaks P1, P2, P3 · plans cycle_breaks P1b, P2a, P2, P3 · summary Authority is a guest or declared data, Knot's lane a supervised app after a blob door route exists, no Lane trait and no distribution binary.
+  Links: area stack · draws on cycle-breaks D1, D12, D14 · amends cycle-breaks P1, P2, P3 · plans cycle-breaks P1b, P2a, P2, P3 · summary Authority is a guest or declared data, Knot's lane a supervised app after a blob door route exists, no Lane trait and no distribution binary.
 
 - **D12. Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06):** "D: Woodshed as a
   guest". The generic block pane (Djot documents, rhyme schemes, save, undo, reopen) stays in
@@ -406,7 +407,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Amends D5's means, not its end: Mere stops naming Woodshed. Outcome: new design, written first
   and held for Mark's review.
 
-  Links: area stack · draws on cycle_breaks D5, D8, D9, host_guest_contract_brief · amends cycle_breaks D5 · plans cycle_breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
+  Links: area stack · draws on cycle-breaks D5, D8, D9, host_guest_contract_brief · amends cycle-breaks D5 · plans cycle-breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
 
 - **D13. The guest-blocks decisions (Mark, 2026-11-06):** the eight decisions of
   [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md), answered as relayed:
@@ -430,7 +431,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Outcome: settles D12's design except the view's drawing (guest_blocks R1), the home of the view
   (R2) and the native shell (R3), which are put to Mark.
 
-  Links: area stack · draws on cycle_breaks D12, guest_blocks · plans cycle_breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
+  Links: area stack · draws on cycle-breaks D12, guest_blocks · plans cycle-breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
 
 - **D16. Guest blocks: the three open questions answered (Mark, 2026-11-06):**
   [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md) R1 to R3.
@@ -443,7 +444,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   3. R3, the native shell: "New graphshell-blocks bin".
   Outcome: D13's design is complete; implementation follows its order of work.
 
-  Links: area stack · draws on cycle_breaks D13, guest_blocks · plans cycle_breaks P7 · summary The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin.
+  Links: area stack · draws on cycle-breaks D13, guest_blocks · plans cycle-breaks P7 · summary The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin.
 
 - **D17. `backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06):** "backdrops → graphshell",
   option 1 of F1. `scenomise::backdrops` and `template` (1,517 lines, 12 tests) move into
@@ -454,7 +455,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   stays an isolated root on Mere and is the one allowlisted isolated Murm-to-Mere exception (this
   plan, D17). Outcome: refines D9, closes F1, completes P6.
 
-  Links: area stack · draws on cycle_breaks D9, stack.3 · amends cycle_breaks D9 · plans cycle_breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
+  Links: area stack · draws on cycle-breaks D9, stack.3 · amends cycle-breaks D9 · plans cycle-breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
 
   *D8 and D9 refined 2026-11-07 (engine-split D2): the repository keeps the contract as its
   bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.
@@ -761,7 +762,7 @@ Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the c
 - **The allowlist entry that remains** (P0 allowlist, not built yet): Mere↔Murm, isolated root
   `murm/apps/signalman-desktop`, reason "its own `[workspace]` root, excluded from Murm's, so neither
   lock holds the other; the source homes map's pattern for keeping a lock free of Mere", cites
-  cycle_breaks D17. It is the Genet/Murm entry's sibling and stays permanent, so P8's allowlist ends
+  cycle-breaks D17. It is the Genet/Murm entry's sibling and stays permanent, so P8's allowlist ends
   with two isolated entries, not one.
 
 ## Keeping cycles out: the check
@@ -803,7 +804,7 @@ pip's vendored copy, which is what runs on this Mac's system Python 3.9. The ori
   Mere lock with Knot and Mere both present) is a cycle. Family-wide: the union of edges
   across all roots, strongly connected components of size above one.
 - **Allowlist.** `support/family-cycles/allowed.toml`, one entry per edge pair, each citing
-  this plan's decision (`cycle_breaks D1`) or an isolated-root reason (the signalman-desktop
+  this plan's decision (`cycle-breaks D1`) or an isolated-root reason (the signalman-desktop
   root). A cycle not on the list fails; an entry no cycle uses fails too, so the list only
   shrinks. The report prints each cycle with the closing edge, the package pair, the
   manifest path and, where known, the feature that enables it.
