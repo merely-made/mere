@@ -36,6 +36,12 @@ pub mod projection;
     not(target_arch = "wasm32")
 ))]
 pub mod blob_door;
+#[cfg(all(
+    feature = "blob-serve",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
+pub mod blob_door_source;
 #[cfg(feature = "projection-offer")]
 pub mod projection_offer;
 #[cfg(all(
