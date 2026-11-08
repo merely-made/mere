@@ -124,7 +124,8 @@ the `mere` facade's navigation, trail and roster logic (its visual and workbench
 view and composition crates; no new facade), `mere-cartography`, `pictograph`, `mere-forme`,
 `mere-curation` (merged into `incipit`, P0 done), `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
 `cambium-rootstock`, `cambium-winit`, `cambium-a11y`, `cambium-desktop`, `cambium-web`,
-`workbench`, `hest`, `backstep`, `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
+`workbench`, `hest`, `backstep` (kept and grown under D27 into the editor's ephemeral state: snapshot undo, the
+host clipboard contract, chrome's linear back/forward; P0 lane `p0/backstep`, not merged), `mandrake`, `sprigging`, `tinct`, `persona-picker` (merged into `cambium`, P0 done),
 `mere-view`, `mere-overmap`), `tabard`, `mere-chrome`, `mere-registry` (examined feature by
 feature in P0; a registry may carry several owners' contracts but makes none of their
 decisions; P0 done: trimmed to `diagnostics` and `observations` under its own name, the five
@@ -1259,3 +1260,18 @@ revision and what crosses at frame rate.
   No family consumer names a moved crate through `mere.git` any more, and no `[patch]` redirect
   for one remains in Mere, Turnstone or Cleromancy. Pre-existing failures unchanged: Knot's three
   `site_generation` tests (same at `a58ba28`), Turnstone's 46 "Access is denied", Cleromancy's two.
+
+- 2026-11-08: D27 carried out (branch `p0/backstep`, worktree `worktrees/mere-backstep`, not merged).
+  `backstep` 0.2.0 (0.1.0 is the published version; this one is not), still dependency-free, now
+  holds three jobs: snapshot undo, a text `Clipboard` trait (`read_text`, `write_text`, errors
+  `Unavailable`, `Refused`, `Empty`; `NoClipboard` refuses) and `backstep::nav::History`, chrome's
+  linear back/forward (71 lines and its five tests moved; `NavTarget`, `classify`, `resolve_href`
+  and the query encoding stay in chrome, which takes `backstep` and re-exports the type as
+  `chrome::nav::History`, so Turnstone's uses still resolve; the lock gains only that edge).
+  Bound: Cambium's `TextInput::apply_clipboard` with Ctrl/Cmd+C/X/V as `ClipboardCommand`. Left
+  as forks, the shape being no synchronous call: rootstock's egui embedding (Copy and Cut need
+  the document's selected text, which Genet's `document-session-api` does not expose; Paste
+  already arrives as text), rootstock's iced embedding (iced's clipboard is request-shaped:
+  `Event::Clipboard` carries `Read` and `Written` results of earlier requests), chrome's frame
+  model (writes travel back through host ports) and the Graphshell web share (a browser promise
+  inside a user gesture). Knot's `backstep = "0.1.0"` requirement needs 0.2.0 when it next repins.

@@ -31,7 +31,7 @@ serde_json = "1.0.140"
 # arrangement does not depend on the machine that solved it (ruling S4).
 libm = { workspace = true }
 jotdown = { version = "0.10", optional = true }
-backstep = { version = "0.1.0", path = "../../backstep", optional = true }
+backstep = { version = "0.2.0", path = "../../backstep", optional = true }
 workbench = { version = "0.1.1", path = "../../workbench", optional = true }
 
 [dev-dependencies]
