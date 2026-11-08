@@ -42,11 +42,14 @@ use knot_editor::{
 };
 use transport::BlobScope;
 
-use crate::resident_blobs::{LEGACY_KNOT_LEASE, LegacyBlobMigration, ResidentBlobCustody};
+use crate::resident_blobs::{LegacyBlobMigration, ResidentBlobCustody};
 use crate::settings::KnotResidentSettings;
 use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 
+/// Namespace used while importing the old per-persona evidence store. The lane
+/// owns the name (cycle breaks D14 (f)); the shared blob custody does not.
+pub const LEGACY_KNOT_LEASE: &str = "legacy.knot";
 /// Stable first-party route for the resident Djot vault.
 pub const RESIDENT_KNOT_ROUTE: &str = "knot";
 
