@@ -793,6 +793,28 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D8, engine-split D10 · plans engine-split P0 · summary forme's arrangement authority is incipit's arrangement feature; incipit's default stays ids and curation; mere-forme is freed.
 
+- **D29. A host-enacted effect from chrome is a hest Invocation; no clipboard enum on the frame
+  model (Mark, 2026-11-08):** D27's F2 lane bound rootstock's iced embedding and the Graphshell web
+  share to backstep's request/completion pair and found the frame model's outgoing leg had nothing
+  to ride on: its "host ports" are a 2026-06 doc comment with no type in Mere, Graphshell or
+  Turnstone. Offered a drained request list, a new port type or leaving it: "Are enums really the
+  best approach here? Isn't this plan a bit stale relative to newer work on the subject?" Evidence:
+  hest's `Invocation` (id, schema, opaque arguments, `EffectClass::ExternalEffect`) and host-established
+  `Outcome` are the family's vocabulary for a runtime asking its host to enact an effect, mirrored on
+  the wire by chirograph's `AdvertisedAction` with `IntentEffect::ExternalEffect` and `IntentResult`,
+  already used by the Graphshell port's handlers and transfer endpoint and the resident's identity
+  endpoint; chrome does not speak hest yet. Put back as hest on the frame model with Outcomes back,
+  hest at the frame model with backstep's pair kept at the bindings, retiring the pair for hest, or
+  leaving it: "A hest Invocation with ExternalEffect; Outcome back (Recommended)". chrome takes hest;
+  the frame model's `clipboard_completions` becomes hest Outcomes keyed by invocation id and carries
+  no clipboard-specific type; the stale comment is rewritten; the host enacts the write through
+  backstep's binding or its own clipboard; the same shape later carries webview creation and focus
+  handoff. backstep 0.2.0 (published 2026-11-08) keeps the pair for host-internal bindings.
+  Outcome: refines D27 (the pair is a binding shape, not the runtime-to-host contract) and applies
+  Stack 9 (chrome names the contract root's vocabulary rather than minting its own).
+
+  Links: area The stack · draws on engine-split D27, engine-split D22 · plans engine-split P3 · summary chrome asks its host to enact an effect with a hest Invocation and reads a hest Outcome; the frame model carries no clipboard-specific type.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
@@ -1273,9 +1295,6 @@ revision and what crosses at frame rate.
   Both locks change only by the removal and incipit's new edges. Name freed: `mere-forme` (on
   crates.io only once its 0.2.0 publish, `publish = true` in its manifest, is yanked or left).
 
-||||||| e29f1f226
-
-
 
 - 2026-11-08: D27 carried out (branch `p0/backstep`, worktree `worktrees/mere-backstep`, not merged).
   `backstep` 0.2.0 (0.1.0 is the published version; this one is not), still dependency-free, now
@@ -1291,4 +1310,20 @@ revision and what crosses at frame rate.
   `Event::Clipboard` carries `Read` and `Written` results of earlier requests), chrome's frame
   model (writes travel back through host ports) and the Graphshell web share (a browser promise
   inside a user gesture). Knot's `backstep = "0.1.0"` requirement needs 0.2.0 when it next repins.
+- 2026-11-08: D27's fork F2 carried out, "request and completion pair" (branch
+  `p0/clipboard-requests`, worktree `worktrees/mere-clipboard-requests`, not merged). `backstep` 0.2.0
+  (still unpublished, still dependency-free) gains `ClipboardRequest { Read, Write(String) }` and
+  `ClipboardEvent { Read(Result<String, ClipboardError>), Written(Result<(), ClipboardError>) }`, with
+  `ClipboardRequest::fail` (the answer that refuses a request) and `ClipboardRequest::serve` (carry a
+  request through a call-shaped `Clipboard`); the sync trait stays. Bound: rootstock's iced embedding
+  (iced's `Event::Clipboard` maps to `ClipboardEvent`, answers to other widgets' requests are ignored by
+  a pending count, a Paste's text arrives as `SessionInput::Text`, other answers as the new
+  `OwnerInput::Clipboard`; Copy and Cut write a selection the host supplies and refuse `Unavailable`
+  without one, until Genet's selection query lands) and the Graphshell web share (`web_share::clipboard`
+  takes the request inside the gesture and completes with `Written`; the status line now names the
+  `ClipboardError` rather than the browser's message). Half-bound: chrome's frame model accepts
+  `Written` answers in `FrameHostInput::clipboard_completions` and re-exports the pair, but no host
+  port exists in any repository to carry `ClipboardRequest::Write` out, so that leg is a fork. Left:
+  rootstock's egui embedding (Copy and Cut wait on the same selection query). Locks gain only the
+  `backstep` edges (rootstock, `graphshell-web`).
 

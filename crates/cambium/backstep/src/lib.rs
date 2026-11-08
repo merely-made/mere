@@ -10,9 +10,12 @@
 //!   share a key within a window, on a clock the host supplies, coalesce into
 //!   one step; a saved marker says whether the document differs from its last
 //!   save. Cambium's text field and the projection editor use it.
-//! - **The clipboard contract.** [`Clipboard`] is implemented by the host
-//!   (a platform clipboard, or [`NoClipboard`]) and coded against by editors,
-//!   so no editor links a clipboard library.
+//! - **The clipboard contract.** [`Clipboard`] is implemented by a host whose
+//!   clipboard answers a call (a platform clipboard, or [`NoClipboard`]); a
+//!   host whose clipboard answers later carries a [`ClipboardRequest`] and
+//!   answers with a [`ClipboardEvent`] (`Read` with `Read`, `Write` with
+//!   `Written`). Editors code against these, so no editor links a clipboard
+//!   library.
 //! - **Linear navigation.** [`nav::History`] is a toolbar's back/forward list,
 //!   which chrome re-exports.
 //!
@@ -23,7 +26,7 @@
 pub mod clipboard;
 pub mod nav;
 
-pub use clipboard::{Clipboard, ClipboardError, NoClipboard};
+pub use clipboard::{Clipboard, ClipboardError, ClipboardEvent, ClipboardRequest, NoClipboard};
 
 /// Undo/redo over whole-document snapshots, never inverse commands.
 ///

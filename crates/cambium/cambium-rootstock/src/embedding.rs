@@ -265,6 +265,9 @@ impl<P: TextureProducer> View<P> {
                 self.invalidate();
                 Some(owner(OwnerInput::Wheel { position, delta }))
             },
+            OwnerInput::Clipboard(event) => {
+                (!self.disposed).then(|| owner(OwnerInput::Clipboard(event)))
+            },
         }
     }
     pub fn frame(
