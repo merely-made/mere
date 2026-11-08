@@ -27,10 +27,10 @@
 use std::collections::HashMap;
 use std::time::Duration;
 
+use hest::{Invocation, Outcome};
 use incipit::forme::{OwnedTreeRow, SplitBoundary, TabEntry};
 
 use crate::toolbar::ToolbarDraft;
-pub use backstep::{ClipboardError, ClipboardEvent, ClipboardRequest};
 use kernel::content::ContentLoadState;
 use kernel::geometry::{PortablePoint, PortableRect, PortableSize};
 use kernel::graph::NodeKey;
@@ -48,8 +48,8 @@ use kernel::time::PortableInstant;
 ///
 /// All fields are read-only from the host's perspective. The host may
 /// rasterise, lay out, or cache derived quantities, but must not mutate
-/// the model — any feedback flows back through host ports /
-/// [`FrameHostInput`].
+/// the model — any feedback flows back through [`FrameHostInput`],
+/// and effects leave beside it in [`FrameStep::invocations`].
 ///
 /// No `Debug` derive because `OverlayStrokePass` transitively contains
 /// non-Debug fields. Can be revisited independently.
@@ -411,13 +411,12 @@ pub struct DegradedReceiptSpec {
 
 /// Per-frame input bundle flowing from the host into the runtime.
 ///
-/// The runtime consumes this, advances state, and produces a view
-/// model. Any host-specific side effects (webview creation requests,
-/// clipboard writes, focus handoffs) travel back through host ports
-/// rather than through the view model. A clipboard write is a
-/// [`ClipboardRequest::Write`]; the host's answer comes back here as
-/// [`ClipboardEvent::Written`] in
-/// [`clipboard_completions`](Self::clipboard_completions).
+/// The runtime consumes this, advances state, and produces a
+/// [`FrameStep`]: a view model to paint and, beside it, the effects it
+/// asks the host to enact (clipboard writes today; webview creation and
+/// focus handoff later) as hest [`Invocation`]s. The host's terminal
+/// results come back here as [`Outcome`]s in [`outcomes`](Self::outcomes)
+/// (engine-split D29).
 #[derive(Debug, Clone, Default)]
 pub struct FrameHostInput {
     /// Host-neutral events translated from native input (keyboard,
@@ -459,11 +458,23 @@ pub struct FrameHostInput {
     /// projects reflects the applied intents.
     pub host_intents: Vec<crate::host_intent::HostIntent>,
 
-    /// The host's answers to clipboard requests the runtime made
-    /// through host ports, in the order the host received them
-    /// (engine-split D27). A refused write arrives as
-    /// `Written(Err(..))`, never as silence.
-    pub clipboard_completions: Vec<ClipboardEvent>,
+    /// The host's terminal results for invocations the runtime issued,
+    /// each paired with its invocation's id, in arrival order. The id is
+    /// the command's, so the host answers one command's invocations in the
+    /// order they were issued. A refused
+    /// effect arrives as [`Outcome::Refused`], never as silence; deferred
+    /// work arrives in a later frame.
+    pub outcomes: Vec<(String, Outcome)>,
+}
+
+/// What the runtime hands the host each frame: the view model to paint
+/// and, beside it rather than inside it, the effects it asks the host to
+/// enact, in issue order. Each invocation's terminal result returns in a
+/// later [`FrameHostInput::outcomes`].
+#[derive(Clone, Default)]
+pub struct FrameStep {
+    pub view_model: FrameViewModel,
+    pub invocations: Vec<Invocation>,
 }
 
 mod settings;
