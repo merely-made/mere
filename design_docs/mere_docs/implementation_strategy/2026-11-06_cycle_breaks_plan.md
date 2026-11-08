@@ -134,7 +134,13 @@ calls do; the in-process callers (personal replica) are unchanged; the resident 
 (the file moves to Eidetic) is sequenced against it, and decision (f)'s lease-name
 parameterisation lands first. Tests keep their counts and the door route has its own.
 
+**Status 2026-11-08: landed** (Progress; domain contract, "The blob door route").
+
 ### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
+
+**Status 2026-11-08: step (1) done; steps (2) and (3) stopped on two design questions the plan and rulings do
+not settle (Findings, "P2 findings"); step (4) depends on them.** The brief's repository name `merely-made/knot` does
+not exist on GitHub; Knot is `merely-made/knot-editor`, which is also what Mere's manifests and lock name.
 
 In this order. **(1)** P2a. **(2)** Knot's `DeclaredPolicy` (its `OperationPolicy`, a data value,
 in Knot) registered as `Authority::Declared`, which P1b leaves as a typed variant that refuses
@@ -153,6 +159,9 @@ fixtures; Knot's lock names Mere but Mere's resolves without `knot-editor`; the 
 conditions hold. No `Lane` trait and no distribution binary.
 
 ### P3. D1 Mere stops naming Cleromancy (reshaped by D14 and D15)
+
+**Status 2026-11-08: steps (1) and (2) done; the spike passes (Findings, "P3 spike"). Stopped for Mark's review
+(D15 (h)); steps (3) and (4) are not started.**
 
 In this order. **(1)** A validator-only crate split in Cleromancy: the authority's closure leaves
 `muniment/redb` and the other native-only dependencies (the locked checks on
@@ -765,6 +774,93 @@ Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the c
   cycle-breaks D17. It is the Genet/Murm entry's sibling and stays permanent, so P8's allowlist ends
   with two isolated entries, not one.
 
+### P2 findings (2026-11-08)
+
+**Step (2), Knot's `DeclaredPolicy` as `Authority::Declared`, has no consumer and no delivery path today.**
+Evidence:
+- `KnotSyncPolicy` (`knot-editor/crates/knot-editor/src/sync.rs:307-366`) is private to Knot and is called by Knot's own
+  `KnotSyncHost` when an operation arrives. No code in `mere-resident` takes an `OperationPolicy`: the registry's
+  `Authority::validator()` returns a `pandect::GraphValidator` (a function of a complete graph), and `Declared` returns
+  only the pending refusal. Admission of Knot operations happens in the process that runs the sync host, which after
+  step (3) is the supervised child, not the resident.
+- The interpreter the plan names (in Stickleback) cannot be written over `OperationPolicy<E>` alone: Knot's checks
+  read `operation.header.extensions.space_id`, `.encryption` and `.parents`, which are Knot's `KnotSyncExt`. A generic
+  interpreter needs a trait over the extension (space, encryption profile, causal parents) that Knot implements.
+- A connecting application cannot install authority (`domain_registry`; the contract's rule), and the registry is built
+  by the process that owns the store. So "Knot registers its policy value" needs a delivery path that does not exist:
+  an owner setting, an owner-installed file, or a reviewed pack like D12's.
+
+Options: (A) leave `Declared` a typed pending slot and skip step (2) until M4 (the replicated `notes` mere is the first
+resident-side consumer of an operation policy), since Knot's policy keeps running inside Knot's own host. (B) Build the
+interpreter and the extension trait in Eidetic now and have Knot replace `KnotSyncPolicy` with a `DeclaredPolicy` value
+it interprets itself: the consumer is Knot's host, the resident only carries the slot. (C) Deliver the value as an
+owner setting (`declared_policies.<domain>`), interpreted by the resident, with nothing consuming it until M4. Recommend
+A: it deletes nothing Mere needs deleted and builds nothing with no caller; B is the right shape when M4 arrives.
+
+**Step (3), the supervised sync host, is blocked on *serving*, which the door route does not carry.** P2a gives an
+application custody administration (leases, the serving authorizer's retain and readers) and reads. Knot's host builds its
+iroh endpoint with `P2pandaTransport::builder.scoped_blobs(&blobs, scope, readers)`
+(`knot-editor/crates/knot-editor/src/resident/operations.rs:131-135`): the endpoint peers dial answers blob requests from
+a `BlobStore` in its own process under the authorizer. A supervised child cannot hold the resident's store (iroh's file
+store is single-process), so peers could not fetch Knot's evidence from the child. Options: (1) the child keeps its own
+blob store for serving (the drawing board's old (i)1, two iroh endpoints and two stores until M5); the door route is then
+only the one-time copy-out and the resident-side custody of what it already holds. (2) Make the transport's
+`scoped_blobs` take a source trait so a door-backed reader can serve: a Murm change, and the provider needs verified
+streaming (outboard data) that `read_range` bytes do not give, so the child would recompute it. (3) The resident serves
+Knot's evidence from its own node: peers must be told to fetch evidence from the resident's node id, a change to Knot's
+evidence reference and dial hints (the key stays in the child). (4) Keep Knot's lane compiled into the resident until M4
+to M5 absorb it (drawing board (i)3); D1 stays open for Knot. Evidence not gathered: how often Knot evidence is fetched
+across devices (decides whether two stores cost anything). Lean: (3) if the evidence reference can carry a node id,
+otherwise (4); (1) is the cheapest and is the option (i)2 turned down.
+
+**Independent of both:** `knot_relation_intake.rs` (349 lines, 6 tests in 817), the two `knot_overlay_*` tests and the
+Knot-as-guest fixtures can move to Knot as consumers (domain contract, section 4). They were not moved: Knot would take
+`graph-kernel`, a dev edge to `mere-resident` and a relock against Mere first, and none of it advances the manifests until
+(3) is answered.
+
+### P3 spike (2026-11-08)
+
+**Step (1), the split.** The blocker was one manifest line. `core/Cargo.toml` (the `cleromancy-core` package Mere names as
+`cleromancy-domain`) listed `muniment` with feature `redb`; the only code that opens a redb store is the root package's
+`cleromancy_receipt` binary, which keeps its own row. With the feature dropped, `cargo check --locked --target
+wasm32-wasip2` passes for the whole portable core (`errno` went with `redb`). `wasm32-unknown-unknown` still fails, now in
+`getrandom 0.2` ("enable the js feature"); a wasmtime guest does not need it. No code moved: a separate validator-only
+crate is not needed for the guest, though it would shrink it (Cleromancy `046bd58`).
+
+**Step (2), the spike** (Cleromancy `spike/wasm-authority`, throwaway, own lock root; corpus from
+`tests/authority_corpus.rs`; reproduction in its README; toolchain 1.97.1, wasmtime 45, wit-bindgen 0.57.1):
+
+| Measure | Result |
+|---|---|
+| Builds as a component | yes: `cargo build --release --target wasm32-wasip2` on a `cdylib` emits a component |
+| Size | 7,816,625 bytes (7.45 MiB) against the 16 MiB cap (`opt-level = "s"`, LTO, strip, `panic = "abort"`, no wasm-opt) |
+| Verdict-equal, native versus wasm | 577 of 577 cases, identical error text in 577 (51 refused, 526 admitted); 0 traps |
+| Corpus | the six product graphs of the seven moving tests (published reading, typed decks, ambient, shuffled, situation, inference) and 571 single-leaf tampers of their captured batches, each with its native verdict |
+| Per call, release, Apple silicon | native min 0.11 ms, p50 10.3 ms, p90 26.9 ms, max 34.1 ms; wasm min 0.21 ms, p50 20.4 ms, p90 55.6 ms, max 101 ms (about 2 times native); includes the guest's JSON decode and graph restore |
+| Fuel per call | p50 3.9e8, max 1.74e9 (wasmtime fuel units) |
+| Guest memory | 6.6 MiB peak requested |
+| Cold start | compile 1.03 s (Cranelift on first load; precompile to avoid), instantiate 0.37 ms |
+
+Candidate sizes 14 KB to 296 KB. Time follows the replayed content (ephemeris recomputation), not the byte size.
+
+**Interface.** The drawing board's `domain-authority` world works unchanged (`describe`, `validate(list<u8>)`,
+`admit`; `log` import only). Findings on the bytes:
+- `GraphSnapshot` alone is not a complete candidate: it does not carry the facet store, and the validator over it fails
+  ("must carry exactly one domain record"). The candidate the spike uses is one JSON object `{snapshot, facets}`
+  (`Graph::to_snapshot_at`, `Graph::facets()`, `Graph::try_from_snapshot`, `Graph::install_facets`, all serde); the
+  validator over the restored graph agrees with the native verdict in every case. The captured-delta batch also works but
+  the resident holds no whole-graph delta export, so the declared format should be snapshot plus facets
+  (`mere.graph-snapshot-and-facets/json`). The resident's own encode time per call is not in the numbers above.
+- A fuel cut-off traps the guest and the instance then refuses re-entry ("cannot enter component instance"): the host
+  instantiates afresh after a trap (0.4 ms).
+- A guest panic is a trap (`panic = "abort"`); the kernel's delta replay panics on a malformed stable id, which the
+  snapshot path reports as an error instead.
+
+**Blockers.** None for `wasm32-wasip2`. Not measured: cross-architecture determinism (one aarch64 machine), the seven
+tests' multi-process owner behaviour through a guest (step 3's conformance), the resident-side encode cost, and `admit`
+(stubbed; divination registers none). The fallback (supervised native process, D15 (h)) is not needed on this evidence.
+Mark's review of the spike gates step (3).
+
 ## Keeping cycles out: the check
 
 `scripts/check_family_cycles.py`, with tests beside it in `scripts/test_check_family_cycles.py`
@@ -1037,3 +1133,8 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   `quarantine_review`); everything else in `mere-resident` passes. The in-process callers (personal replica, Knot lane)
   are unchanged except that `personal_sync` reserves its graph scope. Not wired: `djinn` has no live grant-removal
   path to call `revoke`. The route does not move serving; P2's blocker is in Findings.
+- 2026-11-08: P2 stopped after step (1); two design questions (Declared authority has no consumer or delivery path; the
+  supervised host cannot serve blobs through the door) are written up with options in Findings, "P2 findings". P3 steps (1)
+  and (2) done and pushed (Cleromancy `046bd58`): `core/Cargo.toml` drops muniment's `redb` feature, the portable core checks
+  on `wasm32-wasip2`; the component is 7.45 MiB of 16, verdict-equal over 577 of 577 corpus cases, about 2 times native per
+  call (p50 20 ms, max 101 ms). The real guest is held for Mark's review (D15 (h)). Cleromancy's own plan has a short entry.
