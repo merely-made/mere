@@ -1384,3 +1384,11 @@ revision and what crosses at frame rate.
   `selected_text`; bole by `rev = ddf4e31`) is a fork, because webcue 0.1.2 from crates.io pins
   `document-session-api = "=0.1.1"`, the git patch then misses it, and inker's `cue.rs` mixes the
   two copies (seven E0308); until webcue moves, owners have no `selected_text()` to call.
+- 2026-11-08: D30's retirement carried out (branch `p0/chrome-retire`, worktree
+  `worktrees/mere-chrome-retire`, not merged; `df0141622`). `frame_model`, `effects` and `host_intent`
+  are deleted (1,023 lines); chrome drops `hest` and `incipit`, and the lock only those two edges. The
+  audit of what remains is in the receipts: no module has two consumers; `routing` has one
+  (ux-events, `ToolSurfaceReturnTarget` alone, not `toolbar` as D30's evidence says); Turnstone's
+  `nav::History` is backstep's; `authorities`, `omnibar`, `suggest`, `toolbar` and the rest of `nav`
+  have none, Turnstone carrying its own omnibar and address normalising. `mere-chrome` 0.0.1 is not on
+  crates.io. Dispositions are pending Mark's ruling.
