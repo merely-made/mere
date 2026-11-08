@@ -7369,6 +7369,7 @@ dependencies = [
  "insigne",
  "ostiary",
  "personae",
+ "sceno",
  "serde",
  "serde_json",
  "tokio",

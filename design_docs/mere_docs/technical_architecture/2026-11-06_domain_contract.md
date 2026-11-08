@@ -921,3 +921,125 @@ into Knot as tests of a supervised process, not of a lane).
    manifest, so D1 stays open for Knot).
 - Recommend 1: the cost is bounded and temporary, and it is the only option that closes D1 for
   Knot without waiting on S4.
+
+## The blob door route (cycle breaks P2a, 2026-11-08)
+
+**Status:** route, grant and revocation shape stated first, as P2a requires; built the same day
+(section 6, "As built"). For Mark's review alongside D15 (i).
+Read against Mere `a2c41e933`. Mark's D15 (i) ("Wait for a door route") made this the
+prerequisite for moving Knot's lane out of the resident.
+
+### 1. What exists, and what is asked of the route
+
+`ResidentBlobCustody` (`ports/mere-resident/src/resident_blobs.rs`) owns the resident's one iroh
+store and one `BlobReadAuthorizer`. Two in-process lanes borrow it today: personal-graph transfers
+(`personal_sync.rs`, scope = the graph) and Knot's evidence (`resident_knot.rs`, scope = the
+Knot space id). A lane uses six things: `blobs()` (put under a `BlobLease`, lease and release an
+existing hash, read bytes), `authorizer()` (retain and release a hash for serving, add, remove and
+replace a scope's readers), `bind_scope` (rebuild serving custody from durable leases after a
+restart), and `migrate_legacy_store` (copy an old per-lane store under verified leases, with a
+marker, never deleting the source). The route must give an admitted application the same six,
+over the app door, and nothing else.
+
+### 2. The route
+
+- **Name:** `blob-custody-v1`, a resident endpoint route in the app catalog, like
+  `device-directory-v1`. It rides the existing projection carrier; no wire in Ostiary changes.
+- **Calls** are intents: one intent, `blob.call`, whose payload is a JSON `BlobRequest { call, op }`.
+  `op` is one of `bind-scope`, `put-begin`, `put-part`, `put-commit`, `put-abort`, `lease`,
+  `release`, `retain`, `unretain`, `allow-reader`, `deny-reader`, `replace-readers`,
+  `migrate-legacy`. Every op that names a scope names it explicitly.
+- **Replies** are the route's snapshot: its one resource is a `BlobLedger` JSON document holding the
+  outcomes of the last 64 calls by `call` number plus, for each bound scope, its leased hashes and
+  its readers. The intent answers `Accepted` or `Rejected { reason }`; the outcome (a hash count, a
+  `LegacyBlobMigration`, the committed hash) is read from the ledger. This is the device
+  directory's pattern, and it keeps the wire as it is.
+- **Bytes out** are the carrier's resource chunks. The resource address is the BLAKE3 hash,
+  which is also the iroh `BlobHash`, so `resource_chunk(hash)` is `BlobStore::read_range`. A read
+  is answered only for a hash leased in a scope the application owns.
+- **Bytes in** are staged in parts of at most 64 KiB (a JSON byte array inside a 1 MiB frame),
+  declared up front with the length and the BLAKE3 hash, verified at `put-commit` before the
+  store sees them, then installed under the named lease. One staged upload at a time per session,
+  at most 256 MiB.
+
+### 3. Grant
+
+Two gates, both already the family's idiom, and no default grant:
+1. **Route:** the application declares `blob-custody-v1` in its `AppDeclaration.routes` and the
+   owner's grant names it (`applications::grant_for`, the owner dialog lists it as a route). An
+   ungranted application never opens the endpoint (the `an_ungranted_route_never_opens...` test
+   pins that for the catalog).
+2. **Scope:** a scope is claimed by the first admitted application that binds it, recorded in a
+   durable ledger (`content/scope-owners.json`, written atomically). Another application naming
+   that scope is refused with the owner named. The resident's own in-process scopes (personal
+   transfers) are reserved to `resident` when they bind, so no door application can name them. An
+   application may therefore use the Knot space id as its scope, as the in-process lane does, so
+   leases already in the store (`knot.evidence`, `legacy.knot`) are the same leases the supervised
+   child will use; nothing is re-leased or re-keyed.
+
+The lease name stays the lane's: `namespace` is the caller's (`BlobLease::new` still validates its
+characters), and the migration `namespace` must begin `legacy.` as the in-process calls' names do.
+A migration `source` is a directory path the application names. The door is owner-only and the
+same user could open that directory, so this widens nothing, but the resident opens it read-only
+and copies only blobs the legacy store retains.
+
+### 4. Revocation
+
+- **The grant** is revoked the way every route grant is: the owner removes it, and the door
+  refuses the next open.
+- **A live session** is cut by `BlobDoor::revoke(app)`: the endpoint's `is_live` turns false, its
+  calls are refused, and the resident releases the application's *serving* authority (every hash
+  retained in its scopes, every reader) from the in-memory authorizer. Leases and the owner ledger
+  are kept: custody data is never deleted by revocation (S4 says legacy stores are "copied and
+  never deleted"; leases follow the same rule). `BlobDoor::restore(app)` reinstates the
+  application, which then re-binds its scopes and so rebuilds serving custody from the durable
+  leases, exactly as after a resident restart.
+- **On lock** the resident refuses new sessions and ends live ones, as for custody (a locked
+  resident serves no route).
+- **Shutdown** is `ResidentBlobCustody::shutdown`'s existing check: the route holds a custody
+  handle, so its catalog is dropped inside the task scope before the shutdown that refuses live
+  borrowers.
+
+### 5. What is not in it, and the S4 sequence
+
+- No new serving path. Peers fetch blobs from the resident's iroh endpoint under the shared
+  authorizer, as now; the route only changes who may retain and release. What an out-of-process
+  sync host does about *serving* (it has no iroh store) is not answered by this route; see the open
+  question in the cycle breaks plan, P2.
+- `resident_blobs.rs` moves to Eidetic under S4. The route's server side is in its own file
+  (`resident_blob_door.rs`) and reaches `ResidentBlobCustody` only through its public methods plus
+  the two scope-owner methods this change adds, so S4 moves one file and the route follows by import. Decision
+  (f) is done first: `LEGACY_KNOT_LEASE` left that file and is now `resident_knot`'s.
+- The client and the wire types are in `graphshell-door` (feature `blob-door`), so a supervised
+  application links a door client and not the resident.
+
+### 6. As built (2026-11-08)
+
+- **Server:** `ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `bin/djinn.rs`
+  beside the published-site route; `BlobDoor::revoke` and `restore`). **Wire and client:**
+  `crates/graphshell/graphshell-door/src/blob_door.rs`, feature `blob-door`
+  (`BlobDoorClient`: `bind_scope`, `put`, `lease`, `release`, `lease_hash`, `retain`, `unretain`,
+  `allow_reader`, `deny_reader`, `replace_readers`, `allows`, `migrate_legacy`, `read`, `ledger`).
+  **Custody:** `ResidentBlobCustody` gained `claim_scope`, `reserve_scope`, `scope_owner`,
+  `scopes_of` and `withdraw_serving`, and the durable owner record `content/scope-owners.json`;
+  `personal_sync` reserves the personal graph's scope as `resident`. The Knot lane claims nothing:
+  it is the in-process caller until P2 removes it, and the supervised application then claims the
+  same scope.
+- **The one narrowing against the in-process calls** (beyond the namespace and path rules in 3):
+  `retain` is refused unless the scope holds a lease on the hash, because the door otherwise lets an
+  application authorize serving of bytes it does not hold by naming another scope's hash.
+- **Not wired:** nothing in `djinn` calls `BlobDoor::revoke` yet, since the daemon has no live
+  grant-removal path (owner grants are read at start and on the consent dialog's yes). Revoking by
+  removing the grant therefore takes effect at the next connection and the next restart; the
+  live cut is the API, tested.
+- **Open for P2 (not this route's):** the route moves custody administration and reads. It does not
+  move *serving*. Knot's sync host builds its iroh endpoint with
+  `P2pandaTransport::builder.scoped_blobs(&blobs, scope, readers)`
+  (`knot-editor/crates/knot-editor/src/resident/operations.rs:131-135`), so the endpoint that
+  peers dial serves bytes out of the `BlobStore` in its own process. A supervised child cannot hold
+  the resident's store, so P2 step 3 needs a ruling; the options are in the cycle breaks plan's
+  Findings.
+- **Tests:** `resident_blob_door::tests` 8 (the lib's `resident_blobs` 2 unchanged), `tests/blob_door.rs`
+  1 (the real door: put in parts, read in chunks, lease, release, serving authority, migration,
+  a second application refused, an ungranted application refused, revocation, restore), and
+  `graphshell-door` 2 wire tests (4 total in the crate with the feature).

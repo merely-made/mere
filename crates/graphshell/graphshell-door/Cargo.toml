@@ -15,6 +15,8 @@ default = []
 projection-door = ["dep:ostiary", "ostiary/native", "dep:serde_json", "dep:tokio"]
 # Portable messages for the application projection provider route.
 projection-offer = ["dep:ostiary", "dep:serde", "dep:serde_json"]
+# The client and wire of the resident's blob custody route (cycle breaks P2a).
+blob-door = ["projection-door", "dep:serde", "dep:sceno"]
 # The native runner for a projection offer.
 projection-provider = ["projection-offer", "ostiary/native", "dep:tokio"]
 # The Graphshell application's identity: the persona in use, as djinn releases it.
@@ -24,6 +26,7 @@ profile = ["dep:ostiary", "ostiary/native", "dep:castellan-client", "castellan-c
 chirograph.workspace = true
 graphshell-endpoint = { workspace = true, features = ["projection"] }
 serde = { workspace = true, optional = true }
+sceno = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 ostiary = { workspace = true, optional = true }
 castellan-client = { workspace = true, optional = true }

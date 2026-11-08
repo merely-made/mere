@@ -11,8 +11,9 @@ to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered t
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
 boundaries" (source homes map, `mere_docs/technical_architecture/2026-10-28_source_homes_map.md`,
-"Costs every move carries"). Doctrine Stack 3 (`../../doctrine.md`): "Mere consumes
-producers, never the reverse". Until now the cycles were acknowledged as transitional and
+"Costs every move carries"). Doctrine Stack 3 (`../../doctrine.md`), as worded 2026-11-06: "Mere consumes
+producers, never the reverse" (engine-split D1 reworded it on 2026-11-07 to "the host
+consumes producers, never the reverse"). Until now the cycles were acknowledged as transitional and
 paid for in two-phase repins (`../../2026-08-12_family_composition_thesis_brief.md`, the Knot,
 Cleromancy and Murm repin sections); this plan removes the back edges instead.
 
@@ -133,7 +134,13 @@ calls do; the in-process callers (personal replica) are unchanged; the resident 
 (the file moves to Eidetic) is sequenced against it, and decision (f)'s lease-name
 parameterisation lands first. Tests keep their counts and the door route has its own.
 
+**Status 2026-11-08: landed** (Progress; domain contract, "The blob door route").
+
 ### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
+
+**Status 2026-11-08: step (1) done; steps (2) and (3) stopped on two design questions the plan and rulings do
+not settle (Findings, "P2 findings"); step (4) depends on them.** The brief's repository name `merely-made/knot` does
+not exist on GitHub; Knot is `merely-made/knot-editor`, which is also what Mere's manifests and lock name.
 
 In this order. **(1)** P2a. **(2)** Knot's `DeclaredPolicy` (its `OperationPolicy`, a data value,
 in Knot) registered as `Authority::Declared`, which P1b leaves as a typed variant that refuses
@@ -152,6 +159,9 @@ fixtures; Knot's lock names Mere but Mere's resolves without `knot-editor`; the 
 conditions hold. No `Lane` trait and no distribution binary.
 
 ### P3. D1 Mere stops naming Cleromancy (reshaped by D14 and D15)
+
+**Status 2026-11-08: steps (1) and (2) done; the spike passes (Findings, "P3 spike"). Stopped for Mark's review
+(D15 (h)); steps (3) and (4) are not started.**
 
 In this order. **(1)** A validator-only crate split in Cleromancy: the authority's closure leaves
 `muniment/redb` and the other native-only dependencies (the locked checks on
@@ -286,7 +296,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   repository. Outcome: applies Stack 3 ("Mere consumes producers, never the reverse") and
   refines the source homes map's "Mere↔Knot and Mere↔Cleromancy already work this way".
 
-  Links: area stack · draws on domain-contract C5, stack.3 · amends source-homes-map "Repository cycles" · plans cycle_breaks P1, P2, P3 · summary The resident hosts domains through a Stickleback seam and apps register at runtime, so Mere's Cargo names neither Knot nor Cleromancy.
+  Links: area stack · draws on domain-contract C5, stack.3 · amends source-homes-map "Repository cycles" · plans cycle-breaks P1, P2, P3 · summary The resident hosts domains through a Stickleback seam and apps register at runtime, so Mere's Cargo names neither Knot nor Cleromancy.
 
 - **D2. Eidetic↔Distillery: the ESP adapter moves to ESP (Mark, 2026-11-06):** "Move adapter
   to ESP". `eidetic-search` keeps only the `GoalEmbedder` trait; the ESP adapter
@@ -294,14 +304,14 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   stops depending on ESP. Put to Mark against leaving it and recording that `persistence`
   stays off in Eidetic's root. Outcome: new.
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P4 · summary eidetic-search keeps the GoalEmbedder trait; the ESP adapter, calibration tests and recall example live in ESP.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P4 · summary eidetic-search keeps the GoalEmbedder trait; the ESP adapter, calibration tests and recall example live in ESP.
 
 - **D3. gemot↔Murm: an address trait (Mark, 2026-11-06):** "gemot↔Murm: trait". An address
   trait in `murm-resolve`, implemented by Gemot, so Murm stops depending on `gemot-address`.
   Put to Mark against Murm duplicating Gemot's grammar, which conflicts with Gemot owning it.
   Outcome: new.
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P5 · summary murm-resolve owns an address trait that Gemot implements; Murm no longer names gemot-address.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P5 · summary murm-resolve owns an address trait that Gemot implements; Murm no longer names gemot-address.
 
 - **D4. Mere↔Murm: mere-comms goes down (Mark, 2026-11-06):** "Mere↔Murm: mere-comms down".
   `mere-comms` moves into Murm, so signalman stops depending on Mere. Outcome: applies the
@@ -311,27 +321,27 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   **Paused 2026-11-06 (Mark), pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); unpaused by D7 to D9, which moved the scene vocabulary below Murm.**
 
-  Links: area stack · draws on resident-split S6, stack.3 · plans cycle_breaks P6 · summary mere-comms moves into Murm so signalman's comms feature no longer names Mere.
+  Links: area stack · draws on resident-split S6, stack.3 · plans cycle-breaks P6 · summary mere-comms moves into Murm so signalman's comms feature no longer names Mere.
 
 - **D5. Mere↔Woodshed: adapters go up (Mark, 2026-11-06):** "Mere↔Woodshed: adapters up".
   The Woodshed adapters move out of Graphshell into Woodshed behind its own features, so Mere
   stops naming Woodshed. Outcome: applies the source homes map's reading of Pandect/Graphshell
   adapters as "adapters for other owners".
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P7 · summary Woodshed's block-editing adapters move out of Graphshell into Woodshed behind its features; Mere no longer names Woodshed.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P7 · summary Woodshed's block-editing adapters move out of Graphshell into Woodshed behind its features; Mere no longer names Woodshed.
 
 - **D6. Dev-only edges count (Mark, 2026-11-06):** "Count them". Dev-dependency edges are cycles in
   the family check: tests use fixtures, or live in the higher repository. Settles F2's check rule
   and the dev-only fixture in P0's tests (a dev-only cycle fails). Outcome: new.
 
-  Links: area stack · draws on stack.3 · plans cycle_breaks P0 · summary Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository.
+  Links: area stack · draws on stack.3 · plans cycle-breaks P0 · summary Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository.
 
 - **D7. Extract the contract leaves first (Mark, 2026-11-06):** "D: hybrid, leaves first", on
   `../research/2026-11-06_host_guest_contract_brief.md`. The clean contract crates move to a
   bottom layer now; the full host/guest split is decided later. Unpauses D4/P6 once the leaves are
   out. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D4 · plans cycle_breaks P6 · summary The host/guest contract's leaf crates are extracted to a bottom layer first; the full split waits.
+  Links: area stack · draws on cycle-breaks D4 · plans cycle-breaks P6 · summary The host/guest contract's leaf crates are extracted to a bottom layer first; the full split waits.
 
 - **D8. The bottom layer is the revived Graphshell repository, named for the protocol (Mark,
   2026-11-06):** "we can use it as the bottom layer. unarchive, hard cut, i'm ok with that" and
@@ -340,7 +350,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   left in Mere. The Graphshell reference host (`ports/graphshell`, `graphshell-mere`,
   `graphshell-host`) stays above Mere. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D7 · plans cycle_breaks P6 · summary The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere.
+  Links: area stack · draws on cycle-breaks D7 · plans cycle-breaks P6 · summary The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere.
 
 - **D9. Contract plus host-role kit (Mark, 2026-11-06):** "Contract + kit". The bottom layer holds
   `chirograph`, one WIT world with `script/wire` and `witgen`, `sceno`, `scenotime`, `hest` (and
@@ -348,7 +358,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   `graphshell-client`; the endpoint's `door`, `profile` and projection-provider features, and
   `scenomise`, stay in Mere. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D8 · plans cycle_breaks P6 · summary The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features.
+  Links: area stack · draws on cycle-breaks D8 · plans cycle-breaks P6 · summary The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features.
 
 - **D10. The WIT world reaches Mere's hosts through `links` metadata, for now (Mark,
   2026-11-06):** "Accept for now". `graphshell-endpoint` declares `links` metadata for its one
@@ -357,7 +367,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   unused normal dependency on `graphshell-endpoint`. Revisit together with the open question
   of renaming `mere:script@0.1.0`. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D9 · summary Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided.
+  Links: area stack · draws on cycle-breaks D9 · summary Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided.
 
 - **D11. The extraction's structural choices stand (Mark, 2026-11-06):** "Keep all three".
   The endpoint's door features are the Mere crate `graphshell-door`, beside `graphshell-host`;
@@ -365,7 +375,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   the AccessKit conversion is `uxtree::frozen::FrozenUxTree` behind `uxtree`'s `frozen`
   feature. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
+  Links: area stack · draws on cycle-breaks D9 · summary graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere.
 
 - **D14. P1's decisions answered; the distribution binary reopened (Mark, 2026-11-06):** on the
   [domain contract](../technical_architecture/2026-11-06_domain_contract.md) section 8.
@@ -381,7 +391,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   domain's authority is Rust code linked into the store-owning process; P2 and P3 stay held on
   it. Outcome: new; amends P1, adds P1b.
 
-  Links: area stack · draws on cycle_breaks D1, domain-contract C5 · amends cycle_breaks P1 · plans cycle_breaks P1, P1b, P2, P3 · summary P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board.
+  Links: area stack · draws on cycle-breaks D1, domain-contract C5 · amends cycle-breaks P1 · plans cycle-breaks P1, P1b, P2, P3 · summary P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board.
 
 - **D15. The drawing-board answers (Mark, 2026-11-06):** on the domain contract's drawing-board
   section. (g) "Yes, split them": authority runs as a guest or as declared data, Knot's live sync
@@ -394,7 +404,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   off until a door route to the resident's blob custody exists, so that route is a prerequisite
   phase (P2a). Supersedes the Lane and distribution parts of P1; reshapes P2 and P3. Outcome: new.
 
-  Links: area stack · draws on cycle_breaks D1, D12, D14 · amends cycle_breaks P1, P2, P3 · plans cycle_breaks P1b, P2a, P2, P3 · summary Authority is a guest or declared data, Knot's lane a supervised app after a blob door route exists, no Lane trait and no distribution binary.
+  Links: area stack · draws on cycle-breaks D1, D12, D14 · amends cycle-breaks P1, P2, P3 · plans cycle-breaks P1b, P2a, P2, P3 · summary Authority is a guest or declared data, Knot's lane a supervised app after a blob door route exists, no Lane trait and no distribution binary.
 
 - **D12. Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06):** "D: Woodshed as a
   guest". The generic block pane (Djot documents, rhyme schemes, save, undo, reopen) stays in
@@ -406,7 +416,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Amends D5's means, not its end: Mere stops naming Woodshed. Outcome: new design, written first
   and held for Mark's review.
 
-  Links: area stack · draws on cycle_breaks D5, D8, D9, host_guest_contract_brief · amends cycle_breaks D5 · plans cycle_breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
+  Links: area stack · draws on cycle-breaks D5, D8, D9, host_guest_contract_brief · amends cycle-breaks D5 · plans cycle-breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
 
 - **D13. The guest-blocks decisions (Mark, 2026-11-06):** the eight decisions of
   [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md), answered as relayed:
@@ -430,7 +440,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Outcome: settles D12's design except the view's drawing (guest_blocks R1), the home of the view
   (R2) and the native shell (R3), which are put to Mark.
 
-  Links: area stack · draws on cycle_breaks D12, guest_blocks · plans cycle_breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
+  Links: area stack · draws on cycle-breaks D12, guest_blocks · plans cycle-breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
 
 - **D16. Guest blocks: the three open questions answered (Mark, 2026-11-06):**
   [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md) R1 to R3.
@@ -443,7 +453,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   3. R3, the native shell: "New graphshell-blocks bin".
   Outcome: D13's design is complete; implementation follows its order of work.
 
-  Links: area stack · draws on cycle_breaks D13, guest_blocks · plans cycle_breaks P7 · summary The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin.
+  Links: area stack · draws on cycle-breaks D13, guest_blocks · plans cycle-breaks P7 · summary The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin.
 
 - **D17. `backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06):** "backdrops → graphshell",
   option 1 of F1. `scenomise::backdrops` and `template` (1,517 lines, 12 tests) move into
@@ -454,7 +464,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   stays an isolated root on Mere and is the one allowlisted isolated Murm-to-Mere exception (this
   plan, D17). Outcome: refines D9, closes F1, completes P6.
 
-  Links: area stack · draws on cycle_breaks D9, stack.3 · amends cycle_breaks D9 · plans cycle_breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
+  Links: area stack · draws on cycle-breaks D9, stack.3 · amends cycle-breaks D9 · plans cycle-breaks P6 · summary The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception.
 
   *D8 and D9 refined 2026-11-07 (engine-split D2): the repository keeps the contract as its
   bottom root and also holds the hosting above it; see `2026-11-07_engine_split_plan.md`.
@@ -761,8 +771,95 @@ Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the c
 - **The allowlist entry that remains** (P0 allowlist, not built yet): Mere↔Murm, isolated root
   `murm/apps/signalman-desktop`, reason "its own `[workspace]` root, excluded from Murm's, so neither
   lock holds the other; the source homes map's pattern for keeping a lock free of Mere", cites
-  cycle_breaks D17. It is the Genet/Murm entry's sibling and stays permanent, so P8's allowlist ends
+  cycle-breaks D17. It is the Genet/Murm entry's sibling and stays permanent, so P8's allowlist ends
   with two isolated entries, not one.
+
+### P2 findings (2026-11-08)
+
+**Step (2), Knot's `DeclaredPolicy` as `Authority::Declared`, has no consumer and no delivery path today.**
+Evidence:
+- `KnotSyncPolicy` (`knot-editor/crates/knot-editor/src/sync.rs:307-366`) is private to Knot and is called by Knot's own
+  `KnotSyncHost` when an operation arrives. No code in `mere-resident` takes an `OperationPolicy`: the registry's
+  `Authority::validator()` returns a `pandect::GraphValidator` (a function of a complete graph), and `Declared` returns
+  only the pending refusal. Admission of Knot operations happens in the process that runs the sync host, which after
+  step (3) is the supervised child, not the resident.
+- The interpreter the plan names (in Stickleback) cannot be written over `OperationPolicy<E>` alone: Knot's checks
+  read `operation.header.extensions.space_id`, `.encryption` and `.parents`, which are Knot's `KnotSyncExt`. A generic
+  interpreter needs a trait over the extension (space, encryption profile, causal parents) that Knot implements.
+- A connecting application cannot install authority (`domain_registry`; the contract's rule), and the registry is built
+  by the process that owns the store. So "Knot registers its policy value" needs a delivery path that does not exist:
+  an owner setting, an owner-installed file, or a reviewed pack like D12's.
+
+Options: (A) leave `Declared` a typed pending slot and skip step (2) until M4 (the replicated `notes` mere is the first
+resident-side consumer of an operation policy), since Knot's policy keeps running inside Knot's own host. (B) Build the
+interpreter and the extension trait in Eidetic now and have Knot replace `KnotSyncPolicy` with a `DeclaredPolicy` value
+it interprets itself: the consumer is Knot's host, the resident only carries the slot. (C) Deliver the value as an
+owner setting (`declared_policies.<domain>`), interpreted by the resident, with nothing consuming it until M4. Recommend
+A: it deletes nothing Mere needs deleted and builds nothing with no caller; B is the right shape when M4 arrives.
+
+**Step (3), the supervised sync host, is blocked on *serving*, which the door route does not carry.** P2a gives an
+application custody administration (leases, the serving authorizer's retain and readers) and reads. Knot's host builds its
+iroh endpoint with `P2pandaTransport::builder.scoped_blobs(&blobs, scope, readers)`
+(`knot-editor/crates/knot-editor/src/resident/operations.rs:131-135`): the endpoint peers dial answers blob requests from
+a `BlobStore` in its own process under the authorizer. A supervised child cannot hold the resident's store (iroh's file
+store is single-process), so peers could not fetch Knot's evidence from the child. Options: (1) the child keeps its own
+blob store for serving (the drawing board's old (i)1, two iroh endpoints and two stores until M5); the door route is then
+only the one-time copy-out and the resident-side custody of what it already holds. (2) Make the transport's
+`scoped_blobs` take a source trait so a door-backed reader can serve: a Murm change, and the provider needs verified
+streaming (outboard data) that `read_range` bytes do not give, so the child would recompute it. (3) The resident serves
+Knot's evidence from its own node: peers must be told to fetch evidence from the resident's node id, a change to Knot's
+evidence reference and dial hints (the key stays in the child). (4) Keep Knot's lane compiled into the resident until M4
+to M5 absorb it (drawing board (i)3); D1 stays open for Knot. Evidence not gathered: how often Knot evidence is fetched
+across devices (decides whether two stores cost anything). Lean: (3) if the evidence reference can carry a node id,
+otherwise (4); (1) is the cheapest and is the option (i)2 turned down.
+
+**Independent of both:** `knot_relation_intake.rs` (349 lines, 6 tests in 817), the two `knot_overlay_*` tests and the
+Knot-as-guest fixtures can move to Knot as consumers (domain contract, section 4). They were not moved: Knot would take
+`graph-kernel`, a dev edge to `mere-resident` and a relock against Mere first, and none of it advances the manifests until
+(3) is answered.
+
+### P3 spike (2026-11-08)
+
+**Step (1), the split.** The blocker was one manifest line. `core/Cargo.toml` (the `cleromancy-core` package Mere names as
+`cleromancy-domain`) listed `muniment` with feature `redb`; the only code that opens a redb store is the root package's
+`cleromancy_receipt` binary, which keeps its own row. With the feature dropped, `cargo check --locked --target
+wasm32-wasip2` passes for the whole portable core (`errno` went with `redb`). `wasm32-unknown-unknown` still fails, now in
+`getrandom 0.2` ("enable the js feature"); a wasmtime guest does not need it. No code moved: a separate validator-only
+crate is not needed for the guest, though it would shrink it (Cleromancy `046bd58`).
+
+**Step (2), the spike** (Cleromancy `spike/wasm-authority`, throwaway, own lock root; corpus from
+`tests/authority_corpus.rs`; reproduction in its README; toolchain 1.97.1, wasmtime 45, wit-bindgen 0.57.1):
+
+| Measure | Result |
+|---|---|
+| Builds as a component | yes: `cargo build --release --target wasm32-wasip2` on a `cdylib` emits a component |
+| Size | 7,816,625 bytes (7.45 MiB) against the 16 MiB cap (`opt-level = "s"`, LTO, strip, `panic = "abort"`, no wasm-opt) |
+| Verdict-equal, native versus wasm | 577 of 577 cases, identical error text in 577 (51 refused, 526 admitted); 0 traps |
+| Corpus | the six product graphs of the seven moving tests (published reading, typed decks, ambient, shuffled, situation, inference) and 571 single-leaf tampers of their captured batches, each with its native verdict |
+| Per call, release, Apple silicon | native min 0.11 ms, p50 10.3 ms, p90 26.9 ms, max 34.1 ms; wasm min 0.21 ms, p50 20.4 ms, p90 55.6 ms, max 101 ms (about 2 times native); includes the guest's JSON decode and graph restore |
+| Fuel per call | p50 3.9e8, max 1.74e9 (wasmtime fuel units) |
+| Guest memory | 6.6 MiB peak requested |
+| Cold start | compile 1.03 s (Cranelift on first load; precompile to avoid), instantiate 0.37 ms |
+
+Candidate sizes 14 KB to 296 KB. Time follows the replayed content (ephemeris recomputation), not the byte size.
+
+**Interface.** The drawing board's `domain-authority` world works unchanged (`describe`, `validate(list<u8>)`,
+`admit`; `log` import only). Findings on the bytes:
+- `GraphSnapshot` alone is not a complete candidate: it does not carry the facet store, and the validator over it fails
+  ("must carry exactly one domain record"). The candidate the spike uses is one JSON object `{snapshot, facets}`
+  (`Graph::to_snapshot_at`, `Graph::facets()`, `Graph::try_from_snapshot`, `Graph::install_facets`, all serde); the
+  validator over the restored graph agrees with the native verdict in every case. The captured-delta batch also works but
+  the resident holds no whole-graph delta export, so the declared format should be snapshot plus facets
+  (`mere.graph-snapshot-and-facets/json`). The resident's own encode time per call is not in the numbers above.
+- A fuel cut-off traps the guest and the instance then refuses re-entry ("cannot enter component instance"): the host
+  instantiates afresh after a trap (0.4 ms).
+- A guest panic is a trap (`panic = "abort"`); the kernel's delta replay panics on a malformed stable id, which the
+  snapshot path reports as an error instead.
+
+**Blockers.** None for `wasm32-wasip2`. Not measured: cross-architecture determinism (one aarch64 machine), the seven
+tests' multi-process owner behaviour through a guest (step 3's conformance), the resident-side encode cost, and `admit`
+(stubbed; divination registers none). The fallback (supervised native process, D15 (h)) is not needed on this evidence.
+Mark's review of the spike gates step (3).
 
 ## Keeping cycles out: the check
 
@@ -803,7 +900,7 @@ pip's vendored copy, which is what runs on this Mac's system Python 3.9. The ori
   Mere lock with Knot and Mere both present) is a cycle. Family-wide: the union of edges
   across all roots, strongly connected components of size above one.
 - **Allowlist.** `support/family-cycles/allowed.toml`, one entry per edge pair, each citing
-  this plan's decision (`cycle_breaks D1`) or an isolated-root reason (the signalman-desktop
+  this plan's decision (`cycle-breaks D1`) or an isolated-root reason (the signalman-desktop
   root). A cycle not on the list fails; an entry no cycle uses fails too, so the list only
   shrinks. The report prints each cycle with the closing edge, the package pair, the
   manifest path and, where known, the feature that enables it.
@@ -1022,3 +1119,22 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   a resolved-lock cycle) and `support/family-cycles/allowed.toml` (D1 `mere -> knot-editor`, `mere -> cleromancy`; D17
   isolated `murm/apps/signalman-desktop`). The result on the real family is under "The P0 result": three cycle groups this
   plan did not list, which the check reports and does not allowlist. Not wired into a gate yet.
+- 2026-11-08: P2a landed (the blob door route). Decision (f) first: `LEGACY_KNOT_LEASE` left `resident_blobs.rs` for
+  `resident_knot.rs` (the lane passes its own lease name; the shared file names no application). Then the route
+  `blob-custody-v1`: shape stated first in the domain contract ("The blob door route", sections 1 to 5), built the same
+  day (section 6). Server `ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `djinn`); wire
+  and client `graphshell-door` feature `blob-door` (`BlobDoorClient`); `ResidentBlobCustody` gained the durable scope
+  owner record (`claim_scope`, `reserve_scope`, `withdraw_serving`). Grant: the route in the application's declaration
+  and the owner's grant, plus first-binder scope ownership (the resident's own personal scope is reserved). Revocation:
+  `BlobDoor::revoke` cuts live sessions and withdraws serving, keeps leases and ownership; `restore` plus re-bind
+  rebuilds serving from the leases. Tests: `resident_blob_door::tests` 8 new, `tests/blob_door.rs` 1 new over the real
+  door, `resident_blobs` 2 unchanged, `graphshell-door` 2 new wire tests; mere-resident lib 264 to 272 (the same
+  `the_dialable_host` failure), and the same known failing binaries (`custodian_client`, `cxf_import`,
+  `quarantine_review`); everything else in `mere-resident` passes. The in-process callers (personal replica, Knot lane)
+  are unchanged except that `personal_sync` reserves its graph scope. Not wired: `djinn` has no live grant-removal
+  path to call `revoke`. The route does not move serving; P2's blocker is in Findings.
+- 2026-11-08: P2 stopped after step (1); two design questions (Declared authority has no consumer or delivery path; the
+  supervised host cannot serve blobs through the door) are written up with options in Findings, "P2 findings". P3 steps (1)
+  and (2) done and pushed (Cleromancy `046bd58`): `core/Cargo.toml` drops muniment's `redb` feature, the portable core checks
+  on `wasm32-wasip2`; the component is 7.45 MiB of 16, verdict-equal over 577 of 577 corpus cases, about 2 times native per
+  call (p50 20 ms, max 101 ms). The real guest is held for Mark's review (D15 (h)). Cleromancy's own plan has a short entry.
