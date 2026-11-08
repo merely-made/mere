@@ -474,6 +474,72 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   below and hosting above, with no application; the reference host and MCP server go to
   Turnstone.*
 
+- **D18. The resident seam applies wherever `mere-resident` lives (Mark, 2026-11-08):** "(a) Seam
+  goes wherever it lives". The P2 and P3 registration seam (D1, D14, D15) is not tied to the
+  repository that holds the resident. Whether `mere-resident` stays in Mere or moves to Graphshell
+  with the engine split (engine-split D23), the resident names neither Knot nor Cleromancy in its
+  manifests, and Knot and Cleromancy register themselves at runtime through the Stickleback domain
+  seam. The allowlisted `mere -> knot-editor` and `mere -> cleromancy` edges stay allowed until P2
+  and P3 land and, if the resident moves first, become `graphshell -> knot-editor` and
+  `graphshell -> cleromancy`, closed by the same steps. Outcome: refines D1 (where the seam lives
+  does not change what it rules).
+
+  Links: area stack · draws on cycle-breaks D1, cycle-breaks D14, stack.3 · amends cycle-breaks D1 · plans cycle-breaks P2, P3 · summary The registration seam binds the resident wherever it lives, Mere or Graphshell, so neither repository's Cargo names Knot or Cleromancy.
+
+- **D19. Inker↔Mere: allowlisted until P5 (Mark, 2026-11-08):** "Allowlist until P5". Inker's
+  optional `fleece` row on Mere's `linked-data` (`mere-fleece -> mere-rdf`, engine-split F3) is the
+  only edge from Inker to Mere. Engine-split F3 records that `mere-rdf` depends on `inker`, so Inker
+  cannot name the engine without a cycle until engine-split P5 folds `linked-data` and the resource
+  half of `graph-kernel` into one `mere` crate with no host dependency. `inker -> mere` is allowlisted
+  in `support/family-cycles/allowed.toml` with this decision and leaves when P5 lands (the entry on
+  no cycle fails the check, so P5 deletes it). No code moves now. Outcome: new; the check's second
+  unlisted finding (The P0 result).
+
+  Links: area stack · draws on cycle-breaks D6, stack.3 · plans engine-split P5 · summary inker to mere is allowlisted as a temporary back edge until engine-split P5 separates the engine from inker; the entry leaves with P5.
+
+- **D20. The ring: `murm-wire` and `murm-rtc` move into Genet (Mark, 2026-11-08):** Mark asked:
+  "Why wouldn't rtc just be a genet capability then? Given it's w3c, wpt… http(s) isn't in murm
+  either, but it's a protocol too." He then ruled "Move both into Genet". `murm-wire` (HTTP/1-3 and
+  WebSocket carriage, originally split out of Genet's Netfetcher with its history kept) and
+  `murm-rtc` (the pinned WebRTC protocol leaf) become Genet capabilities, in `components/`
+  beside `netfetcher` and `genet-webrtc`. Genet is their only consumer: no Murm crate outside
+  `murm/wire/` names them, and no manifest outside Genet names them, so they are renamed
+  `genet-wire` and `genet-rtc`. The `murm/wire` workspace leaves Murm. This removes the
+  `genet -> murm` edge, which the P0 check found closing the Genet, Murm, Eidetic and Dramatis ring
+  (The P0 result, item 3). Reverses the Findings' reading that the Genet/Murm pair needed no break.
+  Outcome: new.
+
+  Links: area stack · draws on stack.3 · plans cycle-breaks P0 · summary murm-wire and murm-rtc move into Genet as genet-wire and genet-rtc, since Genet is their only consumer; the Genet to Murm edge and the four-repository ring go with them.
+
+- **D21. Dramatis's application may become a producer (Mark, 2026-11-08; tentative):** "Maybe those
+  lib's apps should be producers if hosts already depend on them either way." A tentative direction,
+  not a final ruling: `apps/dramatis` may become a producer that hosts present, instead of an
+  application that names Mere's Cambium (`cambium`, `cambium-desktop`, `mandrake`). A separate
+  agent is writing the design. The Dramatis to Mere cycle (The P0 result, item 1) stays flagged by
+  the check, with no allowlist entry, until the design is ruled. Outcome: direction recorded, no
+  decision taken; nothing moves.
+
+  Links: area stack · draws on cycle-breaks D6, stack.3 · plans cycle-breaks P0 · summary Dramatis's app may become a producer that hosts present rather than an app naming Cambium; tentative, design pending, and the Dramatis to Mere cycle stays flagged.
+
+- **D22. The viewer ships one build, `webgl2/` (Mark, 2026-11-08):** "Keep one build". Recorded in
+  the Graphshell host plan (T7) and in the
+  [viewer build audit brief](../research/2026-11-07_viewer_build_audit_brief.md), Rulings 3. The
+  viewer ships `webgl2/` only; `webgpu/` is an opt-in comparison build. Two findings travel with
+  the ruling: WebGL2 uses 1.4 to 1.85 times WebGPU's page CPU time per frame (21 nodes 5.0 against
+  2.7 ms paused and 17.4 against 9.8 live; 200 nodes 11.0 against 6.8 and 36.1 against 25.6), so a
+  slower device has less headroom than the measured Mac; and ANGLE on Metal draws two overlapping
+  diamonds in one pictograph glyph in the other order, a 10-pixel difference in the compare
+  images, accepted and not fixed. Outcome: records an engine and host decision here so the
+  cycle-breaks numbering carries all of Mark's 2026-11-08 rulings.
+
+  Links: area stack · draws on stack.3 · summary The viewer ships the single webgl2 build; WebGL2 costs 1.4 to 1.85 times WebGPU's page CPU per frame and ANGLE on Metal differs by 10 pixels in the compare images, both recorded in T7 and the audit brief.
+
+- **D23. P3: build the real Cleromancy guest (Mark, 2026-11-08):** after the P3 spike (Findings,
+  "P3 spike"), Mark ruled to build the real guest, step (3). Another agent is doing that work.
+  Recorded here only; the plan's P3 steps stand. Outcome: settles the spike's open question for P3.
+
+  Links: area stack · draws on cycle-breaks D1, cycle-breaks D14, stack.3 · plans cycle-breaks P3 · summary Mark ruled to build the real Cleromancy guest (P3 step 3); another agent is doing it.
+
 ## Findings
 
 Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other repositories'
