@@ -616,7 +616,9 @@ revision and what crosses at frame rate.
   strategies: "Canvas plus strategies take the cartography name; pictograph shrinks to faces
   (Recommended)". The 63.8k canvas lines and cartography's strategies and contracts become one
   crate under `mere-cartography`; `pictograph` keeps the 4.4k lines its name describes. No name
-  freed; two used correctly. Outcome: applies D10.
+  freed; two used correctly. Outcome: applies D10. Timing (Mark, 2026-11-08, with another
+  session making 11 pictograph commits in a day): "Fold it into P3"; the rename happens at the canvas's
+  move to Graphshell, one move instead of two.
 
   Links: area The stack · draws on engine-split D10 · plans engine-split P3 · summary The graph canvas and the layout strategies are one crate named mere-cartography; pictograph is node faces only.
 
@@ -758,11 +760,42 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D10, engine-split D14 · plans engine-split P0 · summary mere-registry stays as the diagnostics and observations library; the five dead registries go and mod_loader moves to document-host; incipit bumps compatibly and persona_picker is a cambium feature.
 
+- **D27. backstep grows into the editor's ephemeral state (Mark, 2026-11-08):** P0 fork F4, the
+  `cambium` merge being a cycle and `meristem` the only receiver left: "If undo history can be diff,
+  merge it. If not, keep it and consider what we might do with it. Do we want to add code from, say,
+  arboard or something in there? Are there relevant utility states/commands? Compass? Idk, throwing
+  spaghetti here". Evidence: meristem diffs retained view trees for a renderer; backstep records
+  whole-document snapshots before each edit and rules out inverse commands, with durable undo in the
+  session journal, so undo cannot ride that diff. No `arboard` in Mere; clipboard is a host operation
+  refused at four sites (Cambium's text input, rootstock's egui and iced embeddings, chrome's frame
+  model, the Graphshell web share); navigation history exists three times with three subjects
+  (chrome's linear back/forward, 383 lines; the kernel's shared browse trail, 488; the port's
+  checkpoints, 319); nothing is named compass. Put back as keep, grow with a clipboard contract, or
+  grow with the contract and chrome's back/forward: "Grow: undo, clipboard contract, and chrome's
+  back/forward". `backstep` stays dependency-free: it gains a host-implemented clipboard trait the
+  four sites code against (hosts bind arboard or the browser API) and chrome's linear history as its
+  second ephemeral history; the kernel's trail and the port's checkpoints stay. Outcome: refines D10
+  (a crate may grow by taking its neighbours' scattered copies of its own job).
+
+  Links: area The stack · draws on engine-split D10 · plans engine-split P0 · summary backstep is the editor's ephemeral state: snapshot undo, a host-implemented clipboard contract, and chrome's linear back/forward; it stays dependency-free.
+
+- **D28. forme merges into incipit behind an arrangement feature (Mark, 2026-11-08):** P0 fork
+  F5: "Compare 1 and 2. 2 seems cleaner, should incipit grow its ambit?" Evidence: forme is
+  framework-free (serde, incipit, serde_json, taffy, optional petgraph, uuid; the receipt's kernel
+  dependency is a dev-dependency and its manifest's "mere-kernel depends on mere-forme" comment is
+  stale); platen carries kernel, backstep, inker, document-canvas, workbench, uxtree and accesskit,
+  and forme's other dependents `mere-chrome` and `pictograph` take only forme, so into platen hands
+  them the reading stack for a data type; into incipit costs a feature carrying taffy and petgraph
+  with the default still serde and uuid, which is the growth D8 already rules. "Into incipit behind
+  an arrangement feature (Recommended)". Frees `mere-forme`. Outcome: applies D8 and D10.
+
+  Links: area The stack · draws on engine-split D8, engine-split D10 · plans engine-split P0 · summary forme's arrangement authority is incipit's arrangement feature; incipit's default stays ids and curation; mere-forme is freed.
+
 ## Open questions
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
-  The four that change assigned moves (F1 pictograph and cartography, F4 backstep, F5 forme,
-  F17 the dead registries) go to Mark first; the rest follow in later rounds. F2 is the
+  The four that change assigned moves are ruled: F1 by D13 (folded into P3), F4 by D27, F5 by D28,
+  F17 by D14 and D26; the rest follow in later rounds. F2 is the
   engine's own: `linked-data/src/statements.rs` makes the engine depend on `inker`, which a
   2026-07-10 ruling placed there so Inker stayed kernel-free; under the split it belongs with
   Inker's emitted statements or the host's intake adapter.

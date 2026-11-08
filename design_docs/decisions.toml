@@ -643,6 +643,14 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 title = ". Diagnostics stays a library; mere-registry keeps its name as that library (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 
+[decisions."engine-split D27"]
+title = ". backstep grows into the editor's ephemeral state (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
+[decisions."engine-split D28"]
+title = ". forme merges into incipit behind an arrangement feature (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
