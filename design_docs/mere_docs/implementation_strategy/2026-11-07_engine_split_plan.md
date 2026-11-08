@@ -856,8 +856,8 @@ revision and what crosses at frame rate.
   `www.github.com` rev pin P2's block records). Isocosm's `.cargo/tabletop-local.toml` 62 and 63
   overlay `numen` and `seiche` onto Mere's deleted paths. Done 2026-11-08: Cleromancy (`e79576b`),
   Knot (`189487c1`), Murm (`df3e293`) and mer3ly (`47599d6`) repinned these rows, and Mere's
-  `numen` redirect left. Mere's `seiche` row stays while `mere-resident` locks Cleromancy
-  `671e9bc4`, which still names `seiche` through `mere.git`; it leaves when that lock moves.
+  `numen` redirect left, then its `seiche` row once Mere relocked Cleromancy to `d9fc819` the
+  same day; nothing is pending here.
   Active Mere documents still carry 21 code-font lines into `crates/conatus/` in 10 documents;
   the one Markdown link was repointed.
 - **Knot repin (D15) on the branch.** Four of nine tests in `knot-editor`'s
@@ -1218,4 +1218,11 @@ revision and what crosses at frame rate.
   source moved) and dropped the `numen` redirect row; the lock holds one `seiche`, one `numen`, one
   `incipit` and no `mere-curation`. The `seiche` row stays: `mere-resident` locks Cleromancy
   `671e9bc4`, whose `cleromancy-core` names `seiche` through `mere.git` (Cleromancy repinned it in
-  `e79576b`). Turnstone's `tinct` redirect and Dramatis's `persona-picker` row are in flight.
+  `e79576b`). Later the same day: Cleromancy `d9fc819` (Mere relocked to `52047e58`, Knot to
+  `189487c1`, both redirect rows gone), Turnstone `f3a455d3`, `c24b5e0d`, `b12348d9` (Mere, Knot and
+  Woodshed relocked, curation repathed, its `seiche`, `numen` and `tinct` redirects gone) and
+  Dramatis `772cce49` (app workspace relocked 154 Mere commits, the picker as cambium's feature)
+  pushed; Mere then relocked Cleromancy to `d9fc819` and dropped its last redirect row, `seiche`.
+  No family consumer names a moved crate through `mere.git` any more, and no `[patch]` redirect
+  for one remains in Mere, Turnstone or Cleromancy. Pre-existing failures unchanged: Knot's three
+  `site_generation` tests (same at `a58ba28`), Turnstone's 46 "Access is denied", Cleromancy's two.

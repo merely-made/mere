@@ -609,9 +609,6 @@ too_many_lines = "warn"
 [patch."https://github.com/merely-made/mere.git"]
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
-# The Cleromancy revision mere-resident locks (671e9bc4) names seiche through
-# mere.git; this row leaves when that lock moves past its repin (e79576b).
-seiche = { git = "https://github.com/merely-made/seiche.git", branch = "main" }
 mere-edit = { path = "crates/system/source-edit" }
 mere-facts = { path = "crates/domain/personal-facts" }
 cambium = { path = "crates/cambium/cambium" }
