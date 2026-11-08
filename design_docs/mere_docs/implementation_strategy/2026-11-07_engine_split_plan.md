@@ -428,6 +428,13 @@ crates.
   names no app-level crate.
 - Needs: P1 (Inker as a supplier), P2 (Seiche as a supplier), cycle-breaks P6.
 
+**Drift line for P3 (2026-11-08, from the D29 lane; Mark: "Record it as a P3 drift line; keep the
+contract").** `mere-chrome`'s frame model (`FrameHostInput`, `FrameViewModel`, now `FrameStep` with
+hest `Invocation`s out and `Outcome`s in, and `chrome::effects`) has no consumer: nothing in Mere,
+Graphshell or Turnstone constructs the view model or consumes the host input, and `GraphshellRuntime`
+exists only in doc comments. When P3 moves chrome into Graphshell's hosting layer, the lane either
+builds the runtime step that consumes the input and produces the step, or retires the types; D29's
+shape is the contract it builds to. Until then the types stay as the declared contract.
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
