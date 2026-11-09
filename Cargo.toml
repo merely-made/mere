@@ -372,7 +372,7 @@ platen = { version = "0.0.1", path = "crates/platen/platen" }
 site-model = { package = "gemot-site", version = "0.1.0", git = "https://github.com/merely-made/gemot.git", branch = "main" }
 personal-facts = { package = "mere-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", branch = "main", default-features = false }
-eidetic = { version = "0.0.3", default-features = false, git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+eidetic = { version = "0.0.3", default-features = false, features = ["product"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 # Derived lexical recall is owned by Eidetic. Hosts supply the retained corpus
 # and any vector rankings; model backends remain optional.
 eidetic-search = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
