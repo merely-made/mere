@@ -1,0 +1,24 @@
+{
+  "tab_cap": 12,
+  "theme_id": "theme:dark",
+  "theme_mode": "dark",
+  "fonts": {
+    "interface": [
+      "Inter"
+    ],
+    "code": [
+      "Iosevka",
+      "monospace"
+    ]
+  },
+  "shellbar_edge": "left",
+  "shellbar_hidden": false,
+  "disabled_engines": [],
+  "document_typography": null,
+  "ui_zoom": 1.1,
+  "snapshot_idle_refresh": true,
+  "snapshot_byte_cap_mb": null,
+  "cascade_budget": 4,
+  "recall_ngram_max_order": 2,
+  "recall_vector_weight": 0.0
+}

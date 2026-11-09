@@ -12066,7 +12066,6 @@ dependencies = [
  "serde_json",
  "servitor",
  "sporran",
- "tabard",
  "tempfile",
  "uuid",
  "wasm-bindgen-test",

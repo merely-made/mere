@@ -123,6 +123,9 @@ pub mod session_graph_store;
 // graph.json; the host loads it on launch and saves on change. Application and
 // device preferences have their own stores and must not travel with it.
 pub mod settings_store;
+// The chosen theme as stored values; the host converts to its theming type
+// (engine split D79).
+pub mod stored_theme;
 // DocumentScript origin->component bindings sidecar (script-bindings.json): the
 // auto-attach list (§11.4 follow-on #2). Native-only (filesystem).
 #[cfg(not(target_arch = "wasm32"))]
@@ -242,6 +245,7 @@ pub use settings_store::{
     LegacySettingsMigration, PersistedSettings, SETTINGS_FILENAME, SettingsLoad,
     load_settings_with_legacy,
 };
+pub use stored_theme::{FontStacks, StoredTheme};
 pub use switcher_thumbnail::{
     SwitcherThumbnail, SwitcherThumbnailOptions, ThumbnailEdge, ThumbnailNode,
     build_switcher_thumbnail_with,

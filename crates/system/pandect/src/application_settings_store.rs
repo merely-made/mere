@@ -16,7 +16,8 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
-use tabard::theme::choice::ThemeChoice;
+
+use crate::stored_theme::StoredTheme;
 
 fn default_tab_cap() -> usize {
     12
@@ -52,11 +53,12 @@ pub struct ApplicationSettings {
     /// scope=application; movement=local-only; mutability=live; security=ordinary.
     #[serde(default = "default_tab_cap")]
     pub tab_cap: usize,
-    /// The chosen theme, stored as `theme_id` and `theme_mode` (tabard's
-    /// choice). scope=application; movement=persona-synced opt-in;
+    /// The chosen theme, stored as `theme_id`, `theme_mode` and `fonts` with
+    /// the same bytes Tabard's `ThemeChoice` writes; the host converts (engine
+    /// split D79). scope=application; movement=persona-synced opt-in;
     /// mutability=live; security=ordinary.
     #[serde(flatten)]
-    pub theme: Option<ThemeChoice>,
+    pub theme: Option<StoredTheme>,
     /// scope=application; movement=local-only; mutability=live; security=ordinary.
     pub shellbar_edge: ShellbarEdge,
     /// scope=application; movement=local-only; mutability=live; security=ordinary.
@@ -175,8 +177,7 @@ mod tests {
     }
 
     #[test]
-    fn stored_theme_fields_read_into_the_choice() {
-        use tabard::theme::registry::Mode;
+    fn stored_theme_fields_read_into_the_theme() {
         // Records from before the choice type held two optional strings,
         // written as nulls when unset.
         let unset: ApplicationSettings =
@@ -186,13 +187,35 @@ mod tests {
             serde_json::from_str(r#"{"theme_id":"theme:dark","theme_mode":"dark"}"#).unwrap();
         assert_eq!(
             set.theme,
-            Some(ThemeChoice::new("theme:dark", Some(Mode::Dark)))
+            Some(StoredTheme::new("theme:dark", Some("dark".into())))
         );
         let id_only: ApplicationSettings =
             serde_json::from_str(r#"{"theme_id":"theme:light"}"#).unwrap();
-        assert_eq!(id_only.theme, Some(ThemeChoice::new("theme:light", None)));
+        assert_eq!(id_only.theme, Some(StoredTheme::new("theme:light", None)));
         let absent: ApplicationSettings = serde_json::from_str("{}").unwrap();
         assert_eq!(absent.theme, None);
+    }
+
+    #[test]
+    fn the_theme_keeps_the_bytes_tabards_choice_wrote() {
+        // Written by this store before D79, when the field was
+        // `Option<tabard::ThemeChoice>`: fonts in role order, a null mode.
+        for fixture in [
+            include_str!("../tests/fixtures/application_settings_theme_fonts.json"),
+            include_str!("../tests/fixtures/application_settings_theme_unmoded.json"),
+        ] {
+            let settings: ApplicationSettings = serde_json::from_str(fixture).unwrap();
+            assert!(settings.theme.is_some());
+            assert_eq!(serde_json::to_string_pretty(&settings).unwrap(), fixture.trim_end());
+        }
+        let fonts: ApplicationSettings = serde_json::from_str(include_str!(
+            "../tests/fixtures/application_settings_theme_fonts.json"
+        ))
+        .unwrap();
+        let theme = fonts.theme.unwrap();
+        assert_eq!(theme.theme_mode.as_deref(), Some("dark"));
+        assert_eq!(theme.fonts.0[0].0, "interface");
+        assert_eq!(theme.fonts.0[1].1, ["Iosevka", "monospace"]);
     }
 
     #[test]
@@ -204,10 +227,7 @@ mod tests {
         ));
         let original = ApplicationSettings {
             tab_cap: 24,
-            theme: Some(ThemeChoice::new(
-                "theme:dark",
-                Some(tabard::theme::registry::Mode::Dark),
-            )),
+            theme: Some(StoredTheme::new("theme:dark", Some("dark".into()))),
             shellbar_edge: ShellbarEdge::Right,
             shellbar_hidden: true,
             disabled_engines: vec!["scrying.web".into()],

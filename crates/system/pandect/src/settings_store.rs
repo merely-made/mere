@@ -133,14 +133,9 @@ impl LegacySettingsFields {
             let defaults = ApplicationSettings::default();
             ApplicationSettings {
                 tab_cap: self.tab_cap.unwrap_or(defaults.tab_cap),
-                theme: self.theme_id.map(|theme_id| {
-                    tabard::theme::choice::ThemeChoice::new(
-                        theme_id,
-                        self.theme_mode
-                            .as_deref()
-                            .and_then(tabard::theme::registry::Mode::from_key),
-                    )
-                }),
+                theme: self
+                    .theme_id
+                    .map(|theme_id| crate::StoredTheme::new(theme_id, self.theme_mode)),
                 shellbar_edge: self.shellbar_edge.unwrap_or(defaults.shellbar_edge),
                 shellbar_hidden: self.shellbar_hidden.unwrap_or(defaults.shellbar_hidden),
                 disabled_engines: self.disabled_engines.unwrap_or(defaults.disabled_engines),
