@@ -19,6 +19,10 @@ cxf = ["personal-sync", "dramatis-resident/cxf"]
 # through the installed custodian.
 in-process-custody = ["dramatis-resident/in-process-custody", "dep:castellan", "castellan/cxf", "dep:djinn-custodian", "djinn-custodian/fixture"]
 personal-sync = []
+# `resident_mere::fixture`: a live mere over a reservoir and one shared app door,
+# public for consumers that drive the route from outside (Knot's overlay tests).
+# Pulls the in-process custody the fixture's vault stands on; tests only.
+test-fixtures = ["in-process-custody", "dep:tempfile"]
 moot-site = ["site-model/publication", "dep:gemot", "dep:errand", "dep:pollster", "dep:scroll-protocol", "dep:url"]
 moot-site-nomadnet = ["moot-site", "dep:retinue"]
 # Knot sites over NomadNet. Off by default: it links Reticulum-licensed retinue
@@ -194,6 +198,7 @@ transport = { workspace = true, features = ["notochord"] }
 uuid = { workspace = true, features = ["v5"] }
 webrtc-carrier = { workspace = true, optional = true }
 zeroize = "1"
+tempfile = { version = "3", optional = true }
 
 # Device condition sensing (`src/conditions.rs`). Win32 only — no COM, no WMI,
 # no WinRT, so the resident never pays for a COM apartment to read a battery.
