@@ -1035,3 +1035,13 @@ uuid `v5`; `non_graph_domain` and `retained_text` tests require it. pandect take
   published.
 - `cargo check --workspace --all-targets`: green, 2m43s. Tests: `cargo test -p catchment` 3 (ids);
   `--features store` 17 + 2 + 4; `-p incipit` 11; `-p pandect` 313 (+1 ignored), unchanged.
+
+## 2026-11-09: P4 D84, slot_guard into catchment (on Mere main `b5e679d90`)
+
+`git mv crates/system/pandect/src/slot_guard.rs crates/system/catchment/src/slot_guard.rs` (170
+lines, unchanged), behind `store`; `pandect::slot_guard` is `pub use catchment::slot_guard`, so
+`ports/graphshell` (`block_editing/store.rs`, `presentation_store.rs`, `web_tree/forme.rs`,
+`forme_session_lifecycle_tests.rs`) needs no edit. Lock unchanged.
+- `cargo test -p catchment --features store`: 20 unit (17 + slot_guard's 3), 2, 4.
+- `cargo check --workspace --all-targets`: green, 1m33s. `cargo test -p pandect`: 281 unit (284
+  less slot_guard's 3) + 11 + 1 + 9 + 2 (+1 ignored) + 1 + 5 = 310.

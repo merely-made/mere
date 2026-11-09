@@ -21,6 +21,7 @@
 //! - **sealing**: values sealed under custody ([`SealedValues`]) and the
 //!   custody gate on a mere's retained page text ([`RetainedText`]);
 //! - the **family-shared root** personas live under ([`shared_root`]);
+//! - **slot guards**: compare-and-replace over one muniment slot ([`slot_guard`]);
 //! - the **ids** a mere's session lines and their graphs are known by
 //!   ([`SessionId`], [`GraphId`]), which the workspace and pandect both name.
 //!
@@ -47,6 +48,10 @@ pub mod retained_text;
 pub mod sealed;
 #[cfg(feature = "store")]
 pub mod shared_root;
+// The one compare-and-replace over a muniment slot, for every store that
+// writes back bytes it loaded (engine split D84).
+#[cfg(feature = "store")]
+pub mod slot_guard;
 #[cfg(feature = "store")]
 pub mod store;
 

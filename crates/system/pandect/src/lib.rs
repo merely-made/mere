@@ -79,9 +79,9 @@ pub mod furnace;
 // born as facets, since the bespoke cartography sidecar was never wired.
 pub mod arrangement_facets;
 pub mod cartography_geometry;
-// The one compare-and-replace over a muniment slot, for every store that
-// writes back bytes it loaded (rules, blocks, Forme).
-pub mod slot_guard;
+// The compare-and-replace over a muniment slot moved to catchment (engine
+// split D84); the module path stays for its callers.
+pub use catchment::slot_guard;
 // The scene.* facet namespace: the graph-scene's own view settings (sizing
 // mode, importance metric, physics damping) as facets of the CONTAINER node
 // (keyed by the session's root_graph_id) — scene-scoped, not per-node.
