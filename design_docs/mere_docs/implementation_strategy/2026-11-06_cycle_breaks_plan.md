@@ -1512,7 +1512,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   `resident_v1_fixture` (an example seeding the lane) was deleted; its code is in Mere's history and the Knot test seeds
   its own vault.
 
-### Stopped on `block_editing` (2026-11-08, ruling 1)
+### `block_editing` (2026-11-08, ruling 1; done 2026-11-09 by Mark's choice A, "Small default in Graphshell")
 
 Mark ruled that `block_editing.rs` moves into Knot so `ports/graphshell` stops naming `knot-document`. The move is not
 mechanical, and the docs do not settle what replaces it, so it stopped here with nothing changed and the
@@ -1533,4 +1533,15 @@ mechanical, and the docs do not settle what replaces it, so it stopped here with
   Turnstone/Graphshell move (engine-split P3 / D23), so Mere keeps only the trait and no default; the feature is dead in
   Mere builds until then. (C) leave it until D23 (the earlier recommendation, now overruled by ruling 1, so asking
   whether A or B is meant).
+
+**Done (2026-11-09).** `ports/graphshell/src/block_editing.rs` now holds a `BlockEditor` trait (source, selection, apply, input,
+input_mut, is_dirty, accept_saved_source), `BufferEditor` (a cambium `TextInput` with its undo journal, the default) and
+`register_editor(factory)`, a once-only registration seam; `Document { id, editor: Box<dyn BlockEditor> }` takes the
+registered editor or the default, so `block_pane`, the `blocks` binary and the web `product` feature were not touched.
+`ports/graphshell` and the workspace drop `knot-document`; the `mere -> knot-editor` allowlist entry is deleted and
+`scripts/check_family_cycles.py --remote` exits 0 without it. Knot (`block-editor` feature on `knot-editor`,
+`src/block_editor.rs`) implements the trait over `KnotEditor` (`KnotBlockEditor`) and exposes `register()`; the host that
+composes the pane with Knot calls it before the pane opens. Tests: Graphshell's six `block_editing` document tests stay and
+run over the default buffer; the same six run in Knot over `KnotEditor` (6 before in Mere, 6 + 6 after). Mere `203a73abc`,
+Knot `95467df`. Nothing in this repository registers Knot, so Mere builds edit through the default buffer.
 
