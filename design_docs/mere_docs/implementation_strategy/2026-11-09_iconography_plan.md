@@ -1,9 +1,11 @@
 # Iconography Plan: More Faces and Uses for Emblem and Pictograph
 
 **Date:** 2026-11-09
-**Status:** plan (2026-11-09). Nothing built. D1 (emblem's repository hosts the
+**Status (2026-11-09):** G landed (grammar identity, key domains, the full
+face cache key); every other phase open. D1 (emblem's repository hosts the
 faces crate) and D2 (identity and drawing version separately) ruled 2026-11-09;
-every other fork carries a provisional recommendation.
+every other fork carries a provisional recommendation. SVG output (emblem's
+plan) landed the same day.
 
 **For:** Mark, 2026-11-09: "Let's consider additional faces/uses of
 emblem/pictograph?" Offered kinship faces with blazon, a text-height arm with
@@ -453,6 +455,21 @@ Provisional (recommended first; asked only if they become blocking):
 - 2026-11-09: whether `canvas/frame.rs` passes logical or device pixels as
   `Host.height` is unverified; T3 settles it.
 
+- 2026-11-09: G keeps the address seed exactly (FNV-1a over the address,
+  XORed with the seed version), so `KeyDomain::Address` needs no tag; a context
+  domain hashes the context's length, the context and the key, then XORs a tag.
+  A crafted address could still collide with a context seed; G4 already says a
+  face proves nothing, so no stronger separation is bought.
+- 2026-11-09: pictograph still holds the canvas (`src/canvas`), so the face
+  cache moved with G rather than waiting for D13.
+
 ## Progress
 
-(none)
+- 2026-11-09: G landed in pictograph: `src/grammar.rs` (`Grammar`, `CELLS5`
+  with seed version 3 and drawing version 1, `KeyDomain::{Address, Context}`,
+  `FaceKey`, `derive_in`, `params_in`); `derive` and `params_of` route through
+  the address domain; the canvas's derived-face cache keys on `FaceKey`; the
+  crate docs state G3 and G4. The four digest fixtures pass unchanged; new
+  tests show every route to an address face gives the same bytes, two domains
+  give two faces, and a drawing bump misses the cache without moving
+  parameters.

@@ -551,9 +551,10 @@ pub struct Canvas {
     /// Theme-derived colors resolved while decoding pictograph bytes. This can change without
     /// invalidating the deterministic byte cache.
     derived_face_palette: DerivedFacePalette,
-    /// Derived IconVG bytes keyed by canonical node address. The derivation version is compiled
-    /// into pictograph's seed, so an implementation update naturally starts a fresh process cache.
-    derived_face_cache: HashMap<(u32, String), Vec<u8>>,
+    /// Derived IconVG bytes keyed by the whole face name: grammar, seed and drawing versions,
+    /// key domain and canonical node address. A version bump therefore misses the cache instead
+    /// of serving stale bytes.
+    derived_face_cache: HashMap<crate::FaceKey, Vec<u8>>,
     /// Per-node face footprint overrides (px). A node absent here takes size-by-degree
     /// (when on) or the uniform default, so this holds only explicit resizes. (P0 resize.)
     node_sizes: HashMap<uuid::Uuid, f32>,

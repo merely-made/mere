@@ -135,9 +135,9 @@ impl Canvas {
                 let side = bounds.width();
                 let file = self
                     .derived_face_cache
-                    .entry((crate::DERIVATION_VERSION, address.clone()))
-                    .or_insert_with(|| {
-                        crate::derive(address.as_bytes())
+                    .entry(crate::FaceKey::address(address))
+                    .or_insert_with_key(|face| {
+                        face.derive()
                             .expect("pictograph must encode every canonical node address")
                     });
                 let commands = crate::canvas::derived_face::commands(
