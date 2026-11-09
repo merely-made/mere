@@ -229,3 +229,175 @@ async fn a_granted_application_holds_scoped_leases_over_the_door() {
 
     server.abort();
 }
+
+/// A supervised application that holds no store serves its scope's blobs to a
+/// peer through the door (cycle breaks P2 step 3): the provider's source is a
+/// `DoorBlobSource`, the verified bytes come from the resident's store, the
+/// fetching peer checks them against the hash, and the serving rules hold:
+/// retained hashes only, readers only, and revocation cuts it.
+#[tokio::test(flavor = "multi_thread")]
+async fn an_application_without_the_store_serves_verified_streams_through_the_door() {
+    use graphshell_door::blob_door::ChunkInterval;
+    use graphshell_door::blob_door_source::DoorBlobSource;
+    use transport::{BlobHash, BlobScope, P2pandaTransport, PeerID, Transport as _};
+
+    let temp = tempfile::tempdir().unwrap();
+    let custody = ResidentBlobCustody::open(
+        &temp.path().join("data"),
+        &ResidentContentSettings {
+            gc_interval_seconds: 60,
+            ..ResidentContentSettings::default()
+        },
+    )
+    .await
+    .unwrap();
+    let door = BlobDoor::new(custody.clone());
+    let mut catalog = ResidentEndpointCatalog::new();
+    let route = door.register(&mut catalog).unwrap();
+    let grants = AppRouteGrants::new(AllowedAppRoutes::new([
+        (AppId::new("blob-fixture"), route.clone()),
+        (AppId::new("blob-intruder"), route),
+    ]));
+    let (endpoint, _socket) = socket();
+    let serving_endpoint = endpoint.clone();
+    let server = tokio::spawn(async move {
+        let _ = serve_app_broker(
+            &serving_endpoint,
+            resident_host(),
+            grants,
+            60_000,
+            None,
+            AppEndpointCatalog::new(catalog),
+        )
+        .await;
+    });
+
+    let scope = BlobScope::new(SCOPE);
+    let mut app = connect(&endpoint, "blob-fixture").await.unwrap();
+    app.bind_scope(SCOPE).await.unwrap();
+    // The serving session is its own, so a peer's download does not hold the
+    // custody calls.
+    let source = DoorBlobSource::new(connect(&endpoint, "blob-fixture").await.unwrap());
+    source.bind_scope(scope).await.unwrap();
+
+    // Bound before any put: binding a scope rebuilds serving custody from every
+    // durable lease (the restart rule), so a session bound later would retain
+    // the leased-only blob below.
+    let mut direct = connect(&endpoint, "blob-fixture").await.unwrap();
+    direct.bind_scope(SCOPE).await.unwrap();
+
+    let bytes: Vec<u8> = (0..200_000u32).map(|n| (n % 251) as u8).collect();
+    let hash = app.put(SCOPE, "fixture.evidence", b"served", &bytes).await.unwrap();
+    let leased_only = app
+        .put(SCOPE, "fixture.evidence", b"leased-only", b"leased but never retained")
+        .await
+        .unwrap();
+    let small = app.put(SCOPE, "fixture.evidence", b"small", b"a small blob").await.unwrap();
+
+    let provider = P2pandaTransport::builder_from_seed_ref(&[0xA5; 32])
+        .scoped_source(source.clone(), scope)
+        .bind()
+        .await
+        .unwrap();
+    let bob_blobs = transport::BlobStore::new();
+    let bob = P2pandaTransport::builder_from_seed_ref(&[0xB5; 32])
+        .blobs(&bob_blobs)
+        .bind()
+        .await
+        .unwrap();
+    let mallory_blobs = transport::BlobStore::new();
+    let mallory = P2pandaTransport::builder_from_seed_ref(&[0xC5; 32])
+        .blobs(&mallory_blobs)
+        .bind()
+        .await
+        .unwrap();
+    let provider_id: PeerID = provider.local_peer_id();
+    let addr = provider.endpoint_addr().await.unwrap();
+    bob.add_peer(addr.clone()).await.unwrap();
+    mallory.add_peer(addr).await.unwrap();
+
+    app.retain(SCOPE, hash).await.unwrap();
+    app.retain(SCOPE, small).await.unwrap();
+    app.allow_reader(SCOPE, bob.local_peer_id().to_bytes()).await.unwrap();
+
+    // The peer fetches a multi-leaf blob and verifies it against its hash.
+    bob_blobs
+        .fetch_from(&bob, provider_id, BlobHash::from_bytes(hash))
+        .await
+        .expect("a reader fetches a retained blob served through the door");
+    assert_eq!(
+        bob_blobs.get_bytes(BlobHash::from_bytes(hash)).await.unwrap().to_vec(),
+        bytes
+    );
+
+    // The verified read's ranges are honoured at the door itself.
+    let bob_id = bob.local_peer_id().to_bytes();
+    let mut whole = direct
+        .bao_open(SCOPE, bob_id, hash, vec![ChunkInterval { start: 0, end: None }])
+        .await
+        .unwrap();
+    let mut partial = direct
+        .bao_open(SCOPE, bob_id, hash, vec![ChunkInterval { start: 0, end: Some(1) }])
+        .await
+        .unwrap();
+    assert!(partial.total_len() < whole.total_len(), "one chunk streams less than the blob");
+    let mut got = 0u64;
+    while let Some(piece) = direct.bao_next(&mut whole).await.unwrap() {
+        got += piece.len() as u64;
+    }
+    assert_eq!(got, whole.total_len());
+    assert!(direct.bao_close(&partial).await.unwrap());
+    // Streams are sequential: a closed cursor is gone.
+    assert!(direct.bao_next(&mut partial).await.is_err());
+
+    // Held under a lease but not retained: refused, at the door and on the wire.
+    let refused = direct
+        .bao_open(SCOPE, bob_id, leased_only, vec![ChunkInterval { start: 0, end: None }])
+        .await
+        .unwrap_err();
+    assert!(refused.to_string().contains("not retained"), "{refused}");
+    assert!(
+        bob_blobs
+            .fetch_from(&bob, provider_id, BlobHash::from_bytes(leased_only))
+            .await
+            .is_err()
+    );
+    assert!(!bob_blobs.has(BlobHash::from_bytes(leased_only)).await.unwrap());
+
+    // A peer that is not a reader gets nothing.
+    assert!(
+        mallory_blobs
+            .fetch_from(&mallory, provider_id, BlobHash::from_bytes(small))
+            .await
+            .is_err()
+    );
+    assert!(!mallory_blobs.has(BlobHash::from_bytes(small)).await.unwrap());
+
+    // A scope the application does not own is not reachable at all.
+    let mut intruder = connect(&endpoint, "blob-intruder").await.unwrap();
+    assert!(
+        intruder
+            .bao_open(SCOPE, bob_id, hash, vec![ChunkInterval { start: 0, end: None }])
+            .await
+            .is_err()
+    );
+
+    // Taking the reader away cuts serving at once, without the child's help.
+    app.deny_reader(SCOPE, bob_id).await.unwrap();
+    let after_deny = transport::BlobStore::new();
+    assert!(after_deny.fetch_from(&bob, provider_id, BlobHash::from_bytes(small)).await.is_err());
+    assert!(!after_deny.has(BlobHash::from_bytes(small)).await.unwrap());
+    app.allow_reader(SCOPE, bob_id).await.unwrap();
+
+    // Revocation cuts the session: the child's source answers nothing more.
+    door.revoke("blob-fixture").await.unwrap();
+    let after_revoke = transport::BlobStore::new();
+    assert!(after_revoke.fetch_from(&bob, provider_id, BlobHash::from_bytes(small)).await.is_err());
+    assert!(!after_revoke.has(BlobHash::from_bytes(small)).await.unwrap());
+    assert!(
+        custody.blobs().has(BlobHash::from_bytes(small)).await.unwrap(),
+        "revocation leaves the custody data"
+    );
+
+    server.abort();
+}

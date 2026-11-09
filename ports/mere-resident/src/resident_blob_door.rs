@@ -18,7 +18,7 @@
 //! Revocation ([`BlobDoor::revoke`]) cuts live sessions and withdraws serving
 //! authority; leases and ownership stay, since custody data is never deleted.
 
-use std::collections::{BTreeSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -33,8 +33,8 @@ use chirograph::{
 };
 use graphshell_door::blob_door::{
     BLOB_CALL_INTENT, BLOB_CUSTODY_ROUTE, BlobLedger, BlobOp, BlobOutcome, BlobRequest,
-    CallOutcome, LEDGER_OUTCOMES, MAX_PART_BYTES, MAX_UPLOAD_BYTES, MigrationState, ScopeLedger,
-    hex32, parse_hex, parse_hex32,
+    CallOutcome, LEDGER_OUTCOMES, MAX_BAO_CURSORS, MAX_PART_BYTES,
+    MAX_UPLOAD_BYTES, MigrationState, ScopeLedger, hex32, parse_hex, parse_hex32,
 };
 use graphshell_host::endpoint_catalog::{
     ResidentEndpoint, ResidentEndpointCatalog, ResidentEndpointCatalogError,
@@ -45,6 +45,7 @@ use sceno::{
     SourceRef, Transform2,
 };
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
+use transport::blob_source::{BaoReader, BlobSource, StoreBlobSource, intervals_to_chunk_ranges};
 use transport::{BlobHash, BlobLease, BlobScope};
 
 use crate::resident_blobs::{LegacyBlobMigration, ResidentBlobCustody};
@@ -123,11 +124,25 @@ struct Upload {
     bytes: Vec<u8>,
 }
 
+/// One open verified read: the store's `export_bao` for one request, read in
+/// order. Authorization is re-asked at every chunk.
+struct BaoCursor {
+    scope: BlobScope,
+    peer: [u8; 32],
+    hash: BlobHash,
+    reader: Box<dyn BaoReader>,
+    position: u64,
+    total: u64,
+    pending: Vec<u8>,
+}
+
 struct BlobEndpoint {
     door: BlobDoor,
     app: String,
     outcomes: VecDeque<CallOutcome>,
     upload: Option<Upload>,
+    streams: BTreeMap<[u8; 32], BaoCursor>,
+    bao_serial: u64,
     /// The card and ledger bytes of the last snapshot, so the resources it
     /// names stay servable while calls move the ledger.
     current: Option<(Vec<u8>, Vec<u8>)>,
@@ -165,6 +180,8 @@ impl BlobEndpoint {
             app,
             outcomes: VecDeque::new(),
             upload: None,
+            streams: BTreeMap::new(),
+            bao_serial: 0,
             current: None,
         }
     }
@@ -369,6 +386,81 @@ impl BlobEndpoint {
                     value: readers.allows(scope, &peer_of(&peer)?, hash_of(&hash)?),
                 })
             },
+            BlobOp::BaoOpen {
+                scope,
+                peer,
+                hash,
+                ranges,
+            } => {
+                let scope = self.owned(&scope)?;
+                let peer = peer_of(&peer)?;
+                let hash = hash_of(&hash)?;
+                if self.streams.len() >= MAX_BAO_CURSORS {
+                    return Err(format!(
+                        "at most {MAX_BAO_CURSORS} verified reads may be open: bao-close one first"
+                    ));
+                }
+                // Leased in the scope, and retained for this reader: the
+                // two rules that decide serving.
+                let leased = run(blobs.leased_hashes(scope)).map_err(|error| error.to_string())?;
+                if !leased.contains(&hash) {
+                    return Err("the scope holds no lease on that hash".into());
+                }
+                if !readers.allows(scope, &peer, hash) {
+                    return Err("that hash is not retained for that peer in this scope".into());
+                }
+                let intervals: Vec<(u64, Option<u64>)> =
+                    ranges.iter().map(|range| (range.start, range.end)).collect();
+                let chunks = intervals_to_chunk_ranges(&intervals)?;
+                let source = StoreBlobSource::new(&blobs, readers.clone());
+                // One counting pass fixes the stream's length, so the carrier's
+                // chunk assembly can run over it.
+                let total = run(async {
+                    let mut counted = source.export_bao(scope, &peer, hash, chunks.clone()).await?;
+                    let mut total = 0u64;
+                    while let Some(piece) = counted.next().await? {
+                        total += piece.len() as u64;
+                    }
+                    Ok::<_, std::io::Error>(total)
+                })
+                .map_err(|error| format!("could not read the blob: {error}"))?;
+                let reader = run(source.export_bao(scope, &peer, hash, chunks))
+                    .map_err(|error| format!("could not read the blob: {error}"))?;
+                self.bao_serial += 1;
+                let mut label = Vec::new();
+                label.extend_from_slice(b"mere.blob-custody/bao-v1");
+                label.extend_from_slice(&scope.to_bytes());
+                label.extend_from_slice(&peer);
+                label.extend_from_slice(hash.as_bytes());
+                label.extend_from_slice(&self.bao_serial.to_le_bytes());
+                for (start, end) in &intervals {
+                    label.extend_from_slice(&start.to_le_bytes());
+                    label.extend_from_slice(&end.unwrap_or(u64::MAX).to_le_bytes());
+                }
+                let resource = *ContentHash::of(&label).as_bytes();
+                self.streams.insert(
+                    resource,
+                    BaoCursor {
+                        scope,
+                        peer,
+                        hash,
+                        reader,
+                        position: 0,
+                        total,
+                        pending: Vec::new(),
+                    },
+                );
+                Ok(BlobOutcome::Bao {
+                    resource: hex32(&resource),
+                    total_len: total,
+                })
+            },
+            BlobOp::BaoClose { resource } => {
+                let key = parse_hex32(&resource).map_err(|error| format!("resource: {error}"))?;
+                Ok(BlobOutcome::Bool {
+                    value: self.streams.remove(&key).is_some(),
+                })
+            },
             BlobOp::MigrateLegacy {
                 scope,
                 namespace,
@@ -435,6 +527,61 @@ impl BlobEndpoint {
             app: self.app.clone(),
             outcomes: self.outcomes.iter().cloned().collect(),
             scopes,
+        })
+    }
+
+    /// The next piece of an open verified read. The application must still be
+    /// live and the authorizer must still allow `(scope, peer, hash)`, so
+    /// revocation, an unretained hash and a removed reader all stop a stream
+    /// at its next chunk.
+    fn bao_chunk(&mut self, request: ResourceChunkRequest) -> Result<ResourceChunkResponse, String> {
+        let key = *request.resource.as_bytes();
+        let readers = self.door.custody.authorizer();
+        let cursor = self
+            .streams
+            .get_mut(&key)
+            .ok_or_else(|| "no such verified read".to_string())?;
+        if !readers.allows(cursor.scope, &cursor.peer, cursor.hash) {
+            self.streams.remove(&key);
+            return Err("serving of that hash to that peer is withdrawn".into());
+        }
+        if request.offset != cursor.position {
+            return Err(format!(
+                "a verified read is sequential: it is at {}, not {}",
+                cursor.position, request.offset
+            ));
+        }
+        let remaining = cursor.total - cursor.position;
+        let want = (if request.length == 0 {
+            MAX_RESOURCE_CHUNK_BYTES
+        } else {
+            request.length.min(MAX_RESOURCE_CHUNK_BYTES)
+        } as u64)
+            .min(remaining) as usize;
+        while cursor.pending.len() < want {
+            match run(cursor.reader.next()).map_err(|error| error.to_string())? {
+                Some(piece) => cursor.pending.extend_from_slice(&piece),
+                None => break,
+            }
+        }
+        if cursor.pending.len() < want {
+            self.streams.remove(&key);
+            return Err("the verified read ended before its declared length".into());
+        }
+        let bytes: Vec<u8> = cursor.pending.drain(..want).collect();
+        let offset = cursor.position;
+        cursor.position += bytes.len() as u64;
+        let total = cursor.total;
+        if cursor.position >= total {
+            self.streams.remove(&key);
+        }
+        Ok(ResourceChunkResponse {
+            session: Self::session(),
+            resource: request.resource,
+            offset,
+            total_len: total,
+            chunk: ContentHash::of(&bytes),
+            bytes: base64::engine::general_purpose::STANDARD.encode(&bytes),
         })
     }
 
@@ -550,6 +697,9 @@ impl ResidentEndpoint for BlobEndpoint {
                 }
             }
         }
+        if self.streams.contains_key(request.resource.as_bytes()) {
+            return Err("a verified read is read in chunks, in order".into());
+        }
         let hash = BlobHash::from_bytes(*request.resource.as_bytes());
         if !self.leased_anywhere(hash)? {
             return Err("that resource is neither in the ledger nor leased in a scope you hold".into());
@@ -587,6 +737,9 @@ impl ResidentEndpoint for BlobEndpoint {
                     ));
                 }
             }
+        }
+        if self.streams.contains_key(request.resource.as_bytes()) {
+            return self.bao_chunk(request);
         }
         let hash = BlobHash::from_bytes(*request.resource.as_bytes());
         if !self.leased_anywhere(hash)? {

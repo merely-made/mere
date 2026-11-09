@@ -17,6 +17,9 @@ projection-door = ["dep:ostiary", "ostiary/native", "dep:serde_json", "dep:tokio
 projection-offer = ["dep:ostiary", "dep:serde", "dep:serde_json"]
 # The client and wire of the resident's blob custody route (cycle breaks P2a).
 blob-door = ["projection-door", "dep:serde", "dep:sceno"]
+# `DoorBlobSource`: a Murm `BlobSource` over a blob door session, so a supervised
+# application that holds no store serves verified streams (cycle breaks P2 step 3).
+blob-serve = ["blob-door", "dep:transport", "dep:async-trait", "dep:bytes"]
 # The native runner for a projection offer.
 projection-provider = ["projection-offer", "ostiary/native", "dep:tokio"]
 # The Graphshell application's identity: the persona in use, as djinn releases it.
@@ -29,6 +32,9 @@ serde = { workspace = true, optional = true }
 sceno = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 ostiary = { workspace = true, optional = true }
+transport = { workspace = true, optional = true }
+async-trait = { version = "0.1", optional = true }
+bytes = { version = "1", optional = true }
 castellan-client = { workspace = true, optional = true }
 
 [target.'cfg(all(not(target_arch = "wasm32"), any(unix, windows)))'.dependencies]

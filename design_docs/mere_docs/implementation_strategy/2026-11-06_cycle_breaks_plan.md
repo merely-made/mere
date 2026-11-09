@@ -583,6 +583,25 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
 
   Links: area stack · draws on stack.3 · summary Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed.
 
+- **D24. Declared authority stays a pending slot until M4 (Mark, 2026-11-08):** "(A) Pending slot until M4",
+  on the P2 findings' step (2) question. `Authority::Declared` stays a typed slot that refuses as "pending: no
+  authority installed"; no interpreter, no extension trait and no delivery path are built before M4 (the
+  replicated `notes` mere), its first resident-side consumer. Knot's `KnotSyncPolicy` keeps running inside
+  Knot's own sync host. P2 step (2) is therefore done by this ruling: the slot and its test
+  (`guest_and_declared_validators_refuse_every_candidate_as_pending`) exist, and its doc comment says so.
+  Outcome: settles the P2 findings' step (2) question as option A.
+
+  Links: area stack · draws on cycle-breaks D1, D15 · plans cycle-breaks P2 · summary Authority::Declared stays a typed pending slot until M4; no interpreter is built.
+
+- **D25. Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08):**
+  "(2) Transport change", on the P2 findings' step (3) question. Murm's scoped blob provider takes a source
+  trait (`BlobSource`) instead of a store; the blob door route gains a verified read so a child that holds no store
+  serves iroh-blobs-compatible verified streams sourced from the resident. Knot's evidence reference and dial
+  hints are unchanged. Design in the domain contract, "Serving through the door".
+  Outcome: settles the P2 findings' step (3) question as option 2.
+
+  Links: area stack · draws on cycle-breaks D15 (i), domain-contract blob door route · plans cycle-breaks P2 · summary The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store.
+
 ## Findings
 
 Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other repositories'

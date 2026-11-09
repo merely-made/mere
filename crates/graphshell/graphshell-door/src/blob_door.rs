@@ -21,7 +21,8 @@
 
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, ContentHash, IntentInvocation, IntentResult,
-    PortableCardV1, ProjectionRequest, ProjectionSession, Revision, SceneEpoch,
+    PortableCardV1, ProjectionRequest, ProjectionSession, ResourceChunkRequest, Revision,
+    SceneEpoch, MAX_RESOURCE_CHUNK_BYTES,
 };
 use ostiary::app_admission::{AppId, AppRouteId};
 use ostiary::app_client::AppClientError;
@@ -40,6 +41,17 @@ pub const MAX_PART_BYTES: usize = 64 * 1024;
 pub const MAX_UPLOAD_BYTES: u64 = 256 * 1024 * 1024;
 /// How many call outcomes the ledger keeps.
 pub const LEDGER_OUTCOMES: usize = 64;
+/// How many verified-read cursors one session may hold open.
+pub const MAX_BAO_CURSORS: usize = 4;
+
+/// A range of chunks (1 KiB units) of a blob, `end` absent for open to the
+/// end: the wire form of iroh's `ChunkRanges`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ChunkInterval {
+    pub start: u64,
+    pub end: Option<u64>,
+}
 
 /// One call: `call` is the caller's own number, unique within the session.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -104,6 +116,19 @@ pub enum BlobOp {
         peer: String,
         hash: String,
     },
+    /// Open a verified read: the iroh-blobs response bytes for `ranges` of
+    /// `hash`, for `peer`, from `scope`. Refused unless the scope holds a lease
+    /// on the hash and the authorizer allows `(scope, peer, hash)`. Answers
+    /// [`BlobOutcome::Bao`]; the bytes are the resource it names, read in
+    /// order.
+    BaoOpen {
+        scope: String,
+        peer: String,
+        hash: String,
+        ranges: Vec<ChunkInterval>,
+    },
+    /// Drop a verified-read cursor. Answers [`BlobOutcome::Bool`].
+    BaoClose { resource: String },
     /// Copy an old per-lane blob store, read-only, under verified leases
     /// named `namespace` (which must begin `legacy.`). Answers
     /// [`BlobOutcome::Migration`].
@@ -124,6 +149,8 @@ pub enum BlobOutcome {
     MaybeHash { hash: Option<String> },
     Bool { value: bool },
     Migration { state: MigrationState, blobs: u64 },
+    /// A verified read is open: read `total_len` bytes at `resource` in order.
+    Bao { resource: String, total_len: u64 },
     Refused { reason: String },
 }
 
@@ -224,6 +251,20 @@ impl std::error::Error for BlobDoorError {}
 impl From<AppClientError> for BlobDoorError {
     fn from(error: AppClientError) -> Self {
         Self::Door(error)
+    }
+}
+
+/// An open verified read: where it is and how long it is.
+#[derive(Clone, Debug)]
+pub struct BaoRead {
+    resource: ContentHash,
+    total_len: u64,
+    position: u64,
+}
+
+impl BaoRead {
+    pub fn total_len(&self) -> u64 {
+        self.total_len
     }
 }
 
@@ -530,6 +571,83 @@ impl BlobDoorClient {
             BlobOutcome::Migration { state, blobs } => Ok((state, blobs)),
             other => Err(unexpected("a migration", &other)),
         }
+    }
+
+    /// Open a verified read of `ranges` of `hash` for `peer` in `scope`.
+    pub async fn bao_open(
+        &mut self,
+        scope: [u8; 32],
+        peer: [u8; 32],
+        hash: [u8; 32],
+        ranges: Vec<ChunkInterval>,
+    ) -> Result<BaoRead, BlobDoorError> {
+        match self
+            .call(BlobOp::BaoOpen {
+                scope: hex32(&scope),
+                peer: hex32(&peer),
+                hash: hex32(&hash),
+                ranges,
+            })
+            .await?
+        {
+            BlobOutcome::Bao {
+                resource,
+                total_len,
+            } => Ok(BaoRead {
+                resource: ContentHash(parse_hex32(&resource).map_err(BlobDoorError::Unexpected)?),
+                total_len,
+                position: 0,
+            }),
+            other => Err(unexpected("a verified read", &other)),
+        }
+    }
+
+    /// The next piece of an open verified read, or `None` when it is complete.
+    /// Pieces arrive in order; the chunk's hash is checked by the carrier.
+    pub async fn bao_next(&mut self, read: &mut BaoRead) -> Result<Option<Vec<u8>>, BlobDoorError> {
+        if read.position >= read.total_len {
+            return Ok(None);
+        }
+        let body = self
+            .client
+            .request_body(CarrierRequestBody::ResourceChunk(ResourceChunkRequest {
+                session: self.session(),
+                resource: read.resource,
+                offset: read.position,
+                length: MAX_RESOURCE_CHUNK_BYTES,
+            }))
+            .await?;
+        let CarrierResponseBody::ResourceChunk(chunk) = body else {
+            return Err(BlobDoorError::Unexpected(format!(
+                "a resource chunk was answered with {body:?}"
+            )));
+        };
+        if chunk.resource != read.resource
+            || chunk.offset != read.position
+            || chunk.total_len != read.total_len
+        {
+            return Err(BlobDoorError::Unexpected(
+                "the verified read answered out of order".into(),
+            ));
+        }
+        let bytes = chunk
+            .decode()
+            .ok_or_else(|| BlobDoorError::Unexpected("a chunk failed its hash".into()))?;
+        if bytes.is_empty() {
+            return Err(BlobDoorError::Unexpected(
+                "the verified read made no progress".into(),
+            ));
+        }
+        read.position += bytes.len() as u64;
+        Ok(Some(bytes))
+    }
+
+    /// Drop an open verified read.
+    pub async fn bao_close(&mut self, read: &BaoRead) -> Result<bool, BlobDoorError> {
+        self.boolean(BlobOp::BaoClose {
+            resource: hex32(read.resource.as_bytes()),
+        })
+        .await
     }
 
     /// Read a blob leased in a scope this application owns, whole, verified
