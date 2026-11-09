@@ -119,7 +119,7 @@ grows out of `incipit` and takes its name (D8: surfaces, trails, arrangements, b
 resource references by UUIDv5; the graph and session ids stay reachable behind a minimal
 default feature so Cleromancy and Fleece keep depending on ids alone),
 the `mere` facade's navigation, trail and roster logic (its visual and workbench APIs to the
-view and composition crates; no new facade), `mere-cartography`, `pictograph`, `mere-forme`
+view and composition crates; no new facade), `mere-cartography` (not `pictograph`, which goes to the emblem repository under iconography D1), `mere-forme`
 (merged into `incipit` as `incipit::forme`, P0 done),
 `mere-curation` (merged into `incipit`, P0 done), `platen`, `uxtree`, the Cambium family (`meristem`, `cambium`,
 `cambium-rootstock`, `cambium-winit`, `cambium-a11y`, `cambium-desktop`, `cambium-web`,
@@ -499,8 +499,8 @@ Three repositories fold into their consumers (none has yet, 2026-11-08), each as
 with history preserved as the 2026-10-19 promotion did. `smolweb` (the protocol family: the repository is `merely-made/errand`, holding
 `errand`, `gemini-protocol`, `gopher-protocol`, `misfin` and ten more crates; no repository is named smolweb) into Inker with P1, since
 `nematic` and `inker` are its consumers; `misfin` is the exception to check, since
-`mere-comms` is its other consumer and Murm may be its home. `emblem` (IconVG) into
-Graphshell with P3, since `pictograph` is its only consumer. `wavicle` (WavPack) into
+`mere-comms` is its other consumer and Murm may be its home. `emblem` (IconVG) no longer folds: iconography D1 (2026-11-09) keeps it as its own
+repository and moves `pictograph` (faces only, after D13) into it, because faces gained consumers below Graphshell. `wavicle` (WavPack) into
 Woodshed, its only consumer, on Woodshed's own schedule. The four `wgpu-*` repositories
 stay (D7, D21), with Inker recorded as the owner of scrying and welding. Inside each wgpu
 repository the audit's folds apply: the `grafting-servo` rename finished,
@@ -508,7 +508,7 @@ the scry and weld demo crates folded, the three `keyutils.rs` copies deduplicate
 - Done when: each folded repository is archived with a pointer to its new home; its crates
   publish from the receiver under their existing names; every consumer resolves them from
   one source; the family's repository count is recorded.
-- Needs: P1 for smolweb, P3 for emblem; nothing in this plan for wavicle.
+- Needs: P1 for smolweb; nothing in this plan for wavicle. Emblem left this section under iconography D1.
 
 ### P8. Cutover and the engine-to-workspace contract
 

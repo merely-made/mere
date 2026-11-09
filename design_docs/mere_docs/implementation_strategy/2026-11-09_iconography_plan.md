@@ -1,8 +1,9 @@
 # Iconography Plan: More Faces and Uses for Emblem and Pictograph
 
 **Date:** 2026-11-09
-**Status:** plan (2026-11-09). Nothing built. Two questions are open with Mark
-(Decisions, Q1 and Q2); every other fork carries a provisional recommendation.
+**Status:** plan (2026-11-09). Nothing built. D1 (emblem's repository hosts the
+faces crate) and D2 (identity and drawing version separately) ruled 2026-11-09;
+every other fork carries a provisional recommendation.
 
 **For:** Mark, 2026-11-09: "Let's consider additional faces/uses of
 emblem/pictograph?" Offered kinship faces with blazon, a text-height arm with
@@ -35,8 +36,9 @@ Receipts go to `archive_docs/receipts/2026-11-09_iconography_plan_receipts.md`.
   cached by `(DERIVATION_VERSION, address)` (`canvas/frame.rs:130-150`).
 - **Engine split.** D13: pictograph shrinks to faces (about 4.4k lines) when
   the canvas leaves as `mere-cartography`; P3 moves both to Graphshell. D7:
-  emblem folds into Graphshell "since `pictograph` is its only consumer".
-  Several directions here add consumers outside Graphshell; see Q1.
+  emblem was to fold into Graphshell "since `pictograph` is its only consumer".
+  D1 below replaces that for emblem: the directions here add consumers below
+  Graphshell, so emblem stays its own repository and pictograph joins it.
 - The derived faces plan
   (`archive_docs/2026-10-06_completed_plans/2026-08-28_derived_faces_plan.md`)
   still governs: palette slots only (§2), a version bump is a dated decision
@@ -52,7 +54,7 @@ These bind each direction below.
   `cells5`; `derive(address)` keeps today's seed exactly, so no current face
   changes. New grammars (`heraldic`, the backdrop's `wash`) version themselves
   and never touch `DERIVATION_VERSION`.
-- **G2. Identity and drawing version separately** (provisional; Q2). The seed
+- **G2. Identity and drawing version separately** (D2). The seed
   version decides *what* a face is (its `Params`); a drawing version per grammar
   decides *how* the arms draw it, and enters the cache key and the digest
   fixtures but not the seed. Adding an arm (direction T) then changes bytes
@@ -316,6 +318,11 @@ because F, T and B all name grammars and versions.
   the four existing digest fixtures pass unchanged; a test shows two key domains
   with the same key bytes derive different faces; the G3 and G4 statements are
   in pictograph's crate docs.
+- **H. Home (D1).** Runs with engine-split P3, when D13 leaves pictograph as
+  faces only. Done when: `pictograph` builds as a member of the emblem
+  repository with its history; its consumers name that repository with
+  `branch = "main"`; it depends on no Graphshell or Mere crate; the mere copy is
+  removed.
 - **F1. Blazon.** Done when: the `Blazon` types exist and no field can hold a
   colour; `Display` and `parse` round-trip over thousands of generated blazons;
   malformed text returns a typed error and never panics.
@@ -335,7 +342,7 @@ because F, T and B all name grammars and versions.
 - **T1. Three arms.** Done when: a test walks heights 0 to 200 in half-pixel
   steps and finds exactly one arm drawing at each; every (form, symmetry) pair
   gives a distinct text-arm path set; only palette entries appear; goldens move
-  by the version rule Q2 settles; every face stays under the 512-byte cap.
+  by the drawing version (D2) while every `Params` stays unchanged; every face stays under the 512-byte cap.
 - **T2. Contrast-safe text palette.** Done when: a palette built from a
   background meets 3:1 for every entry with hue preserved, tested against the
   light and dark grounds and their hover and selection colours.
@@ -383,19 +390,27 @@ because F, T and B all name grammars and versions.
 
 ## Decisions
 
-Open with Mark:
+- **D1. Emblem's repository hosts the faces crate (Mark, 2026-11-09):** asked
+  where emblem and pictograph live once faces have consumers below Graphshell
+  (inline faces in Inker and genet text, release faces on Mere's HTTP pages, SVG
+  for merelyllc.com), with family rows as git dependencies: "Emblem repo hosts
+  both (Recommended)". emblem stays its own repository; `pictograph`, faces only
+  after engine-split D13, moves into it as a second crate, below every consumer.
+  The canvas still leaves as `mere-cartography` for Graphshell. Outcome: amends
+  engine-split D7 for emblem (the family keeps one more repository than D7
+  counted); the engine-split plan's C section and Graphshell list were edited
+  the same day.
 
-- **Q1. Where emblem and the faces crate live, given the new consumers.**
-  Engine-split D7 folds emblem into Graphshell because pictograph was its only
-  consumer, and D13 with P3 moves pictograph there too. This plan adds consumers
-  below Graphshell: inline faces in Inker's and genet's text, release faces and
-  their HTTP pages in Mere, and SVG for merelyllc.com. Graphshell code cannot be
-  a dependency of its own suppliers. Bears on engine-split D7; outcome pending
-  (contradicts or applies).
-- **Q2. Re-roll every face for a drawing change, or split identity from
-  drawing (G2).** The text arm changes every face's bytes. Bumping
-  `DERIVATION_VERSION`, as v2 to v3 did, also re-seeds every node's colours and
-  shape; a separate drawing version keeps identities and moves only bytes.
+  Links: area The stack · amends engine-split D7 · draws on engine-split D13 · plans iconography G · summary emblem stays its own repository and takes pictograph's faces crate, because faces have consumers below Graphshell.
+
+- **D2. Identity and drawing version separately (Mark, 2026-11-09):** asked how
+  to version the text-height arm, since bumping `DERIVATION_VERSION` re-seeds
+  every node's colours and shape: "Split identity/drawing (Recommended)". The
+  seed version stays at 3 and decides what a face is; each grammar's drawing
+  version moves bytes, the cache key and the digest fixtures only. Outcome: new;
+  refines the derived faces plan §5, whose single version covered both.
+
+  Links: area Faces · draws on derived-faces §5 · plans iconography G, iconography T1 · summary A face's seed version decides its identity; a separate drawing version per grammar moves only its bytes.
 
 Provisional (recommended first; asked only if they become blocking):
 
