@@ -1396,6 +1396,18 @@ revision and what crosses at frame rate.
 - 2026-11-07: the 2026-06-18 benchmark measured a `Vec<Quad>` proxy at about 11x memory, 19x
   load and 18x mutation against petgraph truth with an identical hot path, because both used
   the same runtime index. The measurement, not the arena, carries forward.
+- 2026-11-09, P3 slice 1 (branch `es/p3-slice1` in Mere, Graphshell, Eidetic, Turnstone, Knot and
+  Isocosm; D35 to D40; receipts in the receipt file): the slice closes. Nothing staying in Mere names
+  what left, and the Mere lock only loses packages: 125 removed, none added, no version moved.
+  `pelt-core` did not close, because `ports/graphshell` names it (optional, `retained-content`), so it
+  stays. The five host crates (34,127 lines) run 296 tests in Graphshell's `host/`, the same count
+  and results as in Mere at `e9e9b0aec`, including one failure that already fails there:
+  `tabard-workshop`'s `release_accessibility_focus_click_and_numeric_value_keep_separate_authority`.
+  Three of the crates read fixtures owned by crates that stay in Mere: Pelt's `examples/`, a Cambium
+  example font and a Scenomise map. They were copied with history to the same subpaths under `host/`,
+  so no test changed. Under D35 the checker drops `murm/apps/signalman-desktop`'s D17 isolation as
+  stale, because that root is now its own node. Counting path rows as well would surface Murm's root
+  and `native/` workspaces naming each other by path, so the checker counts git rows only.
 
 ## Progress
 

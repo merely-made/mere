@@ -26,9 +26,3 @@ from = "inker"
 to = "mere"
 decision = "D19"
 reason = "fleece's optional linked-data row (engine-split F3); mere-rdf names inker, so Inker cannot name the engine until engine-split P5. Leaves with P5."
-
-# D17 (Mark, 2026-11-06): the one isolated Murm root.
-[[isolated]]
-root = "murm/apps/signalman-desktop"
-decision = "D17"
-reason = "its own [workspace] root, excluded from Murm's, so neither lock holds the other; the source homes map's pattern for keeping a lock free of Mere."

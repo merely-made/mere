@@ -13,8 +13,6 @@ Cargo.lock
 !/crates/script/block-host/guest/Cargo.lock
 !/crates/script/authority-host/guest/Cargo.lock
 !/ports/moot/examples/capsule-library/guest/Cargo.lock
-!/crates/script/document-host/guest/Cargo.lock
-!/crates/script/document-host/guest-bomb/Cargo.lock
 # The browser viewer's standalone workspace: a host builds the plain viewer
 # with `--locked` from this lock (mer3ly site canvas plan, Ruling 157).
 !/ports/graphshell/web/Cargo.lock

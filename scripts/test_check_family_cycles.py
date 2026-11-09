@@ -8,6 +8,7 @@
 import contextlib
 import importlib.util
 import io
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -182,6 +183,49 @@ class FamilyCycleTests(unittest.TestCase):
         self.assertIn("warning resolved cycle inside a/Cargo.lock", out)
         code, _ = self.run_check("--strict-locks")
         self.assertEqual(code, 1)
+
+    def two_root_graphshell(self, mere_names):
+        """Graphshell's contract root at the top and a hosting root in host/ (D35, D37)."""
+        def write(rel, text):
+            path = self.family / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        write("graphshell/Cargo.toml", '[workspace]\nmembers = ["crates/hest"]\nexclude = ["host"]\n')
+        write("graphshell/crates/hest/Cargo.toml", '[package]\nname = "hest"\nversion = "0.2.1"\n')
+        write("graphshell/host/Cargo.toml",
+              '[workspace]\nmembers = ["crates/cambium"]\n[workspace.dependencies]\n'
+              f'kernel = {{ package = "mere-kernel", git = "{url("mere")}", branch = "main" }}\n'
+              'hest = { path = "../crates/hest" }\n')
+        write("graphshell/host/crates/cambium/Cargo.toml",
+              '[package]\nname = "cambium"\nversion = "0.6.1"\n'
+              '[dependencies]\nkernel = { workspace = true }\nhest = { workspace = true }\n')
+        write("mere/Cargo.toml",
+              '[package]\nname = "mere-kernel"\nversion = "0.0.3"\n[dependencies]\n'
+              f'{mere_names} = {{ git = "{url("graphshell")}", branch = "main" }}\n')
+
+    def test_each_workspace_root_is_a_node(self):
+        # Mere names the contract root and the host names Mere. By repository that was
+        # graphshell <-> mere; by root (D35) there is no cycle. The host's path row to the
+        # contract root is not an edge: only git rows are.
+        self.two_root_graphshell("hest")
+        code, out = self.run_check("--json")
+        self.assertEqual(code, 0, out)
+        found = json.loads(out)
+        pairs = {(e["from"], e["to"]) for e in found["edges"]}
+        self.assertEqual(pairs, {("graphshell/host", "mere"), ("mere", "graphshell")})
+        self.assertEqual(found["strict"], [])
+
+    def test_a_host_package_named_from_below_is_a_cycle(self):
+        self.two_root_graphshell("cambium")
+        code, out = self.run_check()
+        self.assertEqual(code, 1, out)
+        self.assertIn("graphshell/host -> mere -> graphshell/host", out)
+
+    def test_a_repository_entry_covers_its_roots(self):
+        self.two_root_graphshell("cambium")
+        self.allow('[[edge]]\nfrom = "mere"\nto = "graphshell"\ndecision = "D1"\nreason = "ruled"\n')
+        code, out = self.run_check()
+        self.assertEqual(code, 0, out)
 
     def test_pair_witness_is_shortest_cycle(self):
         found = checker.witnesses({("a", "b"), ("b", "a"), ("b", "c"), ("c", "a")})

@@ -14,17 +14,20 @@ producers, never the reverse".
 
 Two scopes:
 
-* Family-wide, from Cargo manifests. Every `git = "https://github.com/merely-made/<repo>"`
-  dependency row (dependencies, build-dependencies, dev-dependencies, target tables and
-  `workspace = true` inheritance) is an edge `owner repo -> <repo>` tagged normal, build or
-  dev. Optional rows count (the all-feature graph, which is what a cycle costs). Normal and
-  build cycles fail. Dev-only cycles also fail (D6, "Count them"); `--dev-warn` lists them
+* Family-wide, from Cargo manifests. The nodes are workspace roots (D35, "Each root is a
+  node"): a manifest belongs to the deepest `[workspace]` directory above it, by path
+  prefix, and a repository with one root is one node named after it. Every
+  `git = "https://github.com/merely-made/<repo>"` dependency row (dependencies,
+  build-dependencies, dev-dependencies, target tables and `workspace = true` inheritance)
+  is an edge `owner root -> root holding the named package` tagged normal, build or dev. Optional
+  rows count (the all-feature graph, which is what a cycle costs). Normal and build
+  cycles fail. Dev-only cycles also fail (D6, "Count them"); `--dev-warn` lists them
   as warnings instead.
 * Per lock root, from Cargo.lock. Each lock is one resolved graph; a repository cycle inside
   one lock fails (a lock cannot tell dev from normal edges, so it counts them all).
 
-`support/family-cycles/allowed.toml` lists the ruled back edges (a directed repository pair)
-and isolated roots (by path), each citing a decision. The graph is checked with those left
+`support/family-cycles/allowed.toml` lists the ruled back edges (a directed pair of
+repositories, covering every root pair between them, or of root nodes) and isolated roots (by path), each citing a decision. The graph is checked with those left
 out: any cycle that remains fails, and an entry that sits on no cycle fails too, so the list
 only shrinks.
 
@@ -55,6 +58,8 @@ except ImportError:  # Python before 3.11
         except ImportError:
             sys.exit("check_family_cycles.py needs Python 3.11+ (tomllib) or the tomli package")
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from family_roots import Roots, repo_of_node  # noqa: E402  (D35 workspace-root logic)
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_ALLOWLIST = ROOT / "support/family-cycles/allowed.toml"
@@ -202,8 +207,10 @@ def scan_repo(name, repo_path):
     return manifests
 
 
-def manifest_edges(name, manifests):
-    """Cross-repository edges of one repository, from its manifests."""
+def manifest_edges(name, manifests, roots):
+    """Edges between workspace-root nodes, from one repository's git rows: a row naming a
+    family repository is an edge from the manifest's root to the root that holds the named
+    package, which may be another root of the same repository. Path rows are not edges."""
     workspace_deps = {}
     for relative, data, _ in manifests:
         table = (data.get("workspace") or {}).get("dependencies")
@@ -221,6 +228,7 @@ def manifest_edges(name, manifests):
 
     edges = []
     for relative, data, text in manifests:
+        source = roots.node(name, os.path.dirname(relative))
         for kind, table, deps in dep_tables(data):
             for dep_name, spec in deps.items():
                 if not isinstance(spec, dict):
@@ -229,11 +237,14 @@ def manifest_edges(name, manifests):
                 if spec.get("workspace"):
                     base = inherited(relative, dep_name)
                     spec = base if isinstance(base, dict) else {}
-                target = repo_of_url(spec.get("git", ""))
-                if target is None or target == name:
+                target_repo = repo_of_url(spec.get("git", ""))
+                if target_repo is None:
+                    continue
+                target = roots.of_package(target_repo, spec.get("package", dep_name))
+                if target == source:
                     continue
                 edges.append({
-                    "from": name, "to": target, "kind": kind, "optional": optional,
+                    "from": source, "to": target, "kind": kind, "optional": optional,
                     "manifest": f"{name}/{relative}", "dep": dep_name,
                     "line": line_of(text, dep_name, table.split(".")[-1]),
                 })
@@ -250,8 +261,8 @@ def lock_roots(repo_path):
     ]
 
 
-def lock_edges(name, repo_path, relative_lock):
-    """Repository-level edges inside one lock: [(from, to, package, dependency)]."""
+def lock_edges(name, repo_path, relative_lock, roots):
+    """Root-level edges inside one lock: [(from, to, package, dependency)]."""
     data = load_toml(repo_path / relative_lock)
     if data is None:
         return None
@@ -260,9 +271,10 @@ def lock_edges(name, repo_path, relative_lock):
     def owner(package):
         source = package.get("source")
         if source is None:
-            return name
+            return roots.of_package(name, package["name"])
         if source.startswith("git+"):
-            return repo_of_url(source)
+            repo = repo_of_url(source)
+            return None if repo is None else roots.of_package(repo, package["name"])
         return None
 
     by_name = {}
@@ -391,10 +403,12 @@ def analyse(repos, allowlist, dev_warn=False):
     """Scan the repositories and judge the graphs against the allowlist."""
     edges = []
     locks = {}
+    scanned = {name: scan_repo(name, path) for name, path in sorted(repos.items())}
+    roots = Roots(scanned)
     for name, path in sorted(repos.items()):
-        edges.extend(manifest_edges(name, scan_repo(name, path)))
+        edges.extend(manifest_edges(name, scanned[name], roots))
         for relative_lock in lock_roots(path):
-            found = lock_edges(name, path, relative_lock)
+            found = lock_edges(name, path, relative_lock, roots)
             if found is not None:
                 locks[f"{name}/{relative_lock}"] = found
     return judge(sorted(repos), edges, locks, allowlist, dev_warn)
@@ -402,7 +416,20 @@ def analyse(repos, allowlist, dev_warn=False):
 
 def judge(repo_names, edges, locks, allowlist, dev_warn=False):
     isolated = allowlist["isolated"]
-    allowed = {(e["from"], e["to"]): index for index, e in enumerate(allowlist["edge"])}
+    entries = {(e["from"], e["to"]): index for index, e in enumerate(allowlist["edge"])}
+
+    def entry_for(pair):
+        """An [[edge]] entry names root nodes or repositories; a repository pair covers
+        every root pair between them."""
+        if pair in entries:
+            return entries[pair]
+        return entries.get((repo_of_node(pair[0]), repo_of_node(pair[1])))
+
+    class Allowed:
+        def __contains__(self, pair):
+            return entry_for(pair) is not None
+
+    allowed = Allowed()
 
     def isolated_for(edge):
         return [i for i, e in enumerate(isolated) if edge["manifest"].startswith(e["root"].rstrip("/") + "/")]
@@ -423,8 +450,9 @@ def judge(repo_names, edges, locks, allowlist, dev_warn=False):
     # Which allowlist entries sit on a cycle? Judge with everything present.
     used = set()
     full = cyclic_pairs(pairs_of(included, everything))
-    for pair, index in allowed.items():
-        if pair in full:
+    for pair in full:
+        index = entry_for(pair)
+        if index is not None:
             used.add(("edge", index))
     full_with_isolated = cyclic_pairs(pairs_of(edges, everything))
     for index, entry in enumerate(isolated):

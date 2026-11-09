@@ -789,3 +789,91 @@ Searched `mere/crates`, `mere/ports`, `turnstone/src`, `knot-editor`, `isocosm`,
 - Freed: the package name `mere-chrome` (0.0.1 from the workspace version, no `publish` field,
   not on crates.io: the API answers "crate `mere-chrome` does not exist") and the workspace row
   `chrome = { package = "mere-chrome", ... }` in Mere's root manifest.
+
+## 2026-11-09: P3 slice 1 (D35 to D40), branch `es/p3-slice1` in six repositories
+
+Every branch starts from that repository's `origin/main`. Mere's branch was rebased onto
+`68ba84b1a`, whose new commits change only documents. History was imported the way
+`sceno-backdrops` was: a `--no-local` clone of Mere at `e9e9b0aec`, `git filter-repo --path ...
+--path-rename ...`, then `git merge --allow-unrelated-histories --no-ff`.
+
+- **Eidetic** `22deb33` (import merge `b5467b5`, 4 commits of history): `mere-edit` at
+  `crates/source-edit`, added as a workspace member. `cargo test -p mere-edit` ran 6 passed, the same
+  as the 6 test attributes. The pre-commit hook (line ceiling, `cargo clippy --locked --all-targets`)
+  passed.
+- **Graphshell** `64813dff` (import merges `c58cb48c` with 173 commits of history, and `b8f240b6` for
+  fixtures): `host/` holds tabard-workshop 4,448 lines, document-host 3,722, ux-events 2,183,
+  graphshell-client-tests 9 and pelt-desktop 23,765 (lines of Rust in each crate's source).
+  - The contract root: `cargo check --workspace --all-targets --locked` is green, and its `Cargo.lock`
+    keeps sha256 `df67a47c...` before and after.
+  - `host/`: `cargo check --workspace --all-targets --locked` is green. The lock was seeded from Mere's
+    `Cargo.lock`, then resolved with mere.git at `72888bb8`. Its 987 packages hold 13 path packages:
+    the 5 host crates and 8 contract crates.
+  - Tests: `cargo test --workspace --no-fail-fast` in `host/`, against `cargo test --no-fail-fast` with
+    `-p` for the same five crates in Mere at `e9e9b0aec`. Both runs give identical per-crate results:
+
+    | crate | passed | failed | ignored |
+    |---|---|---|---|
+    | document-host | 56 | 0 | 3 |
+    | graphshell-client-tests | 30 | 0 | 0 |
+    | pelt-desktop | 85 | 0 | 0 |
+    | tabard-workshop | 75 | 1 | 3 |
+    | ux-events | 43 | 0 | 0 |
+
+    That is 296 in each run. The one failure is the same in both:
+    `release_host_acceptance::release_accessibility_focus_click_and_numeric_value_keep_separate_authority`,
+    `assert_ne!` at line 134 with both sides `Srgb { r: 51, g: 102, b: 200, a: 255 }`.
+  - Fixtures copied with history, because the moved tests read them by relative path:
+    `ports/pelt/examples` (57 files), `crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf`
+    and `crates/cambium/scenes/scenomise/fixtures/coastal_map.json`, all under `host/` at the same
+    subpaths. Mere keeps `ports/pelt/examples/Ahem.ttf`, which Cambium's tests read.
+  - 15 line-ceiling exceptions moved to Graphshell's root `line-ceiling.toml` with a `host/` prefix.
+- **Turnstone** (import merges `9b0319b8`, with 106 commits of history, and `c67b426a`, the Tabard
+  README; manifest changes staged, not committed):
+  - The `pelt` and `tabard-desktop` binaries are now members at `ports/pelt` and
+    `ports/tabard/desktop`. The root's `[workspace.package]` gained edition, license, repository and
+    authors, plus a `[workspace.dependencies]` table of 16 rows at the sources Turnstone already names.
+    The `tabard-workshop` row moved from mere.git to graphshell.git.
+  - Two line-ceiling exceptions moved here.
+  - `cargo check --workspace --all-targets`, run with the overrides listed below, is green.
+  - `cargo test -p pelt -p tabard-desktop`: pelt 4 passed; tabard-desktop 16 passed. The crate has 18
+    test attributes, and 2 of them sit in an example that `cargo test` does not run.
+- **Knot** (staged): 2 rows. `tabard-workshop` in the root workspace table moved from mere.git to
+  graphshell.git, and `mere-edit` in `crates/knot-document` from mere.git to eidetic.git.
+  `cargo check --workspace --all-targets`, with the overrides, is green.
+- **Isocosm** (staged): 1 row, `mere-edit` in `crates/isocosm-system` from mere.git to eidetic.git.
+  `cargo check --workspace --all-targets` is green. `cargo test -p isocosm-system --all-features` ran
+  116 passed.
+- **Overrides.** These are local and uncommitted, and stand in for revisions not yet pushed. They are
+  passed as `cargo --config`:
+  - `patch.'graphshell.git'` and `patch.crates-io` for the 11 contract crates, pointing at the
+    Graphshell branch;
+  - `patch.'graphshell.git'` for `tabard-workshop` and `pelt-desktop`, pointing at `host/`;
+  - `patch.'eidetic.git'` for `mere-edit`;
+  - for Turnstone, `patch.'knot-editor.git'` for knot-editor, knot-composition and knot-document,
+    pointing at the Knot branch.
+
+  The resolved locks were kept outside the repositories, and each repository's lock was restored to
+  its `origin/main` copy, because none of these sources exists upstream yet.
+- **Mere** `68ba84b1a`, everything staged, nothing committed (Mark: wait on `responsa`):
+  - Removed members: source-edit, ux-events, document-host, graphshell-client-tests, gazette-ledger,
+    tabard/desktop, tabard/workshop, pelt and pelt/desktop.
+  - Removed rows: the workspace rows for ux-events, pelt-desktop, tabard-workshop and gazette-ledger,
+    and the root's `[patch."mere.git"]` rows for mere-edit and tabard-workshop. Also the mere-edit
+    patch row in `ports/graphshell/web/Cargo.toml` and two `.gitignore` guest-lock exceptions.
+  - 18 line-ceiling exceptions left: 17 moved out with their files, and the stale
+    `embedded_reservoir_validation.rs` entry, which Mark approved dropping.
+  - `cargo check --workspace --all-targets` is green (4 min 57 s). The lock lost 125 packages (the 9
+    moved or retired, and 116 only they reached) and gained none.
+  - `gazette-ledger` retired (D39). The subject of its parity test, Gazette's three Ledger receipts
+    reproduced through `scenomise::matrix`, was the retirement path for `ledger.rs` (mer3ly site
+    canvas plan, Ruling 143). Its 3 unit tests and 3 parity tests retire with it. `scenomise`'s own 8
+    matrix tests stay, including `value_cells_carry_both_axis_inputs`.
+- **Checker (D35).**
+  - `scripts/test_check_family_cycles.py`: 18 tests pass, 3 of them new: the two Graphshell roots as
+    separate nodes, a host package named from below as a cycle, and a repository allowlist entry
+    covering its roots.
+  - `scripts/check_family_cycles.py --family-dir C:/t/p3-family` (this slice's six branches beside the
+    other local checkouts): exit 0 once the stale `[[isolated]] murm/apps/signalman-desktop` (D17)
+    entry is deleted. With it, the run exits 1 and names that entry as stale.
+  - The edges include `graphshell/host -> mere` and `mere -> graphshell`, with no cycle between them.

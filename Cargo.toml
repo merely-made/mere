@@ -9,18 +9,19 @@ members = [
     "crates/incipit",
     "crates/system/pandect",
     "crates/system/fetch",
-    "crates/system/source-edit",
     "crates/system/registry",
     "crates/system/tabard",
     "crates/distillery/alembic",
-    "crates/system/ux-events",
     "crates/forme/uxtree",
     "crates/domain/personal-facts",
     "crates/platen/platen",
     # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
     # left for their own repository on 2026-10-09 (dramatis repo plan, DR-D);
     # the shared persona picker is a module of cambium (engine split D10).
-    "crates/script/document-host",
+    # mere-edit went to Eidetic (engine split D40); ux-events, document-host,
+    # graphshell-client-tests, tabard-workshop and pelt-desktop to Graphshell's
+    # host/ workspace (P3 slice 1, D36, D37); the pelt and tabard-desktop binaries to
+    # Turnstone (D36); gazette-ledger retired (D39).
     "crates/script/app-host",
     "crates/script/block-host",
     "crates/script/authority-host",
@@ -40,7 +41,6 @@ members = [
     "crates/cambium/scenes/scenomise",
     "crates/cambium/scenes/scenograph",
     "crates/graphshell/graphshell-door",
-    "crates/graphshell/graphshell-client-tests",
     "crates/graphshell/graphshell-host",
     "crates/graphshell/graphshell-mcp",
     "ports/graphshell",
@@ -50,17 +50,11 @@ members = [
     "ports/mere-resident",
     "ports/moot",
     "ports/distillery/athanor",
-    "ports/gazette-ledger",
     # ─── Landed 2026-09-03 from genet (design_docs/mere_docs/implementation_
     # strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md,
     # the consumers-first half of P3) ───
-    # Pelt is the reference-browser port. Tabard moved to `crates/system/`
-    # on 2026-10-07 after becoming the shared theme library. Package names are
-    # unchanged.
-    "ports/tabard/desktop",
-    "ports/pelt",
+    # Pelt's retained-session controller stays while the Graphshell port names it.
     "ports/pelt/core",
-    "ports/pelt/desktop",
     # ─── Landed 2026-09-03 from genet (the same plan, P2) ───
     # The Cambium family: the retained widget lane. It keeps its own crate
     # names and versions; only its repository home moved. The scene lane lives
@@ -71,8 +65,6 @@ members = [
     "crates/cambium/cambium-winit",
     "crates/cambium/cambium-winit-a11y",
     "crates/cambium/cambium-genet-winit-host",
-    # Shared authoring surface; the standalone product is ports/tabard/desktop.
-    "ports/tabard/workshop",
     "crates/cambium/cambium-genet-web-host",
     "crates/cambium/backstep",
     "crates/cambium/meristem",
@@ -254,7 +246,6 @@ pandect = { version = "0.2.0", path = "crates/system/pandect" }
 # The crate's own `default = ["native"]` still serves consumers outside this
 # workspace, which is who it is for.
 luggage = { default-features = false, git = "https://github.com/merely-made/eidetic.git", branch = "main" }
-ux-events = { path = "crates/system/ux-events" }
 registry = { package = "mere-registry", path = "crates/system/registry", default-features = false }
 
 # The engine-management family moved to genet 2026-07-10, came back on
@@ -333,12 +324,7 @@ netfetcher = { version = "0.1.1", git = "https://github.com/merely-made/genet.gi
 # Workspace members, so path deps. None of these may appear in
 # .cargo/config.toml's genet patch table.
 pelt-core = { path = "ports/pelt/core" }
-# `default-features = false` belongs on the workspace declaration, not on
-# pelt's line: cargo will not let a member turn an inherited dependency's
-# defaults off. Pelt re-enables livery/reader/netfetch through its own features.
-pelt-desktop = { path = "ports/pelt/desktop", default-features = false }
 tabard = { version = "0.0.2", path = "crates/system/tabard" }
-tabard-workshop = { path = "ports/tabard/workshop" }
 mere-lanes = { version = "0.1.0", git = "https://github.com/merely-made/inker.git", branch = "main" }
 
 # Genet crates the landed ports reach. In genet these were relative paths into
@@ -443,14 +429,6 @@ servitor = { version = "0.0.3", git = "https://github.com/merely-made/eidetic.gi
 # Path + version: the path is used for local workspace builds, the version lets
 # a publishable dependent (stickleback) record the crates.io dependency.
 muniment = { version = "0.2.1", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
-# The directory port. Promoted from `crates/dramatis/` to `ports/` 2026-08-23
-# (suite census 7.3): the three senses of the word were always the roadmap —
-# an index, being gazetted, and the paper you read — so the resolver grows
-# into the port rather than sitting beside one. Built today: WebFinger
-# resolution. Unbuilt: the contact and recipient surfaces over `gaz`, feed
-# polling over `fleece::crawl`, and the reading room. Its blocking reqwest
-# still needs an async port before a resident polls with it.
-gazette-ledger = { version = "0.0.1", path = "ports/gazette-ledger" }
 # Stored key-rooted contacts (the "them" side personae keeps): petnames, handles,
 # per-endpoint trust, kith/kin tiers, recency. Relocated from repos/gaz 2026-08-10.
 gaz = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
@@ -572,7 +550,6 @@ too_many_lines = "warn"
 [patch."https://github.com/merely-made/mere.git"]
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
-mere-edit = { path = "crates/system/source-edit" }
 mere-facts = { path = "crates/domain/personal-facts" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
@@ -622,7 +599,6 @@ mooting = { git = "https://github.com/merely-made/gemot.git", branch = "main" }
 pictograph = { path = "crates/canvas/pictograph" }
 sprigging = { path = "crates/cambium/sprigging" }
 tabard = { path = "crates/system/tabard" }
-tabard-workshop = { path = "ports/tabard/workshop" }
 uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 

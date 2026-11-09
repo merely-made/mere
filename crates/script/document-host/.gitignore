@@ -1,4 +1,0 @@
-/target
-/guest/target
-/guest-bomb/target
-# Guest portable locks are tracked; local mode uses the root ignore rules.
