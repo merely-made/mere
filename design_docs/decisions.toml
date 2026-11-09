@@ -460,6 +460,13 @@ area = "stack"
 summary = "The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store."
 draws_on = ["cycle-breaks D15"]
 
+[decisions."cycle-breaks D26"]
+title = ". Dramatis becomes a projection producer and its window retires (Mark, 2026-11-08)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed."
+draws_on = ["stack.3"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
