@@ -191,10 +191,6 @@ path = "crates/system/pandect/src/manifest_store.rs"
 reason = "In-memory + on-disk store for [GraphSessionManifest]s. Existing source-size debt; a responsibility split must preserve ManifestStore, LoadReport, LoadFailure and existing module visibility."
 
 [[exception]]
-path = "crates/system/pandect/src/reservoir.rs"
-reason = "The reservoir: every mere a persona holds, one per data domain. Existing source-size debt; a responsibility split must preserve DomainId, MereId, MereRecord and existing module visibility."
-
-[[exception]]
 path = "crates/system/pandect/src/snapshot_merge.rs"
 reason = "Snapshot-level merge for codicil compose (Alembic tail B7 / decision 1). Existing source-size debt; a responsibility split must preserve MergeReport and existing module visibility."
 

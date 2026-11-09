@@ -64,7 +64,9 @@ pub mod web_facets;
 // a facet bundle on the node, in facets.json. Supersedes the transitional
 // denizen_bindings.json sidecar (removed before any host wrote one).
 pub mod denizen_facets;
-pub mod shared_root;
+// The family-shared root moved to catchment with the reservoir (engine split
+// P4); the module path stays for its callers.
+pub use catchment::shared_root;
 // Per-node facet-store sidecar (facets.json): the runtime tier of the one-node
 // facet system — typed per-node metadata keyed by node UUID, persisted beside
 // graph.json. The durable home the bespoke per-node sidecars (browser/participant/
@@ -131,10 +133,6 @@ pub mod script_bindings_store;
 // distinct from the session/dataspace settings_store and the application/device
 // stores; first field is the configurable menu.
 pub mod persona_settings_store;
-// The reservoir: every mere a persona holds, one per data domain, indexed under
-// `personas/<id>/reservoir/` (reservoir plan V1).
-pub mod reservoir;
-pub mod retained_text;
 pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so
@@ -209,19 +207,25 @@ pub use persona_settings_store::{
     PERSONA_SETTINGS_DIR, PERSONA_UI_FILENAME, PersonaSettings, load_persona_settings,
     persona_settings_path, record_launch, save_persona_settings,
 };
-pub use reservoir::{
-    DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereApplicationAccess, MereId, MereRecord,
-    RESERVOIR_DB_FILENAME, RESERVOIR_DIR, ReservoirError, ReservoirStore, mere_dir, reservoir_dir,
+// The reservoir service is catchment's (engine split P4, D3, D9): every mere a
+// persona holds, one per data domain. These names stay for cutover; access
+// decisions are attributed with the journal's `Author`.
+pub use catchment::{
+    DEFAULT_KEPT_BYTES, DomainId, KEEP_SETTING_SCHEMA, KEEP_SETTING_SLOT, KeepPageText, Keeping,
+    MAX_KEPT_BYTES, MERE_RECORD_SCHEMA, MERES_DIR, MereId, MereRecord, PlainCustody,
+    RESERVOIR_DB_FILENAME, RESERVOIR_DIR, RETAINED_DB_FILENAME, ReservoirError, RetainedCustody,
+    RetainedText, SealedValues, SharedSealer, mere_dir, reservoir_dir, retained_path,
 };
 #[cfg(not(target_arch = "wasm32"))]
-pub use reservoir::{open_mere_archive_backend, open_mere_backend, open_reservoir_backend};
-pub use retained_text::{
-    DEFAULT_KEPT_BYTES, KEEP_SETTING_SCHEMA, KEEP_SETTING_SLOT, KeepPageText, Keeping,
-    MAX_KEPT_BYTES, PlainCustody, RETAINED_DB_FILENAME, RetainedCustody, RetainedText,
-    SealedValues, SharedSealer, retained_path,
+pub use catchment::{
+    open_mere_archive_backend, open_mere_backend, open_mere_retained_backend,
+    open_reservoir_backend,
 };
-#[cfg(not(target_arch = "wasm32"))]
-pub use retained_text::open_mere_retained_backend;
+/// A persona's reservoir index, with access decisions attributed by [`Author`].
+pub type ReservoirStore<B> = catchment::ReservoirStore<B, Author>;
+/// An owner's access decision for one application and one mere, attributed by
+/// [`Author`].
+pub type MereApplicationAccess = catchment::MereApplicationAccess<Author>;
 pub use cartography_geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
 pub use saved_scene::{
     DEFAULT_ARRANGEMENT, SAVED_SCENE_FACET, SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3,

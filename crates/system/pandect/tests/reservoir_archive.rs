@@ -180,7 +180,7 @@ fn archive_survives_owner_exit_and_a_fresh_process_forks_the_thaw() {
     let receipt = serde_json::json!({"schema":"mere.reservoir-v3-receipt/v1","result":"passed",
         "scope":"durable owner exit, real child process reopen, exact canonical graph/facet bytes, views, read-only direct APIs, edit-fork lineage, second-owner refusals",
         "parent_pid":std::process::id(),"contention_stdout":contention,
-        "source_revision":std::env::var("MERE_V3_SOURCE_REVISION").unwrap_or_else(|_| "uncommitted-source-hash-below".into()),"source_hash":blake3::hash(concat!(include_str!("../src/graph_session.rs"),include_str!("../src/graph_codicil.rs"),include_str!("../src/reservoir.rs")).as_bytes()).to_hex().to_string(),
+        "source_revision":std::env::var("MERE_V3_SOURCE_REVISION").unwrap_or_else(|_| "uncommitted-source-hash-below".into()),"source_hash":blake3::hash(concat!(include_str!("../src/graph_session.rs"),include_str!("../src/graph_codicil.rs"),include_str!("../../catchment/src/store.rs")).as_bytes()).to_hex().to_string(),
         "codicil":codicil.to_string(),"state_hash":blake3::hash(&expected).to_hex().to_string(),"child_stdout":String::from_utf8_lossy(&output.stdout)});
     println!("{receipt}");
     if let Some(path) = std::env::var_os("MERE_V3_RECEIPT_OUTPUT") {

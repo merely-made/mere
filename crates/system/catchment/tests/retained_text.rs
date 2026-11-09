@@ -13,8 +13,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use eidetic::{PageTextStore, ResourceCaptureStore};
 use muniment::{Backend, MemoryBackend};
-use pandect::manifest::PersonaId;
-use pandect::{
+use identity::PersonaId;
+use catchment::{
     DomainId, KeepPageText, Keeping, MereId, PlainCustody, RetainedCustody, RetainedText,
     open_mere_retained_backend, open_reservoir_backend, retained_path,
 };

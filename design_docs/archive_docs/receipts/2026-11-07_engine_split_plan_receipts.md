@@ -977,3 +977,24 @@ Mark's F7 ruling (D65): SPARQL update evaluation, 97 tests, is "not run: no upda
 ## 2026-11-09: D56, mere-alembic into mere-athanor (branch `es/hostmerge`, worktree `C:/t/mere-es-hostmerge`)
 
 Moved with history (git mv): alembic `workshop.rs` (193 lines), `workshop_surface.rs` (369), `workshop_native.rs` (120) to `ports/distillery/athanor/src/alembic/`; `lib.rs` (65), README and Cargo.toml dropped. Tests: 45 before (athanor 41, alembic 4), 45 after (`cargo test -p mere-athanor --all-features`: 45 passed). Checks: athanor `--all-targets` with no features, `workshop`, `workshop-surface`, `workshop-destination,workshop-sealed`, and all consumer features (`workshop-native,workshop-worker,workshop-sealed,workshop-destination`); graphshell `--all-targets --features alembic-workshop`. Lock diff: `mere-alembic` removed; athanor gains cambium, cambium-desktop, taproot; nothing else moved.
+
+## 2026-11-09: P4 stage 1, catchment (branch `es/p4`, worktree `C:/t/mere-es-p4`)
+
+Ruling F1 (Mark): "Generic over author". Moved with history (git mv) into `crates/system/catchment`:
+`pandect/src/reservoir.rs` (701 lines) split into `catalog.rs` 175, `paths.rs` 119, `store.rs` 207 and
+`store_tests.rs` 242, retiring its line-ceiling exception; `retained_text.rs` (353) split into
+`retained_text.rs` 196 and `sealed.rs` 161; `shared_root.rs` 186; `tests/retained_text.rs` 183. New:
+`lib.rs` 55, `tests/non_graph_domain.rs` 104 (a `music` mere and a Knot-style operation store opened
+through the reservoir), `pandect/tests/reservoir_sessions.rs` 43 (the one reservoir test that needs
+`MereSessions`). Pandect drops `dirs`, gains `catchment`, re-exports every old name and aliases
+`ReservoirStore<B>` and `MereApplicationAccess` to `Author`. Consumer edits: none.
+
+- `cargo tree -p catchment -e normal`: 135 packages; no `mere-kernel`, `pandect`, `incipit`, `tabard`,
+  `hest`, `sceno` or Cambium crate. `chartulary` and `petgraph` arrive via `eidetic` and `sporran`.
+- Lock: `catchment` added; pandect's entry gains `catchment` and drops `dirs 5.0.1`; nothing else moved.
+- `cargo check --workspace --all-targets -j 4` (debug=0): green, 10m15s cold at `fe8c2d785`; green
+  again in 1m14s after rebasing onto `62fc39ca6` (D56).
+- Tests before: pandect 331 (299 unit, 32 integration). After: `cargo test -p catchment` 20 passed
+  (14 unit, 2 non_graph_domain, 4 retained_text); `cargo test -p pandect` 313 passed, 1 ignored
+  (284 unit, graph_residency 11, image_migration_failure 1, live_graph 9, reservoir_archive 2 + 1
+  ignored, reservoir_sessions 1, resident_transaction 5). 331 kept or moved, 2 new.

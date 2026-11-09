@@ -2402,6 +2402,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "catchment"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "dirs 5.0.1",
+ "eidetic",
+ "muniment",
+ "personae",
+ "pollster 0.4.0",
+ "serde",
+ "serde_json",
+ "sporran",
+ "tempfile",
+ "uuid",
+]
+
+[[package]]
 name = "cbc"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12024,10 +12041,10 @@ version = "0.2.0"
 dependencies = [
  "async-trait",
  "blake3",
+ "catchment",
  "chacha20poly1305 0.11.0",
  "chartulary",
  "ciborium",
- "dirs 5.0.1",
  "eidetic",
  "euclid",
  "getrandom 0.3.4",
