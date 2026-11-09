@@ -96,38 +96,40 @@ source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_co
 summary = "P4–P6 stay outlines with a goal and done-condition until P2 proves the retained table."
 
 [decisions."cambium-publish D1"]
-title = ". Publish the app's GUI dependencies first (Mark, 2026-11-05)"
+title = "Publish the app's GUI dependencies first (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "The Dramatis app's GUI chain goes to crates.io; mere.git main is the interim."
 
 [decisions."cambium-publish D2"]
-title = ". `mesquite` becomes `mandrake` (Mark, 2026-11-05)"
+title = "`mesquite` becomes `mandrake` (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "The scenario lane publishes as mandrake."
 
 [decisions."cambium-publish D3"]
-title = ". Rename everywhere, consumers now (Mark, 2026-11-05)"
+title = "Rename everywhere, consumers now (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "Package, lib and imports take mandrake in Mere and its four consumer repositories now."
 
 [decisions."cambium-publish D4"]
-title = ". Drop the accesskit patch (Mark, 2026-11-05)"
+title = "Drop the accesskit patch (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "cambium-a11y remaps through accesskit's public API with an exhaustiveness canary; the local patch goes."
 
 [decisions."cambium-publish D5"]
-title = ". Publish the vello sparse fork under Netrender names (Mark, 2026-11-05)"
+title = "Publish the vello sparse fork under Netrender names (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "The fork's sparse vello crates publish under Netrender names, keeping exact curve refusal and the tolerance fix."
 
 [decisions."cambium-publish D6"]
-title = ". Bench embeddings leave rootstock (Mark, 2026-11-05)"
+title = "Bench embeddings leave rootstock (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
 summary = "Toolkit-embedding benches live in a probe crate; published rootstock carries no git dependency."
 
 [decisions."cambium-publish D7"]
-title = ". Publish after the move, from Graphshell (Mark, 2026-11-07)"
+title = "Publish after the move, from Graphshell (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
+summary = "The Cambium chain publishes once, from Graphshell, after engine-split P3; consumers track git main until then."
+plans = ["engine-split"]
 
 [decisions."capability-door D1"]
 title = "OS channels on one device"
@@ -346,122 +348,207 @@ summary = "An application declares its retained-content seal scope and the grant
 draws_on = ["stack.2"]
 
 [decisions."cycle-breaks D1"]
-title = ". Mere↔Knot and Mere↔Cleromancy: the resident stops depending (Mark, 2026-11-06)"
+title = "Mere↔Knot and Mere↔Cleromancy: the resident stops depending (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The resident hosts domains through a Stickleback seam and apps register at runtime, so Mere's Cargo names neither Knot nor Cleromancy."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D2"]
-title = ". Eidetic↔Distillery: the ESP adapter moves to ESP (Mark, 2026-11-06)"
+title = "Eidetic↔Distillery: the ESP adapter moves to ESP (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "eidetic-search keeps the GoalEmbedder trait; the ESP adapter, calibration tests and recall example live in ESP."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D3"]
-title = ". gemot↔Murm: an address trait (Mark, 2026-11-06)"
+title = "gemot↔Murm: an address trait (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "murm-resolve owns an address trait that Gemot implements; Murm no longer names gemot-address."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D4"]
-title = ". Mere↔Murm: mere-comms goes down (Mark, 2026-11-06)"
+title = "Mere↔Murm: mere-comms goes down (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "mere-comms moves into Murm so signalman's comms feature no longer names Mere."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D5"]
-title = ". Mere↔Woodshed: adapters go up (Mark, 2026-11-06)"
+title = "Mere↔Woodshed: adapters go up (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Woodshed's block-editing adapters move out of Graphshell into Woodshed behind its features; Mere no longer names Woodshed."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D6"]
-title = ". Dev-only edges count (Mark, 2026-11-06)"
+title = "Dev-only edges count (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Dev-only dependency edges count as cycles in the family check; tests use fixtures or live in the higher repository."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D7"]
-title = ". Extract the contract leaves first (Mark, 2026-11-06)"
+title = "Extract the contract leaves first (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The host/guest contract's leaf crates are extracted to a bottom layer first; the full split waits."
+draws_on = ["cycle-breaks D4"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D8"]
-title = ". The bottom layer is the revived Graphshell repository, named for the protocol (Mark, 2026-11-06)"
+title = "The bottom layer is the revived Graphshell repository, named for the protocol (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere."
+draws_on = ["cycle-breaks D7"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D9"]
-title = ". Contract plus host-role kit (Mark, 2026-11-06)"
+title = "Contract plus host-role kit (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The bottom Graphshell layer holds the contract crates and the host-role kit, not the runtime-bound features."
+draws_on = ["cycle-breaks D8"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D10"]
-title = ". The WIT world reaches Mere's hosts through `links` metadata, for now (Mark, 2026-11-06)"
+title = "The WIT world reaches Mere's hosts through `links` metadata, for now (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 area = "stack"
 summary = "Mere's WIT hosts take the one world from graphshell-endpoint's links metadata until the package rename is decided."
 draws_on = ["cycle-breaks D9"]
 
 [decisions."cycle-breaks D11"]
-title = ". The extraction's structural choices stand (Mark, 2026-11-06)"
+title = "The extraction's structural choices stand (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 area = "stack"
 summary = "graphshell-door, graphshell-client-tests and uxtree's frozen feature are the accepted homes for what the extraction left in Mere."
 draws_on = ["cycle-breaks D9"]
 
 [decisions."cycle-breaks D12"]
-title = ". Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06)"
+title = "Woodshed is a guest, not a compiled-in adapter (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package."
+draws_on = ["cycle-breaks D5"]
+amends = ["cycle-breaks D5"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D13"]
-title = ". The guest-blocks decisions (Mark, 2026-11-06)"
+title = "The guest-blocks decisions (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike."
+draws_on = ["cycle-breaks D12"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D14"]
-title = ". P1's decisions answered; the distribution binary reopened (Mark, 2026-11-06)"
+title = "P1's decisions answered; the distribution binary reopened (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "P1's decisions b to f accepted and P1b added; where the installed resident carries Knot's and Cleromancy's authority is open and back at the drawing board."
+draws_on = ["cycle-breaks D1"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D15"]
-title = ". The drawing-board answers (Mark, 2026-11-06)"
+title = "The drawing-board answers (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Authority is a guest or declared data, Knot's lane a supervised app after a blob door route exists, no Lane trait and no distribution binary."
+draws_on = ["cycle-breaks D1"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D16"]
-title = ". Guest blocks: the three open questions answered (Mark, 2026-11-06)"
+title = "Guest blocks: the three open questions answered (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The guest returns a sceno scene for regions plus a protocol vector sheet the host paints; the adapter splits across woodshedding and woodshed-notation features; the native shell is a new graphshell-blocks bin."
+draws_on = ["cycle-breaks D13"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D17"]
-title = ". `backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06)"
+title = "`backdrops` goes to Graphshell; F1 closed (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The backdrops and template modules move into Graphshell's sceno-backdrops crate, so Signalman's portable-scenes no longer names Mere; signalman-desktop stays the one isolated exception."
+draws_on = ["cycle-breaks D9", "stack.3"]
+amends = ["cycle-breaks D9"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D18"]
-title = ". The resident seam applies wherever `mere-resident` lives (Mark, 2026-11-08)"
+title = "The resident seam applies wherever `mere-resident` lives (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "The registration seam binds the resident wherever it lives, Mere or Graphshell, so neither repository's Cargo names Knot or Cleromancy."
+draws_on = ["cycle-breaks D1", "cycle-breaks D14", "stack.3"]
+amends = ["cycle-breaks D1"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D19"]
-title = ". Inker↔Mere: allowlisted until P5 (Mark, 2026-11-08)"
+title = "Inker↔Mere: allowlisted until P5 (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "inker to mere is allowlisted as a temporary back edge until engine-split P5 separates the engine from inker; the entry leaves with P5."
+draws_on = ["cycle-breaks D6", "stack.3"]
+plans = ["engine-split"]
 
 [decisions."cycle-breaks D20"]
-title = ". The ring: `murm-wire` and `murm-rtc` move into Genet (Mark, 2026-11-08)"
+title = "The ring: `murm-wire` and `murm-rtc` move into Genet (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "murm-wire and murm-rtc move into Genet as genet-wire and genet-rtc, since Genet is their only consumer; the Genet to Murm edge and the four-repository ring go with them."
+draws_on = ["stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D21"]
-title = ". Dramatis's application may become a producer (Mark, 2026-11-08; tentative)"
+title = "Dramatis's application may become a producer (Mark, 2026-11-08; tentative)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Dramatis's app may become a producer that hosts present rather than an app naming Cambium; tentative, design pending, and the Dramatis to Mere cycle stays flagged."
+draws_on = ["cycle-breaks D6", "stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D22"]
-title = ". The viewer ships one build, `webgl2/` (Mark, 2026-11-08)"
+title = "The viewer ships one build, `webgl2/` (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 area = "stack"
 summary = "The viewer ships the single webgl2 build; WebGL2 costs 1.4 to 1.85 times WebGPU's page CPU per frame and ANGLE on Metal differs by 10 pixels in the compare images, both recorded in T7 and the audit brief."
 draws_on = ["stack.3"]
 
 [decisions."cycle-breaks D23"]
-title = ". P3: build the real Cleromancy guest (Mark, 2026-11-08)"
+title = "P3: build the real Cleromancy guest (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
+area = "stack"
+summary = "Mark ruled to build the real Cleromancy guest (P3 step 3); another agent is doing it."
+draws_on = ["cycle-breaks D1", "cycle-breaks D14", "stack.3"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D24"]
-title = ". Declared authority stays a pending slot until M4 (Mark, 2026-11-08)"
+title = "Declared authority stays a pending slot until M4 (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 area = "stack"
 summary = "Authority::Declared stays a typed pending slot until M4; no interpreter is built."
 draws_on = ["cycle-breaks D1", "cycle-breaks D15"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D25"]
-title = ". Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08)"
+title = "Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 area = "stack"
 summary = "The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store."
 draws_on = ["cycle-breaks D15"]
+plans = ["cycle-breaks"]
 
 [decisions."cycle-breaks D26"]
-title = ". Dramatis becomes a projection producer and its window retires (Mark, 2026-11-08)"
+title = "Dramatis becomes a projection producer and its window retires (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md"
 area = "stack"
 summary = "Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed."
@@ -478,400 +565,804 @@ source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairin
 summary = "The self-hosted iroh relay runs on T-PC behind a mesh port forward and dynamic DNS, with idle mesh machines as further relays."
 
 [decisions."distillery-extraction D1"]
-title = ". The move (Mark, 2026-10-31)"
+title = "The move (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Distillery leaves Mere for the ESP repository, which becomes `distillery`; donor directories are removed."
 draws_on = ["house-style D12"]
 
 [decisions."distillery-extraction D2"]
-title = ". The back edge (Mark, 2026-10-31)"
+title = "The back edge (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Cut Distillery's Mere imports before moving it; the receiving repository takes no mere.git dependency."
 
 [decisions."distillery-extraction D3"]
-title = ". Contents (Mark, 2026-10-31)"
+title = "Contents (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "ports/distillery and crates/distillery/alembic move together."
 
 [decisions."distillery-extraction D4"]
-title = ". Consumers (Mark, 2026-10-31)"
+title = "Consumers (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Every esp.git consumer moves to distillery.git in this pass, one source per graph."
 
 [decisions."distillery-extraction D5"]
-title = ". mere-mesh (Mark, 2026-10-31)"
+title = "mere-mesh (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "mere-mesh moves into the distillery repository."
 
 [decisions."distillery-extraction D6"]
-title = ". Djinn holds no endpoints (Mark, 2026-10-31)"
+title = "Djinn holds no endpoints (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Djinn supervises and serves no endpoint; the adapter-port answer is superseded by D7."
 
 [decisions."distillery-extraction D7"]
-title = ". Distillery is a producer (Mark, 2026-10-31)"
+title = "Distillery is a producer (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Distillery keeps its surfaces as a producer over the published contract crates; no mere-distillery port."
 amends = ["distillery-extraction D6"]
 
 [decisions."distillery-extraction D8"]
-title = ". Leaf and branch (Mark, 2026-10-31)"
+title = "Leaf and branch (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "An app is a branch only if it owns a graph and hosts others; otherwise it is a producer leaf."
 amends = ["stack.3"]
 
 [decisions."distillery-extraction D9"]
-title = ". Any branch hosts (Mark, 2026-10-31)"
+title = "Any branch hosts (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Every branch can host producers; Graphshell is the reference host, Turnstone the flagship."
 amends = ["stack.3"]
 
 [decisions."distillery-extraction D10"]
-title = ". Order (Mark, 2026-10-31)"
+title = "Order (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Finish Distillery first; survey the other ports against D8 after."
 
 [decisions."distillery-extraction D11"]
-title = ". Djinn is execution only (Mark, 2026-10-31)"
+title = "Djinn is execution only (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Djinn should hold no meres; who owns store lifetimes is open."
 
 [decisions."distillery-extraction D12"]
-title = ". Graph halves (Mark, 2026-10-31)"
+title = "Graph halves (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Graph halves become pandect modules; mere-alembic and mere-athanor leave Mere whole."
 draws_on = ["house-style D2"]
 
 [decisions."distillery-extraction D13"]
-title = ". Atomic file replacement (Mark, 2026-10-31)"
+title = "Atomic file replacement (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Atomic file replacement lives in muniment; pandect and Distillery share it."
 draws_on = ["house-style D2"]
 
 [decisions."distillery-extraction D14"]
-title = ". Gate G1 (Mark, 2026-10-31)"
+title = "Gate G1 (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Publish cambium 0.6.0 and sprigging 0.3.0 so Distillery's surface builds standalone."
 
 [decisions."distillery-extraction D15"]
-title = ". Repairs to D8 (Mark, 2026-10-31)"
+title = "Repairs to D8 (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Producers, hosts and runners; frames are not hosts; endpoints are producer-side; the graph core is contract tier."
 amends = ["distillery-extraction D8", "stack.3"]
 
 [decisions."distillery-extraction D16"]
-title = ". Athanor and Alembic wait for their lane (Mark, 2026-10-31)"
+title = "Athanor and Alembic wait for their lane (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Distillery and mere-mesh move now; Athanor and Alembic wait for the Alembic lane's answer."
 amends = ["distillery-extraction D3"]
 
 [decisions."distillery-extraction D17"]
-title = ". Republish the drifted contract crates (Mark, 2026-10-31)"
+title = "Republish the drifted contract crates (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Bump and republish the contract crates whose source drifted from crates.io."
 
 [decisions."distillery-extraction D18"]
-title = ". Slim Djinn before publishing it (Mark, 2026-10-31)"
+title = "Slim Djinn before publishing it (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "Slim Djinn to the door before publishing; producers depend on the door's wire contract, not on Djinn."
 amends = ["distillery-extraction D17"]
 
 [decisions."distillery-extraction D19"]
-title = ". The store owns its lifetimes (Mark, 2026-11-05)"
+title = "The store owns its lifetimes (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
+summary = "Store lifetimes belong to the reservoir store; Djinn and embedding hosts only execute it."
 
 [decisions."distillery-extraction D20"]
-title = ". The workshop move does not wait for W3 (Mark, 2026-11-05)"
+title = "The workshop move does not wait for W3 (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "The workshop core moves on its existing bounded gates; W3 remains a product gate that travels with it."
 amends = ["distillery-extraction D16"]
 
 [decisions."distillery-extraction D21"]
-title = ". Workshop destinations become a pandect feature (Mark, 2026-11-05)"
+title = "Workshop destinations become a pandect feature (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
 summary = "The graph-writing workshop destinations are a pandect feature, not a new crate."
 draws_on = ["distillery-extraction D12"]
 amends = ["distillery-extraction D16"]
 
 [decisions."engine-split D1"]
-title = ". The split (Mark, 2026-11-07)"
+title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Mere is the semantic-web engine and the person's profile of it; the host, reading and spatial stacks leave; each crate keeps one intention."
+draws_on = ["linked-data-platform-lessons D2", "linked-data-platform-lessons D31"]
+amends = ["mere:stack.3"]
+plans = ["engine-split"]
 
 [decisions."engine-split D2"]
-title = ". Graphshell is the host, contract and hosting together (Mark, 2026-11-07)"
+title = "Graphshell is the host, contract and hosting together (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Graphshell repository holds the host contract and the hosting; repositories are a cost to be paid down."
+draws_on = ["mere:stack.3"]
+amends = ["cycle-breaks D8", "cycle-breaks D9"]
+plans = ["engine-split"]
 
 [decisions."engine-split D3"]
-title = ". The reservoir service lives in Mere, outside the engine (Mark, 2026-11-07)"
+title = "The reservoir service lives in Mere, outside the engine (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The reservoir service is its own crate in the Mere repository; Pandect keeps the graph-domain revision lifecycle."
+draws_on = ["domain-adoption D8"]
+plans = ["engine-split"]
 
 [decisions."engine-split D4"]
-title = ". Moves do not wait on the engine contract (Mark, 2026-11-07)"
+title = "Moves do not wait on the engine contract (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Inker, Conatus and the hosting move first; the engine-to-workspace contract is settled after."
+plans = ["engine-split"]
 
 [decisions."engine-split D5"]
-title = ". The spatial split is the runtime only (Mark, 2026-11-07)"
+title = "The spatial split is the runtime only (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Seiche takes the spatial runtime; the kernel-consuming projections stay with the host."
+draws_on = ["mere:stack.3"]
+plans = ["engine-split"]
 
 [decisions."engine-split D6"]
-title = ". The spatial repository is named seiche (Mark, 2026-11-07)"
+title = "The spatial repository is named seiche (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The spatial runtime's repository is merely-made/seiche."
+draws_on = ["engine-split D5"]
+plans = ["engine-split"]
 
 [decisions."engine-split D7"]
-title = ". Consolidations (Mark, 2026-11-07)"
+title = "Consolidations (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "smolweb folds into Inker, emblem into Graphshell, wavicle into Woodshed; the wgpu repositories stay separate."
+draws_on = ["engine-split D2"]
+plans = ["engine-split"]
 
 [decisions."engine-split D8"]
-title = ". The workspace kernel is incipit (Mark, 2026-11-07)"
+title = "The workspace kernel is incipit (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The workspace kernel is incipit, grown from the ids crate with the ids kept behind a minimal feature."
+draws_on = ["engine-split D1"]
+plans = ["engine-split"]
 
 [decisions."engine-split D9"]
-title = ". The reservoir service crate is catchment (Mark, 2026-11-07)"
+title = "The reservoir service crate is catchment (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The reservoir service crate is catchment."
+draws_on = ["engine-split D3"]
+plans = ["engine-split"]
 
 [decisions."engine-split D10"]
-title = ". Squish the sprawl; free names before spending them (Mark, 2026-11-07)"
+title = "Squish the sprawl; free names before spending them (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Crates whose job is a neighbour's module merge into it; a distinct purpose takes a freed family name before a new word is spent."
+draws_on = ["engine-split D1", "mere:stack.1"]
+plans = ["engine-split"]
 
 [decisions."engine-split D11"]
-title = ". Sweep the whole tree (Mark, 2026-11-07)"
+title = "Sweep the whole tree (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Main commits the whole dirty tree so the lanes' plan copies can merge."
+plans = ["engine-split"]
 
 [decisions."engine-split D12"]
-title = ". state-witness and mere-framing go to Eidetic (Mark, 2026-11-07)"
+title = "state-witness and mere-framing go to Eidetic (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "state-witness and mere-framing move to Eidetic; Seiche and Mere consume them from there."
+draws_on = ["cycle-breaks D6", "engine-split D5"]
+plans = ["engine-split"]
 
 [decisions."engine-split D13"]
-title = ". The canvas takes the cartography name; pictograph shrinks to faces (Mark, 2026-11-07)"
+title = "The canvas takes the cartography name; pictograph shrinks to faces (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The graph canvas and the layout strategies are one crate named mere-cartography; pictograph is node faces only."
+draws_on = ["engine-split D10"]
+plans = ["engine-split"]
 
 [decisions."engine-split D14"]
-title = ". Retire the five dead registries now (Mark, 2026-11-07)"
+title = "Retire the five dead registries now (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The five never-enabled registries are deleted; the three live ones move to their owners; mere-registry is freed."
+draws_on = ["engine-split D10"]
+plans = ["engine-split"]
 
 [decisions."engine-split D15"]
-title = ". Repin Knot before P1 lands (Mark, 2026-11-07)"
+title = "Repin Knot before P1 lands (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Knot is repinned to the moved backdrops and Mere relocked before P1 commits; the hook is not skipped."
+draws_on = ["cycle-breaks D17"]
+plans = ["engine-split"]
 
 [decisions."engine-split D16"]
-title = ". The reader lanes own their types (Mark, 2026-11-07)"
+title = "The reader lanes own their types (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-lanes owns ReadingPreferences and ReadingAnchor; hosts convert Tabard's settings at the edge."
+draws_on = ["engine-split D1"]
+plans = ["engine-split"]
 
 [decisions."engine-split D17"]
-title = ". The Knot editor lives in knot-document (Mark, 2026-11-07)"
+title = "The Knot editor lives in knot-document (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "KnotEditor moves to Knot's knot-document; the lexers to Illume; knot-editor-host retires."
+draws_on = ["engine-split D10"]
+plans = ["engine-split"]
 
 [decisions."engine-split D18"]
-title = ". Create both repositories now, empty (Mark, 2026-11-07)"
+title = "Create both repositories now, empty (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The inker and seiche repositories are created empty under merely-made; their lanes populate them once clean."
+plans = ["engine-split"]
 
 [decisions."engine-split D19"]
-title = ". Inker may name the bottom root; tinct joins it (Mark, 2026-11-07)"
+title = "Inker may name the bottom root; tinct joins it (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Graphshell contract root gains tinct and is a leaf layer Inker may name; the palette lives in the lanes over Tinct."
+draws_on = ["engine-split D2", "engine-split D16"]
+amends = ["cycle-breaks D9"]
+plans = ["engine-split"]
 
 [decisions."engine-split D20"]
-title = ". scrying and welding move into Inker; cue and graft stay (Mark, 2026-11-07)"
+title = "scrying and welding move into Inker; cue and graft stay (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "wgpu-scry and wgpu-weld fold into Inker as feature-gated engine members; wgpu-cue and wgpu-graft stay below Inker."
+draws_on = ["mere:stack.3"]
+amends = ["engine-split D7"]
+plans = ["engine-split"]
 
 [decisions."engine-split D21"]
-title = ". D20 reverted: scrying and welding stay separate, Inker named as their owner (Mark, 2026-11-07)"
+title = "D20 reverted: scrying and welding stay separate, Inker named as their owner (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The wgpu repositories all stay; Inker is recorded as the owner of the scrying and welding engines."
+draws_on = ["engine-split D7"]
+replaces = ["engine-split D20"]
+plans = ["engine-split"]
 
 [decisions."engine-split D22"]
-title = ". An eighth Stack statement, for the roots (Mark, 2026-11-07)"
+title = "An eighth Stack statement, for the roots (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The stack has a data root and a presentation root; a leaf goes to the root of its nature; Stack 9 says so."
+draws_on = ["engine-split D12", "engine-split D19"]
 
 [decisions."engine-split D23"]
-title = ". Graphshell is the host layer as a library; Turnstone takes the reference-host duties (Mark, 2026-11-07)"
+title = "Graphshell is the host layer as a library; Turnstone takes the reference-host duties (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Graphshell repository is the host layer as a library, contract root below and hosting above, with no application; Turnstone holds the reference host and the MCP server."
+draws_on = ["mere:stack.3"]
+amends = ["cycle-breaks D8", "engine-split D2"]
+plans = ["engine-split"]
 
 [decisions."engine-split D24"]
-title = ". Fleece's fixtures copy into the Graphshell port (Mark, 2026-11-07)"
+title = "Fleece's fixtures copy into the Graphshell port (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Graphshell port carries its own copies of Fleece's three portable-clip fixtures."
+draws_on = ["engine-split D1"]
+plans = ["engine-split"]
 
 [decisions."engine-split D25"]
-title = ". The conatus engine plan and its two briefs move to Seiche as its first area (Mark, 2026-11-07)"
+title = "The conatus engine plan and its two briefs move to Seiche as its first area (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Seiche's first design area holds the conatus engine plan and its two briefs; the dynamics grammar and physics catalog plans stay in Mere."
+draws_on = ["engine-split D5"]
+plans = ["engine-split"]
 
 [decisions."engine-split D26"]
-title = ". Diagnostics stays a library; mere-registry keeps its name as that library (Mark, 2026-11-08)"
+title = "Diagnostics stays a library; mere-registry keeps its name as that library (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-registry stays as the diagnostics and observations library; the five dead registries go and mod_loader moves to document-host; incipit bumps compatibly and persona_picker is a cambium feature."
+draws_on = ["engine-split D10", "engine-split D14"]
+plans = ["engine-split"]
 
 [decisions."engine-split D27"]
-title = ". backstep grows into the editor's ephemeral state (Mark, 2026-11-08)"
+title = "backstep grows into the editor's ephemeral state (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "backstep is the editor's ephemeral state: snapshot undo, a host-implemented clipboard contract, and chrome's linear back/forward; it stays dependency-free."
+draws_on = ["engine-split D10"]
+plans = ["engine-split"]
 
 [decisions."engine-split D28"]
-title = ". forme merges into incipit behind an arrangement feature (Mark, 2026-11-08)"
+title = "forme merges into incipit behind an arrangement feature (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "forme's arrangement authority is incipit's arrangement feature; incipit's default stays ids and curation; mere-forme is freed."
+draws_on = ["engine-split D8", "engine-split D10"]
+plans = ["engine-split"]
 
 [decisions."engine-split D29"]
-title = ". A host-enacted effect from chrome is a hest Invocation; no clipboard enum on the frame model (Mark, 2026-11-08)"
+title = "A host-enacted effect from chrome is a hest Invocation; no clipboard enum on the frame model (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "chrome asks its host to enact an effect with a hest Invocation and reads a hest Outcome; the frame model carries no clipboard-specific type."
+draws_on = ["engine-split D22", "engine-split D27"]
+plans = ["engine-split"]
 
 [decisions."engine-split D30"]
-title = ". The frame model retires; chrome is audited for dissolution (Mark, 2026-11-08)"
+title = "The frame model retires; chrome is audited for dissolution (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The frame model retires with the shell that needed it; rootstock's embedding and chirograph are the living shapes; chrome is audited for dissolution."
+draws_on = ["engine-split D10", "engine-split D29"]
+plans = ["engine-split"]
 
 [decisions."engine-split D31"]
-title = ". chrome dissolves (Mark, 2026-11-08)"
+title = "chrome dissolves (Mark, 2026-11-08)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "chrome dissolves: routing to ux-events, nav::History is backstep's, the rest retires; mere-chrome is freed."
+draws_on = ["engine-split D10", "engine-split D30"]
+plans = ["engine-split"]
+
+[decisions."engine-split D32"]
+title = "Errand stays its own repository (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "merely-made/errand stays a supplier repository below Inker and the host; D7's smolweb fold is withdrawn."
+amends = ["engine-split D7"]
+plans = ["engine-split"]
+
+[decisions."engine-split D33"]
+title = "Misfin stays with errand (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "misfin stays in the errand repository; Murm keeps its comms adapter."
+draws_on = ["engine-split D32"]
+plans = ["engine-split"]
+
+[decisions."engine-split D34"]
+title = "Fleece's structured-data feature retires (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-fleece's structured-data feature and its mere-rdf edge retire; Inker names nothing in Mere."
+draws_on = ["engine-split D1"]
+plans = ["engine-split"]
+
+[decisions."engine-split D35"]
+title = "The family cycle checker treats each workspace root as a node (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The cycle checker's node is a workspace root; Graphshell's contract root and host workspace are separate nodes."
+draws_on = ["engine-split D2", "engine-split D19"]
+amends = ["cycle-breaks D6"]
+plans = ["engine-split"]
+
+[decisions."engine-split D36"]
+title = "Pelt's and Tabard's binaries go to Turnstone; their libraries go to Graphshell (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Applications go to Turnstone and their libraries to Graphshell; pelt and tabard-desktop are binaries in Turnstone."
+draws_on = ["engine-split D23"]
+plans = ["engine-split"]
+
+[decisions."engine-split D37"]
+title = "Graphshell's host workspace sits at host/ beside the contract root (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Graphshell's hosting workspace is host/ with its own lock, beside the unchanged contract root."
+draws_on = ["engine-split D2", "engine-split D35"]
+plans = ["engine-split"]
+
+[decisions."engine-split D38"]
+title = "Signals moves with the canvas; pictograph is faces only (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-cartography takes the canvas and signals; pictograph keeps node faces only."
+amends = ["engine-split D13"]
+plans = ["engine-split"]
+
+[decisions."engine-split D39"]
+title = "A crate with no dependents is kept unless it declares itself superseded (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A crate with no dependents stays unless its own docs say it is a superseded stopgap; gazette-ledger retires, ux-events and document-host stay."
+draws_on = ["engine-split D10", "engine-split D14"]
+plans = ["engine-split"]
+
+[decisions."engine-split D40"]
+title = "mere-edit goes to Eidetic's data root (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-edit moves to Eidetic as a data-root leaf; the Graphshell contract root does not grow."
+draws_on = ["engine-split D19", "engine-split D22"]
+plans = ["engine-split"]
+
+[decisions."engine-split D41"]
+title = "The app's linked modules leave by the door or the wire, not by extraction (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The resident, Cleromancy and Woodshed stop linking the reference app and reach it over the door or the wire; P3's toolkit and canvas moves wait on that."
+draws_on = ["engine-split D23"]
+plans = ["engine-split"]
+
+[decisions."engine-split D42"]
+title = "statements.rs retires (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The unused statements apply module retires; mere-rdf drops its inker edge."
+draws_on = ["engine-split D34"]
+plans = ["engine-split"]
+
+[decisions."engine-split D43"]
+title = "The session manifest splits at the type (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The session manifest keeps lineage and marks; host fields ride an opaque extension slot; worker and policy types go to the host."
+draws_on = ["engine-split D3"]
+plans = ["engine-split"]
+
+[decisions."engine-split D44"]
+title = "The view stream keeps its log in pandect with an opaque payload (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Pandect keeps the view log with an opaque payload; ViewIntent and its store move to Graphshell."
+draws_on = ["engine-split D3"]
+plans = ["engine-split"]
+
+[decisions."engine-split D45"]
+title = "The furnace splits by nature: retention to Eidetic, consolidation stays (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Memory levels, forgetting and retirement go to Eidetic; codicil consolidation stays in pandect; graph-reading proposals are pandect adapters."
+amends = ["distillery-extraction D12"]
+plans = ["engine-split"]
+
+[decisions."engine-split D46"]
+title = "Session distillation is reserved in Distillery (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Distilling sessions into dataset engrams for adapters is Distillery's reserved job, reading Eidetic and cited by Gemot's FLORA rounds."
+draws_on = ["engine-split D45"]
+
+[decisions."engine-split D47"]
+title = "The preview-image store goes to Eidetic beside content_store (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The content-addressed preview-image store moves to Eidetic; pandect keeps the graph-aware orphan check."
+draws_on = ["engine-split D45"]
+plans = ["engine-split"]
+
+[decisions."engine-split D48"]
+title = "nisus and modulus stay, because each has more to become (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "nisus (the voxel authority to be) and modulus (the brick ABI) each keep their own crate."
+draws_on = ["engine-split D10"]
+plans = ["engine-split"]
+
+[decisions."engine-split D49"]
+title = "numen splits: field definitions go to chartulary, evaluation stays in Seiche (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Field definitions join nodes and edges in chartulary; numen's evaluator stays in Seiche; fields may become queryable through chartulary's RDF projection later."
+draws_on = ["engine-split D22"]
+plans = ["engine-split"]
+
+[decisions."engine-split D50"]
+title = "eidetic-core's product half is feature-gated in place (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "eidetic-core gates its browsing-memory modules behind features; substrate-only consumers opt out."
+draws_on = ["engine-split D45", "engine-split D47"]
+plans = ["engine-split"]
+
+[decisions."engine-split D51"]
+title = "mere-overmap and mere-view stay separate (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "overmap keeps its wire crate apart from the view so the headless resident avoids the Cambium cone."
+draws_on = ["engine-split D10"]
+plans = ["engine-split"]
+
+[decisions."engine-split D52"]
+title = "The three small script hosts merge into app-host (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "block-host and authority-host become features of app-host; document-host stays its own crate."
+draws_on = ["engine-split D10", "engine-split D39"]
+plans = ["engine-split"]
+
+[decisions."engine-split D53"]
+title = "uxtree grows into the stack's accessibility and automation spine (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "uxtree becomes the one accessibility and automation tree: grafted subtrees, path-addressed automation, invariant lints through diagnostics."
+draws_on = ["engine-split D10", "engine-split D26"]
+plans = ["engine-split"]
+
+[decisions."engine-split D54"]
+title = "query_view moves into mere-view (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "query_view goes with its editor into mere-view; the engine's query stage is SPARQL only."
+draws_on = ["engine-split D1"]
+plans = ["engine-split"]
+
+[decisions."engine-split D55"]
+title = "mere-moot stays a host port (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-moot is a Graphshell host port; Gemot names no host crate."
+plans = ["engine-split"]
+
+[decisions."engine-split D56"]
+title = "Alembic merges into Athanor, which stays with the host (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-alembic folds into mere-athanor, which moves with the host; a Distillery move later is one move."
+draws_on = ["distillery-extraction D12", "engine-split D10"]
+plans = ["engine-split"]
+
+[decisions."engine-split D57"]
+title = "djinn-testkit stays with the resident (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "djinn-testkit tests the resident and moves with it."
+plans = ["engine-split"]
+
+[decisions."engine-split D58"]
+title = "The mere facade dissolves in P3's third slice (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The mere facade dissolves when the toolkit moves; the name passes to the engine crate."
+draws_on = ["engine-split D8", "engine-split D54"]
+plans = ["engine-split"]
+
+[decisions."engine-split D59"]
+title = "graph-kernel's split waits for P8 (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P3 moves no kernel code; hosts take mere-kernel from mere.git until the P8 contract."
+draws_on = ["engine-split D4"]
+plans = ["engine-split"]
+
+[decisions."engine-split D60"]
+title = "pandect's edges to incipit and tabard are cut in P3 (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P3 cuts pandect's incipit and tabard edges so both leave with the toolkit."
+draws_on = ["engine-split D43", "engine-split D44"]
+plans = ["engine-split"]
+
+[decisions."engine-split D61"]
+title = "The conformance ledger scores two layers (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Ledger rows record both the parser layer and the adapter layer until the engine API exists."
+plans = ["engine-split"]
+
+[decisions."engine-split D62"]
+title = "The ledger runs SPARQL evaluation and RDF/XML now (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The ledger adds SPARQL evaluation through sparesults and RDF/XML through oxrdfxml; SHACL waits for P6."
+draws_on = ["engine-split D61"]
+plans = ["engine-split"]
+
+[decisions."engine-split D63"]
+title = "The ledger's first-run choices stand (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The ledger keeps its RDF 1.1 baseline rows, records suite directory and clone revision, and keeps its dated name."
+plans = ["engine-split"]
+
+[decisions."engine-split D64"]
+title = "murm-ocapn-transport becomes a feature of murm-ocapn (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Murm needs one squish: murm-ocapn-transport folds into murm-ocapn as a feature."
+draws_on = ["engine-split D10", "engine-split D39"]
 
 [decisions."house-style D1"]
-title = ". Abstraction timing (Mark, 2026-10-30)"
+title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Reserve a seam for a consumer named today; never abstract for a speculative one."
 amends = ["stack.1"]
 
 [decisions."house-style D2"]
-title = ". Crate inflation (Mark, 2026-10-30)"
+title = "Crate inflation (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "A component is a module, not a crate; a reserved home receives its capability."
 amends = ["stack.1"]
 
 [decisions."house-style D3"]
-title = ". First checks (Mark, 2026-10-30)"
+title = "First checks (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "The shared check starts as the 600-line ceiling plus `responsa check`, locally and in CI."
 draws_on = ["isocosm:592"]
 
 [decisions."house-style D4"]
-title = ". Where the principles live (Mark, 2026-10-30)"
+title = "Where the principles live (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Adopted principles refine existing stack statements within budget; new ones only where nothing fits."
 governs = ["stack.1", "stack.3", "stack.5", "stack.6"]
 
 [decisions."house-style D5"]
-title = ". Patron style (Mark, 2026-10-30)"
+title = "Patron style (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "House style takes rust-analyzer's guide as its base and TigerStyle's bounds and units-last naming; divergences are recorded."
 
 [decisions."house-style D6"]
-title = ". Shared lint set (Mark, 2026-10-30)"
+title = "Shared lint set (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Owned Rust repositories share the API-contract lints and an advisory function-length lint."
 amends = ["house-style D3"]
 
 [decisions."house-style D7"]
-title = ". Existing systems first (Mark, 2026-10-30)"
+title = "Existing systems first (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Checks run on existing tools where one meets the requirement; custom code only for the gap."
 amends = ["house-style D3"]
 
 [decisions."house-style D8"]
-title = ". Hook runner (Mark, 2026-10-30)"
+title = "Hook runner (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "prek runs every repository's checks, locally and in CI, from pre-commit's config format."
 draws_on = ["house-style D7"]
 
 [decisions."house-style D9"]
-title = ". Line-ceiling home (Mark, 2026-10-30)"
+title = "Line-ceiling home (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "The line ceiling is a separate Rust binary in eidetic, exposed as a pinned hook."
 draws_on = ["house-style D7"]
 
 [decisions."house-style D10"]
-title = ". The ceiling is stack doctrine (Mark, 2026-10-30)"
+title = "The ceiling is stack doctrine (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "The 600-line ceiling becomes stack.7, the area's last budget slot."
 draws_on = ["isocosm:592"]
 
 [decisions."house-style D11"]
-title = ". Local only (Mark, 2026-10-30)"
+title = "Local only (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "The shared checks run at commit and in each repository's full local gate; no CI."
 amends = ["house-style D3", "house-style D8", "stack.7"]
 
 [decisions."house-style D12"]
-title = ". Extraction timing (Mark, 2026-10-31)"
+title = "Extraction timing (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Extraction proceeds once a second host is planned in its own repository's plan; it is done when the code has moved and the first host builds on it."
 amends = ["stack.1"]
 
 [decisions."house-style D13"]
-title = ". One source-size statement (Mark, 2026-11-02)"
+title = "One source-size statement (Mark, 2026-11-02)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Isocosm retires its duplicate Method 3 source-size statement and cites Mere stack.7."
 draws_on = ["stack.7"]
 governs = ["isocosm:1160"]
 
 [decisions."house-style D14"]
-title = ". Reuse order (Mark, 2026-11-02)"
+title = "Reuse order (Mark, 2026-11-02)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Try use, configure, compose and extend before implementing the gap; a dependency still earns its cost."
 amends = ["stack.1"]
 
 [decisions."house-style D15"]
-title = ". Consolidate before adding principles (Mark, 2026-11-02)"
+title = "Consolidate before adding principles (Mark, 2026-11-02)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Consolidate related Stack statements within seven slots for bounded work and distinguishable failure; refine ownership and capability routing in place."
 amends = ["stack.3", "stack.6"]
 governs = ["H4"]
 
 [decisions."house-style D16"]
-title = ". Preserve reference coefficients (Mark, 2026-11-03)"
+title = "Preserve reference coefficients (Mark, 2026-11-03)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Preserve the VSOP87D coefficients with a module-only approximate-constant lint allowance."
 draws_on = ["stack.7"]
 governs = ["H1"]
 
 [decisions."house-style D17"]
-title = ". Repair receiving graphs (Mark, 2026-11-03)"
+title = "Repair receiving graphs (Mark, 2026-11-03)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Repair the necessary receiving cohorts to qualify the local lint gates."
 draws_on = ["stack.7"]
 governs = ["H3"]
 
+[decisions."iconography D1"]
+title = "Emblem's repository hosts the faces crate (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_iconography_plan.md"
+area = "The stack"
+summary = "emblem stays its own repository and takes pictograph's faces crate, because faces have consumers below Graphshell."
+draws_on = ["engine-split D13"]
+amends = ["engine-split D7"]
+plans = ["iconography"]
+
+[decisions."iconography D2"]
+title = "Identity and drawing version separately (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_iconography_plan.md"
+area = "Faces"
+summary = "A face's seed version decides its identity; a separate drawing version per grammar moves only its bytes."
+plans = ["iconography"]
+
 [decisions."key-lane D1"]
-title = ". Prekeys travel on the lane (Mark, 2026-11-06)"
+title = "Prekeys travel on the lane (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
 summary = "Prekey bundles move onto GroupKeyLane as a version-2 record kind; all key material leaves the graph log."
 
 [decisions."key-lane D2"]
-title = ". Reader-set intents stay in the graph log (Mark, 2026-11-06)"
+title = "Reader-set intents stay in the graph log (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
 summary = "AdmitReader and RetireReader remain personal-graph events gated by SyncRoster; only cryptographic carriage moves."
 
 [decisions."key-lane D3"]
-title = ". Clean break for old logs (Mark, 2026-11-06)"
+title = "Clean break for old logs (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
 summary = "The PublishPrekey and GroupDispatch variants are removed; graphs keyed before the move are not carried forward."
 
 [decisions."key-lane D4"]
-title = ". Graph-key carriage follows the resident (Mark, 2026-11-07)"
+title = "Graph-key carriage follows the resident (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
+summary = "GraphKeyGroup and key_paired_devices move with mere-resident to Graphshell; the lane adoption is unchanged."
+plans = ["engine-split"]
 
 [decisions."node-body-face-model D1"]
-title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
+title = "Per-node overrides key by member, pruned (Mark, 2026-10-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"
 summary = "Per-node overrides key by member Uuid and are pruned when the member leaves; a reused slot starts clean."
 
 [decisions."ranged-fetch D1"]
-title = ". One handle, three calls"
+title = "One handle, three calls"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."ranged-fetch D2"]
-title = ". Names"
+title = "Names"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."ranged-fetch D3"]
-title = ". Four default-on features"
+title = "Four default-on features"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."ranged-fetch D4"]
-title = ". A caller-supplied store set"
+title = "A caller-supplied store set"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."ranged-fetch D5"]
-title = ". Lanes T2 and T3 stay in this plan,"
+title = "Lanes T2 and T3 stay in this plan,"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."ranged-fetch D6"]
-title = ". `HostBlob` stays rejected"
+title = "`HostBlob` stays rejected"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."ranged-fetch D7"]
-title = ". Lane F starts now in an isolated Mere worktree,"
+title = "Lane F starts now in an isolated Mere worktree,"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
 [decisions."release-log D1"]
@@ -965,37 +1456,37 @@ summary = "forward-secure conversations by default; durable shared data with bou
 plans = ["release-log"]
 
 [decisions."resident-split D1"]
-title = ". Device conditions go to mesh-host (Mark, 2026-11-05)"
+title = "Device conditions go to mesh-host (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "Device-condition sensing lives in Distillery's mesh-host; Mere selects it."
 
 [decisions."resident-split D2"]
-title = ". Vault-lock triggers and identity dialogs go to Dramatis (Mark, 2026-11-05)"
+title = "Vault-lock triggers and identity dialogs go to Dramatis (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "Dramatis owns its vault-lock triggers and native identity dialogs."
 
 [decisions."resident-split D3"]
-title = ". Moot publication to Gemot, NomadNet carriage to Murm (Mark, 2026-11-05)"
+title = "Moot publication to Gemot, NomadNet carriage to Murm (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "Moot publication goes to Gemot and its NomadNet carriage to Murm, licence gate kept."
 
 [decisions."resident-split D4"]
-title = ". Leased blob custody goes to Eidetic (Mark, 2026-11-05)"
+title = "Leased blob custody goes to Eidetic (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "The resident's leased iroh blob custody becomes Eidetic storage machinery."
 
 [decisions."resident-split D5"]
-title = ". The compute-endpoint protocol goes to Distillery (Mark, 2026-11-05)"
+title = "The compute-endpoint protocol goes to Distillery (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "The signed compute-endpoint exchange moves to Distillery; Mere keeps the graph-authority adapter."
 
 [decisions."resident-split D6"]
-title = ". The lifecycle event file goes to Armillary, its diagnostics copy stays (Mark, 2026-11-05)"
+title = "The lifecycle event file goes to Armillary, its diagnostics copy stays (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "Djinn's lifecycle event file lives in Armillary; the registry-backed diagnostics copy stays in Mere."
 
 [decisions."resident-split D7"]
-title = ". Plan adopting the separate key-agreement lane (Mark, 2026-11-05)"
+title = "Plan adopting the separate key-agreement lane (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
 summary = "Key agreement moves onto Eidetic's GroupKeyLane and Murm's GroupKeySync under its own plan; roster reconciliation stays in Mere."
 
@@ -1073,6 +1564,8 @@ draws_on = ["house-style D15", "stack.6"]
 title = "Two roots, by nature"
 source = "design_docs/doctrine.md"
 area = "The stack"
+summary = "Two roots by nature, data and presentation; a leaf goes to the root of its nature; neither root names anything above it; one trunk is not forced."
+draws_on = ["cycle-breaks D9", "engine-split D12", "engine-split D19", "linked-data-platform-lessons D10"]
 
 [statements."surfaces.1"]
 title = "A frame hosts one presentation"

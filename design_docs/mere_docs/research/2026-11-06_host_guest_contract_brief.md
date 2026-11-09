@@ -45,8 +45,8 @@ dependency rule.
 
 **Contract candidates, clean today.**
 
-- `crates/chirograph`: `hest`, `sceno`, `scenotime`, `serde`, `serde_json`, `blake3`, `sha2`, `base64`
-  (`crates/chirograph/Cargo.toml`). No Mere runtime crate.
+- `graphshell/crates/chirograph`: `hest`, `sceno`, `scenotime`, `serde`, `serde_json`, `blake3`, `sha2`, `base64`
+  (`graphshell/crates/chirograph/Cargo.toml`). No Mere runtime crate.
 - `crates/cambium/scenes/sceno` (serde only), `scenotime` (sceno), `crates/cambium/hest` (serde),
   `crates/forme/curation` (serde). `scenograph` adds `mere-curation` and optional `backstep`,
   `script-engine-api`.

@@ -557,7 +557,7 @@ contract the brief wants narrow.
 `:143`, `:295`). The `[patch."https://github.com/merely-made/mere.git"]` section is at
 `:664`. Its comment says it redirects what Knot names; Cleromancy also names `mere.git`, so
 P2 and P3 decide what leaves by comparing the resolved graph, not by trusting the comment.
-Also: `crates/inker/knot-editor-host` (`Cargo.toml:84`, `:355`) is Mere's own crate and not
+Also: `crates/inker/knot-editor-host` *(historical citation)* <!-- doc-audit: historical-path --> (`Cargo.toml:84`, `:355`) is Mere's own crate and not
 the Knot repository; the check for "Mere names Knot" is the `knot-editor.git` source, not the
 string.
 

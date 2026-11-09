@@ -44,8 +44,8 @@ Receipts go to `archive_docs/receipts/2026-11-07_engine_split_plan_receipts.md` 
   applies: Turnstone and Knot resolve one source per shared package, and the count of
   repositories repinned for a change to reach Turnstone is recorded per phase.
 - **Repository count is a cost** (D2). This plan adds Inker and Seiche and reuses the revived
-  Graphshell; D7 pays for them by folding smolweb, emblem and wavicle into their consumers,
-  so the family nets one fewer repository (24 from 25).
+  Graphshell. D7 meant to pay for them with three folds, but only wavicle still folds: D32
+  keeps errand and iconography D1 keeps emblem. So the family nets 26 repositories from 25.
 - **One intention per crate, and one crate per intention** (D1, D10). Each crate touched
   states what still fits its original job; the rest gets an explicit disposition: merge into
   the neighbour whose job it serves, move, split at an adapter, or retire. Merging is the
@@ -354,7 +354,7 @@ converts at the lanes' boundary:
   (`ports/tabard/workshop/src/reader.rs`, `reader_styles`).
 
 Follow-up under D17 (not edited here): Knot's `crates/knot-document/src/editor.rs` takes
-`KnotEditor`, `EditOutcome` and `KnotReadout` from `crates/inker/knot-editor-host/src/{model,editor}.rs`
+`KnotEditor`, `EditOutcome` and `KnotReadout` from `crates/inker/knot-editor-host/src/model.rs` *(historical citation)* <!-- doc-audit: historical-path --> and `crates/inker/knot-editor-host/src/editor.rs` *(historical citation)* <!-- doc-audit: historical-path -->
 (with `model.rs`'s three tests) and depends on `cambium` and `illume` (feature `markdown`)
 instead of `knot-editor-host` (root `Cargo.toml` line 106, `crates/knot-document/Cargo.toml`
 line 38); Turnstone's `src/knot_authoring.rs:43` and Mere's `ports/graphshell/src/block_editing.rs:14`
@@ -363,7 +363,7 @@ then import `KnotEditor` from `knot-document`, and their manifests drop `knot-ed
 
 - F2 (ruled D17, Knot's `knot-document`), `knot-editor-host -> cambium`: stays until Knot
   takes the editor (above).
-- F3 (open), `mere-fleece -> mere-rdf` (optional, `structured-data`, no consumer in any manifest).
+- F3 (ruled D34: retire), `mere-fleece -> mere-rdf` (optional, `structured-data`, no consumer in any manifest).
   It projects JSON-LD blocks into graph contributions, the engine's job. Options: the engine,
   taking plain block text and base address; the host; retirement. Recommended: the engine.
   Finding: `mere-rdf` depends on `mere-kernel` and on `inker`, so Inker cannot depend on the
@@ -398,7 +398,7 @@ projection crates that consume the workspace kernel stay with the host.
   source each. Not done: the repository, the move, the repins.
 - State (2026-11-07, Mere's cut on a worktree branch): Seiche main `a6b8641` holds the seven
   crates (`seiche-model` included) with history and D25's two documents; Mere deleted
-  `crates/conatus/`, takes `seiche` and `numen` from `seiche.git` (`pictograph` and
+  `crates/conatus/` *(historical citation)* <!-- doc-audit: historical-path -->, takes `seiche` and `numen` from `seiche.git` (`pictograph` and
   `graph-kernel` inherit), and redirects both in its `mere.git` patch table until the outside
   consumers repin (Open, After P2's cut). Not done: those repins, and Isocosm resolving
   Eponym and Mesocosm from `seiche.git`.
@@ -431,7 +431,8 @@ crates.
   git dependency and no Mere crate depending back; Turnstone and Pelt run from it with
   today's headed receipts; the layout test's repin count is recorded; the bottom root still
   names no app-level crate.
-- Needs: P1 (Inker as a supplier), P2 (Seiche as a supplier), cycle-breaks P6.
+- Needs: P1 (Inker as a supplier), P2 (Seiche as a supplier), cycle-breaks P6; the checker
+  change of D35; past the first slice, the resident split plan's door and wire work (D41).
 
 **Drift line for P3 (2026-11-08, from the D29 lane; Mark: "Record it as a P3 drift line; keep the
 contract").** `mere-chrome`'s frame model (`FrameHostInput`, `FrameViewModel`, now `FrameStep` with
@@ -495,12 +496,10 @@ rules stay in the workspace.
 
 ### C. Consolidations (D7)
 
-Three repositories fold into their consumers (none has yet, 2026-11-08), each as a workspace member of the receiver
-with history preserved as the 2026-10-19 promotion did. `smolweb` (the protocol family: the repository is `merely-made/errand`, holding
-`errand`, `gemini-protocol`, `gopher-protocol`, `misfin` and ten more crates; no repository is named smolweb) into Inker with P1, since
-`nematic` and `inker` are its consumers; `misfin` is the exception to check, since
-`mere-comms` is its other consumer and Murm may be its home. `emblem` (IconVG) no longer folds: iconography D1 (2026-11-09) keeps it as its own
-repository and moves `pictograph` (faces only, after D13) into it, because faces gained consumers below Graphshell. `wavicle` (WavPack) into
+One repository folds into its consumer (not yet, 2026-11-09), as a workspace member of the receiver
+with history preserved as the 2026-10-19 promotion did. `merely-made/errand` (the smolweb protocol family, misfin
+included) stays its own repository under D32 and D33. `emblem` (IconVG) no longer folds: iconography D1 (2026-11-09) keeps it as its own
+repository and moves `pictograph` (faces only, after D13 and D38) into it, because faces gained consumers below Graphshell. `wavicle` (WavPack) into
 Woodshed, its only consumer, on Woodshed's own schedule. The four `wgpu-*` repositories
 stay (D7, D21), with Inker recorded as the owner of scrying and welding. Inside each wgpu
 repository the audit's folds apply: the `grafting-servo` rename finished,
@@ -508,7 +507,7 @@ the scry and weld demo crates folded, the three `keyutils.rs` copies deduplicate
 - Done when: each folded repository is archived with a pointer to its new home; its crates
   publish from the receiver under their existing names; every consumer resolves them from
   one source; the family's repository count is recorded.
-- Needs: P1 for smolweb; nothing in this plan for wavicle. Emblem left this section under iconography D1.
+- Needs: nothing in this plan for wavicle. Errand stays under D32; emblem left this section under iconography D1.
 
 ### P8. Cutover and the engine-to-workspace contract
 
@@ -863,7 +862,368 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D10, engine-split D30 · plans engine-split P0 · summary chrome dissolves: routing to ux-events, nav::History is backstep's, the rest retires; mere-chrome is freed.
 
+- **D32. Errand stays its own repository (Mark, 2026-11-09):** Mark asked: "Should errand go
+  to inker? Or does it contain unique transports that would put it in murm?" The evidence lane
+  (receipt file, 2026-11-09) answered neither. Errand is 14 crates and about 33.9k lines, and
+  nine crates in six repositories consume it: Mere, Inker (`nematic` for parsing only,
+  `mere-lanes` for transport), Turnstone, Woodshed, Gemot and Murm. The `inker` crate does not
+  consume it. No errand crate carries a peer carrier: those are all Murm's, and errand speaks
+  client/server TLS, TCP and UDP to the public small web. Its 2026-08-03 home decision gives
+  the protocol crates to their communities. Ruling: "Stays its own repo (Recommended)". D7's
+  smolweb clause is withdrawn. Later the same day, iconography D1 kept emblem too, so C folds
+  only wavicle and the family nets 26. Outcome: refines D7, which rested on a consumer premise the manifests do not bear
+  out.
+
+  Links: area The stack · amends engine-split D7 · plans engine-split C · summary merely-made/errand stays a supplier repository below Inker and the host; D7's smolweb fold is withdrawn.
+
+- **D33. Misfin stays with errand (Mark, 2026-11-09):** misfin is 5.4k lines, a TLS mail
+  protocol rather than a carrier. Its only real consumer is Murm's `mere-comms` mailbox adapter
+  (247 lines), and its crates.io name is held in stewardship for the protocol's author. Ruling:
+  "Stays with errand (Recommended)". Murm keeps the adapter, and errand does not come to name
+  Murm. Outcome: settles the open question "Misfin's home"; applies D32.
+
+  Links: area The stack · draws on engine-split D32 · plans engine-split C · summary misfin stays in the errand repository; Murm keeps its comms adapter.
+
+- **D34. Fleece's structured-data feature retires (Mark, 2026-11-09):** P1 F3. The feature
+  (561 lines in `structured_data.rs`, enabled by no manifest) is Inker's last edge into Mere. It
+  keeps Inker's 11-row mere.git patch table and a mere→inker→mere repository loop, and it
+  returns `GraphContribution`, which P5 sends to the host's legacy adapter. Ruling: "Retire it
+  (Recommended)". The feature and its `linked-data` row are deleted (git keeps them), and a
+  host that needs JSON-LD blocks composes Inker's block with the engine's parse. Outcome:
+  settles P1 F3 and meets P1's done-condition once Inker lands it.
+
+  Links: area The stack · draws on engine-split D1 · plans engine-split P1 · summary mere-fleece's structured-data feature and its mere-rdf edge retire; Inker names nothing in Mere.
+
+- **D35. The family cycle checker treats each workspace root as a node (Mark, 2026-11-09):**
+  the P3 cut map (receipt file, 2026-11-09) found that `check_family_cycles.py` blocks every
+  P3 slice. It reads cycles at repository level, so the first Graphshell host crate that names
+  mere.git closes graphshell↔mere (Mere's engine names hest and sceno from the contract root),
+  and graphshell↔inker likewise. Ruling: "Each root is a node (Recommended)". The checker assigns
+  manifest rows to a workspace root by path prefix and checks the root graph. This is D19's
+  lockfile order made mechanical, and the allowlist stays for edges ruled but not yet broken.
+  Outcome: refines cycle-breaks D6 (the unit is a workspace root, not a repository); applies
+  D2 and D19.
+
+  Links: area The stack · amends cycle-breaks D6 · draws on engine-split D2, engine-split D19 · plans engine-split P3 · summary The cycle checker's node is a workspace root; Graphshell's contract root and host workspace are separate nodes.
+
+- **D36. Pelt's and Tabard's binaries go to Turnstone; their libraries go to Graphshell (Mark,
+  2026-11-09):** the dispositions list put `pelt`, `pelt-desktop` and `tabard-desktop` in
+  Graphshell, while D23 says Graphshell holds no application. Ruling: "Only binaries to
+  Turnstone". The `pelt` and `tabard-desktop` binaries move to Turnstone. `pelt-core`,
+  `pelt-desktop` and `tabard-workshop` move to Graphshell's host workspace as libraries.
+  Outcome: applies D23.
+
+  Links: area The stack · draws on engine-split D23 · plans engine-split P3 · summary Applications go to Turnstone and their libraries to Graphshell; pelt and tabard-desktop are binaries in Turnstone.
+
+- **D37. Graphshell's host workspace sits at host/ beside the contract root (Mark,
+  2026-11-09):** Ruling: "host/ beside the root (Recommended)". The repository root stays the
+  contract workspace with its own lock and `exclude = ["host"]`. `host/Cargo.toml` is the
+  hosting workspace with its own lock. It mirrors Mere's subpaths (`host/crates/cambium/…`,
+  `host/ports/…`), so history imports and line-ceiling prefixes carry over, and it names the
+  contract crates by path. Outcome: applies D2, D19 and D35.
+
+  Links: area The stack · draws on engine-split D2, engine-split D35 · plans engine-split P3 · summary Graphshell's hosting workspace is host/ with its own lock, beside the unchanged contract root.
+
+- **D38. Signals moves with the canvas; pictograph is faces only (Mark, 2026-11-09):** D13's
+  "4.4k lines its name describes" counted `signals` (2,828 lines) as faces, but faces are 1,294
+  lines. The canvas uses `crate::signals` 58 times in 25 files, and signals uses
+  `cartography::IntelligenceSignals`, so leaving signals behind would make
+  cartography→pictograph→cartography a cycle. Ruling: "Signals moves with canvas
+  (Recommended)". `mere-cartography` becomes about 71.7k lines: the strategies, the canvas and
+  signals. `pictograph` is about 1.3k, and it goes to the emblem repository under iconography
+  D1. The 777 test attributes carry over. Outcome: refines D13's
+  figure; its intent stands.
+
+  Links: area The stack · amends engine-split D13 · plans engine-split P3 · summary mere-cartography takes the canvas and signals; pictograph keeps node faces only.
+
+- **D39. A crate with no dependents is kept unless it declares itself superseded (Mark,
+  2026-11-09):** P0 F8, F13 and F12's `document-host`. Three crates have no dependent manifest
+  in ten repositories: `ux-events` (2,183 lines, routing's home under D31), `document-host`
+  (3,722, the mod loader under D26) and `gazette-ledger` (477, published 0.0.1, whose own
+  comment says it retires at the Dramatis split, which landed 2026-11-03). Ruling: "Keep unless
+  self-declared (Recommended)". `gazette-ledger` retires, after its parity test is checked
+  against the shared derivation. `ux-events` and `document-host` are kept as host leaves and
+  move with P3. Outcome: new; refines D10 (a missing dependency row is not by itself
+  evidence of dead code) and settles F8 and F13.
+
+  Links: area The stack · draws on engine-split D10, engine-split D14 · plans engine-split P0, engine-split P3 · summary A crate with no dependents stays unless its own docs say it is a superseded stopgap; gazette-ledger retires, ux-events and document-host stay.
+
+- **D40. mere-edit goes to Eidetic's data root (Mark, 2026-11-09):** P0 F16. `mere-edit` is
+  232 source lines, serde only, unpublished: "revision-bound UTF-8 edit proposals without
+  parser, editor or storage authority". Its consumers are Knot's `knot-document` and Isocosm's
+  pack author, both of which already name eidetic.git, and nothing in Mere uses it. Ruling:
+  "4, 1 if that's not reasonable". It is reasonable: no consumer gains a repository edge, and a
+  revision-bound proposal is data that both sides link (Stack 9). It moves to Eidetic under
+  its own name. Outcome: applies D22, and keeps D19's contract root from taking another leaf.
+
+  Links: area The stack · draws on engine-split D22, engine-split D19 · plans engine-split P3 · summary mere-edit moves to Eidetic as a data-root leaf; the Graphshell contract root does not grow.
+
+- **D41. The app's linked modules leave by the door or the wire, not by extraction (Mark,
+  2026-11-09):** P3 Cut A. The reference app (`ports/graphshell`, about 105k lines) cannot go
+  to Turnstone first, because `mere-resident` links 13 of its modules (81 use lines in 19
+  files, about 23k lines), and Cleromancy (`personal_sync`) and Woodshed (`block_editing`,
+  `capsule_applet`) link it too. Offered an extracted hosting crate, door and wire, or parking
+  the app in Graphshell. Ruling: "Over the door or wire". The resident and the outside consumers
+  reach the app through the door or the wire instead of linking it. That is the
+  [resident split plan](2026-11-05_resident_split_plan.md)'s ground, so P3's slices past the
+  first wait on it. Outcome: new; orders P3 after the resident's door and wire work.
+
+  Links: area The stack · draws on engine-split D23 · plans engine-split P3 · summary The resident, Cleromancy and Woodshed stop linking the reference app and reach it over the door or the wire; P3's toolkit and canvas moves wait on that.
+
+- **D42. statements.rs retires (Mark, 2026-11-09):** P0 F2. `linked-data/src/statements.rs`
+  (309 lines plus 625 of tests) is the engine's only edge to `inker`, and its apply half has no
+  caller in ten repositories. Ruling: "Retire it (Recommended)". The file and `mere-rdf`'s
+  `inker` row are deleted (git keeps them). Inker keeps the `link_statements` walk, and P5
+  writes apply against the dataset. With D34, the engine and Inker name nothing of each
+  other. Outcome: settles F2 and corrects P1's "statements walk the engine ingests".
+
+  Links: area The stack · draws on engine-split D34 · plans engine-split P1, engine-split P5 · summary The unused statements apply module retires; mere-rdf drops its inker edge.
+
+- **D43. The session manifest splits at the type (Mark, 2026-11-09):** P0 F21.
+  `GraphSessionManifest` has 22 fields, three of them host-flavoured (`active_workers`,
+  `engine_profile`, `policy`). `WorkerKind`, `SessionPolicy` and pandect's `EngineProfileBinding`
+  enum have no user outside pandect. The lifecycle reads the manifest, so moving it whole would be
+  a cycle. Ruling: "Split at the type (Recommended)". Lineage, marks and the codicil fields stay. The
+  three host fields become one opaque `#[serde(default)]` extension slot that pandect round-trips
+  without naming. `WorkerKind`, `SessionPolicy`, `session_service_runner` and
+  `engine_profile_store` go to the host. Outcome: applies P4 ("worker declarations ... most to
+  the host") and keeps room reserved for the session-service-runner plan.
+
+  Links: area The stack · draws on engine-split D3 · plans engine-split P4 · summary The session manifest keeps lineage and marks; host fields ride an opaque extension slot; worker and policy types go to the host.
+
+- **D44. The view stream keeps its log in pandect with an opaque payload (Mark, 2026-11-09):**
+  P0 F24. `graph_session` stores `ViewIntent`, a host sidecar type naming incipit curation and
+  sceno, in a stream written atomically with the journal batch. Ruling: "Opaque payload
+  (Recommended)". Pandect keeps `ViewKey` and the log beside the journal, with a
+  schema-referenced value as the payload. `ViewIntent` and `view_intent_store` move to
+  Graphshell, which defines and edits them. Outcome: applies P4 and domain contract C7.
+
+  Links: area The stack · draws on engine-split D3 · plans engine-split P4 · summary Pandect keeps the view log with an opaque payload; ViewIntent and its store move to Graphshell.
+
+- **D45. The furnace splits by nature: retention to Eidetic, consolidation stays (Mark,
+  2026-11-09):** P0 F22. Asked first, Mark answered: "this feels less like graph and more like
+  dealing with stm in eidetic, no? What does furnace do?" The code (`pandect/src/furnace.rs`,
+  842 lines) is housekeeping, not distillation. It has four propose/apply passes:
+  - forgetting evicts the cached page bodies of untagged short-term nodes;
+  - image GC drops unreferenced preview blobs;
+  - consolidation composes the lineage of saved codicils that cover the same material;
+  - retirement empties aged tombstones.
+  `memory_levels` (404 lines) classifies nodes as short-term or long-term. The apply halves call
+  Eidetic's `content_store`, `purge_deleted` and retention. Ruling: "Split by nature
+  (Recommended)":
+  - Retention goes to Eidetic's memory program: `memory_levels`, made generic over node records
+    with no kernel types, plus forgetting's apply and retirement.
+  - Consolidation, which is codicil lineage, stays in pandect as lifecycle.
+  - The graph-reading propose halves stay as thin pandect adapters.
+  Outcome: refines distillery-extraction D12 (graph-reading stays with the graph, retention
+  mechanics go to the store's memory program). Weigh it with the Eidetic squish F4, still open,
+  since it grows `eidetic-core`'s product half.
+
+  Links: area The stack · amends distillery-extraction D12 · plans engine-split P4 · summary Memory levels, forgetting and retirement go to Eidetic; codicil consolidation stays in pandect; graph-reading proposals are pandect adapters.
+
+- **D46. Session distillation is reserved in Distillery (Mark, 2026-11-09):** Mark's account
+  of the furnace's purpose is winnowing browsing sessions into an indexed slice to inform a
+  model or agent adapter, for example one offered to a moot's FLoRA round. That exists nowhere in
+  code. Gemot's `moot/flora.rs` holds round contracts and "does not execute training", and the
+  2026-06-09 Alembic doc's "mints distillates" went with the workshop to Distillery unbuilt.
+  Ruling: "Distillery, reserved now (Recommended)". It is a known future, not P4 work. A
+  Distillery job reads Eidetic captures, codicils and search, and emits a dataset engram that a
+  FLORA round can cite. Distillery's plans carry the reservation. Outcome: new; applies
+  "design for known futures".
+
+  Links: area The stack · draws on engine-split D45 · summary Distilling sessions into dataset engrams for adapters is Distillery's reserved job, reading Eidetic and cited by Gemot's FLORA rounds.
+
+- **D47. The preview-image store goes to Eidetic beside content_store (Mark, 2026-11-09):**
+  P0 F23. Asked first: "is it the graph's images, or images saved in sessions?" It is the
+  graph's node preview imagery: favicons, page previews and last-render snapshots. Kernel nodes
+  hold an `ImageRef`, and the pixels live content-addressed at `content/image/<blake3>`. It is
+  the sibling of `eidetic::content_store`. Session content images are Turnstone's own sidecar.
+  Ruling: "Store half to Eidetic (Recommended)". Save, load, delete and list by digest (about
+  130 lines) go to Eidetic. The orphan check stays with pandect's graph-reading propose, and
+  `migrate_legacy_images` goes to the legacy snapshot adapter. Outcome: applies D45.
+
+  Links: area The stack · draws on engine-split D45 · plans engine-split P4 · summary The content-addressed preview-image store moves to Eidetic; pandect keeps the graph-aware orphan check.
+
+- **D48. nisus and modulus stay, because each has more to become (Mark, 2026-11-09):** P2
+  fork. Mark's rule: "I am ok with 1 if there is more nisus can become, or 2 if not. Same with
+  modulus." Both have a ruled future:
+  - nisus (635 lines): Isocosm wing rulings 330 ("nisus grows into the voxel authority") and
+    697 (the store behind Isometer), and the conatus engine plan's T2, make it the revisioned
+    voxel world store.
+  - modulus (2,239 lines): the product-neutral sparse-brick GPU ABI and the exact CPU walk that
+    Isometer calls (wing 361) and Eponym draws through.
+  Both stay whole. Outcome: applies D10's "one intention per crate" (each has its own); the P2
+  nisus fork is closed.
+
+  Links: area The stack · draws on engine-split D10 · plans engine-split P2 · summary nisus (the voxel authority to be) and modulus (the brick ABI) each keep their own crate.
+
+- **D49. numen splits: field definitions go to chartulary, evaluation stays in Seiche (Mark,
+  2026-11-09):** P2 fork, `graph-kernel`'s `numen` edge. Offered the workspace half, the engine
+  half, or a split. Mark: "Wait, why wouldn't we do 3? I figure the definitions for the three
+  should be together… and fields becoming meaningful in an rdf sense could be done,
+  potentially. If nothing else, then with querying and scripting, no?" Nothing argues against
+  it except its size: a crate split across three repositories, and `numen` is published.
+  - numen's definition half (about 930 lines: `field`, `coupling`, `field_ast`, `edge_path`)
+    moves down to Eidetic's `chartulary`, beside the generic nodes and relations and its
+    existing RDF projection.
+  - The evaluator stays in Seiche.
+  - Neither engine nor host names Seiche for field truth.
+  Link-model L9 (fields act as forces, never as assertions) stands. A field becoming queryable
+  or scriptable through the RDF projection is a later P6 or P7 question, not an assertion.
+  Outcome: new; applies Stack 9 (a leaf goes to the root of its nature).
+
+  Links: area The stack · draws on engine-split D22 · plans engine-split P2, engine-split P5 · summary Field definitions join nodes and edges in chartulary; numen's evaluator stays in Seiche; fields may become queryable through chartulary's RDF projection later.
+
+- **D50. eidetic-core's product half is feature-gated in place (Mark, 2026-11-09):** Eidetic
+  squish F4. `eidetic-core` is 16,557 lines, about 65% of them browsing-memory product
+  (`browsing`, `models`, `import`, `records`, `capture` and smaller ones), compiled by 42
+  manifests in 11 repositories, while Gemot and Dramatis use substrate paths only. D45 and D47
+  add more product. Ruling: "Feature-gate in place (Recommended)". The product modules sit
+  behind features, and substrate-only consumers set `default-features = false`. No name is
+  spent and no ruling is reversed. Outcome: applies memory-gates D17 and D10; settles F4.
+
+  Links: area The stack · draws on engine-split D45, engine-split D47 · plans engine-split P4 · summary eidetic-core gates its browsing-memory modules behind features; substrate-only consumers opt out.
+
+- **D51. mere-overmap and mere-view stay separate (Mark, 2026-11-09):** P0 F3. Two hosts take
+  overmap's `wire` without the view: the Graphshell port, and the headless `mere-resident`.
+  `mere-view` carries Cambium, cartography, pictograph and sprigging as non-optional
+  dependencies. Ruling: "Keep both (Recommended)". Both move with P3. Outcome: applies D10's
+  test (overmap's job is not one module of the view's).
+
+  Links: area The stack · draws on engine-split D10 · plans engine-split P3 · summary overmap keeps its wire crate apart from the view so the headless resident avoids the Cambium cone.
+
+- **D52. The three small script hosts merge into app-host (Mark, 2026-11-09):** P0 F12. There
+  are four wasm hosts, each repeating `wasmtime = "45"`, a `build.rs` and a guest: `app-host`
+  (483 lines), `block-host` (273), `authority-host` (411) and `document-host` (3,722, which D39
+  keeps). Ruling: "Three small into app-host (Recommended)". `block` and `authority` become
+  features of `app-host`, sharing one wasmtime pin. `document-host` stays separate with its own
+  Genet and Inker cone. Frees `block-host` and `authority-host`. Outcome: applies D10.
+
+  Links: area The stack · draws on engine-split D10, engine-split D39 · plans engine-split P3 · summary block-host and authority-host become features of app-host; document-host stays its own crate.
+
+- **D53. uxtree grows into the stack's accessibility and automation spine (Mark, 2026-11-09):**
+  P0 F6. Asked first: "Is there more that can be done with it to support accessibility,
+  diagnostics, and automation stack wise?" uxtree projects documents and workbenches into
+  AccessKit with stable path-derived IDs. Its `graft` joins independent trees, and `frozen`
+  catches unlabelled nodes. Turnstone's a11y layer (25 files, 1.3k lines) sits on it, while
+  Cambium (sprigging, rootstock) and Genet's taproot (the scenario driver formerly named
+  genet-probe) build their own AccessKit trees. Ruling: "Grow into the spine (Recommended)".
+  It stays whole and gets a brief, with no code now, covering four directions:
+  - graft joins the Cambium and taproot subtrees into one ID space;
+  - taproot scenarios address native surfaces by uxtree path, one automation grammar for both;
+  - a lint pass (unlabelled, orphaned and unstable IDs) asserts through `mere-registry`'s
+    diagnostics;
+  - Turnstone's generic a11y pieces are audited for promotion.
+  Outcome: new; refines the 2026-11-07 finding that uxtree stays whole, and gives it a
+  direction.
+
+  Links: area The stack · draws on engine-split D10, engine-split D26 · plans engine-split P3 · summary uxtree becomes the one accessibility and automation tree: grafted subtrees, path-addressed automation, invariant lints through diagnostics.
+
+- **D54. query_view moves into mere-view (Mark, 2026-11-09):** P0 F10. The `mere` facade's
+  `query_view` (892 production and 727 test lines) sits behind a `query` feature that pulls in
+  SPARQL, yet it uses none. It applies views over `kernel::Graph` and `incipit::forme`, and
+  its consumers are mere-view's query editor and the Graphshell port. Ruling: "Into mere-view
+  (Recommended)". It moves into `mere-view` as a module, `mere-view` drops its `mere` edge, and
+  the port's `query-views` feature repoints. Outcome: applies the plan's facade dissolution
+  and keeps the engine's Query stage meaning SPARQL.
+
+  Links: area The stack · draws on engine-split D1 · plans engine-split P3 · summary query_view goes with its editor into mere-view; the engine's query stage is SPARQL only.
+
+- **D55. mere-moot stays a host port (Mark, 2026-11-09):** P0 F14. Ruling: "Stays a host port
+  (Recommended)". Gemot stays presentation-free, and the port moves with P3. Outcome: applies
+  the Layering constraint.
+
+  Links: area The stack · plans engine-split P3 · summary mere-moot is a Graphshell host port; Gemot names no host crate.
+
+- **D56. Alembic merges into Athanor, which stays with the host (Mark, 2026-11-09):** P0 F15
+  and P3 F4. Athanor (5,243 lines) depends on Alembic (747), its workshop surface. Athanor's
+  `workshop-destination` names pandect and the kernel, and moving Alembic alone would make a
+  Graphshell→Distillery→Graphshell triangle. Ruling: "Merge, home unchanged (Recommended)".
+  Alembic folds into `mere-athanor` behind features, and the merged crate moves with the host
+  in P3. Any later move to Distillery is one move. Frees `mere-alembic`. Outcome: refines the
+  plan's "mere-alembic to Distillery"; applies D10.
+
+  Links: area The stack · draws on engine-split D10, distillery-extraction D12 · plans engine-split P3 · summary mere-alembic folds into mere-athanor, which moves with the host; a Distillery move later is one move.
+
+- **D57. djinn-testkit stays with the resident (Mark, 2026-11-09):** P0 F11. Its one dependent
+  is mere-resident's tests, and it spawns the resident's own `djinn` binary. Ruling: "Stays with
+  the resident (Recommended)". It moves beside `mere-resident`, not to Armillary. Outcome:
+  confirms the dispositions list; P0's "to Armillary" line is withdrawn.
+
+  Links: area The stack · plans engine-split P3 · summary djinn-testkit tests the resident and moves with it.
+
+- **D58. The mere facade dissolves in P3's third slice (Mark, 2026-11-09):** P3 F6. The facade
+  (6,928 lines) is named about 970 times across Mere, Turnstone and Cleromancy, mostly as
+  re-exports, and P5 reuses the name `mere`. Ruling: "Dissolve in slice 3 (Recommended)".
+  Navigation, trail and roster go to incipit, and consumers name the kernel, cartography and
+  the rest directly. The name is free for P5's engine. Outcome: applies P3 as written and D54.
+
+  Links: area The stack · draws on engine-split D8, engine-split D54 · plans engine-split P3, engine-split P5 · summary The mere facade dissolves when the toolkit moves; the name passes to the engine crate.
+
+- **D59. graph-kernel's split waits for P8 (Mark, 2026-11-09):** P3 F7. The kernel's "surface
+  half" is not a module set (`kernel::graph` alone is used 631 times by host crates), and the
+  kernel has no Mere dependencies. Ruling: "Wait for P8 (Recommended)". P3 moves no kernel
+  code, hosts name `mere-kernel` from mere.git, and the split follows the engine-to-workspace
+  contract. Outcome: applies D4.
+
+  Links: area The stack · draws on engine-split D4 · plans engine-split P3, engine-split P8 · summary P3 moves no kernel code; hosts take mere-kernel from mere.git until the P8 contract.
+
+- **D60. pandect's edges to incipit and tabard are cut in P3 (Mark, 2026-11-09):** P3 F8.
+  pandect names incipit (`SessionId` and curation folds, in 11 store files) and tabard
+  (`ThemeChoice` and `Mode` in its settings stores). These are the engine's only edges into
+  Graphshell-bound crates, and they pin both crates in Mere. Ruling: "Cut in P3", over holding
+  until P4. The settings and curation store work of P4 (D43, D44) is pulled forward far enough
+  to cut both edges, so incipit and tabard can leave with the toolkit rather than in a slice
+  after P4. Outcome: reorders P3 and P4; P3's slice 4 is no longer gated on P4.
+
+  Links: area The stack · draws on engine-split D43, engine-split D44 · plans engine-split P3, engine-split P4 · summary P3 cuts pandect's incipit and tabard edges so both leave with the toolkit.
+
+- **D61. The conformance ledger scores two layers (Mark, 2026-11-09):** ledger fork F2. The
+  first run (`mere_docs/testing/2026-11-09_conformance_ledger.md`) recorded two layers. The
+  parser layer is the Oxigraph component crates as the adapter configures them. The adapter
+  layer is `mere-rdf`'s own entry points, scored accept or reject, and it surfaces gaps such as
+  TriG 1.1 at 199/214 because `from_trig` takes no base IRI. Ruling: "Both layers
+  (Recommended)", marked provisional until P5's engine API. Outcome: refines the Constraints
+  ledger columns.
+
+  Links: area The stack · plans engine-split P0, engine-split P5 · summary Ledger rows record both the parser layer and the adapter layer until the engine API exists.
+
+- **D62. The ledger runs SPARQL evaluation and RDF/XML now (Mark, 2026-11-09):** ledger fork F3.
+  Asked first: "I don't mind either, but costs?" `sparesults` is already in Mere's lock (0.3.5,
+  through spareval), so the 341 SPARQL 1.1 evaluation tests cost harness code only. `oxrdfxml`
+  is about one new crate over `oxrdf` and `quick-xml`, both present, and the Formats stage names
+  RDF/XML. Ruling: "Both (Recommended)". SHACL waits for P6. Outcome: applies "Standards follow
+  the suites".
+
+  Links: area The stack · draws on engine-split D61 · plans engine-split P0 · summary The ledger adds SPARQL evaluation through sparesults and RDF/XML through oxrdfxml; SHACL waits for P6.
+
+- **D63. The ledger's first-run choices stand (Mark, 2026-11-09):** ledger forks F4 to F6.
+  Ruling: "Accept all three (Recommended)". The RDF 1.1 baseline and SPARQL 1.2 rows stay, since
+  rdf12 is only a delta over 1.1. Spec revision is the suite directory plus the clone HEAD,
+  since the suites carry no dated snapshot. The file keeps its dated name. Outcome: applies P0.
+
+  Links: area The stack · plans engine-split P0 · summary The ledger keeps its RDF 1.1 baseline rows, records suite directory and clone revision, and keeps its dated name.
+
+- **D64. murm-ocapn-transport becomes a feature of murm-ocapn (Mark, 2026-11-09):** asked
+  whether Murm needs squishing, the evidence lane audited its 39 packages under D10 and found
+  one real candidate. `murm-ocapn-transport` (294 lines) admits OCapN onto an existing
+  transport, owns no endpoint, discovery or keys, and has one dependent, a Mere testing probe.
+  Ruling: "Merge as a feature (Recommended)". It becomes murm-ocapn's `native` feature and frees
+  its name, done in Murm on Murm's schedule. The rest of Murm passes D10, and its crates with no
+  dependents are kept under D39. Outcome: applies D10 and D39.
+
+  Links: area The stack · draws on engine-split D10, engine-split D39 · summary Murm needs one squish: murm-ocapn-transport folds into murm-ocapn as a feature.
+
 ## Open questions
+
+- **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
+  contract root, and merging it into tabard would reverse that. F9 is closed by D12: both crates
+  are in Eidetic and both names stay. F18 is closed by D14: the lens registry is deleted, the
+  physics presets go with the canvas, and the pack sense stays with the declared-lens plan. F19
+  is closed by D26: diagnostics is a host library, and engine stages return typed results as
+  data. F20 is closed by D14: scheme routing stays with `mere-fetch`. Also settled this day: F2
+  (D42), F8 and F13 (D39), F16 (D40), F21 (D43), F22 (D45), F23 (D47), F24 (D44), P1 F3 (D34),
+  P2's forks (D48, D49) and the Eidetic F4 (D50).
 
 - **P0 forks F1 to F25** are listed with their evidence in the receipt file's audit section.
   The four that change assigned moves are ruled: F1 by D13 (folded into P3), F4 by D27, F5 by D28,
@@ -981,8 +1341,7 @@ revision and what crosses at frame rate.
   `InteropBackend`, `NativeFrame` and sync types (about 3.5k duplicated lines, differing
   `DmaBufPlane` shapes), and scrying and welding share `NavigationEvent`, `Cookie`,
   `CursorShape`, `DragInput` and `KeyEvent`: shared vocabulary, not a repository merge (D7).
-- **Misfin's home (C).** It sits in smolweb but serves `mere-comms`, which cycle-breaks D4
-  sends to Murm. Whether it follows smolweb into Inker or goes to Murm.
+- **Misfin's home (C).** Settled by D33: it stays in the errand repository, which D32 keeps.
 - **Pandect's traced parts (P4).** Owners for settings, view sidecars, worker declarations and
   the furnace paths, found in P0.
 - **The derived layer's engine (P6).** Lessons D29 gates differential-dataflow on a wasm

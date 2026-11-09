@@ -21,7 +21,7 @@ Line numbers refer to `archive_docs/2026-10-28/2026-06-26_illume_text_lexer_plan
 ## Phases
 
 ### L1. A stable illume release
-illume 0.0.1 was published as a name-reserve straight from the workspace; the 0.0.x signals that the API is still moving. A stable release (0.1) follows once the API settles. The workspace crate is `crates/nematic/illume`.
+illume 0.0.1 was published as a name-reserve straight from the workspace; the 0.0.x signals that the API is still moving. A stable release (0.1) follows once the API settles. The workspace crate is `inker/crates/nematic/illume`.
 - Done when: a stable illume release is published once the API settles; the sources state no further gate.
 - Needs: the API to settle.
 - Rulings: -
@@ -68,7 +68,7 @@ The host-side reuse-lexer crate keeps the app's own parsers (cssparser, html5eve
 
 ## Findings
 
-- 2026-10-06 (carried): illume is `crates/nematic/illume`, licensed MPL-2.0; tinct is `crates/cambium/tinct`; the highlight bridge is cambium's `highlight` feature (`crates/cambium/cambium/src/highlight.rs`), not xilem-serval's. The Decisions section is copied unchanged, so Decision 5's 2026-07-08 revision (the seam moved into xilem-serval) still appears there, and its "Decision 8" names the old build sequence's point 8 (lines 150-158, 182); the extraction behind it was reversed on 2026-09-03 (`archive_docs/2026-10-28/2026-06-26_illume_text_lexer_plan.md:4-14,160-166`).
+- 2026-10-06 (carried): illume is `crates/nematic/illume` *(historical citation)* <!-- doc-audit: historical-path -->, licensed MPL-2.0; tinct is `crates/cambium/tinct` *(historical citation)* <!-- doc-audit: historical-path -->; the highlight bridge is cambium's `highlight` feature (`crates/cambium/cambium/src/highlight.rs`), not xilem-serval's. The Decisions section is copied unchanged, so Decision 5's 2026-07-08 revision (the seam moved into xilem-serval) still appears there, and its "Decision 8" names the old build sequence's point 8 (lines 150-158, 182); the extraction behind it was reversed on 2026-09-03 (`archive_docs/2026-10-28/2026-06-26_illume_text_lexer_plan.md:4-14,160-166`).
 - 2026-10-28 (observed in the tree, not in the old plan): the workspace manifest pins illume at 0.0.3 (`Cargo.toml:352`) and tinct at 0.2.0 (`Cargo.toml:461`); `highlighted_text_field` is documented there as the single-line, entities-only mode for an omnibar (`crates/cambium/cambium/src/highlight.rs:21-23`); `ports/graphshell/Cargo.toml:39` lists illume and `knot-editor-host` under its optional `editable-blocks` feature.
 
 ## Progress

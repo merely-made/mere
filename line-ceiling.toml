@@ -526,10 +526,6 @@ path = "ports/mere-resident/src/sync/transfer_staging.rs"
 reason = "Stage-and-forward: putting every byte a transfer names onto the destination before anything is applied. Existing source-size debt; a responsibility split must preserve StagingError and existing module visibility."
 
 [[exception]]
-path = "ports/mere-resident/tests/embedded_reservoir_validation.rs"
-reason = "V3/V5 regression: one domain validator is installed by open_with before serving and reused by daemon composition. Existing source-size debt; a responsibility split must preserve NoLocalPrompt, Process and existing module visibility."
-
-[[exception]]
 path = "ports/mere-resident/tests/inference_automatic.rs"
 reason = "Real resident settings, graph key agreement, app route and supervisor leases. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 

@@ -9,7 +9,7 @@
 
 *Reading, not ruled* marks this brief's own inference. Every other claim is a quotation, a file and line, or a cited source.
 
-**Path key.** Short paths in the tables expand as follows. `seiche/` is `crates/conatus/seiche/src/`; `pictograph/` is `crates/canvas/pictograph/src/canvas/`; `cartography/` is `crates/canvas/cartography/src/`; `sceno/` is `graphshell/crates/sceno/src/`; `numen/` is `crates/conatus/numen/src/`. The main files are `crates/conatus/seiche/src/lib.rs`, `crates/conatus/seiche/src/forces.rs`, `crates/canvas/pictograph/src/canvas/physics_catalog.rs`, `crates/canvas/pictograph/src/canvas/cartography_scene.rs` and `graphshell/crates/sceno/src/score.rs`. Files that exist only on a branch are cited in git's `rev:path` form, for example `1bf47cf9:crates/conatus/seiche/src/laws/density.rs`.
+**Path key.** Short paths in the tables expand as follows. `seiche/` is `crates/conatus/seiche/src/` *(historical citation)* <!-- doc-audit: historical-path -->; `pictograph/` is `crates/canvas/pictograph/src/canvas/`; `cartography/` is `crates/canvas/cartography/src/`; `sceno/` is `graphshell/crates/sceno/src/`; `numen/` is `crates/conatus/numen/src/` *(historical citation)* <!-- doc-audit: historical-path -->. The main files are `crates/conatus/seiche/src/lib.rs` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/conatus/seiche/src/forces.rs` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/canvas/pictograph/src/canvas/physics_catalog.rs`, `crates/canvas/pictograph/src/canvas/cartography_scene.rs` and `graphshell/crates/sceno/src/score.rs`. Files that exist only on a branch are cited in git's `rev:path` form, for example `1bf47cf9:crates/conatus/seiche/src/laws/density.rs`.
 
 ## 0. The result on one page
 
@@ -443,7 +443,7 @@ Determinism is partial today:
 
 - laws iterate nodes in sorted order so seeded runs reproduce (`seiche/laws/mod.rs:65-83`);
 - Anneal and Kinds are seeded (`LAW_SEED`, `physics_catalog.rs:56`);
-- seiche's manifest names no rapier features (`crates/conatus/seiche/Cargo.toml`, line 19), so cross-platform bit-identity is not claimed. Whether a spec promises reproduction or only resemblance is a receipt question, unverified here.
+- seiche's manifest names no rapier features (`crates/conatus/seiche/Cargo.toml` *(historical citation)* <!-- doc-audit: historical-path -->, line 19), so cross-platform bit-identity is not claimed. Whether a spec promises reproduction or only resemblance is a receipt question, unverified here.
 
 **How it would travel.** `SavedSceneV1` already carries the choice in flattened form: law, overlays and three sources (`ports/graphshell/src/product.rs`, lines 216–243), plus damping, paused and `arrangement_pull`. Affinity is absent, as the plan noted. Shelfmark lets a target own an opaque delta section, which is how mer3ly carries `mer3ly.motion`. So a citation could carry a `dynamics` section with no envelope change (*Reading*).
 
@@ -453,7 +453,7 @@ Determinism is partial today:
 
 | Term | Rungs in the tree | Rungs in the literature | Selected by |
 |---|---|---|---|
-| Inverse-square repulsion with cutoff (`NodeExclusion`) | CPU exact (`seiche/forces.rs:65-135`); staged closure (`seiche/lib.rs:364`); Burn `[N, N]` tensors (`seiche/tensor_forces.rs`); CubeCL tiled (`438187cb`); CubeCL cell list (`7784ddf5`); lagged seam (`03cb4207`); resident `integrate` (`crates/conatus/conatus/src/resident/kernels.rs`, line 177) | Verlet neighbour lists | node count per host, measured (P5) |
+| Inverse-square repulsion with cutoff (`NodeExclusion`) | CPU exact (`seiche/forces.rs:65-135`); staged closure (`seiche/lib.rs:364`); Burn `[N, N]` tensors (`seiche/tensor_forces.rs`); CubeCL tiled (`438187cb`); CubeCL cell list (`7784ddf5`); lagged seam (`03cb4207`); resident `integrate` (`crates/conatus/conatus/src/resident/kernels.rs` *(historical citation)* <!-- doc-audit: historical-path -->, line 177) | Verlet neighbour lists | node count per host, measured (P5) |
 | `1/d` charge (Charge, Hub pull) | Barnes–Hut on the CPU (`seiche/barnes_hut.rs:57`) | FM³ multipole; GPU Barnes–Hut; PME-style mesh | none today |
 | Stress | integration of pairwise springs (`stress.rs`) | KK Newton; majorization; SGD; sparse pivots | none today |
 | Spring-electrical energy | integration (Springs); Metropolis (Anneal) | L-BFGS (OpenMM's minimizer, Penrose) | the law id |

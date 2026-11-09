@@ -480,7 +480,7 @@ Current implementation boundaries:
   exact reason identity, stratum and displayed aliases. Each row contributes
   one slot; a Traversal row still contributes one irrespective of its event
   count or recency. Seiche stores only adjacent equal ordered pairs as counted
-  runs (`crates/conatus/seiche/src/edge_topology.rs`). Its public force and
+  runs (`seiche/crates/conatus/seiche-model/src/edge_topology.rs`). Its public force and
   diagnostic slice interfaces receive the original ordered rows through a
   transient expansion. Nonadjacent rows and reversed endpoints stay distinct,
   preserving addition order, directed laws and degree/neighbor multiplicity.
@@ -488,12 +488,12 @@ Current implementation boundaries:
   representation of the existing unit contributions, not weighted policy,
   one globally aggregated spring per link, or measured assertion force.
 - **Seiche's `EdgeSpring` acts only along the endpoint line**
-  (`crates/conatus/seiche/src/forces.rs`:184). It supplies no lateral path
+  (`seiche/crates/conatus/seiche/src/forces.rs`:184). It supplies no lateral path
   state. A field-responsive path needs its own evaluator and response model.
   Existing node-targeted couplings do not already act on paths.
 - **Numen's `EdgePath::Spline` and `EdgePath::FieldLine` remain vocabulary**
-  (`crates/conatus/numen/src/edge_path.rs`). The separate bounded evaluator in
-  `crates/conatus/numen/src/responsive_path.rs` implements P5's fixed-endpoint
+  (`seiche/crates/conatus/numen/src/edge_path.rs`). The separate bounded evaluator in
+  `seiche/crates/conatus/numen/src/responsive_path.rs` implements P5's fixed-endpoint
   response. Pictograph adapts shared link readings and Graphshell supplies the
   reference host. The implementation plan owns its bounds and visual evidence;
   the declarations alone do not install a response law.

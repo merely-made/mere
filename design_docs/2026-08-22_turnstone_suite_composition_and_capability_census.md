@@ -112,7 +112,7 @@ Frisket/Workbench furniture, Forme arrangements and Scenograph projections are
 available to both applications. An app's Mere keeps its durable authority.
 
 The first implementation lives in `ports/pelt/core/src/native.rs`,
-`crates/system/document-lanes/src/retained_clip.rs` and
+`inker/crates/system/document-lanes/src/retained_clip.rs` and
 `ports/graphshell/src/retained_content.rs`. It handles held HTML, normalized
 text, encoded images and selected text/WAV clips through retained Pelt sessions.
 Graphshell mounts the same portable input view and producer in its Workbench.

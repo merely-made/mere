@@ -9,7 +9,7 @@
 
 *Reading, not ruled* marks this brief's own inference. Every other claim is a quotation, a file and line, a measured figure, or a cited source.
 
-**Path key.** `seiche/` is `crates/conatus/seiche/src/`; `pictograph/` is `crates/canvas/pictograph/src/canvas/`; `scenomise/`, `sceno/` and `scenotime/` are `crates/cambium/scenes/<name>/src/`; `graphshell/` is `ports/graphshell/src/`. "Catalog" is the projection grammar catalog, "proofs plan" the projection proofs plan, "physics plan" the physics catalog plan, "grammar plan" and "grammar brief" the dynamics grammar plan and brief, "seam doc" the cartography–gyre layout seam. Line numbers are at the audit base.
+**Path key.** `seiche/` is `crates/conatus/seiche/src/` *(historical citation)* <!-- doc-audit: historical-path -->; `pictograph/` is `crates/canvas/pictograph/src/canvas/`; `scenomise/`, `sceno/` and `scenotime/` are `crates/cambium/scenes/<name>/src/`; `graphshell/` is `ports/graphshell/src/`. "Catalog" is the projection grammar catalog, "proofs plan" the projection proofs plan, "physics plan" the physics catalog plan, "grammar plan" and "grammar brief" the dynamics grammar plan and brief, "seam doc" the cartography–gyre layout seam. Line numbers are at the audit base.
 
 ## 0. The result on one page
 

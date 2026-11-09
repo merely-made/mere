@@ -157,7 +157,7 @@ Descend to the focused node's document and highlight the focused accessibility e
 - From: `archive_docs/2026-10-28/2026-06-25_operator_presence_overlay_plan.md:154-156, 55-57`
 
 ### OP4. The web-clip inspector as the local-cursor source (build step 3)
-Build the hover-pick inspector as the local-cursor source of the same element-highlight primitive, so the inspector and presence share code. The building blocks exist (`web_clip_script` with its `elementFromPoint` picker, `ClipRect` and semantic clip lowering in `crates/fleece/src/clip.rs`; `write_clip_node` in `crates/mere/src/clip.rs`) but no host calls them; the inspector UI is unbuilt.
+Build the hover-pick inspector as the local-cursor source of the same element-highlight primitive, so the inspector and presence share code. The building blocks exist (`web_clip_script` with its `elementFromPoint` picker, `ClipRect` and semantic clip lowering in `inker/crates/fleece/src/clip.rs`; `write_clip_node` in `crates/mere/src/clip.rs`) but no host calls them; the inspector UI is unbuilt.
 - Done when: the source states none.
 - Needs: OP3.
 - Rulings: -

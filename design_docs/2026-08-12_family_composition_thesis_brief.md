@@ -1332,9 +1332,9 @@ toolkits; they do not imply that native shared-core hosting is absent.
 | Mere view model and requests | Presentation from session/storage authority | Adapt toolkit input, focus and accessibility while retaining the same owner requests |
 
 Source homes are `crates/cambium/sprigging/src/lib.rs`,
-`crates/conatus/tenant/src/device.rs`,
+`seiche/crates/conatus/tenant/src/device.rs`,
 `crates/cambium/cambium-rootstock/src/lib.rs`,
-`crates/inker/inker/src/surface_engine.rs` and
+`inker/crates/inker/inker/src/surface_engine.rs` and
 `crates/cambium/mere-view/src/lib.rs`.
 The external trio is Scrying, Graft and Weld, with opt-in Inker adapters;
 native Pelt/Genet remains the baseline under the

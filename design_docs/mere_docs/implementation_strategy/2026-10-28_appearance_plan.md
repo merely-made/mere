@@ -136,7 +136,7 @@ The scoped shared CPU gate has excluded one document-canvas table test (`normal_
 ## Findings
 
 - 2026-10-28 (observed in the tree): Tabard is `crates/system/tabard` (`src/lib.rs` derives the Tinct palette, DTCG colour JSON, CSS custom properties and `lagrange_palette_txt()` with typed diagnostics, including `StockVersionIgnored`; `src/smolweb.rs` defines `SmolwebTheme`, re-exported by document-lanes; `src/typography.rs`, `src/workshop.rs`, `src/library.rs`). The workshop and its desktop host are `ports/tabard/workshop` and `ports/tabard/desktop`, moved there on 2026-10-26 (ownership repair plan §5); the old plan's earlier text still says `crates/cambium/tabard-workshop` (`archive_docs/2026-10-28/2026-07-05_theme_modes_plan.md:584-593,781`).
-- 2026-10-28 (observed): the excluded table test lives at `crates/inker/document-canvas/src/layout/tests.rs:1123`; its pass state was not re-run for this cut.
+- 2026-10-28 (observed): the excluded table test lives at `crates/inker/document-canvas/src/layout/tests.rs:1123` *(historical citation)* <!-- doc-audit: historical-path -->; its pass state was not re-run for this cut.
 - 2026-10-10 (carried, checked 2026-10-28): `.gitattributes:14` pins `crates/system/tabard/tests/fixtures/**` to LF, so the Lagrange golden compares byte for byte under `core.autocrlf`; the row had been left matching nothing when Tabard moved (`archive_docs/2026-10-28/2026-07-05_theme_modes_plan.md:528-537`).
 
 ## Progress

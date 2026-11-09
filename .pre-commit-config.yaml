@@ -16,7 +16,7 @@ repos:
         language: rust
         pass_filenames: false
         always_run: true
-        additional_dependencies: ["cli:https://github.com/merely-made/eidetic:responsa-v0.0.2:responsa"]
+        additional_dependencies: ["cli:https://github.com/merely-made/eidetic:responsa-v0.0.3:responsa"]
       - id: clippy
         name: clippy
         entry: cargo clippy --locked --all-targets

@@ -7,7 +7,7 @@ node-based game engine, fully deterministic, with scripts that reload in
 milliseconds". It is MIT licensed, "Copyright (c) 2026 Sébastien Crozet, Dragos
 Daian". Crozet is the Dimforge author of rapier, parry, kiss3d and nexus. Mere
 already carries his nexus binning under Apache-2.0
-(`crates/conatus/conatus/src/resident/binning`, with its `LICENSES.md` row). The
+(`crates/conatus/conatus/src/resident/binning` *(historical citation)* <!-- doc-audit: historical-path -->, with its `LICENSES.md` row). The
 repository has a `.claude/` folder and a `CLAUDE.md`, so it is partly
 AI-assisted. Its licence and named holders are what count for reuse.
 
@@ -399,13 +399,13 @@ and S4 in `design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md`.
 - The `seiche-repeat` probe (`Code/testing/mere/seiche-repeat`) already uses
   balaur's fold, FNV-1a over `to_bits` with positions sorted by key, but takes
   one fingerprint at the end of 300 ticks.
-- seiche's `LayoutSnapshot` (`crates/conatus/seiche/src/view.rs`, L65) holds
+- seiche's `LayoutSnapshot` (`crates/conatus/seiche/src/view.rs` *(historical citation)* <!-- doc-audit: historical-path -->, L65) holds
   only positions, for the host. It cannot be restored.
 - seiche runs two generators: xorshift32 for emitter jitter
-  (`crates/conatus/seiche/src/emitter.rs`) and SplitMix64 for the laws
-  (`crates/conatus/seiche/src/laws/mod.rs`).
+  (`crates/conatus/seiche/src/emitter.rs` *(historical citation)* <!-- doc-audit: historical-path -->) and SplitMix64 for the laws
+  (`crates/conatus/seiche/src/laws/mod.rs` *(historical citation)* <!-- doc-audit: historical-path -->).
 - seiche is on rapier2d 0.33, with neither `enhanced-determinism` nor
-  `parallel` on (`crates/conatus/seiche/Cargo.toml`).
+  `parallel` on (`crates/conatus/seiche/Cargo.toml` *(historical citation)* <!-- doc-audit: historical-path -->).
 - On the Scenograph side (L4), scenotime's `SceneSnapshot`
   (`graphshell/crates/scenotime/src/snapshot.rs`) crosses a wire with its
   tombstones and revisions. Nothing stores one.

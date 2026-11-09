@@ -295,7 +295,7 @@ not yet (the engine split plan's Open items carry the count).
 
 **Two documents left for Seiche on 2026-11-07.** The conatus engine plan and the
 conatus/nexus alignment brief had no area root here and followed their subject,
-`crates/conatus/`, to `merely-made/seiche` as its first area, `seiche_docs/` (engine
+`crates/conatus/` *(historical citation)* <!-- doc-audit: historical-path -->, to `merely-made/seiche` as its first area, `seiche_docs/` (engine
 split plan, P2 and D25), with their history; they are indexed in that repository's
 `design_docs/DOC_README.md`. Their D2 records stay here and map to the new home in
 `support/doc-audit/d2/moved_out.json`. The dynamics grammar and physics catalog plans,

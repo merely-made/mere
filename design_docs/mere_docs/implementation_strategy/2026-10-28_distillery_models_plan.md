@@ -90,6 +90,11 @@ Eponym and its ambience probe remain unverified because the checkout lacks the r
 - **Reliability and reputation accounting** is out of scope "until a lane gives standing a purpose"; its kith lane retired on 2026-09-02, so it has no home. From: `archive_docs/2026-10-28/2026-10-06_distillery_models_plan.md:132-133`; `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:1197-1206`
 - **Has Isometry's own repin onto the stable cohort landed?** The Burn plan's S18 waited on a checkpoint that was superseded by Isocosm moving to stable, but Isometry's repin is not stated done. From: `archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md:627,1652,1776`
 - **Does the Burn Fusion remote MiniLM autotune panic status need correcting in the Burn plan's record?** The Burn plan calls it a separate backend sidequest; the distillery plan records it as gone on stable and replaced by the autotune reclaim failure above. From: `archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md:572-575`; `archive_docs/2026-10-28/2026-10-06_distillery_models_plan.md:5-6`
+- **Session distillation is reserved here** (engine-split D46, 2026-11-09): a Distillery job
+  winnows browsing sessions into an indexed dataset engram that informs a model or agent adapter.
+  It reads Eidetic captures, codicils and search, and its output is what a Gemot FLORA round
+  (`gemot/crates/gemot/src/moot/flora.rs`) can cite. No phase owns it yet. The furnace's
+  retention passes are not it: they split between Eidetic and pandect under engine-split D45.
 
 ## Findings
 

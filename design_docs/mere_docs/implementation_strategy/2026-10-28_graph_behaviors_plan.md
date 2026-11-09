@@ -225,7 +225,7 @@ on a live moot, the mere-native meadowcap structural-cap layer, and "broader con
   `draining` flag makes the tiers structural); a constant digest journals nothing after the first
   write (`:417-435,905-932`).
 - 2026-10-06: the omnibar Rhai lane left with Meerkat; the shared sandboxed engine in
-  `crates/script/rhai/src/lib.rs` holds. `DocumentScript` attaches a Wasm component to a focused
+  `inker/crates/script/rhai/src/lib.rs` holds. `DocumentScript` attaches a Wasm component to a focused
   page and gates imports before instantiation (mod plan `:31-70`).
 
 ## Progress

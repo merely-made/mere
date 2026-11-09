@@ -68,9 +68,9 @@ fleece = { path = "../genet/components/fleece" }
 # cargo fails with "failed to find <pkg> in path source" — the missing-entry
 # trap, not a network problem.
 "genet-render-host" = { path = "../genet/components/genet-render-host" }
-# The inker family is NOT here any more, and neither is knot-editor-host: it landed in mere 2026-09-03 as the
-# workspace member crates/inker/knot-editor-host. Patching a git source at a path that
-# is also a workspace member is a hard lockfile collision, so the four crates
+# The inker family is NOT here any more, and neither is knot-editor-host: it retired in the engine split
+# (2026-11-07). Its editor is in Knot's knot-document and its lexers are in Illume. Patching a git source
+# at a path that is also a workspace member is a hard lockfile collision, so the four crates
 # the platform boundary plan landed that day — pelt, tabard, knot-editor-host
 # and mere-document-lanes — must never appear in this table.
 #

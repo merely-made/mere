@@ -7,7 +7,7 @@ feature plans are non-overlapping layers it cross-refs. Written to stop the plan
 (six docs circling the orrery-as-interactive-document with overlapping claims), verified against
 the tree by a five-agent consolidation pass (2026-06-18).
 **Code**: `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path --> (fetch, content, render, input, window_view), `crates/orrery/` *(historical citation)* <!-- doc-audit: historical-path -->
-(orrery + gyre + arrangements), `crates/inker/` (engines), `crates/graph/` (kernel + linked-data).
+(orrery + gyre + arrangements), `inker/crates/inker/` (engines), `crates/graph/` (kernel + linked-data).
 
 This doc is the **spine**; the [composition spine](2026-05-21_mere_composition_spine.md) stays
 the *arrangement ontology* (forme / platen projection). Where this doc names an owner, that plan

@@ -463,14 +463,14 @@ and Distillery enrichment do not enter this first delivery's dependency cone.
   receiving native web-only dispatch is
   `ports/graphshell/mere/src/browser.rs`. Neither proves a browser clipboard
   or attached-tab realization exists.
-- `crates/fleece/src/page_links.rs` resolves/deduplicates targets. Genet's
+- `inker/crates/fleece/src/page_links.rs` resolves/deduplicates targets. Genet's
   `genet/components/fleece/src/lib.rs` has a rect-free `Link` with href/text/rel
   and canonical-text selector facilities, but no full per-link context record.
   This shape was also checked on fetched Genet main `55f3908edff`.
-- `crates/fleece/src/eidetic_bridge.rs` preserves caller-supplied capture
-  evidence; `crates/fleece/src/portable_clip.rs` exports approved part closure
+- `inker/crates/fleece/src/eidetic_bridge.rs` preserves caller-supplied capture
+  evidence; `inker/crates/fleece/src/portable_clip.rs` exports approved part closure
   without traversing private backing or external source URLs.
-- `crates/system/page-load/src/lib.rs` already gates outcomes by request and
+- `inker/crates/system/page-load/src/lib.rs` already gates outcomes by request and
   carries typed input, client-certificate and certificate-change failures.
   `crates/system/fetch/src/handle.rs` is explicitly blocking and refuses
   unsupported rich requests. Reuse the former in Wasm; reuse the latter only

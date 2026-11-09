@@ -107,7 +107,7 @@ pass.
 - 2026-10-06: plan written; F3, F4 and F6 recorded in the data formats
   brief.
 - 2026-10-06: H1 landed on branch `mere-framing`.
-  - **The crate.** `crates/system/framing`, published as `mere-framing` with
+  - **The crate.** `eidetic/crates/framing`, published as `mere-framing` with
     lib name `framing`, depending on postcard and serde only.
   - **Its API.** `frame`, `unframe`, `peek` and `split` in wing-formats'
     layout, byte for byte. A test writes the expected bytes out by hand.

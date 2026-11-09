@@ -504,7 +504,7 @@ ruling as §7 does.
    is a status, and nothing in mere's tree names the scheme on a fetch path;
    `document-lanes`' smolweb lane only renders a body it is handed, by scheme
    or by `message/x-misfin`. So inker's default `misfin` scheme rule
-   (`crates/inker/inker/src/routing.rs`) and the registry's middlenet scheme
+   (`inker/crates/inker/inker/src/routing.rs`) and the registry's middlenet scheme
    list (`viewer.rs`) reach a reader with nothing to read. The comms adapter
    (`murm/native/crates/comms/src/misfin_adapter.rs`) presents one mailbox from the
    receive server's `MailboxStore`, one conversation per correspondent, and
@@ -553,7 +553,7 @@ ruling as §7 does.
 
 Landed 2026-10-27, read at `10fe98b50`. Rulings 6 and 8 (`cebb68fa4`, merged
 as `306fa68c7`): `inker::PresentationDeclaration`
-(`crates/inker/inker/src/presentation.rs`) carries the four parts: `presents`
+(`inker/crates/inker/inker/src/presentation.rs`) carries the four parts: `presents`
 (schemes, content types, extensions), `reaches` (`SurfaceContractMode`,
 accessibility, producer capabilities), `accepts` (source edits, commands) and
 `operations`. `EngineRoutePolicy::default` is built from the declared
