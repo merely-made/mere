@@ -1406,3 +1406,8 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   interaction tests: focus order, zoom and narrow layout, focus-follow against manual scroll, live region and
   heading stability, disabled-while-busy) and its mount in `graphshell-mere` (3 tests; 44 before, 47 after);
   Mere's lock moves `dramatis.git` to the surface commit. `scripts/check_family_cycles.py --remote` passes (The P0 result).
+- 2026-11-08 (host placement): engine-split P3 had not landed when the Dramatis pane was placed (Mere `183acf839`, Graphshell
+  `4d971f38`: the Graphshell repository still holds only the contract root, and Cambium is in Mere), so the pane is Mere's
+  `ports/graphshell/dramatis-pane` plus a mount in `ports/graphshell/mere`. Both sit inside `ports/graphshell`, which D23
+  moves to Turnstone, so the P3 lane carries them with it: the pane crate names only `cambium`, `cambium-desktop`,
+  `cambium-rootstock`, the published projection contract and `dramatis-surface`, and needs no change but its path.
