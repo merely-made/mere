@@ -53,6 +53,9 @@ getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optio
 
 [dev-dependencies]
 kernel = { workspace = true, features = ["fixtures"] }
+# The W3C conformance harness (tests/w3c_conformance): RDF/XML parsing and SPARQL result files.
+oxrdfxml = { version = "0.2", features = ["rdf-12"] }
+sparesults = { version = "0.3", features = ["sparql-12"] }
 
 [lints]
 workspace = true

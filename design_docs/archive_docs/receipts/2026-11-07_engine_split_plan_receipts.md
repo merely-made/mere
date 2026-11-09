@@ -877,3 +877,79 @@ Every branch starts from that repository's `origin/main`. Mere's branch was reba
     other local checkouts): exit 0 once the stale `[[isolated]] murm/apps/signalman-desktop` (D17)
     entry is deleted. With it, the run exits 1 and names that entry as stale.
   - The edges include `graphshell/host -> mere` and `mere -> graphshell`, with no cycle between them.
+
+
+## 2026-11-09: P0 conformance ledger, first run (branch `es/ledger`, worktree `C:/t/mere-es-ledger`)
+
+Base: Mere main `31dc9107d`. Adapter: `crates/graph/linked-data` (package `mere-rdf`), last changed in `60622438`. Ledger: `mere_docs/testing/2026-11-09_conformance_ledger.md`. Harness: `crates/graph/linked-data/tests/w3c_conformance/` (`main.rs`, `manifest.rs`, `rdf.rs`, `sparql.rs`, `jsonld.rs`, `report.rs`; new; no manifest touched, no dependency added). No W3C manifest runner existed in Mere, Eidetic or the family (grep for `manifest.ttl`, `mf:entries`, `rdf-tests`, `json-ld-api` over every repository's `crates`, `tests` and `ports` found none).
+
+**Suites** (plain `git clone` of `origin` into `C:/Users/mark_/Code/crates/<name>`, nothing else fetched):
+
+| Clone | HEAD | Commit date | Branch | Size |
+|---|---|---|---|---|
+| `rdf-tests` | `202a74eb81f47bcad13bbafdd37eba69c361c1c2` | 2026-11-04 | main | 39 MB |
+| `json-ld-api` | `55514738d854e56bb8bad4c53cda2f0e23be4a50` | 2026-10-07 | main | 43 MB |
+| `data-shapes` | `9c102cbb5309fe2662cb6b608e4c17413df357d8` | 2026-11-08 | gh-pages | 37 MB |
+| `rdf-canon` | `15619df2fda7a4ca88308733789b6774517f9638` | 2026-02-24 | main | 6.7 MB |
+
+`data-shapes` clones onto `gh-pages` (its default branch); recorded as cloned.
+
+**Commands** (Git Bash, `CARGO_PROFILE_DEV_DEBUG=0`, `CARGO_BUILD_BUILD_DIR=C:/t/cargo-build/mere-es-ledger` by environment because `.cargo/config.toml` is tracked and cannot be a gitignored local file, `-j 4`, one cargo command at a time):
+
+- `cargo check -j 4 -p mere-rdf --features query --test w3c_conformance`: clean (the only warnings are the existing `mere-kernel` ones).
+- `cargo check -j 4 -p mere-rdf --tests` (no `query` feature): clean; the SPARQL part is `cfg(feature = "query")`.
+- `W3C_SUITES_DIR=C:/Users/mark_/Code/crates cargo test -j 4 -p mere-rdf --features query --test w3c_conformance -- --include-ignored --nocapture`: `2 passed`; the run takes about 1 s. A second run after `rustfmt` gave byte-identical ROW, LEAF and FAIL lines.
+- `W3C_SUITES_DIR=C:/nonexistent` the same command: prints `W3C suites absent ... skipping`, `2 passed`.
+- Controls (test `instrument_controls`, runs by default): a bad N-Triples line is rejected, a good one parses to one quad, blank-node renaming is isomorphic and a real difference is not, `from_nquads` rejects and accepts as expected.
+
+Two harness faults found and fixed during the first runs, kept here because they changed counts: (1) the SPARQL syntax tests were first run without a base IRI and 20 failed on relative IRIs; with the test's own address as base all 106 + 63 pass (the adapter's own call has no base, so the ledger says so); (2) a negative JSON-LD test passed whenever a context was unreachable, so rejections caused by a context outside the suite are now skipped, and the adapter's context cache holds every `.jsonld` file under `tests/`.
+
+**Counts** (pass / fail / skip; `parser` = `oxttl`, `oxjsonld`, `spargebra` as the adapter configures them; `adapter` = `from_nquads`, `from_trig`, `from_jsonld_with_contexts_and_base_iri`):
+
+| Suite, category | parser | adapter |
+|---|---|---|
+| rdf12 syntax (N-Triples 33/1/0, N-Quads 31/0/0, Turtle 77/0/0, TriG 38/0/0, RDF/XML 0/0/2) | 179 / 1 / 2 | 69 / 0 / 113 |
+| rdf12 eval (Turtle 32, TriG 26, RDF/XML 0/0/29) | 58 / 0 / 29 | all 87 skipped |
+| rdf12 c14n, entailment | 0 / 0 / 82, 0 / 0 / 29 | all skipped |
+| rdf11 syntax | 539 / 0 / 40 | 286 / 15 / 278 |
+| rdf11 eval | 288 / 0 / 126 | all 414 skipped |
+| rdf11 entailment | 0 / 0 / 48 | all skipped |
+| sparql11 query syntax | 106 / 0 / 0 | all skipped |
+| sparql11 query eval | 0 / 0 / 247 | all skipped |
+| sparql11 update syntax | 63 / 0 / 0 | all skipped |
+| sparql11 update eval | 0 / 0 / 94 | all skipped |
+| sparql12 syntax | 200 / 3 / 0 | all skipped |
+| sparql12 eval (65 query, 3 update) | 0 / 0 / 68 | all skipped |
+| jsonld toRdf (467 tests) | 439 / 10 / 18 | 441 / 1 / 25 |
+| jsonld expand 386, compact 246, flatten 58, fromRdf 54, html 50, remote-doc 18 | all skipped | all skipped |
+
+Entry counts per walked root: rdf12 380, rdf11 1,041, sparql11 query 353, sparql11 update 157, sparql12 271.
+
+**Failing tests** (parser layer unless stated):
+
+- rdf12: `ntriples-version-1` (`VERSION` directive in N-Triples rejected).
+- rdf11 adapter, `from_trig`: 15 positive tests (`trig-syntax-number-01` to `-11`, `trig-syntax-datatypes-01` and `-02`, `trig-syntax-kw-01` and `-02`) rejected with "No scheme found in an absolute IRI": relative IRIs, and `from_trig` takes no base IRI. The same inputs pass at the parser layer with a base.
+- sparql12 syntax: `nested-aggregate-functions`, `tripleterm-subject-03`, `tripleterm-subject-06` accepted; the suite says reject.
+- jsonld toRdf, dataset not isomorphic to the expected output: `#t0122`, `#t0123`, `#tc013`, `#tdi02`, `#tdi04`, `#tdi05`, `#tdi06`, `#te062`, `#te091` (the `di` tests are the default-direction cases, which the adapter's `rdf-12` build answers with RDF 1.2 directional literals). `#tli12` rejected at both layers: base `http://invalid/<>/` is refused as an invalid IRI.
+
+**Skip reasons**: RDF/XML (no parser in the adapter; `oxrdfxml` is in the lock but not a dependency of `mere-rdf`); C14N (no canonical output entry point); entailment (no stage); SPARQL query evaluation (comparison needs `sparesults`, not a dependency; the adapter's `query::sparql` runs SELECT and ASK over a kernel `Graph` only); update evaluation (no entry point); JSON-LD 1.0-only tests (11), `rdfDirection` (4), `expandContext` (1), `processingMode` 1.0 at the adapter (8); the other JSON-LD algorithms (no API). Not run: `data-shapes` (SHACL) and `rdf-canon` (RDFC-1.0), no engine stage yet.
+
+## 2026-11-09 (later): ledger rerun with SPARQL query evaluation and RDF/XML (branch `es/ledger`, on Mere main `c480cefd9`)
+
+Mark's rulings D61 to D63. Harness gained: `oxrdfxml` for RDF/XML (syntax and evaluation, RDF 1.1 and 1.2), `spareval` over an `oxrdf::Dataset` with expected results read through `sparesults` (SRX, SRJ, TSV; CONSTRUCT and DESCRIBE compared as graphs) for SPARQL query evaluation. Dev-dependencies of `mere-rdf` only: `oxrdfxml = "0.2"` (feature `rdf-12`) and `sparesults = "0.3"` (feature `sparql-12`).
+
+**Lock diff** (`Cargo.lock`, +15 lines): one new package, `oxrdfxml` 0.2.5, resolved from crates.io (depends on `oxilangtag`, `oxiri`, `oxrdf`, `quick-xml` 0.37.5, `thiserror` 2.0.21, all already locked), plus the two dev-dependency edges on `mere-rdf` (`oxrdfxml`, `sparesults`). Nothing else new. `oxrdfxml` 0.2.4 pins `oxrdf =0.3.4`, which would have split the types; 0.2.5 uses the single locked `oxrdf` 0.3.5.
+
+**Commands**: `cargo check -j 4 -p mere-rdf --features query --test w3c_conformance` (clean), then `W3C_SUITES_DIR=C:/Users/mark_/Code/crates W3C_VERBOSE=1 cargo test -j 4 -p mere-rdf --features query --test w3c_conformance -- --include-ignored --nocapture`: `2 passed`, 2 to 40 s depending on cache. Scoring: row order is not checked; numeric literals compare by value (integer, decimal, double, float), because the first pass compared lexical forms and failed 28 tests on `1` against `1.0`.
+
+**Counts** (parser layer; pass / fail / skip): rdf12 syntax 181 / 1 / 0 (RDF/XML 2/0/0 included), rdf12 eval 85 / 2 / 0 (RDF/XML 27/2/0), rdf11 syntax 579 / 0 / 0 (RDF/XML 40/0/0), rdf11 eval 412 / 2 / 0 (RDF/XML 124/2/0), sparql11 query syntax 106 / 0 / 0, sparql11 query eval 230 / 14 / 3, sparql11 update syntax 63 / 0 / 0, sparql11 update eval 0 / 0 / 94, sparql12 syntax 200 / 3 / 0, sparql12 query eval 64 / 1 / 0, sparql12 update eval 0 / 0 / 3, jsonld toRdf 439 / 10 / 18. Adapter layer unchanged: rdf12 syntax 69 / 0 / 113, rdf11 syntax 286 / 15 / 278, jsonld toRdf 441 / 1 / 25; everything else skipped (no entry point).
+
+**Failing tests by suite**
+- rdf12: `ntriples-version-1`; RDF/XML `rdf12-xml-an-13`, `rdf12-xml-an-14` (not isomorphic).
+- rdf11: RDF/XML `xml-canon-test001`, `xml-canon-test002` (not isomorphic); adapter `from_trig` as before (15 relative-IRI tests).
+- sparql11 query eval (14): aggregates `agg-groupconcat-04`, `agg-groupconcat-06`; bindings `graph-from-named-1`, `-2`, `-3`, `values-construct-group-by` (rejected at parse: expected `UNDEF`); functions `bnode01`; negation `graph-minus`; property-path `zero_or_more_set_start`, `zero_or_more_set_end`, `zero_or_one_set_start`, `zero_or_one_set_end`; subquery `subquery15`, `subquery16`. Not verified as engine faults: the `graph-from-named`, `graph-minus`, property-path `set_*` and `subquery` cases involve named-graph data or FROM clauses, where the harness's graph naming and dataset loading may be at fault.
+- sparql12: syntax `nested-aggregate-functions`, `tripleterm-subject-03`, `tripleterm-subject-06` (accepted); eval `select-variable-reuse` (rejected at parse).
+- jsonld toRdf: as in the first run.
+
+**Skips**: 3 sparql11 query-eval tests whose expected result is in a format the harness does not read; 94 + 3 update evaluation tests: `spareval` 0.2.9 evaluates queries, and its `PreparedDeleteInsertUpdate` covers DELETE/INSERT deltas only, so a full update run needs harness-written executor code for the rest (INSERT DATA, DELETE DATA, LOAD, CREATE, CLEAR, DROP, ADD, COPY, MOVE); returned to Mark as a fork.
+

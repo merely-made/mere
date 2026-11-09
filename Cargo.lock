@@ -9713,9 +9713,11 @@ dependencies = [
  "mere-kernel",
  "oxjsonld",
  "oxrdf",
+ "oxrdfxml",
  "oxsdatatypes",
  "oxttl",
  "serde_json",
+ "sparesults",
  "spareval",
  "spargebra",
  "time",
@@ -11766,6 +11768,19 @@ dependencies = [
  "oxiri",
  "oxsdatatypes",
  "rand 0.9.5",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "oxrdfxml"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b69a81d41e2ee7d0d296980e6e44d3d2282f558cd82a8b3b4988c2eb06a6e07d"
+dependencies = [
+ "oxilangtag",
+ "oxiri",
+ "oxrdf",
+ "quick-xml 0.37.5",
  "thiserror 2.0.21",
 ]
 
