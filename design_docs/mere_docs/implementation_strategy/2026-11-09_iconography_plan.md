@@ -2,7 +2,8 @@
 
 **Date:** 2026-11-09
 **Status (2026-11-09):** G landed (grammar identity, key domains, the full
-face cache key); every other phase open. D1 (emblem's repository hosts the
+face cache key) and T1 (the text arm, drawing version 2); every other phase
+open. D1 (emblem's repository hosts the
 faces crate) and D2 (identity and drawing version separately) ruled 2026-11-09;
 every other fork carries a provisional recommendation. SVG output (emblem's
 plan) landed the same day.
@@ -473,3 +474,14 @@ Provisional (recommended first; asked only if they become blocking):
   tests show every route to an address face gives the same bytes, two domains
   give two faces, and a drawing bump misses the cache without moving
   parameters.
+- 2026-11-09: T1 landed in pictograph: `src/text_arm.rs` draws one plate
+  (rounded square for `Block` with quadratic corners, diamond for `Diamond`) in
+  the primary entry and one accent figure by symmetry (bar, dot, diagonal),
+  every coordinate an integer in `[-30, 30]`; arms are `[0, 14)`, `[14, 32)`,
+  `[32, ∞)` (`TEXT_THRESHOLD = 14`); `CELLS5` drawing version 2. Tests: a walk
+  of heights 0 to 200 in half-pixel steps matches exactly one arm's reference
+  calls at each; the six (form, symmetry) marks are distinct; the text arm is
+  primary then accent; two faces agreeing on form, symmetry and colours draw
+  the same mark whatever their grids; fills at 8, 20 and 64 px are palette
+  entries only. The four goldens moved in length and digest only; their
+  filled-cell counts did not. The largest fixture face is 217 bytes.
