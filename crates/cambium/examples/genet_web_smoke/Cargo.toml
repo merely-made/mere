@@ -104,17 +104,17 @@ stickleback = { git = "https://github.com/merely-made/eidetic.git", branch = "ma
 text-protocol = { git = "https://github.com/merely-made/errand.git", branch = "main" }
 # Keep the standalone smoke on this checkout's current scripted-DOM and
 # render-neutral DOM contracts instead of a previously published graph.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.2" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "0.1.2" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "0.1.1" }
 # Published Genet Taffy fork, locally patched to this checkout for smoke builds.
 # The exact versions pick one package each: genet holds two `genet-taffy`s.
-genet-taffy = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.16.0" }
+genet-taffy = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "0.16.0" }
 # ahash runtime-rng/getrandom-0.3 drop for the wasm graph.
 sonic-rs = { git = "https://github.com/merely-made/genet.git", branch = "main" }
 # Classic 0.11 and its owned repairs; standalone patches are not inherited.
-netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0" }
-netrender-vello-encoding = { git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0" }
-netrender-vello-shaders = { git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0" }
+netrender-vello = { git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos" }
+netrender-vello-encoding = { git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos" }
+netrender-vello-shaders = { git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos" }
 
 [workspace.package]
 rust-version = "1.97.1"

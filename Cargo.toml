@@ -293,11 +293,11 @@ weld-engine = { version = "0.2.0", git = "https://github.com/merely-made/inker.g
 # full git spec, so a genet bump meant editing fifteen files and a missed one
 # silently forked the lineage. Stated once here; members inherit with
 # `foo.workspace = true` and add only their own features/optional flags.
-genet-scripted-dom = { version = "=0.1.2", git = "https://github.com/merely-made/genet.git", branch = "main" }
+genet-scripted-dom = { version = "0.1.2", git = "https://github.com/merely-made/genet.git", branch = "main" }
 # Unpublished (0.0.0): native event dispatch plan, Phase 2 (cambium click, key and focus listeners).
 genet-events = { version = "0.0.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
-layout-dom-api = { version = "=0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
-layout_dom_api = { package = "layout-dom-api", version = "=0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
+layout-dom-api = { version = "0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
+layout_dom_api = { package = "layout-dom-api", version = "0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
 genet-livery = { version = "0.0.4", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false }
 # Named genet-probe until genet 7baa554c (2026-09-14); same crate, new name.
 taproot = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false, features = ["accesskit"] }
@@ -319,13 +319,13 @@ errand = { version = "0.4.0", git = "https://github.com/merely-made/errand.git",
 # errand lived there; they arrive here with it. `finger-protocol` carries
 # WebFinger too, which errand deliberately does not enable, since WebFinger is
 # HTTP and errand does not speak HTTP.
-nex-protocol = { version = "=0.1.1" }
-spartan-protocol = { version = "=0.1.1" }
-guppy-protocol = { version = "=0.1.1" }
-gopher-protocol = { version = "=0.2.0" }
-gemini-protocol = { version = "=0.1.7" }
-scroll-protocol = { version = "=0.1.0" }
-finger-protocol = { version = "=0.1.1", default-features = false, features = [
+nex-protocol = { version = "0.1.1" }
+spartan-protocol = { version = "0.1.1" }
+guppy-protocol = { version = "0.1.1" }
+gopher-protocol = { version = "0.2.0" }
+gemini-protocol = { version = "0.1.7" }
+scroll-protocol = { version = "0.1.0" }
+finger-protocol = { version = "0.1.1", default-features = false, features = [
     "client",
 ] }
 netfetcher = { version = "0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
@@ -480,8 +480,8 @@ settings-wit = { version = "0.0.1", path = "crates/system/settings-wit" }
 # package and revision, preserving one concrete Scene type across Sprigging,
 # Pictograph and Netrender. The fork retains the owned renderer repairs on
 # the upstream 0.11 release.
-vello = { package = "netrender-vello", version = "0.11.0", git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0", default-features = false }
-netrender_vello = { package = "netrender-vello", version = "0.11.0", git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0", default-features = false }
+vello = { package = "netrender-vello", version = "0.11.0", git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos", default-features = false }
+netrender_vello = { package = "netrender-vello", version = "0.11.0", git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos", default-features = false }
 # 30.0.1 at least: 30.0.0 decodes a successful WebGPU error-scope pop through
 # `JsOption`, which wasm-bindgen 0.2.126 and later read as an error, and panics
 # (burn plan 13.37, 13.38).
@@ -683,9 +683,9 @@ muniment = { git = "https://github.com/merely-made/eidetic.git", branch = "main"
 # Classic 0.11 plus the owned Radeon, command-progress and resource repairs.
 # Patches are not inherited from Netrender. Keep Classic and its encoding/
 # shader packages on the exact source used by the workspace Scene aliases.
-netrender-vello = { git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0" }
-netrender-vello-encoding = { git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0" }
-netrender-vello-shaders = { git = "https://github.com/mark-ik/vello", rev = "dfb9b53b315561887761deff319afed08cc33ff0" }
+netrender-vello = { git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos" }
+netrender-vello-encoding = { git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos" }
+netrender-vello-shaders = { git = "https://github.com/mark-ik/vello", branch = "mark-ik/all-vellos" }
 # cubecl-wgpu 0.10.0, vendored from the registry and moved to wgpu 30. This is
 # the "narrow CubeCL backport" of the 2026-08-15 wgpu 30 unification: it is the
 # ONLY crate in the burn 0.21 / cubecl 0.10 stack that names wgpu at all, so
@@ -728,8 +728,8 @@ cubek-matmul = { path = "support/patches/cubek-matmul" }
 # the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
 # cases, plus nine unfused native launcher controls. Vendored patch source
 # remains for provenance; current consumers select the registry crate.
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.1" }
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.2" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "0.1.2" }
 # Livery/Buckram select published genet-taffy 0.16 directly. No Git patch is
 # needed; the registry source remains independent of the Genet checkout.
 # No parley/fontique patch rows: as of genet 5ae30cad the forks are published as
