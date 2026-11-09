@@ -1464,6 +1464,29 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   carries Mere's graphics stack through `mere-resident` to `graphshell`). Knot lib 171 passed, all Knot test binaries pass.
   `check_family_cycles.py --remote`: exit 0.
 
+- 2026-11-08 (later): P2 remainder, Mark's four rulings (no pins, no locks, one checkout, main). **Mere `2cdb1aa6c`, `65454be2b`
+  (main); Knot `d3f0468` (main).** (2) **The supervised child offers the `knot` route.** `knot_sync_host --door-custody` keeps
+  the `KnotResidentSource` beside the host (it is the one process that opens Knot's redb) and offers `knot` through the
+  door's projection-provider route, a session per permitted viewer with the editor's write grant (`--offer-route <route>`,
+  default `knot`; `--no-offer`). A refused or ended offer is logged and never stops sync. Mere un-reserved `knot` in the
+  provider policy (the resident composes no lane of its own now; the reserved-route test lost its `knot` row and a new
+  assertion accepts it). Ported into Knot: `tests/supervised_projection.rs` (from `knot_checkpoint_receiving`: the real
+  child repairs a legacy checkpoint when it opens the store, a viewer reads and saves through the `knot` route, a restarted
+  child continues the signed author; 1 test; Mere had 1 + 1 ignored helper) and `tests/knot_residue.rs` (harness off, with
+  copies of Mere's `residue` and `residue_verdict` helpers; the source-and-session run is what the child holds and offers; 1
+  before, 1 after). (3) **`test-fixtures` on `mere-resident`** exposes `resident_mere::fixture` (`Fixture`, `fixture`,
+  `attach`, public `catalog`, `grants`, `route`; the rest `pub(super)` for the in-crate tests, which now import it; the
+  module was cut out of `resident_mere::tests` with no test change). Knot's dev-dependency takes the feature and
+  `tests/mere_overlay_door.rs` holds the two `knot_overlay_*` tests (2 before in Mere history, 2 after). `mere-resident` lib
+  stays 270 (1 known failure). (4) **The live revoke path.** `applications::GrantWatch` compares the owner's settings
+  `applications` with what it last saw: a grant that is gone is emptied in the door's grants and `BlobDoor::revoke(app)`
+  runs (sessions cut, serving withdrawn, leases and scope ownership kept); a grant that comes back calls `restore`. `djinn`
+  runs it every 2 s in the maintenance loop. Test `removing_a_grant_while_a_peer_is_mid_fetch_refuses_the_next_chunk`
+  (`tests/blob_door.rs`, 2 to 3): the peer's verified stream has its first piece, the grant is removed, the next chunk is
+  refused, serving authority is gone, the door refuses a new connection, the lease and bytes remain, and a re-grant rebuilds
+  serving. `cargo check --workspace` clean in both repositories; checker exit 0. (1) **Not done: `block_editing`.** See
+  P2 remainder, "Stopped on `block_editing`".
+
 ### P2 remainder (2026-11-08)
 
 - **`mere -> knot-editor` is not gone.** The resident's rows are; `ports/graphshell/Cargo.toml:223` (`knot-document`,
@@ -1488,4 +1511,26 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   standalone host always did); no live grant-removal path calls `BlobDoor::revoke` in `djinn` (still the API only);
   `resident_v1_fixture` (an example seeding the lane) was deleted; its code is in Mere's history and the Knot test seeds
   its own vault.
+
+### Stopped on `block_editing` (2026-11-08, ruling 1)
+
+Mark ruled that `block_editing.rs` moves into Knot so `ports/graphshell` stops naming `knot-document`. The move is not
+mechanical, and the docs do not settle what replaces it, so it stopped here with nothing changed and the
+`mere -> knot-editor` allowlist entry still in place.
+
+- **What names Knot:** only `src/block_editing.rs` (`use knot_document::retained::KnotEditor`), in one struct,
+  `Document { id, editor: KnotEditor }` (`new`, `blocks`, `wrap_selection`, `apply`, and the six tests). `Change`,
+  `Preview`, `Div`, `wrap` and `MAX_DOCUMENT_BYTES` in the same file, and the five submodules (`adapter`, `rhyme`,
+  `sheet_leaf`, `worker`, `store`), name no Knot.
+- **What consumes it:** `block_pane.rs` holds a `Document` and reaches into `document.editor.source()` at some twenty sites
+  (preview, apply, undo and save use its history); the `blocks` binary and `web`'s `product` feature
+  (`graphshell/editable-blocks`) compose that pane inside Mere. A producer seam therefore needs a `BlockDocument` trait in
+  Graphshell and a factory the host registers, and then every Mere build that links the pane needs an implementation
+  without naming Knot.
+- **The choice:** (A) give Graphshell its own small buffer-with-undo implementation of the trait (duplicating what
+  `KnotEditor::scratch` supplies, so `editable-blocks` keeps working in Mere with no Knot); Knot registers its richer one
+  where it composes the pane. (B) make the pane's host (`blocks`, the web product) live outside Mere, with the
+  Turnstone/Graphshell move (engine-split P3 / D23), so Mere keeps only the trait and no default; the feature is dead in
+  Mere builds until then. (C) leave it until D23 (the earlier recommendation, now overruled by ruling 1, so asking
+  whether A or B is meant).
 
