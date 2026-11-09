@@ -440,6 +440,40 @@ hest `Invocation`s out and `Outcome`s in, and `chrome::effects`) has no consumer
 Graphshell or Turnstone constructs the view model or consumes the host input, and `GraphshellRuntime`
 exists only in doc comments. Superseded the same day by D30: the frame model retires and chrome is
 audited for dissolution; D29's shape is the rule for rootstock's embedding and any future runtime step.
+
+**Slice 2: dissolve the app's linked modules (D67 to D73, D81 to D83).** The reference app
+(`ports/graphshell`) cannot leave for Turnstone while anything below Turnstone links it. Four
+places do: `mere-resident` (13 modules, about 23k lines, 36 non-test use lines), Cleromancy
+(`personal_sync`), Woodshed (a dev row for one conformance test) and Knot (the optional
+`block-editor` feature). The resident serves these modules and never calls the app, so each
+module moves to its owner below both sides. No route is added. Steps, in dependency order:
+
+- **S1, leaves with no dependents among the others.** `declaration` to `graphshell-door`;
+  `kept_text` to Eidetic (D71); the goal surface's provider, facts and door to the resident
+  (D71); `coop`'s owner side to `graphshell-host`, after `declaration`; `carriage` and
+  `receipts` to the resident's `sync/` (D81).
+  - Done when: the resident and the app compile without those `graphshell::` paths, and the
+    moved tests pass with unchanged counts.
+- **S2, the sync domain.** `access` and `personal_sync` to pandect (D69), which gains
+  stickleback and p2panda.
+  - Done when: Cleromancy builds with no `graphshell` package and its row is gone.
+  - Needs: P4's pandect stages landed, since both edit pandect.
+- **S3, the endpoint closure.** `mere_host`, `handlers`, `session_item` and `resident_host`
+  become graphshell-host's `mere-host` feature (D68).
+  - Done when: the resident's route provider and the app's roughly 60 users build against it.
+- **S4, transfer.** The data types, `transfer_offer` and the codicil decode move down with the
+  sync domain (D70); the resident's tests stop calling `product`.
+- **S5, the outside consumers.** Woodshed's conformance test runs over `block-host` (D72);
+  `BlockEditor` moves to cambium without its widget accessors, and Knot implements it there
+  (D73); the resident's MCP test moves to Turnstone with `graphshell-mcp` (D82).
+- **S6, close.** The resident's four rows naming the app or `graphshell-mcp` are deleted, and
+  consumers are re-addressed (D66).
+  - Done when: `cargo tree -i graphshell` is empty for mere-resident, Cleromancy, Woodshed and
+    Knot, and the family cycle checker passes with the app placed in Turnstone.
+
+Another session is active in `ports/mere-resident`; each step rebases before it lands and
+touches the resident last.
+
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
@@ -1366,6 +1400,51 @@ revision and what crosses at frame rate.
   linked-data's `query` directly and drops `mere`. Outcome: refines D54.
 
   Links: area The stack · amends engine-split D54 · draws on engine-split D58 · plans engine-split P3 · summary subgraph derivation and query_view both live in mere-view, which names linked-data's query directly and not the mere facade.
+
+- **D81. carriage and receipts become resident code (Mark, 2026-11-09):** D67's F11.
+  `carriage` (608 lines) has no app consumer, and `receipts` (1,637) says "authoring is the
+  resident host's alone". Ruling: "Resident sync/ (Recommended)". Both move into
+  mere-resident's `sync/`, beside `carriage_host`; the key-lane plan's later changes land
+  there. Outcome: applies D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary carriage and receipts move from the app into the resident's sync module.
+
+- **D82. The resident's MCP test moves to Turnstone with graphshell-mcp (Mark, 2026-11-09):**
+  D67's F10. mere-resident names `graphshell-mcp` as a dev dependency for one test, and D23
+  sends that crate to Turnstone. Ruling: "Port to the MCP crate's home (Recommended)". The test
+  becomes a Turnstone consumer test over the resident's test-fixtures export. Outcome: applies
+  D23 and cycle-breaks D6.
+
+  Links: area The stack · draws on engine-split D23, engine-split D67 · plans engine-split P3 · summary The MCP test over the resident lives in Turnstone beside graphshell-mcp.
+
+- **D83. The dissolve work is P3's slice 2 (Mark, 2026-11-09):** D67's F9. The resident split
+  plan moves different pieces in the other direction and does not mention the app link.
+  Ruling: "Engine split P3, slice 2 (Recommended)". The steps S1 to S6 are written under P3,
+  and the resident split plan's constraint on `graphshell::` types notes that slice 2 removes
+  those paths. Outcome: applies D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary The dissolution of the app's linked modules is written and tracked as P3 slice 2.
+
+- **D84. slot_guard moves into catchment (Mark, 2026-11-09):** P4 F6. `slot_guard` (170 lines,
+  compare-and-replace over a muniment slot) is used only by four Graphshell port files. Offered
+  leaving it in pandect until P3, catchment, or Eidetic's muniment. Ruling: "Move to
+  catchment", over the recommended wait. It sits behind catchment's `store` feature (D85).
+  Outcome: applies the P0 audit's placement.
+
+  Links: area The stack · draws on engine-split D9 · plans engine-split P4 · summary slot_guard is catchment's, behind its store feature.
+
+- **D85. catchment's default is ids only; the reservoir sits behind a store feature (Mark,
+  2026-11-09):** D75 landed (`b67021f0c`) and, measured, took incipit's default from serde and
+  uuid to 168 crates: catchment brings eidetic, muniment, dramatis.git's personae and sporran,
+  and their crypto. The cost put to Mark for D75 had understated it. incipit is published and
+  catchment is not, and D8 keeps the ids "behind a minimal default feature". Offered gating
+  catchment, the ids in Eidetic, the ids back in incipit, or accepting the weight. Ruling:
+  "Gate catchment (Recommended)". catchment's default holds `SessionId` and `GraphId` over
+  serde and uuid. The catalog, store, sealing and custody sit behind `store`, which pandect and
+  the resident enable. catchment publishes before incipit's next release. Outcome: refines
+  D75; restores D8's minimal default.
+
+  Links: area The stack · amends engine-split D75 · draws on engine-split D8 · plans engine-split P4 · summary catchment's default feature is the ids alone; the reservoir, sealing and custody are its store feature; incipit's default stays light.
 
 ## Open questions
 

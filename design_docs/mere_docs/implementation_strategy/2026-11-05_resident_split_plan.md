@@ -29,7 +29,9 @@ Receipts go to `archive_docs/receipts/2026-11-05_resident_split_plan_receipts.md
   they live with those applications (cycle breaks D1, D14; the domain contract's registration
   section). A piece leaves only when it carries no graph type
   (`graphshell::`, `pandect::`, `kernel::`, graph ids, `MereRoutes`); a coupled piece is split
-  at an explicit adapter first, never moved whole.
+  at an explicit adapter first, never moved whole. (2026-11-09: the `graphshell::` paths
+  themselves leave the resident under engine-split P3 slice 2, D67 and D83; that work moves app
+  modules below the resident and does not conflict with this plan's slices.)
 - **Security code follows standards.** Key groups, seals and custody use maintained
   libraries (Stickleback, Castellan) as today; no slice reimplements them at the receiver.
 - **Licence gates travel.** Retinue and Tulle are Reticulum-licensed and stay behind
