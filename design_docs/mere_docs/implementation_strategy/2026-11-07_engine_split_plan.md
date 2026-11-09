@@ -432,7 +432,7 @@ crates.
   today's headed receipts; the layout test's repin count is recorded; the bottom root still
   names no app-level crate.
 - Needs: P1 (Inker as a supplier), P2 (Seiche as a supplier), cycle-breaks P6; the checker
-  change of D35; past the first slice, the resident split plan's door and wire work (D41).
+  change of D35; past the first slice, the dissolution of the app's linked modules (D67, which replaced D41).
 
 **Drift line for P3 (2026-11-08, from the D29 lane; Mark: "Record it as a P3 drift line; keep the
 contract").** `mere-chrome`'s frame model (`FrameHostInput`, `FrameViewModel`, now `FrameStep` with
@@ -1234,6 +1234,138 @@ revision and what crosses at frame rate.
   carry their consumer re-addressing as a done-condition.
 
   Links: area The stack · plans engine-split P3 · summary Moving a crate rewrites every consumer's git row to its new repository, branch main, no pins; family crates are not version-addressed; names are claimed for future stable releases.
+
+- **D67. The app's linked modules dissolve into their owners; D41's door and wire is withdrawn
+  (Mark, 2026-11-09):** D41 ruled that the resident and outside consumers reach the reference
+  app "over the door or wire". The evidence lane (receipt file, 2026-11-09) found the premise
+  wrong for the resident. The resident serves all 13 linked modules and never calls the app:
+  `MereHost` is the resident's own `mere` route provider, `receipts` says "authoring is the
+  resident host's alone", and coop's owner side runs in the resident. There is no app process
+  for it to call. Put back as dissolve into owners, literal routes, or the hosting crate D41
+  declined. Ruling: "Dissolve into owners (Recommended)". Each module moves to the owner below
+  both sides, the way Turnstone dropped the package on 2026-10-15. No hosting crate and no new
+  routes; the app keeps reaching the resident over the existing doors. Older rulings in the
+  way: "Supersede both (Recommended)". Stack-lift's "Group 4 product truth is not lifted" and
+  key-lane D4's "the personal-graph event types travel with `ports/graphshell`" are both
+  superseded here. Outcome: replaces D41; applies domain contract C5; P3's later slices no
+  longer wait on the resident split plan.
+
+  Links: area The stack · replaces engine-split D41 · amends key-lane D4 · draws on engine-split D23 · plans engine-split P3 · summary The modules the resident, Cleromancy, Woodshed and Knot link from the app move to owners below both sides; no new routes; stack-lift Group 4 and key-lane D4's event-types clause are superseded.
+
+- **D68. The mere endpoint closure is a feature of graphshell-host (Mark, 2026-11-09):** D67's
+  F3. `mere_host` (2,467 lines), `handlers` (328), `session_item` (81) and `resident_host` (305)
+  are used by the resident and by about 60 app files, and implement `graphshell-endpoint` traits
+  over chirograph, sceno and scenograph. Ruling: "graphshell-host feature (Recommended)". They
+  become a `mere-host` feature of `graphshell-host`, below both the app and the resident.
+  Outcome: applies D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary MereHost and its handlers live in graphshell-host behind a mere-host feature.
+
+- **D69. personal_sync moves to pandect now, as it is (Mark, 2026-11-09):** D67's F4.
+  `personal_sync` (about 4.7k lines) names facets 54 times while the facet-dissolution brief is
+  open, and key-lane D1 is removing `PublishPrekey` and `GroupDispatch` from it. Ruling: "Move
+  as-is now (Recommended)". It moves with `access` (581 lines), and the facet and key-lane
+  rulings land in pandect afterwards. Cleromancy then builds with no `graphshell` package.
+  Outcome: applies domain contract C5 and D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3, engine-split P4 · summary personal_sync and access move to pandect now; later facet and key-lane rulings land there.
+
+- **D70. Transfer's data types and offer decode move down; product stays the app's (Mark,
+  2026-11-09):** D67's F5. The resident's production code uses transfer's data types and
+  `offer_for`, which calls `product::decode_profiled_codicil`. Ruling: "Data types + offer
+  decode move (Recommended)". The data types, `transfer_offer` and the codicil decode move with
+  `personal_sync`. `product` stays the app's data source, and the resident's tests that called
+  `prepare_transfer` and `apply_transfer` are rewritten. Outcome: applies D67.
+
+  Links: area The stack · draws on engine-split D67, engine-split D69 · plans engine-split P3 · summary Transfer data types and the offer decode move below the resident; product stays in the app.
+
+- **D71. kept_text goes to Eidetic; the goal-surface provider goes to the resident (Mark,
+  2026-11-09):** D67's F6. `kept_text` (245 lines) imports only eidetic, muniment, serde and
+  url. The goal surface's resident half (provider, facts and door, 713 lines) also imports
+  Fleece's retained traversal, so Eidetic cannot hold it. Ruling: "kept_text to Eidetic,
+  provider to resident (Recommended)". The roughly 2.9k-line viewer stays in the app. Outcome:
+  applies D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary kept_text's intents, policy and writer join Eidetic; the goal-surface provider becomes resident code; the viewer stays in the app.
+
+- **D72. Woodshed's conformance test runs over block-host (Mark, 2026-11-09):** D67's F7. The
+  test loads the signed pack through the app's `block_editing`, `capsule_applet` and
+  `graphshell-blocks`, a dev row that becomes a cycle once the app is in Turnstone. Ruling:
+  "Rewrite over block-host (Recommended)". It tests over the `block-guest` WIT world with
+  Eidetic's pack review, and `GuestAdapter` and `GuestEngine` move into an app-agnostic crate.
+  Outcome: applies D67 and cycle-breaks D6.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary Woodshed tests its pack over the block-guest wire, with no link to the app.
+
+- **D73. BlockEditor moves to cambium, message-shaped (Mark, 2026-11-09):** D67's F8. Offered
+  the Knot adapter moving to Turnstone, the trait moving to cambium, or a wire guest. Mark: "my
+  instinct is 2 but... i mean, would 3 impart modifiability in some manner, or enforce a
+  correct boundary we'd otherwise have to derive?" It would enforce one boundary: five of the
+  trait's seven methods are already messages, and only `input()` and `input_mut()`, which hand
+  out Cambium's `TextInput`, couple it in-process. Ruling: "Cambium, message-shaped
+  (Recommended)". The trait moves to cambium without the two widget accessors, and the pane
+  owns its `TextInput`. That is the wire's boundary kept in-process, and a WIT editor guest is
+  a mechanical wrap later. Outcome: new; applies D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary BlockEditor is a cambium trait of messages only; the pane owns the text widget; a wire guest can wrap it later.
+
+- **D74. catchment is generic over the author of an access decision (Mark, 2026-11-09):** P4
+  F1. The access record named `kernel::graph::Author`, which would put the kernel in
+  catchment's path and fail P4's done-condition. Ruling: "Generic over author (Recommended)".
+  `MereApplicationAccess<A>` and `ReservoirStore<B, A>` are generic, and pandect aliases them
+  with `Author`. Stored bytes and consumers are unchanged. Outcome: applies D3 and D9.
+
+  Links: area The stack · draws on engine-split D3, engine-split D9 · plans engine-split P4 · summary catchment's access types are generic over the author; pandect supplies the kernel's Author.
+
+- **D75. SessionId and GraphId live in catchment (Mark, 2026-11-09):** P4 F4, for D60. pandect
+  uses incipit's ids in about 100 places and keys the manifest by them. Ruling: "catchment
+  (Recommended)". The ids move into catchment, below both pandect and incipit, and incipit
+  re-exports them. incipit's default then carries catchment rather than only serde and uuid.
+  Outcome: applies D60; refines D8's "ids behind a minimal default feature".
+
+  Links: area The stack · amends engine-split D8 · draws on engine-split D60 · plans engine-split P4 · summary Session and graph ids are catchment's; incipit re-exports them; pandect no longer names incipit for ids.
+
+- **D76. chartulary takes uuid's v4 and js features, and no strum (Mark, 2026-11-09):** D49's
+  fork. numen's definitions need `strum` for one derive and uuid's `v4` for random ids, neither
+  of which chartulary has. Ruling: "uuid features, no strum (Recommended)". chartulary's
+  existing uuid gains `v4` (native) and `js` (wasm), and the derive becomes a hand-written
+  `iter()` of the same signature. Outcome: applies D49.
+
+  Links: area The stack · draws on engine-split D49 · plans engine-split P2 · summary chartulary widens uuid's features for field ids and hand-writes the one iteration strum provided.
+
+- **D77. D43's host types split by job (Mark, 2026-11-09):** P4 F2. Nothing outside pandect
+  uses `WorkerKind`, `SessionPolicy`, `session_service_runner` or `engine_profile_store`.
+  Ruling: "Split by job (Recommended)". The runner, `WorkerKind` and `SessionPolicy` go to a
+  `mere-resident` module. `engine_profile_store` and its `EngineProfileBinding` go to
+  `mere-fetch`, beside the fetch service's per-engine site data. Outcome: applies D43.
+
+  Links: area The stack · draws on engine-split D43 · plans engine-split P4 · summary The session service runner and its types go to the resident; the engine profile store goes to mere-fetch.
+
+- **D78. ViewIntent lives in incipit behind a view feature (Mark, 2026-11-09):** P4 F3, for
+  D44. `ViewIntent` and `view_intent_store` (602 lines) name incipit's `FoldRecord`, sceno's
+  `LinkKey` and hest's `CommandChoices`, and crates below the port use them. Ruling: "incipit
+  `view` feature (Recommended)". They move to incipit behind a `view` feature that carries
+  sceno and hest, and pandect drops those two edges. Outcome: applies D44 and D8.
+
+  Links: area The stack · draws on engine-split D44, engine-split D8 · plans engine-split P4 · summary ViewIntent and its store are incipit's view feature; pandect stops naming sceno and hest.
+
+- **D79. The settings theme is stored opaque, with the same bytes (Mark, 2026-11-09):** P4 F5,
+  for D60. `ApplicationSettings` held `tabard::ThemeChoice`, and its only outside consumer is
+  Turnstone. Ruling: "Opaque theme, same bytes (Recommended)". The store stays in pandect and
+  holds the theme as a plain id, mode key and fonts with identical serialization. Turnstone
+  converts to `ThemeChoice` at its edge. Outcome: applies D60.
+
+  Links: area The stack · draws on engine-split D60 · plans engine-split P4 · summary pandect stores the theme as plain values; Turnstone converts to tabard's type.
+
+- **D80. subgraph moves into mere-view with query_view, now (Mark, 2026-11-09):** D54's
+  premise was wrong. `query_view` uses no SPARQL itself, but `QueryViewSpec::members` calls
+  `mere::subgraph::try_derive_members`, which evaluates saved SPARQL through linked-data's
+  `query` feature. Offered deferral to slice 3, moving subgraph now, or moving the module with
+  the `mere` edge kept. Ruling: "Move subgraph now", over the recommended deferral. `subgraph`
+  (556 lines with tests) moves into mere-view with `query_view`, and mere-view takes
+  linked-data's `query` directly and drops `mere`. Outcome: refines D54.
+
+  Links: area The stack · amends engine-split D54 · draws on engine-split D58 · plans engine-split P3 · summary subgraph derivation and query_view both live in mere-view, which names linked-data's query directly and not the mere facade.
 
 ## Open questions
 

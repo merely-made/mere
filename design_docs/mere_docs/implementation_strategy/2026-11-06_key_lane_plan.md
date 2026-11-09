@@ -113,7 +113,9 @@ removed variants with a named error, not a decode panic.
   Put to Mark on finding that engine-split moves `mere-resident` to Graphshell while this plan
   assumed graph keys stayed in Mere. The personal-graph event types travel with
   `ports/graphshell`, so carriage and events stay together. Outcome: refines the constraint
-  drawn from resident-split ("Mere keeps graph authority").
+  drawn from resident-split ("Mere keeps graph authority"). *Amended 2026-11-09 by engine-split
+  D67 and D69: the event types move to pandect with `personal_sync`, not with the port; carriage
+  still follows the resident.*
 
   Links: plans engine-split P3 · summary GraphKeyGroup and key_paired_devices move with mere-resident to Graphshell; the lane adoption is unchanged.
 
