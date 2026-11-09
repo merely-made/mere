@@ -138,9 +138,6 @@ castellan-client = { workspace = true, features = ["client"] }
 graphshell-host = { workspace = true, features = ["native"] }
 # The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
 mere-overmap.workspace = true
-# `peers`: the resident sync host, the publish lane and the iroh blob store are
-# the networked half of the library, off unless a host names them.
-knot-editor = { workspace = true, features = ["peers"] }
 # Exact signed Knot relation intake into durable Mere sessions.
 kernel.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from
@@ -190,7 +187,7 @@ ssh-key = { version = "0.6", features = ["ed25519", "encryption"] }
 thiserror = "1"
 # "signal" is what lets the run loop stop the mesh works deliberately on Ctrl-C
 # rather than being killed mid-lease.
-tokio = { version = "1", features = ["io-std", "io-util", "macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
+tokio = { version = "1", features = ["io-std", "io-util", "macros", "net", "process", "rt-multi-thread", "signal", "sync", "time"] }
 tracing.workspace = true
 tracing-subscriber.workspace = true
 transport = { workspace = true, features = ["notochord"] }
@@ -290,9 +287,6 @@ required-features = ["distillery-chronicle-receipt-host"]
 [dev-dependencies]
 # The bounded cross-source fixture imports a pinned layered checkpoint.
 esp.workspace = true
-# Knot's overmap layer over the mere route (`mere_overlay`), driven through the
-# first-party door in `resident_mere`'s archive round trip.
-knot-editor = { workspace = true, features = ["mere-overlay"] }
 # This package with `passphrase-fd`, so the binary the tests spawn reads the
 # harness's passphrase (ruling 65).
 mere-resident = { path = ".", default-features = false, features = ["passphrase-fd", "in-process-custody"] }
@@ -342,15 +336,6 @@ safetensors = "0.4"
 scenotime.workspace = true
 tempfile = "3"
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
-
-# Vault lock rulings 48 and 49: what Knot leaves of its seed, strict on the
-# paths that open no network and judged against iroh's and p2panda-net's own
-# blocks for the sync host; castellan's residue tracker (its own global allocator, no
-# libtest).
-[[test]]
-name = "knot_residue"
-path = "tests/knot_residue.rs"
-harness = false
 
 [[bin]]
 name = "dr-c-receipt-host"

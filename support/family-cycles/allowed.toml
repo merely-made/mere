@@ -17,13 +17,16 @@
 # delete an entry in the same commit that breaks its cycle. A cycle that remains with the
 # entries left out fails.
 
-# D1 (Mark, 2026-11-06): "Resident stops depending". Mere's resident is the down edge to
-# remove. Open until P2 (Knot, behind P2a); P3 (Cleromancy) closed its edge on 2026-11-08.
+# D1 (Mark, 2026-11-06): "Resident stops depending". P2 (Knot) removed the resident's
+# rows on 2026-11-08 (Knot runs as a supervised application over the door); P3 (Cleromancy)
+# closed its edge the same day. What is left of this edge is `ports/graphshell`'s optional
+# `knot-document` row (`editable-blocks`), which leaves with D23 when that port moves to
+# Turnstone.
 [[edge]]
 from = "mere"
 to = "knot-editor"
 decision = "D1"
-reason = "ports/mere-resident names knot-editor (peers, mere-overlay); Knot names Mere crates. Plan C1, P2."
+reason = "ports/graphshell names knot-document (optional, editable-blocks, block_editing.rs); Knot names Mere crates. Leaves when ports/graphshell moves to Turnstone (D23). Plan C1, P2."
 
 # D19 (Mark, 2026-11-08): "Allowlist until P5". Inker's optional fleece row on Mere's
 # linked-data (mere-fleece -> mere-rdf, engine-split F3) closes against Mere's rows naming

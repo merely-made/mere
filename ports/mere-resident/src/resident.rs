@@ -7,8 +7,7 @@
 //! Product-neutral ownership assembled by the desktop resident.
 //!
 //! This module owns process-lifetime resources without importing a product UI.
-//! Graphshell supplies admitted local sessions; Knot supplies document and sync
-//! semantics; Castellan supplies credential records; Djinn keeps their
+//! Graphshell supplies admitted local sessions; Castellan supplies credential records; Djinn keeps their
 //! lifetimes and local storage topology coherent.
 
 use std::path::{Path, PathBuf};
@@ -25,11 +24,11 @@ use transport::BlobScope;
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
 use crate::resident_inference::{self, ResidentInference};
-use crate::resident_knot::{KnotGate, ResidentKnot};
+use crate::supervisor::AppSupervisor;
 use crate::resident_mere::MereRoutes;
 use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
 use crate::resident_site::{PublishedSiteEndpoint, PublishedSiteService};
-use crate::settings::{KnotResidentSettings, OwnerSettings, ReservoirLaneSettings};
+use crate::settings::{OwnerSettings, ReservoirLaneSettings};
 
 /// Process-wide services retained by one Djinn run.
 pub struct DjinnResident {
@@ -38,10 +37,10 @@ pub struct DjinnResident {
     credential_profile: ProfileId,
     blobs: ResidentBlobCustody,
     site: Arc<tokio::sync::Mutex<PublishedSiteService>>,
-    knot: Option<ResidentKnot>,
-    /// What reopens the Knot lane after a lock: its settings and the gate
-    /// its route was registered over (vault lock ruling 48).
-    knot_reopen: Option<(PathBuf, KnotResidentSettings, KnotGate, crate::resident_knot::KnotEpochs)>,
+    /// The application the owner named to run while the vault is unlocked
+    /// (cycle breaks P2 step 3). The resident names no application; the
+    /// door's endpoint arrives with [`DjinnResident::start_supervised`].
+    supervised: Option<AppSupervisor>,
     distillery: Option<ResidentDistillery>,
     /// The inference lane, which borrows the Distillery lane's model
     /// library and so closes before it.
@@ -58,12 +57,11 @@ pub struct DjinnResident {
 
 /// Where the resident's custody-derived material comes from (custody
 /// isolation plan, H2): Distillery's mesh author (exactly
-/// [`distillery::InstalledAuthority::release_salts`]) and Knot's epoch keys.
+/// [`distillery::InstalledAuthority::release_salts`]).
 /// Never a second vault open, and never a wallet read in this process.
 #[derive(Clone)]
 pub enum MeshAuthor {
-    /// Captured from the identity the resident was given. Knot's epochs are
-    /// read in this process only in a build with `in-process-custody`.
+    /// Captured from the identity the resident was given.
     Resident,
     /// Custody itself: the independently launched custodian in production.
     Custody(Arc<dyn dramatis_resident::custody_host::ResidentCustody>),
@@ -87,40 +85,6 @@ impl MeshAuthor {
         captured
             .map(|keys| (Arc::new(keys) as Arc<dyn IdentityProvider>, protection.to_string()))
             .map_err(|error| format!("the Distillery mesh author: {error}"))
-    }
-
-    /// Knot's personal vault keys, each derivation checked against Knot's own
-    /// declaration where they are made: this resident composes Knot in
-    /// process, so it asks for no more than Knot states it needs.
-    fn knot_epochs(&self, data_root: &Path) -> crate::resident_knot::KnotEpochs {
-        let policy = dramatis_resident::custody::ReleasePolicy::none()
-            .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch);
-        match self {
-            Self::Custody(host) => {
-                let host = Arc::clone(host);
-                let root = data_root.to_path_buf();
-                Arc::new(move |persona, label, requests| {
-                    if requests.iter().any(|request| !policy.allows_epoch(request)) {
-                        return Err("an epoch derivation outside the release policy".into());
-                    }
-                    host.epoch_keys(&root, persona, Some(label), requests).map_err(|refusal| format!("{refusal:?}"))
-                })
-            },
-            Self::Resident => {
-                #[cfg(feature = "in-process-custody")]
-                {
-                    let root = data_root.to_path_buf();
-                    Arc::new(move |persona, label, requests| {
-                        dramatis_resident::custody::epoch_keys(&policy, &root, persona, Some(label), requests).map_err(|refusal| format!("{refusal:?}"))
-                    })
-                }
-                #[cfg(not(feature = "in-process-custody"))]
-                {
-                    let _ = (data_root, policy);
-                    Arc::new(|_, _, _| Err("Knot's epoch keys come from custody; this resident was given none".into()))
-                }
-            },
-        }
     }
 }
 
@@ -148,7 +112,7 @@ impl DjinnResident {
         Ok(resident)
     }
 
-    /// Open the credential, content, and optional Knot and Distillery
+    /// Open the credential, content, and optional supervised-application and Distillery
     /// authorities selected for one already-unlocked Personae profile.
     ///
     /// The Distillery lane's identity is a profile-derived mesh author. It
@@ -160,7 +124,7 @@ impl DjinnResident {
         identity: &P,
         data_root: &Path,
         profile: &ProfileId,
-        owner: OwnerSettings,
+        mut owner: OwnerSettings,
         mesh_author: MeshAuthor,
     ) -> Result<Self, String> {
         // Before anything opens, so a refusal leaves nothing to unwind.
@@ -180,25 +144,10 @@ impl DjinnResident {
                 });
             },
         };
-        let knot_settings = owner.knot.clone();
-        let knot = match owner.knot {
-            Some(settings) => match ResidentKnot::open(data_root, settings, blobs.clone(), mesh_author.knot_epochs(data_root)).await {
-                Ok(knot) => Some(knot),
-                Err(open_error) => {
-                    drop(site);
-                    let close_error = blobs.shutdown().await.err();
-                    return Err(match close_error {
-                        Some(close_error) => {
-                            format!(
-                                "open resident Knot: {open_error}; close blob custody: {close_error}"
-                            )
-                        },
-                        None => open_error,
-                    });
-                },
-            },
-            None => None,
-        };
+        let supervised = owner
+            .supervised
+            .take()
+            .map(|settings| AppSupervisor::new(settings, data_root));
         let automatic_mesh = if matches!(
             owner.inference.as_ref().map(|s| &s.model),
             Some(crate::settings::InferenceModelSettings::Automatic { .. })
@@ -234,19 +183,9 @@ impl DjinnResident {
                 match opened {
                     Ok(distillery) => Some(distillery),
                     Err(open_error) => {
-                        // Unwind in reverse construction order: the Knot lane
-                        // was built after blob custody and borrows it, so it
-                        // has to let go first.
-                        let knot_error = match knot {
-                            Some(knot) => knot.close().await.err(),
-                            None => None,
-                        };
                         drop(site);
                         let close_error = blobs.shutdown().await.err();
                         let mut message = format!("open resident Distillery: {open_error}");
-                        if let Some(knot_error) = knot_error {
-                            message.push_str(&format!("; close resident Knot: {knot_error}"));
-                        }
                         if let Some(close_error) = close_error {
                             message.push_str(&format!("; close blob custody: {close_error}"));
                         }
@@ -256,16 +195,11 @@ impl DjinnResident {
             },
             None => None,
         };
-        let knot_reopen = match (&knot, knot_settings) {
-            (Some(knot), Some(settings)) => Some((data_root.to_path_buf(), settings, knot.gate(), mesh_author.knot_epochs(data_root))),
-            _ => None,
-        };
         Ok(Self {
             credential_profile: profile.clone(),
             blobs,
             site,
-            knot,
-            knot_reopen,
+            supervised,
             distillery,
             inference: None,
             #[cfg(feature = "inference")]
@@ -448,31 +382,19 @@ impl DjinnResident {
     }
 
     /// Djinn's ordinary immutable-site service. Callers arrive through its
-    /// separately admitted first-party route; this never exposes Knot vault or
+    /// separately admitted first-party route; this never exposes any supervised application's vault or
     /// evidence authority.
     pub fn published_site(&self) -> Arc<tokio::sync::Mutex<PublishedSiteService>> {
         Arc::clone(&self.site)
     }
 
-    /// Register the owner-only published-site route. It shares no Knot route,
+    /// Register the owner-only published-site route. It shares no application's route,
     /// sync pairing, or evidence reader authority.
     pub fn register_published_site_route(
         &self,
         catalog: &mut ResidentEndpointCatalog,
     ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
         PublishedSiteEndpoint::register(Arc::clone(&self.site), catalog)
-    }
-
-    /// Register the optional Knot source under its stable first-party route.
-    pub fn register_knot_route(
-        &self,
-        catalog: &mut ResidentEndpointCatalog,
-    ) -> Result<Option<ResidentEndpointRoute>, ResidentEndpointCatalogError> {
-        let Some(knot) = self.knot.as_ref() else {
-            return Ok(None);
-        };
-        knot.register(catalog)?;
-        Ok(Some(ResidentKnot::route()))
     }
 
     /// Register the inference route when this run composes the lane.
@@ -507,50 +429,40 @@ impl DjinnResident {
             .configure_recall(corpus, config)
     }
 
-    /// Refresh mutable Knot pairing and evidence-reader authority.
-    pub async fn refresh(&mut self) -> Result<bool, String> {
-        match self.knot.as_mut() {
-            Some(knot) => knot.refresh_settings().await,
+    /// Whether the owner named an application to supervise.
+    pub fn supervised_enabled(&self) -> bool {
+        self.supervised.is_some()
+    }
+
+    /// The supervised application's id, when one is named.
+    pub fn supervised_app(&self) -> Option<&str> {
+        self.supervised.as_ref().map(AppSupervisor::app)
+    }
+
+    /// Start the supervised application against the door at `endpoint`, once
+    /// the door is up. Returns whether a process was started.
+    pub fn start_supervised(&mut self, endpoint: &str) -> Result<bool, String> {
+        match self.supervised.as_mut() {
+            Some(supervised) => supervised.start(endpoint),
             None => Ok(false),
         }
     }
 
-    /// Whether this run has an open resident Knot source.
-    pub fn knot_enabled(&self) -> bool {
-        self.knot.is_some()
-    }
-
-    /// Close the Knot lane for a vault lock (ruling 48): the route refuses,
-    /// live sessions are cut, sync stops, and the source and its seed go.
-    /// Returns how many sessions were cut, or `None` with no lane open.
-    pub async fn close_knot(&mut self) -> Result<Option<usize>, String> {
-        let Some(knot) = self.knot.take() else {
-            return Ok(None);
-        };
-        let cut = knot.gate().close();
-        knot.close().await?;
-        Ok(Some(cut))
-    }
-
-    /// Reopen the Knot lane after an unlock, through the gate its route was
-    /// registered over, so the same route serves again.
-    pub async fn reopen_knot(&mut self) -> Result<bool, String> {
-        if self.knot.is_some() {
-            return Ok(false);
+    /// Start the supervised application again if it exited (after a back-off).
+    pub fn ensure_supervised(&mut self, endpoint: &str) -> Result<bool, String> {
+        match self.supervised.as_mut() {
+            Some(supervised) => supervised.ensure_running(endpoint),
+            None => Ok(false),
         }
-        let Some((data_root, settings, gate, epochs)) = self.knot_reopen.clone() else {
-            return Ok(false);
-        };
-        let knot =
-            ResidentKnot::open_through(&data_root, settings, self.blobs.clone(), gate, epochs).await?;
-        self.knot = Some(knot);
-        Ok(true)
     }
 
-    /// Loggable Knot transport facts without exposing a source or signing key.
-    pub fn knot_network_facts(&self) -> Option<([u8; 32], [u8; 32])> {
-        let knot = self.knot.as_ref()?;
-        Some((knot.node_id()?, knot.space_id()?))
+    /// End the supervised application for a vault lock (ruling 48). The door
+    /// has already refused it new keys. Returns whether a process was ended.
+    pub async fn stop_supervised(&mut self) -> Result<bool, String> {
+        match self.supervised.as_mut() {
+            Some(supervised) => supervised.stop().await,
+            None => Ok(false),
+        }
     }
 
     /// Whether this run composes the resident Distillery works.
@@ -590,7 +502,7 @@ impl DjinnResident {
         self.distillery = distillery;
     }
 
-    /// Stop mesh work, then Knot networking, release credential authority, and
+    /// Stop mesh work, then the supervised application, release credential authority, and
     /// finally flush the shared physical store. Call only after every broker
     /// and endpoint view borrowing this resident has stopped.
     pub async fn shutdown(self) -> Result<(), String> {
@@ -598,8 +510,7 @@ impl DjinnResident {
             credential_profile: _,
             blobs,
             site,
-            knot,
-            knot_reopen: _,
+            supervised,
             distillery,
             inference,
             #[cfg(feature = "inference")]
@@ -660,11 +571,11 @@ impl DjinnResident {
                 }) as CloseAction<'static>,
             ),
             (
-                "Knot",
+                "supervised application",
                 Box::new(move || {
                     Box::pin(async move {
-                        match knot {
-                            Some(knot) => knot.close().await,
+                        match supervised {
+                            Some(mut supervised) => supervised.stop().await.map(drop),
                             None => Ok(()),
                         }
                     }) as CloseFuture<'static>

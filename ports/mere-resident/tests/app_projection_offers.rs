@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! A real app-owned Knot directory is served through the existing door using
+//! An app-owned fixture endpoint is served through the existing door using
 //! arbitrary provider and viewer labels. No application-specific registration
 //! is installed in the host catalog. Owner policy, denial, revocation and
 //! provider disconnect are exercised over native local streams.
@@ -43,7 +43,7 @@ impl Drop for SocketPath {
 }
 
 /// A resident identity with fixed door keys and no custody route: the route
-/// under test is Knot's, and only djinn links the real keeper (dramatis D4).
+/// under test is the door's, and only djinn links the real keeper (dramatis D4).
 struct FixtureResident(InMemoryProvider);
 
 impl DoorIdentity for FixtureResident {
@@ -185,7 +185,10 @@ async fn provider_with_limit(door: &Door, root: &std::path::Path, limit: usize) 
             AppRouteId::new(ROUTE).unwrap(),
             "Documents".into(),
             limit,
-            move |_| knot_editor::KnotEndpoint::open(&root).map_err(|error| error.to_string()),
+            move |_| {
+                let _ = &root;
+                Ok(graphshell_host::canary::FixtureEndpoint::new())
+            },
         )
         .await
     }));
@@ -271,7 +274,7 @@ async fn real_directory_offer_has_separate_viewer_permission_and_revocation() {
     });
     let mut client = viewer(&door, VIEWER).await.unwrap();
     let opened = client.open_session().await.unwrap();
-    assert_eq!(opened.descriptor.label, "Knot");
+    assert_eq!(opened.descriptor.label, "graphshell fixture");
     let request = opened.descriptor.projections[0].request.clone();
     let snapshot = client.snapshot(request.clone()).await.unwrap();
     assert!(snapshot.scene.active_item_count() > 0);

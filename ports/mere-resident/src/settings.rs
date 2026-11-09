@@ -148,8 +148,15 @@ pub struct OwnerSettings {
     pub coop_relay_urls: Vec<String>,
     /// Absent means personal sync stays off for this profile.
     pub sync: Option<SyncSettings>,
-    /// Absent means this device host does not compose a resident Knot route.
-    pub knot: Option<KnotResidentSettings>,
+    /// An application the resident keeps running while the vault is unlocked
+    /// and ends on lock (cycle breaks P2 step 3). Absent means none.
+    ///
+    /// The key `knot` is read as this setting for one release: owner settings
+    /// are on users' disks, and the old `knot` record named the persona,
+    /// device label and evidence limits of the lane the resident used to
+    /// compose. It is written back as `supervised`.
+    #[serde(default, alias = "knot", skip_serializing_if = "Option::is_none")]
+    pub supervised: Option<SupervisedAppSettings>,
     /// Absent means this device host does not compose the Distillery works.
     pub distillery: Option<DistilleryLaneSettings>,
     /// Absent means this device host does not compose the inference lane.
@@ -535,28 +542,58 @@ impl Default for ReservoirLaneSettings {
     }
 }
 
-/// Device-host selection for one startup-unlocked personal Knot vault.
+/// An application the resident supervises: started when the vault is
+/// unlocked and the door is up, ended on lock, restarted on unlock.
 ///
-/// Pairing, relays, and dial hints remain in Knot's persona-scoped settings.
-/// This profile-scoped record only selects which persona the current host
-/// exposes and configures local resource limits.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(default, deny_unknown_fields)]
-pub struct KnotResidentSettings {
-    /// UUID of the Personae wallet whose Knot vault is exposed.
-    pub persona: String,
-    /// Stable label used when this machine first records its device identity.
-    pub device_label: String,
-    /// Previous per-Knot evidence root to import. Normally left unset because
-    /// the historical default is derived from the persona vault.
-    pub evidence_root: Option<PathBuf>,
-    /// Largest retained clip artifact.
-    pub max_artifact_bytes: u64,
-    /// Largest Djot source projected into one Rosette.
-    pub max_source_bytes: u64,
+/// The resident names no application's crate. It starts `command` with the
+/// door's endpoint in `GRAPHSHELL_APP_ENDPOINT`; the application connects as
+/// itself, declares what it needs, and holds only what the owner grants
+/// (custody, `blob-custody-v1`). `{data_root}` and `{endpoint}` in `command`
+/// and `args` are replaced with the resident's data root and door endpoint.
+///
+/// scope=profile; movement=local-only; mutability=restart-required;
+/// security=ordinary (a command line, no key material).
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
+pub struct SupervisedAppSettings {
+    /// The application's id at the door, for events and logs.
+    pub app: String,
+    /// The executable: a path, or a name found on `PATH`.
+    pub command: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub args: Vec<String>,
 }
 
-impl Default for KnotResidentSettings {
+/// What `deny_unknown_fields` accepts: the current record or the one release's
+/// legacy `knot` record.
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum SupervisedRecord {
+    Current(SupervisedCurrent),
+    LegacyKnot(LegacyKnotSettings),
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SupervisedCurrent {
+    app: String,
+    command: String,
+    #[serde(default)]
+    args: Vec<String>,
+}
+
+/// The pre-P2 `knot` owner setting, read for one release.
+#[derive(Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct LegacyKnotSettings {
+    persona: String,
+    device_label: String,
+    evidence_root: Option<PathBuf>,
+    max_artifact_bytes: u64,
+    #[allow(dead_code)]
+    max_source_bytes: u64,
+}
+
+impl Default for LegacyKnotSettings {
     fn default() -> Self {
         Self {
             persona: String::new(),
@@ -565,6 +602,39 @@ impl Default for KnotResidentSettings {
             max_artifact_bytes: 64 * 1024 * 1024,
             max_source_bytes: 8 * 1024 * 1024,
         }
+    }
+}
+
+impl<'de> Deserialize<'de> for SupervisedAppSettings {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(match SupervisedRecord::deserialize(deserializer)? {
+            SupervisedRecord::Current(current) => Self {
+                app: current.app,
+                command: current.command,
+                args: current.args,
+            },
+            SupervisedRecord::LegacyKnot(legacy) => {
+                let mut args = vec!["{data_root}".to_string()];
+                if !legacy.persona.trim().is_empty() {
+                    args.push(legacy.persona.trim().to_string());
+                }
+                args.extend([
+                    "--label".into(),
+                    legacy.device_label,
+                    "--door-custody".into(),
+                    "--max-artifact-bytes".into(),
+                    legacy.max_artifact_bytes.to_string(),
+                ]);
+                if let Some(root) = legacy.evidence_root {
+                    args.extend(["--evidence-root".into(), root.display().to_string()]);
+                }
+                Self {
+                    app: "knot-editor".into(),
+                    command: "knot_sync_host".into(),
+                    args,
+                }
+            },
+        })
     }
 }
 
@@ -1086,6 +1156,37 @@ pub fn hex32(bytes: &[u8; 32]) -> String {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn the_old_knot_setting_reads_as_the_supervised_application_for_one_release() {
+        let legacy: OwnerSettings = serde_json::from_str(
+            r#"{"knot": {"persona": "00000000-0000-0000-0000-000000000042",
+                          "device_label": "study", "max_artifact_bytes": 4096}}"#,
+        )
+        .unwrap();
+        let supervised = legacy.supervised.clone().expect("read as supervised");
+        assert_eq!(supervised.app, "knot-editor");
+        assert_eq!(supervised.command, "knot_sync_host");
+        assert_eq!(
+            supervised.args,
+            [
+                "{data_root}",
+                "00000000-0000-0000-0000-000000000042",
+                "--label",
+                "study",
+                "--door-custody",
+                "--max-artifact-bytes",
+                "4096",
+            ]
+        );
+        // Written back in the new shape, which reads as itself.
+        let written = serde_json::to_string(&legacy).unwrap();
+        assert!(written.contains("\"supervised\"") && !written.contains("\"knot\""), "{written}");
+        let again: OwnerSettings = serde_json::from_str(&written).unwrap();
+        assert_eq!(again.supervised, legacy.supervised);
+        // An unknown field in either shape is still refused.
+        assert!(serde_json::from_str::<OwnerSettings>(r#"{"supervised": {"app": "a", "command": "c", "extra": 1}}"#).is_err());
+    }
     use super::*;
 
     #[test]
@@ -1216,7 +1317,7 @@ mod tests {
                 },
                 ..SyncSettings::default()
             }),
-            knot: None,
+            supervised: None,
             distillery: None,
             inference: None,
             reservoir: ReservoirLaneSettings::default(),

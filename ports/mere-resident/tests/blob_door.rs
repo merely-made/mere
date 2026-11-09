@@ -43,7 +43,7 @@ impl Drop for SocketPath {
 }
 
 /// A resident identity with fixed door keys and no custody route: the route
-/// under test is Knot's, and only djinn links the real keeper (dramatis D4).
+/// under test is the door's, and only djinn links the real keeper (dramatis D4).
 struct FixtureResident(InMemoryProvider);
 
 impl DoorIdentity for FixtureResident {

@@ -493,10 +493,6 @@ path = "ports/mere-resident/src/resident_inference.rs"
 reason = "The resident inference lane (resident inference and recall plan, I1). Existing source-size debt; a responsibility split must preserve ResidentInference and existing module visibility."
 
 [[exception]]
-path = "ports/mere-resident/src/resident_knot.rs"
-reason = "Resident Knot composition inside Djinn. Existing source-size debt; a responsibility split must preserve KnotGate, GateState, GatedSession and existing module visibility."
-
-[[exception]]
 path = "ports/mere-resident/src/resident_mere.rs"
 reason = "A mere's own route inside Djinn (reservoir plan V2, step 5). Existing source-size debt; a responsibility split must preserve MereRoutes, ProfileLookup, Routes and existing module visibility."
 
@@ -540,10 +536,6 @@ reason = "Real resident settings, graph key agreement, app route and supervisor 
 [[exception]]
 path = "ports/mere-resident/tests/inference_route.rs"
 reason = "The resident inference lane through Djinn's application door (resident inference and recall plan, I1): a resident with the lane on answers an ask over inference.ask to Turnstone's. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "ports/mere-resident/tests/knot_relation_intake.rs"
-reason = "Signed Knot relation projection into durable Mere assertion history. Existing source-size debt; a responsibility split must preserve SignedProjection and existing module visibility."
 
 [[exception]]
 path = "ports/moot/examples/capsule-library.rs"

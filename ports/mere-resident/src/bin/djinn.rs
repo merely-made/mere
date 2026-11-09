@@ -1253,17 +1253,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         );
     }
     #[cfg(feature = "personal-sync")]
-    if resident.knot_enabled() {
-        if let Some((node, space)) = resident.knot_network_facts() {
-            tracing::info!(
-                sync = true,
-                node = owner_settings::hex32(&node),
-                space = owner_settings::hex32(&space),
-                "resident Knot route open"
-            );
-        } else {
-            tracing::info!(sync = false, "resident Knot route open");
-        }
+    if let Some(app) = resident.supervised_app() {
+        tracing::info!(app, "supervised application named; it starts once the door is up");
     }
 
     // The works run for the whole length of the loop and need `&mut` on the
@@ -1355,12 +1346,6 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             // owner grant names it; none is granted by label (D24).
             let grants = AppRouteGrants::new(AllowedAppRoutes::none());
             grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
-            if let Some(route) = catalog
-                .update(|catalog| resident.register_knot_route(catalog))
-                .await?
-            {
-                grants.update(|routes| routes.serve(route));
-            }
             // Served to the declared applications whose grant names it.
             let route = catalog
                 .update(|catalog| resident.register_published_site_route(catalog))
@@ -1520,8 +1505,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             session_duration_ms(),
             supplemental_cards,
         );
-        let mut knot_refresh = tokio::time::interval(Duration::from_secs(1));
-        knot_refresh.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        let mut supervise_tick = tokio::time::interval(Duration::from_secs(1));
+        supervise_tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
         let works_enabled = works.is_some();
         let stop_works = Arc::new(tokio::sync::Notify::new());
         let works_stop = Arc::clone(&stop_works);
@@ -1570,6 +1555,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let action_activity = activity.clone();
         let maintenance = async {
             let mut lock_watched = true;
+            let mut supervise_active = true;
             loop {
                 tokio::select! {
                 changed = lock_state.changed(), if lock_watched => {
@@ -1584,9 +1570,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             };
                             tracing::info!(event, "vault lock state changed");
                             events.emit(event, json!({}));
-                            // Knot's lane follows the lock (ruling 48). The
-                            // close runs after lock() returned: that window
-                            // is logged.
+                            // The supervised application follows the lock
+                            // (ruling 48). The stop runs after lock()
+                            // returned: that window is logged.
                             let since = std::time::Instant::now();
                             if now == VaultLockView::Unlocked {
                                 // Kept from the first unlock on (ruling 46).
@@ -1595,32 +1581,41 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                                 );
                             }
                             match now {
-                                VaultLockView::Locked => match resident.close_knot().await {
-                                    Ok(None) => {},
-                                    Ok(Some(cut)) => {
-                                        let window_ms = since.elapsed().as_millis() as u64;
-                                        tracing::info!(cut, window_ms, "Knot lane closed after the lock");
-                                        events.emit("knot-closed", json!({ "cut": cut, "window_ms": window_ms }));
-                                    },
-                                    Err(error) => tracing::error!(%error, "Knot lane did not close cleanly"),
+                                VaultLockView::Locked => {
+                                    supervise_active = false;
+                                    match resident.stop_supervised().await {
+                                        Ok(false) => {},
+                                        Ok(true) => {
+                                            let window_ms = since.elapsed().as_millis() as u64;
+                                            tracing::info!(window_ms, "supervised application ended after the lock");
+                                            events.emit("knot-closed", json!({ "cut": 1, "window_ms": window_ms }));
+                                        },
+                                        Err(error) => tracing::error!(%error, "supervised application did not end cleanly"),
+                                    }
                                 },
-                                VaultLockView::Unlocked => match resident.reopen_knot().await {
-                                    Ok(true) => {
-                                        tracing::info!("Knot lane reopened after the unlock");
-                                        events.emit("knot-reopened", json!({}));
-                                    },
-                                    Ok(false) => {},
-                                    Err(error) => tracing::error!(%error, "Knot lane did not reopen"),
+                                VaultLockView::Unlocked => {
+                                    supervise_active = true;
+                                    match resident.start_supervised(&args.app_endpoint) {
+                                        Ok(true) => {
+                                            tracing::info!("supervised application started after the unlock");
+                                            events.emit("knot-reopened", json!({}));
+                                        },
+                                        Ok(false) => {},
+                                        Err(error) => tracing::error!(%error, "supervised application did not start"),
+                                    }
                                 },
                             }
                         },
                         Err(_) => lock_watched = false,
                     }
                 }
-                _ = knot_refresh.tick(), if resident.knot_enabled() && !maintenance_stopping.load(std::sync::atomic::Ordering::SeqCst) => {
-                    let _action = action_activity.begin();
-                    if let Err(error) = resident.refresh().await {
-                        tracing::warn!(%error, "could not refresh resident Knot authority");
+                _ = supervise_tick.tick(), if resident.supervised_enabled() && supervise_active && !maintenance_stopping.load(std::sync::atomic::Ordering::SeqCst) => {
+                    // Starts the application once the door is up, and again
+                    // if it exits while the vault stays unlocked.
+                    match resident.ensure_supervised(&args.app_endpoint) {
+                        Ok(true) => tracing::info!("supervised application started"),
+                        Ok(false) => {},
+                        Err(error) => tracing::warn!(%error, "supervised application did not start"),
                     }
                 }
                 }

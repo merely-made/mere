@@ -230,7 +230,7 @@ mod tests {
                 graph: "personal".into(),
                 ..SyncSettings::default()
             }),
-            knot: None,
+            supervised: None,
             distillery: None,
             inference: None,
             reservoir: Default::default(),
@@ -307,7 +307,7 @@ mod tests {
                 roster_roots: vec![owner_settings::hex32(&[0xc0; 32])],
                 ..SyncSettings::default()
             }),
-            knot: None,
+            supervised: None,
             distillery: None,
             inference: None,
             reservoir: Default::default(),

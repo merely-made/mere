@@ -27,7 +27,6 @@ use ostiary::declaration::{
     AppDeclaration, AppGrant, CustodyOperation, CustodyUse, EpochUse, NamePattern,
 };
 use dramatis::view::VaultProtectionView;
-use knot_editor::PersonalVaultKeys;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::door::projection_offers::ProviderPermission;
 use dramatis_resident::keeper::Keeper;
@@ -123,40 +122,95 @@ fn refusal(result: Result<impl std::fmt::Debug, CustodyClientError>) -> CustodyR
     }
 }
 
+/// A stand-in shaped like a personal-vault application (Knot is the real one;
+/// its own tests hold the real declaration against these contexts). The
+/// resident names no application crate, so the shapes are literals here and
+/// the owner's grant for them is `fixtures/owner_applications.json`.
+const VAULT_APP: &str = "knot-editor";
+const ROOT_CONTEXT: &str = "mere.knot.persona-vault.root.v1";
+const WRITER_CONTEXT: &str = "mere.knot.persona-vault.writer.v1";
+
+fn vault_requests() -> Vec<EpochKeyRequest> {
+    vec![
+        EpochKeyRequest::secret(ROOT_CONTEXT, false),
+        EpochKeyRequest::secret(WRITER_CONTEXT, true),
+        EpochKeyRequest::public(WRITER_CONTEXT, false),
+    ]
+}
+
+fn vault_declaration() -> AppDeclaration {
+    AppDeclaration {
+        routes: vec![
+            NamePattern::exact(castellan_client::custody::CUSTODY_ROUTE),
+            NamePattern::prefix("mere/"),
+            NamePattern::exact("published-site-v1"),
+            NamePattern::exact(graphshell_door::projection_offer::PROJECTION_PROVIDER_ROUTE),
+        ],
+        offers: Vec::new(),
+        custody: CustodyUse {
+            operations: [
+                CustodyOperation::Status,
+                CustodyOperation::Roster,
+                CustodyOperation::WatchLock,
+                CustodyOperation::ReleaseEpochKeys,
+            ]
+            .into(),
+            epoch: vault_requests()
+                .into_iter()
+                .map(|request| EpochUse {
+                    context: request.context,
+                    device_bound: request.device_bound,
+                    secret: !request.public_only,
+                })
+                .collect(),
+            ..CustodyUse::default()
+        },
+    }
+}
+
+fn vault_offering(route: AppRouteId, label: impl Into<String>) -> AppDeclaration {
+    let mut declaration = vault_declaration();
+    declaration.offers.push(ostiary::declaration::OfferedProjection {
+        route,
+        label: label.into(),
+    });
+    declaration
+}
+
 #[tokio::test(flavor = "multi_thread")]
-async fn knot_receives_its_declared_custody_within_the_default_grant() {
+async fn a_vault_application_receives_its_declared_custody_within_the_default_grant() {
     let wallet = tempfile::tempdir().unwrap();
     castellan::custody::wallet::ensure_wallet_state(wallet.path(), persona(), DEVICE).unwrap();
     let endpoint = serve(wallet.path(), Vec::new(), AppEndpointCatalog::default()).await;
-    let knot = knot_editor::declaration::app_declaration();
+    let declared = vault_declaration();
 
-    // Knot's three epoch keys, exactly as the in-process release derives them.
-    let mut client = open(&endpoint, knot_editor::KNOT_APP_ID, Some(knot.clone()))
+    // The vault application's three epoch keys, exactly as the in-process release derives them.
+    let mut client = open(&endpoint, VAULT_APP, Some(declared.clone()))
         .await
-        .expect("Knot is admitted by its declaration");
+        .expect("the vault application is admitted by its declaration");
     client.status().await.unwrap();
     client.roster().await.unwrap();
     let released = client
-        .release_epoch_keys(*persona().as_uuid(), Some(DEVICE.into()), PersonalVaultKeys::requests())
+        .release_epoch_keys(*persona().as_uuid(), Some(DEVICE.into()), vault_requests())
         .await
         .unwrap();
     let expected = dramatis_resident::custody::epoch_keys(
-        &dramatis_resident::custody::ReleasePolicy::none().with_declared_epochs(&knot.custody.epoch),
+        &dramatis_resident::custody::ReleasePolicy::none().with_declared_epochs(&declared.custody.epoch),
         wallet.path(),
         persona(),
         Some(DEVICE),
-        &PersonalVaultKeys::requests(),
+        &vault_requests(),
     )
     .unwrap();
     assert_eq!(released, expected);
-    PersonalVaultKeys::from_released(&released).unwrap();
+    assert_eq!(released.len(), 3, "the vault key, this device's writer and the legacy writer's public key");
 
-    // What Knot does not declare is refused as undeclared, before any policy.
+    // What it does not declare is refused as undeclared, before any policy.
     assert!(matches!(
         refusal(client.call(CustodyCall::LockVault).await),
         CustodyRefusal::Undeclared { .. }
     ));
-    let legacy_secret = EpochKeyRequest::secret(knot_editor::SIGNING_KEY_CONTEXT, false);
+    let legacy_secret = EpochKeyRequest::secret(WRITER_CONTEXT, false);
     assert!(matches!(
         refusal(client.call(release(vec![legacy_secret])).await),
         CustodyRefusal::Undeclared { .. }
@@ -170,8 +224,8 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
         CustodyRefusal::Undeclared { .. }
     ));
 
-    // Knot's label without its declaration is refused at the door.
-    assert!(open(&endpoint, knot_editor::KNOT_APP_ID, None).await.is_err());
+    // Its label without its declaration is refused at the door.
+    assert!(open(&endpoint, VAULT_APP, None).await.is_err());
 
     // No application reaches custody by its label alone.
     assert!(open(&endpoint, "cleromancy", None).await.is_err());
@@ -373,7 +427,7 @@ async fn a_declared_provider_offers_only_what_it_declares() {
             [&route, &other]
                 .into_iter()
                 .map(|route| ProviderPermission {
-                    provider: AppId::new(knot_editor::KNOT_APP_ID),
+                    provider: AppId::new(VAULT_APP),
                     route: route.clone(),
                     viewers: vec![AppId::new("fixture-viewer")],
                     max_sessions: 2,
@@ -392,7 +446,7 @@ async fn a_declared_provider_offers_only_what_it_declares() {
             for _ in 0..100 {
                 match AppConnection::open_declared_route_at(
                     &endpoint,
-                    AppId::new(knot_editor::KNOT_APP_ID),
+                    AppId::new(VAULT_APP),
                     provider_route.clone(),
                     declaration.clone(),
                 )
@@ -416,7 +470,7 @@ async fn a_declared_provider_offers_only_what_it_declares() {
     };
 
     // Offering a route the declaration does not name is refused.
-    let undeclared = connect(knot_editor::declaration::offering(route.clone(), "Knot directory")).await;
+    let undeclared = connect(vault_offering(route.clone(), "Knot directory")).await;
     let root = directory.path().to_owned();
     let refused = tokio::time::timeout(
         Duration::from_secs(4),
@@ -428,7 +482,7 @@ async fn a_declared_provider_offers_only_what_it_declares() {
     assert!(!offered(&other).await);
 
     // The declared offer registers.
-    let declared = connect(knot_editor::declaration::offering(route.clone(), "Knot directory")).await;
+    let declared = connect(vault_offering(route.clone(), "Knot directory")).await;
     let serving = tokio::spawn(projection_provider_serve(declared, route.clone(), root));
     tokio::time::timeout(Duration::from_secs(4), async {
         while !offered(&route).await {
@@ -450,7 +504,10 @@ async fn projection_provider_serve(
         route,
         "Knot directory".into(),
         2,
-        move |_| knot_editor::KnotEndpoint::open(&root).map_err(|error| error.to_string()),
+        move |_| {
+            let _ = &root;
+            Ok(graphshell_host::canary::FixtureEndpoint::new())
+        },
     )
     .await
 }

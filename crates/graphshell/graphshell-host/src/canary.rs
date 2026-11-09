@@ -327,6 +327,28 @@ impl ProjectionSource for FixtureEndpoint {
     }
 }
 
+/// A fixture endpoint serves as an app-door provider's endpoint: a resume
+/// answers with its one snapshot and it never rings a notice.
+impl graphshell_endpoint::ResumableProjectionSource for FixtureEndpoint {
+    type Error = CanaryError;
+
+    fn resume(
+        &mut self,
+        _request: chirograph::ResumeRequest,
+    ) -> Result<chirograph::ResumeReply, CanaryError> {
+        let snapshot = self.snapshot(self.request())?;
+        Ok(chirograph::ResumeReply::Snapshot(Box::new(snapshot)))
+    }
+}
+
+impl graphshell_endpoint::ProjectionNoticeSource for FixtureEndpoint {
+    type Error = CanaryError;
+
+    fn poll_notice(&mut self) -> Result<Option<chirograph::CarrierNotice>, CanaryError> {
+        Ok(None)
+    }
+}
+
 impl PresentationSource for FixtureEndpoint {
     type Error = CanaryError;
 
