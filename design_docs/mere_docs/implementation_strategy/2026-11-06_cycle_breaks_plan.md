@@ -138,7 +138,13 @@ parameterisation lands first. Tests keep their counts and the door route has its
 
 ### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
 
-**Status 2026-11-08 (later): step (1) done; step (2) settled by D24 (a pending slot until M4; nothing to build);
+**Status 2026-11-08 (last): done for the resident; one edge remains, open.** `ports/mere-resident` names no Knot crate
+(Mere `cacf7094f`, Knot `fc8ab8e41`); the supervised host, its door-backed evidence, the multi-process test and the
+moves are built (Progress). `scripts/check_family_cycles.py --remote` exits 0. **Not done:** the allowlist entry
+`mere -> knot-editor` stays, because `ports/graphshell`'s optional `knot-document` row (`editable-blocks`, `block_editing.rs`)
+still names Knot; it leaves when D23 moves that port to Turnstone (Findings, "P2 remainder").
+
+**Status 2026-11-08 (later, superseded above): step (1) done; step (2) settled by D24 (a pending slot until M4; nothing to build);
 step (3) ruled by D25 and half built: Murm's source trait is on main, the door's verified read and `DoorBlobSource`
 are built and tested on Mere branch `agent/p2-door-serving`, held for a relock blocker (Findings, "P2 relock
 blocker"); Knot's side (door-backed evidence host, the supervisor, the multi-process test) and step (4) are not done.** The brief's repository name `merely-made/knot` does
@@ -1430,3 +1436,56 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   `ports/graphshell/dramatis-pane` plus a mount in `ports/graphshell/mere`. Both sit inside `ports/graphshell`, which D23
   moves to Turnstone, so the P3 lane carries them with it: the pane crate names only `cambium`, `cambium-desktop`,
   `cambium-rootstock`, the published projection contract and `dramatis-surface`, and needs no change but its path.
+- 2026-11-08: P2 steps (3) and (4) built and pushed (Mark: no pins, no locks, track main). **Mere `cacf7094f` (main):**
+  `ports/mere-resident` drops `knot-editor` (both rows, the `peers` and `mere-overlay` features, the `knot_residue` `[[test]]`),
+  `resident_knot.rs`, `knot_relation_intake.rs` and `OwnerSettings.knot`. New: `supervisor.rs` (`AppSupervisor`: starts a
+  named command with `GRAPHSHELL_APP_ENDPOINT` set to the door, kills it on lock, restarts it on unlock and after a crash
+  with a 5 s back-off; `{data_root}` and `{endpoint}` placeholders; 3 tests) and `OwnerSettings.supervised`
+  (`SupervisedAppSettings { app, command, args }`; the old `knot` key is read as it for one release by a `knot_sync_host
+  --door-custody` command line and written back as `supervised`; 1 test). `djinn` starts the child once the door is up,
+  ends it on lock and restarts it on unlock, keeping the events `knot-closed` and `knot-reopened`; the Knot arm of the
+  select loop became the supervisor tick. `graphshell_host::canary::FixtureEndpoint` gained resume and notice impls so
+  it serves as a provider fixture; `app_projection_offers` (4) and the provider half of `declared_applications` run on it,
+  and `declared_applications`' Knot custody test is a vault-application test over literal contexts (held to Knot's real
+  declaration by a Knot test). Counts: `mere-resident` lib 269 to 270 (3 supervisor and 1 settings new, the lane test and
+  the 2 overlay tests gone); `knot_app_route` 1, `knot_checkpoint_receiving` 1 (+1 ignored helper), `knot_relation_intake`
+  6 (+1 ignored helper) and `knot_residue` (harness off) left the crate. The same known failures as the baseline and
+  nothing new: lib `the_dialable_host...`, `custodian_client` 2, `cxf_import`, `quarantine_review`; all else passes.
+  **Knot `fc8ab8e41` (main):** `KnotContentRetentionPort::open_door` (a door-backed port holds no store;
+  `blob_store()` is now an `Option`), `DoorEvidence` public with `retain_artifact` and `migrate_legacy`, `knot_sync_host
+  --door-custody [--evidence-root] [--max-artifact-bytes] [--ticket-file]` (keys from custody, evidence in the resident's
+  custody, old store migrated through the door, serving restored from the document's references), the declaration names
+  `blob-custody-v1`. Tests: `tests/supervised_evidence.rs` 3 (a peer fetches evidence from the real supervised child
+  through the door and revocation cuts it off, custody kept; the door-backed port retains into the resident under Knot's
+  lease; the declaration against the owner grant and the Mere fixture literals) and `tests/relation_intake.rs` 6 + 1 ignored
+  helper (moved with `knot_relation_intake.rs` as `tests/support/`; 6 before in Mere, 6 after). Knot's lock widened by the
+  git dev-dependencies `mere-resident`, `djinn`, `castellan`, `dramatis-resident` (no `djinn-testkit`: the resident's door
+  runs in the test process, only the child is spawned) and by Mere's git-sourced crates-io patch rows (the graph now
+  carries Mere's graphics stack through `mere-resident` to `graphshell`). Knot lib 171 passed, all Knot test binaries pass.
+  `check_family_cycles.py --remote`: exit 0.
+
+### P2 remainder (2026-11-08)
+
+- **`mere -> knot-editor` is not gone.** The resident's rows are; `ports/graphshell/Cargo.toml:223` (`knot-document`,
+  optional, `editable-blocks`, used by `src/block_editing.rs` for `KnotEditor`) remains, so the allowlist entry stays
+  (its reason now names that row). Options: (A) leave it until D23 moves `ports/graphshell` to Turnstone (which already
+  names `knot-document`), my recommendation since engine-split P3 owns that move; (B) move `block_editing.rs` and the
+  `editable-blocks` feature to Knot, which would make Knot name Graphshell's block applet host.
+- **The two `knot_overlay_*` tests were not ported.** They drive Knot's `MereOverlay` against `resident_mere`'s private test
+  `Fixture` (`fixture`, `attach`, `knot_door`, ~300 lines), so they cannot be consumers of the public crate today. Removed
+  from Mere without a Knot copy; the removed source is in Mere's history (`git show d3156d4e0:ports/mere-resident/src/resident_mere.rs`,
+  lines 3392 to 3676). Options: (A) a `test-fixtures` feature on `mere-resident` exporting the fixture, then port;
+  (B) a real `djinn` spawned from Knot by `djinn-testkit` (needs the binary built from Mere, which Knot cannot get as a
+  Cargo artifact).
+- **The `knot` route and the editor session no longer ride the resident.** The lane composed `KnotResidentSource` in the
+  resident for Turnstone's `knot` route; the supervised child is the sync host only (it must be the one process that opens
+  Knot's redb). Serving the editor through the app door is `knot_endpoint projection-provider` (route `knot` is reserved by
+  it today); wiring the supervised child to offer it is not done. `knot_checkpoint_receiving` (route plus checkpoint
+  receiving over the lane) and `knot_residue` (a residue run of the lane) were deleted from Mere and not ported for that
+  reason; their old copies are in Mere's history. Needs Mark: should the child also offer the route, and should these two
+  be rebuilt over it?
+- **Not done:** pairing facts and `refresh_settings` (the host reconciles `knot-sync.json` itself every 5 s, as the
+  standalone host always did); no live grant-removal path calls `BlobDoor::revoke` in `djinn` (still the API only);
+  `resident_v1_fixture` (an example seeding the lane) was deleted; its code is in Mere's history and the Knot test seeds
+  its own vault.
+
