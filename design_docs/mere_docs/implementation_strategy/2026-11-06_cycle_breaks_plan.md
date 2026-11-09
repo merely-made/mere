@@ -6,7 +6,7 @@ open (F1, F2). D6 (dev edges count) added the same day. D7 to D9 (Mark, 2026-11-
 the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md) and
 unpaused D4 and P6: the contract leaves and the host-role kit left Mere for the revived
 `merely-made/graphshell` the same day (Progress, Findings); `mere-comms` into Murm is still
-to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review). D18 to D23 (Mark, 2026-11-08) ruled the P0 check's unlisted cycles: the resident seam binds wherever the resident lives, `inker -> mere` is allowlisted until engine-split P5, `murm-wire` and `murm-rtc` moved into Genet (D20, done), Dramatis's app may become a producer (tentative, still flagged), the viewer's one build, and the real Cleromancy guest.
+to do, and F1 is half answered. D14 (Mark, 2026-11-06) added P1b; D15 answered the distribution binary (authority as guest or data, Knot's lane supervised after a blob door route). D2 landed as P4 and D3 as P5 (2026-11-06, Progress). D17 (Mark, 2026-11-06) closed F1 (`backdrops` to Graphshell) and P6 is done. D1 proceeds; D5 became D12 (Woodshed as a guest, design written, held for review). D26 (Mark, 2026-11-08) made Dramatis a producer and retired its window; D18 to D23 (Mark, 2026-11-08) ruled the P0 check's unlisted cycles: the resident seam binds wherever the resident lives, `inker -> mere` is allowlisted until engine-split P5, `murm-wire` and `murm-rtc` moved into Genet (D20, done), Dramatis's app may become a producer (tentative, still flagged), the viewer's one build, and the real Cleromancy guest.
 
 **For:** breaking the family's git-dependency cycles. Mark, 2026-10-28: "what's important is
 to untangle the repos and prevent cycles, dogfooding, and not drawing inefficient
@@ -524,7 +524,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   application that names Mere's Cambium (`cambium`, `cambium-desktop`, `mandrake`). A separate
   agent is writing the design. The Dramatis to Mere cycle (The P0 result, item 1) stays flagged by
   the check, with no allowlist entry, until the design is ruled. Outcome: direction recorded, no
-  decision taken; nothing moves.
+  decision taken; nothing moves. *Final ruling: D26 (2026-11-08).*
 
   Links: area stack · draws on cycle-breaks D6, stack.3 · plans cycle-breaks P0 · summary Dramatis's app may become a producer that hosts present rather than an app naming Cambium; tentative, design pending, and the Dramatis to Mere cycle stays flagged.
 
@@ -555,7 +555,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   (`guest_and_declared_validators_refuse_every_candidate_as_pending`) exist, and its doc comment says so.
   Outcome: settles the P2 findings' step (2) question as option A.
 
-  Links: area stack · draws on cycle-breaks D1, D15 · plans cycle-breaks P2 · summary Authority::Declared stays a typed pending slot until M4; no interpreter is built.
+  Links: area stack · draws on cycle-breaks D1, cycle-breaks D15 · summary Authority::Declared stays a typed pending slot until M4; no interpreter is built.
 
 - **D25. Serving Knot's evidence from a supervised child: change the transport (Mark, 2026-11-08):**
   "(2) Transport change", on the P2 findings' step (3) question. Murm's scoped blob provider takes a source
@@ -564,7 +564,24 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   hints are unchanged. Design in the domain contract, "Serving through the door".
   Outcome: settles the P2 findings' step (3) question as option 2.
 
-  Links: area stack · draws on cycle-breaks D15 (i), domain-contract blob door route · plans cycle-breaks P2 · summary The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store.
+  Links: area stack · draws on cycle-breaks D15 · summary The scoped blob provider reads from a BlobSource and the blob door adds verified reads, so a supervised Knot host serves evidence it does not store.
+
+- **D26. Dramatis becomes a projection producer and its window retires (Mark, 2026-11-08):** after the
+  design note (shapes A to D and the isolated-root fallback), Mark ruled four things. Shape A only, no
+  interim: Dramatis serves its roster, quarantine review, vault lock and passphrase change as titulus cards
+  plus `ActionFormV1` actions from a contract-only crate; no `[[isolated]]` allowlist entry is added, and the
+  check kept flagging `dramatis -> mere` until the window left. Pane only: Dramatis exists as a pane in
+  hosts; there is no standalone `Dramatis.app` or launcher, so `apps/dramatis` and its packaging are removed.
+  Card contract: if quarantine review did not fit today's cards, extend the contract by the smallest
+  compatible bump; it fits (labelled values and badges carry the store, details, credential kinds and the
+  blocked reason), so no contract change is carried and nothing waits on a publish. Stdio carrier: until
+  the peer-authentication work on the stdio carrier lands, a custody surface does not cross an unauthenticated
+  pipe; the surface runs in the host's process and the stdio child form waits. Built: Dramatis
+  `crates/dramatis-surface` (published contract crates only), Mere `ports/graphshell/dramatis-pane` and its
+  mount in `graphshell-mere`. Outcome: settles D21's tentative direction as shape A; removes the Dramatis
+  window, the `cambium`, `cambium-desktop`, `mandrake` and `taproot` rows and the dev `luggage` row.
+
+  Links: area stack · draws on stack.3 · summary Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed.
 
 ## Findings
 
@@ -1131,6 +1148,14 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
     requires `wgpu-cue =0.1.4`, which is not on crates.io (0.1.3 is the latest), and Mere's root pins
     `webcue =0.1.2` and `wgpu-cue =0.1.3`. That is the webcue lane's loop, not this decision's. Until it lands,
     the `--strict-locks` warnings for these roots remain.
+- **After D26, 2026-11-08 (the same check, `--remote`, Dramatis `a96e22df8`, Mere `d5b9dcf4d` plus this entry,
+  Graphshell `4d971f381`; exit 0, no allowlist entry added):** the check passes. The report lists 35 repositories,
+  91 lock roots and 1,209 manifest edges; the normal, dev and strict lists are empty, and Dramatis has no
+  outgoing cross-repository manifest edge at all. `dramatis -> mere` (the Cambium rows), `dramatis -> genet`
+  (`taproot`) and the dev `dramatis -> eidetic` (`luggage`) are gone with `apps/dramatis`; its one remaining
+  git row, `ostiary` from Armillary, went with the app as well, since `dramatis-surface` takes `ostiary` from
+  crates.io like `castellan-client` does. The `--dev-warn` run is also empty. Ten resolved-lock warnings remain, all of the
+  stale-pin kind below.
 - **Resolved-lock warnings (stale pins, not ruled):** `cleromancy`, `mere`, `turnstone` (a Distillery
   revision that named Mere, and the loops above), `inker`, `dramatis/apps/dramatis` and seven more roots
   (twelve in all) holding `dramatis` and `eidetic` together. Re-run with `--strict-locks` after the family's relock loop.
@@ -1365,3 +1390,19 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   lib tests leave for Cleromancy. Cleromancy: `authority-guest/` (5.15 MiB), 577 of 577 verdicts and refusal texts equal native,
   the seven owner tests and four natal tests pass through it. Cleromancy's root lock is blocked on webcue and wgpu-cue, so its tests
   are on a branch. Measurements and choices: Findings, "P3 guest".
+- 2026-11-08: Mere's pre-move `ports/dramatis` copy is deleted (Mere `028954140`): the workspace member, the
+  `dramatis-app` lock entry, the four packages only it reached (`cargo update -w`), and the six
+  `support/dramatis_*` receipt scripts and `scripts/test_dramatis_auth_tools.py` that hashed it (Dramatis holds
+  its own copies under `support/`). No other family repo named the copy by path or by git package. Root
+  `cargo check --workspace --locked` and `ports/graphshell/web` `cargo check --locked --target
+  wasm32-unknown-unknown` pass. The stdio carrier's peer authentication is a design awaiting Mark's ruling R1:
+  transport agnosticism note, section 10.
+- 2026-11-08: D26 (Mark: shape A only, pane only, no interim, in process until the stdio carrier authenticates its
+  peer). Dramatis `crates/dramatis-surface` (`f3ba597` to `0bef744`; the custody state machine and worker copied from
+  the app, then served as titulus cards and `ActionFormV1` actions over `ostiary`, with 11 surface tests and the
+  app's 5 state tests; no contract change) and `a96e22df8` (`apps/dramatis`, its packaging and its receipt drivers
+  deleted, the `cambium`, `cambium-desktop`, `mandrake`, `taproot` and dev `luggage` rows with them). Mere
+  `f957c7299`: `ports/graphshell/dramatis-pane` (`graphshell-dramatis-pane`, 12 tests rebuilt from the window's
+  interaction tests: focus order, zoom and narrow layout, focus-follow against manual scroll, live region and
+  heading stability, disabled-while-busy) and its mount in `graphshell-mere` (3 tests; 44 before, 47 after);
+  Mere's lock moves `dramatis.git` to the surface commit. `scripts/check_family_cycles.py --remote` passes (The P0 result).
