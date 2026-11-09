@@ -16,13 +16,16 @@ path = "src/lib.rs"
 # Everything the crate did before the blocking handle arrived stays on by
 # default. A small host turns the defaults off and takes only `Fetch` over
 # netfetcher (design_docs/.../2026-09-20_ranged_fetch_plan.md, D3).
-default = ["actor", "smolweb", "persona-cookies", "flip"]
+default = ["actor", "smolweb", "persona-cookies", "flip", "engine-profiles"]
 # The off-UI-thread page actor.
 actor = ["dep:armillary", "armillary/tokio", "tokio/macros"]
 # gemini, gopher, finger, spartan, nex, guppy and titan through errand.
 smolweb = ["dep:errand"]
 # Durable per-persona cookies in an eidetic store.
 persona-cookies = ["dep:eidetic", "dep:pandect", "dep:serde", "dep:serde_json", "dep:pollster"]
+# Engine user-data folder paths by persona, session or graph, read from the
+# session manifest's extension slot (engine split D43).
+engine-profiles = ["dep:pandect", "dep:serde"]
 # The session's cookies as portable records for an engine flip.
 flip = ["dep:inker"]
 https-blobs = ["dep:eidetic", "dep:ureq"]
@@ -53,6 +56,11 @@ tracing.workspace = true
 url = "2"
 inker = { workspace = true, optional = true }
 zeroize = "1"
+
+[dev-dependencies]
+# The engine-profile tests build ids and read a legacy manifest.
+serde_json.workspace = true
+uuid.workspace = true
 
 [lints]
 workspace = true

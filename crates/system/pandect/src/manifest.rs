@@ -6,8 +6,8 @@
 
 //! Durable session manifest types — `GraphSessionManifest` is the
 //! per-session record on disk that anchors session identity,
-//! references its root graph + sub-graphs, holds the worker
-//! manifest, engine-profile binding, and policy overrides.
+//! references its root graph + sub-graphs, and carries the host's
+//! own fields in an opaque extension slot (engine split D43).
 //!
 //! This module ships only the **types**. Lifecycle (load-all-at-
 //! startup, persist-on-mutation, archive-on-kill) lands in the
@@ -38,71 +38,10 @@ pub const MANIFEST_SCHEMA_VERSION: u32 = 1;
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CodicilId(pub String);
 
-/// Where the engine's user-data folder lives for this session.
-/// Persona-scoped is the default; sessions/graphs can escalate when
-/// isolation is explicitly required. See the
-/// `design_docs/mere_docs/research/2026-05-11_browser_multiplexer_framing.md`
-/// §5.4.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub enum EngineProfileBinding {
-    /// Share the persona's engine UDF with every session.
-    #[default]
-    PersonaScoped,
-    /// This session gets its own UDF.
-    SessionScoped,
-    /// A specific graph inside this session gets its own UDF
-    /// (reserved; not used in v0).
-    GraphScoped,
-}
-
-/// A background worker the session has declared. Real worker
-/// implementations land alongside their workloads — `WorkerKind` is
-/// the *vocabulary* the manifest persists, not a guarantee that a
-/// runner can service every variant. Per the
-/// [SessionServiceRunner plan](../../../../design_docs/mere_docs/implementation_strategy/2026-05-14_session_service_runner_plan.md)
-/// §3, a runner returns `WorkerStartError::Unsupported` for kinds it
-/// can't handle.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum WorkerKind {
-    /// No worker declared. Placeholder retained so the enum can be
-    /// serialised before any real worker kinds land.
-    #[default]
-    None,
-    /// Background URL fetcher pool — populates document caches and
-    /// surfaces preview content for tiles. v0b adds the implementation.
-    FetcherPool,
-    /// Embedding producer (BERT-class model) — runs on demand to
-    /// populate the embed store.
-    Embedder,
-    /// Indexer that walks document content into the `SearchIndex`
-    /// codicil referenced by the framing brief §3.
-    Indexer,
-    /// Intelligence-signal producer — clusters, affinity, recency
-    /// signals consumed by cartography strategies.
-    IntelligenceSignalProducer,
-}
-
-/// Capability overrides for this session. v0 ships an empty struct
-/// — the capability-gate catalogue brief lands the actual override
-/// shape. Reserving the field now lets later plans add overrides
-/// without a schema bump.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SessionPolicy {
-    /// Reserved for future capability-override entries. Empty in v0.
-    #[serde(default)]
-    pub overrides: Vec<SessionPolicyOverride>,
-}
-
-/// Placeholder for a single capability override. v0: unit-like;
-/// real shape lands with the gate catalogue. Reserved so adding
-/// real entries later doesn't require migrating already-saved
-/// manifests.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SessionPolicyOverride {}
-
 /// The durable session record. One file on disk per session
 /// (`<data_dir>/mere/host/sessions/<session_id>/manifest.json`).
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(remote = "Self")]
 pub struct GraphSessionManifest {
     /// Schema version. Bumped on incompatible changes.
     pub schema_version: u32,
@@ -142,16 +81,14 @@ pub struct GraphSessionManifest {
     /// idle" policies (when opted in). `None` = never consolidated.
     #[serde(default)]
     pub last_consolidated_at: Option<SystemTime>,
-    /// Background workers this session has declared. v0 empty;
-    /// `SessionServiceRunner` plan populates.
-    #[serde(default)]
-    pub active_workers: Vec<WorkerKind>,
-    /// Engine profile binding. Defaults to persona-scoped UDF.
-    #[serde(default)]
-    pub engine_profile: EngineProfileBinding,
-    /// Session-scope capability policy. v0: empty overrides.
-    #[serde(default)]
-    pub policy: SessionPolicy,
+    /// The host's own fields, which pandect stores and round-trips without
+    /// reading (engine split D43): worker declarations, the engine profile
+    /// binding and session policy live here under keys their owners name.
+    /// Files written before the split carried them as the top-level keys
+    /// `active_workers`, `engine_profile` and `policy`; reading folds those
+    /// in under the same names (see [`LEGACY_HOST_KEYS`]).
+    #[serde(default, skip_serializing_if = "serde_json::Map::is_empty")]
+    pub extension: serde_json::Map<String, serde_json::Value>,
     /// On-disk root for this session's data. Stored explicitly so
     /// the manifest is self-describing if it's ever copied out of
     /// its host directory.
@@ -248,9 +185,7 @@ impl GraphSessionManifest {
             parent_session: None,
             consolidated_codicils: Vec::new(),
             last_consolidated_at: None,
-            active_workers: Vec::new(),
-            engine_profile: EngineProfileBinding::default(),
-            policy: SessionPolicy::default(),
+            extension: serde_json::Map::new(),
             storage_path: None,
             forked_at: None,
             trashed: None,
@@ -284,6 +219,74 @@ impl GraphSessionManifest {
     }
 }
 
+/// The top-level keys the host's fields had before the extension slot
+/// (engine split D43), and the value each held by default. A legacy file's
+/// non-default values are folded into [`GraphSessionManifest::extension`]
+/// under the same key; defaults are dropped, since the host defaults them.
+pub const LEGACY_HOST_KEYS: [(&str, &str); 3] = [
+    ("active_workers", "[]"),
+    ("engine_profile", "\"PersonaScoped\""),
+    ("policy", "{\"overrides\":[]}"),
+];
+
+impl GraphSessionManifest {
+    /// A host field from the extension slot, if present and of type `T`.
+    pub fn extension_get<T: serde::de::DeserializeOwned>(&self, key: &str) -> Option<T> {
+        self.extension
+            .get(key)
+            .and_then(|value| serde_json::from_value(value.clone()).ok())
+    }
+
+    /// Store a host field in the extension slot under `key`.
+    pub fn extension_set<T: Serialize>(
+        &mut self,
+        key: &str,
+        value: &T,
+    ) -> Result<(), serde_json::Error> {
+        self.extension
+            .insert(key.to_owned(), serde_json::to_value(value)?);
+        Ok(())
+    }
+}
+
+impl Serialize for GraphSessionManifest {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        GraphSessionManifest::serialize(self, serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for GraphSessionManifest {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        let mut object = serde_json::Map::<String, serde_json::Value>::deserialize(deserializer)?;
+        let mut folded = serde_json::Map::new();
+        for (key, default) in LEGACY_HOST_KEYS {
+            let Some(value) = object.remove(key) else {
+                continue;
+            };
+            let default: serde_json::Value =
+                serde_json::from_str(default).expect("legacy default is JSON");
+            if value != default && !value.is_null() {
+                folded.insert(key.to_owned(), value);
+            }
+        }
+        if !folded.is_empty() {
+            let slot = object
+                .entry("extension")
+                .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+            let serde_json::Value::Object(slot) = slot else {
+                return Err(D::Error::custom("manifest extension is not an object"));
+            };
+            for (key, value) in folded {
+                slot.entry(key).or_insert(value);
+            }
+        }
+        GraphSessionManifest::deserialize(serde_json::Value::Object(object))
+            .map_err(D::Error::custom)
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -307,7 +310,7 @@ mod tests {
         assert!(m.parent_session.is_none());
         assert!(m.consolidated_codicils.is_empty());
         assert_eq!(m.persona_id, PersonaId::default_persona());
-        assert_eq!(m.engine_profile, EngineProfileBinding::PersonaScoped);
+        assert!(m.extension.is_empty());
     }
 
     #[test]
@@ -316,7 +319,7 @@ mod tests {
         m.display_name = Some("research-session".to_string());
         m.set_parent(SessionId::from_uuid(Uuid::from_u128(0xdeadbeef)));
         m.record_consolidation(CodicilId("codicil-hash-abc123".to_string()));
-        m.engine_profile = EngineProfileBinding::SessionScoped;
+        m.extension_set("engine_profile", &"SessionScoped").unwrap();
 
         let json = serde_json::to_string(&m).expect("serialize");
         let restored: GraphSessionManifest = serde_json::from_str(&json).expect("deserialize");
@@ -326,7 +329,11 @@ mod tests {
         assert_eq!(restored.display_name, m.display_name);
         assert_eq!(restored.parent_session, m.parent_session);
         assert_eq!(restored.consolidated_codicils, m.consolidated_codicils);
-        assert_eq!(restored.engine_profile, m.engine_profile);
+        assert_eq!(restored.extension, m.extension);
+        assert_eq!(
+            restored.extension_get::<String>("engine_profile").as_deref(),
+            Some("SessionScoped")
+        );
     }
 
     #[test]
@@ -370,7 +377,7 @@ mod tests {
         assert_eq!(restored.root_graph_id, fixture_graph());
         assert!(restored.sub_graph_refs.is_empty());
         assert!(restored.consolidated_codicils.is_empty());
-        assert_eq!(restored.engine_profile, EngineProfileBinding::PersonaScoped);
+        assert!(restored.extension.is_empty());
         assert_eq!(restored.persona_id, PersonaId::default_persona());
         assert_eq!(restored.picked_from, None);
         assert_eq!(
@@ -428,6 +435,55 @@ mod tests {
         let json = serde_json::to_string(&picked).expect("serialize");
         let back: GraphSessionManifest = serde_json::from_str(&json).expect("round trip");
         assert_eq!(back.picked_from, picked.picked_from);
+    }
+
+    #[test]
+    fn legacy_host_keys_fold_into_the_extension_and_are_not_written_back() {
+        // A manifest as written before D43: every host field at the top level,
+        // two with values and one at its default.
+        let legacy = format!(
+            r#"{{
+                "schema_version": 1,
+                "session_id": "{}",
+                "root_graph_id": "{}",
+                "created_at": {{ "secs_since_epoch": 0, "nanos_since_epoch": 0 }},
+                "updated_at": {{ "secs_since_epoch": 0, "nanos_since_epoch": 0 }},
+                "active_workers": ["FetcherPool"],
+                "engine_profile": "SessionScoped",
+                "policy": {{ "overrides": [] }}
+            }}"#,
+            fixture_session().as_uuid(),
+            fixture_graph().as_uuid(),
+        );
+        let restored: GraphSessionManifest = serde_json::from_str(&legacy).unwrap();
+        assert_eq!(
+            restored.extension_get::<Vec<String>>("active_workers"),
+            Some(vec!["FetcherPool".to_string()])
+        );
+        assert_eq!(
+            restored.extension_get::<String>("engine_profile").as_deref(),
+            Some("SessionScoped")
+        );
+        assert!(!restored.extension.contains_key("policy"), "a default is dropped");
+
+        let written = serde_json::to_value(&restored).unwrap();
+        for (key, _) in LEGACY_HOST_KEYS {
+            assert!(written.get(key).is_none(), "{key} is not written at the top level");
+        }
+        let again: GraphSessionManifest = serde_json::from_value(written).unwrap();
+        assert_eq!(again.extension, restored.extension);
+    }
+
+    #[test]
+    fn a_pre_split_file_with_only_defaults_reads_with_an_empty_extension() {
+        let manifest = GraphSessionManifest::new(fixture_session(), fixture_graph());
+        let mut value = serde_json::to_value(&manifest).unwrap();
+        let object = value.as_object_mut().unwrap();
+        for (key, default) in LEGACY_HOST_KEYS {
+            object.insert(key.into(), serde_json::from_str(default).unwrap());
+        }
+        let restored: GraphSessionManifest = serde_json::from_value(value).unwrap();
+        assert!(restored.extension.is_empty());
     }
 
     #[test]

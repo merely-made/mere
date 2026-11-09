@@ -5,7 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Engine profile boundary — path resolution for the engine UDF
-//! directories.
+//! directories. Moved from pandect's `engine_profile_store` to the fetch
+//! service, which keeps per-engine site data (engine split D43).
 //!
 //! Per the [framing brief §5.4](../../../../design_docs/mere_docs/research/2026-05-11_browser_multiplexer_framing.md#54-engine-profile--site-data-boundary)
 //! and the [engine profile boundary plan](../../../../design_docs/mere_docs/implementation_strategy/2026-05-14_engine_profile_boundary_plan.md):
@@ -23,21 +24,56 @@
 
 use std::path::{Path, PathBuf};
 
-use catchment::{GraphId, SessionId};
+use pandect::{GraphId, GraphSessionManifest, PERSONAS_DIR, PersonaId, SESSIONS_DIR, SessionId};
+use serde::{Deserialize, Serialize};
 
-use crate::manifest::{EngineProfileBinding, GraphSessionManifest, PersonaId};
+/// The manifest extension key holding a session's [`EngineProfileBinding`].
+/// The same name the manifest field had before engine split D43, so legacy
+/// files fold in unchanged.
+pub const ENGINE_PROFILE_KEY: &str = "engine_profile";
+
+/// Where the engine's user-data folder lives for this session.
+/// Persona-scoped is the default; sessions/graphs can escalate when
+/// isolation is explicitly required. See the
+/// `design_docs/mere_docs/research/2026-05-11_browser_multiplexer_framing.md`
+/// §5.4.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EngineProfileBinding {
+    /// Share the persona's engine UDF with every session.
+    #[default]
+    PersonaScoped,
+    /// This session gets its own UDF.
+    SessionScoped,
+    /// A specific graph inside this session gets its own UDF
+    /// (reserved; not used in v0).
+    GraphScoped,
+}
+
+
+/// The binding `manifest` carries; persona-scoped when none is stored.
+pub fn engine_profile_binding(manifest: &GraphSessionManifest) -> EngineProfileBinding {
+    manifest
+        .extension_get(ENGINE_PROFILE_KEY)
+        .unwrap_or_default()
+}
+
+/// Record `binding` on `manifest`; the default clears the key.
+pub fn set_engine_profile_binding(
+    manifest: &mut GraphSessionManifest,
+    binding: EngineProfileBinding,
+) {
+    if binding == EngineProfileBinding::default() {
+        manifest.extension.remove(ENGINE_PROFILE_KEY);
+    } else {
+        manifest
+            .extension_set(ENGINE_PROFILE_KEY, &binding)
+            .expect("a binding serializes");
+    }
+}
 
 /// Subdirectory holding per-engine UDFs, under whichever scope owns
 /// them (persona, session, or graph).
 pub const ENGINE_PROFILES_DIR: &str = "engine-profiles";
-
-/// Top-level subdirectory holding per-persona state — engine UDFs,
-/// future persona-scoped data (vaults, settings).
-pub use sporran::PERSONAS_DIR;
-
-/// Top-level subdirectory holding per-session state. Matches the
-/// `ManifestStore` layout convention.
-pub const SESSIONS_DIR: &str = "sessions";
 
 /// Subdirectory under a session for per-graph state. v0 doesn't write
 /// here unless the session's binding is `GraphScoped`.
@@ -125,7 +161,7 @@ pub fn engine_profile_path_for_session(
     engine_id: &str,
     graph_id: Option<GraphId>,
 ) -> Option<PathBuf> {
-    let scope = EngineProfileScope::from(manifest.engine_profile);
+    let scope = EngineProfileScope::from(engine_profile_binding(manifest));
     let session_id = Some(manifest.session_id);
     let graph_id = graph_id.or(match scope {
         EngineProfileScope::Graph => Some(manifest.root_graph_id),
@@ -292,7 +328,7 @@ mod tests {
         assert_eq!(path, expected_persona);
 
         // Flipping to SessionScoped picks up the manifest's session id.
-        manifest.engine_profile = EngineProfileBinding::SessionScoped;
+        set_engine_profile_binding(&mut manifest, EngineProfileBinding::SessionScoped);
         let path =
             engine_profile_path_for_session(Path::new("/data"), &manifest, "scrying.web", None)
                 .unwrap();
@@ -305,7 +341,7 @@ mod tests {
 
         // GraphScoped — wrapper falls back to root_graph_id when the
         // caller doesn't pass an explicit graph id.
-        manifest.engine_profile = EngineProfileBinding::GraphScoped;
+        set_engine_profile_binding(&mut manifest, EngineProfileBinding::GraphScoped);
         let path =
             engine_profile_path_for_session(Path::new("/data"), &manifest, "scrying.web", None)
                 .unwrap();
@@ -335,5 +371,30 @@ mod tests {
         )
         .unwrap();
         assert!(path.ends_with(Path::new("engine-profiles/wry.web")));
+    }
+
+    #[test]
+    fn a_pre_split_manifest_keeps_its_binding() {
+        // Written before D43: the binding was a top-level manifest field.
+        let legacy = format!(
+            r#"{{
+                "schema_version": 1,
+                "session_id": "{}",
+                "root_graph_id": "{}",
+                "created_at": {{ "secs_since_epoch": 0, "nanos_since_epoch": 0 }},
+                "updated_at": {{ "secs_since_epoch": 0, "nanos_since_epoch": 0 }},
+                "engine_profile": "GraphScoped"
+            }}"#,
+            fixture_session().as_uuid(),
+            fixture_graph().as_uuid(),
+        );
+        let manifest: GraphSessionManifest = serde_json::from_str(&legacy).unwrap();
+        assert_eq!(
+            engine_profile_binding(&manifest),
+            EngineProfileBinding::GraphScoped
+        );
+        let mut manifest = manifest;
+        set_engine_profile_binding(&mut manifest, EngineProfileBinding::PersonaScoped);
+        assert!(manifest.extension.is_empty(), "the default is not stored");
     }
 }

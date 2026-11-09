@@ -415,7 +415,7 @@ impl ManifestStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::manifest::{CodicilId, EngineProfileBinding, GraphSessionManifest};
+    use crate::manifest::{CodicilId, GraphSessionManifest};
     use catchment::{GraphId, SessionId};
     use uuid::Uuid;
 
@@ -464,13 +464,16 @@ mod tests {
         assert!(!store.is_dirty(sid));
         let ok = store.update(sid, |m| {
             m.display_name = Some("research".to_string());
-            m.engine_profile = EngineProfileBinding::SessionScoped;
+            m.extension_set("engine_profile", &"SessionScoped").unwrap();
         });
         assert!(ok);
         assert!(store.is_dirty(sid));
         let m = store.get(sid).unwrap();
         assert_eq!(m.display_name.as_deref(), Some("research"));
-        assert_eq!(m.engine_profile, EngineProfileBinding::SessionScoped);
+        assert_eq!(
+            m.extension_get::<String>("engine_profile").as_deref(),
+            Some("SessionScoped")
+        );
     }
 
     #[test]

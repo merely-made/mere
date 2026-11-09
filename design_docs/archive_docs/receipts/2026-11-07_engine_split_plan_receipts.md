@@ -1045,3 +1045,34 @@ lines, unchanged), behind `store`; `pandect::slot_guard` is `pub use catchment::
 - `cargo test -p catchment --features store`: 20 unit (17 + slot_guard's 3), 2, 4.
 - `cargo check --workspace --all-targets`: green, 1m33s. `cargo test -p pandect`: 281 unit (284
   less slot_guard's 3) + 11 + 1 + 9 + 2 (+1 ignored) + 1 + 5 = 310.
+
+## 2026-11-09: P4 D43/D77, the manifest's host fields become an extension slot
+
+Ruling F2 (Mark): "Split by job". `GraphSessionManifest` (`pandect/src/manifest.rs`, 457 to 513
+lines) replaces `active_workers`, `engine_profile` and `policy` with `extension:
+serde_json::Map` (`#[serde(default, skip_serializing_if = "Map::is_empty")]`), `extension_get` and
+`extension_set`. Serialization goes through `#[serde(remote = "Self")]` with hand-written impls; the
+`Deserialize` folds the three legacy keys into the slot unless they hold their old defaults
+(`[]`, `"PersonaScoped"`, `{"overrides":[]}`). Moved with history:
+- `pandect/src/session_service_runner.rs` (340) to `ports/mere-resident/src/session_workers.rs`
+  (434), with `WorkerKind`, `SessionPolicy`, `SessionPolicyOverride` from `manifest.rs` and
+  `active_workers`/`set_active_workers`/`session_policy` over the slot.
+- `pandect/src/engine_profile_store.rs` (339) to `crates/system/fetch/src/engine_profile.rs` (400),
+  with `EngineProfileBinding` and `engine_profile_binding`/`set_engine_profile_binding`, behind a new
+  default feature `engine-profiles = ["dep:pandect", "dep:serde"]`; fetch gains dev-deps
+  `serde_json`, `uuid`.
+- `PERSONAS_DIR` (sporran's) and `SESSIONS_DIR` now sit at pandect's root.
+
+Consumers outside Mere naming any moved item or field: none (Turnstone, Cleromancy, Knot, Woodshed,
+Graphshell checked). Lock: mere-fetch gains `uuid`.
+
+- `cargo check --workspace --all-targets`: green, 1m14s; `cargo check -p mere-fetch
+  --no-default-features`: green.
+- Tests before / after: pandect unit 281 / 266 (less the runner's 8 and the store's 9, plus two
+  shim tests), its integration tests unchanged (29 + 1 ignored); mere-fetch lib 66 / 76 (9 moved,
+  one legacy-binding test); mere-resident lib 271 / 280 (8 moved, one extension test).
+- mere-resident lib has two failures with and without this change, also at `fe8c2d785` before P4
+  began: `resident_mere::tests::retained::nothing_is_kept_in_plaintext_when_no_custody_is_configured`
+  (Windows os error 33 reading a locked `.redb`, `tests/retained.rs:244`) and
+  `resident_mere::tests::the_dialable_host_serves_only_what_the_grant_and_the_owner_name`
+  (`admitted: ActionNotOffered`, `resident_mere.rs:3109`). Not P4's; reported.

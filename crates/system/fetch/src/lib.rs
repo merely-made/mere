@@ -525,6 +525,11 @@ pub mod iroh_blob;
 
 pub mod crawler;
 
+// Where an engine's user-data folder lives for a persona, session or graph
+// (moved from pandect, engine split D43).
+#[cfg(feature = "engine-profiles")]
+pub mod engine_profile;
+
 #[cfg(all(feature = "fleece-crawl", not(target_arch = "wasm32")))]
 pub mod fleece_crawl;
 

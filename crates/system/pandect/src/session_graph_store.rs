@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 
 use catchment::SessionId;
 
-use crate::engine_profile_store::SESSIONS_DIR;
+use crate::SESSIONS_DIR;
 
 /// The graph file name under a session directory.
 pub const GRAPH_FILE: &str = "graph.json";

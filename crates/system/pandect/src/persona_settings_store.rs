@@ -24,7 +24,7 @@ use std::{fs, io};
 use muniment::{Backend, JsonSlots, StoreError};
 use serde::{Deserialize, Serialize};
 
-use crate::engine_profile_store::PERSONAS_DIR;
+use crate::PERSONAS_DIR;
 use crate::manifest::PersonaId;
 use crate::memory_levels::EvictionPolicy;
 

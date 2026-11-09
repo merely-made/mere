@@ -36,6 +36,8 @@ pub mod resident_mere;
 pub mod resident_projection;
 pub mod resident_reservoir;
 pub mod retained_custody;
+// Session worker declarations and their runner, from pandect (engine split D43).
+pub mod session_workers;
 pub mod supervisor;
 pub mod resident_site;
 #[cfg(feature = "moot-site")]

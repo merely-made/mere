@@ -6,8 +6,11 @@
 
 //! Background-worker orchestration trait per the framing brief §5.7.
 //!
-//! Sessions *declare* which workers they want running via
-//! `GraphSessionManifest.active_workers: Vec<WorkerKind>`. A
+//! Sessions *declare* which workers they want running: a
+//! `Vec<WorkerKind>` under [`ACTIVE_WORKERS_KEY`] in the session manifest's
+//! extension slot, with the session's [`SessionPolicy`] under
+//! [`POLICY_KEY`]. Pandect stores both without reading them; this host
+//! module owns them (engine split D43, Mark: "Split by job"). A
 //! [`SessionServiceRunner`] implementation owns the actual workers
 //! and answers start / stop / list queries against them.
 //!
@@ -24,9 +27,83 @@
 
 use std::collections::HashMap;
 
-use catchment::SessionId;
+use pandect::{GraphSessionManifest, SessionId};
+use serde::{Deserialize, Serialize};
 
-use crate::manifest::WorkerKind;
+/// The manifest extension key holding a session's declared workers. The
+/// same name the field had before D43, so legacy files fold in unchanged.
+pub const ACTIVE_WORKERS_KEY: &str = "active_workers";
+/// The manifest extension key holding a session's policy.
+pub const POLICY_KEY: &str = "policy";
+
+/// A background worker the session has declared. Real worker
+/// implementations land alongside their workloads — `WorkerKind` is
+/// the *vocabulary* the manifest persists, not a guarantee that a
+/// runner can service every variant. Per the
+/// [SessionServiceRunner plan](../../../../design_docs/mere_docs/implementation_strategy/2026-05-14_session_service_runner_plan.md)
+/// §3, a runner returns `WorkerStartError::Unsupported` for kinds it
+/// can't handle.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum WorkerKind {
+    /// No worker declared. Placeholder retained so the enum can be
+    /// serialised before any real worker kinds land.
+    #[default]
+    None,
+    /// Background URL fetcher pool — populates document caches and
+    /// surfaces preview content for tiles. v0b adds the implementation.
+    FetcherPool,
+    /// Embedding producer (BERT-class model) — runs on demand to
+    /// populate the embed store.
+    Embedder,
+    /// Indexer that walks document content into the `SearchIndex`
+    /// codicil referenced by the framing brief §3.
+    Indexer,
+    /// Intelligence-signal producer — clusters, affinity, recency
+    /// signals consumed by cartography strategies.
+    IntelligenceSignalProducer,
+}
+
+/// Capability overrides for this session. v0 ships an empty struct
+/// — the capability-gate catalogue brief lands the actual override
+/// shape. Reserving the field now lets later plans add overrides
+/// without a schema bump.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SessionPolicy {
+    /// Reserved for future capability-override entries. Empty in v0.
+    #[serde(default)]
+    pub overrides: Vec<SessionPolicyOverride>,
+}
+
+/// Placeholder for a single capability override. v0: unit-like;
+/// real shape lands with the gate catalogue. Reserved so adding
+/// real entries later doesn't require migrating already-saved
+/// manifests.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SessionPolicyOverride {}
+
+
+/// The workers `manifest` declares; none when the slot is empty or unreadable.
+pub fn active_workers(manifest: &GraphSessionManifest) -> Vec<WorkerKind> {
+    manifest
+        .extension_get(ACTIVE_WORKERS_KEY)
+        .unwrap_or_default()
+}
+
+/// Declare `workers` on `manifest`; an empty list clears the key.
+pub fn set_active_workers(manifest: &mut GraphSessionManifest, workers: &[WorkerKind]) {
+    if workers.is_empty() {
+        manifest.extension.remove(ACTIVE_WORKERS_KEY);
+    } else {
+        manifest
+            .extension_set(ACTIVE_WORKERS_KEY, &workers)
+            .expect("worker kinds serialize");
+    }
+}
+
+/// The session's policy; the empty default when none is stored.
+pub fn session_policy(manifest: &GraphSessionManifest) -> SessionPolicy {
+    manifest.extension_get(POLICY_KEY).unwrap_or_default()
+}
 
 /// Opaque handle minted by a [`SessionServiceRunner`] when a worker
 /// is started. Callers don't construct these; they identify a
@@ -336,5 +413,22 @@ mod tests {
             let back: WorkerKind = serde_json::from_str(&json).unwrap();
             assert_eq!(back, kind, "WorkerKind::{kind:?} did not round-trip");
         }
+    }
+
+    #[test]
+    fn declared_workers_ride_the_manifest_extension() {
+        let mut manifest =
+            GraphSessionManifest::new(session(1), pandect::GraphId::from_uuid(Uuid::from_u128(2)));
+        assert!(active_workers(&manifest).is_empty());
+        set_active_workers(&mut manifest, &[WorkerKind::FetcherPool, WorkerKind::Indexer]);
+        let stored: GraphSessionManifest =
+            serde_json::from_value(serde_json::to_value(&manifest).unwrap()).unwrap();
+        assert_eq!(
+            active_workers(&stored),
+            vec![WorkerKind::FetcherPool, WorkerKind::Indexer]
+        );
+        assert_eq!(session_policy(&stored), SessionPolicy::default());
+        set_active_workers(&mut manifest, &[]);
+        assert!(manifest.extension.is_empty());
     }
 }

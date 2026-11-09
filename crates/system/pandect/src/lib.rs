@@ -85,7 +85,6 @@ pub use catchment::slot_guard;
 // The scene.* facet namespace: the graph-scene's own view settings (sizing
 // mode, importance metric, physics damping) as facets of the CONTAINER node
 // (keyed by the session's root_graph_id) — scene-scoped, not per-node.
-pub mod engine_profile_store;
 pub mod saved_scene;
 pub mod scene_facets;
 pub mod graph_codicil;
@@ -120,7 +119,6 @@ pub mod manifest_store;
 // backend).
 #[cfg(not(target_arch = "wasm32"))]
 pub mod session_graph_store;
-pub mod session_service_runner;
 // Session/dataspace settings sidecar (settings.json). A flat JSON document beside
 // graph.json; the host loads it on launch and saves on change. Application and
 // device preferences have their own stores and must not travel with it.
@@ -166,10 +164,11 @@ pub use eidetic::schema_facets::{
     ContentClassCodicil, SchemaFacetValidator, content_class_schema_definition,
     content_class_schema_ref, load_content_class, save_content_class,
 };
-pub use engine_profile_store::{
-    ENGINE_PROFILES_DIR, EngineProfileScope, GRAPHS_DIR, PERSONAS_DIR, SESSIONS_DIR,
-    engine_profile_path, engine_profile_path_for_session,
-};
+/// Top-level subdirectory holding per-persona state, under a data root.
+pub use sporran::PERSONAS_DIR;
+/// Top-level subdirectory holding per-session state. Matches the
+/// [`ManifestStore`] layout convention.
+pub const SESSIONS_DIR: &str = "sessions";
 pub use facet_store::{
     AcceptAll, ExpiringFacet, FacetError, FacetId, FacetValidator, NODE_FACETS_FILE,
     NodeFacetStore, NodeFacets, copy_node_facets, load_node_facets, node_facets_path,
@@ -195,8 +194,8 @@ pub use live_view::{
     open_live_view_record, save_live_view_record, save_live_view_record_sealed,
 };
 pub use manifest::{
-    CodicilId, EngineProfileBinding, GraphSessionManifest, Lineage, MANIFEST_SCHEMA_VERSION,
-    MergedMark, PersonaId, PickedFrom, SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
+    CodicilId, GraphSessionManifest, LEGACY_HOST_KEYS, Lineage, MANIFEST_SCHEMA_VERSION,
+    MergedMark, PersonaId, PickedFrom, TrashMark,
 };
 pub use manifest_store::{LoadFailure, LoadReport, MANIFEST_FILE, ManifestStore, TRASH_DIR};
 #[cfg(not(target_arch = "wasm32"))]
@@ -239,10 +238,6 @@ pub use scene_facets::{
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use script_bindings_store::{SCRIPT_BINDINGS_FILENAME, ScriptBinding};
-pub use session_service_runner::{
-    InMemoryRunner, NullRunner, SessionServiceRunner, WorkerHandle, WorkerStartError, WorkerState,
-    WorkerStatus, WorkerStopError,
-};
 pub use settings_store::{
     LegacySettingsMigration, PersistedSettings, SETTINGS_FILENAME, SettingsLoad,
     load_settings_with_legacy,
