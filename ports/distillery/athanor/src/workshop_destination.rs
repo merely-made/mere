@@ -9,7 +9,7 @@
 //! transaction. This adapter supplies no custody or human authority of its own.
 
 use crate::workshop::{Error, revalidate_acceptance, validate_proposal};
-use alembic::workshop::{Acceptance, Owner, Passage, Proposal, Receipt, Source};
+use crate::alembic::workshop::{Acceptance, Owner, Passage, Proposal, Receipt, Source};
 use kernel::graph::{Author, Graph, apply::GraphDelta};
 use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use pandect::graph_session::{GraphSession, LegacyTransactionBackend, OperationReceipt};
@@ -534,7 +534,7 @@ pub fn capture_graph_public_source(
 mod tests {
     use super::*;
     use crate::workshop::{Workshop, evaluate};
-    use alembic::workshop::Destination;
+    use crate::alembic::workshop::Destination;
     use muniment::MemoryBackend;
     use pandect::graph_session::MereSessions;
     use servitor::{Cap, Mode, Subject};

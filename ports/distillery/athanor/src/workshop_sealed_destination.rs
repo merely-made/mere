@@ -13,7 +13,7 @@ use crate::workshop::{Error, revalidate_acceptance, validate_private_proposal};
 use crate::workshop_destination::{
     graph_revision, identifiers, ledger_identity, ledger_identity_for, require_complete,
 };
-use alembic::workshop::{Acceptance, Owner, Proposal, Receipt};
+use crate::alembic::workshop::{Acceptance, Owner, Proposal, Receipt};
 use kernel::graph::{Graph, apply::GraphDelta};
 use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use servitor::AuthorityProvider;
@@ -432,7 +432,7 @@ pub fn verify_graph_effect(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alembic::workshop::{Destination, Passage, Source};
+    use crate::alembic::workshop::{Destination, Passage, Source};
     use kernel::graph::apply::{GraphDeltaResult, apply_graph_delta};
     use servitor::{Cap, Mode, Subject};
     use std::sync::atomic::{AtomicBool, Ordering};

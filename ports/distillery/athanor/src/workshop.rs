@@ -14,7 +14,7 @@
 //! the acceptance operation ledger to their actual product mutation and return
 //! a durable receipt. This module deliberately cannot turn a handoff into one.
 
-use alembic::workshop::*;
+use crate::alembic::workshop::*;
 use muniment::{Backend, WriteOp};
 use serde::{Deserialize, Serialize};
 use servitor::{AuthorityProvider, Cap, Mode, RunEvent, RunPhase, RunReducer};

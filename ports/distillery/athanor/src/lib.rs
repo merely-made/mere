@@ -10,6 +10,8 @@
 //! (distillery-extraction D12).
 
 #[cfg(feature = "workshop")]
+pub mod alembic;
+#[cfg(feature = "workshop")]
 pub mod workshop;
 #[cfg(feature = "workshop")]
 pub mod workshop_seal;

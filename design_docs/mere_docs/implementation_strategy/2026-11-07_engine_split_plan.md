@@ -1429,6 +1429,7 @@ revision and what crosses at frame rate.
   so no test changed. Under D35 the checker drops `murm/apps/signalman-desktop`'s D17 isolation as
   stale, because that root is now its own node. Counting path rows as well would surface Murm's root
   and `native/` workspaces naming each other by path, so the checker counts git rows only.
+- 2026-11-09: D56 landed. `mere-alembic` (3 source files, 682 lines plus lib.rs, README) is folded into `mere-athanor` as `athanor::alembic::{workshop, workshop_surface, workshop_native}`; the crate, its workspace row and its patch row are gone and the name is free. Athanor's existing `workshop` feature now also carries Alembic's records (every consumer already enabled it through `workshop-destination`); `workshop-surface` and `workshop-native` are new athanor features with Alembic's deps. Tests 45 before (41 athanor, 4 alembic), 45 after. The relock removed only `mere-alembic`. D54 is held: `QueryViewSpec::members` calls `mere::subgraph::try_derive_members`, which evaluates SPARQL through `linked-data/query`, so query_view does use SPARQL and cannot leave `mere` behind without `subgraph`'s derivation (fork with Mark).
 
 ## Progress
 

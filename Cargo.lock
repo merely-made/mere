@@ -6757,7 +6757,6 @@ dependencies = [
  "insigne",
  "layout-dom-api",
  "mere",
- "mere-alembic",
  "mere-athanor",
  "mere-comms",
  "mere-fleece",
@@ -9388,27 +9387,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-alembic"
-version = "0.0.1"
-dependencies = [
- "cambium",
- "cambium-desktop",
- "serde",
- "taproot",
-]
-
-[[package]]
 name = "mere-athanor"
 version = "0.0.1"
 dependencies = [
  "armillary",
  "async-trait",
  "blake3",
+ "cambium",
+ "cambium-desktop",
  "chacha20poly1305 0.10.1",
  "chartulary",
  "eidetic",
  "euclid",
- "mere-alembic",
  "mere-kernel",
  "muniment",
  "pandect",
@@ -9416,6 +9406,7 @@ dependencies = [
  "serde",
  "serde_json",
  "servitor",
+ "taproot",
  "tempfile",
  "uuid",
 ]

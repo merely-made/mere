@@ -8,7 +8,7 @@
 //! live source, authority and custody policy with dispatch and observation.
 
 use crate::workshop::{Error, Workshop, WorkshopBackend, worker::Worker};
-use alembic::workshop::{Control, Owner, Passage, RunStatus, WorkshopView};
+use crate::alembic::workshop::{Control, Owner, Passage, RunStatus, WorkshopView};
 use servitor::AuthorityProvider;
 use std::sync::mpsc::TryRecvError;
 
@@ -320,7 +320,7 @@ impl<B: WorkshopBackend> Driver<B> {
 mod tests {
     use super::*;
     use crate::workshop::capture;
-    use alembic::workshop::Source;
+    use crate::alembic::workshop::Source;
     use muniment::MemoryBackend;
     use servitor::{Cap, Mode, Subject};
     use std::sync::{

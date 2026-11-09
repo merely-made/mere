@@ -974,3 +974,6 @@ Not controlled (unconfirmed, unchanged): the SPARQL and RDF/XML-independent synt
 
 Mark's F7 ruling (D65): SPARQL update evaluation, 97 tests, is "not run: no update stage" until P5 or P6.
 
+## 2026-11-09: D56, mere-alembic into mere-athanor (branch `es/hostmerge`, worktree `C:/t/mere-es-hostmerge`)
+
+Moved with history (git mv): alembic `workshop.rs` (193 lines), `workshop_surface.rs` (369), `workshop_native.rs` (120) to `ports/distillery/athanor/src/alembic/`; `lib.rs` (65), README and Cargo.toml dropped. Tests: 45 before (athanor 41, alembic 4), 45 after (`cargo test -p mere-athanor --all-features`: 45 passed). Checks: athanor `--all-targets` with no features, `workshop`, `workshop-surface`, `workshop-destination,workshop-sealed`, and all consumer features (`workshop-native,workshop-worker,workshop-sealed,workshop-destination`); graphshell `--all-targets --features alembic-workshop`. Lock diff: `mere-alembic` removed; athanor gains cambium, cambium-desktop, taproot; nothing else moved.

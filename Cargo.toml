@@ -11,7 +11,6 @@ members = [
     "crates/system/fetch",
     "crates/system/registry",
     "crates/system/tabard",
-    "crates/distillery/alembic",
     "crates/forme/uxtree",
     "crates/domain/personal-facts",
     "crates/platen/platen",
@@ -210,11 +209,6 @@ distillery = { version = "0.0.1", git = "https://github.com/merely-made/distille
 # their authority. Founding reservation, no implementation. Package is
 # `mere-moot` because crates.io `moot` and `murmur` are both held elsewhere.
 moot = { package = "mere-moot", version = "0.0.1", path = "ports/moot" }
-# Distillery's shared recall-and-workshop library: memory levels behind
-# `recall`, with the granted-agent workshop still reserved. Athanor is its
-# first actor. Package is `mere-alembic`; crates.io `alembic` is the Linux
-# Foundation VFX binding.
-alembic = { package = "mere-alembic", version = "0.0.1", path = "crates/distillery/alembic" }
 athanor = { package = "mere-athanor", version = "0.0.1", path = "ports/distillery/athanor" }
 # Shared pins the graphshell crates inherit.
 base64 = "0.22"
@@ -586,7 +580,6 @@ errand = { git = "https://github.com/merely-made/errand.git", branch = "main" }
 incipit = { path = "crates/incipit" }
 luggage = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 mere = { path = "crates/mere" }
-mere-alembic = { path = "crates/distillery/alembic" }
 mere-cartography = { path = "crates/canvas/cartography" }
 mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-overmap = { path = "crates/cambium/mere-overmap" }

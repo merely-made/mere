@@ -7,7 +7,7 @@
 //! The same retained evidence-brief controls for every embedding host.
 //! Queued actions are requests; the owner supplies live gates and persistence.
 
-use crate::workshop::{
+use crate::alembic::workshop::{
     Control, Digest, InstallationStatus, Review, RunStatus, Source, WorkshopView,
 };
 use cambium::{AnyView, GenetCtx, GenetElement, PointerClick, button, el};

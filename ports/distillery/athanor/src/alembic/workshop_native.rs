@@ -7,7 +7,7 @@
 //! Native mounting only. The embedding app owns the window/event loop, source
 //! admission, current authority, driver pump, target transaction and close.
 
-use crate::workshop_surface::{STYLESHEET, Surface, SurfaceState, surface};
+use crate::alembic::workshop_surface::{STYLESHEET, Surface, SurfaceState, surface};
 use cambium::{TITLE_BAR_CSS, el};
 use cambium_genet_winit_host::{
     CaptionLabels, HostHooks, Init, WindowCommands, WinitHost, inert_hooks,
@@ -43,7 +43,7 @@ pub fn native_hooks() -> HostHooks<SurfaceState, NativeLogic, Surface> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::workshop_surface::{SourceChoice, SurfaceAction};
+    use crate::alembic::workshop_surface::{SourceChoice, SurfaceAction};
     use cambium_genet_winit_host::Harness;
     use taproot::Selector;
 
@@ -101,7 +101,7 @@ mod tests {
     fn workshop_native_retained_text_is_available_to_accessibility() {
         let mut state = SurfaceState::new();
         let text = "The café note cites version 2 of its source.";
-        state.reading = Some(crate::workshop_surface::RetainedReading {
+        state.reading = Some(crate::alembic::workshop_surface::RetainedReading {
             title: "Field notes".into(),
             version: "v2".into(),
             text: text.into(),

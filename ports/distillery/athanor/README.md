@@ -5,7 +5,7 @@ the Mere platform's works.
 
 An athanor is the furnace that holds a constant low heat for as long as the
 work takes. This crate is the authority half of the
-[alembic](https://crates.io/crates/mere-alembic) workshop: what a furnace pass
+Alembic workshop (folded in as `athanor::alembic`, features `workshop`, `workshop-surface`, `workshop-native`): what a furnace pass
 is, what it may propose — distillation, cleanup, facet proposals — and the
 grants, runs, pending petitions, refusals, costs, pause, revoke, retry, and
 dissolve over the bounded actors the workshop admits, of which the furnace

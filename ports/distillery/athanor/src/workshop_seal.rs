@@ -158,7 +158,7 @@ pub use eidetic_adapter::EideticProtection;
 #[cfg(all(test, feature = "workshop-sealed"))]
 mod tests {
     use super::*;
-    use alembic::workshop::{Owner, Source};
+    use crate::alembic::workshop::{Owner, Source};
     use chacha20poly1305::{
         ChaCha20Poly1305, KeyInit, Nonce,
         aead::{Aead, Payload},
@@ -405,7 +405,7 @@ mod tests {
             use crate::workshop::{Workshop, capture_private, evaluate};
             use crate::workshop_destination::graph_revision;
             use crate::workshop_sealed_destination::{self as destination, Preparation};
-            use alembic::workshop::{Control, Destination};
+            use crate::alembic::workshop::{Control, Destination};
             use kernel::graph::{
                 Graph,
                 apply::{GraphDeltaResult, apply_graph_delta},

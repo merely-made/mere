@@ -5,7 +5,7 @@ version = "0.0.1"
 edition.workspace = true
 license = "MPL-2.0"
 repository.workspace = true
-description = "Athanor is the distillation furnace of Distillery, the Mere platform's works: the authority half of Alembic's workshop — what a furnace pass is, what it may propose (distillation, cleanup, facet proposals), and the grants, runs, petitions, and revocation over bounded actors. It proposes and never becomes graph-truth authority; Djinn schedules it as one resident service."
+description = "Athanor is the distillation furnace of Distillery, the Mere platform's works: Alembic's workshop folded in (records, surface and native host behind `workshop`, `workshop-surface`, `workshop-native`) and its authority half — what a furnace pass is, what it may propose (distillation, cleanup, facet proposals), and the grants, runs, petitions, and revocation over bounded actors. It proposes and never becomes graph-truth authority; Djinn schedules it as one resident service."
 readme = "README.md"
 keywords = ["memory", "agents", "distillation", "automation", "local-first"]
 categories = ["development-tools"]
@@ -16,13 +16,15 @@ path = "src/lib.rs"
 
 [features]
 default = []
-workshop = ["dep:alembic", "alembic/workshop", "dep:servitor", "dep:muniment", "dep:serde", "dep:serde_json", "dep:blake3"]
+workshop = ["dep:servitor", "dep:muniment", "dep:serde", "dep:serde_json", "dep:blake3"]
+workshop-surface = ["workshop", "dep:cambium"]
+workshop-native = ["workshop-surface", "dep:cambium-desktop"]
 workshop-worker = ["workshop", "dep:armillary"]
 workshop-sealed = ["workshop", "dep:eidetic"]
 workshop-destination = ["workshop", "dep:pandect", "dep:kernel", "dep:chartulary", "dep:euclid", "dep:uuid"]
 
 [dependencies]
-alembic = { workspace = true, optional = true }
+cambium = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }
 pandect = { workspace = true, optional = true }
@@ -36,6 +38,9 @@ chartulary = { workspace = true, optional = true }
 euclid = { version = "0.22", optional = true }
 uuid = { version = "1", optional = true }
 
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+cambium-desktop = { workspace = true, optional = true }
+
 [dev-dependencies]
 chacha20poly1305 = "=0.10.1"
 async-trait = "0.1"
@@ -43,6 +48,9 @@ muniment = { workspace = true, features = ["directory"] }
 pollster = "0.4"
 serde_json = "1"
 tempfile = "3"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+taproot.workspace = true
 
 [lints]
 workspace = true
