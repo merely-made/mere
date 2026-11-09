@@ -43,7 +43,7 @@ fn declared_view_field_replaces_live_canvas_rest_path_and_remains_pickable() {
     );
     let mut settings = LinkPathResponse::default();
     settings.field_response = true;
-    settings.view_field = Some(numen::VectorField::ConstVec { x: 0.0, y: 500.0 }.into());
+    settings.view_field = Some(chartulary::field_ast::VectorField::ConstVec { x: 0.0, y: 500.0 }.into());
     settings.config.control_points = 9;
     settings.config.iterations = 8;
     settings.config.field_gain = 1.0;
@@ -105,7 +105,7 @@ fn hidden_member_of_explicit_compatibility_group_does_not_refuse_remaining_paths
     settings.field_response = true;
     settings.compatible_attraction = true;
     settings.compatible_links = keys;
-    settings.view_field = Some(numen::VectorField::ConstVec { x: 0.0, y: 500.0 }.into());
+    settings.view_field = Some(chartulary::field_ast::VectorField::ConstVec { x: 0.0, y: 500.0 }.into());
     settings.config.control_points = 9;
     settings.config.iterations = 8;
     canvas.set_link_path_response(settings);
@@ -157,7 +157,7 @@ fn graph_swap_clears_graph_field_and_compatibility_targets() {
     let mut settings = LinkPathResponse::default();
     settings.field_response = true;
     settings.compatible_attraction = true;
-    settings.view_field = Some(numen::VectorField::ConstVec { x: 1.0, y: 0.0 }.into());
+    settings.view_field = Some(chartulary::field_ast::VectorField::ConstVec { x: 1.0, y: 0.0 }.into());
     settings.compatible_links.push(
         canvas
             .visible_link_appearances()

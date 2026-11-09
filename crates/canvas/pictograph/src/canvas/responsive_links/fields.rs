@@ -9,7 +9,8 @@
 use std::collections::HashMap;
 
 use kernel::graph::{FieldDefinition, FieldExtent, FieldId, Graph};
-use numen::{MAX_FIELD_AST_DEPTH, MAX_FIELD_AST_NODES, ScalarField, VectorField};
+use chartulary::field_ast::{ScalarField, VectorField};
+use numen::{MAX_FIELD_AST_DEPTH, MAX_FIELD_AST_NODES};
 
 use super::LinkPathFailure;
 

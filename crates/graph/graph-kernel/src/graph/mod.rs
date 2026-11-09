@@ -131,13 +131,13 @@ pub mod source_time;
 mod chart;
 
 // Field system: the field-layer definition types (Field / Coupling / the field AST /
-// EdgePath) live in the portable `numen` crate, promoted out of the kernel so the
+// EdgePath) live in chartulary (engine-split D49), promoted out of the kernel so the
 // third graph primitive sits at the same portable tier as chartulary's nodes/edges.
 // The kernel keeps the parallel keyed store on `Graph` (fields/couplings are neither
-// petgraph node weights nor `EdgePayload` sidecars) and re-exports numen's types.
+// petgraph node weights nor `EdgePayload` sidecars) and re-exports chartulary's types.
 /// Graph mutators + queries for the field layer (Phase 1): the parallel keyed store
 /// on `Graph` + selector evaluation. The field-layer *definition* types (Field /
-/// Coupling / the field AST / EdgePath) now live in the portable `numen` crate,
+/// Coupling / the field AST / EdgePath) now live in chartulary,
 /// re-exported below so `kernel::graph::` paths stay stable.
 mod field_ops;
 
@@ -214,11 +214,13 @@ pub use edge_taxonomy::{
 pub use muniment::{LogId, Seq};
 
 // Field-system truth types (2026-05-31). Field/Coupling form a parallel field
-// layer beside the node/edge graph; numen reads them and evaluates.
-pub use numen::{
-    COUPLING_VOCAB, Coupling, CouplingId, CouplingResponse, EdgePath, EdgePathRule, Falloff, Field,
-    FieldDefinition, FieldExtent, FieldId, FieldLifecycle, NodeSelector, ScalarField, VectorField,
+// layer beside the node/edge graph; Seiche's numen reads them and evaluates.
+pub use chartulary::coupling::{COUPLING_VOCAB, Coupling, CouplingResponse, NodeSelector};
+pub use chartulary::edge_path::{EdgePath, EdgePathRule};
+pub use chartulary::field::{
+    CouplingId, Field, FieldDefinition, FieldExtent, FieldId, FieldLifecycle,
 };
+pub use chartulary::field_ast::{Falloff, ScalarField, VectorField};
 
 /// Traversal archive payload emitted when dissolving a node.
 #[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize)]

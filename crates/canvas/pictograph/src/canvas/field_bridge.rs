@@ -26,7 +26,9 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use numen::{FieldId, FieldProjection, ScalarField};
+use chartulary::field::FieldId;
+use chartulary::field_ast::ScalarField;
+use numen::FieldProjection;
 
 use esp::embed::VectorIndex;
 use esp::embed::provider::SimilarityMetric;

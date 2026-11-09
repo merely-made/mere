@@ -36,7 +36,7 @@ pub struct LinkPathResponse {
     pub field_strength: f32,
     /// An explicitly view-local field AST. Its label and construction belong
     /// to the host; this never becomes graph truth.
-    pub view_field: Option<Arc<numen::VectorField>>,
+    pub view_field: Option<Arc<chartulary::field_ast::VectorField>>,
     pub config: ResponsivePathConfig,
 }
 

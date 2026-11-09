@@ -155,9 +155,9 @@ struct Row {
 
 /// The numen fields the coupling rows sample: a paraboloid for the scalar
 /// responses, a uniform flow for the vector ones.
-fn paraboloid() -> numen::FieldDefinition {
-    use numen::ScalarField as S;
-    numen::FieldDefinition::Scalar(S::Scale(
+fn paraboloid() -> chartulary::field::FieldDefinition {
+    use chartulary::field_ast::ScalarField as S;
+    chartulary::field::FieldDefinition::Scalar(S::Scale(
         Box::new(S::Add(
             Box::new(S::Mul(Box::new(S::CoordX), Box::new(S::CoordX))),
             Box::new(S::Mul(Box::new(S::CoordY), Box::new(S::CoordY))),
@@ -166,8 +166,8 @@ fn paraboloid() -> numen::FieldDefinition {
     ))
 }
 
-fn flow() -> numen::FieldDefinition {
-    numen::FieldDefinition::Vector(numen::VectorField::ConstVec { x: 1.0, y: 0.0 })
+fn flow() -> chartulary::field::FieldDefinition {
+    chartulary::field::FieldDefinition::Vector(chartulary::field_ast::VectorField::ConstVec { x: 1.0, y: 0.0 })
 }
 
 /// Every force the catalog builds on `fixture`, by row: each law's forces,
@@ -235,7 +235,7 @@ fn rows(fixture: &Fixture) -> Vec<Row> {
         name: "slot/affinity".into(),
         make: Rc::new(move || Box::new(AffinitySpring::new(pairs.clone()))),
     });
-    use numen::CouplingResponse as R;
+    use chartulary::coupling::CouplingResponse as R;
     for (label, response, field) in [
         ("attract", R::AttractToMin, paraboloid()),
         ("repel", R::RepelFromMax, paraboloid()),
@@ -394,7 +394,7 @@ fn every_catalog_term_declares_itself() {
     }
     // The open coupling tail applies nothing and declares nothing.
     let open = CouplingForce::new(
-        numen::CouplingResponse::Open {
+        chartulary::coupling::CouplingResponse::Open {
             predicate: "https://example.test/open".into(),
         },
         1.0,
