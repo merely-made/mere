@@ -998,3 +998,22 @@ through the reservoir), `pandect/tests/reservoir_sessions.rs` 43 (the one reserv
   (14 unit, 2 non_graph_domain, 4 retained_text); `cargo test -p pandect` 313 passed, 1 ignored
   (284 unit, graph_residency 11, image_migration_failure 1, live_graph 9, reservoir_archive 2 + 1
   ignored, reservoir_sessions 1, resident_transaction 5). 331 kept or moved, 2 new.
+
+## 2026-11-09: P4 D60, graph and session ids into catchment (branch `es/p4`, on Mere main `61636ef0f`)
+
+Ruling F4 (Mark): "catchment". `GraphId` and `SessionId` (types, impls and the three id tests) moved
+from `crates/incipit/src/lib.rs` (308 lines before, 220 after) to `crates/system/catchment/src/ids.rs`
+(110). `incipit` gains `catchment` and `pub use catchment::{GraphId, SessionId}`. Pandect's
+`incipit::{GraphId, SessionId}` imports repointed to catchment in `engine_profile_store`,
+`graph_session`, `lib`, `manifest`, `manifest_store`, `session_graph_store` and
+`session_service_runner`. Consumer edits: none (same names through the re-export).
+
+- Lock: `incipit` gains `catchment`; nothing else moved.
+- `cargo check --workspace --all-targets -j 4` (debug=0): green, 1m58s.
+- Tests before: catchment 20, incipit 14, pandect 313 (+1 ignored). After (`cargo test -p catchment
+  -p incipit -p pandect`): catchment 23 (17 unit, 2, 4), incipit 11, pandect 313 (+1 ignored).
+- Pandect's remaining incipit uses: `live_view.rs` 15, 296; `view_intent_store.rs` 36, 398, 434, 439
+  (curation folds, F3).
+- First push refused: `5ef37f685` (eidetic row `features = ["product"]`, D50) landed first. Rebased
+  onto it with no conflict (lock gains only `catchment` under incipit); workspace check green in
+  1m56s and the same three crates' tests pass with the same counts.

@@ -24,7 +24,7 @@
 
 use std::collections::HashMap;
 
-use incipit::SessionId;
+use catchment::SessionId;
 
 use crate::manifest::WorkerKind;
 

@@ -12,7 +12,7 @@
 
 use std::path::{Path, PathBuf};
 
-use incipit::SessionId;
+use catchment::SessionId;
 
 use crate::engine_profile_store::SESSIONS_DIR;
 

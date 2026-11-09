@@ -20,9 +20,11 @@
 //!   owner that may open them ([`open_reservoir_backend`], [`open_mere_backend`]);
 //! - **sealing**: values sealed under custody ([`SealedValues`]) and the
 //!   custody gate on a mere's retained page text ([`RetainedText`]);
-//! - the **family-shared root** personas live under ([`shared_root`]).
+//! - the **family-shared root** personas live under ([`shared_root`]);
+//! - the **ids** a mere's session lines and their graphs are known by
+//!   ([`SessionId`], [`GraphId`]), which the workspace and pandect both name.
 //!
-//! It names no graph, session or host type. A domain's grammar, fold and
+//! It names no graph or host type. A domain's grammar, fold and
 //! admission policy are the domain's; Pandect supplies the graph domain's.
 //! Replication is the resident's (`personal_sync`) today.
 //!
@@ -31,6 +33,7 @@
 //! data on disk.
 
 pub mod catalog;
+pub mod ids;
 pub mod paths;
 pub mod retained_text;
 pub mod sealed;
@@ -41,6 +44,7 @@ pub use catalog::{
     DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_INDEX_SCHEMA,
     RESERVOIR_INDEX_SLOT, ReservoirError,
 };
+pub use ids::{GraphId, SessionId};
 pub use paths::{MERES_DIR, RESERVOIR_DB_FILENAME, RESERVOIR_DIR, mere_dir, reservoir_dir};
 #[cfg(not(target_arch = "wasm32"))]
 pub use paths::{open_mere_archive_backend, open_mere_backend, open_reservoir_backend};

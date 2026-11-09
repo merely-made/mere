@@ -186,7 +186,7 @@ pub use graph_session::{
 pub use identity::StartupUnlockMode;
 // The ids and author the session schema names, so a host can name them
 // through pandect.
-pub use incipit::{GraphId, SessionId};
+pub use catchment::{GraphId, SessionId};
 pub use kernel::graph::{Author, AuthorKind, CapturedDelta, Part};
 pub use live_view::{
     LIVE_VIEW_RECORD_SCHEMA_ID, LIVE_VIEW_RECORD_VERSION, LiveViewCursor, LiveViewRecord,

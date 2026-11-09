@@ -24,6 +24,9 @@ arrangement = ["dep:serde_json", "dep:taffy", "dep:petgraph"]
 arrangement-store = ["arrangement"]
 
 [dependencies]
+# The graph and session ids live in catchment and are re-exported here
+# (engine split P4, D60).
+catchment.workspace = true
 serde.workspace = true
 uuid.workspace = true
 serde_json = { version = "1.0", optional = true }

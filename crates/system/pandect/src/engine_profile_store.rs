@@ -23,7 +23,7 @@
 
 use std::path::{Path, PathBuf};
 
-use incipit::{GraphId, SessionId};
+use catchment::{GraphId, SessionId};
 
 use crate::manifest::{EngineProfileBinding, GraphSessionManifest, PersonaId};
 

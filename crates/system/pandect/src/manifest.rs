@@ -22,7 +22,7 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 pub use identity::PersonaId;
-use incipit::{GraphId, SessionId};
+use catchment::{GraphId, SessionId};
 use kernel::time::wall_clock_now;
 use serde::{Deserialize, Serialize};
 
