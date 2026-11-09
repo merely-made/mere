@@ -68,7 +68,7 @@ REPO_URL = re.compile(
     r"github\.com[/:]" + re.escape(ORG) + r"/([A-Za-z0-9._-]+?)(?:\.git)?(?:[/#?]|$)",
     re.IGNORECASE,
 )
-SKIP_DIRS = {".git", "target", "node_modules", "fixtures", "receipts"}
+SKIP_DIRS = {".git", ".claude", "target", "node_modules", "fixtures", "receipts"}
 SKIP_PATHS = {"support/patches"}
 DEP_TABLES = {
     "dependencies": "normal",

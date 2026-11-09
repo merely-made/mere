@@ -17,12 +17,3 @@
 # delete an entry in the same commit that breaks its cycle. A cycle that remains with the
 # entries left out fails.
 
-# D19 (Mark, 2026-11-08): "Allowlist until P5". Inker's optional fleece row on Mere's
-# linked-data (mere-fleece -> mere-rdf, engine-split F3) closes against Mere's rows naming
-# Inker. Leaves when engine-split P5 folds linked-data into a `mere` crate that does not
-# depend on inker.
-[[edge]]
-from = "inker"
-to = "mere"
-decision = "D19"
-reason = "fleece's optional linked-data row (engine-split F3); mere-rdf names inker, so Inker cannot name the engine until engine-split P5. Leaves with P5."
