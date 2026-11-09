@@ -13,33 +13,59 @@ keywords = ["reservoir", "persona", "store", "mere"]
 categories = ["data-structures"]
 description = "The reservoir service for Mere: a persona's catalog of meres by data domain, access decisions, store lifetimes and sealing. Names no graph."
 
+[features]
+# The default is the ids alone (serde and uuid), so the workspace vocabulary
+# (`incipit`) names them without the reservoir (engine split D8, D75).
+default = []
+# The reservoir service itself: catalog, access, store lifetimes, sealing and
+# the shared root.
+store = [
+    "dep:async-trait",
+    "dep:identity",
+    "dep:muniment",
+    "dep:eidetic",
+    "dep:sporran",
+    "dep:dirs",
+    "dep:serde_json",
+    "uuid/v5",
+]
+
 [dependencies]
-async-trait = "0.1"
-# The persona the reservoir belongs to.
-identity.workspace = true
-# The storage seam: every mere's store is a muniment backend.
-muniment.workspace = true
-# PayloadSealer and the content hash, for sealed values.
-eidetic.workspace = true
-# Where personas and the identity wallet live under the shared root.
-sporran.workspace = true
-# The platform data dir, for the family-shared root.
-dirs = "5"
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-uuid = { version = "1", features = ["serde", "v4", "v5"] }
+uuid = { version = "1", features = ["serde", "v4"] }
+async-trait = { version = "0.1", optional = true }
+# The persona the reservoir belongs to.
+identity = { workspace = true, optional = true }
+# The storage seam: every mere's store is a muniment backend.
+muniment = { workspace = true, optional = true }
+# PayloadSealer and the content hash, for sealed values.
+eidetic = { workspace = true, optional = true }
+# Where personas and the identity wallet live under the shared root.
+sporran = { workspace = true, optional = true }
+# The platform data dir, for the family-shared root.
+dirs = { version = "5", optional = true }
+serde_json = { version = "1", optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # The reservoir's durable index: muniment's redb file backend, whose exclusive
 # lock is the one-owner rule. A mere's own files live in its directory backend.
-muniment = { workspace = true, features = ["redb", "directory"] }
+muniment = { workspace = true, features = ["redb", "directory"], optional = true }
 
 [dev-dependencies]
 pollster = "0.4"
+serde_json = "1"
 tempfile = "3"
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 uuid = { version = "1", features = ["js"] }
+
+[[test]]
+name = "non_graph_domain"
+required-features = ["store"]
+
+[[test]]
+name = "retained_text"
+required-features = ["store"]
 
 [lints]
 workspace = true

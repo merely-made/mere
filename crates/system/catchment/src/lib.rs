@@ -24,6 +24,7 @@
 //! - the **ids** a mere's session lines and their graphs are known by
 //!   ([`SessionId`], [`GraphId`]), which the workspace and pandect both name.
 //!
+//! Its default feature is the ids alone; the service is the `store` feature.
 //! It names no graph or host type. A domain's grammar, fold and
 //! admission policy are the domain's; Pandect supplies the graph domain's.
 //! Replication is the resident's (`personal_sync`) today.
@@ -32,28 +33,41 @@
 //! slot keys and schema strings keep their `pandect` names, because they are
 //! data on disk.
 
-pub mod catalog;
 pub mod ids;
+pub use ids::{GraphId, SessionId};
+
+// The reservoir service proper, behind `store`; the default is the ids alone.
+#[cfg(feature = "store")]
+pub mod catalog;
+#[cfg(feature = "store")]
 pub mod paths;
+#[cfg(feature = "store")]
 pub mod retained_text;
+#[cfg(feature = "store")]
 pub mod sealed;
+#[cfg(feature = "store")]
 pub mod shared_root;
+#[cfg(feature = "store")]
 pub mod store;
 
+#[cfg(feature = "store")]
 pub use catalog::{
     DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_INDEX_SCHEMA,
     RESERVOIR_INDEX_SLOT, ReservoirError,
 };
-pub use ids::{GraphId, SessionId};
+#[cfg(feature = "store")]
 pub use paths::{MERES_DIR, RESERVOIR_DB_FILENAME, RESERVOIR_DIR, mere_dir, reservoir_dir};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "store", not(target_arch = "wasm32")))]
 pub use paths::{open_mere_archive_backend, open_mere_backend, open_reservoir_backend};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "store", not(target_arch = "wasm32")))]
 pub use retained_text::open_mere_retained_backend;
+#[cfg(feature = "store")]
 pub use retained_text::{
     DEFAULT_KEPT_BYTES, KEEP_SETTING_SCHEMA, KEEP_SETTING_SLOT, KeepPageText, Keeping,
     MAX_KEPT_BYTES, PlainCustody, RETAINED_DB_FILENAME, RetainedCustody, RetainedText,
     retained_path,
 };
+#[cfg(feature = "store")]
 pub use sealed::{SealedValues, SharedSealer};
+#[cfg(feature = "store")]
 pub use store::{MereApplicationAccess, ReservoirStore};

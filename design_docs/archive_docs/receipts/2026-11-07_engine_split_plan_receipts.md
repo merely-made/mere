@@ -1017,3 +1017,21 @@ from `crates/incipit/src/lib.rs` (308 lines before, 220 after) to `crates/system
 - First push refused: `5ef37f685` (eidetic row `features = ["product"]`, D50) landed first. Rebased
   onto it with no conflict (lock gains only `catchment` under incipit); workspace check green in
   1m56s and the same three crates' tests pass with the same counts.
+
+## 2026-11-09: P4, catchment gated (D75 amended, "Gate catchment"; on Mere main `9cba35894`)
+
+`catchment` default features: none (ids: serde, uuid `serde`+`v4`). `store` enables async-trait,
+identity (personae), muniment (+redb, directory natively), eidetic, sporran, dirs, serde_json and
+uuid `v5`; `non_graph_domain` and `retained_text` tests require it. pandect takes
+`catchment = { workspace = true, features = ["store"] }`; incipit keeps the default. Lock unchanged.
+
+- `cargo tree -p incipit -e normal --prefix none | sort -u`: 168 at `b67021f0c` (the coordinator's count); 12 now
+  (catchment, cfg-if, getrandom 0.4.3, proc-macro2, quote, serde, serde_core, serde_derive, syn,
+  unicode-ident, uuid, incipit); 11 with the catchment row removed, i.e. the pre-move set.
+- `cargo tree -p catchment -e normal` (default): 11 packages, no eidetic, dramatis or crypto crate.
+- `cargo package -p incipit --list`: ok. `cargo publish --dry-run --no-verify -p incipit`: fails,
+  "no matching package named `catchment`" on crates.io. Same for catchment: fails, "`eidetic` with
+  feature `product` but `eidetic` does not have that feature" (crates.io eidetic 0.0.3). Nothing
+  published.
+- `cargo check --workspace --all-targets`: green, 2m43s. Tests: `cargo test -p catchment` 3 (ids);
+  `--features store` 17 + 2 + 4; `-p incipit` 11; `-p pandect` 313 (+1 ignored), unchanged.

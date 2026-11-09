@@ -25,7 +25,7 @@ insigne = { workspace = true, features = ["verify"] }
 hex = "0.4"
 # The reservoir service: catalog, access, store lifetimes and sealing
 # (engine split P4, D3, D9). Re-exported under the old names for cutover.
-catchment.workspace = true
+catchment = { workspace = true, features = ["store"] }
 # The storage seam (2026-07-12): eidetic's Store is muniment::Backend.
 muniment.workspace = true
 incipit.workspace = true
