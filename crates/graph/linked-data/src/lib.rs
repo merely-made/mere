@@ -59,10 +59,6 @@ pub mod vocab;
 /// Turtle-family file I/O (N-Quads / TriG) for the RDF projection, via `oxttl`.
 pub mod serialize;
 
-/// Statements-over-schema ingest (Phase 0): knot `rel` links → `Semantic`
-/// edges. The apply half of inker's pure `link_statements` walk; relocated
-/// here 2026-07-10 (inker-adoption plan) so inker stays kernel-free.
-pub mod statements;
 
 /// SPARQL query over the graph via spareval evaluating directly over the
 /// borrowed RDF projection (the `query` feature).
@@ -85,7 +81,6 @@ pub use serialize::{
     from_nquads, from_nquads_envelope, from_trig, from_trig_envelope, to_nquads,
     to_nquads_with_history, to_trig, to_trig_with_history,
 };
-pub use statements::{StatementOutcome, apply_link_statements, resolve_rel};
 pub use vocab::{Alignment, alignment, vocabulary_alignment_quads};
 
 /// `schema:name` — the curated mapping target for a node's title.
