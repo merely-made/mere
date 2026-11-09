@@ -8,9 +8,9 @@
 //! and placement. No Graphshell state, storage flags or frame hook is used.
 use cambium::{el, lens};
 use cambium_genet_winit_host::Harness;
-use mere::kernel::graph::Graph;
-use mere::query_view::editor::{Completion, Effect, SaveRequest, SaveResult, SaveState, Scope};
-use mere::query_view::{self, QueryViewSpec};
+use kernel::graph::Graph;
+use mere_view::query::editor::{Completion, Effect, SaveRequest, SaveResult, SaveState, Scope};
+use mere_view::query::{self, QueryViewSpec};
 use mere_view::{
     MereViewElement,
     query_editor::{self, QueryEditor},
@@ -49,7 +49,7 @@ impl Host {
             .expect("a real control emitted an effect");
         match effect {
             Effect::Save(request) => {
-                let owner = query_view::save_spec(
+                let owner = query::save_spec(
                     &mut self.graph,
                     request.owner,
                     request.expected.as_ref(),
@@ -131,7 +131,7 @@ fn native_host_routes_the_editor_and_retries_without_recreating_source() {
     assert_eq!(host.state().editor.lifecycle().status(), "Query view saved");
     let owner = host.state().editor.lifecycle().owner().unwrap();
     assert_eq!(
-        query_view::read_spec(&host.state().graph, owner)
+        query::read_spec(&host.state().graph, owner)
             .unwrap()
             .title,
         "Host-owned query"

@@ -8,8 +8,8 @@
 //! draft controls and an outbox; hosts supply source bindings and completions.
 //! No browser API, executor, store, Graphshell page or ambient graph is needed.
 use cambium::{AnyView, GenetCtx, GenetElement, TextInput, button, el, lens, text_field_typed};
-pub use mere::query_view::editor::{Completion, Editor, Effect, SaveState, Scope};
-use mere::query_view::{AppearancePolicy, QueryViewSpec, StrokeCue};
+pub use crate::query::editor::{Completion, Editor, Effect, SaveState, Scope};
+use crate::query::{AppearancePolicy, QueryViewSpec, StrokeCue};
 use std::collections::VecDeque;
 use uuid::Uuid;
 

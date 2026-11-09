@@ -57,9 +57,6 @@ workbench = [
     "dep:platen",
     "dep:workbench",
 ]
-# The app-facing semantic query surface stays opt-in because it carries the
-# SPARQL evaluator. Consumers that only need graph construction do not pull it.
-query = ["linked-data", "linked-data/query"]
 clip = ["graph", "dep:fleece", "fleece/clip"]
 
 [dependencies]

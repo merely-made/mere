@@ -1076,3 +1076,13 @@ Graphshell checked). Lock: mere-fetch gains `uuid`.
   (Windows os error 33 reading a locked `.redb`, `tests/retained.rs:244`) and
   `resident_mere::tests::the_dialable_host_serves_only_what_the_grant_and_the_owner_name`
   (`admitted: ActionNotOffered`, `resident_mere.rs:3109`). Not P4's; reported.
+
+
+
+
+
+## 2026-11-09 (later): D54, subgraph and query_view into mere-view (branch `es/queryview`, worktree `C:/t/mere-es-hostmerge`)
+
+Moved with history (git mv) into `crates/cambium/mere-view/src/`: `query.rs` (277) and `query/` (editor 248, editor/tests 154, projection 281, stroke 86, tests 573) = 1,619 lines; `subgraph.rs` (557) and `subgraph/` (classifier 265, query_tests 314, saved 159, tests 488) = 1,783 lines. Every file is under 600. Tests: 43 `#[test]` before and after in the moved files; at run time 42 under feature `query` (the 43rd is `cfg(not(feature = "query"))`). `cargo test -p mere-view --features query-editor`: lib 80 passed, `query_editor_host` 2 passed, `host_routing` 1 passed. `cargo test -p graphshell --features query-views --lib query_view`: 5 passed. Features: `subgraph` (incipit `arrangement`, serde), `query` (implies `subgraph`, linked-data/query), `query-editor` (implies `query`). Re-run after rebasing on cbf546caf: `--features subgraph --lib` 59 passed; `--features query-editor` lib 80, `query_editor_host` 2, `host_routing` 1. Checks: mere-view `--all-targets` with no features, `subgraph`, `query-editor`; graphshell `--all-targets --features query-views`; `cargo check --workspace --all-targets`. `--all-features` on mere-view fails on the `presentation_editor_host` test (`Snapshot` lacks `read_only`), which origin/main also fails. Lock diff: workspace-internal edges only (mere-view gains euclid, mere-rdf, serde; loses mere; graphshell gains mere-view).
+
+

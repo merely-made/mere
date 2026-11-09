@@ -12,13 +12,17 @@ categories = ["gui"]
 publish = true
 
 [features]
+# Subgraph derivation (moved from `mere`, D54) needs incipit's forme and Serde;
+# off, mere-view's cone stays free of taffy and petgraph.
+subgraph = ["incipit/arrangement", "dep:serde", "dep:serde_json"]
+query = ["subgraph", "dep:linked-data", "linked-data/query"]
 # Editable query UI is absent from ordinary mere views and the site viewer.
-query-editor = ["dep:mere"]
+query-editor = ["query"]
 workbench-editor = ["dep:platen", "platen/workspace-editor"]
 presentation-editor = []
 
 [dependencies]
-mere = { path = "../../mere", default-features = false, features = ["query"], optional = true }
+linked-data = { workspace = true, optional = true }
 platen = { path = "../../platen/platen", default-features = false, optional = true }
 cambium = { workspace = true }
 # Graph-only layouts by strategy id, over a kernel graph built from the model.
@@ -31,11 +35,15 @@ kernel = { workspace = true }
 # The paint leaf's colour type; hosts supply the palette.
 sprigging = { workspace = true }
 uuid = { workspace = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
 scenograph = { workspace = true, features = ["editor"] }
 pictograph = { workspace = true, features = ["canvas", "physics-engine"] }
 serde_json.workspace = true
+euclid = "0.22"
+kernel = { workspace = true, features = ["fixtures"] }
 netrender.workspace = true
 
 mandrake = { workspace = true }
