@@ -1545,3 +1545,10 @@ composes the pane with Knot calls it before the pane opens. Tests: Graphshell's 
 run over the default buffer; the same six run in Knot over `KnotEditor` (6 before in Mere, 6 + 6 after). Mere `203a73abc`,
 Knot `95467df`. Nothing in this repository registers Knot, so Mere builds edit through the default buffer.
 
+**Amended (2026-11-09, Mark: "Switch").** The process-global `register_editor` is gone. `EditorFactory` (a trait, implemented
+by closures and by `DefaultEditors`) is passed per pane: `Pane::load_with(storage, ports, editors)` (`Pane::load` keeps the
+default) and `Document::open(id, source, &dyn EditorFactory)`; the `blocks` binary passes its factory explicitly. Knot's
+`KnotBlockEditor::factory()` replaces `register()`. Tests: two panes in one process over different editors, and no editor
+choice leaking between panes or documents (Mere, +2: 42 to 44 graphshell block tests); Knot's six over `KnotEditor` through the
+factory plus one coexistence test (6 to 7). Mere `b68d6777d`, Knot `28c39c6`.
+
