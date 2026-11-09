@@ -141,8 +141,8 @@ djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git
 peer-facts = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", branch = "main" }
 
 cue-netrender = { git = "https://github.com/merely-made/wgpu-cue.git", branch = "main" }
-webcue = "=0.1.2"
-wgpu-cue = "=0.1.3"
+webcue = "=0.1.3"
+wgpu-cue = "=0.1.4"
 # ─── Workspace-internal path deps ────────────────────────────────────────────
 # Every workspace member listed here; consumers do `dep.workspace = true`
 # so only the root Cargo.toml knows where each crate lives. Package names
@@ -683,6 +683,13 @@ peer-facts = { version = "0.0.1", git = "https://github.com/merely-made/armillar
 ostiary = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", branch = "main" }
 # Registry Webcue and native Genet sessions share one canonical input vocabulary.
 document-session-api = { git = "https://github.com/merely-made/genet.git", branch = "main" }
+# Webcue and Wgpu Cue come from their repository so the family has one copy of each (and so one
+# document-session-api); Wgpu Cue 0.1.4 is not on crates.io, and registry Wgpu Cue 0.1.3 names Webcue =0.1.2.
+webcue = { git = "https://github.com/merely-made/wgpu-cue.git", branch = "main" }
+wgpu-cue = { git = "https://github.com/merely-made/wgpu-cue.git", branch = "main" }
+# Wgpu Cue main is written against Graft main (owned Metal surfaces), as its own workspace patches.
+grafting = { git = "https://github.com/merely-made/wgpu-graft.git", branch = "main" }
+grafting-frame = { git = "https://github.com/merely-made/wgpu-graft.git", branch = "main" }
 # Reuse the Windows password class across cancellation and sequential prompts.
 light-file-dialog = { path = "support/patches/light-file-dialog" }
 # Canonical promoted families; keep registry and Git consumers type-identical.
