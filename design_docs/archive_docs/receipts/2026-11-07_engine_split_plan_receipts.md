@@ -953,3 +953,24 @@ Mark's rulings D61 to D63. Harness gained: `oxrdfxml` for RDF/XML (syntax and ev
 
 **Skips**: 3 sparql11 query-eval tests whose expected result is in a format the harness does not read; 94 + 3 update evaluation tests: `spareval` 0.2.9 evaluates queries, and its `PreparedDeleteInsertUpdate` covers DELETE/INSERT deltas only, so a full update run needs harness-written executor code for the rest (INSERT DATA, DELETE DATA, LOAD, CREATE, CLEAR, DROP, ADD, COPY, MOVE); returned to Mark as a fork.
 
+## 2026-11-09 (last): controls for the SPARQL evaluation and RDF/XML fails
+
+Rule (Mark): a failure is evidence only with a control. Base `c480cefd9` plus the previous ledger commit `d2b5488ba`.
+
+**Harness check against the manifest semantics.** `qt:data` loads into the default graph, `qt:graphData` into a graph named by the file's address (`https://w3c.github.io/rdf-tests/<path>`), base IRIs are the test file addresses; all three were already so. One gap found and closed: FROM and FROM NAMED in a query did not load graphs the manifest data lacks. The harness now reads the query's dataset clause and, for a named IRI the data does not hold and that addresses a suite file, loads that file into the named graph. It changed no result: counts before and after are identical (sparql11 query eval 230 / 14 / 3, sparql12 query eval 64 / 1 / 0, RDF/XML eval 27 / 2 in 1.2 and 124 / 2 in 1.1), because no failing test relied on a FROM file. No harness fault was found behind any of the 19 fails.
+
+**Controls** (`cargo test -j 4 -p mere-rdf --features query --test w3c_conformance engine_controls -- --nocapture`, with `W3C_SUITES_DIR` for the four RDF/XML cases; prints `CONTROL <name> MATCH|DIVERGES`, got, want). Positive controls match: a plain `GRAPH ?g` pattern returns g1 and g2, and the same pattern with `FROM NAMED ex:g1` returns g1 only. All 19 diverge from the expected result, each over inline data and a direct `spareval`, `spargebra` or `oxrdfxml` call, so all 19 are engine, none unconfirmed:
+- `graph-from-named-1`: got four rows (`?g` unbound with x=1; g1/2; g2/3; unknown/4); want g1/1 and g1/2.
+- `graph-from-named-2`: got g1, g2 and unknown each with x=1; want g1 only. `graph-from-named-3`: got x=1, 2, 3; want 1.
+- `graph-minus`: got no rows; want `:a`.
+- `zero_or_more_set_start`, `zero_or_more_set_end`, `zero_or_one_set_start`, `zero_or_one_set_end` over an empty dataset: got no rows; want the constant (`:o` or `:s`).
+- `agg-groupconcat-04`, `agg-groupconcat-06`: ASK over GROUP_CONCAT of language-tagged strings: got false; want true.
+- `subquery15`: got one row; want two. `subquery16`: got two rows, both `:s :o`; want the four rows `s1/o1`, `s1/o2`, `s2/o1`, `s2/o2`.
+- `bnode01`: two distinct blank nodes across the four rows; want six.
+- `values-construct-group-by`: `spargebra` rejects ("SELECT * is not authorized with GROUP BY"); want accepted. `select-variable-reuse`: rejected ("expression with a variable that is unbound"); want accepted.
+- `xml-canon-test001`, `xml-canon-test002`, `rdf12-xml-an-13`, `rdf12-xml-an-14` (suite files): the only difference is the XMLLiteral value, `<br xmlns:rdf="..." xmlns:eg="..."></br>` against the expected `<br></br>`, and the rest of each graph, with reified triple terms, equals the expected one. `oxrdfxml` does not write the literal in exclusive canonical form.
+
+Not controlled (unconfirmed, unchanged): the SPARQL and RDF/XML-independent syntax fails (`nested-aggregate-functions`, `tripleterm-subject-03`, `tripleterm-subject-06`), `ntriples-version-1`, and the JSON-LD toRdf fails.
+
+Mark's F7 ruling (D65): SPARQL update evaluation, 97 tests, is "not run: no update stage" until P5 or P6.
+

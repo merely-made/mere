@@ -186,6 +186,29 @@ fn expected_rows(
     }
 }
 
+/// The graph IRIs a query's FROM and FROM NAMED clauses name.
+#[cfg(feature = "query")]
+fn from_iris(text: &str, base: &str) -> Vec<oxrdf::NamedNode> {
+    use spargebra::Query;
+    let Ok(parser) = spargebra::SparqlParser::new().with_base_iri(base) else {
+        return Vec::new();
+    };
+    let Ok(query) = parser.parse_query(text) else {
+        return Vec::new();
+    };
+    let dataset = match &query {
+        Query::Select { dataset, .. }
+        | Query::Construct { dataset, .. }
+        | Query::Describe { dataset, .. }
+        | Query::Ask { dataset, .. } => dataset,
+    };
+    dataset
+        .iter()
+        .flat_map(|d| d.default.iter().chain(d.named.iter().flatten()))
+        .cloned()
+        .collect()
+}
+
 #[cfg(feature = "query")]
 fn query_eval(root: &Path, e: &Entry) -> Outcome {
     use sparesults::{QueryResultsFormat, QueryResultsParser, SliceQueryResultsParserOutput};
@@ -223,6 +246,28 @@ fn query_eval(root: &Path, e: &Entry) -> Outcome {
     let Ok(text) = std::fs::read_to_string(q) else {
         return Outcome::Fail("query file unreadable".into());
     };
+    // FROM and FROM NAMED name graphs: one the manifest data does not hold is loaded from the
+    // suite directory, from the file the IRI addresses.
+    for iri in from_iris(&text, &test_base(root, q)) {
+        let held = data.iter().any(
+            |d| matches!(d.graph_name, oxrdf::GraphNameRef::NamedNode(n) if n == iri.as_ref()),
+        );
+        if held {
+            continue;
+        }
+        let Some(rest) = iri.as_str().strip_prefix(crate::manifest::TEST_BASE) else {
+            continue;
+        };
+        let file = root.join(rest);
+        if file.is_file() {
+            match load(root, &file, true) {
+                Ok(d) => d.iter().for_each(|q| {
+                    data.insert(q);
+                }),
+                Err(err) => return Outcome::Fail(format!("FROM data unreadable: {err}")),
+            }
+        }
+    }
     let run = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<bool, String> {
         let parser = SparqlParser::new()
             .with_base_iri(test_base(root, q))

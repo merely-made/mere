@@ -1214,6 +1214,10 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D10, engine-split D39 · summary Murm needs one squish: murm-ocapn-transport folds into murm-ocapn as a feature.
 
+- **D65. SPARQL update evaluation waits for the engine's update stage (Mark, 2026-11-09):** ledger fork F7. spareval 0.2.9 evaluates queries and DELETE/INSERT-WHERE deltas only, and no dependency executes INSERT DATA, DELETE DATA, LOAD, CREATE, CLEAR, DROP, ADD, COPY or MOVE, so running the 97 update tests (94 in 1.1, 3 in 1.2) would score a harness executor, not the engine. Ruling: "Not run until the engine (Recommended)". The rows read "not run: no update stage" until P5 or P6 adds one. Outcome: applies D61.
+
+  Links: area The stack · draws on engine-split D61 · plans engine-split P5 · summary SPARQL update evaluation is not run until the engine has an update stage.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

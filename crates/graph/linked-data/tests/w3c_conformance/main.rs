@@ -24,6 +24,7 @@
 //! failing test. The only assertions are the positive and negative controls, which prove the
 //! instrument before any count is believed.
 
+mod controls;
 mod jsonld;
 mod manifest;
 mod rdf;
