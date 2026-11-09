@@ -26,9 +26,10 @@
 
 use std::sync::Mutex;
 
-use chrome::routing::ToolSurfaceReturnTarget;
 use kernel::graph::NodeKey;
 use kernel::pane::PaneId;
+
+use crate::routing::ToolSurfaceReturnTarget;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CommandBarSemanticMetadata {

@@ -357,6 +357,144 @@ where he chose the widest option.
 - **T8, WebRTC signalling. Ruled: keep HTTP for now.** Moving it onto an
   admitted carrier stays in the later tier.
 
+## 10. Stdio peer authentication (2026-11-08, ruling R1 open)
+
+**Status:** design for Mark's ruling. Nothing is built. Source read at
+Graphshell `4d971f38` (`crates/graphshell-endpoint/src/stdio.rs`), Mere `028954140`,
+Dramatis `772cce4`, Armillary `main`. This section amends capability-door D23
+("stdio and local ... never report a proved principal") and answers question 6
+of the Dramatis producer note (2026-11-08): Mark ruled that the stdio carrier
+gains peer authentication before a custody surface runs over it. The
+Dramatis roster and quarantine review is that surface, and another lane is
+building it as a titulus-card projection producer.
+
+### 10.1 What is missing today
+
+- `stdio::dispatch` refuses only `Open` and `Suspend`. `dispatch_common` answers
+  `Discover`, `Snapshot`, `Resource`, `ResourceChunk`, `Resume`, `RetainedPages`
+  and **`Intent`** on the first line, with no handshake. "Does not authenticate"
+  currently means no principal is reported, not that no one is served: whoever
+  starts the child binary, or writes to its stdin, drives every verb.
+- Both directions matter for a custody surface. The child must know who drives it
+  (Accept, Delete and Assign are intents). The host must know the child is the
+  genuine producer before it renders its cards or forwards a user's click.
+  Djinn's own consent and passphrase prompts stay native and name the exact
+  item, so a wrong peer can mislead but cannot approve; that is the residual
+  risk this closes.
+- The carrier lives in `merely-made/graphshell` (`graphshell-endpoint`, feature
+  `stdio`, published 0.0.3), which names nothing of Mere or Dramatis. It cannot
+  take `notochord` or `personae` without a Graphshell to Dramatis edge, which
+  the cycle plan is removing. Whatever is built here must therefore hold the
+  mechanism in the carrier and take identity by injection, the same rule
+  section 2 states for `network` ("admission vocabulary belongs to the service").
+
+### 10.2 Who uses stdio
+
+| Side | User | Call |
+|---|---|---|
+| Host (spawns) | Mere `graphshell-host` `sessions.rs:57` (`spawn_endpoint_session`, `mount_endpoint_processes`) | `StdioCarrier::spawn` |
+| Host | Cleromancy `a1_enrichment_receipt`, `a2_enriched_receipt` | `StdioCarrier::spawn` |
+| Host | Knot `tests/revision_bell.rs:16` | `StdioCarrier::spawn` |
+| Child (serves) | Knot `knot_endpoint` (`:343`) | `serve_resumable_notifying` |
+| Child | Turnstone `bin/graphshell_endpoint.rs:10` | `serve_basic` |
+| Child | Isocosm `vtt_endpoint` example; `eponym-play` no-argument endpoint | `serve_basic` |
+| Child | the Dramatis producer (in design) | to be `serve_*` |
+
+Murm's `retained_peer` stdio and `script-wire`'s pipe transport (D23) are
+separate wires and out of scope here; the second needs the same treatment if it
+ever carries custody.
+
+### 10.3 What the peer should prove: the options
+
+The docs settle the shape of every answer except which one applies to a spawned
+child, so this is the ruling.
+
+| | What each side proves | How the expected identity is known | Cost | Evidence |
+|---|---|---|---|---|
+| **A. OS peer facts** | Code signature (macOS), image (Windows), uid (Unix), read by `peer-facts` | A pinned `SignedIdentity` in owner or host config | `peer-facts` reads sockets and pipe handles, not anonymous pipes. Needs a socketpair or named pipe instead of stdin/stdout, so every child's `main` changes shape. Windows holds a different object. | D2, D7, D11; `custody-wire::ServerExpectation` verifies the custodian this way |
+| **B. Spawn-bound secret** | Possession of a one-time secret the spawner minted for this child, mutually and fresh per connection. It proves lineage (this peer is the process I started, or one it shared the secret with) and nothing more | The host is the spawner; the child's program is pinned by the host by path and, optionally, by digest | Small. Works over the existing pipes. Children call one `claim()` first in `main`. No keys, no vault. | D2 Linux launch handles (`ostiary::launch`, `DJINN_LAUNCH_FD`), D16 child-only; `LAUNCH_FD` is the template |
+| **C. Persona key plus delegation** | Notochord `SessionHello`: a personae-derived signer attested to the subject, a delegation chain, action and nonce bound to the link. Identifies a persona and an application | Owner policy: trusted roots and `ServiceRule`s, as for QUIC and WebRTC | A signer needs a vault or a restricted provider in each side, and apps hold no secret (Dramatis app plan). Needs the T5 application claim (still open: transport note Progress item 1). Notochord proves the initiator only; the responder needs a new proof. | Sections 2 and 7; `admit_local_client` shows the local door already runs notochord with a door-minted grant, so the exchange there proves the link, and the OS facts prove the app (D2) |
+
+**Recommendation: B now, converging on C when T5 lands.** B is the only option
+that fits stdio as it is, gives mutual proof, adds no secret that outlives the
+process and needs no Graphshell to Dramatis edge. It does not name a persona.
+For a custody surface that is acceptable because the producer authenticates to
+Djinn on the app door under its own D2 identity (label plus launch handle, then
+the owner's grant and declaration), so Djinn, not stdio, says which application
+asks to review quarantine. A and C remain open for anything that needs more.
+
+### 10.4 Design under B
+
+1. **Secret.** Per spawn the host draws 32 bytes from the OS RNG and passes them
+   on an inherited descriptor named by `GRAPHSHELL_STDIO_PEER_FD` (Windows: an
+   inheritable handle number the same way), never on argv or the environment.
+   The child's `PeerSecret::claim()` reads it, closes the descriptor and clears
+   the variable first in `main`, as `ostiary::launch::claim` does, so its own
+   children cannot speak as it.
+2. **Mechanism in the carrier, secret by injection.** `graphshell-endpoint::stdio`
+   gains `PeerSecret` (claim, from bytes) and an authenticated `serve_*` and
+   `StdioCarrier::spawn_authenticated`. It takes `blake3` keyed hashing only; no
+   identity crate. A host that wants more (C) supplies a verifier trait later at
+   the same seam.
+3. **Handshake before the first request**, as pre-frames of schema
+   `graphshell.stdio/peer-proof/v1` on the same NDJSON stream, so chirograph is
+   unchanged (R2 below asks whether Mark prefers a `CarrierRequestBody` verb
+   instead). The child opens: `Challenge { version, child_nonce }`. The host
+   answers `Proof { host_nonce, tag }` with
+   `tag = keyed_blake3(S, "host" || version || child_nonce || host_nonce)`. The
+   child verifies, then sends `Confirm { tag }` with
+   `keyed_blake3(S, "child" || version || host_nonce || child_nonce)`. Only
+   after the host verifies `Confirm` may either side send a request or notice.
+4. **Replay.** Both nonces are 32 fresh random bytes per connection and are both
+   in both tags. A captured exchange fails on any other connection, and a
+   reflected tag fails because the role labels differ. The child accepts exactly
+   one `Proof` and rejects a duplicate.
+5. **Downgrade.** The mode is local policy, never negotiated on the wire. A child
+   built to require the proof sends only `Challenge` and answers nothing else
+   until verified; a legacy host's first request line fails the handshake, the
+   child closes and serves no verb. A host that requires the proof refuses a
+   child whose first line is not `Challenge` within the handshake timeout (5 s)
+   and kills it. The version is in the tags, so a stripped version cannot verify.
+6. **Failure is closed.** Any malformed, wrong, missing, late, duplicate or
+   oversized pre-frame (bounded at 4 KiB) ends the session: the child exits
+   non-zero and serves nothing, the host reaps the child and returns
+   `CarrierError::Disconnected("peer authentication failed")`. The message does
+   not say which check failed and the tag compare is constant-time.
+   `Refused` is never used, because the session is not intact.
+7. **Compatibility.** `StdioCarrier::spawn` becomes authenticated and the
+   unauthenticated form is renamed `spawn_unauthenticated` and marked deprecated;
+   likewise `serve_basic`, `serve_resumable` and `serve_resumable_notifying` keep
+   their names for one release as unauthenticated and gain `*_authenticated`
+   siblings. The eight call sites in 10.2 migrate in lockstep with a Graphshell
+   release (cut first, so each consumer builds against it before the old forms
+   go). Children cannot be mixed: a migrated host cannot drive an unmigrated
+   child, which is the point. D23's `ChannelGate` for advertised offers stays,
+   and `Open` stays refused under B because no persona principal exists.
+
+### 10.5 Tests (when ruled)
+
+- an authenticated host and child complete the handshake and serve `Discover`
+  and an `Intent`;
+- a wrong secret, a missing handshake, a truncated or oversized pre-frame, a
+  duplicate `Proof` and a late proof are each refused and no verb is served;
+- a recorded handshake replayed against a fresh child fails (fresh nonces);
+- a reflected `Challenge` tag fails (role labels);
+- a legacy host against an authenticated child is refused, and an authenticated
+  host against a legacy child is refused;
+- the eight call sites keep their own tests, run authenticated.
+
+### 10.6 Open rulings for Mark
+
+- **R1. Which identity proves a stdio peer:** A (OS facts, needs a socketpair),
+  **B (spawn-bound secret, recommended)**, or C (persona key and delegation,
+  needs T5 and signer provisioning).
+- **R2. Pre-frames or a chirograph verb.** Pre-frames leave the published
+  chirograph 0.0.4 alone. A verb is typed in the contract but costs a
+  contract publish and a version cut.
+- **R3. The unauthenticated window.** One release of deprecated unauthenticated
+  forms (recommended), or none, migrating the eight call sites in the same
+  change.
+
 ## Findings
 
 **2026-10-15** (Mere `9cc711fbc`; Murm `b49df894` and `3d9e799f` from the
@@ -427,6 +565,8 @@ built):
   `djinn::resident_projection`, not yet started by the binary. Still open:
   push notices (item 2), one client correlator (item 3), and the binary's
   trusted roots.
+- **2026-11-08:** section 10 designs peer authentication for the stdio carrier (Mark's ruling: before a custody
+  surface runs over it). Nothing built; R1 to R3 are open.
 
 ## Authority audit checkpoint, 2026-10-16
 

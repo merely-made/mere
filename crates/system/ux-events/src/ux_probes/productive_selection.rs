@@ -19,7 +19,7 @@ use super::{ProbeFailure, UxProbe};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProductiveOutcome {
     /// Any [`UxEvent::ActionDispatched`] satisfies the rule. Use for
-    /// surfaces whose only effect is dispatching a `HostIntent::Action`
+    /// surfaces whose only effect is dispatching an action
     /// (Command Palette, Confirm Dialog).
     AnyAction,
     /// A [`UxEvent::SurfaceOpened`] for `surface` satisfies the rule.

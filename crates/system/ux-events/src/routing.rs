@@ -15,9 +15,8 @@
 //! are carried across the update-frame pipeline without the host
 //! having to re-derive the caller's origin.
 //!
-//! Pre-M4 slice 10 (2026-04-22) this enum lived in `app/routing.rs`
-//! (the shell-side app crate); moved here so focus-authority bundles
-//! + view-model types can be fully portable.
+//! It lived in `mere-chrome` until that crate dissolved (engine-split
+//! D31); ux-events, its only consumer, now owns it.
 
 use serde::{Deserialize, Serialize};
 

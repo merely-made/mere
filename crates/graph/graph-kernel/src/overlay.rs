@@ -9,8 +9,7 @@
 //! These are the pure-data shapes that the workbench compositor emits
 //! for host painters to render on top of graph panes — focus rings,
 //! selection borders, dashed drag-preview outlines, lens-glyph badges.
-//! Descriptors flow through the `FrameViewModel.overlays` field in
-//! the host-neutral vocabulary; egui / iced hosts convert the
+//! Descriptors travel in the host-neutral vocabulary; egui / iced hosts convert the
 //! portable types back to their native painting primitives at the
 //! render boundary.
 //!
@@ -18,7 +17,7 @@
 //! `shell/desktop/workbench/compositor_adapter.rs` alongside the
 //! egui-specific painter, and the glyph-overlay types were in
 //! `registries/atomic/lens/registry.rs`. Consolidating them here
-//! removes the last data-shape barrier between `FrameViewModel` and
+//! removes the last data-shape barrier between host painters and
 //! kernel.
 
 use serde::{Deserialize, Serialize};
