@@ -1365,3 +1365,10 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   lib tests leave for Cleromancy. Cleromancy: `authority-guest/` (5.15 MiB), 577 of 577 verdicts and refusal texts equal native,
   the seven owner tests and four natal tests pass through it. Cleromancy's root lock is blocked on webcue and wgpu-cue, so its tests
   are on a branch. Measurements and choices: Findings, "P3 guest".
+- 2026-11-08: Mere's pre-move `ports/dramatis` copy is deleted (Mere `028954140`): the workspace member, the
+  `dramatis-app` lock entry, the four packages only it reached (`cargo update -w`), and the six
+  `support/dramatis_*` receipt scripts and `scripts/test_dramatis_auth_tools.py` that hashed it (Dramatis holds
+  its own copies under `support/`). No other family repo named the copy by path or by git package. Root
+  `cargo check --workspace --locked` and `ports/graphshell/web` `cargo check --locked --target
+  wasm32-unknown-unknown` pass. The stdio carrier's peer authentication is a design awaiting Mark's ruling R1:
+  transport agnosticism note, section 10.
