@@ -1198,6 +1198,13 @@ summary = "SPARQL update evaluation is not run until the engine has an update st
 draws_on = ["engine-split D61"]
 plans = ["engine-split"]
 
+[decisions."engine-split D66"]
+title = "A move re-addresses its consumers' git rows; no pins, no version addressing (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Moving a crate rewrites every consumer's git row to its new repository, branch main, no pins; family crates are not version-addressed; names are claimed for future stable releases."
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

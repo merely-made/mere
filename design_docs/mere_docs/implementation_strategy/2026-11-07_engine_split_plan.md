@@ -1218,6 +1218,23 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D61 · plans engine-split P5 · summary SPARQL update evaluation is not run until the engine has an update stage.
 
+- **D66. A move re-addresses its consumers' git rows; no pins, no version addressing (Mark,
+  2026-11-09):** P3 slice 1 moved `tabard-workshop` to graphshell.git, leaving seven rows in
+  Woodshed, Cleromancy and Murm that named mere.git. Those rows already followed the
+  cycle-breaks rule (`branch = "main"`, no `rev`); the break is the address, because a git row
+  names the repository Cargo fetches from. Offered version addressing (crates.io or a family
+  registry) so that moves become invisible, or keeping git rows and fixing them per move. Mark:
+  "we should have the names either way. for when they deserve stable releases. readdress the
+  repos. no pins. although it would probably be easier to just do cargo bumps and make all the
+  crates name a minimum acceptable version, but somehow i'm sure that will become a monkey's
+  paw". Each move rewrites its consumers' rows to the crate's new canonical URL, still
+  `branch = "main"`, as part of the same phase. Version requirements are not used for family
+  crates. Crate names are claimed on crates.io for when a crate earns a stable release, which
+  is not a way of addressing it. Outcome: applies the cycle-breaks row rule; P3's later slices
+  carry their consumer re-addressing as a done-condition.
+
+  Links: area The stack · plans engine-split P3 · summary Moving a crate rewrites every consumer's git row to its new repository, branch main, no pins; family crates are not version-addressed; names are claimed for future stable releases.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
