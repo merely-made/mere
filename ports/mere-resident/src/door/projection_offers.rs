@@ -53,7 +53,6 @@ impl ProviderPolicy {
                     APP_IDENTITY_ROUTE,
                     CUSTODY_ROUTE,
                     PROJECTION_PROVIDER_ROUTE,
-                    "knot",
                     "reservoir",
                     "published-site-v1",
                     "device-directory-v1",
@@ -665,7 +664,6 @@ mod tests {
         reserved.route = AppRouteId::new("identity").unwrap();
         assert!(ProviderPolicy::new(vec![reserved]).is_err());
         for route in [
-            "knot",
             "inference.ask",
             "mere/example",
             "ambient/mere/example",
@@ -676,5 +674,10 @@ mod tests {
             assert!(ProviderPolicy::new(vec![reserved]).is_err());
         }
         assert!(ProviderPolicy::new(vec![permission(), permission()]).is_err());
+        // The resident no longer composes a Knot lane of its own (cycle breaks
+        // P2), so Knot's supervised host may offer `knot` like any provider.
+        let mut knot = permission();
+        knot.route = AppRouteId::new("knot").unwrap();
+        assert!(ProviderPolicy::new(vec![knot]).is_ok());
     }
 }

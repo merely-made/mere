@@ -1192,6 +1192,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // Declared applications receive what their declaration names and these
     // grants allow (capability door plan, M1).
     let application_grants = owner.application_grants()?;
+    // Who the owner had granted at start: what removal is judged against.
+    let granted_at_start: Vec<ostiary::app_admission::AppId> = owner
+        .applications
+        .iter()
+        .flatten()
+        .map(|grant| grant.app.clone())
+        .collect();
     let consent_ui = args.native_identity_ui();
     let projection_providers = owner
         .projection_providers
@@ -1340,7 +1347,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         // The catalog and grants are shared with the door, so a mere ensured
         // while it serves gets its route then (reservoir plan Â§7 item 20).
         #[cfg(feature = "personal-sync")]
-        let (allowed_app_routes, app_catalog) = {
+        let (allowed_app_routes, app_catalog, blob_door) = {
             let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
             // Every route below is served to the declared applications whose
             // owner grant names it; none is granted by label (D24).
@@ -1353,11 +1360,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             grants.update(|routes| routes.serve(route));
             // Scoped leases on the resident's blob store, for the declared
             // applications whose grant names `blob-custody-v1` (P2a).
+            let blob_door = mere_resident::resident_blob_door::BlobDoor::new(resident.blobs());
             let route = catalog
-                .update(|catalog| {
-                    mere_resident::resident_blob_door::BlobDoor::new(resident.blobs())
-                        .register(catalog)
-                })
+                .update(|catalog| blob_door.register(catalog))
                 .await?;
             grants.update(|routes| routes.serve(route));
             // Owner-only and read-only: where each paired device is now.
@@ -1448,15 +1453,19 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             {
                 grants.update(|routes| routes.serve(route));
             }
-            (grants, catalog)
+            (grants, catalog, Some(blob_door))
         };
         #[cfg(not(feature = "personal-sync"))]
-        let (allowed_app_routes, app_catalog) = {
+        let (allowed_app_routes, app_catalog, blob_door): (
+            _,
+            _,
+            Option<mere_resident::resident_blob_door::BlobDoor>,
+        ) = {
             let grants = AppRouteGrants::default();
             grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
             mere_resident::custody::grant(&grants)?;
             mere_resident::applications::install(&grants, application_grants);
-            (grants, AppEndpointCatalog::default())
+            (grants, AppEndpointCatalog::default(), None)
         };
         app_catalog.set_connection_ledger(resident_status::ConnectionLedger::new(status.clone()));
         // An application nobody has granted is put to the owner (D25).
@@ -1468,6 +1477,19 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         app_catalog
             .set_provider_permissions(projection_providers)
             .await?;
+        // Removing an application's grant from the owner's settings takes
+        // effect now, including its blob custody sessions (cycle breaks P2
+        // remainder), and not at the next connection.
+        let mut grant_watch = blob_door.map(|door| {
+            mere_resident::applications::GrantWatch::new(
+                owner_settings::settings_path(&app_dir, &profile_id),
+                allowed_app_routes.clone(),
+                door,
+                granted_at_start,
+            )
+        });
+        let mut grant_tick = tokio::time::interval(Duration::from_secs(2));
+        grant_tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
         // Binding is startup work: a ready resident must already own every
         // endpoint. Keep serving lazy so the resident loop owns their lifetime.
         let app_listener = LocalListener::bind(&args.app_endpoint, "first-party")
@@ -1607,6 +1629,16 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             }
                         },
                         Err(_) => lock_watched = false,
+                    }
+                }
+                _ = grant_tick.tick(), if grant_watch.is_some() => {
+                    if let Some(watch) = grant_watch.as_mut() {
+                        match watch.reconcile().await {
+                            Ok(removed) => for app in removed {
+                                tracing::info!(app = %app, "an application's grant was removed; its door sessions are cut");
+                            },
+                            Err(error) => tracing::warn!(%error, "owner grants could not be reconciled"),
+                        }
                     }
                 }
                 _ = supervise_tick.tick(), if resident.supervised_enabled() && supervise_active && !maintenance_stopping.load(std::sync::atomic::Ordering::SeqCst) => {

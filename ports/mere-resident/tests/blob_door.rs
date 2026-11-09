@@ -401,3 +401,128 @@ async fn an_application_without_the_store_serves_verified_streams_through_the_do
 
     server.abort();
 }
+
+/// Removing an application's grant from the owner's settings cuts its blob
+/// custody now (cycle breaks P2 remainder): a stream a peer is part-way
+/// through reads no further chunk, the door refuses the application's next
+/// connection, serving authority is withdrawn and custody is kept.
+#[tokio::test(flavor = "multi_thread")]
+async fn removing_a_grant_while_a_peer_is_mid_fetch_refuses_the_next_chunk() {
+    use graphshell_door::blob_door::ChunkInterval;
+    use mere_resident::applications::{GrantWatch, grant_for};
+    use mere_resident::settings::OwnerSettings;
+    use transport::BlobScope;
+
+    let temp = tempfile::tempdir().unwrap();
+    let custody = ResidentBlobCustody::open(
+        &temp.path().join("data"),
+        &ResidentContentSettings {
+            gc_interval_seconds: 60,
+            ..ResidentContentSettings::default()
+        },
+    )
+    .await
+    .unwrap();
+    let door = BlobDoor::new(custody.clone());
+    let mut catalog = ResidentEndpointCatalog::new();
+    let route = door.register(&mut catalog).unwrap();
+    let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    grants.update(|routes| routes.serve(route));
+    let declaration = AppDeclaration {
+        routes: vec![NamePattern::exact(BLOB_CUSTODY_ROUTE)],
+        ..AppDeclaration::default()
+    };
+    let app_id = AppId::new("blob-fixture");
+    let grant = grant_for(&app_id, &declaration, None);
+    // The owner's settings are where the grant lives; the resident installed
+    // it at start.
+    let settings = temp.path().join("owner.json");
+    OwnerSettings::update(&settings, |owner| {
+        owner.applications = Some(vec![grant.clone()]);
+        Ok::<_, mere_resident::settings::OwnerSettingsError>(())
+    })
+    .unwrap();
+    mere_resident::applications::install(&grants, vec![grant.clone()]);
+    let mut watch = GrantWatch::new(settings.clone(), grants.clone(), door.clone(), [app_id.clone()]);
+
+    let serving_grants = grants.clone();
+    let (endpoint, _socket) = socket();
+    let serving = endpoint.clone();
+    let server = tokio::spawn(async move {
+        let _ = serve_app_broker(
+            &serving,
+            resident_host(),
+            serving_grants,
+            60_000,
+            None,
+            AppEndpointCatalog::new(catalog),
+        )
+        .await;
+    });
+
+    let scope = BlobScope::new(SCOPE);
+    let mut app = connect(&endpoint, "blob-fixture").await.unwrap();
+    app.bind_scope(SCOPE).await.unwrap();
+    let mut serving_session = connect(&endpoint, "blob-fixture").await.unwrap();
+    serving_session.bind_scope(SCOPE).await.unwrap();
+    let bytes: Vec<u8> = (0..2_000_000u32).map(|n| (n % 251) as u8).collect();
+    let hash = app.put(SCOPE, "fixture.evidence", b"big", &bytes).await.unwrap();
+    app.retain(SCOPE, hash).await.unwrap();
+    let peer = [0x0b; 32];
+    app.allow_reader(SCOPE, peer).await.unwrap();
+
+    // Nothing has changed in the settings: a reconcile cuts no one.
+    assert!(watch.reconcile().await.unwrap().is_empty());
+
+    // The peer starts a verified stream and has its first piece.
+    let mut stream = serving_session
+        .bao_open(SCOPE, peer, hash, vec![ChunkInterval { start: 0, end: None }])
+        .await
+        .unwrap();
+    let first = serving_session.bao_next(&mut stream).await.unwrap().expect("a first piece");
+    assert!(!first.is_empty());
+    assert!((first.len() as u64) < stream.total_len(), "the stream is part-way through");
+
+    // The owner removes the grant. The next reconcile is the live path.
+    OwnerSettings::update(&settings, |owner| {
+        owner.applications = Some(Vec::new());
+        Ok::<_, mere_resident::settings::OwnerSettingsError>(())
+    })
+    .unwrap();
+    assert_eq!(watch.reconcile().await.unwrap(), vec![app_id.clone()]);
+
+    // The next chunk is refused, not at the next connection.
+    assert!(
+        serving_session.bao_next(&mut stream).await.is_err(),
+        "the next chunk is refused once the grant is removed"
+    );
+    assert!(app.lease_hash(SCOPE, "fixture.evidence", b"big").await.is_err());
+    assert!(
+        !custody.authorizer().allows(scope, &peer, transport::BlobHash::from_bytes(hash)),
+        "serving authority is withdrawn"
+    );
+    assert!(connect(&endpoint, "blob-fixture").await.is_err(), "the door refuses it afresh");
+    // Custody is kept: the lease and the bytes are the resident's still.
+    assert!(custody
+        .blobs()
+        .leased_hashes(scope)
+        .await
+        .unwrap()
+        .contains(&transport::BlobHash::from_bytes(hash)));
+    assert_eq!(custody.blobs().get_bytes(transport::BlobHash::from_bytes(hash)).await.unwrap().len(), bytes.len());
+    // A second reconcile finds nothing more to cut.
+    assert!(watch.reconcile().await.unwrap().is_empty());
+
+    // The owner grants it again: it opens the route and rebuilds serving.
+    OwnerSettings::update(&settings, |owner| {
+        owner.applications = Some(vec![grant.clone()]);
+        Ok::<_, mere_resident::settings::OwnerSettingsError>(())
+    })
+    .unwrap();
+    mere_resident::applications::install(&grants, vec![grant]);
+    assert!(watch.reconcile().await.unwrap().is_empty());
+    let mut again = connect(&endpoint, "blob-fixture").await.unwrap();
+    assert_eq!(again.bind_scope(SCOPE).await.unwrap(), 1, "serving custody is rebuilt from the lease");
+
+    server.abort();
+}

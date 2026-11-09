@@ -26,6 +26,7 @@ use ostiary::declaration::{
 };
 
 use dramatis_resident::identity_ui::NativeIdentityUi;
+use crate::resident_blob_door::BlobDoor;
 use crate::resident_devices::DEVICE_DIRECTORY_ROUTE;
 use crate::resident_status::{RESIDENT_APP, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE};
 use crate::settings::OwnerSettings;
@@ -192,6 +193,64 @@ impl ApplicationConsent for OwnerConsent {
             Ok(granted) => tracing::info!(app = %app, granted, "the owner answered an application's declaration"),
             Err(error) => tracing::warn!(app = %app, %error, "an application's declaration was not put to the owner"),
         });
+    }
+}
+
+/// The live half of grant removal (cycle breaks P2 remainder, ruling 4).
+///
+/// The owner's grants are read at start and on the consent dialog's yes; this
+/// watches the settings file the owner edits, so removing an application's
+/// grant takes effect now and not at its next connection. A removed
+/// application's grant is emptied (the door admits it nothing further) and the
+/// blob door cuts its live sessions and withdraws its serving authority
+/// ([`BlobDoor::revoke`]); its leases and scope ownership are kept. An
+/// application the owner grants again is restored to the blob door.
+pub struct GrantWatch {
+    settings: PathBuf,
+    grants: AppRouteGrants,
+    blobs: BlobDoor,
+    known: BTreeSet<AppId>,
+}
+
+impl GrantWatch {
+    /// Watch `settings`, `known` being the applications granted at start.
+    pub fn new(
+        settings: PathBuf,
+        grants: AppRouteGrants,
+        blobs: BlobDoor,
+        known: impl IntoIterator<Item = AppId>,
+    ) -> Self {
+        Self { settings, grants, blobs, known: known.into_iter().collect() }
+    }
+
+    /// Cut `app` off now: empty its grant and revoke its blob custody.
+    /// Returns the hashes whose serving authority was withdrawn.
+    pub async fn remove(&mut self, app: &AppId) -> Result<usize, String> {
+        self.known.remove(app);
+        self.grants.update(|routes| routes.grant_app(AppGrant::new(app.clone())));
+        self.blobs.revoke(app.as_str()).await
+    }
+
+    /// Compare the owner's settings with what was last seen: cut every
+    /// application whose grant has gone, admit again any that came back.
+    /// Returns the applications removed.
+    pub async fn reconcile(&mut self) -> Result<Vec<AppId>, String> {
+        let owner = OwnerSettings::load(&self.settings).map_err(|error| error.to_string())?;
+        let granted: BTreeSet<AppId> = owner
+            .applications
+            .iter()
+            .flatten()
+            .map(|grant| grant.app.clone())
+            .collect();
+        for app in granted.difference(&self.known) {
+            self.blobs.restore(app.as_str());
+        }
+        let gone: Vec<AppId> = self.known.difference(&granted).cloned().collect();
+        self.known.extend(granted);
+        for app in &gone {
+            self.remove(app).await?;
+        }
+        Ok(gone)
     }
 }
 
