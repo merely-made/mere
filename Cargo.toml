@@ -204,15 +204,6 @@ graphshell-door = { version = "0.0.1", path = "crates/graphshell/graphshell-door
 # host (Graphshell stack lift plan, L2, ruling R4). Default features off here;
 # each consumer names the half it serves.
 graphshell-host = { version = "0.0.2", path = "crates/graphshell/graphshell-host", default-features = false }
-# Knot is an independent document product. Mere's resident no longer names it
-# (cycle breaks P2: Knot runs as a supervised application over the door); the
-# one row left is `knot-document`, which `ports/graphshell`'s `editable-blocks`
-# feature embeds until that port moves to Turnstone (cycle breaks D23). The
-# `[patch]` table at the bottom of this file makes this checkout the
-# implementation source for the Mere contracts it names, so those types keep
-# one Cargo source identity. The row tracks Knot's main like every first-party
-# row (family source convention).
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", branch = "main" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.

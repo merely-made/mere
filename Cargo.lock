@@ -7228,7 +7228,6 @@ dependencies = [
  "image",
  "inker",
  "insigne",
- "knot-document",
  "layout-dom-api",
  "mere",
  "mere-alembic",
@@ -8430,7 +8429,6 @@ source = "git+https://github.com/merely-made/inker.git?branch=main#09369925ace5f
 dependencies = [
  "jotdown",
  "logos",
- "pulldown-cmark",
 ]
 
 [[package]]
@@ -9233,19 +9231,6 @@ name = "khronos_api"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
-
-[[package]]
-name = "knot-document"
-version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#42973d00d3c8c6b1f1be913103609b62508860c1"
-dependencies = [
- "cambium",
- "illume",
- "mere-edit",
- "mere-surface-api",
- "same-file",
- "windows-sys 0.59.0",
-]
 
 [[package]]
 name = "kurbo"
@@ -11225,13 +11210,13 @@ dependencies = [
 [[package]]
 name = "netrender-vello"
 version = "0.11.0"
-source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+source = "git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos#7784613985d58823bb27b6274916009299cbee46"
 dependencies = [
  "bytemuck",
  "futures-intrusive",
  "log",
- "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
- "netrender-vello-shaders 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos)",
+ "netrender-vello-shaders 0.11.0 (git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos)",
  "peniko",
  "png 0.18.1",
  "skrifa",
@@ -11243,13 +11228,13 @@ dependencies = [
 [[package]]
 name = "netrender-vello"
 version = "0.11.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
 dependencies = [
  "bytemuck",
  "futures-intrusive",
  "log",
- "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
- "netrender-vello-shaders 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "netrender-vello-shaders 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
  "peniko",
  "png 0.18.1",
  "skrifa",
@@ -11287,7 +11272,7 @@ dependencies = [
 [[package]]
 name = "netrender-vello-encoding"
 version = "0.11.0"
-source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+source = "git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos#7784613985d58823bb27b6274916009299cbee46"
 dependencies = [
  "bytemuck",
  "guillotiere",
@@ -11299,7 +11284,7 @@ dependencies = [
 [[package]]
 name = "netrender-vello-encoding"
 version = "0.11.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
 dependencies = [
  "bytemuck",
  "guillotiere",
@@ -11340,24 +11325,24 @@ dependencies = [
 [[package]]
 name = "netrender-vello-shaders"
 version = "0.11.0"
-source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
+source = "git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos#7784613985d58823bb27b6274916009299cbee46"
 dependencies = [
  "bytemuck",
  "log",
  "naga",
- "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos)",
  "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "netrender-vello-shaders"
 version = "0.11.0"
-source = "git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0#dfb9b53b315561887761deff319afed08cc33ff0"
+source = "git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46#7784613985d58823bb27b6274916009299cbee46"
 dependencies = [
  "bytemuck",
  "log",
  "naga",
- "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
+ "netrender-vello-encoding 0.11.0 (git+https://github.com/mark-ik/vello?rev=7784613985d58823bb27b6274916009299cbee46)",
  "thiserror 2.0.21",
 ]
 
@@ -13679,7 +13664,7 @@ dependencies = [
  "mere-cartography",
  "mere-kernel",
  "netrender",
- "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
+ "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos)",
  "netrender_device",
  "numen",
  "paint_list_api",
@@ -16782,7 +16767,7 @@ name = "sprigging"
 version = "0.3.0"
 dependencies = [
  "accesskit 0.25.1",
- "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?rev=dfb9b53b315561887761deff319afed08cc33ff0)",
+ "netrender-vello 0.11.0 (git+https://github.com/mark-ik/vello?branch=mark-ik%2Fall-vellos)",
  "paint_list_api",
 ]
 
