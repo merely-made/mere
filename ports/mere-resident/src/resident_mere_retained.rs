@@ -23,7 +23,7 @@ use chirograph::{
     RetainedKeeping, RetainedPagesRequest, RetainedPagesResponse,
 };
 use graphshell::goal_surface::{GraphFacts, RetainedPages, door as page_door};
-use graphshell::kept_text::{
+use eidetic::kept_text::{
     KEEP_PAGES_INTENT, KEEP_SETTING_INTENT, KeepPagesV1, KeepSettingV1, KeepTextPolicy, KeptBatch,
     fetch_record_key, judge, record_kept_pages,
 };

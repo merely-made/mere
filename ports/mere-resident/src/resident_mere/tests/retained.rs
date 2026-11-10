@@ -13,7 +13,7 @@ use chirograph::{
     CarrierRequest, CarrierRequestBody, CarrierResponseBody, RetainedKeeping, RetainedPagesLimits,
     RetainedPagesRequest, RetainedPagesResponse,
 };
-use graphshell::kept_text::{
+use eidetic::kept_text::{
     KEEP_PAGES_INTENT, KEEP_SETTING_INTENT, KeepPagesV1, KeepSettingV1, KeptPage,
 };
 use dramatis_resident::custody_host::ResidentCustody;
@@ -437,7 +437,7 @@ async fn sealed_text_and_the_setting_survive_a_cold_reopen_of_the_resident() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn an_explicit_fetch_is_recorded_beside_the_text_it_produced() {
-    use graphshell::kept_text::{FetchRecordV1, fetch_record_key};
+    use eidetic::kept_text::{FetchRecordV1, fetch_record_key};
     let fixture = fixture(0x5336_06, "browsing").await;
     let mut app = fixture.attach("graphshell").await;
     let graph = graph(&mut app);
