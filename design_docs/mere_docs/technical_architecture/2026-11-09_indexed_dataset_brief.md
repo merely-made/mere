@@ -1,0 +1,81 @@
+# The indexed dataset: the engine's query store (design brief)
+
+**Date**: 2026-11-09
+**Status**: design brief from a Mark session. Mark ruled "Let's measure, and do the indexed dataset after" (2026-11-09); §1 is the measurement, §2 to §5 the design, §6 the forks as cards. Nothing implemented. The quadratic property append that the measurement also found is a separate session (Mark, 2026-11-09, "Separate session"), not this brief.
+**Related**: the [engine split plan](../implementation_strategy/2026-11-07_engine_split_plan.md) (The engine's stages, Model and Query rows; Constraints, "Measure before the join moves"; P5, "Oxigraph's component crates stay upstream behind the engine's dataset and loader interfaces"), the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows; the adapter layer "not scorable"), the [link model](2026-10-15_link_model.md) (what an assertion retains), the [statement kernel brief](2026-06-19_statement_kernel_brief.md) (the kernel as a statement store), the [linked-data platform lessons brief](../research/2026-11-06_linked_data_platform_lessons_brief.md) (the pack model that names predicates), doctrine Stack 1, Stack 3 and Stack 6.
+
+## 1. The measurement
+
+Instrument: `crates/graph/linked-data/examples/adapter_scale.rs` (package `mere-rdf`, release only, behind the `query` feature; landed on main 2026-11-09). It builds a chain graph of N nodes, each with one semantic statement to the next node and one literal property, which projects to 8 quads per node, and times four queries through today's adapter (`linked_data::query::sparql`) and through the same quads materialized into an `oxrdf::Dataset` and evaluated by the same `spareval`. Row counts agreed in every cell.
+
+| nodes | quads | query | adapter | materialized `oxrdf::Dataset` | ratio |
+|---|---|---|---|---|---|
+| 1k | 8,000 | bound predicate, count | 26 ms | 0.9 ms | 30× |
+| 1k | 8,000 | point lookup, one subject | 26 ms | 0.1 ms | 260× |
+| 1k | 8,000 | two-hop join, count | 21.6 s | 2.8 ms | 7,700× |
+| 1k | 8,000 | full scan, count | 44 ms | 3.4 ms | 13× |
+| 10k | 80,000 | bound predicate, count | 228 ms | 5 ms | 45× |
+| 10k | 80,000 | point lookup, one subject | 222 ms | 0.1 ms | 2,000× |
+| 10k | 80,000 | two-hop join, count | not run (projected 40 min) | | |
+| 10k | 80,000 | full scan, count | 434 ms | 40 ms | 11× |
+
+Materializing the dataset cost 94 ms at 1k and 827 ms at 10k.
+
+The cause is in `crates/graph/linked-data/src/query/dataset.rs`. `GraphDataset` implements `spareval::QueryableDataset` with `InternalTerm = Term` and an `internal_quads_for_pattern` that re-runs `dataset_quad_iter(graph)` over the whole graph for every pattern evaluation, cloning terms and deduplicating through a `HashSet`. A point lookup therefore costs the same as a predicate scan, and a join pays that scan once per binding: 1,000 bindings × 26 ms is the 21.6 s. The history entry point, `sparql_with_history`, already materializes an `oxrdf::Dataset` and so already runs at the right-hand column's speed; only the live path is slow.
+
+The 100k scale was not reached because building the graph is itself quadratic. Per phase at 500 / 1k / 2k nodes: `add_node` 1 / 2 / 3 ms, `assert_semantic_statement` 3 / 8 / 14 ms, `append_node_properties` 150 / 920 / 3,236 ms, and 257 s at 10k. `literal_handle_available` (`crates/graph/graph-kernel/src/graph/resource_properties.rs`) walks every held literal and every semantic statement per append to check a statement id is unused, deserializing each resource's properties facet as it goes. That is the kernel's and goes to its own session; the 100k row of the table above is measured once it lands.
+
+## 2. What the dataset is today
+
+The dataset is a derived projection, not a store. `dataset_quad_iter` in `crates/graph/linked-data/src/lib.rs` walks surface nodes (direct quads: the node IRI as subject, properties as literals, scoped statements into named graphs by `GraphScope`, then RDF 1.2 reifier metadata per statement: asserter, assertion time, withdrawal), resource nodes (resource metadata) and resource edges (held assertions and their metadata). Terms are built as `oxrdf` strings on every walk. Named graphs are assertion scopes; the reserved history graph (`ASSERTION_HISTORY_GRAPH_IRI`) carries withdrawn reifiers only in the explicit history projection.
+
+What the kernel already holds that an index can key on:
+
+- **Durable identity.** A resource's id is a UUIDv5 of its canonical IRI (`chartulary::resource_id_from_canonical_iri`); the plan's Constraints call that "a durable binding, never a per-frame join".
+- **Assertion records.** `chartulary::AssertionRecord { id, from, to, edge, asserter, span, basis }` with `AssertionSpan { first_asserted_ms, last_asserted_ms, withdrawn }`; `is_held` is `withdrawn.is_none()`. Scope lives on the statement (`GraphScope`).
+- **Change counters.** `Graph` carries `revision`, `content_revision`, `semantic_observation_revision` and four `GraphInputKey`s advanced at the structural, content, site and visit mutation boundaries; a cached projection can be keyed on them without new plumbing.
+- **A generic projection below Mere.** `chartulary::rdf` (the folded scholia crate) projects any chartulary graph's semantic ring to quads, JSON-LD and N-Quads, and names "named-graph scopes, RDF 1.2 reified statement metadata, vocabulary alignment, and SPARQL" as future work.
+
+What the dataset must keep: the query tests in `crates/graph/linked-data/src/query/` (`tests.rs`, `coverage_tests.rs`, `resource_member_tests.rs`, `history_projection_tests.rs`), the coverage note on every result, resource-member and history semantics, and the ledger's SPARQL rows at the parser layer (1.1 evaluation 230/244, 1.2 evaluation 64/65). The ledger's adapter layer is "not scorable" today because `query::sparql` evaluates over a kernel `Graph` rather than a dataset the harness can load; the index is the chance to make it scorable.
+
+## 3. The shape
+
+**One dataset, held per revision, indexed, dictionary-encoded, fed to `spareval` through its own internal term.** The evaluator, optimizer, algebra and parsers stay upstream unchanged (P5); only the thing they evaluate over is ours.
+
+- **Dictionary.** Every term that appears in a quad is interned once: IRIs, blank or skolem nodes, literals with datatype and language. The dictionary maps a term to a small integer id and back. Resource IRIs already have a durable UUID; the dictionary's id is a projection of it with the revision's lifetime (Stack 6: identity is stable, representations are projections with their own lifetimes). Literals are interned by content.
+- **Quads as id tuples.** A quad is four ids, graph included (default graph is a reserved id), plus what a filter needs beside the triple: held or withdrawn, the asserter id, and the statement id for reifier lookups. The reifier metadata quads of today's projection are derived from that record rather than stored as extra tuples, so the live projection and the history projection are the same index read with and without the withdrawn rows.
+- **Orderings.** Sorted tuple vectors in the orderings that serve every pattern shape `spareval` asks for (`internal_quads_for_pattern` binds any subset of subject, predicate, object and graph). Three orderings cover bound prefixes of the triple; their graph-first twins cover a bound graph. A pattern binds a prefix and reads one contiguous range; nothing scans.
+- **The `spareval` seam.** `QueryableDataset` with `InternalTerm` = the dictionary id (a `u32` or `u64`: `Clone + Eq + Hash`, cheap to hash and compare, which is where today's `Term` clones cost). `internalize_term` is a dictionary lookup; a term the dictionary does not hold matches nothing. `externalize_term` is the reverse. The optional `externalize_expression_term` decodes a literal straight to the evaluator's typed `ExpressionTerm`, so a `FILTER` on a number or a date never rebuilds an `oxrdf` literal.
+- **Refresh.** Rebuilt per revision from the kernel's assertion records, keyed on the change counters above; the host holds the projection and reads it until the key moves. Incremental maintenance through the kernel's write paths is the second step, taken only if the rebuild cost shows at the scales the host sees (§4 says what to measure).
+- **Writes do not go through the index.** SPARQL Update (ledger D65, "no update stage") would land through the kernel's assertion rules (separate assertions per asserter, withdrawal retained, no revival by a stale assert) and then refresh; the index is a read structure and never a second truth.
+
+Nothing here forks a crate. The parsers, `spargebra`, `sparopt` and `spareval` are consumed as they are; `oxrdf` remains the external term type at the seam.
+
+## 4. Done-conditions and budget
+
+- The four queries of §1 run through the new dataset with the same row counts, at 1k, 10k and 100k nodes, and the table is appended to §1. Targets at 10k nodes: point lookup under 1 ms; two-hop join under 50 ms; bound predicate and full scan within 2× the materialized `oxrdf::Dataset` column.
+- Index build at 10k nodes within 2× today's materialization (827 ms); memory for 80k quads under 10 MB across all orderings (six orderings of four 32-bit ids is 7.7 MB).
+- Load, mutation, projection refresh and frame cost measured separately (plan Constraints), so the refresh fork in §6 is decided on numbers.
+- The query tests, coverage note, resource-member and history behaviour pass unchanged; the ledger's SPARQL 1.1 and 1.2 evaluation rows gain an adapter-layer score run through this dataset.
+- No new dependency; no fork of an Oxigraph component.
+
+## 5. Where it bears on the doctrine
+
+- **Stack 1.** "Try use, configure, compose and extend before implementing the gap." Use was tried: the borrowed adapter is the smallest thing that works and §1 is its cost. Compose is the shape chosen: the evaluator composed over our store. "A component is a module in its parent crate, not a crate of its own" and "a product's own crates are made when the abstraction earns one" are the first fork.
+- **Stack 3.** "Seams stay clean even at some cost in speed" and "hot or wide stays native": a dataset read on every query is hot and wide, so it is native code behind the engine's dataset interface, not a pluggable component.
+- **Stack 6.** Persist by durable identity, never a reusable slot: the dictionary id is never persisted; the UUID and the statement id are.
+- **Engine split D1 and P5.** The query stage's store is the engine's; Oxigraph's components stay upstream behind it.
+
+## 6. Forks
+
+Each is a card; the answer is recorded under Decisions in the words given.
+
+- **F1. Home.** (a) A module of the `mere` engine crate's query stage, where `linked-data/query` folds under P5. (b) Its own crate in Mere, taking a freed family name before a new word is spent (plan Constraints). (c) A generic index over chartulary's semantic ring in Eidetic's data root, beside `chartulary::rdf`, with Mere supplying the term mapping. Evidence: nothing outside the engine queries the dataset today; chartulary's own projection already lists SPARQL as future work; Stack 1 says a module until the abstraction earns a crate.
+- **F2. Internal term.** (a) Dense ids minted per rebuild, smallest and simplest, no stability across revisions. (b) Durable ids (the resource UUID; a content hash for literals), stable across revisions, which incremental maintenance would need and which cost 128 bits per slot instead of 32.
+- **F3. Orderings.** (a) Six (three triple orderings and their graph-first twins). (b) Three plus a per-graph partition. (c) Three, with a bound graph filtered on read. Evidence: `spareval` binds any subset of the four positions; the scopes are few and the triples many.
+- **F4. Refresh.** (a) Rebuild per revision keyed on the kernel's change counters, then measure. (b) Incremental from the first cut, hooked where the kernel session's statement-id index hooks. Evidence: materialization today is 827 ms at 80k quads, which is the rebuild's ceiling to beat; the host's mutation rate is not yet measured.
+- **F5. History.** (a) One index with held and withdrawn rows, live and history as reads of it, retiring `dataset_quads_with_history` as a separate walk. (b) Keep the separate history projection and index only the live view. Evidence: the history path is the one that is already fast, so (a) is about one structure rather than speed.
+
+## Decisions
+
+None yet. The forks above become D1 onward as they are answered.

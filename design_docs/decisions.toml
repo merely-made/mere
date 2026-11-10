@@ -1643,6 +1643,29 @@ area = "encryption"
 summary = "forward-secure conversations by default; durable shared data with bounded epoch retention"
 plans = ["release-log"]
 
+[decisions."release-log D13"]
+title = "the governed address form, and memorable names (2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "addressing"
+summary = "governed addresses keep moot id host plus collection path for now; memorable names wanted as a resolving layer, scheme name open"
+amends = ["release-log D3"]
+plans = ["release-log"]
+
+[decisions."release-log D14"]
+title = "Tor through a patched arti directory cache (2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "carriers"
+summary = "Tor transport only once arti's directory cache drops rusqlite for a pure-Rust store"
+plans = ["release-log"]
+
+[decisions."release-log D15"]
+title = "durable retention by epochs or time (2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-03_release_log_plan.md"
+area = "encryption"
+summary = "durable lanes forget epoch secrets after N epochs or a set age, whichever first"
+amends = ["release-log D12"]
+plans = ["release-log"]
+
 [decisions."resident-split D1"]
 title = "Device conditions go to mesh-host (Mark, 2026-11-05)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
