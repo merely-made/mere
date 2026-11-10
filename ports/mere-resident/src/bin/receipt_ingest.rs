@@ -26,7 +26,7 @@
 
 use std::path::PathBuf;
 
-use graphshell::receipts::{self, ReceiptError};
+use mere_resident::sync::receipts::{self, ReceiptError};
 use muniment::{BlobStore, RedbBackend};
 
 fn usage() -> ! {

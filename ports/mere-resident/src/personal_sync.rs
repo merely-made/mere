@@ -211,7 +211,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     // exists to prevent. Blob availability comes on with it, since a receipt
     // without its captures is half a fact.
     let mut facets = sync.lanes.facets.clone();
-    for facet in graphshell::receipts::sync_facets() {
+    for facet in crate::sync::receipts::sync_facets() {
         if !facets.iter().any(|selected| selected == facet) {
             facets.push(facet.to_string());
         }
@@ -229,7 +229,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
         // The only synthetic rule the resident host installs today. If a
         // second lane ever needs one, extend this list rather than calling
         // the setter twice: it replaces rather than appends.
-        .with_synthetic_addresses([graphshell::receipts::sync_address_rule()]);
+        .with_synthetic_addresses([crate::sync::receipts::sync_address_rule()]);
 
     // The cached-address rung: every hint recorded by a previous run rides in
     // as a best-effort address, so a device that has connected once can redial
@@ -343,7 +343,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     spawn_card_refresh(Arc::clone(&host), Arc::clone(&surface));
     spawn_receipt_intake(
         Arc::clone(&host),
-        graphshell::receipts::inbox_dir(&data_root),
+        crate::sync::receipts::inbox_dir(&data_root),
     );
     spawn_accept_watch(host.clone(), Arc::clone(&surface));
     Ok(Some(PersonalSyncStarted {
@@ -1067,9 +1067,9 @@ fn spawn_card_refresh(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle)
 /// so a receipt cannot advertise a blob whose bytes say something else.
 async fn stage_captures(
     host: &PersonalSyncHost,
-    receipt: &graphshell::receipts::PendingReceipt,
+    receipt: &crate::sync::receipts::PendingReceipt,
 ) -> Result<usize, String> {
-    let captures = graphshell::receipts::captures_in(&receipt.events);
+    let captures = crate::sync::receipts::captures_in(&receipt.events);
     let mut staged = 0;
     for (name, expected) in captures {
         // Already staged (a re-poll, or the same capture from another run):
@@ -1120,7 +1120,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
     armillary::tasks::spawn_tracked(async move {
         loop {
             tokio::time::sleep(RECEIPT_POLL).await;
-            let waiting = match graphshell::receipts::claim_pending(&inbox) {
+            let waiting = match crate::sync::receipts::claim_pending(&inbox) {
                 Ok(waiting) if waiting.is_empty() => continue,
                 Ok(waiting) => waiting,
                 Err(error) => {
@@ -1152,7 +1152,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
 /// after authoring may replay the turn; it must never clear a newer deposit.
 async fn author_receipt_claim(
     host: &PersonalSyncHost,
-    claim: graphshell::receipts::ClaimedReceipt,
+    claim: crate::sync::receipts::ClaimedReceipt,
 ) -> Result<usize, String> {
     let receipt = claim.receipt();
     let events = receipt.events.len();
@@ -1214,20 +1214,20 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn receipt_authoring_acknowledges_only_the_claimed_version() {
         let (directory, host) = receipt_host().await;
-        let inbox = graphshell::receipts::inbox_dir(directory.path());
+        let inbox = crate::sync::receipts::inbox_dir(directory.path());
         let node = uuid::Uuid::from_u128(0x85);
-        graphshell::receipts::write_to_inbox(
+        crate::sync::receipts::write_to_inbox(
             &inbox,
             node,
             directory.path(),
             &receipt_events(node, "original"),
         )
         .unwrap();
-        let claim = graphshell::receipts::claim_pending(&inbox)
+        let claim = crate::sync::receipts::claim_pending(&inbox)
             .unwrap()
             .pop()
             .unwrap();
-        graphshell::receipts::write_to_inbox(
+        crate::sync::receipts::write_to_inbox(
             &inbox,
             node,
             directory.path(),
@@ -1239,9 +1239,9 @@ mod tests {
         let cards = host.supplemental_cards().await.unwrap();
         assert!(cards.iter().any(|card| card.card.title == "original"));
         assert!(!cards.iter().any(|card| card.card.title == "corrected"));
-        assert_eq!(graphshell::receipts::pending(&inbox).unwrap().len(), 1);
+        assert_eq!(crate::sync::receipts::pending(&inbox).unwrap().len(), 1);
 
-        let claim = graphshell::receipts::claim_pending(&inbox)
+        let claim = crate::sync::receipts::claim_pending(&inbox)
             .unwrap()
             .pop()
             .unwrap();
@@ -1254,7 +1254,7 @@ mod tests {
                 .any(|card| card.card.title == "corrected")
         );
         assert!(
-            graphshell::receipts::claim_pending(&inbox)
+            crate::sync::receipts::claim_pending(&inbox)
                 .unwrap()
                 .is_empty()
         );
@@ -1264,16 +1264,16 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn a_receipt_capture_failure_retains_the_claim_without_authoring() {
         let (directory, host) = receipt_host().await;
-        let inbox = graphshell::receipts::inbox_dir(directory.path());
+        let inbox = crate::sync::receipts::inbox_dir(directory.path());
         let node = uuid::Uuid::from_u128(0x86);
         let mut events = receipt_events(node, "must not be authored");
         events.push(PersonalGraphEvent::SetFacet {
             node,
-            facet: graphshell::receipts::FACET_ARTIFACTS.into(),
+            facet: crate::sync::receipts::FACET_ARTIFACTS.into(),
             value: serde_json::json!([{"name":"absent.png", "blake3":"42".repeat(32)}]),
         });
-        graphshell::receipts::write_to_inbox(&inbox, node, directory.path(), &events).unwrap();
-        let claim = graphshell::receipts::claim_pending(&inbox)
+        crate::sync::receipts::write_to_inbox(&inbox, node, directory.path(), &events).unwrap();
+        let claim = crate::sync::receipts::claim_pending(&inbox)
             .unwrap()
             .pop()
             .unwrap();
@@ -1294,7 +1294,7 @@ mod tests {
                 .any(|card| card.card.title == "must not be authored")
         );
         assert_eq!(
-            graphshell::receipts::claim_pending(&inbox).unwrap().len(),
+            crate::sync::receipts::claim_pending(&inbox).unwrap().len(),
             1
         );
         host.close().await.unwrap();

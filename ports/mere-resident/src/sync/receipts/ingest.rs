@@ -38,7 +38,7 @@ use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
 use pandect::personal_sync::{BlobAvailabilityObservation, PersonalGraphEvent};
-use crate::receipts::manifest::{
+use crate::sync::receipts::manifest::{
     FACET_ARTIFACTS, FACET_RUN, RECEIPT_NAMESPACE, ReceiptError, ReceiptManifest,
 };
 
@@ -208,7 +208,7 @@ fn hex_sha256(bytes: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::receipts::{sync_address_rule, sync_facets};
+    use crate::sync::receipts::{sync_address_rule, sync_facets};
     use muniment::MemoryBackend;
 
     fn manifest_json(artifacts: &str) -> String {

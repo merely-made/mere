@@ -1214,12 +1214,12 @@ impl PersonalSyncHost {
                     .facets()
                     .get(&node.id, &chartulary::FacetId::new(facet))
             };
-            let run = facet_of(graphshell::receipts::FACET_RUN);
-            if let Some(card) = graphshell::receipts::receipt_card(
+            let run = facet_of(crate::sync::receipts::FACET_RUN);
+            if let Some(card) = crate::sync::receipts::receipt_card(
                 &node.title,
                 &node.url(),
                 run,
-                facet_of(graphshell::receipts::FACET_ARTIFACTS),
+                facet_of(crate::sync::receipts::FACET_ARTIFACTS),
             ) {
                 cards.push(SupplementalCard {
                     adapter: "graphshell.receipt".into(),

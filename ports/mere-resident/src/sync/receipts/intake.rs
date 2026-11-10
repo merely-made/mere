@@ -102,7 +102,7 @@ pub fn captures_in(events: &[PersonalGraphEvent]) -> Vec<(String, [u8; 32])> {
         let PersonalGraphEvent::SetFacet { facet, value, .. } = event else {
             continue;
         };
-        if facet != crate::receipts::FACET_ARTIFACTS {
+        if facet != crate::sync::receipts::FACET_ARTIFACTS {
             continue;
         }
         let Some(items) = value.as_array() else {

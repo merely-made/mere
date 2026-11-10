@@ -250,6 +250,13 @@ name = "djinn-moot-site"
 path = "src/bin/djinn_moot_site.rs"
 required-features = ["moot-site"]
 
+# Ingest a scenario-receipt directory into the personal graph's blob store
+# (moved from graphshell with `sync::receipts`, engine split D92).
+[[bin]]
+name = "receipt_ingest"
+path = "src/bin/receipt_ingest.rs"
+required-features = ["personal-sync"]
+
 [[bin]]
 name = "djinn-devices"
 path = "src/bin/djinn_devices.rs"
