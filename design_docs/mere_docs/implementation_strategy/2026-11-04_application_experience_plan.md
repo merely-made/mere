@@ -1,11 +1,12 @@
 # Application experience: link-first sharing and the browser companion
 
-**Status:** 2026-11-09. P0, S1 and B1 have partial implementation. Headed Chrome
+**Status:** 2026-11-10. P0, S1 and B1 have partial implementation. Headed Chrome
 and Firefox runs cover bounded capture, restart, writer handover and read-only
 follower paths. S1's reference copy and open path has a headless Chromium run.
-The full browser release profile and N2's four-host, live peer and offline
-gates remain open. See [Progress and evidence](#progress-and-evidence) for the
-scope of each run.
+N2's local Woodshed fixture passed on macOS desktop and in Chrome. Android and
+iOS remain open in the four-host gate. Live peer access, offline reopen and the
+full browser release profile also remain open. See [Progress and evidence](#progress-and-evidence)
+for the scope of each run.
 **Design:** [portable application experience brief](../../2026-11-04_portable_application_experience_brief.md).
 **First delivery:** a useful browser extension with no resident installed:
 copy a source link, relate consented browsing, Fleece the current page, inspect
@@ -482,6 +483,13 @@ the following gates independently:
    reconcile it on reconnect. Qualify against
    [domain adoption](2026-11-05_domain_adoption_plan.md) and Woodshed's W4/W6
    in `woodshed/design_docs/2026-11-05_woodshed_mere_plan.md`.
+
+**Four-host progress.** The local fixture passed in the Graphshell Blocks
+window on Intel macOS and in headed Chrome on the same Mac. Both hosts used the
+same signed Woodshed guest, wrote the same chart revision, and restored focus
+to the originating passage link. Android and iOS device runs are pending.
+Turnstone integration is a separate run. See the
+[N2 desktop and web receipt](../../archive_docs/receipts/2026-11-04_application_experience_plan_receipts.md#2026-11-10--n2-woodshed-on-desktop-and-web).
 
 The full live-editor handoff follows the portable-view gate. Qualify each
 platform's editor mount and return behavior separately.

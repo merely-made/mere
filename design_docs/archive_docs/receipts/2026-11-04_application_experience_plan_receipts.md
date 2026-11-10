@@ -73,3 +73,30 @@ Raw receipts and screenshots are under
 `20261106T005455Z/chrome/` and `20261106T005538Z/firefox/`.
 The harness controls the overlap without replacing IndexedDB or the
 application save path. This scenario covers voluntary handover.
+
+## 2026-11-10 — N2 Woodshed on desktop and web
+
+Rebuilt the N2 fixture at Mere `fe7c4905168e90e578895bcdb6c6e811492c70de`
+with Rust 1.99.1. The published fixture commit `942d8a6c478d5fa04b632bd12eb15df6e466af14`
+has identical source and dependency files. The native Graphshell Blocks window
+and headed Chrome 152
+with WebGPU ran on Intel macOS 15.8.1. Both used the same signed component
+built from Woodshed `c9b461da0c846e3a08a237d70acc7a16eb03de4e` and the
+[shared passage scenario](../../../ports/graphshell/web/scenarios/woodshed_passage_return.scn).
+
+Before approval, the passage refused to open the tune. After approval, both
+hosts opened `graphshell:fixture/woodshed-tune` from the Bridge passage in
+Rehearsal notes, showed the guest example and passage as provenance, and ran
+**Write notation**. Both rendered the chart and selected a chart event. The
+source fingerprint changed from `19910c964cbf8bd1` to `8b0d3ab47ae1b581` on
+both hosts. **Return to passage** restored focus to the originating link.
+Pressing Enter opened the same edited chart in the current session.
+
+Native approval used the window's review control. The web run used the
+existing browser approval harness. The browser refusal control made zero
+guest calls. The approved browser run made ten guest calls with zero
+refusals or errors.
+
+Raw receipts, screenshots, guarded build logs and frozen inputs are under
+`Code/output/mere-n2-woodshed/published/`. Android and iOS device evidence
+is pending. Live peer access and offline reopen have separate gates.
