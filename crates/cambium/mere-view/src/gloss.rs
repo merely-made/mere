@@ -100,7 +100,7 @@ pub fn cap_outline_rows(
 }
 
 /// Build the gloss outline snapshot for one graph/frame, enriching pure
-/// `mere::glossary::outline_rows` output with node state/selection supplied by the
+/// `glossary::outline_rows` output with node state/selection supplied by the
 /// caller.
 pub fn build_outline_snapshot(
     graph: &Graph,

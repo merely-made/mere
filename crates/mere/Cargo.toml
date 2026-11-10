@@ -29,18 +29,11 @@ graph = [
 ]
 # Semantic import/export remains independent of the graph canvas.
 linked-data = ["graph", "dep:linked-data"]
-# Mere's graph-aware visual surface. `gloss` is canvas-backed, so it belongs in
-# this capability rather than the graph-only cone.
+# Mere's graph-aware visual surface: the pictograph canvas re-export.
 canvas = [
     "graph",
-    "dep:accesskit",
     "dep:pictograph",
     "pictograph/canvas",
-    "dep:inker",
-    "dep:netrender",
-    "dep:tabard",
-    "dep:tracing",
-    "dep:uxtree",
 ]
 # The canvas's repulsion staged on the host's GPU (`canvas::PhysicsDevice`,
 # `Canvas::set_physics_device`): pictograph `gpu` -> seiche `gpu` ->
@@ -60,14 +53,9 @@ clip = ["graph", "dep:fleece", "fleece/clip"]
 
 [dependencies]
 fleece = { workspace = true, optional = true }
-accesskit = { workspace = true, optional = true }
-netrender = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
-tabard = { workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
-uxtree = { workspace = true, optional = true }
 # forme, the arrangement authority, is incipit's `arrangement` feature (D28).
 incipit = { workspace = true, optional = true, features = ["graph"] }
 # The engine-management layer (genet component since 2026-07-10): the facade
@@ -80,7 +68,6 @@ platen = { workspace = true, optional = true }
 workbench = { workspace = true, optional = true }
 
 [dev-dependencies]
-euclid = "0.22"
 kernel = { workspace = true, features = ["fixtures"] }
 
 [lints]

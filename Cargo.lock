@@ -9419,22 +9419,16 @@ dependencies = [
 name = "mere"
 version = "0.0.2"
 dependencies = [
- "accesskit 0.25.1",
- "euclid",
  "incipit",
  "inker",
  "mere-fleece",
  "mere-kernel",
  "mere-rdf",
- "netrender",
  "pictograph",
  "platen",
  "serde",
  "serde_json",
- "tabard",
- "tracing",
  "uuid",
- "uxtree",
  "workbench",
 ]
 
@@ -9904,11 +9898,13 @@ dependencies = [
 name = "mere-view"
 version = "0.1.0"
 dependencies = [
+ "accesskit 0.25.1",
  "cambium",
  "cambium-desktop",
  "euclid",
  "genet-scripted-dom",
  "incipit",
+ "inker",
  "layout-dom-api",
  "mandrake",
  "mere-cartography",
@@ -9921,8 +9917,11 @@ dependencies = [
  "serde",
  "serde_json",
  "sprigging",
+ "tabard",
  "taproot",
+ "tracing",
  "uuid",
+ "uxtree",
 ]
 
 [[package]]

@@ -20,6 +20,17 @@ query = ["subgraph", "dep:linked-data", "linked-data/query"]
 query-editor = ["query"]
 workbench-editor = ["dep:platen", "platen/workspace-editor"]
 presentation-editor = []
+# The gloss outline and graph digests (moved from `mere`, D98): the outline
+# snapshot, minimap geometry and the document outline into uxtree.
+gloss = [
+    "pictograph/canvas",
+    "dep:accesskit",
+    "dep:inker",
+    "dep:netrender",
+    "dep:tabard",
+    "dep:tracing",
+    "dep:uxtree",
+]
 
 [dependencies]
 linked-data = { workspace = true, optional = true }
@@ -37,6 +48,12 @@ sprigging = { workspace = true }
 uuid = { workspace = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
+accesskit = { workspace = true, optional = true }
+inker = { workspace = true, optional = true }
+netrender = { workspace = true, optional = true }
+tabard = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+uxtree = { workspace = true, optional = true }
 
 [dev-dependencies]
 scenograph = { workspace = true, features = ["editor"] }

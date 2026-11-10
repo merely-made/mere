@@ -51,6 +51,11 @@ pub mod workbench_editor;
 #[cfg(feature = "presentation-editor")]
 pub mod presentation_editor;
 
+#[cfg(feature = "gloss")]
+pub mod gloss;
+#[cfg(feature = "gloss")]
+pub mod glossary;
+
 mod folds;
 pub use folds::fold_node_key;
 mod layout;
