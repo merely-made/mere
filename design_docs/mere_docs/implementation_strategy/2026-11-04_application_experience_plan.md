@@ -1,9 +1,11 @@
 # Application experience: link-first sharing and the browser companion
 
-**Status:** 2026-11-04: implementation plan. No phase has been implemented or
-qualified by this plan. Existing mechanisms below are source observations;
-integration choices and workload bounds are proposals unless identified as an
-owner decision.
+**Status:** 2026-11-09. P0, S1 and B1 have partial implementation. Headed Chrome
+and Firefox runs cover bounded capture, restart, writer handover and read-only
+follower paths. S1's reference copy and open path has a headless Chromium run.
+The full browser release profile and N2's four-host, live peer and offline
+gates remain open. See [Progress and evidence](#progress-and-evidence) for the
+scope of each run.
 **Design:** [portable application experience brief](../../2026-11-04_portable_application_experience_brief.md).
 **First delivery:** a useful browser extension with no resident installed:
 copy a source link, relate consented browsing, Fleece the current page, inspect
@@ -438,13 +440,51 @@ without changing canonical resources or requiring data migration; locked
 custody and disconnect have bounded refusals; ordinary capture/copy/read still
 work after detaching; holding uses release-log R5's custody/availability gates.
 
-Follow-on work retained here: focused mobile receiving must reopen its local
-domain with Graphshell absent; a PWA must declare its actual permission/storage
-profile and needs no browser-history APIs; shareable applets need packaging,
+N2 owns focused mobile receiving. A PWA must declare its actual permission/storage
+profile and needs no browser-history APIs. Shareable applets need packaging,
 instance grants and upgrade/revoke gates over existing mods/contributions.
 These require separate bounded implementation cuts before execution. General
 applet ABI, OHTTP/anonymity services, WPT/Widevine, other-platform app runtimes
 and Distillery enrichment do not enter this first delivery's dependency cone.
+
+### N2. Portable surfaces across hosts
+
+**Needs.** Reuse the [Woodshed guest block's scene and vector sheet](../technical_architecture/2026-11-06_guest_blocks.md)
+and Graphshell's existing projection offers and revision-checked actions. Take
+the reference product and supplier boundary from [engine split P3 and D23](2026-11-07_engine_split_plan.md).
+The portable view can be exercised with a local fixture before peer and replica
+suppliers are ready.
+
+**Owners.** Woodshed supplies the tune presentation and domain actions.
+Graphshell owns the shared presentation and session contract. Turnstone owns
+the reference interaction and its return to the original passage. Each host
+supplies platform navigation, input, accessibility and lifecycle handling.
+
+Use one fixture: open a Woodshed tune from a passage, show its chart revision
+and provenance, invoke one permitted action, and return to the passage. Record
+the following gates independently:
+
+1. **Four-host Woodshed proof.** Desktop, web, Android and iOS render the same
+   provider's tune and offer the same permitted action. Verify the resource
+   identity, revision and source, the action's result, and the restored reading
+   position. On both phones, exercise touch, accessible labels and actions,
+   and suspend/resume on a device. Record the actual host and platform for each
+   result.
+2. **Live peer access.** Run the interaction over an admitted connection to a
+   peer that owns the tune. Exercise disconnect and re-admission, then verify
+   that stale or revoked intents leave owner state intact and get a clear
+   response. Reuse the [browser carrier plan](2026-10-28_browser_carrier_plan.md)
+   for WebRTC and record the actual carrier and reachability path for each
+   live run.
+3. **Offline reopen.** Receive an admitted local replica, disconnect, and
+   cold-reopen the tune directly in Woodshed on a named phone with Turnstone
+   and a separate Graphshell app absent. Make one permitted local edit and
+   reconcile it on reconnect. Qualify against
+   [domain adoption](2026-11-05_domain_adoption_plan.md) and Woodshed's W4/W6
+   in `woodshed/design_docs/2026-11-05_woodshed_mere_plan.md`.
+
+The full live-editor handoff follows the portable-view gate. Qualify each
+platform's editor mount and return behavior separately.
 
 ## Findings — source inspection, 2026-11-04
 
