@@ -24,7 +24,7 @@ impl Graph {
     pub(crate) fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload> {
         match key {
             RelationKey::Surface(key) => self.get_edge_mut(key),
-            RelationKey::Resource(key) => self.resources.edge_mut(key.raw()),
+            RelationKey::Resource(key) => self.resource_edge_mut(key.raw()),
         }
     }
 

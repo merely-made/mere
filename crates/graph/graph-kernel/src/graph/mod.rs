@@ -73,6 +73,9 @@ pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, Pen
 pub mod frozen_selection;
 pub use frozen_selection::{FrozenSelection, OpenedFrozenSelection};
 pub mod frozen_link;
+mod handle_index;
+#[cfg(test)]
+mod handle_index_tests;
 pub use frozen_link::{
     FROZEN_LINK, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource, FrozenSourceBinding,
     FrozenSourceRevision, OpenedFrozenLink,
@@ -446,6 +449,8 @@ pub struct Graph {
     pub(crate) known_coverage: CoverageNote,
     /// Set only inside a legacy migration's staged scope; see `edge_admission`.
     pub(crate) staged_edges: edge_admission::StagedEdges,
+    /// Runtime index of where each statement handle is held; see `handle_index`.
+    pub(crate) handle_index: handle_index::HandleIndex,
 }
 
 // Edge mutators (add_edge, assert_relation, replay_*, dissolve_*,

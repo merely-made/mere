@@ -271,6 +271,7 @@ impl Graph {
                 .set(id, facet, value, &chartulary::AcceptAll)
                 .expect("permissive facet validator");
         }
+        self.note_resource_literals(id);
         self.bump_revision();
         true
     }
@@ -391,7 +392,7 @@ impl Graph {
             self.resources.disconnect(edge);
         }
         for payload in payloads.into_iter().rev() {
-            self.resources.connect(source, target, payload);
+            self.connect_resource(source, target, payload);
         }
         self.bump_revision();
         true

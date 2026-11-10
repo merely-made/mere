@@ -405,7 +405,7 @@ fn legacy_resource_migration_preserves_baseline_handles_and_uncertainty_with_sur
     });
     let a = baseline.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
     let b = baseline.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
-    baseline.inner.connect(a, b, held.clone());
+    baseline.connect_surface(a, b, held.clone());
     let before = baseline.to_snapshot();
     let replay = migrate_legacy_prefix(&baseline, &[]).unwrap();
     assert_eq!(

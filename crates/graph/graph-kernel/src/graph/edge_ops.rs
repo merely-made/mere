@@ -158,9 +158,9 @@ impl Graph {
         spec.asserted_at_ms.get_or_insert_with(unix_epoch_millis);
         let edge_key = self
             .find_edge_key(from, to)
-            .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
+            .unwrap_or_else(|| self.connect_surface(from, to, EdgePayload::new()));
         let outcome = {
-            let payload = self.inner.edge_mut(edge_key)?;
+            let payload = self.get_edge_mut(edge_key)?;
             payload.assert_semantic_statement(spec)
         };
         if outcome.changed {
@@ -199,9 +199,9 @@ impl Graph {
         }
         let edge_key = self
             .find_edge_key(from, to)
-            .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
+            .unwrap_or_else(|| self.connect_surface(from, to, EdgePayload::new()));
         let changed = {
-            let payload = self.inner.edge_mut(edge_key)?;
+            let payload = self.get_edge_mut(edge_key)?;
             payload.upsert_persisted_semantic_statement(statement)
         };
         if changed {
@@ -379,7 +379,7 @@ impl Graph {
         let mut removed = 0usize;
         let mut edges_to_delete = Vec::new();
         for edge_id in edge_ids {
-            if let Some(payload) = self.inner.edge_mut(edge_id)
+            if let Some(payload) = self.get_edge_mut(edge_id)
                 && payload.retract_relation(selector)
             {
                 removed += 1;
@@ -430,7 +430,7 @@ impl Graph {
                 }
             }
             if !payload.is_empty() || edge.semantic.is_some() || edge.traversal.is_some() {
-                self.inner.connect(from, to, payload);
+                self.connect_surface(from, to, payload);
             }
         }
         self.bump_revision();
@@ -453,7 +453,7 @@ impl Graph {
         predicate: Option<String>,
         asserter: String,
     ) -> bool {
-        let Some(payload) = self.inner.edge_mut(key) else {
+        let Some(payload) = self.get_edge_mut(key) else {
             return false;
         };
         let before = payload.clone();
@@ -483,7 +483,7 @@ impl Graph {
             return false;
         }
         if let Some(edge_key) = self.find_edge_key(from, to)
-            && let Some(payload) = self.inner.edge_mut(edge_key)
+            && let Some(payload) = self.get_edge_mut(edge_key)
         {
             // Existing edge: a re-visit appends a traversal but does not change the structure, so
             // the revision holds (navigation re-visits must not churn the structural caches).
@@ -492,7 +492,7 @@ impl Graph {
         }
         let mut payload = EdgePayload::new();
         payload.push_traversal(traversal);
-        let _ = self.inner.connect(from, to, payload);
+        let _ = self.connect_surface(from, to, payload);
         self.bump_revision();
         true
     }

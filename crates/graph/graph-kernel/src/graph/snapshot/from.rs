@@ -98,9 +98,9 @@ impl Graph {
         let structural_changes = restore_persisted_payload(&mut payload, pedge);
         if pedge.semantic.is_some() || pedge.traversal.is_some() || !payload.is_empty() {
             match existing {
-                Some(key) => *self.inner.edge_mut(key).expect("existing edge") = payload,
+                Some(key) => *self.get_edge_mut(key).expect("existing edge") = payload,
                 None => {
-                    self.inner.connect(from, to, payload);
+                    self.connect_surface(from, to, payload);
                 },
             }
         }

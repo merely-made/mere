@@ -131,7 +131,7 @@ impl LegacyFamilyAttribution {
 
         let mut changed = false;
         for (key, repairs) in keys {
-            if let Some(payload) = graph.inner.edge_mut(key) {
+            if let Some(payload) = graph.get_edge_mut(key) {
                 for statement in &mut payload.assertions.statements {
                     if let Some((_, author)) =
                         repairs.iter().find(|(id, _)| *id == statement.statement_id)
@@ -278,7 +278,7 @@ mod tests {
 
     fn force_structural_unknown(graph: &mut Graph) -> (String, u32) {
         let (key, _, _, _) = graph.surface_relation_buckets().next().unwrap();
-        let payload = graph.inner.edge_mut(key).unwrap();
+        let payload = graph.get_edge_mut(key).unwrap();
         let statement = payload
             .assertions
             .statements
@@ -521,7 +521,7 @@ mod tests {
         });
         let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
         let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
-        graph.inner.connect(from, to, payload);
+        graph.connect_surface(from, to, payload);
         let attribution = LegacyFamilyAttribution::from_baseline(&graph);
         attribution.repair_checkpoint(&mut graph);
         assert_eq!(

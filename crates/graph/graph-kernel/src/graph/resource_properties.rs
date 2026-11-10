@@ -39,35 +39,6 @@ impl Graph {
             .unwrap_or_default()
     }
 
-    pub(crate) fn literal_handle_available(&self, resource: Uuid, property: &NodeProperty) -> bool {
-        if self
-            .find_semantic_statement(&property.statement_id)
-            .is_some()
-        {
-            return false;
-        }
-        for node in self.resource_nodes() {
-            for held in self.resource_properties(node.id()) {
-                if held.statement_id == property.statement_id
-                    && (node.id() != resource || !held.content_eq(property))
-                {
-                    return false;
-                }
-            }
-        }
-        for (key, _) in self.nodes() {
-            if self
-                .legacy_node_properties(key)
-                .into_iter()
-                .flatten()
-                .any(|held| held.statement_id == property.statement_id)
-            {
-                return false;
-            }
-        }
-        true
-    }
-
     pub fn append_resource_properties(
         &mut self,
         id: Uuid,

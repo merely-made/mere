@@ -375,7 +375,7 @@ impl Graph {
         // own when they re-derive the edges.
         let mut changed = false;
         for edge_id in edge_ids {
-            if let Some(payload) = self.inner.edge_mut(edge_id) {
+            if let Some(payload) = self.get_edge_mut(edge_id) {
                 let before = payload.assertions().len();
                 payload.assertions.statements.retain(|statement| {
                     !(statement.is_held()

@@ -55,6 +55,7 @@ impl Graph {
     /// [visit revision](Graph::visit_revision).
     pub(crate) fn facets_mut(&mut self) -> &mut NodeFacetStore {
         self.bump_visit_revision();
+        self.clear_handle_index();
         &mut self.facets
     }
 
@@ -66,6 +67,7 @@ impl Graph {
     /// (Graph::validate_active_resource_assertion_handles)).
     pub fn install_facets(&mut self, facets: NodeFacetStore) -> Result<(), ResourceSnapshotError> {
         let previous = std::mem::replace(&mut self.facets, facets);
+        self.clear_handle_index();
         if let Err(error) = self.validate_active_resource_assertion_handles() {
             self.facets = previous;
             return Err(ResourceSnapshotError::InvalidFacets(error));
@@ -126,6 +128,7 @@ impl Graph {
         self.facets
             .set(node_id, facet_id, value, &chartulary::AcceptAll)
             .expect("AcceptAll cannot reject a kernel facet");
+        self.note_surface_literals(node_id);
         if facet == VISIT_HISTORY {
             self.bump_visit_revision();
         }

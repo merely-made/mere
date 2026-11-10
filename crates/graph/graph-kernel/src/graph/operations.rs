@@ -35,6 +35,7 @@ impl Graph {
             appearance_admission_revision: 0,
             known_coverage: CoverageNote::default(),
             staged_edges: Default::default(),
+            handle_index: Default::default(),
         }
     }
 

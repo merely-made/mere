@@ -181,7 +181,7 @@ fn legacy_resource_migration_handle_collision_is_atomic_with_distinct_handle_con
     let a = baseline.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
     let b = baseline.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
     let predicate = predicate_iri(SemanticSubKind::Cites);
-    baseline.inner.connect(
+    baseline.connect_surface(
         a,
         b,
         payload("collision", predicate, Some("https://legacy.test/")),
@@ -203,7 +203,7 @@ fn legacy_resource_migration_handle_collision_is_atomic_with_distinct_handle_con
     // Deliberately malformed in-memory input bypasses the checked setter.
     let from = baseline.resources.key_of(&pair.0).unwrap();
     let to = baseline.resources.key_of(&pair.1).unwrap();
-    baseline.resources.connect(
+    baseline.connect_resource(
         from,
         to,
         payload("collision", predicate, Some("https://typed.test/")),
@@ -306,8 +306,8 @@ fn legacy_resource_migration_dedupes_identical_parallel_handle_copies_and_says_s
         predicate_iri(SemanticSubKind::Cites),
         Some("https://author.test/"),
     );
-    baseline.inner.connect(a, b, claim.clone());
-    baseline.inner.connect(a, b, claim);
+    baseline.connect_surface(a, b, claim.clone());
+    baseline.connect_surface(a, b, claim);
     let migrated = migrate_legacy_prefix(&baseline, &[]).unwrap();
     let pair = resource_pair("https://a.test/", "https://b.test/");
     let rows = migrated

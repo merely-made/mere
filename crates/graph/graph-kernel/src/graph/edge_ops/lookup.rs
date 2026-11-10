@@ -7,8 +7,9 @@
 use super::*;
 
 impl Graph {
-    /// Get a mutable edge payload by key.
+    /// Get a mutable edge payload by key, noted as written for the handle index.
     pub(crate) fn get_edge_mut(&mut self, key: EdgeKey) -> Option<&mut EdgePayload> {
+        self.note_relation_handles(RelationKey::Surface(key));
         self.inner.edge_mut(key)
     }
 

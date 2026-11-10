@@ -174,7 +174,7 @@ impl Graph {
                     statement.normalize_legacy_asserter();
                 }
                 if !payload.is_empty() || pedge.semantic.is_some() || pedge.traversal.is_some() {
-                    graph.inner.connect(from, to, payload);
+                    graph.connect_surface(from, to, payload);
                     graph.bump_revision();
                 }
             }

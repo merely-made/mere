@@ -369,7 +369,7 @@ fn predicate_declarations_nature_changes_leave_held_claims_in_both_strata_exact(
         });
         payload
     };
-    graph.inner.connect(a, b, held("surface-claim"));
+    graph.connect_surface(a, b, held("surface-claim"));
     let ra = ResourceNode::for_term("https://resource.test/a");
     let rb = ResourceNode::for_term("https://resource.test/b");
     for resource in [&ra, &rb] {

@@ -544,6 +544,7 @@ fn set_node_facet(
         .facets
         .set(node_id, facet, value, &chartulary::AcceptAll)
         .expect("AcceptAll cannot reject a graph facet");
+    graph.note_surface_literals(node_id);
     if visits {
         graph.bump_visit_revision();
     }

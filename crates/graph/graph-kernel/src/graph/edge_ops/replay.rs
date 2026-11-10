@@ -92,7 +92,7 @@ impl Graph {
         }
         let edge_key = self
             .find_edge_key(from_key, to_key)
-            .unwrap_or_else(|| self.inner.connect(from_key, to_key, EdgePayload::new()));
+            .unwrap_or_else(|| self.connect_surface(from_key, to_key, EdgePayload::new()));
         let outcome =
             self.inner
                 .edge_mut(edge_key)?
@@ -143,7 +143,7 @@ impl Graph {
             }
             let edge_key = self
                 .find_edge_key(from, to)
-                .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
+                .unwrap_or_else(|| self.connect_surface(from, to, EdgePayload::new()));
             let outcome =
                 self.inner
                     .edge_mut(edge_key)?
@@ -171,7 +171,7 @@ impl Graph {
         if let Some(RelationKey::Surface(key)) = result {
             let from_id = self.get_node(from)?.id;
             let to_id = self.get_node(to)?.id;
-            let payload = self.inner.edge_mut(key)?;
+            let payload = self.get_edge_mut(key)?;
             let mut generations = std::collections::BTreeMap::<String, usize>::new();
             for statement in &payload.assertions.statements {
                 if before.contains(&statement.statement_id) {

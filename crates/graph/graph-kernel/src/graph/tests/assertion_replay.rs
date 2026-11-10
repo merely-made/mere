@@ -52,7 +52,7 @@ fn exact_surface_pair_replay_keeps_parallel_traversals_and_complete_payloads() {
         payload.assert_relation(EdgeAssertion::Containment {
             sub_kind: ContainmentSubKind::UserFolder,
         });
-        graph.inner.connect(from, to, payload);
+        graph.connect_surface(from, to, payload);
     }
     let edges = graph.persisted_edges_between(from, to);
     assert_eq!(edges.len(), 2);

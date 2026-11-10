@@ -907,6 +907,7 @@ impl ReplayAttribution {
     pub(crate) fn repair_checkpoint(&self, graph: &mut Graph) {
         let changed = self.repair_edges(&mut graph.inner) | self.repair_edges(&mut graph.resources);
         if changed {
+            graph.clear_handle_index();
             graph.bump_revision();
         }
         self.1.repair_checkpoint(graph);

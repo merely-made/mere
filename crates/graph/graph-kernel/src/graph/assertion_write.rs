@@ -147,7 +147,7 @@ impl Graph {
         }
         let key = match self.find_resource_edge_key(from, to) {
             Some(key) => key,
-            None => ResourceEdgeKey::from_raw(self.resources.connect(
+            None => ResourceEdgeKey::from_raw(self.connect_resource(
                 self.resources.key_of(&from).expect("held source"),
                 self.resources.key_of(&to).expect("held target"),
                 EdgePayload::new(),
@@ -236,7 +236,7 @@ impl Graph {
         match stratum {
             GraphStratum::Surface => Ok(RelationKey::Surface(
                 self.find_edge_key(from, to)
-                    .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new())),
+                    .unwrap_or_else(|| self.connect_surface(from, to, EdgePayload::new())),
             )),
             GraphStratum::Resource => {
                 let source_id = self
@@ -250,7 +250,7 @@ impl Graph {
                     None => {
                         let source = self.resources.key_of(&source_id).expect("bound resource");
                         let target = self.resources.key_of(&target_id).expect("bound resource");
-                        ResourceEdgeKey::from_raw(self.resources.connect(
+                        ResourceEdgeKey::from_raw(self.connect_resource(
                             source,
                             target,
                             EdgePayload::new(),

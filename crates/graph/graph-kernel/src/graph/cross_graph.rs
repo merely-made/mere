@@ -171,6 +171,7 @@ impl Graph {
                         .expect("AcceptAll cannot reject copied content");
                 }
             }
+            self.note_surface_literals(new_id);
             key_remap.insert(old_key, new_key);
             copy.new_keys.push(new_key);
             copy.id_remap.push((source_id, new_id));
@@ -181,7 +182,7 @@ impl Graph {
             if let (Some(&from), Some(&to)) =
                 (key_remap.get(&edge.source()), key_remap.get(&edge.target()))
             {
-                self.inner.connect(from, to, edge.weight().clone());
+                self.connect_surface(from, to, edge.weight().clone());
             }
         }
         self.copy_component_resources(source, &key_remap);

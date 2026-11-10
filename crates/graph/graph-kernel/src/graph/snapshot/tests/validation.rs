@@ -62,7 +62,7 @@ fn checked_snapshot_recorded_loader_preserves_same_host_resource_containment_and
             withdrawn: None,
             basis: Default::default(),
         });
-        graph.inner.connect(child, parent, payload);
+        graph.connect_surface(child, parent, payload);
     }
     let snapshot = graph.to_snapshot();
     let recorded = Graph::try_from_recorded_snapshot(&snapshot).unwrap();

@@ -146,7 +146,7 @@ fn resource_pair_rejects_conflicting_handles_before_replacing_truth() {
     );
     let mut collision = other_pair.clone();
     collision.retained_assertions_mut()[0].statement_id = "surface-handle".into();
-    graph.inner.connect(
+    graph.connect_surface(
         first,
         second,
         super::super::snapshot::payload_from_persisted(&collision),

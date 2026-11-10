@@ -144,7 +144,7 @@ impl Graph {
             // Existing edge: assert onto its payload. A real change (a new relation on the pair —
             // a multiplicity bump a weighted signal reads) advances the revision.
             let changed = {
-                let payload = self.inner.edge_mut(edge_key)?;
+                let payload = self.get_edge_mut(edge_key)?;
                 payload.assert_relation_with_context(
                     assertion,
                     Some(asserter_iri.clone()),
@@ -173,7 +173,7 @@ impl Graph {
         ) {
             return None;
         }
-        let edge_key = self.inner.connect(from, to, payload);
+        let edge_key = self.connect_surface(from, to, payload);
         if let Some(kind) = derived_kind {
             self.normalize_derived_membership(RelationKey::Surface(edge_key), kind);
         }

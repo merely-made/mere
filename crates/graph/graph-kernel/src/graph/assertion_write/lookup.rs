@@ -7,29 +7,6 @@
 use super::*;
 
 impl Graph {
-    /// Locate any retained handle, including withdrawn history, independent of
-    /// current nature. Use `find_held_semantic_statement` for default reads.
-    pub fn find_semantic_statement(
-        &self,
-        statement_id: &str,
-    ) -> Option<(RelationKey, &SemanticStatement)> {
-        self.inner
-            .inner()
-            .edge_references()
-            .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
-            .chain(
-                self.resource_relations()
-                    .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload)),
-            )
-            .find_map(|(key, payload)| {
-                payload
-                    .assertions()
-                    .iter()
-                    .find(|statement| statement.statement_id == statement_id)
-                    .map(|statement| (key, statement))
-            })
-    }
-
     pub fn find_held_semantic_statement(
         &self,
         statement_id: &str,
