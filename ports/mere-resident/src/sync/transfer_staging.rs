@@ -27,8 +27,8 @@ use muniment::{Backend, BlobStore};
 use transport::BlobHash;
 
 use crate::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostError};
-use graphshell::transfer::{TransferManifestV1, TransferOperation};
-use graphshell::transfer_offer::{OfferError, TransferOfferV1, offer_events, offer_for};
+use pandect::transfer::{TransferManifestV1, TransferOperation};
+use pandect::transfer_offer::{OfferError, TransferOfferV1, offer_events, offer_for};
 
 #[derive(Debug, thiserror::Error)]
 pub enum StagingError {
@@ -256,32 +256,30 @@ fn hex(bytes: &[u8; 32]) -> String {
 mod tests {
     use super::*;
     use crate::sync::personal_sync_host::PersonalSyncHostConfig;
-    use eidetic::PrivacyClass;
-    use pandect::access::AccessContext;
-    use graphshell_host::mere_host::{MereHost, SelectedPersonaRef, fixture_handlers};
-    use pandect::personal_sync::{SyncRoster, SyncSelection};
-    use graphshell::product::{
-        EditableRelation, ExportRequest, LocalFileMetadata, ProductHost, TransferScope,
+    use eidetic::{
+        Codicil, ModerationState, PrivacyClass, ProvenanceOrigin, ProvenanceRecord, TimeBounds,
+        Timestamp, TrustEnvelope, TrustLevel, TypedPayload, validate_payload,
     };
-    use graphshell::transfer::{
-        AccessTransferPolicy, ApplyTransferContext, TransferAuthorization, TransferEndpointV1,
-        TransferRequest, TransferRouteV1, apply_transfer, prepare_transfer,
-    };
-    use graphshell::transfer_offer::TRANSFER_OFFER_FACET;
+    use kernel::geometry::PortablePoint;
+    use kernel::graph::Graph;
+    use kernel::graph::apply::add_node;
     use muniment::MemoryBackend;
+    use pandect::personal_sync::{SyncRoster, SyncSelection};
+    use pandect::product_codicil::{
+        PRODUCT_CODICIL_SCHEMA, ProductCodicilV3, ProfiledProductCodicil, TransferScope,
+        product_codicil_schema,
+    };
+    use pandect::transfer::{
+        AccessTransferPolicy, TRANSFER_MANIFEST_SCHEMA, TransferBlobV1, TransferEndpointV1,
+        TransferRouteV1,
+    };
+    use pandect::transfer_offer::TRANSFER_OFFER_FACET;
     use personae::{IdentityProvider, InMemoryProvider};
-    use sha2::{Digest, Sha256};
     use uuid::Uuid;
 
     const PERSONA: &str = "personae://persona/staging";
     const FILE_BYTES: &[u8] = b"bytes that must survive the source going away\n";
-
-    fn selected() -> SelectedPersonaRef {
-        SelectedPersonaRef {
-            persona: PERSONA.to_string(),
-            profile: "profile:graphshell-s3".to_string(),
-        }
-    }
+    const EXPORTED_AT_MS: u64 = 1_700_000_000_500;
 
     fn endpoint(device: [u8; 32]) -> TransferEndpointV1 {
         TransferEndpointV1 {
@@ -291,49 +289,87 @@ mod tests {
         }
     }
 
-    /// A source graph holding one URL node and one real file, related.
-    fn source_host(device: [u8; 32]) -> (MereHost<MemoryBackend>, MemoryBackend, Uuid, Uuid) {
-        let backend = MemoryBackend::new();
-        let mut host = MereHost::empty(
-            backend.clone(),
-            selected(),
-            fixture_handlers(),
-            AccessContext {
-                persona: PERSONA.to_string(),
-                device: format!("personae://device/{}", hex(&device)),
-                at_ms: 1_700_000_000_000,
+    /// A manifest as the app's `prepare_transfer` writes one, built from the
+    /// record types alone: a selection of one URL node and one file node, and
+    /// the file's bytes put into the source store under the hash it names.
+    async fn source_manifest(
+        source: [u8; 32],
+        destination: [u8; 32],
+        source_blobs: &BlobStore<MemoryBackend>,
+    ) -> TransferManifestV1 {
+        let (url, file) = (Uuid::new_v4(), Uuid::new_v4());
+        let mut graph = Graph::new();
+        for (id, address) in [
+            (url, "https://example.test/s3"),
+            (file, "file:///s3-reference.txt"),
+        ] {
+            add_node(&mut graph, Some(id), address.to_string(), PortablePoint::new(0.0, 0.0));
+        }
+        let payload = serde_json::to_vec(&ProfiledProductCodicil {
+            product: ProductCodicilV3 {
+                schema: PRODUCT_CODICIL_SCHEMA.to_string(),
+                scope: TransferScope::SelectedSubgraph,
+                exported_at_ms: EXPORTED_AT_MS,
+                graph: graph.to_snapshot(),
+                facets: pandect::NodeFacetStore::new(),
+                scene: None,
             },
+            placement: None,
+        })
+        .unwrap();
+        let selection_schema = product_codicil_schema();
+        validate_payload(&selection_schema, &payload).unwrap();
+        let selection = Codicil::new(
+            ProductCodicilV3::schema_ref(),
+            payload,
+            PrivacyClass::TrustedPeersOnly,
+            ProvenanceRecord {
+                origin: ProvenanceOrigin::Generated,
+                upstream: Vec::new(),
+                tooling: None,
+                generated_at: Timestamp(EXPORTED_AT_MS),
+            },
+            TrustEnvelope {
+                level: TrustLevel::SelfAsserted,
+                signatures: Vec::new(),
+                moderation_state: ModerationState::Unreviewed,
+            },
+            TimeBounds::at(Timestamp(EXPORTED_AT_MS)),
         );
-        let url = host
-            .create_address("https://example.test/s3", "S3 staging notes")
-            .unwrap();
-        host.edit_node(url, "S3 staging notes", ["transport".to_string()])
-            .unwrap();
-        let file = host
-            .create_file_metadata(LocalFileMetadata {
-                content_hash: Sha256::digest(FILE_BYTES)
-                    .iter()
-                    .map(|byte| format!("{byte:02x}"))
-                    .collect(),
-                name: "s3-reference.txt".to_string(),
+        let stored = source_blobs.put(FILE_BYTES).await.unwrap();
+        let content_hash = Hash::of(FILE_BYTES);
+        assert_eq!(stored.to_hex(), content_hash.to_hex());
+        TransferManifestV1 {
+            schema: TRANSFER_MANIFEST_SCHEMA.to_string(),
+            transfer_id: Uuid::new_v4(),
+            operation: TransferOperation::Replicate,
+            source: endpoint(source),
+            destination: endpoint(destination),
+            route: TransferRouteV1 {
+                carrier: "personal-sync".to_string(),
+                peer: hex(&destination),
+            },
+            selection_schema,
+            selection,
+            blobs: vec![TransferBlobV1 {
+                node_id: file,
+                role: "primary".to_string(),
                 media_type: "text/plain".to_string(),
+                content_hash,
                 byte_len: FILE_BYTES.len() as u64,
-                last_modified_ms: 1_700_000_000_000,
-            })
-            .unwrap();
-        host.edit_node(file, "S3 real file", ["file".to_string()])
-            .unwrap();
-        host.assert_product_relation(file, url, EditableRelation::Cites)
-            .unwrap();
-        (host, backend, url, file)
+            }],
+            access_policy: AccessTransferPolicy::ExcludeSourceHistory,
+            access_records: Vec::new(),
+        }
     }
 
     /// The whole point of stage-and-forward: by the time apply runs, the source
-    /// is gone. Its sync host is closed and its blob store is never handed to
-    /// apply, which receives the destination's store as both arguments. If any
-    /// byte were still being read across the wire, this test could not pass.
+    /// is gone. Its sync host is closed and its blob store dropped, and the
+    /// destination's one store must then hold the manifest and every byte it
+    /// names, so the app's `apply_transfer` can take that store as both of its
+    /// arguments. If any byte were still across the wire, this could not pass.
     #[tokio::test]
-    async fn a_transfer_applies_after_its_source_is_gone() {
+    async fn a_transfer_is_whole_on_the_destination_after_its_source_is_gone() {
         let directory = tempfile::tempdir().unwrap();
         let graph = [0xa3; 32];
         let source_identity = InMemoryProvider::from_seed([0xa4; 32]);
@@ -385,42 +421,13 @@ mod tests {
             .await
             .unwrap();
 
-        let (source, source_backend, url, file) = source_host(source_sync.node_id());
-        let source_blobs = BlobStore::new(source_backend.clone());
-        let mut source_authority = source_backend.clone();
-        let manifest = prepare_transfer(
-            &source,
-            &mut source_authority,
+        let source_blobs = BlobStore::new(MemoryBackend::new());
+        let manifest = source_manifest(
+            source_sync.node_id(),
+            destination_sync.node_id(),
             &source_blobs,
-            TransferRequest {
-                transfer_id: Uuid::new_v4(),
-                operation: TransferOperation::Replicate,
-                source: endpoint(source_sync.node_id()),
-                destination: endpoint(destination_sync.node_id()),
-                route: TransferRouteV1 {
-                    carrier: "personal-sync".to_string(),
-                    peer: hex(&destination_sync.node_id()),
-                },
-                selection: ExportRequest {
-                    focused: file,
-                    selected: vec![file, url],
-                    scope: TransferScope::SelectedSubgraph,
-                    exported_at_ms: 1_700_000_000_500,
-                    include_local_file_locations: true,
-                    scene: None,
-                },
-                access_policy: AccessTransferPolicy::ExcludeSourceHistory,
-                privacy: PrivacyClass::TrustedPeersOnly,
-            },
-            vec![graphshell::transfer::TransferBlobInput {
-                node_id: file,
-                role: "primary".to_string(),
-                media_type: "text/plain".to_string(),
-                bytes: FILE_BYTES.to_vec(),
-            }],
         )
-        .await
-        .unwrap();
+        .await;
 
         let offered = offer_transfer(
             &source_sync,
@@ -437,6 +444,10 @@ mod tests {
             !offer_is_grantable(&offered, Some("pairing-s3-after-repair")),
             "a re-paired device must not inherit a queued transfer"
         );
+        assert_eq!(offered.nodes, 2, "the offer summarizes the selection");
+        assert_eq!(offered.relations, 0);
+        assert_eq!(offered.blobs, 1);
+        assert_eq!(offered.blob_bytes, FILE_BYTES.len() as u64);
 
         // The destination learns of the transfer from the graph, not the test.
         let mut incoming = Vec::new();
@@ -449,127 +460,41 @@ mod tests {
         }
         assert_eq!(incoming, vec![offered.clone()]);
 
-        let destination_backend = MemoryBackend::new();
-        let destination_blobs = BlobStore::new(destination_backend.clone());
+        let destination_blobs = BlobStore::new(MemoryBackend::new());
         let fetched = receive_transfer(&destination_sync, &destination_blobs, &incoming[0])
             .await
             .unwrap();
         assert_eq!(fetched.transfer_id, manifest.transfer_id);
 
-        let normalize_edges = |graph: &kernel::graph::Graph| {
-            let mut edges: Vec<_> = graph
-                .to_snapshot()
-                .resource_edges
-                .iter()
-                .map(|edge| serde_json::to_string(edge).unwrap())
-                .collect();
-            edges.sort();
-            edges
-        };
-        let expected_resource_edges = normalize_edges(source.graph());
-        let file_resource = source
-            .graph()
-            .shown_resource_id(source.graph().get_node_key_by_id(file).unwrap())
-            .unwrap();
-        let url_resource = source
-            .graph()
-            .shown_resource_id(source.graph().get_node_key_by_id(url).unwrap())
-            .unwrap();
-        assert!(
-            source
-                .graph()
-                .find_resource_edge_key(file_resource, url_resource)
-                .is_some()
-        );
-
         // Everything the source contributes ends here.
         source_sync.close().await.unwrap();
         drop(source_blobs);
-        drop(source);
 
-        let mut destination = MereHost::empty(
-            destination_backend.clone(),
-            selected(),
-            fixture_handlers(),
-            AccessContext {
-                persona: PERSONA.to_string(),
-                device: format!("personae://device/{}", hex(&destination_sync.node_id())),
-                at_ms: 1_700_000_003_000,
-            },
+        assert_eq!(
+            fetched, manifest,
+            "the manifest off the wire is the one the source staged"
         );
-        let mut destination_authority = destination_backend.clone();
-        let receipt = apply_transfer(
-            &mut destination,
-            &destination_blobs,
-            &destination_blobs,
-            &mut destination_authority,
+        for descriptor in &fetched.blobs {
+            let key = muniment_hash(descriptor.content_hash).unwrap();
+            assert_eq!(
+                destination_blobs.get(&key).await.unwrap().as_deref(),
+                Some(FILE_BYTES),
+                "every byte the manifest names is in the destination's own store"
+            );
+        }
+        // Re-summarizing the fetched manifest decodes its selection again,
+        // here, with the source gone.
+        let resummarized = offer_for(
             &fetched,
-            &ApplyTransferContext {
-                authorization: TransferAuthorization {
-                    grant_id: offered.pairing_id.clone(),
-                    revoked: false,
-                },
-                application: "graphshell".to_string(),
-                handler: "graphshell.transfer/v1".to_string(),
-                completed_at_ms: 1_700_000_003_500,
-                access_privacy: PrivacyClass::LocalOnly,
-            },
+            offered.manifest_blob,
+            offered.manifest_byte_len,
+            offered.pairing_id.clone(),
+            offered.offered_at_ms,
         )
-        .await
         .unwrap();
+        assert_eq!(resummarized, offered, "the offer's summary held");
 
-        assert_eq!(receipt.nodes, 2);
-        assert_eq!(
-            receipt.relations, 0,
-            "the protocol counts Surface relation records"
-        );
-        assert_eq!(receipt.nodes, offered.nodes, "the offer's summary held");
-        assert_eq!(receipt.relations, offered.relations);
-        assert!(
-            receipt
-                .id_map
-                .iter()
-                .all(|ids| ids.source == ids.destination),
-            "replicate preserves ids"
-        );
-        assert!(destination.graph().get_node_by_id(url).is_some());
-        assert!(destination.graph().get_node_by_id(file).is_some());
-        let file_key = destination.graph().get_node_key_by_id(file).unwrap();
-        let url_key = destination.graph().get_node_key_by_id(url).unwrap();
-        assert_eq!(
-            destination.graph().shown_resource_id(file_key),
-            Some(file_resource)
-        );
-        assert_eq!(
-            destination.graph().shown_resource_id(url_key),
-            Some(url_resource)
-        );
-        assert!(
-            destination
-                .graph()
-                .node_content_tags(file_key)
-                .unwrap()
-                .contains("file")
-        );
-        assert!(destination.graph().node_tags(file_key).unwrap().is_empty());
-        let (handle, payload) = destination
-            .graph()
-            .projected_relations_between(file_key, url_key)
-            .next()
-            .unwrap();
-        assert!(matches!(handle, kernel::graph::RelationKey::Resource(_)));
-        assert!(
-            payload.has_relation(kernel::graph::RelationSelector::Semantic(
-                kernel::graph::SemanticSubKind::Cites
-            ))
-        );
-        assert_eq!(
-            normalize_edges(destination.graph()),
-            expected_resource_edges,
-            "all Resource assertion handles, sources, scopes and metadata survive the source closing"
-        );
-
-        // The bytes a browser would pull are the bytes that were applied.
+        // The bytes a browser would pull are the bytes that were staged.
         // Derived from the local store, so this also proves the release list
         // survives the source being gone.
         let released = released_blobs_for(&destination_sync, &fetched)
@@ -611,42 +536,8 @@ mod tests {
         .await
         .unwrap();
 
-        let (source, backend, url, file) = source_host(sync.node_id());
-        let blobs = BlobStore::new(backend.clone());
-        let mut authority = backend.clone();
-        let manifest = prepare_transfer(
-            &source,
-            &mut authority,
-            &blobs,
-            TransferRequest {
-                transfer_id: Uuid::new_v4(),
-                operation: TransferOperation::Replicate,
-                source: endpoint(sync.node_id()),
-                destination: endpoint([0xa8; 32]),
-                route: TransferRouteV1 {
-                    carrier: "personal-sync".to_string(),
-                    peer: hex(&[0xa8; 32]),
-                },
-                selection: ExportRequest {
-                    focused: file,
-                    selected: vec![file, url],
-                    scope: TransferScope::SelectedSubgraph,
-                    exported_at_ms: 1_700_000_000_500,
-                    include_local_file_locations: true,
-                    scene: None,
-                },
-                access_policy: AccessTransferPolicy::ExcludeSourceHistory,
-                privacy: PrivacyClass::TrustedPeersOnly,
-            },
-            vec![graphshell::transfer::TransferBlobInput {
-                node_id: file,
-                role: "primary".to_string(),
-                media_type: "text/plain".to_string(),
-                bytes: FILE_BYTES.to_vec(),
-            }],
-        )
-        .await
-        .unwrap();
+        let blobs = BlobStore::new(MemoryBackend::new());
+        let manifest = source_manifest(sync.node_id(), [0xa8; 32], &blobs).await;
 
         let refused = offer_transfer(&sync, &blobs, &manifest, "pairing-s3", 1_700_000_002_000)
             .await

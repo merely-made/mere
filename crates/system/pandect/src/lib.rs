@@ -143,6 +143,14 @@ pub mod persona_settings_store;
 // (engine split D69, from the reference app, as it was).
 #[cfg(all(feature = "personal-sync", not(target_arch = "wasm32")))]
 pub mod personal_sync;
+// The graph-selection codicil and its checked decode, and the records a
+// transfer writes (engine split D70, from the reference app). Ungated: the
+// app's export and transfer build them for the browser too.
+pub mod product_codicil;
+pub mod transfer;
+// Transfer offers over the personal graph (D70), beside the sync they ride.
+#[cfg(all(feature = "personal-sync", not(target_arch = "wasm32")))]
+pub mod transfer_offer;
 pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so

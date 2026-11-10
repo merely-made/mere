@@ -29,7 +29,7 @@ use uuid::Uuid;
 
 use crate::door::browser_host::now_ms;
 use crate::sync::graph_keys::{GraphKeyError, GraphKeyGroup};
-use graphshell::transfer_offer::{TransferOfferV1, offers_in, transfer_offer_rule};
+use pandect::transfer_offer::{TransferOfferV1, offers_in, transfer_offer_rule};
 
 use crate::door::identity_endpoint::{
     SupplementalCard, TRANSFER_ACCEPT_INTENT, TRANSFER_ACCEPT_SCHEMA,
@@ -1484,7 +1484,7 @@ mod roster_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell::transfer_offer::TRANSFER_OFFER_FACET;
+    use pandect::transfer_offer::TRANSFER_OFFER_FACET;
     use personae::{IdentityProvider, InMemoryProvider};
     use uuid::Uuid;
 
@@ -1809,7 +1809,7 @@ mod tests {
         let offer = TransferOfferV1 {
             schema: TRANSFER_OFFER_FACET.to_string(),
             transfer_id: Uuid::from_u128(0x95),
-            operation: graphshell::transfer::TransferOperation::Copy,
+            operation: pandect::transfer::TransferOperation::Copy,
             source: endpoint_for(&hosts[0]),
             destination: endpoint_for(&hosts[1]),
             pairing_id: "pairing-live".to_string(),
@@ -1822,7 +1822,7 @@ mod tests {
             offered_at_ms: now_ms(),
         };
         hosts[0]
-            .author(graphshell::transfer_offer::offer_events(&offer).unwrap())
+            .author(pandect::transfer_offer::offer_events(&offer).unwrap())
             .await
             .unwrap();
 
@@ -1903,8 +1903,8 @@ mod tests {
         host.close().await.unwrap();
     }
 
-    fn endpoint_for(host: &PersonalSyncHost) -> graphshell::transfer::TransferEndpointV1 {
-        graphshell::transfer::TransferEndpointV1 {
+    fn endpoint_for(host: &PersonalSyncHost) -> pandect::transfer::TransferEndpointV1 {
+        pandect::transfer::TransferEndpointV1 {
             graph: format!("graphshell://graph/{}", hex(&host.graph())),
             persona: "personae://persona/owner".to_string(),
             device: format!("personae://device/{}", hex(&host.node_id())),
@@ -2451,13 +2451,13 @@ mod tests {
         let offer = TransferOfferV1 {
             schema: TRANSFER_OFFER_FACET.to_string(),
             transfer_id: Uuid::from_u128(0xb3),
-            operation: graphshell::transfer::TransferOperation::Copy,
-            source: graphshell::transfer::TransferEndpointV1 {
+            operation: pandect::transfer::TransferOperation::Copy,
+            source: pandect::transfer::TransferEndpointV1 {
                 graph: "graphshell://graph/accept".to_string(),
                 persona: "personae://persona/owner".to_string(),
                 device: device.clone(),
             },
-            destination: graphshell::transfer::TransferEndpointV1 {
+            destination: pandect::transfer::TransferEndpointV1 {
                 graph: "graphshell://graph/accept".to_string(),
                 persona: "personae://persona/owner".to_string(),
                 device,
@@ -2471,7 +2471,7 @@ mod tests {
             blob_bytes: 44,
             offered_at_ms: 1_700_000_000_000,
         };
-        host.author(graphshell::transfer_offer::offer_events(&offer).unwrap())
+        host.author(pandect::transfer_offer::offer_events(&offer).unwrap())
             .await
             .unwrap();
 

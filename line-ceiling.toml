@@ -337,7 +337,7 @@ reason = "Small, host-neutral state for a disclosed practice workspace. Existing
 
 [[exception]]
 path = "ports/graphshell/src/product.rs"
-reason = "Daily graph-product operations composed from Mere's portable graph and canvas surfaces. Existing source-size debt; a responsibility split must preserve TransferScope, RelationFamilyFilter, EditableRelation and existing module visibility."
+reason = "Daily graph-product operations composed from Mere's portable graph and canvas surfaces. Existing source-size debt; a responsibility split must preserve RelationFamilyFilter, EditableRelation and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/query_views.rs"
@@ -353,7 +353,7 @@ reason = "Retained content tests. Existing source-size debt; a responsibility sp
 
 [[exception]]
 path = "ports/graphshell/src/transfer.rs"
-reason = "Portable graph-selection transfer between independent Graphshell stores. Existing source-size debt; a responsibility split must preserve TransferOperation, AccessTransferPolicy, TransferEndpointV1 and existing module visibility."
+reason = "Portable graph-selection transfer between independent Graphshell stores. Existing source-size debt; a responsibility split must preserve TransferAuthorization, TransferRequest, TransferBlobInput and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/web_appearance.rs"
@@ -516,10 +516,6 @@ reason = "This device's membership in one personal graph's key group. Existing s
 [[exception]]
 path = "ports/mere-resident/src/sync/personal_sync_host.rs"
 reason = "Resident owner of Graphshell's durable personal-graph replica. Existing source-size debt; a responsibility split must preserve PersonalSyncHostConfig, PersonalSyncHostError, PersonalSyncHost and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/src/sync/transfer_staging.rs"
-reason = "Stage-and-forward: putting every byte a transfer names onto the destination before anything is applied. Existing source-size debt; a responsibility split must preserve StagingError and existing module visibility."
 
 [[exception]]
 path = "ports/mere-resident/tests/inference_automatic.rs"
