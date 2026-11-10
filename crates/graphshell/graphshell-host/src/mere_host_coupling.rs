@@ -6,7 +6,7 @@
 
 //! Exact coupling writes use the graph journal, not a second field store.
 use super::*;
-use mere::coupling_edit::StrengthDraft;
+use crate::coupling_edit::StrengthDraft;
 use kernel::graph::{Coupling, CouplingId};
 
 /// The journal channel one coupling's saved strength edits and undo travel on.

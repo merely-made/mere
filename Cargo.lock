@@ -6957,7 +6957,6 @@ dependencies = [
  "graphshell-endpoint",
  "incipit",
  "insigne",
- "mere",
  "mere-fleece",
  "mere-kernel",
  "mere-overmap",

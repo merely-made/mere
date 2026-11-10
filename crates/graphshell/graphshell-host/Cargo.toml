@@ -102,7 +102,6 @@ mere-host = [
     "dep:incipit",
     "incipit/view",
     "dep:kernel",
-    "dep:mere",
     "dep:mere-overmap",
     "dep:muniment",
     "dep:pandect",
@@ -152,9 +151,6 @@ pandect = { workspace = true, optional = true }
 mere-overmap = { workspace = true, optional = true }
 url = { version = "2", optional = true }
 scenograph = { workspace = true, optional = true }
-# `coupling_edit`, which lives in the facade itself (engine split D58
-# dissolves it later); every other facade path is named at its crate.
-mere = { path = "../../mere", default-features = false, features = ["graph"], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # An invitation's network id and session (`invitation`).

@@ -39,7 +39,7 @@
 //! | `native` | [`carrier`], [`invitation`], [`line`], [`lifecycle`], [`session_loop`], [`session_notices`], [`endpoint_catalog`], [`projection_host`], [`network_carrier`], [`policy_projection`], and the host halves of [`webrtc_door`] |
 //! | `coop` | [`coop`] (the owner, the guest, `control` and `network`; on top of `native` and `custody-client`) |
 //! | `webrtc-session` | `webrtc_session` and [`projection_host`]'s WebRTC door |
-//! | `mere-host` | [`mere_host`], [`handlers`], [`session_item`], [`resident_host`] (the mere endpoint closure, engine split D68) |
+//! | `mere-host` | [`mere_host`], [`coupling_edit`], [`handlers`], [`session_item`], [`resident_host`] (the mere endpoint closure, engine split D68) |
 //! | `test-support` | `mere_host::placement_test_graph`, for products' tests (a dev-dependency feature only) |
 //!
 //! The default build, `admission` and no features at all build for
@@ -58,6 +58,8 @@ pub mod coop;
 pub mod carrier;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod endpoint_catalog;
+#[cfg(feature = "mere-host")]
+pub mod coupling_edit;
 #[cfg(feature = "mere-host")]
 pub mod handlers;
 #[cfg(feature = "goal-surface")]

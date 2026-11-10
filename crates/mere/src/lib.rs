@@ -22,8 +22,6 @@ pub use incipit::forme;
 #[cfg(feature = "canvas")]
 pub use pictograph::canvas;
 #[cfg(feature = "graph")]
-pub mod coupling_edit;
-#[cfg(feature = "graph")]
 pub use kernel;
 // Turnstone still names `mere::navigation`; retire with its repoint.
 #[cfg(feature = "graph")]
