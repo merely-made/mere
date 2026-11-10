@@ -514,6 +514,17 @@ are named nowhere. Steps, in dependency order:
   - Done when: `cargo tree -i mere` finds no package in any family lock root, and the family
     cycle checker passes. The name is then free for P5's engine crate.
 
+**Slice 3 landed (2026-11-10).** `crates/mere` is deleted (Mere `ec7ba066e`). No family manifest
+names the package, and `cargo tree -i mere` finds none in Mere, its web root, Turnstone
+(`fd57dd3f`), Cleromancy's three roots (`2d02f65`) or Knot (`e0b3374`); no other family lock
+carried one. The cycle checker exits 0 over 35 repositories and 92 lock roots. Isocosm and
+Murm never named the facade. Repoints: 438 in Mere, 369 in Turnstone, 100 in Cleromancy.
+Feature sets were compared before and after and are identical in Mere; outside it, Turnstone
+drops the unused `linked-data` default, Cleromancy's `core` and `authority-guest` drop the
+unused `incipit/arrangement`, and `graphshell-blocks` keeps genet-parley's `complex-scripts`
+through a direct row. Not verified: anything headed, Turnstone's non-default feature builds,
+and full test suites beyond the app's lib tests and the moved tests.
+
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
