@@ -243,3 +243,25 @@ fn held_pair_lookup_reads_only_the_pair_in_scan_order() {
     assert_eq!(again, RelationKey::Resource(ResourceEdgeKey::from_raw(parallel)));
     assert_eq!(reasserted.statement_id, held.statement_id);
 }
+
+#[test]
+fn surfaces_showing_a_resource_follow_reshowing_and_removal() {
+    let mut graph = Graph::new();
+    let [a, b] = ["a", "b"]
+        .map(|name| graph.add_node(format!("https://example.org/{name}"), Default::default()));
+    let (ra, rb) = (
+        graph.ensure_surface_resource(a).unwrap(),
+        graph.ensure_surface_resource(b).unwrap(),
+    );
+    let (ia, ib) = (graph.get_node(a).unwrap().id, graph.get_node(b).unwrap().id);
+    assert_eq!(graph.surface_ids_showing_resource(ra), vec![ia]);
+    assert!(graph.set_shown_resource(ia, Some(rb)));
+    assert!(graph.surface_ids_showing_resource(ra).is_empty());
+    let mut both = vec![ia, ib];
+    both.sort();
+    assert_eq!(graph.surface_ids_showing_resource(rb), both);
+    assert!(graph.remove_node(a));
+    assert_eq!(graph.surface_ids_showing_resource(rb), vec![ib]);
+    assert!(graph.set_shown_resource(ib, None));
+    assert!(graph.resource_surfaces.is_empty());
+}

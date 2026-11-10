@@ -115,10 +115,10 @@ impl Graph {
 
     /// Surface identities showing a resource, in stable order.
     pub fn surface_ids_showing_resource(&self, resource_id: Uuid) -> Vec<Uuid> {
-        self.shown_resources
-            .iter()
-            .filter_map(|(surface, resource)| (*resource == resource_id).then_some(*surface))
-            .collect()
+        self.resource_surfaces
+            .get(&resource_id)
+            .map(|surfaces| surfaces.iter().copied().collect())
+            .unwrap_or_default()
     }
 
     pub fn resource_record(&self, id: Uuid) -> Option<PersistedResourceRecord> {
@@ -291,14 +291,30 @@ impl Graph {
         if self.shown_resources.get(&surface).copied() == resource {
             return false;
         }
-        if let Some(resource) = resource {
-            self.shown_resources.insert(surface, resource);
+        let previous = if let Some(resource) = resource {
+            self.resource_surfaces
+                .entry(resource)
+                .or_default()
+                .insert(surface);
             self.appearance_admission_revision = self.appearance_admission_revision.wrapping_add(1);
+            self.shown_resources.insert(surface, resource)
         } else {
-            self.shown_resources.remove(&surface);
+            self.shown_resources.remove(&surface)
+        };
+        if let Some(previous) = previous {
+            self.unlink_shown_surface(previous, surface);
         }
         self.bump_revision();
         true
+    }
+
+    pub(crate) fn unlink_shown_surface(&mut self, resource: Uuid, surface: Uuid) {
+        if let Some(surfaces) = self.resource_surfaces.get_mut(&resource) {
+            surfaces.remove(&surface);
+            if surfaces.is_empty() {
+                self.resource_surfaces.remove(&resource);
+            }
+        }
     }
 
     pub(crate) fn persisted_resource_edges_between(

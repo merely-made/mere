@@ -367,6 +367,9 @@ pub struct Graph {
     pub(crate) resource_facets: chartulary::FacetStore<Uuid>,
     /// Explicit surface UUID to resource UUID associations.
     pub(crate) shown_resources: BTreeMap<Uuid, Uuid>,
+    /// `shown_resources` inverted: the surfaces showing each resource. Kept
+    /// in step by `set_shown_resource` and node removal, its only writers.
+    pub(crate) resource_surfaces: BTreeMap<Uuid, std::collections::BTreeSet<Uuid>>,
 
     /// Atomic optional metadata keyed by stable node id. This is the single
     /// live authority persisted by the host as `facets.json`; snapshot columns

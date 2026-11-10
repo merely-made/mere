@@ -77,18 +77,13 @@ impl Graph {
     ) -> Result<Option<(RelationKey, String)>, StatementWriteError> {
         let mut matches = std::collections::BTreeMap::new();
         for (key, payload) in self
-            .resource_relations()
-            .filter(|(_, source, target, _)| *source == from && *target == to)
-            .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload))
+            .resource_relations_on_pair(from, to)
+            .into_iter()
+            .map(|(key, payload)| (RelationKey::Resource(key), payload))
             .chain(
-                self.inner
-                    .inner()
-                    .edge_references()
-                    .filter(|edge| {
-                        self.shown_resource_id(edge.source()) == Some(from)
-                            && self.shown_resource_id(edge.target()) == Some(to)
-                    })
-                    .map(|edge| (RelationKey::Surface(edge.id()), edge.weight())),
+                self.surface_edges_showing_pair(from, to)
+                    .into_iter()
+                    .map(|(key, payload)| (RelationKey::Surface(key), payload)),
             )
         {
             for statement in payload

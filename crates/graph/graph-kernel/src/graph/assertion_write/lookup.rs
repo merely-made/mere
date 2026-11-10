@@ -54,7 +54,7 @@ impl Graph {
 
     /// Resource relations from `from` to `to`, in `resource_relations` order
     /// (by edge index), without walking the others.
-    fn resource_relations_on_pair(
+    pub(super) fn resource_relations_on_pair(
         &self,
         from: Uuid,
         to: Uuid,
@@ -70,6 +70,37 @@ impl Graph {
             .map(|edge| (ResourceEdgeKey::from_raw(edge.id()), edge.weight()))
             .collect();
         edges.sort_by_key(|(key, _)| key.raw());
+        edges
+    }
+
+    /// Surface edges whose endpoints show `from` and `to`, by edge index, read
+    /// through the surfaces showing each Resource instead of every edge.
+    pub(super) fn surface_edges_showing_pair(
+        &self,
+        from: Uuid,
+        to: Uuid,
+    ) -> Vec<(crate::graph::EdgeKey, &EdgePayload)> {
+        let showing = |resource: Uuid| -> Vec<NodeKey> {
+            self.resource_surfaces
+                .get(&resource)
+                .into_iter()
+                .flatten()
+                .filter_map(|surface| self.inner.key_of(surface))
+                .collect()
+        };
+        let (sources, targets) = (showing(from), showing(to));
+        let graph = self.inner.inner();
+        let mut edges: Vec<_> = sources
+            .iter()
+            .flat_map(|source| {
+                targets
+                    .iter()
+                    .flat_map(move |target| graph.edges_connecting(*source, *target))
+            })
+            .map(|edge| (edge.id(), edge.weight()))
+            .collect();
+        edges.sort_by_key(|(key, _)| *key);
+        edges.dedup_by_key(|(key, _)| *key);
         edges
     }
 }

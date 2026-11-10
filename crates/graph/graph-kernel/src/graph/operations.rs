@@ -16,6 +16,7 @@ impl Graph {
             resources: chartulary::Graph::new(),
             resource_facets: chartulary::FacetStore::new(),
             shown_resources: BTreeMap::new(),
+            resource_surfaces: BTreeMap::new(),
             facets: chartulary::FacetStore::new(),
             url_to_nodes: HashMap::new(),
             import_records: Vec::new(),
@@ -251,7 +252,9 @@ impl Graph {
             }
             let node_id = node.id;
             self.surface_node_lifetimes.remove(&node_id);
-            self.shown_resources.remove(&node_id);
+            if let Some(resource) = self.shown_resources.remove(&node_id) {
+                self.unlink_shown_surface(resource, node_id);
+            }
             self.remove_facets_for_node(node_id);
             let removed_id = node_id.to_string();
             for record in &mut self.import_records {
