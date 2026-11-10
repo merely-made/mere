@@ -37,7 +37,7 @@ use chirograph::{
     ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion,
     ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest, SemanticRole,
 };
-use graphshell::access::AccessContext;
+use pandect::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
 use djinn::door::app_admission::AppRouteGrants;
@@ -2470,7 +2470,7 @@ mod tests {
             .find(|(_, n)| n.id == Uuid::from_u128(1))
             .unwrap()
             .0;
-        let history = graphshell::access::access_history(&material, key).unwrap();
+        let history = pandect::access::access_history(&material, key).unwrap();
         assert_eq!(history.records.len(), 1);
         assert_eq!(history.records[0].handler, handler.id);
         assert!(history.records[0].at_ms > 0);
@@ -2498,7 +2498,7 @@ mod tests {
             .unwrap()
             .0;
         assert_eq!(
-            graphshell::access::access_history(&material, key).unwrap(),
+            pandect::access::access_history(&material, key).unwrap(),
             history
         );
     }

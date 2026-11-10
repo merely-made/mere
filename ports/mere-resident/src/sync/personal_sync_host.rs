@@ -35,7 +35,7 @@ use crate::door::identity_endpoint::{
     SupplementalCard, TRANSFER_ACCEPT_INTENT, TRANSFER_ACCEPT_SCHEMA,
 };
 use crate::door::identity_projection::IdentityProjectionAction;
-use graphshell::personal_sync::{
+use pandect::personal_sync::{
     KeyAgreementEvent, KeyAgreementStep, PersonalGraphError, PersonalGraphEvent, PersonalGraphExt,
     PersonalGraphIdentityError, PersonalGraphReplica, SyncRoster, SyncSelection, accept_into,
     personal_graph_identity_salt,
@@ -233,7 +233,7 @@ impl PersonalSyncHost {
         // before anything is projected, because until it does this device may
         // hold sealed operations it has the key for and does not know it.
         let caught_up =
-            graphshell::personal_sync::key_agreement(&replica.sync_store(), config.graph)
+            pandect::personal_sync::key_agreement(&replica.sync_store(), config.graph)
                 .await
                 .map_err(PersonalSyncHostError::Graph)?;
         if !caught_up.is_empty() {
@@ -593,7 +593,7 @@ impl PersonalSyncHost {
         self.blob_authority.retain(self.blob_scope, hash);
         let blob = hash.to_bytes();
         self.author(vec![PersonalGraphEvent::ObserveBlobAvailability {
-            observation: graphshell::personal_sync::BlobAvailabilityObservation {
+            observation: pandect::personal_sync::BlobAvailabilityObservation {
                 record_id: Uuid::new_v4(),
                 container_id: container,
                 blob,
@@ -821,12 +821,12 @@ impl PersonalSyncHost {
     pub async fn key_group_exists(&self) -> Result<bool, PersonalSyncHostError> {
         let steps = {
             let replica = self.replica.lock().await;
-            graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
+            pandect::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
         };
         Ok(steps.iter().any(|step| {
             matches!(
                 step.step,
-                graphshell::personal_sync::KeyAgreementEvent::Dispatch(_)
+                pandect::personal_sync::KeyAgreementEvent::Dispatch(_)
             )
         }))
     }
@@ -883,7 +883,7 @@ impl PersonalSyncHost {
             let mut group = self.key_group.lock().await;
             let replica = self.replica.lock().await;
             let steps =
-                graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?;
+                pandect::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?;
             group
                 .absorb_admitted(&steps, replica.roster())
                 .map_err(key_error)?;
@@ -1091,7 +1091,7 @@ impl PersonalSyncHost {
         };
         let steps = {
             let replica = self.replica.lock().await;
-            graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
+            pandect::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
         };
         let (current_roots, historical_roots) =
             sealing_roots(self.graph, &steps, &members, mine, self.own_root);
@@ -1513,7 +1513,7 @@ mod tests {
                 title: "Resident graph node".into(),
             },
             PersonalGraphEvent::ObserveBlobAvailability {
-                observation: graphshell::personal_sync::BlobAvailabilityObservation {
+                observation: pandect::personal_sync::BlobAvailabilityObservation {
                     record_id: Uuid::from_u128(0x64),
                     container_id: node,
                     blob: [0x65; 32],

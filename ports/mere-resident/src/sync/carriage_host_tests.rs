@@ -207,7 +207,7 @@ mod lane {
 mod attached {
     use super::*;
     use crate::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
-    use graphshell::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
+    use pandect::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
     use personae::{IdentityProvider, InMemoryProvider};
     use uuid::Uuid;
 

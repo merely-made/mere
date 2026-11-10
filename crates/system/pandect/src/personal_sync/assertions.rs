@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::{EdgeAssertion, Graph, PersonalGraphError, PersonalGraphEvent, RelationSelector};
-use mere::kernel::graph::{EdgeFamily, RelationKind, SemanticStatement};
-use mere::kernel::types::{AssertionBasis, GraphScope};
+use kernel::graph::{EdgeFamily, RelationKind, SemanticStatement};
+use kernel::types::{AssertionBasis, GraphScope};
 use std::collections::BTreeMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use stickleback::Reject;
@@ -305,7 +305,7 @@ pub(super) fn retract_legacy(
                 edge.held_assertions()
                     .filter(|s| {
                         s.provenance_iri.as_deref() == Some(asserter)
-                            && mere::kernel::graph::edge_payload::selector_matches_kind(
+                            && kernel::graph::edge_payload::selector_matches_kind(
                                 selector,
                                 s.relation_kind(),
                             )
@@ -329,7 +329,7 @@ pub(super) fn retract_legacy(
 #[cfg(test)]
 mod lifecycle_tests {
     use super::*;
-    use mere::kernel::graph::{
+    use kernel::graph::{
         ArrangementSubKind, ContainmentSubKind, ImportedSubKind, ProvenanceSubKind, SemanticSubKind,
     };
     use std::collections::HashSet;
@@ -564,7 +564,7 @@ mod lifecycle_tests {
             statement_id: Some("urn:assertion:same-reason".into()),
             asserted_at_ms: Some(10),
             basis: Some(AssertionBasis {
-                method: Some(mere::kernel::types::AssertionMethod {
+                method: Some(kernel::types::AssertionMethod {
                     iri: "urn:method:extractor".into(),
                     version: Some(version.into()),
                 }),

@@ -346,7 +346,7 @@ async fn the_lane_without_a_distillery_lane_is_refused_before_anything_opens() {
 async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     use distillery::inference::{InferenceDevice, RunJournal, load_library_session};
     use mere_resident::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
-    use graphshell::personal_sync::{SyncRoster, SyncSelection};
+    use pandect::personal_sync::{SyncRoster, SyncSelection};
     use p2panda_core::{Body, Header, Operation, SigningKey};
     use personae::IdentityProvider;
 

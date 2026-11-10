@@ -13,8 +13,8 @@ use eidetic::{
     SchemaRef, Timestamp, TrustEnvelope, TrustLevel, TypedPayload, list_typed, load_typed_sealed,
     save_schema, save_typed_sealed,
 };
-use mere::kernel::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
-use mere::kernel::graph::{Graph, NodeKey};
+use kernel::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
+use kernel::graph::{Graph, NodeKey};
 use muniment::Backend;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -457,11 +457,11 @@ pub fn record_observation(
 /// a `PayloadSealer` in". These tests are what makes that sentence stop being
 /// true for access records, and they check the three properties the seam
 /// promises rather than only that the call compiles.
-#[cfg(all(test, feature = "native"))]
+#[cfg(all(test, not(target_arch = "wasm32")))]
 mod seal_wiring {
     use super::*;
+    use crate::PersonaId;
     use muniment::MemoryBackend;
-    use pandect::{PersonaId};
     use sporran::{KeyEpochId, WalletEpochSealer};
 
     const ADDRESS: &str = "https://example.invalid/private-lane-probe";

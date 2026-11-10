@@ -16,6 +16,9 @@ description = "Session manifests, graph and view sidecars, worker declarations, 
 [features]
 # The furnace's graph passes (forgetting, consolidation), moved from Athanor.
 furnace = []
+# The personal graph's device synchronization (engine split D69): the
+# Stickleback and p2panda closure, off by default so the default stays light.
+personal-sync = ["dep:p2panda-core", "dep:p2panda-store", "dep:stickleback", "dep:thiserror"]
 
 [dependencies]
 async-trait = "0.1"
@@ -51,6 +54,11 @@ chartulary.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "1", features = ["serde", "v4", "v5"] }
+# personal-sync only.
+p2panda-core = { package = "p2mere-core", version = "0.9", optional = true }
+p2panda-store = { package = "p2mere-store", version = "0.9", default-features = false, optional = true }
+stickleback = { workspace = true, optional = true }
+thiserror = { version = "1", optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # The reservoir's durable index (reservoir.rs): muniment's redb file backend,
@@ -73,6 +81,11 @@ pollster = "0.4"
 # The real fjall-backed Store, for the graph-codicil persistence test that proves
 # a codicil survives a store close + reopen (the "survives restart" condition).
 muniment = { workspace = true, features = ["fjall"] }
+# access's and personal_sync's async tests; personal_sync's two-device test
+# joins a real space over the transport.
+murm-sync.workspace = true
+transport = { workspace = true, features = ["test-identity"] }
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "time"] }
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 muniment = { workspace = true, features = ["indexeddb"] }

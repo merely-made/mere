@@ -157,7 +157,7 @@ pub fn pairing_facts<P: IdentityProvider + ?Sized>(
     };
     let graph = personal_graph_id(&sync.graph);
     let transport_key = identity
-        .derive_keypair(&graphshell::personal_sync::personal_graph_identity_salt(
+        .derive_keypair(&pandect::personal_sync::personal_graph_identity_salt(
             graph,
         ))
         .map_err(|error| {

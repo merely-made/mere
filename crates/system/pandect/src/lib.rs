@@ -42,6 +42,8 @@
 
 // Application-scoped preferences live under the host's data root rather than
 // in one session's settings sidecar.
+// Portable address-access history (engine split D69, from the reference app).
+pub mod access;
 pub mod addressable_graph;
 pub mod application_settings_store;
 // Durable content-addressed store for node preview imagery (favicons, previews,
@@ -137,6 +139,10 @@ pub mod script_bindings_store;
 // distinct from the session/dataspace settings_store and the application/device
 // stores; first field is the configurable menu.
 pub mod persona_settings_store;
+// The personal graph's device synchronization over Stickleback and p2panda
+// (engine split D69, from the reference app, as it was).
+#[cfg(all(feature = "personal-sync", not(target_arch = "wasm32")))]
+pub mod personal_sync;
 pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so

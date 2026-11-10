@@ -26,7 +26,7 @@ use crate::sync::personal_sync_host::{
     PersonalSyncHost, PersonalSyncHostConfig, PersonalSyncHostError,
 };
 use crate::sync::transfer_staging::{receive_transfer, released_blobs_for};
-use graphshell::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
+use pandect::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
 
 const PERSONAL_GRAPH_DOMAIN: &[u8] = b"mere.graphshell/personal-graph/v1";
 

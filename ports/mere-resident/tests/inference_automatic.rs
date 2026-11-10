@@ -104,7 +104,7 @@ async fn exercise(native: bool) {
 
 async fn exercise_inner(native: bool) {
     use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-    use graphshell::personal_sync::{SyncRoster, SyncSelection};
+    use pandect::personal_sync::{SyncRoster, SyncSelection};
     use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
     use ostiary::app_admission::AppId;
     use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;

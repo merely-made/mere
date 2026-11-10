@@ -11,21 +11,21 @@
 //! and LogSync join/drain used by Commons and Knot.
 
 use insigne::CheckFault;
-use personae::AttestationKeys;
+use identity::AttestationKeys;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use eidetic::PrivacyClass;
 use insigne::DerivedKeyAttestation;
-use mere::kernel::geometry::PortablePoint;
-use mere::kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
-use mere::kernel::graph::{Author, EdgeAssertion, Graph, RelationSelector};
-use mere::kernel::types::AssertionBasis;
+use kernel::geometry::PortablePoint;
+use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+use kernel::graph::{Author, EdgeAssertion, Graph, RelationSelector};
+use kernel::types::AssertionBasis;
 use muniment::Backend;
 use p2panda_core::cbor::{decode_cbor_strict, encode_cbor};
 use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
 use p2panda_store::topics::TopicStore;
-use personae::{IdentityError, IdentityProvider};
+use identity::{IdentityError, IdentityProvider};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use stickleback::{
@@ -40,8 +40,7 @@ use uuid::Uuid;
 mod assertions;
 
 use crate::access::{ACCESS_HISTORY_FACET, AccessHistory, AccessRecord};
-use mere::canvas::saved_scene;
-use pandect::{SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3, SavedSceneV2};
+use crate::{SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3, SavedSceneV2};
 
 pub const PERSONAL_GRAPH_LOG: u64 = 0;
 pub const PERSONAL_GRAPH_LIMITS: CausalLimits = CausalLimits {
@@ -1161,7 +1160,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonalGraphReplica<B> {
                 event,
                 PersonalGraphEvent::RetractRelation {
                     selector: RelationSelector::Semantic(_)
-                        | RelationSelector::Family(mere::kernel::graph::EdgeFamily::Semantic),
+                        | RelationSelector::Family(kernel::graph::EdgeFamily::Semantic),
                     ..
                 }
             ) {
@@ -1834,13 +1833,13 @@ fn relation_key(assertion: &EdgeAssertion) -> String {
 mod tests {
     use super::*;
     use crate::access::{AccessAction, AccessTransition};
-    use pandect::CartographyGeometry;
-    use mere::kernel::graph::{
+    use crate::CartographyGeometry;
+    use kernel::graph::{
         ArrangementSubKind, ContainmentSubKind, EdgeFamily, ImportedSubKind, ProvenanceSubKind,
         RelationKind, SemanticSubKind,
     };
     use muniment::{MemoryBackend, RedbBackend};
-    use personae::{IdentityProvider, InMemoryProvider};
+    use identity::{IdentityProvider, InMemoryProvider};
     use std::sync::Arc;
     use std::time::Duration;
     use murm_sync::JoinedSpace;
@@ -1931,7 +1930,7 @@ mod tests {
 
     fn assertion_statements(
         projection: &SyncProjection,
-    ) -> Vec<mere::kernel::graph::SemanticStatement> {
+    ) -> Vec<kernel::graph::SemanticStatement> {
         let from = projection.graph.get_node_key_by_id(A).unwrap();
         let to = projection.graph.get_node_key_by_id(B).unwrap();
         projection
@@ -2103,7 +2102,7 @@ mod tests {
             assert!(statement.asserted_at_ms.is_some());
             assert_eq!(
                 statement.graph_scope,
-                mere::kernel::types::GraphScope::Default
+                kernel::types::GraphScope::Default
             );
             assert_eq!(statement.basis.note.as_deref(), Some("signed sync fixture"));
             assert_eq!(
@@ -2259,7 +2258,7 @@ mod tests {
                 .author(vec![PersonalGraphEvent::RetractRelation {
                     from: A,
                     to: B,
-                    selector: mere::kernel::graph::RelationSelector::Arrangement(
+                    selector: kernel::graph::RelationSelector::Arrangement(
                         ArrangementSubKind::TileGroup,
                     ),
                 }])
@@ -2646,7 +2645,7 @@ mod tests {
 
     #[tokio::test]
     async fn p1_sync_legacy_retraction_keeps_exact_claims_in_both_stores() {
-        use mere::kernel::persistence::{
+        use kernel::persistence::{
             PersistedEdge, PersistedEdgeFamily, PersistedSemanticStatement,
             PersistedSemanticSubKind,
         };
@@ -2660,14 +2659,14 @@ mod tests {
         .into_iter()
         .map(|(asserter, id, at)| PersistedSemanticStatement {
             statement_id: id.into(),
-            predicate: mere::kernel::graph::predicate_iri(SemanticSubKind::Supports).into(),
+            predicate: kernel::graph::predicate_iri(SemanticSubKind::Supports).into(),
             recognized_sub_kind: Some(PersistedSemanticSubKind::Supports),
             label: Some("held Surface claim".into()),
             basis: AssertionBasis {
                 note: Some("held Surface claim".into()),
                 ..Default::default()
             },
-            graph_scope: mere::kernel::types::GraphScope::Default,
+            graph_scope: kernel::types::GraphScope::Default,
             provenance_iri: Some(asserter.clone()),
             asserted_at_ms: Some(at),
             first_asserted_ms: Some(at),
@@ -3507,7 +3506,7 @@ mod tests {
             .unwrap();
         let (_, bundle) = stickleback::GroupSession::new(
             stickleback::GroupSessionId(GRAPH),
-            &personae::InMemoryProvider::from_seed([0x75; 32]),
+            &identity::InMemoryProvider::from_seed([0x75; 32]),
         )
         .unwrap();
         let published = replica
@@ -3552,7 +3551,7 @@ mod tests {
         );
         let (_, bundle) = stickleback::GroupSession::new(
             stickleback::GroupSessionId(GRAPH),
-            &personae::InMemoryProvider::from_seed([0x77; 32]),
+            &identity::InMemoryProvider::from_seed([0x77; 32]),
         )
         .unwrap();
         let mixed = replica
@@ -3757,192 +3756,6 @@ mod tests {
         );
     }
 
-    /// The deepest nesting of arrays, maps and tags in definite-length CBOR,
-    /// what cbor-core's recursion limit (200) counts.
-    fn cbor_nesting(bytes: &[u8]) -> usize {
-        fn argument(bytes: &[u8], at: &mut usize, info: u8) -> u64 {
-            let width = match info {
-                0..=23 => return u64::from(info),
-                24 => 1,
-                25 => 2,
-                26 => 4,
-                27 => 8,
-                _ => panic!("indefinite lengths are not deterministic CBOR"),
-            };
-            let value = bytes[*at..*at + width]
-                .iter()
-                .fold(0u64, |v, b| (v << 8) | u64::from(*b));
-            *at += width;
-            value
-        }
-        fn item(bytes: &[u8], at: &mut usize, depth: usize, deepest: &mut usize) {
-            let head = bytes[*at];
-            *at += 1;
-            let n = argument(bytes, at, head & 0x1f);
-            let children = match head >> 5 {
-                2 | 3 => {
-                    *at += n as usize;
-                    0
-                },
-                4 => n,
-                5 => 2 * n,
-                6 => 1,
-                _ => 0,
-            };
-            if matches!(head >> 5, 4..=6) {
-                *deepest = (*deepest).max(depth + 1);
-            }
-            for _ in 0..children {
-                item(bytes, at, depth + 1, deepest);
-            }
-        }
-        let (mut at, mut deepest) = (0, 0);
-        item(bytes, &mut at, 0, &mut deepest);
-        assert_eq!(at, bytes.len(), "one item, read whole");
-        deepest
-    }
-
-    /// F110: a depth-32 dynamics spec round-trips through a personal graph
-    /// record's CBOR (cbor-core's recursion limit, 200); derive refuses 33.
-    #[test]
-    fn a_depth_32_dynamics_spec_round_trips_through_the_record_cbor() {
-        use mere::canvas::dynamics_spec::{DynamicsSpec, Node, Stage, Stop};
-        let chain = |depth: usize| {
-            let mut node = Node::preset("spring.rapier");
-            for _ in 1..depth {
-                node = Node::Schedule {
-                    stages: vec![Stage {
-                        node,
-                        stop: Stop::Rest,
-                        capture: None,
-                    }],
-                    weight: 1.0,
-                    overlays: Vec::new(),
-                };
-            }
-            DynamicsSpec::new(node)
-        };
-        for depth in [32, 33] {
-            let spec = chain(depth);
-            let record = PersonalGraphRecord {
-                events: vec![PersonalGraphEvent::SaveScene {
-                    node: A,
-                    scene: SavedSceneV2 {
-                        name: "Deep spec".into(),
-                        selected: vec![A],
-                        layout_strategy: Some("grid.default".into()),
-                        physics_paused: true,
-                        physics_damping: 0.7,
-                        physics_law: "spring.rapier".into(),
-                        physics_overlays: Vec::new(),
-                        physics_kind_source: "site".into(),
-                        physics_group_source: "site".into(),
-                        physics_mass_source: "degree".into(),
-                        physics_depth_source: "roots".into(),
-                        arrangement_pull: 0.4,
-                        arrangement_roles: None,
-                        dynamics: Some(saved_scene::saved_dynamics(&spec)),
-                        camera_offset: (0.0, 0.0),
-                        camera_zoom: 1.0,
-                        default_handler: "graphshell.inspect".into(),
-                        cartography: CartographyGeometry::default(),
-                    },
-                }],
-                parents: Vec::new(),
-                writer_attestation: None,
-            };
-            let bytes = encode_cbor(&record).expect("encodes");
-            println!(
-                "depth {depth}: record CBOR nesting {} (cbor-core limit 200), {} bytes",
-                cbor_nesting(&bytes),
-                bytes.len()
-            );
-            let back: PersonalGraphRecord =
-                decode_cbor_strict(bytes.as_slice()).expect("decodes within cbor-core's limit");
-            let PersonalGraphEvent::SaveScene { scene, .. } = &back.events[0] else {
-                panic!("the event comes back as it went");
-            };
-            assert_eq!(saved_scene::read_dynamics(scene.dynamics.as_ref().unwrap()), Ok(spec));
-            assert_eq!(
-                encode_cbor(&back).unwrap(),
-                bytes,
-                "byte for byte, deterministic"
-            );
-            assert_eq!(
-                saved_scene::scene_from_v2(scene.clone())
-                    .and_then(|scene| saved_scene::scene_spec(&scene).map(|_| ()))
-                    .is_err_and(|e| e.contains("33 deep")),
-                depth == 33
-            );
-        }
-    }
-
-    /// F114: a record carrying a scene whose spec this reader refuses still
-    /// decodes; the spec rides opaque, and that scene's open alone fails.
-    #[test]
-    fn a_refused_spec_fails_its_scenes_open_not_the_record() {
-        use mere::canvas::dynamics_spec::{DynamicsSpec, Node};
-        let spec = DynamicsSpec::new(Node::preset("spring.rapier"));
-        let mut newer = serde_json::to_value(&spec).unwrap();
-        newer["version"] = serde_json::json!(2);
-        newer["realization"] = serde_json::json!({ "anneal": { "cooling": 0.99 } });
-        let scene = |dynamics: serde_json::Value| SavedSceneV2 {
-            name: "Newer spec".into(),
-            selected: vec![A],
-            layout_strategy: Some("grid.default".into()),
-            physics_paused: true,
-            physics_damping: 0.7,
-            physics_law: "spring.rapier".into(),
-            physics_overlays: Vec::new(),
-            physics_kind_source: "site".into(),
-            physics_group_source: "site".into(),
-            physics_mass_source: "degree".into(),
-            physics_depth_source: "roots".into(),
-            arrangement_pull: 0.4,
-            arrangement_roles: None,
-            dynamics: Some(serde_json::from_value(dynamics).unwrap()),
-            camera_offset: (0.0, 0.0),
-            camera_zoom: 1.0,
-            default_handler: "graphshell.inspect".into(),
-            cartography: CartographyGeometry::default(),
-        };
-        let record = PersonalGraphRecord {
-            events: vec![
-                PersonalGraphEvent::SaveScene {
-                    node: A,
-                    scene: scene(newer),
-                },
-                PersonalGraphEvent::SaveScene {
-                    node: B,
-                    scene: scene(serde_json::to_value(&spec).unwrap()),
-                },
-            ],
-            parents: Vec::new(),
-            writer_attestation: None,
-        };
-        let bytes = encode_cbor(&record).expect("encodes");
-        let back: PersonalGraphRecord =
-            decode_cbor_strict(bytes.as_slice()).expect("the record decodes whole");
-        let opened: Vec<Result<(), String>> = back
-            .events
-            .iter()
-            .map(|event| match event {
-                PersonalGraphEvent::SaveScene { scene, .. } => saved_scene::scene_from_v2(scene.clone())
-                    .and_then(|scene| saved_scene::scene_spec(&scene).map(|_| ())),
-                _ => unreachable!("two scenes"),
-            })
-            .collect();
-        assert_eq!(
-            opened[0],
-            Err(
-                "dynamics spec: at version: dynamics spec version 2 is newer than this \
-                 reader's 1"
-                    .into()
-            )
-        );
-        assert_eq!(opened[1], Ok(()), "the other scene in the record opens");
-    }
-
     /// F158: a version-4 scene travels as an ordinary facet, so a record
     /// carrying one decodes on any device and folds into the facet store
     /// opaque; the facets the typed scene event writes stay reserved to it,
@@ -3950,7 +3763,7 @@ mod tests {
     /// it opens.
     #[test]
     fn a_version_4_scene_travels_as_an_opaque_facet() {
-        use pandect::SAVED_SCENE_FACET;
+        use crate::SAVED_SCENE_FACET;
         assert!(validate_facet_name(SAVED_SCENE_FACET).is_ok());
         for reserved in [SAVED_SCENE_FACET_V3, SAVED_SCENE_FACET_V2] {
             assert_eq!(

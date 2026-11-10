@@ -66,7 +66,7 @@ fn poll_pending_once<F: Future>(future: Pin<&mut F>) {
     assert!(matches!(future.poll(&mut context), Poll::Pending));
 }
 
-fn projection_has_node(projection: &graphshell::personal_sync::SyncProjection, id: Uuid) -> bool {
+fn projection_has_node(projection: &pandect::personal_sync::SyncProjection, id: Uuid) -> bool {
     projection.graph.get_node_key_by_id(id).is_some()
 }
 

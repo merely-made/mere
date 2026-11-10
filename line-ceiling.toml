@@ -191,6 +191,14 @@ path = "crates/system/pandect/src/manifest_store.rs"
 reason = "In-memory + on-disk store for [GraphSessionManifest]s. Existing source-size debt; a responsibility split must preserve ManifestStore, LoadReport, LoadFailure and existing module visibility."
 
 [[exception]]
+path = "crates/system/pandect/src/personal_sync.rs"
+reason = "H7 personal-device synchronization for Graphshell's local Mere graph. Existing source-size debt; a responsibility split must preserve PersonalEncryption, PersonalGraphExt, PersonalGraphEvent and existing module visibility."
+
+[[exception]]
+path = "crates/system/pandect/src/personal_sync/assertions.rs"
+reason = "Assertions. Existing source-size debt; a responsibility split must preserve AssertionOwner, IdentityIndex and existing module visibility."
+
+[[exception]]
 path = "crates/system/pandect/src/snapshot_merge.rs"
 reason = "Snapshot-level merge for codicil compose (Alembic tail B7 / decision 1). Existing source-size debt; a responsibility split must preserve MergeReport and existing module visibility."
 
@@ -318,14 +326,6 @@ reason = "Mere graph truth adapted to Graphshell's portable endpoint vocabulary.
 [[exception]]
 path = "ports/graphshell/src/mere_host_fixture.rs"
 reason = "The H1 reference fixture: literal demo truth for [MereHost]. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "ports/graphshell/src/personal_sync.rs"
-reason = "H7 personal-device synchronization for Graphshell's local Mere graph. Existing source-size debt; a responsibility split must preserve PersonalEncryption, PersonalGraphExt, PersonalGraphEvent and existing module visibility."
-
-[[exception]]
-path = "ports/graphshell/src/personal_sync/assertions.rs"
-reason = "Assertions. Existing source-size debt; a responsibility split must preserve AssertionOwner, IdentityIndex and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/practice_disclosure.rs"

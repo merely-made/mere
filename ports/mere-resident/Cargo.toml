@@ -163,7 +163,8 @@ insigne = { workspace = true, features = ["verify"] }
 custody-wire.workspace = true
 muniment.workspace = true
 notochord.workspace = true
-pandect.workspace = true
+# The personal graph replica and events, and access history (engine split D69).
+pandect = { workspace = true, features = ["personal-sync"] }
 sporran.workspace = true
 personae = { workspace = true, features = ["ssh"] }
 # The receipt hosts' and the native picker's SSH keys (`src/bin/h4*`), and

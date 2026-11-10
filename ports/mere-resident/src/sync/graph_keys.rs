@@ -27,7 +27,7 @@ use stickleback::{
     GroupSessionId,
 };
 
-use graphshell::personal_sync::{
+use pandect::personal_sync::{
     KeyAgreementEvent, KeyAgreementStep, PersonalGraphEvent, SyncRoster,
 };
 
