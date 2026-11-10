@@ -476,6 +476,23 @@ module moves to its owner below both sides. No route is added. Steps, in depende
 Another session is active in `ports/mere-resident`; each step rebases before it lands and
 touches the resident last.
 
+**Slice 2 landed (2026-11-10).** `mere-resident` names the reference app nowhere (Mere
+`cc5d2161d`), and `cargo tree -i graphshell` finds no package in the resident, Cleromancy
+(`704ac93`), Woodshed (`de16948e`), Knot (`13a729b`) or Turnstone (`ce581fd5`). The family
+cycle checker exits 0 over 35 repositories and 92 lock roots. Where each module went:
+`declaration` to `graphshell-door`; `carriage`, `receipts` and `receipt_ingest` to the
+resident's `sync/` (D81, D92); `kept_text` to Eidetic; `access`, `personal_sync`,
+`transfer_offer`, the transfer records and the codicil decode to pandect (D69, D70); `coop`,
+the goal surface's provider, facts and door, and the mere endpoint closure to `graphshell-host`
+features (D88, D91, D68); `BlockEditor` to cambium (D73, D90); the block adapter contract to
+`block-adapter` (D95 to D97); the resident's MCP tests to Turnstone (D82). The app keeps
+`ProductHost`, `CaptureHost` and `WorkshopHost` as extension traits over `MereHost` (D93, D94).
+Left open: `graphshell-host`'s `mere-host` feature names the `mere` facade once, for
+`mere::coupling_edit`, which slice 3 moves with the facade (D58); `mere-host` costs 462 crates
+because `MereHost` uses pictograph's canvas; Cleromancy's `inference_sync` and `situation_sync`
+tests call a now-private `Graph::facets_mut()` and did not compile before this slice either;
+no moved code was checked headed, and only the moved tests were run.
+
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
