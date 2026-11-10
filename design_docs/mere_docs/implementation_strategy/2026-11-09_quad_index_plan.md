@@ -1,7 +1,7 @@
 # The quad index: implementation plan
 
 **Date**: 2026-11-09
-**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 in progress in its lane, nothing landed. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
+**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); P2 in its lane. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
 **Related**: the brief (the measurement in its §1, the shape in §3, the budget in §4); the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows); Eidetic's chartulary notes (`eidetic/design_docs/eidetic_docs/technical_architecture/2026-07-08_chartulary_g0.md` to `g2`); doctrine Stack 1, Stack 3, Stack 6, Stack 7.
 
 ## What the brief ruled, carried here
@@ -31,6 +31,7 @@ A new module of `crates/chartulary`, generic over the term type, with no new dep
 - A short note `eidetic/design_docs/eidetic_docs/technical_architecture/2026-11-09_chartulary_g3_quads.md` in the G0 to G2 form, citing the Mere brief and this plan by path, with its `DOC_README.md` line.
 - Done when: the tests pass; `cargo clippy --locked -p chartulary --all-targets` is clean on native and `cargo check -p chartulary --target wasm32-unknown-unknown` passes; one commit on `eidetic` main through the hooks, pushed; Mere's lock then moves by `cargo update -p chartulary`.
 - Needs: nothing. Eidetic's `crates/chartulary` is 7,278 lines over 15 files today, none above 536.
+- **Landed 2026-11-10**, `eidetic` main `60f3d60`: `quads/mod.rs` 156, `dictionary.rs` 105, `index.rs` 263, `tests.rs` 405 lines; 122 chartulary tests pass, 10 new; `memory_bytes()` 3,840,200 at 80k generated quads; wasm check passes; G3 note `eidetic/design_docs/eidetic_docs/technical_architecture/2026-11-09_chartulary_g3_quads.md`. The lane's own calls, recorded there: `len()` counts stored rows, the default graph is never a named graph, and `TermId::from_u32`, `TermId::as_u32` and `Dictionary::get` exist for P2's unknown-term case. Mere's lock has not moved to it yet: the same Eidetic main carries stickleback on p2mere 0.10 (eidetic `aa71322`), and `cargo update -p chartulary` moves every Eidetic package together, after which `pandect` (19 errors in `crates/system/pandect/src/personal_sync.rs`, a second copy of `p2mere-core`) and `murm-sync` (10 errors) no longer build. The lock moves, and P2 starts, once that drift is repaired.
 
 ## P2. The engine seam in Mere
 
