@@ -48,6 +48,12 @@ fn materialize_wit() {
 
 fn main() {
     materialize_wit();
+    println!("cargo::rerun-if-env-changed=BLOCK_HOST_SKIP_FIXTURE");
+    // Product guests are supplied by the caller. Only the integration tests
+    // need the separate fixture workspace.
+    if std::env::var_os("BLOCK_HOST_SKIP_FIXTURE").is_some() {
+        return;
+    }
     let root = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR");
     for &(dir, artifact, watch) in GUESTS {
         build(Path::new(&root), dir, artifact, watch);
