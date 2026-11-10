@@ -1151,3 +1151,22 @@ load_image_bytes, delete_image_bytes, stored_image_hexes}`; nothing graph-free i
 - Tests: pandect `--features furnace` unit 261 to 264; default unit 250 to 256 (retention's 8
   compile without `furnace`); integration unchanged.
 - `cargo check --workspace --all-targets`: green, 1m23s.
+
+## 2026-11-09: P4 D45/D87, retention moved to eidetic::memory
+
+Eidetic 8e903bf (ff-pushed to main): `crates/eidetic-core/src/memory/{mod,levels,forgetting,retirement}.rs`,
+copied from pandect's `retention/` with `eidetic::` paths rewritten to `crate::`; feature
+`memory = ["content_store", "deleted"]`, added to `product`; README features and module rows.
+`eidetic::retention` untouched. Eidetic hooks (line ceiling, clippy) passed.
+- Eidetic: `cargo test -p eidetic` default 182 lib plus integration green (8 `memory::` tests among them);
+  `--no-default-features --features memory --lib` 99 passed, the 8 `memory::` tests included.
+
+Mere: pandect's `retention/` deleted (mod 29, levels 279, forgetting 94, retirement 134);
+`lib.rs` has `pub use eidetic::memory as retention` (public path kept); `memory_levels` and
+`furnace` re-export from `eidetic::memory`. Mere's eidetic row already carries `product`, so no
+feature edit. Relock by revision substitution only: 12 eidetic.git rows in `Cargo.lock` and 8 in
+`ports/graphshell/web/Cargo.lock`, 76481186 to 8e903bf1; `cargo metadata --locked` passes on both.
+- `cargo check --workspace --all-targets --locked`: green.
+- `cargo test -p pandect --features furnace --locked`: unit 264 to 256; default unit 256 to 248
+  (the 8 moved tests leave); integration unchanged.
+- `ports/graphshell/web`: `cargo check --target wasm32-unknown-unknown --locked`: green.

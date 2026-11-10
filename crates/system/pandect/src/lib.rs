@@ -112,9 +112,10 @@ pub mod merge_rules;
 // boundary-pass plan parked it.
 pub mod manifest;
 pub mod memory_levels;
-// The store-side memory program, bound for Eidetic (engine split D45): no
-// kernel or pandect types.
-pub mod retention;
+// The store-side memory program, now Eidetic's (engine split D45): no kernel or
+// pandect types.
+/// The retention passes live in Eidetic (engine split D45, D87); the path stays.
+pub use eidetic::memory as retention;
 pub mod manifest_store;
 // The session graph file's name and path (graph.json; GraphSession writes it);
 // native-only so the crate stays wasm-clean (wasm hosts use a different storage

@@ -30,9 +30,9 @@ use kernel::persistence::GraphSnapshot;
 use kernel::types::ImageRole;
 
 use crate::memory_levels::{EvictionPolicy, evictable_short_term};
-// The retention halves moved to `crate::retention` (engine split D45); their
+// The retention halves moved to `eidetic::memory` (engine split D45); their
 // names stay here for callers.
-pub use crate::retention::{
+pub use eidetic::memory::{
     ForgetProposal, RetirementProposal, apply_forgetting, apply_retirement, propose_retirement,
 };
 use crate::graph_codicil::{self, RedactionPolicy};

@@ -9,7 +9,7 @@
 //!
 //! Moved back from Alembic 2026-10-31 (distillery-extraction D12). Since engine
 //! split D45 this is the graph adapter: the levels, the policy and the census
-//! are `crate::retention::levels`, generic over node records; this module reads
+//! are `eidetic::memory::levels`, generic over node records; this module reads
 //! a mere's graph into them. This is the spine of Alembic slice C
 //! (the memory model). It is pure logic over
 //! a graph's persisted nodes plus per-node last-visit timing the host supplies, so
@@ -27,8 +27,8 @@ use std::collections::HashMap;
 
 use kernel::graph::{Graph, NodeKey};
 
-pub use crate::retention::levels::{EvictionPolicy, MemoryCensus, MemoryLevel, MemoryRecord};
-use crate::retention::levels;
+pub use eidetic::memory::levels::{EvictionPolicy, MemoryCensus, MemoryLevel, MemoryRecord};
+use eidetic::memory::levels;
 
 /// One graph node as the memory program sees it.
 struct GraphNodeMemory<'a> {

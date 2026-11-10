@@ -1370,6 +1370,14 @@ summary = "live_view is a graphshell-host feature; pandect no longer names incip
 draws_on = ["engine-split D39", "engine-split D44", "engine-split D78"]
 plans = ["engine-split"]
 
+[decisions."engine-split D87"]
+title = "The retention passes are eidetic::memory (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Memory levels, forgetting and retirement live in eidetic::memory behind a memory feature; eidetic::retention stays the custody module."
+draws_on = ["engine-split D45", "engine-split D50"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -2575,7 +2575,7 @@ dependencies = [
 [[package]]
 name = "chartulary"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "muniment",
  "petgraph 0.8.3",
@@ -5021,7 +5021,7 @@ dependencies = [
 [[package]]
 name = "eidetic"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "async-trait",
  "blake3",
@@ -5038,7 +5038,7 @@ dependencies = [
 [[package]]
 name = "eidetic-search"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "eidetic",
  "genet-text",
@@ -9212,7 +9212,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "semver",
  "serde",
@@ -9512,7 +9512,7 @@ dependencies = [
 [[package]]
 name = "mere-fjall"
 version = "2.11.2"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "byteorder",
  "byteview",
@@ -9549,7 +9549,7 @@ dependencies = [
 [[package]]
 name = "mere-framing"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "postcard",
  "serde",
@@ -9610,7 +9610,7 @@ dependencies = [
 [[package]]
 name = "mere-lsm-tree"
 version = "2.10.4"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "byteorder",
  "crossbeam-skiplist",
@@ -9718,7 +9718,7 @@ source = "git+https://github.com/merely-made/inker.git?branch=main#20815afb0ddc8
 [[package]]
 name = "mere-proofs"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "blake3",
  "serde",
@@ -10170,7 +10170,7 @@ dependencies = [
 [[package]]
 name = "muniment"
 version = "0.2.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "async-trait",
  "blake3",
@@ -14861,7 +14861,7 @@ dependencies = [
 [[package]]
 name = "servitor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "chartulary",
  "insigne",
@@ -15494,7 +15494,7 @@ dependencies = [
 [[package]]
 name = "state-witness"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "mere-framing",
  "postcard",
@@ -15516,7 +15516,7 @@ checksum = "33ae9eec00137a8eed469fb4148acd9fc6ac8c3f9b110f52cd34698c8b5bfa0e"
 [[package]]
 name = "stickleback"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/eidetic.git?branch=main#76481186083aff0a6afd5a09420b96b697f86926"
+source = "git+https://github.com/merely-made/eidetic.git?branch=main#8e903bf15936935bd1369547310877d52429ab63"
 dependencies = [
  "blake3",
  "cbor-core",
