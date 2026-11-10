@@ -1593,20 +1593,6 @@ area = "Faces"
 summary = "A Knot link's face keys on the canonical file address of the document it resolves to."
 plans = ["iconography"]
 
-[decisions."iconography D3"]
-title = "Guest pages take faces from a host style layer (Mark, 2026-11-10)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-09_iconography_plan.md"
-area = "Faces"
-summary = "Faces on guest pages come from a host-only stylesheet, never the guest DOM."
-plans = ["iconography"]
-
-[decisions."iconography D4"]
-title = "Knot keys a link's face on the resolved file's address (Mark, 2026-11-10)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-09_iconography_plan.md"
-area = "Faces"
-summary = "A Knot link's face keys on the canonical file address of the document it resolves to."
-plans = ["iconography"]
-
 [decisions."key-lane D1"]
 title = "Prekeys travel on the lane (Mark, 2026-11-06)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
