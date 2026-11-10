@@ -9,7 +9,7 @@ Written 2026-11-09 against Mere main `75e26f56e` (the indexed dataset brief's ru
 ## mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md
 
 - disposition: current
-- status line: "plan, 2026-11-09; D1 to D3 ruled the same day; nothing implemented." — accurate: yes
+- status line: "plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 in progress in its lane, nothing landed." — accurate: yes (updated 2026-11-10)
 - claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims

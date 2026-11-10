@@ -1581,6 +1581,38 @@ summary = "The engine ships the held-dataset handle and its currency check; cons
 draws_on = ["indexed-dataset D4", "mere:stack.1"]
 plans = ["quad-index"]
 
+[decisions."quad-index D4"]
+title = "Orderings are ordinals into one base table (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
+area = "The stack"
+summary = "The six orderings are sorted ordinals into one base table of rows, 4.48 MB at 80k quads."
+draws_on = ["indexed-dataset D3"]
+plans = ["quad-index"]
+
+[decisions."quad-index D5"]
+title = "TermId is a NonZeroU32 with the default graph at u32::MAX (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
+area = "The stack"
+summary = "TermId is a NonZeroU32; u32::MAX is the default graph; Option<TermId> is 4 bytes."
+draws_on = ["indexed-dataset D2"]
+plans = ["quad-index"]
+
+[decisions."quad-index D6"]
+title = "Every (quad, meta) row is kept; a pattern yields each quad once per view, held first (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
+area = "The stack"
+summary = "Rows keep every asserter's record; a pattern read yields a quad once per view, a held row first."
+draws_on = ["indexed-dataset D5", "quad-index D1"]
+plans = ["quad-index"]
+
+[decisions."quad-index D7"]
+title = "graph_names and contains_graph take the View (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
+area = "The stack"
+summary = "The graph listings take the view, so a graph whose rows are all withdrawn is absent from a live read."
+draws_on = ["indexed-dataset D5"]
+plans = ["quad-index"]
+
 [decisions."ranged-fetch D1"]
 title = "One handle, three calls"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"

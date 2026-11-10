@@ -1,7 +1,7 @@
 # The quad index: implementation plan
 
 **Date**: 2026-11-09
-**Status**: plan, 2026-11-09; D1 to D3 ruled the same day; nothing implemented. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
+**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 in progress in its lane, nothing landed. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
 **Related**: the brief (the measurement in its §1, the shape in §3, the budget in §4); the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows); Eidetic's chartulary notes (`eidetic/design_docs/eidetic_docs/technical_architecture/2026-07-08_chartulary_g0.md` to `g2`); doctrine Stack 1, Stack 3, Stack 6, Stack 7.
 
 ## What the brief ruled, carried here
@@ -26,7 +26,7 @@ A new module of `crates/chartulary`, generic over the term type, with no new dep
 
 - `Dictionary<T: Hash + Eq + Clone>`: `intern(T) -> TermId`, `lookup(&T) -> Option<TermId>`, `resolve(TermId) -> &T`, `len()`. Append-only; a rebuild makes a new one (D2, D4). `TermId` is a `u32` newtype; one value is reserved for the default graph.
 - `Quad { subject, predicate, object, graph: TermId }` plus `QuadMeta { held: bool, asserter: Option<TermId>, statement: Option<TermId> }`, the fields a filter needs beside the triple (brief §3).
-- `QuadIndex::build(impl IntoIterator<Item = (Quad, QuadMeta)>) -> QuadIndex`: dedups, then sorts the six orderings of D3. `pattern(subject: Option<TermId>, predicate: Option<TermId>, object: Option<TermId>, graph: Option<Option<TermId>>, view: View) -> impl Iterator<Item = (&Quad, &QuadMeta)>` picks the ordering whose prefix the bound positions fill and reads one contiguous range; `View::Live` skips withdrawn rows, `View::History` keeps them (D5). `graph_names()` and `contains_graph(TermId)` read the graph-first orderings. `len()`, `memory_bytes()` for the measurement.
+- `QuadIndex::build(impl IntoIterator<Item = (Quad, QuadMeta)>) -> QuadIndex`: one base table of rows, every distinct (quad, meta) kept (D6), and the six orderings of D3 as sorted ordinals into it (D4). `TermId` is a `NonZeroU32` with `DEFAULT_GRAPH = u32::MAX` (D5). `pattern(subject: Option<TermId>, predicate: Option<TermId>, object: Option<TermId>, graph: Option<Option<TermId>>, view: View) -> impl Iterator<Item = (&Quad, &QuadMeta)>` picks the ordering whose prefix the bound positions fill and reads one contiguous range; `View::Live` skips withdrawn rows, `View::History` keeps them (brief D5); a quad carried by several rows is yielded once per view, a held row first (D6). `graph_names(View)` and `contains_graph(TermId, View)` read the graph-first orderings and omit a graph whose rows are all outside the view (D7). `len()`, `memory_bytes()` for the measurement.
 - Tests: every one of the sixteen bound shapes, both views, against a brute-force filter over a generated dataset with duplicates and several graphs; the default graph as `Some(None)`; `graph_names`; and one test that indexes `chartulary::rdf::to_quads` of a sample graph, tying the module to the crate's own projection.
 - A short note `eidetic/design_docs/eidetic_docs/technical_architecture/2026-11-09_chartulary_g3_quads.md` in the G0 to G2 form, citing the Mere brief and this plan by path, with its `DOC_README.md` line.
 - Done when: the tests pass; `cargo clippy --locked -p chartulary --all-targets` is clean on native and `cargo check -p chartulary --target wasm32-unknown-unknown` passes; one commit on `eidetic` main through the hooks, pushed; Mere's lock then moves by `cargo update -p chartulary`.
@@ -54,7 +54,7 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
 
 ## Decisions
 
-Ruled 2026-11-09, one round, before the plan was written.
+D1 to D3 ruled 2026-11-09, one round, before the plan was written. D4 to D7 ruled 2026-11-10 on the P1 lane's forks, measured by the lane with a scratch bench before they were asked.
 
 - **D1. Reifier metadata rows are stored as tuples (Mark, 2026-11-09):** asked how the first cut holds the ~75% of tuples that are reifier metadata (six orderings at 100k nodes: 77 MB stored, 19 MB derived on read). "Store them as tuples (Recommended)". Every pattern over a reifier is a range read like any other; memory is measured in P2; deriving on read stays a P3 refinement if the number asks for it. Outcome: applies indexed-dataset D3 and D5.
 
@@ -67,3 +67,19 @@ Ruled 2026-11-09, one round, before the plan was written.
 - **D3. The engine hands out the handle; consumer wiring is the consumer's (Mark, 2026-11-09):** asked whether the plan wires mere-view, the one caller today, to hold the dataset per revision. "Engine handle only; consumer wiring is the consumer's (Recommended)". P2 ships `IndexedDataset::for_graph` and `is_current`; a consumer adopts it in its own receipt. Outcome: applies Stack 1 ("the second host's adoption is that host's receipt").
 
   Links: area The stack · draws on mere:stack.1, indexed-dataset D4 · plans quad-index P2 · summary The engine ships the held-dataset handle and its currency check; consumers wire it themselves.
+
+- **D4. Orderings are ordinals into one base table (Mark, 2026-11-10):** P1 F1. The lane benched both layouts: ordinals cost 4.48 MB at 80k quads and 44.8 MB at 800k, and a wide range through a non-base ordering runs 2 to 10x slower (200k rows at 800k: 3.2 ms against 0.31 ms); six copies of the four ids cost 11.2 MB at 80k once each row reaches its meta, over the brief's cap. "Ordinals into one base table (Recommended)". The slower wide range is about 16 ns per row, far under the evaluator's cost per solution. Outcome: applies indexed-dataset D3 within the brief's §4 budget.
+
+  Links: area The stack · draws on indexed-dataset D3 · plans quad-index P1 · summary The six orderings are sorted ordinals into one base table of rows, 4.48 MB at 80k quads.
+
+- **D5. TermId is a NonZeroU32 with the default graph at u32::MAX (Mark, 2026-11-10):** P1 F2, against reserving 0 or u32::MAX on a plain u32. "NonZeroU32, DEFAULT_GRAPH = u32::MAX (Recommended)". `Option<TermId>` takes the niche and is 4 bytes; `QuadMeta` falls from 20 to 12 bytes; ids start at 1. Outcome: applies indexed-dataset D2.
+
+  Links: area The stack · draws on indexed-dataset D2 · plans quad-index P1 · summary TermId is a NonZeroU32; u32::MAX is the default graph; Option<TermId> is 4 bytes.
+
+- **D6. Every (quad, meta) row is kept; a pattern yields each quad once per view, held first (Mark, 2026-11-10):** P1 F3, the same quad carried by two asserters or by one held and one withdrawn row, against one row per quad with held winning, and against yielding every row. "Keep every (quad, meta) row; pattern yields each quad once per view, held first (Recommended)". No asserter's record is dropped at build; the evaluator never sees a duplicate solution. Outcome: applies indexed-dataset D5 and quad-index D1.
+
+  Links: area The stack · draws on indexed-dataset D5, quad-index D1 · plans quad-index P1 · summary Rows keep every asserter's record; a pattern read yields a quad once per view, a held row first.
+
+- **D7. graph_names and contains_graph take the View (Mark, 2026-11-10):** P1 F4. Mere's reserved history graph holds only withdrawn rows, so without a view a live query would list it among the named graphs. "Take the View (Recommended)". Outcome: applies indexed-dataset D5.
+
+  Links: area The stack · draws on indexed-dataset D5 · plans quad-index P1 · summary The graph listings take the view, so a graph whose rows are all withdrawn is absent from a live read.
