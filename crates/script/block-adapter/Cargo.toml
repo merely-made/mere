@@ -1,0 +1,27 @@
+# The block adapter contract (the trait, its types) and `GuestAdapter`, the native host of a
+# guest block adapter over `block-host`. App-agnostic: it reviews no pack and knows no app.
+[package]
+name = "block-adapter"
+version = "0.0.1"
+edition = "2021"
+
+rust-version = "1.97.1"
+license.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+# GuestAdapter and GuestEngine: the native host of a guest over block-host (wasmtime). Off,
+# the crate is the contract alone and builds for wasm.
+guest = ["dep:block-host"]
+
+[dependencies]
+block-host = { workspace = true, optional = true }
+sceno = { workspace = true }
+vector-sheet = { workspace = true }
+ciborium = "0.2"
+
+[lints]
+workspace = true

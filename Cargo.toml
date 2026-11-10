@@ -24,6 +24,7 @@ members = [
     # Turnstone (D36); gazette-ledger retired (D39).
     "crates/script/app-host",
     "crates/script/block-host",
+    "crates/script/block-adapter",
     "crates/script/authority-host",
     # Native WIT bindings (capability door D17-D19): the runtime and its generator.
     # ─── Absorbed 2026-07-23 (design_docs/.../2026-07-23_repo_consolidation_plan.md) ───
@@ -445,6 +446,7 @@ castellan-client = { version = "0.0.2", git = "https://github.com/merely-made/dr
 script-rhai = { version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
 script-wire = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 block-host = { version = "0.0.1", path = "crates/script/block-host" }
+block-adapter = { version = "0.0.1", path = "crates/script/block-adapter", default-features = false }
 authority-host = { version = "0.0.1", path = "crates/script/authority-host" }
 vector-sheet = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 script-witgen = { version = "0.0.1", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
