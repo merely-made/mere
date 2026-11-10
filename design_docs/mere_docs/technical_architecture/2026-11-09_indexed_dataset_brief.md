@@ -23,7 +23,7 @@ Materializing the dataset cost 94 ms at 1k and 827 ms at 10k.
 
 The cause is in `crates/graph/linked-data/src/query/dataset.rs`. `GraphDataset` implements `spareval::QueryableDataset` with `InternalTerm = Term` and an `internal_quads_for_pattern` that re-runs `dataset_quad_iter(graph)` over the whole graph for every pattern evaluation, cloning terms and deduplicating through a `HashSet`. A point lookup therefore costs the same as a predicate scan, and a join pays that scan once per binding: 1,000 bindings × 26 ms is the 21.6 s. The history entry point, `sparql_with_history`, already materializes an `oxrdf::Dataset` and so already runs at the right-hand column's speed; only the live path is slow.
 
-The 100k scale was not reached because building the graph is itself quadratic. Per phase at 500 / 1k / 2k nodes: `add_node` 1 / 2 / 3 ms, `assert_semantic_statement` 3 / 8 / 14 ms, `append_node_properties` 150 / 920 / 3,236 ms, and 257 s at 10k. `literal_handle_available` (`crates/graph/graph-kernel/src/graph/resource_properties.rs`) walks every held literal and every semantic statement per append to check a statement id is unused, deserializing each resource's properties facet as it goes. That is the kernel's and goes to its own session; the 100k row of the table above is measured once it lands.
+The 100k scale was not reached because building the graph is itself quadratic. Per phase at 500 / 1k / 2k nodes: `add_node` 1 / 2 / 3 ms, `assert_semantic_statement` 3 / 8 / 14 ms, `append_node_properties` 150 / 920 / 3,236 ms, and 257 s at 10k. `literal_handle_available` (`crates/graph/graph-kernel/src/graph/resource_properties.rs`) walks every held literal and every semantic statement per append to check a statement id is unused, deserializing each resource's properties facet as it goes. That went to its own session and landed on Mere main on 2026-11-10 (`handle_index.rs`, a derived statement-handle index; `append_node_properties` 7 / 16 / 36 / 101 ms at 1k / 2k / 4k / 10k); the 100k row is below.
 
 ### 2026-11-10: the indexed dataset (quad index plan P2)
 
@@ -41,6 +41,22 @@ Same instrument, release, 1k and 10k only (100k waits on the kernel session). Th
 | 10k | 80,000 | full scan, count | 411 ms | 7.6 ms | 38.2 ms |
 
 Index build (`for_graph`: projection walk, interning, six orderings) 38 ms at 1k and 329 ms at 10k, against materialization's 85 ms and 923 ms in the same run. `memory_bytes()` (the quad index, not the dictionary's terms) 384,168 bytes at 1k and 3,840,168 at 10k. Against §4 at 10k: point lookup 0.09 ms (target under 1 ms), two-hop join 9.6 ms (under 50 ms), bound predicate 1.4 ms and full scan 7.6 ms (within 2× of 5 ms and 40 ms), build 329 ms (within 2× of 827 ms), index 3.8 MB (under 10 MB). All met. A `sparql()` call costs about one index build. A host that queries per frame holds the dataset and rebuilds on `is_current` (plan D3). Graph build in this run: 2.6 s at 1k and 266 s at 10k, nearly all `append_node_properties`, as above.
+
+
+### 2026-11-10: 100k nodes, with the kernel's statement-id index landed
+
+Same instrument and columns as above, release, one run of `adapter_scale 100000` (800,000 quads). Row counts agreed in every cell.
+
+| nodes | quads | query | `sparql()` per call | held `IndexedDataset` | materialized `oxrdf::Dataset` |
+|---|---|---|---|---|---|
+| 100k | 800,000 | bound predicate, count | 2.92 s | 8.9 ms | 54 ms |
+| 100k | 800,000 | point lookup, one subject | 3.09 s | 0.19 ms | 0.28 ms |
+| 100k | 800,000 | two-hop join, count | 3.48 s | 61 ms | 205 ms |
+| 100k | 800,000 | full scan, count | 2.93 s | 66 ms | 362 ms |
+
+Index build 3.03 s; `memory_bytes()` 38,400,168 (48 bytes per quad, the six ordinal orderings plus the base row); materialization 8.64 s. The per-call `sparql()` column is the rebuild, about 3 s, which is why a consumer holds the dataset (plan D3) and why the rebuild-per-revision ruling (D4) says "then measure": at this scale a rebuild on every edit is not interactive, and the refresh numbers of P3 decide incremental maintenance.
+
+Graph build 89.6 s: `add_node` 0.3 s, `append_node_properties` 1.03 s (linear now), `assert_semantic_statement` 88.2 s. The last is the next kernel finding: 7 / 20 / 62 / 376 ms at 1k / 2k / 4k / 10k, faster than linear, its cause unconfirmed when its session opened (Mark, 2026-11-10: "Open a session to fix it now").
 
 ## 2. What the dataset is today
 
