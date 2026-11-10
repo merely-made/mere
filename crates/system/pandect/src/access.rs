@@ -51,8 +51,11 @@ fn access_record_schema() -> SchemaDefinition {
         .build()
 }
 
+/// Store the access record schema once. `tooling` is the writing program's
+/// provenance label, `name/version` (engine split D89).
 pub async fn bootstrap_access_record_schema<B: Backend>(
     store: &mut B,
+    tooling: &str,
 ) -> Result<(), eidetic::Error> {
     if eidetic::manifest::load_manifest(store, ACCESS_RECORD_SCHEMA_REF.0)
         .await?
@@ -67,7 +70,7 @@ pub async fn bootstrap_access_record_schema<B: Backend>(
         ProvenanceRecord {
             origin: ProvenanceOrigin::Generated,
             upstream: Vec::new(),
-            tooling: Some(format!("graphshell/{}", env!("CARGO_PKG_VERSION"))),
+            tooling: Some(tooling.to_string()),
             generated_at: Timestamp::ZERO,
         },
         TrustEnvelope {
@@ -169,11 +172,14 @@ impl TypedPayload for AccessRecord {
     }
 }
 
+/// Save an access record in cleartext. `tooling` is the writing program's
+/// provenance label (engine split D89).
 pub async fn save_access_record<B: Backend>(
     store: &mut B,
     record: &AccessRecord,
+    tooling: &str,
 ) -> Result<ManifestId, eidetic::Error> {
-    save_access_record_sealed(store, None, record).await
+    save_access_record_sealed(store, None, record, tooling).await
 }
 
 /// Save an access record, sealing it at rest when it belongs to the private
@@ -192,6 +198,7 @@ pub async fn save_access_record_sealed<B: Backend>(
     store: &mut B,
     sealer: Option<&dyn PayloadSealer>,
     record: &AccessRecord,
+    tooling: &str,
 ) -> Result<ManifestId, eidetic::Error> {
     save_typed_sealed(
         store,
@@ -202,7 +209,7 @@ pub async fn save_access_record_sealed<B: Backend>(
         ProvenanceRecord {
             origin: ProvenanceOrigin::Generated,
             upstream: Vec::new(),
-            tooling: Some(format!("graphshell-access/{}", env!("CARGO_PKG_VERSION"))),
+            tooling: Some(tooling.to_string()),
             generated_at: Timestamp(record.at_ms),
         },
         TrustEnvelope {
@@ -465,6 +472,8 @@ mod seal_wiring {
     use sporran::{KeyEpochId, WalletEpochSealer};
 
     const ADDRESS: &str = "https://example.invalid/private-lane-probe";
+    const SCHEMA_TOOLING: &str = "seal-probe/0.0.0";
+    const RECORD_TOOLING: &str = "seal-probe-access/0.0.0";
 
     fn record(privacy: PrivacyClass) -> AccessRecord {
         AccessRecord {
@@ -510,11 +519,11 @@ mod seal_wiring {
     #[tokio::test]
     async fn a_private_record_is_unreadable_on_disk_and_reads_back_through_the_sealer() {
         let mut store = MemoryBackend::new();
-        bootstrap_access_record_schema(&mut store).await.unwrap();
+        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING).await.unwrap();
         let sealer = sealer();
         let record = record(PrivacyClass::LocalOnly);
 
-        save_access_record_sealed(&mut store, Some(&sealer), &record)
+        save_access_record_sealed(&mut store, Some(&sealer), &record, RECORD_TOOLING)
             .await
             .unwrap();
 
@@ -536,11 +545,12 @@ mod seal_wiring {
     #[tokio::test]
     async fn a_reader_without_the_epoch_says_so_instead_of_reporting_no_history() {
         let mut store = MemoryBackend::new();
-        bootstrap_access_record_schema(&mut store).await.unwrap();
+        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING).await.unwrap();
         save_access_record_sealed(
             &mut store,
             Some(&sealer()),
             &record(PrivacyClass::LocalOnly),
+            RECORD_TOOLING,
         )
         .await
         .unwrap();
@@ -558,10 +568,10 @@ mod seal_wiring {
     #[tokio::test]
     async fn the_public_lane_stays_cleartext_under_the_same_sealer() {
         let mut store = MemoryBackend::new();
-        bootstrap_access_record_schema(&mut store).await.unwrap();
+        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING).await.unwrap();
         let record = record(PrivacyClass::PublicPortable);
 
-        save_access_record_sealed(&mut store, Some(&sealer()), &record)
+        save_access_record_sealed(&mut store, Some(&sealer()), &record, RECORD_TOOLING)
             .await
             .unwrap();
 
