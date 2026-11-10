@@ -962,3 +962,6 @@ or a precise reference alone, and no storage migration is selected here.
 - 2026-11-09: D13 (governed address kept; memorable names as a resolving
   layer), D14 (Tor via a patched arti directory cache) and D15 (retention by
   epochs or time) recorded.
+- 2026-11-09: `p2mere-*` 0.10.0 published (tag `p2mere-0.10.0`, `5ad4b99f`):
+  upstream p2panda v0.8.0 taken whole, including the spaces fix for members
+  added after earlier messages; consumers are still on 0.9.
