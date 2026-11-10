@@ -4,19 +4,17 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Pictograph's IconVG bytes lowered into Canvas's portable paint-list paths.
+//! Flat IconVG lowered to portable paint-list paths for Canvas and icon packaging.
 //!
 //! Canvas returns a netrender [`Scene`](netrender::Scene), so it cannot append the raw vello
 //! fragment exposed by pictograph's optional D2 bridge. The paint list already carries arbitrary
 //! paths and netrender fills them with non-zero winding. This small sink keeps Canvas device-free
 //! while preserving IconVG's fill rule at the renderer boundary.
 
-use emblem::{Host, Paint, Rgba, Sink};
+use emblem::{Host, Paint, Palette, Rgba, Sink};
 use paint_list_api::{
     ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, PathItem,
 };
-
-use crate::canvas::DerivedFacePalette;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
@@ -24,6 +22,20 @@ pub(crate) enum Error {
     EmptyViewBox,
     UnsupportedGradient,
 }
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Iconvg(error) => write!(f, "{error}"),
+            Self::EmptyViewBox => {
+                f.write_str("IconVG view box must have positive width and height")
+            },
+            Self::UnsupportedGradient => f.write_str("flat IconVG lowering cannot paint gradients"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 impl From<emblem::Error> for Error {
     fn from(error: emblem::Error) -> Self {
@@ -34,7 +46,7 @@ impl From<emblem::Error> for Error {
 /// Decode one generated face into screen-space paint commands bounded by `target`.
 pub(crate) fn commands(
     file: &[u8],
-    palette: DerivedFacePalette,
+    palette: &Palette,
     host_height: f32,
     target: LayoutRect,
 ) -> Result<Vec<PaintCmd>, Error> {
@@ -62,7 +74,7 @@ pub(crate) fn commands(
     emblem::execute(
         file,
         bytecode_at,
-        &crate::palette_from_rgba(palette.colors()),
+        palette,
         Host {
             features: 0,
             height: host_height,
@@ -179,8 +191,8 @@ mod tests {
         LayoutRect::new(LayoutPoint::new(0.0, 0.0), LayoutPoint::new(side, side))
     }
 
-    fn solid(color: [u8; 4]) -> DerivedFacePalette {
-        DerivedFacePalette::new([color; 8])
+    fn solid(color: [u8; 4]) -> Palette {
+        crate::palette_from_rgba([color; 8])
     }
 
     fn fills(commands: &[PaintCmd]) -> Vec<ColorF> {
@@ -196,8 +208,8 @@ mod tests {
     #[test]
     fn one_byte_vector_recolors_at_decode_time() {
         let file = crate::derive(b"mere://derived-face/recolor").unwrap();
-        let red = commands(&file, solid([255, 0, 0, 255]), 64.0, bounds(64.0)).unwrap();
-        let blue = commands(&file, solid([0, 0, 255, 255]), 64.0, bounds(64.0)).unwrap();
+        let red = commands(&file, &solid([255, 0, 0, 255]), 64.0, bounds(64.0)).unwrap();
+        let blue = commands(&file, &solid([0, 0, 255, 255]), 64.0, bounds(64.0)).unwrap();
 
         assert!(!fills(&red).is_empty());
         assert!(
@@ -215,9 +227,9 @@ mod tests {
     #[test]
     fn host_height_selects_the_embedded_lod_arm() {
         let file = crate::derive(b"mere://derived-face/lod").unwrap();
-        let palette = DerivedFacePalette::default();
-        let small = commands(&file, palette, 16.0, bounds(64.0)).unwrap();
-        let large = commands(&file, palette, 64.0, bounds(64.0)).unwrap();
+        let palette = Palette::default();
+        let small = commands(&file, &palette, 16.0, bounds(64.0)).unwrap();
+        let large = commands(&file, &palette, 64.0, bounds(64.0)).unwrap();
 
         assert_eq!(small.len(), 1, "the small arm is one bold fill");
         assert!(!large.is_empty());

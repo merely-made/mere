@@ -140,9 +140,9 @@ impl Canvas {
                         face.derive()
                             .expect("pictograph must encode every canonical node address")
                     });
-                let commands = crate::canvas::derived_face::commands(
+                let commands = crate::flat_icon::commands(
                     file,
-                    self.derived_face_palette,
+                    &crate::palette_from_rgba(self.derived_face_palette.colors()),
                     side,
                     bounds,
                 )

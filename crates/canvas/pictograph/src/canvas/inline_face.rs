@@ -58,7 +58,8 @@ pub fn inline_face_commands(
     rect: LayoutRect,
 ) -> Option<Vec<PaintCmd>> {
     let device_height = (rect.max.y - rect.min.y) * device_scale;
-    super::derived_face::commands(file, palette, device_height, rect).ok()
+    let palette = crate::palette_from_rgba(palette.colors());
+    crate::flat_icon::commands(file, &palette, device_height, rect).ok()
 }
 
 /// The image URL a host registers an address's face under and names in the

@@ -897,7 +897,6 @@ mod actions;
 pub(crate) mod at_rest;
 mod attention;
 mod cartography;
-mod derived_face;
 mod framing;
 mod gloss;
 mod grammar_view;

@@ -38,3 +38,29 @@ The standalone Graphshell web workspace passed
 on the same toolchain and lane. See `s1/graphshell-web-check.log` under
 the lane output and the guarded receipt
 `Code/output/build-storage-receipts/2026-11-10/build-c6399389bcf0492ea393240c67cf7603.json`.
+
+## 2026-11-10 · S2 Hocket icon pack
+
+Mere baseline `dda5a73d0`. Guarded Rust 1.99.1
+`test --locked --offline -p pictograph --no-default-features --features pack --lib --test symbols --test icon_pack -j 4`
+passed 32 tests. The two pack tests cover rejected IDs and destinations,
+repeatable output, all PNG dimensions and visible ink, and exact PNG payloads
+in both container directories. The `cells5` and S1 byte fixtures passed.
+The guarded receipt is
+`Code/output/build-storage-receipts/2026-11-10/build-c1f1fe1518d24558baf3e090fe6f90f9.json`.
+
+Two runs of the frozen pack binary on macOS 15.8.1 produced identical sets
+of 12 files. The first set is in `Code/output/pictograph-grammar/icons/hocket/`.
+The repeat set, binary, per-file SHA-256 list and decoder logs are under
+`Code/output/pictograph-grammar/s2/`. The manifest records IconVG SHA-256
+`28ab3cecb0fbc6842999033e2f2824578121b77bb40aae2ad4ae9a897b3fa3f1`.
+
+Preview opened the generated `icon.icns`. Apple's `iconutil` extracted the
+ten entries and ImageIO independently decoded those ten ICNS images and all
+seven ICO images. The configured SSH endpoint on o-pc timed out on two
+attempts. Windows Shell acceptance remains open.
+
+The standalone Graphshell web workspace passed
+`check --locked --offline --target wasm32-unknown-unknown --lib -j 4`.
+The lane log is `s2/graphshell-web-check.log` and the guarded receipt is
+`Code/output/build-storage-receipts/2026-11-10/build-90fb829f78bf48309ab79d4d5e5a8f22.json`.

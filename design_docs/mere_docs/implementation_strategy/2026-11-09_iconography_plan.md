@@ -5,12 +5,13 @@
 face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
 vector images); T4 (mentions, guest pages included), F1 (typed blazon
-source) and S1 (authored chrome symbols) landed 2026-11-10. Every other
-phase is open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
+source) and S1 (authored chrome symbols) landed 2026-11-10. S2 is implemented
+for Hocket and qualified on macOS. Windows Shell acceptance on o-pc is open.
+D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
-2026-11-10; every other fork carries a provisional recommendation. SVG output (emblem's
-plan) landed the same day.
+2026-11-10. The remaining forks carry provisional recommendations.
+Emblem’s SVG output landed 2026-11-09.
 
 **For:** Mark, 2026-11-09: "Let's consider additional faces/uses of
 emblem/pictograph?" Offered kinship faces with blazon, a text-height arm with
@@ -183,7 +184,7 @@ genet-livery lays out atomic inline boxes, but its replaced elements are `img`,
 - **Hosting without a dependency cycle.** Inker and genet supply Graphshell, so
   they must not depend on pictograph. Livery gains a generic replaced inline
   element that paints vector paths the embedder supplies (the paint-list paths
-  `canvas/derived_face.rs` already produces); the host fills it with the face.
+  `flat_icon.rs` produces); the host fills it with the face.
   The fallback is a raster `img` per (version, address, palette, pixel size).
 
 ## S. Authored symbols and app icons
@@ -203,9 +204,9 @@ a `Scene` headless (`examples/backdrop_receipt.rs`).
 
 **Design.**
 - **Home.** A `symbols` module in pictograph and a packaging binary behind a
-  `pack` feature (the only part that pulls vello-cpu). After D13 pictograph is
-  the faces crate, and authored pictures belong beside derived ones; a new crate
-  pair would spend two names for a module's worth of code.
+  `pack` feature that enables headless Vello CPU rendering independently of
+  Canvas. After D13, the pictograph faces crate will keep authored pictures
+  beside derived ones.
 - **Source form.** Each symbol is Rust code against emblem's `Writer`, with a
   coarse arm and a full arm. Its encoded bytes are committed as goldens and a
   test re-encodes them byte for byte; the bytes are output, never source.
@@ -217,10 +218,11 @@ a `Scene` headless (`examples/backdrop_receipt.rs`).
 - **App icons** use a fixed palette per app, because operating systems show them
   unthemed. One shared frame shape carries a per-app mark; hocket's existing mark
   is redrawn so its PNG becomes derived output.
-- **Packaging tool.** For an app id: decode at each required size with
-  `Host { height: size }`, render through the vello bridge and vello-cpu, write
-  PNG sets and `.icns` and `.ico` containers directly (both accept PNG entries),
-  with a small manifest of source hash, palette and sizes. Output goes to
+- **Packaging tool.** Decode the app icon at each required size with
+  `Host { height: size }`. Lower the flat paths through the shared paint-list
+  bridge and rasterize with Netrender’s Vello CPU backend. Write PNG sets,
+  embed them in `.icns` and `.ico` containers, and record the source hash,
+  palette and sizes in a manifest. Output goes to
   `Code/output/<lane>/icons/<app>/`; builds go through the build wrapper.
   Consumers: hocket's packager list, Woodshed's script (`CFBundleIconFile` and a
   copy step), and a window icon in the Cambium winit host for every app.
@@ -270,7 +272,7 @@ its nodes, as a per-frame grid of flat rects, capped at 2000 nodes, coloured by
 category. The signals pictograph already caches include communities, bridges,
 importance, recency, spectral coordinates and sites (`src/signals/registry.rs`).
 `cartography::Cluster` carries members, not geometry. The canvas's face
-lowering refuses gradients (`canvas/derived_face.rs:107`); the vello bridge
+lowering refuses gradients (`flat_icon.rs`); the vello bridge
 supports them.
 
 **Design.** A pure function `derive_backdrop(&ViewDigest) -> Vec<u8>` in
@@ -471,7 +473,7 @@ Provisional (recommended first; asked only if they become blocking):
 - 2026-11-09: the coarse 3×3 arm drops any cell under half filled (`lib.rs:374`),
   so small marks must be drawn into the coarse arm explicitly.
 - 2026-11-09: the canvas face lowering refuses gradients
-  (`canvas/derived_face.rs:107`); the vello bridge lowers linear and radial
+  (`flat_icon.rs`); the vello bridge lowers linear and radial
   gradients with all four spreads (`src/vello.rs`).
 - 2026-11-09: `AdvertisedAction` has no icon field at graphshell `40e8c8d`
   (`crates/chirograph/src/lib.rs:135-146`); mere pins `4d971f3`, not checked out
@@ -549,6 +551,16 @@ Provisional (recommended first; asked only if they become blocking):
   The symbol encoder advances the selector by eight before either LOD
   branch, so slots 8–11 can reach the four chrome entries, then restores
   it after the branches. Neither arm changes the selector.
+
+- 2026-11-10: Canvas and the packer can share the flat IconVG sink because
+  the sink takes a resolved palette and a target rectangle. It now lives in
+  `flat_icon.rs` and feeds Netrender’s Vello CPU backend through the paint
+  list. The pack feature can build independently of Canvas.
+- 2026-11-10: macOS accepted ten ICNS representations from five point sizes
+  and their 2× versions. The ICO directory carries seven standalone RGBA
+  PNGs and uses zero for the 256 px directory dimensions.
+  [Apple icon sizes](https://developer.apple.com/library/archive/documentation/General/Conceptual/MOSXAppProgrammingGuide/CommonAppBehaviors/CommonAppBehaviors.html).
+  [Microsoft PNG icon format](https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473/).
 
 ## Progress
 
@@ -643,3 +655,9 @@ Provisional (recommended first; asked only if they become blocking):
   up. Each has a byte-for-byte fixture. A software raster receipt shows the
   eight symbols and three `cells5` faces in two palettes at three sizes each.
   Host UI rendering and app packaging still have their own gates.
+- 2026-11-10: S2's `pack` tool writes a complete package for the `hocket`
+  app ID. Its artwork redraws the amber ring and dot on the shared frame
+  with a bolder mark below 32 px. The tool publishes nine PNG sizes, both
+  platform containers and a source manifest together. Preview opens the
+  ICNS and same-machine output is byte-stable. Windows Shell acceptance
+  on o-pc remains open after connection timeouts.
