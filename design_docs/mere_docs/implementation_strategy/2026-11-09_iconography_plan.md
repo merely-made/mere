@@ -4,9 +4,8 @@
 **Status (2026-11-09):** G landed (grammar identity, key domains, the full
 face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
-vector images); T4 (mentions) landed 2026-11-10 except faces on guest pages,
-which wait on livery images in generated content (D3); every other phase
-open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
+vector images); T4 (mentions, guest pages included) landed 2026-11-10;
+every other phase open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
 2026-11-10; every other fork carries a provisional recommendation. SVG output (emblem's
@@ -524,9 +523,20 @@ Provisional (recommended first; asked only if they become blocking):
   `sha1` 0.11, which its code does not build against (it uses `digest` 0.10
   with `sha2` 0.10); both are pinned to 0.10.6 there. The root lock has the
   same versions and builds `mere-rdf` only when something asks.
-- 2026-11-10: livery's `content` holds text, `attr()` and counters only; an
-  image in generated content (CSS Content 3 `url()`) is new box generation,
-  layout and paint, which D3 needs.
+- 2026-11-10: livery's `content` held text, `attr()` and counters only; an
+  image in generated content (CSS Content 3 `url()`) was new box generation,
+  layout and paint, which D3 needed (landed, genet 3fa3ec62506).
+- 2026-11-10: a margin on a generated image breaks its owner's inline
+  fragment in Livery: the link's rect becomes the image's, so its text loses
+  its hit area. The face rule therefore carries no margin and sits flush
+  against the link text. An owner inside an inline-block or inline-table, or
+  one that is not a block or inline box (a flex or grid item's link, a table
+  cell), generates no image yet; content mixing strings and an image keeps
+  only the strings.
+- 2026-11-10: a guest page reads its mentions once, at spawn (the engine's
+  stylesheets are fixed then), so a node added while a page is open shows its
+  face on the next load. The face's arm follows the device pixel ratio at
+  spawn, not later zoom.
 
 ## Progress
 
@@ -593,4 +603,19 @@ Provisional (recommended first; asked only if they become blocking):
   faces per tile, URL round trip and refusal, one face per address and scale,
   the outline only when asked, link names, the occurrence address; Knot's
   preview test covers a resolving and a missing link.
+- 2026-11-10: T4's guest pages landed (D3). Genet 3fa3ec62506 and
+  7c6ffc87b9a: a `::before` or `::after` whose `content` is a single `url()`
+  image is a replaced atomic inline box, sized as an `<img>`, painted from the
+  embedder's vector image or bytes, adding nothing to the accessible name
+  (five livery tests at 12, 14 and 16 px, unregistered, removed, mixed,
+  name); `LiverySessionEngine::with_host_layer` asks the host once per spawn
+  for sheets and vector images from the parsed DOM and document URL. Mere:
+  Pelt's `sessions_with_host_layer`; Graphshell's
+  `retained_content::mentions` turns each `<a href>` whose resolved address is
+  a graph node into one host rule and one face, and the reading pane refreshes
+  the graph's addresses, faces and device pixel ratio before each spawn.
+  Tests: only node links get a face, one rule per href, a crafted href cannot
+  leave its selector, and through the real content host a link naming a node
+  is wider than the same words naming nothing while the guest bytes stay
+  untouched.
 

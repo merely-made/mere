@@ -6,6 +6,7 @@
 
 //! The stack's held-content engines, shared by embedding applications.
 use crate::PeltRegistries;
+pub use genet_documents::{LiveryHostLayer, LiveryHostLayerFn};
 pub use genet_host_api::ResourceFetcher;
 use inker::{
     EngineDocument, EngineProfileBinding, SessionEngine, SessionError, SessionRegistry,
@@ -139,6 +140,19 @@ pub fn sessions_with_generic_fonts<Fetch: ResourceFetcher + Send + Sync + 'stati
     families: Vec<String>,
     generic_fonts: Vec<(String, Vec<u8>)>,
 ) -> SessionRegistry<Scene> {
+    sessions_with_host_layer(resources, fonts, families, generic_fonts, None)
+}
+
+/// [`sessions_with_generic_fonts`], with a host layer every HTML document is
+/// spawned with: host sheets and vector images outside the guest's DOM, such
+/// as a face beside each link that names a graph node.
+pub fn sessions_with_host_layer<Fetch: ResourceFetcher + Send + Sync + 'static>(
+    resources: Fetch,
+    fonts: Vec<Vec<u8>>,
+    families: Vec<String>,
+    generic_fonts: Vec<(String, Vec<u8>)>,
+    host_layer: Option<genet_documents::LiveryHostLayerFn>,
+) -> SessionRegistry<Scene> {
     // Quote each family separately so commas in a family name cannot change
     // the host-chosen fallback order. The same stack serves HTML and lanes.
     let family = (!families.is_empty()).then(|| {
@@ -154,9 +168,13 @@ pub fn sessions_with_generic_fonts<Fetch: ResourceFetcher + Send + Sync + 'stati
         .collect::<Vec<_>>();
     let mut sessions = SessionRegistry::new();
     let engines: Vec<Box<dyn SessionEngine<Scene>>> = vec![
-        Box::new(genet_documents::LiverySessionEngine::with_author_css(
-            resources, sheets,
-        )),
+        Box::new({
+            let engine = genet_documents::LiverySessionEngine::with_author_css(resources, sheets);
+            match host_layer {
+                Some(layer) => engine.with_host_layer(layer),
+                None => engine,
+            }
+        }),
         Box::new(ReaderSessionEngine::new(SmolwebTheme::System)),
         Box::new(DocumentSessionEngine),
         Box::new(mere_document_lanes::retained_clip::ClipSessionEngine),
