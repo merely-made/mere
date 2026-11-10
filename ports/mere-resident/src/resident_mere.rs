@@ -38,7 +38,7 @@ use chirograph::{
     ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest, SemanticRole,
 };
 use pandect::access::AccessContext;
-use graphshell::handlers::HandlerRegistry;
+use graphshell_host::handlers::HandlerRegistry;
 use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
 use djinn::door::app_admission::AppRouteGrants;
 use ostiary::app_admission::{AppId, AppRequest, AppRouteId};
@@ -2393,7 +2393,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn configured_record_handlers_validate_targets_and_persist_access() {
-        use graphshell::handlers::{HandlerOffer, OpenAddressV1, intent_id};
+        use graphshell_host::handlers::{HandlerOffer, OpenAddressV1, intent_id};
         let handler = HandlerOffer {
             id: "configured-browser".into(),
             label: "Open in browser".into(),

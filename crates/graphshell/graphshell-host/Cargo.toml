@@ -83,6 +83,16 @@ coop = [
 ]
 # The board's repulsion on the host's device (physics catalog, P5c).
 board-gpu = ["board", "pictograph/gpu"]
+# The mere endpoint closure, below the app and the resident (engine split
+# D68): the handler registry and the session item. Native and wasm alike.
+mere-host = [
+    "dep:kernel",
+    "dep:mere-overmap",
+    "dep:muniment",
+    "dep:pandect",
+    "dep:serde",
+    "dep:url",
+]
 
 [dependencies]
 ostiary = { workspace = true, optional = true }
@@ -111,9 +121,13 @@ graphshell-door = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }
 muniment = { workspace = true, optional = true }
 pollster = { version = "0.4", optional = true }
+# `native`'s session store, and the session `mere-host` serves in the browser
+# too, so it is not in the native-only table.
+pandect = { workspace = true, optional = true }
+mere-overmap = { workspace = true, optional = true }
+url = { version = "2", optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-pandect = { workspace = true, optional = true }
 # An invitation's network id and session (`invitation`).
 blake3 = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }

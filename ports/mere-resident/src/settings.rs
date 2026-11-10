@@ -518,10 +518,10 @@ pub struct ReservoirLaneSettings {
 }
 
 impl ReservoirLaneSettings {
-    pub fn handlers(&self) -> graphshell::handlers::HandlerRegistry {
-        graphshell::handlers::HandlerRegistry::new(
+    pub fn handlers(&self) -> graphshell_host::handlers::HandlerRegistry {
+        graphshell_host::handlers::HandlerRegistry::new(
             self.open_web_addresses
-                .then(graphshell::handlers::web_browser_handler)
+                .then(graphshell_host::handlers::web_browser_handler)
                 .into_iter()
                 .collect(),
         )
@@ -1262,7 +1262,7 @@ mod tests {
                 .reservoir
                 .handlers()
                 .actions_for(kernel::address::AddressKind::Http),
-            vec![graphshell::handlers::web_browser_handler().advertised_action()]
+            vec![graphshell_host::handlers::web_browser_handler().advertised_action()]
         );
         assert!(
             settings
