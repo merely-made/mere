@@ -25,11 +25,11 @@ pub(super) fn mere_client() -> ostiary::declaration::AppDeclaration {
     declaration
 }
 
-pub(super) fn persona(n: u128) -> PersonaId {
+pub fn persona(n: u128) -> PersonaId {
     PersonaId::from_uuid(Uuid::from_u128(n))
 }
 
-pub(super) fn context(app: &str) -> AdmittedEndpointContext {
+pub fn context(app: &str) -> AdmittedEndpointContext {
     AdmittedEndpointContext::new(ProjectionSession("v1:test".into()), [0x2b; 32])
         .with_application(app)
 }
@@ -77,11 +77,11 @@ pub(super) fn retained_custody(
 pub struct Fixture {
     pub(super) retained_host: Option<Arc<RetainedHost>>,
     pub(super) _root: tempfile::TempDir,
-    pub(super) reservoir: ResidentReservoir,
+    pub reservoir: ResidentReservoir,
     pub catalog: AppEndpointCatalog,
     pub grants: AppRouteGrants,
     pub route: String,
-    pub(super) routes: MereRoutes,
+    pub routes: MereRoutes,
 }
 
 /// The stand-in authority for a fixture domain: refuses a candidate carrying a
@@ -237,6 +237,11 @@ pub(super) async fn fixture_inner(
 }
 
 impl Fixture {
+    /// The scratch directory the fixture's data root lives in.
+    pub fn root(&self) -> &std::path::Path {
+        self._root.path()
+    }
+
     pub async fn attach(&self, app: &str) -> ResidentEndpointSession {
         self.catalog
             .update(|catalog| catalog.open(&self.route, &context(app)))
