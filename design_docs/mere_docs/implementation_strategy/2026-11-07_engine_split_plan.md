@@ -450,7 +450,7 @@ module moves to its owner below both sides. No route is added. Steps, in depende
 
 - **S1, leaves with no dependents among the others.** `declaration` to `graphshell-door`;
   `kept_text` to Eidetic (D71); the goal surface's provider, facts and door to the resident
-  (D71); `coop`'s owner side to `graphshell-host`, after `declaration`; `carriage` and
+  (D71); the whole of `coop` to `graphshell-host` (D88), after `declaration`; `carriage` and
   `receipts` to the resident's `sync/` (D81).
   - Done when: the resident and the app compile without those `graphshell::` paths, and the
     moved tests pass with unchanged counts.
@@ -1465,6 +1465,19 @@ revision and what crosses at frame rate.
   per module.
 
   Links: area The stack · draws on engine-split D45, engine-split D50 · plans engine-split P4 · summary Memory levels, forgetting and retirement live in eidetic::memory behind a memory feature; eidetic::retention stays the custody module.
+
+- **D88. The whole of coop moves to graphshell-host (Mark, 2026-11-09):** Slice 2's S1 sent
+  "`coop`'s owner side" to `graphshell-host`. The S1 lane found no separable owner side. Of
+  coop's 1,508 non-test lines, the shared types (`Data`, `Edit`, `Operation`) and `Owner` sit
+  together in `mod.rs` (702), `network.rs` (536) mixes the owner's `host` with a 207-line
+  `Guest`, and one 527-line test file shares a fixture across all of it. The app uses the owner
+  too (`graphshell_coop` calls `Owner::open`), and the resident uses `Owner`, `control` and
+  `network`. Offered the whole module, a split leaving `Guest` in the app, or a crate of its
+  own. Ruling: "Whole coop to graphshell-host (Recommended)". All of `coop/` moves behind a
+  `coop` feature of `graphshell-host`, and the app and the resident both import it from there.
+  Outcome: refines S1's coop line; applies D67.
+
+  Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary All of coop, guest and shared tests included, lives in graphshell-host behind a coop feature.
 
 ## Open questions
 

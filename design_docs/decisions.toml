@@ -1378,6 +1378,14 @@ summary = "Memory levels, forgetting and retirement live in eidetic::memory behi
 draws_on = ["engine-split D45", "engine-split D50"]
 plans = ["engine-split"]
 
+[decisions."engine-split D88"]
+title = "The whole of coop moves to graphshell-host (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "All of coop, guest and shared tests included, lives in graphshell-host behind a coop feature."
+draws_on = ["engine-split D67"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
