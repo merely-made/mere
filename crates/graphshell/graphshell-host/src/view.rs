@@ -7,10 +7,15 @@
 use std::fmt::Write;
 
 use base64::Engine;
-use chirograph::{AdvertisedAction, SceneSnapshot, SemanticRole};
+use chirograph::{SceneSnapshot, SemanticRole};
 use graphshell_client::{ResolvedContent, ResolvedPresentation};
 
 use crate::canary::{CanaryError, CanaryRun, run_loopback_canary};
+
+mod actions;
+
+pub use actions::guest_action_symbol;
+use actions::render_actions;
 
 /// One intent outcome shown beside a headed projection receipt.
 pub struct IntentReceiptView {
@@ -460,24 +465,6 @@ fn render_item(html: &mut String, presentation: &ResolvedPresentation) {
             html.push_str("</div></div>");
         },
     }
-}
-
-fn render_actions(html: &mut String, actions: &[AdvertisedAction]) {
-    if actions.is_empty() {
-        return;
-    }
-    html.push_str("<div class=\"actions\">");
-    for action in actions {
-        write!(
-            html,
-            "<button type=\"button\" data-intent=\"{}\" title=\"{}\">{}</button>",
-            escape(&action.intent.0),
-            escape(&action.explanation),
-            escape(&action.label)
-        )
-        .unwrap();
-    }
-    html.push_str("</div>");
 }
 
 fn semantic_role(role: SemanticRole) -> &'static str {

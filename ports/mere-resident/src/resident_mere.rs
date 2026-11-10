@@ -1016,6 +1016,7 @@ fn lifecycle_action(intent: &str, label: &str, explanation: &str) -> AdvertisedA
         payload_schema: SESSIONS_SCHEMA.to_string(),
         input_form: None,
         effect: IntentEffect::DomainTruth,
+        icon: None,
     }
 }
 

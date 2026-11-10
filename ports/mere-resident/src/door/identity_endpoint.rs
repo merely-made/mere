@@ -571,6 +571,7 @@ fn advertised_action(action: &IdentityProjectionAction) -> AdvertisedAction {
         } else {
             IntentEffect::DomainTruth
         },
+        icon: None,
     }
 }
 

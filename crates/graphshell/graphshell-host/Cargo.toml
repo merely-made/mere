@@ -20,7 +20,7 @@ publish = false
 default = ["webrtc-join", "physics-engine"]
 # The board's force engine in this process (pictograph `physics-engine`). Off,
 # a board's physics is a Worker's (`PhysicsBoard::with_transport`).
-physics-engine = ["pictograph?/physics-engine"]
+physics-engine = ["pictograph/physics-engine"]
 # The Graphshell action triple, the hello builders, and the sans-I/O
 # admission with its action check.
 admission = ["dep:insigne", "dep:notochord", "dep:personae"]
@@ -65,7 +65,7 @@ webrtc-session = ["native", "webrtc-carrier/native"]
 # The remote board: a mounted scene described as Pictograph's board, with
 # its relations as edges and its folds honoured (stack lift plan, P10;
 # stack-lift D1 and D2). Native and wasm alike.
-board = ["dep:pictograph"]
+board = ["pictograph/canvas"]
 # Producer-owned live-view records over an Eidetic store, moved from pandect
 # (engine split D86).
 live-view = ["dep:incipit", "incipit/view", "dep:eidetic", "dep:serde"]
@@ -105,7 +105,7 @@ mere-host = [
     "dep:mere-overmap",
     "dep:muniment",
     "dep:pandect",
-    "dep:pictograph",
+    "pictograph/canvas",
     "dep:scenograph",
     "dep:serde",
     "dep:url",
@@ -144,7 +144,7 @@ thiserror = { version = "1", optional = true }
 # a wasm graph (see `webrtc_join`'s module docs).
 getrandom = { version = "0.3", optional = true }
 webrtc-carrier = { workspace = true, optional = true }
-pictograph = { workspace = true, optional = true, features = ["canvas"] }
+pictograph.workspace = true
 incipit = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
 graphshell-door = { workspace = true, optional = true }

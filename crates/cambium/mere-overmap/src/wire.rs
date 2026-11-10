@@ -455,6 +455,7 @@ pub fn advertised(
         payload_schema: schema.to_string(),
         input_form: None,
         effect,
+        icon: None,
     }
 }
 

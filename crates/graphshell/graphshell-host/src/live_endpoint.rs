@@ -158,6 +158,7 @@ impl LiveEndpoint {
                 payload_schema: "mere.graphshell/live-fixture/append/v1".into(),
                 input_form: None,
                 effect: IntentEffect::Curation,
+                icon: Some(chirograph::ActionIcon::Named("action".into())),
             },
             AdvertisedAction {
                 intent: IntentReference(REFUSED_INTENT.into()),
@@ -166,6 +167,7 @@ impl LiveEndpoint {
                 payload_schema: "mere.graphshell/live-fixture/forbidden/v1".into(),
                 input_form: None,
                 effect: IntentEffect::Curation,
+                icon: None,
             },
             AdvertisedAction {
                 intent: IntentReference(COLOURED_INTENT.into()),
@@ -183,6 +185,7 @@ impl LiveEndpoint {
                         )),
                 ),
                 effect: IntentEffect::Curation,
+                icon: None,
             },
         ]
     }

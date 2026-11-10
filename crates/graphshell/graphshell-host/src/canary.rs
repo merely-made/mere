@@ -138,6 +138,7 @@ impl FixtureEndpoint {
             payload_schema: "graphshell.fixture/open-note/v1".into(),
             input_form: None,
             effect: IntentEffect::DomainTruth,
+            icon: None,
         };
         let inspect_map = AdvertisedAction {
             intent: IntentReference("fixture.inspect-tile".into()),
@@ -158,6 +159,7 @@ impl FixtureEndpoint {
                 ),
             ),
             effect: IntentEffect::Curation,
+            icon: None,
         };
         let open_live_view = AdvertisedAction {
             intent: IntentReference(OPEN_LIVE_VIEW_INTENT.into()),
@@ -168,6 +170,7 @@ impl FixtureEndpoint {
             payload_schema: LIVE_VIEW_REFERENCE_SCHEMA.into(),
             input_form: None,
             effect: IntentEffect::Curation,
+            icon: None,
         };
 
         let card = PortableCardV1 {

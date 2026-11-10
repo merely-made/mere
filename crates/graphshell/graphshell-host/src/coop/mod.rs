@@ -604,6 +604,7 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> ProjectionSour
                         payload_schema: EDIT_SCHEMA.into(),
                         input_form: None,
                         effect: IntentEffect::DomainTruth,
+                        icon: None,
                     }],
                 },
             }],

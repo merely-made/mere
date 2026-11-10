@@ -5,8 +5,8 @@
 face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
 vector images); T4 (mentions, guest pages included), F1 (typed blazon
-source) and S1 (authored chrome symbols) landed 2026-11-10. S2 is implemented
-for Hocket and qualified on macOS. Windows Shell acceptance on o-pc is open.
+source), S1 (authored chrome symbols), S2 (Hocket icon pack on macOS and
+Windows) and W1 (named action icons) landed 2026-11-10.
 D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
@@ -232,19 +232,15 @@ a `Scene` headless (`examples/backdrop_receipt.rs`).
 
 ## W. Action icons over the wire
 
-**What exists.** `AdvertisedAction` (chirograph, in the graphshell repository,
-pinned by mere at `4d971f3`) has `intent, label, explanation, payload_schema,
-input_form, effect` and no icon; `input_form` is the optional-field precedent
-(`#[serde(default, skip_serializing_if = "Option::is_none")]`). Graphshell
-renders action buttons as label text
-(`crates/graphshell/graphshell-host/src/view.rs:465-481`). The only size cap in
-chirograph is `MAX_RESOURCE_CHUNK_BYTES`.
+**What exists.** Chirograph’s `AdvertisedAction` carries an optional
+`ActionIcon::Named(id)` after `effect`. The field follows `input_form`’s
+Serde default and omission rule. Graphshell’s HTML view and retained browser
+remote controls draw known names from Pictograph’s eight-symbol catalog.
 
 **Design.**
-- `icon: Option<ActionIcon>` on `AdvertisedAction`, with the `input_form`
-  serde pattern so old peers are unaffected.
-- `ActionIcon::Named(id)` from the shared vocabulary: zero bytes, drawn and
-  themed by the host. This ships first.
+- Named icons send only the name. Graphshell supplies the paths and uses
+  its text color. Reserved and unrecognized names leave the existing text
+  button available. The label remains the button’s accessible name.
 - `ActionIcon::Custom(bytes)`, guest IconVG, comes later and only with all of:
   - **Reserved names.** Lock, shield, verified, permission, window controls,
     system warnings and the host's own marks are host-only; the host refuses them
@@ -562,6 +558,13 @@ Provisional (recommended first; asked only if they become blocking):
   [Apple icon sizes](https://developer.apple.com/library/archive/documentation/General/Conceptual/MOSXAppProgrammingGuide/CommonAppBehaviors/CommonAppBehaviors.html).
   [Microsoft PNG icon format](https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473/).
 
+- 2026-11-10: the Windows Shell icon handler on o-pc decoded the exact
+  retained Hocket ICO and returned the amber mark at 32 px.
+- 2026-11-10: Chirograph appends the optional icon field after `effect` and
+  omits it for legacy actions. JSON compatibility preserves the old wire
+  bytes. Rust producers using an `AdvertisedAction` struct literal supply
+  the new field when they repin.
+
 ## Progress
 
 - 2026-11-09: G landed in pictograph: `src/grammar.rs` (`Grammar`, `CELLS5`
@@ -661,3 +664,11 @@ Provisional (recommended first; asked only if they become blocking):
   platform containers and a source manifest together. Preview opens the
   ICNS and same-machine output is byte-stable. Windows Shell acceptance
   on o-pc remains open after connection timeouts.
+- 2026-11-10: S2’s Windows Shell check passed after o-pc became reachable
+  again. Shell returned the Hocket mark from the same ICO that
+  was qualified through ImageIO on macOS.
+- 2026-11-10: W1 landed. Chirograph `7b913edc` owns the wire field and both
+  Mere lockfiles pin it. Graphshell draws host-authored symbols beside
+  labels in the HTML projection view and the retained browser remote
+  controls. A single catalog lookup governs both surfaces. The live
+  projection fixture advertises the generic action symbol.

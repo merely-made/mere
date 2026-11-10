@@ -174,6 +174,7 @@ impl ProjectionSource for Endpoint {
                         payload_schema: INTENT.into(),
                         input_form: None,
                         effect: IntentEffect::DomainTruth,
+                        icon: None,
                     }],
                 },
             }],

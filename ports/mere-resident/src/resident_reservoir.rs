@@ -308,6 +308,7 @@ impl ReservoirEndpoint {
             payload_schema: ENSURE_MERE_SCHEMA.into(),
             input_form: None,
             effect: IntentEffect::DomainTruth,
+            icon: None,
         }
     }
 

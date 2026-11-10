@@ -194,6 +194,7 @@ impl HandlerOffer {
             payload_schema: OPEN_ADDRESS_SCHEMA.to_string(),
             input_form: None,
             effect: IntentEffect::ExternalEffect,
+            icon: None,
         }
     }
 }

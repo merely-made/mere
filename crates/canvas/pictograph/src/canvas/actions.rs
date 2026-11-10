@@ -83,6 +83,7 @@ impl ArrangementAction {
             payload_schema: self.payload_schema().to_string(),
             input_form: None,
             effect: IntentEffect::Curation,
+            icon: None,
         }
     }
 
