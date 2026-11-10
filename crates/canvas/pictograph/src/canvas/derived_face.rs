@@ -11,7 +11,7 @@
 //! paths and netrender fills them with non-zero winding. This small sink keeps Canvas device-free
 //! while preserving IconVG's fill rule at the renderer boundary.
 
-use emblem::{Host, Paint, Palette, Rgba, Sink};
+use emblem::{Host, Paint, Rgba, Sink};
 use paint_list_api::{
     ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, PathItem,
 };
@@ -62,7 +62,7 @@ pub(crate) fn commands(
     emblem::execute(
         file,
         bytecode_at,
-        &emblem_palette(palette),
+        &crate::palette_from_rgba(palette.colors()),
         Host {
             features: 0,
             height: host_height,
@@ -155,15 +155,6 @@ impl Sink for PaintListSink {
             stroke: None,
         }));
     }
-}
-
-fn emblem_palette(palette: DerivedFacePalette) -> Palette {
-    let mut colors = [Rgba::new(0, 0, 0, 255); 64];
-    for (target, [r, g, b, a]) in colors.iter_mut().zip(palette.colors()) {
-        let premultiply = |channel: u8| ((u32::from(channel) * u32::from(a) + 127) / 255) as u8;
-        *target = Rgba::new(premultiply(r), premultiply(g), premultiply(b), a);
-    }
-    Palette::new(colors).expect("straight-alpha colors premultiply to a sensible IconVG palette")
 }
 
 fn straight_color(color: Rgba) -> ColorF {

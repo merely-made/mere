@@ -4,8 +4,9 @@
 **Status (2026-11-10):** G landed (grammar identity, key domains, the full
 face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
-vector images); T4 (mentions, guest pages included) and F1 (typed blazon
-source) landed 2026-11-10. Every other phase is open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
+vector images); T4 (mentions, guest pages included), F1 (typed blazon
+source) and S1 (authored chrome symbols) landed 2026-11-10. Every other
+phase is open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
 2026-11-10; every other fork carries a provisional recommendation. SVG output (emblem's
@@ -543,6 +544,12 @@ Provisional (recommended first; asked only if they become blocking):
   marks directly, so the depth cap holds in Rust and serde as well as text.
   The contrast class table belongs to F2.
 
+- 2026-11-10: IconVG flat fills address slots 0–15 relative to the
+  selector. At the default selector of 56, slot 15 reaches face entry 7.
+  The symbol encoder advances the selector by eight before either LOD
+  branch, so slots 8–11 can reach the four chrome entries, then restores
+  it after the branches. Neither arm changes the selector.
+
 ## Progress
 
 - 2026-11-09: G landed in pictograph: `src/grammar.rs` (`Grammar`, `CELLS5`
@@ -629,3 +636,10 @@ Provisional (recommended first; asked only if they become blocking):
   orders its figures as ordinary, charge, then oldest-to-newest cadency.
   Parse failures distinguish field syntax, slots, figures, figure order
   and excess marks.
+- 2026-11-10: S1 landed in pictograph's `symbols` module. The palette builder
+  retains the eight face entries and adds ink, muted ink, surface and the
+  reserved host seal. Read, map, inspect, trail, search, tabs, fit and action
+  each use ink alone, with a coarse arm below 32 px and a full arm from 32 px
+  up. Each has a byte-for-byte fixture. A software raster receipt shows the
+  eight symbols and three `cells5` faces in two palettes at three sizes each.
+  Host UI rendering and app packaging still have their own gates.
