@@ -2,8 +2,8 @@
 
 **Date:** 2026-11-09
 **Status (2026-11-09):** G landed (grammar identity, key domains, the full
-face cache key) and T1 (the text arm, drawing version 2); every other phase
-open. D1 (emblem's repository hosts the
+face cache key), T1 (the text arm, drawing version 2) and T2 (the
+contrast-clamped text palette); every other phase open. D1 (emblem's repository hosts the
 faces crate) and D2 (identity and drawing version separately) ruled 2026-11-09;
 every other fork carries a provisional recommendation. SVG output (emblem's
 plan) landed the same day.
@@ -463,6 +463,16 @@ Provisional (recommended first; asked only if they become blocking):
   face proves nothing, so no stronger separation is bought.
 - 2026-11-09: pictograph still holds the canvas (`src/canvas`), so the face
   cache moved with G rather than waiting for D13.
+- 2026-11-09: tinct's `gate` mixes toward white or black, which shifts OKLCH
+  hue, so T2 searches OKLCH lightness at fixed hue instead, dropping chroma
+  only where the gamut forces it (hue holds within 4° wherever chroma is at
+  least 0.03).
+- 2026-11-09: one ground always admits 3:1 (white or black reaches at least
+  4.58 against any ground), so the outline fallback applies only to a palette
+  shared by several grounds. On the dark and high-contrast dark themes no
+  palette holds against both the page and the amber node-selection fill; a
+  selected row or tab takes its own palette. On the light themes one palette
+  fits all four grounds.
 
 ## Progress
 
@@ -485,3 +495,12 @@ Provisional (recommended first; asked only if they become blocking):
   the same mark whatever their grids; fills at 8, 20 and 64 px are palette
   entries only. The four goldens moved in length and digest only; their
   filled-cell counts did not. The largest fixture face is 217 bytes.
+- 2026-11-09: T2 landed in pictograph: `canvas/text_palette.rs`
+  (`TextFacePalette::new(faces, grounds)`, `TEXT_FACE_CONTRAST = 3.0`) moves
+  each entry to the nearest OKLCH lightness holding 3:1 against every ground,
+  keeping hue and alpha, and marks an entry `outlined` when no lightness does.
+  Tests over the light, dark and both high-contrast themes, each against bg,
+  surface, hover and the selection fill: every entry holds on every single
+  ground; a moved entry keeps its hue and one step nearer would fail; a row's
+  resting and hover grounds share one palette; outlined is exactly "below the
+  floor"; alpha is kept and no grounds changes nothing.

@@ -151,6 +151,9 @@ pub use cartography_scene::{
 /// The node accent palette every representation of a node tints from.
 pub mod palette;
 pub use palette::DerivedFacePalette;
+/// Face palettes clamped to read against a line of text's ground.
+pub mod text_palette;
+pub use text_palette::{TEXT_FACE_CONTRAST, TextFacePalette};
 /// The Map's theme roles, resolved once for every host.
 pub mod theme;
 pub use theme::{CanvasRoles, CanvasTheme};
