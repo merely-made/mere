@@ -37,7 +37,7 @@ use super::facts::GraphFacts;
 use eidetic::{PageTextRef, PageTextStore, ResourceCaptureStore};
 use eidetic::models::recall::{RecallSourceId, RecallSourceKind, RetainedSourceText};
 use fleece::retained_traversal::{RetainedLink, RetainedObservation, RetainedProvider};
-use mere::kernel::graph::Graph;
+use kernel::graph::Graph;
 use std::collections::{BTreeMap, BTreeSet};
 use uuid::Uuid;
 

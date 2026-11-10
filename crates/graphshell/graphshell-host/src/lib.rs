@@ -59,6 +59,8 @@ pub mod carrier;
 pub mod endpoint_catalog;
 #[cfg(feature = "mere-host")]
 pub mod handlers;
+#[cfg(feature = "goal-surface")]
+pub mod goal_surface;
 /// An owner's invitation of one guest into one session (case 1060).
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod invitation;

@@ -10,8 +10,8 @@
 //! read, where it cannot hold the graph.
 
 use chartulary::Labeled;
-use mere::kernel::graph::resource::TAGGED_WITH_IRI;
-use mere::kernel::graph::{Graph, RelationKind};
+use kernel::graph::resource::TAGGED_WITH_IRI;
+use kernel::graph::{Graph, RelationKind};
 use std::collections::{BTreeMap, BTreeSet};
 use uuid::Uuid;
 
