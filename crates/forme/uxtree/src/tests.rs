@@ -244,6 +244,43 @@ fn link_in_paragraph_projects_as_addressable_child() {
 }
 
 #[test]
+fn an_unlabelled_link_is_named_by_its_title_then_its_address() {
+    let link = |url: &str, title: Option<&str>| InlineSpan::Link {
+        url: url.to_string(),
+        title: title.map(str::to_string),
+        spans: vec![InlineSpan::Text(" ".to_string())],
+        predicate: None,
+    };
+    let doc = doc_with(vec![Block::Paragraph {
+        spans: vec![
+            link("mere://node/a", Some("Field notes")),
+            link("mere://node/b", None),
+            link("mere://node/c", Some("  ")),
+        ],
+    }]);
+    let tree = project_document(&doc);
+    let names: Vec<_> = tree
+        .nodes
+        .iter()
+        .map(|(_, n)| n)
+        .filter(|n| n.role() == Role::Link)
+        .map(|n| n.label().map(str::to_owned))
+        .collect();
+    assert_eq!(
+        names,
+        [
+            Some("Field notes".to_owned()),
+            Some("mere://node/b".to_owned()),
+            Some("mere://node/c".to_owned()),
+        ]
+    );
+    assert!(
+        tree.nodes.iter().all(|(_, n)| n.role() != Role::Image),
+        "a mention adds no node for its face"
+    );
+}
+
+#[test]
 fn in_page_link_projects_as_a_link_without_a_url() {
     let doc = doc_with(vec![Block::Paragraph {
         spans: vec![InlineSpan::InPage {

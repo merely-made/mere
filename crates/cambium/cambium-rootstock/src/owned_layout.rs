@@ -60,6 +60,30 @@ pub enum ScrollAlign {
     Nearest,
 }
 
+/// An application's vector image source at one layout scale.
+#[derive(Clone)]
+pub struct HostVectors {
+    pub source: crate::VectorImageSource,
+    pub scale: f32,
+}
+
+/// The host's image bytes and vector images as one lookup for Livery.
+pub(crate) struct HostImageLookup<'a> {
+    pub(crate) bytes: &'a HashMap<String, Vec<u8>>,
+    pub(crate) vectors: Option<&'a HostVectors>,
+}
+
+impl genet_livery::ImageSourceLookup for HostImageLookup<'_> {
+    fn vector(&self, key: &str) -> Option<std::sync::Arc<dyn genet_livery::VectorImage>> {
+        let vectors = self.vectors?;
+        (vectors.source)(key, vectors.scale)
+    }
+
+    fn get(&self, key: &str) -> Option<&Vec<u8>> {
+        self.bytes.get(key)
+    }
+}
+
 pub struct OwnedLayout {
     style_set: StyleSet,
     interaction_dependencies: interaction::Dependencies,
@@ -81,6 +105,8 @@ pub struct OwnedLayout {
     /// Host-supplied image bytes by URL. Layout resolves intrinsic sizes and
     /// paint decodes textures out of the same ledger, so it is retained here.
     images: HashMap<String, Vec<u8>>,
+    /// The application's vector images and the scale they draw at.
+    vectors: Option<HostVectors>,
     style_resolve_us: u64,
     layout_with_text_us: u64,
     content_extent_us: u64,

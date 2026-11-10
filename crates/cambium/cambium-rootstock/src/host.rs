@@ -539,7 +539,7 @@ mod disposal_controls;
 #[path = "host/options.rs"]
 mod options;
 
-pub use options::{AppFrameInsets, HostOptions, WindowFrame};
+pub use options::{AppFrameInsets, HostOptions, VectorImageSource, WindowFrame};
 
 #[path = "host/capture_types.rs"]
 mod capture_types;

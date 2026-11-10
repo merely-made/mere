@@ -23,6 +23,20 @@ impl OwnedLayout {
         fonts: &[crate::HostFont],
         images: &HashMap<String, Vec<u8>>,
     ) -> Self {
+        Self::with_vectors(dom, sheets, width, height, fonts, images, None)
+    }
+
+    /// [`new`](Self::new) with the application's vector images, resolved
+    /// beside the image bytes.
+    pub fn with_vectors<D: LayoutDom<NodeId = NodeId>>(
+        dom: &D,
+        sheets: &[&str],
+        width: f32,
+        height: f32,
+        fonts: &[crate::HostFont],
+        images: &HashMap<String, Vec<u8>>,
+        vectors: Option<HostVectors>,
+    ) -> Self {
         let style_set = StyleSet::cambium(sheets);
         let interaction_dependencies = interaction::Dependencies::new(&style_set);
         let device = Device::screen(width, height);
@@ -41,7 +55,10 @@ impl OwnedLayout {
             height,
             ViewportSizes::uniform(width, height),
             &mut text,
-            images,
+            &HostImageLookup {
+                bytes: images,
+                vectors: vectors.as_ref(),
+            },
         )
         .expect("Cambium's authored Livery layout must resolve");
         let layout_with_text_us = elapsed_us(phase.elapsed());
@@ -65,6 +82,7 @@ impl OwnedLayout {
             element_scroll: HashMap::new(),
             content_extent,
             images: images.clone(),
+            vectors,
             style_resolve_us,
             layout_with_text_us,
             content_extent_us,
@@ -116,7 +134,10 @@ impl OwnedLayout {
             height,
             self.device.viewport_sizes,
             &mut self.text,
-            &self.images,
+            &HostImageLookup {
+                bytes: &self.images,
+                vectors: self.vectors.as_ref(),
+            },
         )
         .expect("Cambium's authored Livery layout must resolve");
         self.layout_with_text_us = elapsed_us(phase.elapsed());
@@ -178,5 +199,13 @@ impl OwnedLayout {
         _now: f64,
     ) -> bool {
         false
+    }
+
+    /// Draw the application's vector images at a new layout scale. Layout is
+    /// unchanged: an image's box comes from its CSS, not its detail.
+    pub(crate) fn set_vector_scale(&mut self, scale: f32) {
+        if let Some(vectors) = self.vectors.as_mut() {
+            vectors.scale = scale;
+        }
     }
 }

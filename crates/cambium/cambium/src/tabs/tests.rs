@@ -77,6 +77,35 @@ fn a_marked_tab_hides_its_glyph_and_announces_its_state() {
 }
 
 #[test]
+fn a_tab_face_sits_before_the_label_and_is_hidden() {
+    let dom = dom_handle();
+    let runner = GenetAppRunner::new(
+        dom.clone(),
+        |s: &TabStrip| {
+            tab_strip_items::<()>(
+                s,
+                &[
+                    TabItem::new("Notes").with_face("face:6e"),
+                    TabItem::from("Plain"),
+                ],
+            )
+        },
+        TabStrip::new(0),
+    );
+    let dom = dom.borrow();
+    let root = runner.root();
+    let face = find_attr(&dom, root, "src", "face:6e").expect("the face is drawn");
+    assert_eq!(attr_of(&dom, face, "class"), Some(crate::FACE_CLASS));
+    assert_eq!(attr_of(&dom, face, "aria-hidden"), Some("true"));
+    assert_eq!(attr_of(&dom, face, "alt"), Some(""));
+    let tab = dom.parent(face).expect("the face sits in its tab");
+    assert_eq!(attr_of(&dom, tab, "role"), Some("tab"));
+    assert_eq!(dom.dom_children(tab).next(), Some(face), "face first");
+    assert!(dom.outer_html(tab).contains("Notes"));
+    assert_eq!(dom.outer_html(root).matches("<img").count(), 1);
+}
+
+#[test]
 fn new_holds_selection() {
     assert_eq!(TabStrip::new(2).selected, 2);
     assert_eq!(TabStrip::default().selected, 0);

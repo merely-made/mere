@@ -90,6 +90,34 @@ where
     )
 }
 
+/// [`shell_control`] for a graph node: its face (an image URL the host
+/// resolves) before the label. The face is decorative; `accessible_name` still
+/// names the control.
+pub fn shell_face_control<State, Action, OA, F>(
+    face: String,
+    label: impl Into<String>,
+    accessible_name: impl Into<String>,
+    state: ShellControl,
+    handler: F,
+) -> ShellSlot<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    OA: OptionalAction<Action> + 'static,
+    F: Fn(&mut State, PointerClick) -> OA + 'static,
+{
+    shell_button(
+        Box::new(el(
+            "span",
+            (crate::face::<State, Action>(face), el("span", label.into())),
+        )),
+        accessible_name.into(),
+        "shell-control",
+        state,
+        handler,
+    )
+}
+
 fn shell_button<State, Action, OA, F>(
     content: ShellSlot<State, Action>,
     accessible_name: String,

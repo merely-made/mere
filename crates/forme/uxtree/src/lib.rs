@@ -468,9 +468,21 @@ fn attach_link_children(
         let link_path = format!("{parent_path}/{tag}/{counter}");
         let link_id = node_id_for_path(&link_path);
         let mut link_node = Node::new(Role::Link);
+        // A mention's face is decoration, so a link never takes its name from
+        // one: the label, else the title, else the address (iconography T4).
         let label = inline_text(link_spans);
-        if !label.is_empty() {
-            link_node.set_label(label);
+        let name = if label.trim().is_empty() {
+            [link_title.map(String::as_str), link_url]
+                .into_iter()
+                .flatten()
+                .map(str::trim)
+                .find(|name| !name.is_empty())
+                .map(str::to_owned)
+        } else {
+            Some(label)
+        };
+        if let Some(name) = name {
+            link_node.set_label(name);
         }
         if let Some(t) = link_title {
             link_node.set_description(t.clone());

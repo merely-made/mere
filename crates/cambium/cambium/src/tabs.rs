@@ -211,6 +211,9 @@ pub struct TabItem {
     pub accent: Option<TabAccentColors>,
     /// A live state shown beside the label.
     pub mark: Option<TabMark>,
+    /// An image URL drawn before the label, hidden from assistive technology:
+    /// the face of the graph node the tab shows.
+    pub face: Option<String>,
 }
 
 impl TabItem {
@@ -221,7 +224,14 @@ impl TabItem {
             key: None,
             accent: None,
             mark: None,
+            face: None,
         }
+    }
+
+    /// Draw the image at `url` before the label (see [`face`](crate::face)).
+    pub fn with_face(mut self, url: impl Into<String>) -> Self {
+        self.face = Some(url.into());
+        self
     }
 
     /// Show a live state beside the label.
@@ -414,7 +424,8 @@ where
                     .attr("data-mark", mark.token())
                     .attr("aria-hidden", "true")
             });
-            let mut tab = el::<_, State, Action>("div", (bare, wrapped, mark, close))
+            let face = item.face.clone().map(crate::face::<State, Action>);
+            let mut tab = el::<_, State, Action>("div", (face, bare, wrapped, mark, close))
                 .attr("role", "tab")
                 .attr("aria-selected", if selected { "true" } else { "false" })
                 .attr("tabindex", if selected { "0" } else { "-1" })

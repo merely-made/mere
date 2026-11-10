@@ -356,7 +356,17 @@ where
                         .attr("style", "flex:0 0 auto;"),
                         true,
                     );
-                    let content = render_stack(stack, path, current, marks, on_event, fill);
+                    let content = render_stack(
+                        stack,
+                        path,
+                        current,
+                        &crate::frisket::TabDecor {
+                            marks,
+                            faces: &|_| None,
+                        },
+                        on_event,
+                        fill,
+                    );
                     let content = el::<_, State, Action>("div", content)
                         .attr("style", "flex:1 1 0px;min-width:0;min-height:0;");
                     let panel = el::<_, State, Action>("div", (close, content))
@@ -443,7 +453,17 @@ where
                         && presentation.focus_return_requested,
                 ));
             }
-            let content = render_stack(stack, path, current, marks, on_event, fill);
+            let content = render_stack(
+                stack,
+                path,
+                current,
+                &crate::frisket::TabDecor {
+                    marks,
+                    faces: &|_| None,
+                },
+                on_event,
+                fill,
+            );
             let focus = presentation.focus_return_requested
                 && presentation
                     .return_focus

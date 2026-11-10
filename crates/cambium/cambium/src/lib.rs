@@ -34,9 +34,9 @@ mod block_editor;
 mod command_menu_bar;
 mod command_surface;
 mod component;
+pub mod composition;
 pub mod composition_scheduler;
 pub mod reactive_diagnostics;
-pub mod composition;
 pub use backdrop_scene::{BACKDROP_SCENE_CSS, BackdropSceneEvent, backdrop_scene_reading};
 pub use block_editor::{BlockEditor, EditOutcome, EditorFactory};
 mod context;
@@ -53,6 +53,7 @@ mod editor;
 mod element;
 mod event;
 mod events;
+mod face;
 mod file;
 mod focus;
 mod focus_request;
@@ -64,8 +65,6 @@ mod graph_canvas;
 mod grid;
 #[cfg(feature = "highlight")]
 mod highlight;
-#[cfg(feature = "persona-picker")]
-pub mod persona_picker;
 mod hover;
 mod key;
 mod keyed;
@@ -76,6 +75,8 @@ mod optional_action;
 mod overlay;
 mod overlay_surface;
 mod paged_list;
+#[cfg(feature = "persona-picker")]
+pub mod persona_picker;
 mod pod;
 mod pointer;
 mod popover;
@@ -89,8 +90,8 @@ mod runner;
 mod sectioned_list;
 mod select;
 mod selection_bar;
-mod setting_row_managed;
 mod setting_row;
+mod setting_row_managed;
 mod setting_row_session;
 mod shell;
 mod slider;
@@ -132,23 +133,22 @@ pub use component::{COMPONENT_PROBE_ATTR, Component, ComponentView, component};
 pub use context::GenetCtx;
 pub use detail_panel::{DetailRow, DetailSection, detail_panel};
 pub use detail_popover::{
-    DetailPopoverEvent, DetailPopoverMode, DetailPopoverState, detail_popover,
-    detail_popover_panel,
+    DetailPopoverEvent, DetailPopoverMode, DetailPopoverState, detail_popover, detail_popover_panel,
 };
 pub use disclosure::{
     AccordionConfig, AccordionItem, AccordionMode, AccordionState, DisclosureState, TreeItem,
-    TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_trigger, disclosure_with,
-    tree_view,
+    TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_trigger,
+    disclosure_with, tree_view,
 };
 pub use editor::{EditHistory, History, pair_close, wrap_selection};
 pub use graph_canvas::{
     GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasInput,
     GraphCanvasNode, GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion,
     GraphCanvasRelation, GraphCanvasSubgraph, GraphCanvasSwatch, GraphLabelPlacement,
-    graph_atlas_swatch, graph_canvas, graph_canvas_swatch,
-    graph_canvas_swatch_with_drag, graph_canvas_swatch_with_drag_and_relations,
-    graph_canvas_swatch_with_focus, graph_canvas_swatch_with_focus_and_drag,
-    graph_canvas_swatch_with_focus_and_drag_and_relations, graph_canvas_with_wheel,
+    graph_atlas_swatch, graph_canvas, graph_canvas_swatch, graph_canvas_swatch_with_drag,
+    graph_canvas_swatch_with_drag_and_relations, graph_canvas_swatch_with_focus,
+    graph_canvas_swatch_with_focus_and_drag, graph_canvas_swatch_with_focus_and_drag_and_relations,
+    graph_canvas_with_wheel,
 };
 pub use grid::{GridView, data_grid};
 pub use hest::catalogue;
@@ -224,8 +224,8 @@ pub use selection_bar::{
 pub use slider::{Slider, slider};
 pub use splice::GenetChildrenSplice;
 pub use sprigging::{
-    AngleStrip, AngleStripMark, ColorF, DimensionLine, DimensionLineTraversal, GraphCanvas, GraphViewport,
-    GridColumn, GridSpec, RelationLine,
+    AngleStrip, AngleStripMark, ColorF, DimensionLine, DimensionLineTraversal, GraphCanvas,
+    GraphViewport, GridColumn, GridSpec, RelationLine,
 };
 pub use status_note::{status_note, status_note_labelled};
 pub use styled_field::{
@@ -236,13 +236,15 @@ pub use summary_body::{SummaryBody, summary_body};
 // Per-tag element-view helpers: `div`, `span`, `p`, `input`, `label`, `a`,
 // `h1`/`h2`/`h3`, `ul`/`ol`/`li`. (No `button` here — `controls::button` is the
 // button view, with a handler.)
+pub use face::{FACE_CLASS, face};
 pub use file::{
     FileEvent, FileFilter, FileRequest, OpenFile, OpenFileState, OpenedFile, open_file,
 };
 pub use frisket::{
     DividerTarget, FRISKET_CSS, FRISKET_TILE_ATTR, PaneView, Slot, SlotKind, close_target,
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
-    frisket_with_current, frisket_with_marks, frisket_with_tab_policy, slot_kind, stack_target, tab_drop_index, tab_target,
+    frisket_with_current, frisket_with_faces, frisket_with_marks, frisket_with_tab_policy,
+    slot_kind, stack_target, tab_drop_index, tab_target,
 };
 pub use frisket_presentation::frisket_presented_with;
 pub use paged_list::{PagedWindow, shell_paged_list};
@@ -252,8 +254,9 @@ pub use popover::{
 pub use sectioned_list::{ListRow, ListRowKind, ListSection, sectioned_list};
 pub use shell::{
     SHELL_CSS, ShellControl, ShellDensity, ShellMetrics, ShellSlot, shell_activity_control,
-    shell_activity_rail, shell_control, shell_document_rail, shell_navigation_item, shell_popup,
-    shell_projection_switch, shell_source_binding, shell_toolbar,
+    shell_activity_rail, shell_control, shell_document_rail, shell_face_control,
+    shell_navigation_item, shell_popup, shell_projection_switch, shell_source_binding,
+    shell_toolbar,
 };
 pub use split::{Split, SplitAxis, split};
 pub use status_bar::{
@@ -265,9 +268,8 @@ pub use surface::{
     SessionFailure, SurfaceEffect, SurfaceViewport,
 };
 pub use tabs::{
-    TabStripPolicy,
-    TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, TabStrip, tab_bar_view, tab_strip,
-    tab_strip_closable, tab_strip_items,
+    TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, TabStrip, TabStripPolicy, tab_bar_view,
+    tab_strip, tab_strip_closable, tab_strip_items,
 };
 pub use tags::*;
 pub use text::text;
@@ -330,9 +332,7 @@ pub fn attr_qual(local: &str) -> QualName {
 mod reading_find;
 mod reading_toolbar;
 pub use reading_find::{
-    ReadEvent, ReadFind, find_failed, find_field, find_key, find_row,
-    find_status,
-    is_find_shortcut,
+    ReadEvent, ReadFind, find_failed, find_field, find_key, find_row, find_status, is_find_shortcut,
 };
 pub use reading_toolbar::{
     ReadCommand, RelationshipPreviewCommand, read_toolbar, read_toolbar_with_trailing,
@@ -340,4 +340,7 @@ pub use reading_toolbar::{
 };
 pub mod scope_navigation;
 
-pub use focus_card::{FocusCardDeck, FocusCardInfo, FocusCardCommand, focus_card, focus_card_with_body, context_graph_swatch};
+pub use focus_card::{
+    FocusCardCommand, FocusCardDeck, FocusCardInfo, context_graph_swatch, focus_card,
+    focus_card_with_body,
+};

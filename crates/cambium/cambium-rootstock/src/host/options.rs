@@ -117,7 +117,18 @@ pub struct HostOptions {
     /// handles a resize itself. `None` — the default — leaves
     /// [`ui_zoom`](Self::ui_zoom) alone.
     pub fit_design: Option<(f32, f32)>,
+    /// Vector images the application draws itself, by URL: asked for each
+    /// `<img>` the host's image bytes do not hold, with the layout scale
+    /// (device pixels per CSS pixel, zoom included), so a face beside a
+    /// mention picks its detail for its real size. `None`, the default, is
+    /// raster images only.
+    pub vector_images: Option<VectorImageSource>,
 }
+
+/// Resolves an image URL to a vector image the application paints, given the
+/// layout scale. See [`HostOptions::vector_images`].
+pub type VectorImageSource =
+    std::rc::Rc<dyn Fn(&str, f32) -> Option<std::sync::Arc<dyn genet_livery::VectorImage>>>;
 
 impl AppFrameInsets {
     /// A frame with no transparent outer effect.
@@ -186,6 +197,7 @@ impl Default for HostOptions {
             spatial_focus: true,
             ui_zoom: 1.0,
             fit_design: None,
+            vector_images: None,
         }
     }
 }

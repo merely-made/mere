@@ -102,13 +102,22 @@ where
             _ => {
                 rebuilt = true;
                 let phase = crate::Instant::now();
-                let mut layout = crate::OwnedLayout::new(
+                let vectors = self
+                    .options
+                    .vector_images
+                    .clone()
+                    .map(|source| crate::HostVectors {
+                        source,
+                        scale: self.layout_scale() as f32,
+                    });
+                let mut layout = crate::OwnedLayout::with_vectors(
                     &view,
                     &sheets,
                     lw,
                     lh,
                     &self.s.shared.fonts,
                     &self.s.shared.images,
+                    vectors,
                 );
                 // Carry BOTH scroll planes across rebuilds: element scroll and
                 // the document scroll. Dropping the latter snaps a scrolled
@@ -124,6 +133,12 @@ where
                 self.s.layout_size = (lw, lh);
                 rebuild_us = elapsed_us(phase.elapsed());
             },
+        }
+        // A zoom or a move to another display changes the scale vector images
+        // draw at, not their boxes.
+        let scale = self.layout_scale() as f32;
+        if let Some(layout) = self.s.layout.as_mut() {
+            layout.set_vector_scale(scale);
         }
         // A caret that moved since the last relayout (an edit, a caret key, a
         // click) is kept in view within its field, as a single-line input

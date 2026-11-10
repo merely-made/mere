@@ -73,7 +73,9 @@ pub use presentation::{
     PresentationLifetime, PresentationState, WgpuDriver, WgpuSurfaceFactory, backend_attempts,
 };
 mod owned_layout;
-pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
+/// What [`HostOptions::vector_images`] resolves to.
+pub use genet_livery::VectorImage;
+pub use owned_layout::{HostVectors, OwnedLayout, ScrollAlign, ScrollTarget};
 #[cfg(feature = "embedding")]
 pub mod embedding;
 pub mod producer;
@@ -545,8 +547,8 @@ pub use host::{
     FrameProfile, HOST_WHEEL_LINE_PX, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage,
     HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
     PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView, ScrollRequest,
-    StampedCaptureFn, StampedCaptureFrame, WheelUnit, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
-    ladder_step,
+    StampedCaptureFn, StampedCaptureFrame, VectorImageSource, WheelUnit, WindowFrame, ZOOM_LADDER,
+    env_size, fit_zoom, ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;

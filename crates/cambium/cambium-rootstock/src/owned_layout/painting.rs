@@ -69,7 +69,10 @@ impl OwnedLayout {
             self.generation,
             &mut self.text,
             &self.element_scroll,
-            &self.images,
+            &HostImageLookup {
+                bytes: &self.images,
+                vectors: self.vectors.as_ref(),
+            },
         );
         // Slots were recorded against the un-translated list. Fill them before
         // the document viewport transform is added so their indices and their

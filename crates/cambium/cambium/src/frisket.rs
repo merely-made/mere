@@ -374,9 +374,32 @@ where
     Ev: Fn(&mut State, TileEvent) + Clone + 'static,
     Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
 {
+    frisket_with_faces(tree, current, marks, &|_| None, policy, on_event, fill)
+}
+
+/// [`frisket_with_tab_policy`], plus a face for any tab whose tile shows a
+/// graph node: `faces` gives the image URL drawn before the label
+/// ([`TabItem::with_face`](crate::TabItem::with_face)). Like marks, faces are
+/// asked once per tile per frame and never persisted.
+pub fn frisket_with_faces<State, AppAction, Ev, Fill>(
+    tree: &TileTree,
+    current: Option<TileId>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    faces: &dyn Fn(TileId) -> Option<String>,
+    policy: crate::TabStripPolicy,
+    on_event: Ev,
+    fill: Fill,
+) -> impl View<State, AppAction, GenetCtx, Element = GenetElement>
+where
+    State: 'static,
+    AppAction: 'static,
+    Ev: Fn(&mut State, TileEvent) + Clone + 'static,
+    Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
+{
+    let tabs = rendering::TabDecor { marks, faces };
     el::<_, State, AppAction>(
         "div",
-        render_node(tree, &[], current, marks, policy, &on_event, &fill),
+        render_node(tree, &[], current, &tabs, policy, &on_event, &fill),
     )
     .attr("class", "frisket-body")
     .attr(
@@ -535,4 +558,4 @@ mod rendering;
 
 use rendering::render_node;
 
-pub(super) use rendering::render_stack;
+pub(super) use rendering::{TabDecor, render_stack};

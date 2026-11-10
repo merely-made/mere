@@ -94,6 +94,40 @@ fn hiding_singleton_strips_removes_their_close_and_activation_targets_only() {
     assert!(find_class(&dom, root, "slot-child").is_some());
 }
 
+/// A face the host gives a tile is drawn on that tile's tab only.
+#[test]
+fn a_host_face_reaches_the_tab_of_its_tile_only() {
+    fn faced(state: &State) -> TestView {
+        Box::new(frisket_with_faces(
+            &state.tree,
+            None,
+            &|_| None,
+            &|id| (id == TileId(2)).then(|| "face:32".to_owned()),
+            crate::TabStripPolicy::Always,
+            |state: &mut State, event| state.events.push(event),
+            |_: &Tile| Slot::Hole,
+        ))
+    }
+    let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+    let state = State {
+        tree: sample(),
+        events: Vec::new(),
+    };
+    let runner = GenetAppRunner::new(dom.clone(), faced as fn(&State) -> TestView, state);
+    let dom = dom.borrow();
+    let html = dom.outer_html(runner.root());
+    assert_eq!(
+        html.matches("<img").count(),
+        1,
+        "one tile faced, one face drawn"
+    );
+    let tab = html
+        .split("role=\"tab\"")
+        .find(|tab| tab.contains("face:32"))
+        .expect("the face sits in a tab");
+    assert!(tab.contains("data-tabkey=\"2\""), "{tab}");
+}
+
 /// Only the tile the host marks shows a mark, on its own tab.
 #[test]
 fn a_host_mark_reaches_the_tab_of_its_tile_only() {

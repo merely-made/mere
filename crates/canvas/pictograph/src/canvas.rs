@@ -156,7 +156,10 @@ pub mod text_palette;
 pub use text_palette::{TEXT_FACE_CONTRAST, TextFacePalette};
 /// Faces inline in text: the shared sizing and the paths a host paints.
 pub mod inline_face;
-pub use inline_face::{INLINE_FACE_MIN_DEVICE_PX, inline_face_commands, inline_face_style};
+pub use inline_face::{
+    INLINE_FACE_MIN_DEVICE_PX, InlineFace, InlineFaces, inline_face_address, inline_face_commands,
+    inline_face_style, inline_face_url,
+};
 /// The Map's theme roles, resolved once for every host.
 pub mod theme;
 pub use theme::{CanvasRoles, CanvasTheme};
@@ -221,13 +224,13 @@ pub use ambient::{AmbientSim, GameOfLife, NBody, ParticleLife, SandFall, Tinctur
 use seiche::Physics;
 
 pub mod backdrop_surface;
+/// The board's camera and the links its law reads (stack-lift D3).
+mod board_camera;
+/// A board's edges between cards.
+pub mod board_relations;
 /// A board scene: the cards and backdrops of a scene that is not a graph,
 /// painted where the physics board holds them.
 pub mod board_scene;
-/// A board's edges between cards.
-pub mod board_relations;
-/// The board's camera and the links its law reads (stack-lift D3).
-mod board_camera;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
@@ -312,12 +315,12 @@ pub const SIZE_TIERS: [f32; 5] = [24.0, 36.0, 56.0, 84.0, 120.0];
 /// Per-tick timestep handed to the seiche simulation: seiche's own constant,
 /// re-exported so `crate::canvas::TICK_DT` keeps resolving canvas-wide.
 pub use seiche::TICK_DT;
-/// A transport with no far side, for a build without the engine whose page
-/// cannot start a Worker: the backend fails closed and the layout stays seeded.
-pub use seiche_bridge::UnavailableTransport;
 /// The byte transport a canvas whose physics runs in a Web Worker is given
 /// ([`Canvas::with_graph_remote`]).
 pub use seiche::Transport as PhysicsTransport;
+/// A transport with no far side, for a build without the engine whose page
+/// cannot start a Worker: the backend fails closed and the layout stays seeded.
+pub use seiche_bridge::UnavailableTransport;
 /// Minimum structural-Jaccard similarity for a pair to enter the affinity force. Prunes the
 /// long tail of weakly-similar pairs so the force list stays lean and only meaningful clusters
 /// pull. (Graph signals — P4.)

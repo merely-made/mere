@@ -4,9 +4,12 @@
 **Status (2026-11-09):** G landed (grammar identity, key domains, the full
 face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
-vector images); every other phase open. D1 (emblem's repository hosts the
-faces crate) and D2 (identity and drawing version separately) ruled 2026-11-09;
-every other fork carries a provisional recommendation. SVG output (emblem's
+vector images); T4 (mentions) landed 2026-11-10 except faces on guest pages,
+which wait on livery images in generated content (D3); every other phase
+open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
+drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
+style layer) and D4 (Knot keys a face on the resolved file's address)
+2026-11-10; every other fork carries a provisional recommendation. SVG output (emblem's
 plan) landed the same day.
 
 **For:** Mark, 2026-11-09: "Let's consider additional faces/uses of
@@ -416,6 +419,32 @@ because F, T and B all name grammars and versions.
 
   Links: area Faces · draws on derived-faces §5 · plans iconography G, iconography T1 · summary A face's seed version decides its identity; a separate drawing version per grammar moves only its bytes.
 
+- **D3. Guest pages take faces from a host style layer (Mark, 2026-11-10):**
+  asked how a link in Graphshell's reading pane, guest HTML in a Genet
+  document, gets its face when it resolves to a graph node: "Host style layer
+  (Recommended)" over injecting an `<img>` into the guest DOM or leaving guest
+  pages faceless. Graphshell adds a host-only rule per resolved link,
+  `a[href=…]::before { content: url(face:…) }`; the guest DOM is untouched and
+  scripts never see the face. Outcome: new; needs livery to lay out and paint
+  an image in `content` (it parses text, `attr()` and counters only), and the
+  reading pane to accept a host sheet.
+
+  Links: area Faces · plans iconography T4 · summary Faces on guest pages come from a host-only stylesheet, never the guest DOM.
+
+- **D4. Knot keys a link's face on the resolved file's address (Mark,
+  2026-11-10):** asked what a Knot preview face keys on, since Knot's preview
+  links resolve only to local files. Mark asked what giving Knot a graph would
+  take and whether the idea of a desktop module for addressing across devices
+  and apps through the mere was stale. It is not: Knot's file catalog is its
+  graph ("catalog, route as overmap", 2026-10-15) and its `mere-overlay`
+  feature lays a resident mere's route over it through Djinn. A catalog
+  document's address is its canonical `file://` URL, which its own snapshot
+  carries, so "if 1 works with that, sure": the face keys on that address.
+  Outcome: new; a common address scheme for every app's graph is a cue, not
+  part of T4.
+
+  Links: area Faces · draws on Knot overmap ruling 2026-10-15 · plans iconography T4 · summary A Knot link's face keys on the canonical file address of the document it resolves to.
+
 Provisional (recommended first; asked only if they become blocking):
 
 - F: release-log house is the series root, with claimed kin marked (alternatives:
@@ -423,7 +452,6 @@ Provisional (recommended first; asked only if they become blocking):
 - F: overrides per (house, member) with a house-or-member flag, so a house edit
   propagates.
 - T: a mention is a resolved `Link`, not a new `InlineSpan::Mention`.
-- T: livery's path-painting inline element, with raster `img` as the fallback.
 - S: symbols as Rust `Writer` code in pictograph, not a text or SVG import, and
   not a new crate pair.
 - S: fixed per-app icon palettes, not palettes derived from each app's seeds.
@@ -484,6 +512,21 @@ Provisional (recommended first; asked only if they become blocking):
   its arm from its CSS height times the scale it was built for. Livery had no
   `cap` unit; it now resolves one from the font like `ch`, so the face's
   height is standard CSS rather than a face rule in the engine.
+- 2026-11-10: a host writes its sheet before it knows its device scale, so
+  the shared rule (`InlineFaces::rule`) rounds to whole CSS pixels. That is
+  whole device pixels at any integer scale, not at 1.25 or 1.5; the arm still
+  follows the real scale, which the host passes the source each frame.
+- 2026-11-10: Cambium's `ScopeCrumb` is built by struct literal in Turnstone
+  (`src/scope_navigation/presentation.rs:71`), so a face field would break
+  Turnstone at its next Mere bump; Graphshell's scope trail has no face yet.
+  The grouping breadcrumbs, built in Graphshell, do.
+- 2026-11-10: Graphshell's web lock resolved `spareval` 0.2.9 to `md-5` and
+  `sha1` 0.11, which its code does not build against (it uses `digest` 0.10
+  with `sha2` 0.10); both are pinned to 0.10.6 there. The root lock has the
+  same versions and builds `mere-rdf` only when something asks.
+- 2026-11-10: livery's `content` holds text, `attr()` and counters only; an
+  image in generated content (CSS Content 3 `url()`) is new box generation,
+  layout and paint, which D3 needs.
 
 ## Progress
 
@@ -529,3 +572,25 @@ Provisional (recommended first; asked only if they become blocking):
   face's paths with the arm chosen by device height). Livery and Inker take no
   pictograph dependency; the face reaches livery only through a host's
   `VectorImage` (T4).
+- 2026-11-10: T4 landed except guest pages (D3). Mere: `cambium-rootstock`'s
+  `HostOptions::vector_images`, a source asked for each `<img>` URL with the
+  layout scale (zoom included), reaches layout and paint through
+  `HostImageLookup`; `OwnedLayout::with_vectors`; the scale follows zoom and
+  display moves each frame. Cambium: `face` (`img.face`, empty `alt`,
+  `aria-hidden`), `TabItem::with_face`, `frisket_with_faces`,
+  `shell_face_control`. Pictograph: `InlineFace` (a `VectorImage`, with an
+  outline in the text colour where the palette marks an entry outlined),
+  `InlineFaces` (resolves `face:<hex address>` URLs per scale, made once),
+  `inline_face_url`, `inline_face_address`, `InlineFaces::rule`, the one
+  sizing rule every host's sheet carries. Graphshell: workbench tabs, the
+  document rail's rows and the grouping breadcrumbs show their node's face;
+  faces use the canvas's face palette held against the page ground and are
+  rebuilt when the appearance changes. Knot: preview links that resolve to a
+  readable local file show that document's face (D4), keyed by
+  `knot_document::file_address`, now public. uxtree: a link's name is its
+  label, else its title, else its address, and a face adds no node. Tests:
+  host options to layout and paint at scale 1 and 2, the tab face, frisket
+  faces per tile, URL round trip and refusal, one face per address and scale,
+  the outline only when asked, link names, the occurrence address; Knot's
+  preview test covers a resolving and a missing link.
+

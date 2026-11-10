@@ -82,8 +82,9 @@ pub use cambium_rootstock::{
     FrameProfile, HOST_WHEEL_LINE_PX, Host, HostFont, HostHooks, HostImage, HostOptions,
     HostPointer, HostWake, HostWindow, IdlePolicy, Init, Key, KeyInterceptHook, KeyPress,
     Modifiers, NamedKey, PaintCaptureFn, PreparedPresentationObserver, RelayoutProfile, Runner,
-    ScrollAlign, ScrollIntoView, Surface, WheelUnit, WindowCommand, WindowCommands, WindowFrame,
-    WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
+    ScrollAlign, ScrollIntoView, Surface, VectorImage, VectorImageSource, WheelUnit, WindowCommand,
+    WindowCommands, WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step,
+    read_frame,
 };
 pub use caption_controls::{
     CaptionLabels, caption_controls_for_frame, platform_caption_controls, platform_window_frame,

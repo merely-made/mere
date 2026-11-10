@@ -4,11 +4,17 @@
 
 use super::*;
 
+/// What a host adds to each tab beyond its tile: a live mark and a face.
+pub(crate) struct TabDecor<'a> {
+    pub(crate) marks: &'a dyn Fn(TileId) -> Option<TabMark>,
+    pub(crate) faces: &'a dyn Fn(TileId) -> Option<String>,
+}
+
 pub(super) fn render_node<State, AppAction, Ev, Fill>(
     node: &TileTree,
     path: &[usize],
     current: Option<TileId>,
-    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    tabs: &TabDecor<'_>,
     policy: crate::TabStripPolicy,
     on_event: &Ev,
     fill: &Fill,
@@ -37,7 +43,7 @@ where
                     &branch.tree,
                     &child_path,
                     current,
-                    marks,
+                    tabs,
                     policy,
                     on_event,
                     fill,
@@ -79,7 +85,7 @@ where
             )
         },
         TileTree::Stack(stack) => {
-            render_stack_with_tab_policy(stack, path, current, marks, policy, on_event, fill)
+            render_stack_with_tab_policy(stack, path, current, tabs, policy, on_event, fill)
         },
     }
 }
@@ -88,7 +94,7 @@ pub(in super::super) fn render_stack<State, AppAction, Ev, Fill>(
     stack: &TabStack,
     path: &[usize],
     current: Option<TileId>,
-    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    tabs: &TabDecor<'_>,
     on_event: &Ev,
     fill: &Fill,
 ) -> PaneView<State, AppAction>
@@ -102,7 +108,7 @@ where
         stack,
         path,
         current,
-        marks,
+        tabs,
         crate::TabStripPolicy::Always,
         on_event,
         fill,
@@ -113,7 +119,7 @@ pub(super) fn render_stack_with_tab_policy<State, AppAction, Ev, Fill>(
     stack: &TabStack,
     path: &[usize],
     current: Option<TileId>,
-    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    tabs: &TabDecor<'_>,
     policy: crate::TabStripPolicy,
     on_event: &Ev,
     fill: &Fill,
@@ -135,8 +141,11 @@ where
             if let Some(accent) = tile.accent {
                 item = item.with_accent(TabAccentColors::new(accent.background, accent.foreground));
             }
-            if let Some(mark) = marks(tile.id) {
+            if let Some(mark) = (tabs.marks)(tile.id) {
                 item = item.with_mark(mark);
+            }
+            if let Some(face) = (tabs.faces)(tile.id) {
+                item = item.with_face(face);
             }
             item
         })
