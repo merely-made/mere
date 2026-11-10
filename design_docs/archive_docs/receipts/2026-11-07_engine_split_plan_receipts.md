@@ -1133,3 +1133,21 @@ mere-resident lib 280 with the same two pre-existing failures as at `fe8c2d785`.
   --features product` first failed at `src/web_tree/product.rs:942` (`.cloned()` on the now-owned
   `MereHost::view` result); fixed, then green with `--all-targets`. Its lock takes only the edge
   changes (incipit gains hest, muniment, sceno; pandect loses hest, incipit, sceno, tabard).
+
+## 2026-11-09: P4 D45/D47 preparation, the retention half made self-contained (no Eidetic edits)
+
+New `crates/system/pandect/src/retention/`: `mod.rs` 29, `levels.rs` 279 (5 tests: 3 generic over a
+plain record, the policy default and ladder moved from `memory_levels`), `forgetting.rs` 94
+(`ForgetProposal`, `apply_forgetting`, one test moved from `furnace`), `retirement.rs` 134
+(`RetirementProposal`, `propose_retirement`, `apply_retirement`, two tests moved from `furnace`).
+Imports: `std`, `serde`, `eidetic` (`content_store`, `DeletedNode`, `purge_deleted`, `Result`,
+`Store`); tests use `muniment::MemoryBackend`. No `kernel`, no `crate::`. `memory_levels.rs` 404 to
+294 (graph adapter: `GraphNodeMemory` implements `MemoryRecord`; `is_promoted`, `level_of`,
+`evictable_short_term`, `census` keep their signatures); `furnace.rs` 842 to 659, re-exporting the
+moved names, so Cleromancy's `memory_levels::level_of` and Turnstone's `furnace::*_retirement` are
+unchanged. D47: `image_store.rs` already calls `eidetic::image_content::{save_image_bytes,
+load_image_bytes, delete_image_bytes, stored_image_hexes}`; nothing graph-free is left to move.
+
+- Tests: pandect `--features furnace` unit 261 to 264; default unit 250 to 256 (retention's 8
+  compile without `furnace`); integration unchanged.
+- `cargo check --workspace --all-targets`: green, 1m23s.

@@ -24,13 +24,17 @@
 
 use std::collections::{HashMap, HashSet};
 
-use eidetic::{DeletedNode, ManifestId, ProvenanceOrigin, Result, Store, Timestamp, purge_deleted};
+use eidetic::{ManifestId, ProvenanceOrigin, Result, Store, Timestamp};
 use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
 use kernel::types::ImageRole;
 
 use crate::memory_levels::{EvictionPolicy, evictable_short_term};
-use eidetic::content_store;
+// The retention halves moved to `crate::retention` (engine split D45); their
+// names stay here for callers.
+pub use crate::retention::{
+    ForgetProposal, RetirementProposal, apply_forgetting, apply_retirement, propose_retirement,
+};
 use crate::graph_codicil::{self, RedactionPolicy};
 use crate::image_store;
 
@@ -44,27 +48,6 @@ const CONSOLIDATION_CANDIDATE_CAP: usize = 50;
 /// sessions that both visited one common site). A first-cut heuristic; tune once
 /// real consolidation proposals can be eyeballed.
 const SAME_MATERIAL_OVERLAP: f64 = 0.5;
-
-/// A proposal to forget (evict the cached content of) a set of short-term nodes.
-///
-/// Athanor emits this; the host decides whether to apply it (the R0 propose/apply
-/// split). It names urls, not nodes: forgetting drops cached **content**, leaving the
-/// graph node in place.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct ForgetProposal {
-    /// The urls whose cached content is eligible for eviction.
-    pub urls: Vec<String>,
-}
-
-impl ForgetProposal {
-    pub fn is_empty(&self) -> bool {
-        self.urls.is_empty()
-    }
-
-    pub fn len(&self) -> usize {
-        self.urls.len()
-    }
-}
 
 /// Propose forgetting: the urls of the short-term nodes `policy` would evict as of
 /// `now_ms` / `current_session`, given per-node last-visit timing (`last_visit_ms`,
@@ -94,21 +77,6 @@ pub fn propose_forgetting(
         .filter(|url| !url.is_empty())
         .collect();
     ForgetProposal { urls }
-}
-
-/// Apply a forget proposal: drop the cached content for each url. Returns how many
-/// urls had content actually removed (genuine feedback, never a placebo).
-///
-/// Drops only short-term cached blobs via [`content_store::evict_content`] (R0: not
-/// graph truth, not codicils). An accepted proposal the host hands back here.
-pub async fn apply_forgetting(store: &mut dyn Store, proposal: &ForgetProposal) -> Result<usize> {
-    let mut dropped = 0;
-    for url in &proposal.urls {
-        if content_store::evict_content(store, url).await? {
-            dropped += 1;
-        }
-    }
-    Ok(dropped)
 }
 
 /// Stored image blobs not named by any live node.
@@ -350,70 +318,10 @@ pub async fn apply_consolidation(
     Ok(linked)
 }
 
-/// A proposal to retire (permanently forget) staged deleted-node tombstones
-/// whose time in the recycle bin has passed the retention window — the bin's
-/// steady-heat auto-empty, the third of Athanor's passes.
-///
-/// Athanor emits it; the host applies it (the R0 propose/apply split, so a
-/// "what will be forgotten" preview is possible before the oven runs). Unlike
-/// the on-command "empty the bin" (which clears everything), retirement drops
-/// only the aged-out subset.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct RetirementProposal {
-    /// The node ids whose tombstone(s) are old enough to purge, de-duplicated
-    /// (a node deleted twice has two tombstones but one id).
-    pub node_ids: Vec<String>,
-}
-
-impl RetirementProposal {
-    pub fn is_empty(&self) -> bool {
-        self.node_ids.is_empty()
-    }
-
-    pub fn len(&self) -> usize {
-        self.node_ids.len()
-    }
-}
-
-/// Propose retirement: the ids of tombstones deleted at or before
-/// `now_ms - keep_ms` (the retention window). Pure (R0): it reads the listed
-/// records ([`eidetic::list_deleted`]'s output) and mutates nothing.
-pub fn propose_retirement(
-    deleted: &[DeletedNode],
-    keep_ms: u64,
-    now_ms: u64,
-) -> RetirementProposal {
-    let cutoff = now_ms.saturating_sub(keep_ms);
-    let mut node_ids: Vec<String> = deleted
-        .iter()
-        .filter(|d| d.deleted_at_ms <= cutoff)
-        .map(|d| d.node_id.clone())
-        .collect();
-    node_ids.sort();
-    node_ids.dedup();
-    RetirementProposal { node_ids }
-}
-
-/// Apply a retirement proposal: permanently forget each proposed node
-/// ([`eidetic::purge_deleted`], which drops all of a node's tombstones — R0:
-/// an accepted proposal the host hands back). Returns how many tombstones were
-/// removed, genuine feedback (a node with two tombstones removes both).
-pub async fn apply_retirement(
-    store: &mut dyn Store,
-    proposal: &RetirementProposal,
-) -> Result<usize> {
-    let mut retired = 0;
-    for node_id in &proposal.node_ids {
-        retired += purge_deleted(store, node_id).await?;
-    }
-    Ok(retired)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use async_trait::async_trait;
-    use eidetic::content_store::{StoredContent, save_content};
     use euclid::default::Point2D;
     use kernel::graph::Graph;
     use kernel::graph::fixtures::GraphFixtures;
@@ -494,44 +402,6 @@ mod tests {
     // The in-memory test store is muniment's (2026-07-12): the
     // hand-rolled one was the same map behind the same seam.
     use muniment::MemoryBackend as MemStore;
-
-    #[test]
-    fn apply_drops_proposed_content_and_leaves_the_rest() {
-        pollster::block_on(async {
-            let mut store = MemStore::default();
-            let page = |b: &str| StoredContent {
-                content_type: None,
-                body: b.as_bytes().to_vec(),
-            };
-            save_content(&mut store, "https://stale.example/", &page("old"))
-                .await
-                .unwrap();
-            save_content(&mut store, "https://fresh.example/", &page("new"))
-                .await
-                .unwrap();
-
-            let proposal = ForgetProposal {
-                urls: vec!["https://stale.example/".to_string()],
-            };
-            let dropped = apply_forgetting(&mut store, &proposal).await.unwrap();
-            assert_eq!(dropped, 1, "one url's content removed");
-
-            assert!(
-                content_store::load_content(&mut store, "https://stale.example/")
-                    .await
-                    .unwrap()
-                    .is_none(),
-                "the forgotten content is gone",
-            );
-            assert!(
-                content_store::load_content(&mut store, "https://fresh.example/")
-                    .await
-                    .unwrap()
-                    .is_some(),
-                "un-proposed content is untouched",
-            );
-        });
-    }
 
     #[test]
     fn image_gc_marks_only_orphans_and_apply_rechecks_live_references() {
@@ -653,61 +523,6 @@ mod tests {
             0,
             "reference forgetting is idempotent"
         );
-    }
-
-    use eidetic::{list_deleted, record_deleted};
-
-    fn deleted(node_id: &str, at_ms: u64) -> DeletedNode {
-        DeletedNode {
-            node_id: node_id.to_string(),
-            url: format!("https://{node_id}.test"),
-            title: None,
-            tags: Vec::new(),
-            graph_id: None,
-            deleted_at_ms: at_ms,
-            nested: None,
-            facets: None,
-        }
-    }
-
-    #[test]
-    fn propose_retirement_names_only_the_aged_out_tombstones() {
-        let now = 100 * DAY_MS;
-        let records = [
-            deleted("old", now - 40 * DAY_MS),  // 40d old -> retire
-            deleted("fresh", now - 5 * DAY_MS), // 5d old -> keep
-            deleted("edge", now - 30 * DAY_MS), // exactly the window -> retire (<=)
-        ];
-        let proposal = propose_retirement(&records, 30 * DAY_MS, now);
-        assert_eq!(
-            proposal.node_ids,
-            vec!["edge".to_string(), "old".to_string()]
-        );
-        // A generous window keeps everything; a zero window keeps only the future.
-        assert!(propose_retirement(&records, 365 * DAY_MS, now).is_empty());
-    }
-
-    #[test]
-    fn apply_retirement_purges_the_aged_out_and_lists_the_survivors() {
-        pollster::block_on(async {
-            let mut store = MemStore::default();
-            let now = 100 * DAY_MS;
-            record_deleted(&mut store, &deleted("old", now - 40 * DAY_MS))
-                .await
-                .unwrap();
-            record_deleted(&mut store, &deleted("fresh", now - 5 * DAY_MS))
-                .await
-                .unwrap();
-
-            let listed = list_deleted(&mut store).await.unwrap();
-            let proposal = propose_retirement(&listed, 30 * DAY_MS, now);
-            let retired = apply_retirement(&mut store, &proposal).await.unwrap();
-            assert_eq!(retired, 1, "only the aged-out tombstone purged");
-
-            let survivors = list_deleted(&mut store).await.unwrap();
-            assert_eq!(survivors.len(), 1);
-            assert_eq!(survivors[0].node_id, "fresh", "the fresh one stays");
-        });
     }
 
     /// Save a graph codicil over exactly `urls`, oldest-first by node insertion.
