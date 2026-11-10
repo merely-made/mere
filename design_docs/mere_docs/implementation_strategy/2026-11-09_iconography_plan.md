@@ -1,11 +1,11 @@
 # Iconography Plan: More Faces and Uses for Emblem and Pictograph
 
 **Date:** 2026-11-09
-**Status (2026-11-09):** G landed (grammar identity, key domains, the full
+**Status (2026-11-10):** G landed (grammar identity, key domains, the full
 face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
-vector images); T4 (mentions, guest pages included) landed 2026-11-10;
-every other phase open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
+vector images); T4 (mentions, guest pages included) and F1 (typed blazon
+source) landed 2026-11-10. Every other phase is open. D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
 2026-11-10; every other fork carries a provisional recommendation. SVG output (emblem's
@@ -23,7 +23,7 @@ that proves a key; see G4); face editing beyond what the directions below need
 (derived faces plan §7 still holds); the canvas's move and rename (engine-split
 D13 and P3).
 
-Receipts go to `archive_docs/receipts/2026-11-09_iconography_plan_receipts.md`.
+See the [implementation receipts](../../archive_docs/receipts/2026-11-09_iconography_plan_receipts.md).
 
 ## Where things stand
 
@@ -538,6 +538,11 @@ Provisional (recommended first; asked only if they become blocking):
   face on the next load. The face's arm follows the device pixel ratio at
   spawn, not later zoom.
 
+- 2026-11-10: `blazon::T` checks the same eight-slot range when parsing text
+  and deserializing a numeric entry. `Cadency` represents zero, one or two
+  marks directly, so the depth cap holds in Rust and serde as well as text.
+  The contrast class table belongs to F2.
+
 ## Progress
 
 - 2026-11-09: G landed in pictograph: `src/grammar.rs` (`Grammar`, `CELLS5`
@@ -618,4 +623,9 @@ Provisional (recommended first; asked only if they become blocking):
   leave its selector, and through the real content host a link naming a node
   is wider than the same words naming nothing while the guest bytes stay
   untouched.
-
+- 2026-11-10: F1 landed in pictograph's `blazon` module. The structured
+  source supports plain and patterned fields, six ordinaries, twelve
+  charges and six cadency marks. The text form uses exact slot names and
+  orders its figures as ordinary, charge, then oldest-to-newest cadency.
+  Parse failures distinguish field syntax, slots, figures, figure order
+  and excess marks.
