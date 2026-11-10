@@ -228,6 +228,49 @@ beside it for conversations.
 
 Links: area encryption · plans release-log · summary forward-secure conversations by default; durable shared data with bounded epoch retention
 
+- **D13, the governed address form, and memorable names (2026-11-09):**
+
+**2026-11-09 · new.** The R4 lane chose
+`knot://<moot id>.moot/<collection id>/<page>[@<edition>]`. Asked whether to
+keep it, Mark:
+
+> i'm ok with keeping it for now i guess. i would imagine 2 would be less parseable and thus slightly more secure. ehhh, honestly i would rather use moot (or mere, no?) as the name:// across the apps, but that's a bigger hairball, and semantics.
+>
+> it would be nice if the addresses were, like, three normal/esoteric words or however many is needed to get a unique combo. if we could make the 2 hash like that, then the readability and ease of sharing would outweigh the lack of parseablility; a url (uri? address?) you can remember is one that can be shared from your brain. but i also don't mind 1 or 3, just would prefer non gobbledygook addresses if we can do it (as long as it doesn't compromise safety, compliance, conformance or anything more serious)
+
+The form stands for now. Two things stay open. The scheme name (`knot://`,
+`moot://` or `mere://` across the apps) is a family naming question. Memorable
+addresses are wanted where they don't weaken safety. A word encoding of a whole
+256-bit key is about 24 BIP-39 words. Three words carry about 33 bits, which
+anyone can grind to a collision. So a few-word address can't be the key; it
+has to be a name that resolves to a key. That needs a namespace authority
+(squatting, transfer and dispute rules) or petnames local to each reader. That
+layer sits above the R4 grammar, and Gemot's namespace services brief is its
+nearest owner. The hex form stays the verifiable address underneath.
+
+Links: area addressing · amends release-log D3 · plans release-log · summary governed addresses keep moot id host plus collection path for now; memorable names wanted as a resolving layer, scheme name open
+
+- **D14, Tor through a patched arti directory cache (2026-11-09):**
+
+**2026-11-09 · new.** arti 0.48.0's minimal build (`tokio` + `rustls`, no
+`static` or `compression`) compiles no C but links system libsqlite3 through
+`tor-dirmgr`'s rusqlite. Mark chose "Patch arti's dir cache" over allowing it
+behind an opt-in feature or deferring Tor. A Tor `Transport` waits on an arti
+fork, or an upstream contribution, whose directory cache uses a pure-Rust store
+(Muniment or equivalent) in place of rusqlite. It stays a default-off feature.
+
+Links: area carriers · amends release-log R7 · plans release-log · summary Tor transport only once arti's directory cache drops rusqlite for a pure-Rust store
+
+- **D15, durable retention by epochs or time (2026-11-09):**
+
+**2026-11-09 · new.** D12's bounded retention shipped as an epoch count (8 by
+default). Mark chose "Epochs or time, whichever first" over epochs only or time
+only. A durable lane forgets an epoch secret once it falls outside the epoch
+window or exceeds a time limit, whichever comes first. Quiet groups that rarely
+rotate keys still forget old secrets.
+
+Links: area encryption · amends release-log D12 · plans release-log · summary durable lanes forget epoch secrets after N epochs or a set age, whichever first
+
 ## Constraints
 
 - **Two release authorities.** Governed releases are Gemot collection
@@ -916,3 +959,6 @@ or a precise reference alone, and no storage migration is selected here.
   family moved to 0.9 except cleromancy. R5 holders and R7 follow-ups next.
 - 2026-11-06: R5 holders (murm `6bd9789cf52`) and R7 follow-ups (dramatis
   `b2ab8bf`, murm `df8f0a6daa5`, turnstone `60b7718e`) landed.
+- 2026-11-09: D13 (governed address kept; memorable names as a resolving
+  layer), D14 (Tor via a patched arti directory cache) and D15 (retention by
+  epochs or time) recorded.
