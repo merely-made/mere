@@ -1550,6 +1550,36 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D68, engine-split D93 · plans engine-split P3 · summary The workshop methods on MereHost stay in the app as an extension over public accessors; graphshell-host names no athanor crate.
 
+- **D95. The block adapter contract is a crate of its own (Mark, 2026-11-10):** D72 moved
+  `GuestAdapter` and `GuestEngine` to "an app-agnostic crate". The lane found they implement
+  the app's `BlockAdapter` trait and speak about 260 lines of its types (`Claim`, `Command`,
+  `Field`, `Row`, `BlockInput`, `RunResult`, `ViewAsk`, `GuestView`), which need only sceno and
+  vector-sheet, so the trait and types move with them. Offered a new crate or `block-host`.
+  Ruling: "A new block-adapter crate (Recommended)". Trait, types and `GuestAdapter` live in
+  `block-adapter`, over `block-host` and sceno; `block-host` stays a bare WIT host. Outcome:
+  refines D72.
+
+  Links: area The stack · draws on engine-split D72 · plans engine-split P3 · summary BlockAdapter, its types and GuestAdapter live in a block-adapter crate; block-host stays a bare WIT host.
+
+- **D96. GuestAdapter::attach takes bytes and grants from its caller (Mark, 2026-11-10):**
+  `attach` took the app's `CapsuleMount`, which cannot move down. Offered the caller passing
+  bytes and grants, or a small review type moving with the adapter. Ruling: "Caller passes
+  bytes and grants (Recommended)". The app reviews through `CapsuleMount` and Woodshed's test
+  through Eidetic's `verify_pack`; the hash and `power:block-adapter` checks are the caller's.
+  Outcome: applies D95.
+
+  Links: area The stack · draws on engine-split D95 · plans engine-split P3 · summary attach takes component bytes and the granted powers; pack review is the caller's.
+
+- **D97. The undo and paint checks stay with the app (Mark, 2026-11-10):** Without the app,
+  Woodshed's conformance test keeps the claim, change-map and view-region checks and loses two
+  that need app types: one undo restoring the document byte for byte (`Document`, `Preview`),
+  and each view building a `SheetLeaf`. Offered an app-side test, dropping them, or a
+  text-splice check. Ruling: "App-side test in Mere keeps them (Recommended)". They move to a
+  test in the app's `graphshell-blocks` crate and travel with the app to Turnstone; Woodshed's
+  test proves the wire. Outcome: applies D72.
+
+  Links: area The stack · draws on engine-split D72 · plans engine-split P3 · summary Woodshed's test proves the block-guest wire; the document-undo and paint checks are an app-side test.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
