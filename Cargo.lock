@@ -6932,6 +6932,7 @@ dependencies = [
 name = "graphshell-host"
 version = "0.0.2"
 dependencies = [
+ "async-trait",
  "base64 0.22.1",
  "blake3",
  "castellan-client",
@@ -6939,9 +6940,11 @@ dependencies = [
  "eidetic",
  "getrandom 0.3.4",
  "graphshell-client",
+ "graphshell-door",
  "graphshell-endpoint",
  "incipit",
  "insigne",
+ "mere-kernel",
  "mere-transport",
  "muniment",
  "murm-webrtc",
@@ -6991,6 +6994,7 @@ dependencies = [
  "graphshell-client",
  "graphshell-door",
  "graphshell-dramatis-pane",
+ "graphshell-host",
  "hest",
  "incipit",
  "layout-dom-api",

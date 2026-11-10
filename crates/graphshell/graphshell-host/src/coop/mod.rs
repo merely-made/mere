@@ -11,12 +11,12 @@ use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
 };
-use graphshell_host::lifecycle::AdmittedEndpointContext;
-pub use graphshell_host::invitation::{Card, Contact, Invitation, InvitationTerms, Signer};
+use crate::lifecycle::AdmittedEndpointContext;
+pub use crate::invitation::{Card, Contact, Invitation, InvitationTerms, Signer};
 use insigne::delegation::{
     CapabilityScope, SignedDelegationCertificate, SignedDelegationRevocation,
 };
-use mere::kernel::graph::{Author, apply::GraphDelta};
+use kernel::graph::{Author, apply::GraphDelta};
 use muniment::JsonSlots;
 use pandect::{GraphSession, SessionId};
 use personae::IdentityProvider;
@@ -91,7 +91,7 @@ pub trait GraphAuthority: Send + Sync {
     ) -> Result<(), String>;
 }
 pub struct GraphReading {
-    pub graph: mere::kernel::graph::Graph,
+    pub graph: kernel::graph::Graph,
     pub revision: Revision,
     pub authors: Vec<Author>,
 }
@@ -372,7 +372,7 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> Owner<B> {
     pub async fn edit_owner(&mut self, edit: Edit) -> Result<(), String> {
         self.edit(self.saved.owner, edit).await
     }
-    async fn edit(&mut self, root: [u8; 32], edit: Edit) -> Result<(), String> {
+    pub async fn edit(&mut self, root: [u8; 32], edit: Edit) -> Result<(), String> {
         if edit.graph != self.saved.graph {
             return Err("edit names another graph".into());
         }
@@ -398,7 +398,7 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> Owner<B> {
                 };
                 let mut candidate = g.clone();
                 candidate.set_recorder(None);
-                mere::kernel::graph::apply::apply_graph_delta(&mut candidate, add.clone());
+                kernel::graph::apply::apply_graph_delta(&mut candidate, add.clone());
                 let key = candidate
                     .get_node_key_by_id(id)
                     .ok_or("new node was not created")?;

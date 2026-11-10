@@ -296,7 +296,7 @@ path = "ports/mere-resident/src/sync/carriage.rs"
 reason = "The epoch carriage lane: leased slots for wrapped private-epoch material. Existing source-size debt; a responsibility split must preserve CarriageExt, HeldLease, CarriageCeilings and existing module visibility."
 
 [[exception]]
-path = "ports/graphshell/src/coop/mod.rs"
+path = "crates/graphshell/graphshell-host/src/coop/mod.rs"
 reason = "One explicitly chosen holder-owned graph. Existing source-size debt; a responsibility split must preserve Saved, GraphAuthority, GraphReading and existing module visibility."
 
 [[exception]]

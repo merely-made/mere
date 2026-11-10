@@ -139,7 +139,7 @@ ostiary = { workspace = true, features = ["native"] }
 castellan-client = { workspace = true, features = ["client"] }
 # The serving half: the endpoint catalog and its admitted context, the
 # projection host, admission and the session loop (stack lift plan, L2).
-graphshell-host = { workspace = true, features = ["native"] }
+graphshell-host = { workspace = true, features = ["native", "coop"] }
 # The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
 mere-overmap.workspace = true
 # Exact signed Knot relation intake into durable Mere sessions.

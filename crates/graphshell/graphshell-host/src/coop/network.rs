@@ -7,7 +7,7 @@
 use super::*;
 use castellan_client::custody_identity::CustodyIdentity;
 use ostiary::route::ResidentEndpointRoute;
-use graphshell_host::{
+use crate::{
     carrier::{projection_alpn, projection_policy},
     endpoint_catalog::ResidentEndpointCatalog,
     network_carrier::dial_projection_session,
@@ -25,8 +25,8 @@ pub fn profile() -> ProfileRef {
 }
 pub fn identity() -> Result<Arc<CustodyIdentity>, String> {
     CustodyIdentity::connect_declared_timeout(
-        crate::declaration::APP,
-        crate::declaration::declaration(),
+        graphshell_door::declaration::APP,
+        graphshell_door::declaration::declaration(),
         std::time::Duration::from_secs(10),
     )
     .map(Arc::new)
@@ -370,7 +370,7 @@ impl Guest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell_host::{admission::open_session_for, network_carrier::projection_binding};
+    use crate::{admission::open_session_for, network_carrier::projection_binding};
     use notochord::{RequestedAction, TrafficClass};
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

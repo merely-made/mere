@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MPL-2.0
 //! Co-op reuses the one resident host of an existing session.
 use super::*;
-use graphshell::coop::{self, GraphAuthority, GraphReading, Owner, control, network};
+use graphshell_host::coop::{self, GraphAuthority, GraphReading, Owner, control, network};
 use personae::IdentityProvider;
 use std::sync::Mutex as SyncMutex;
 

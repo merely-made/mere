@@ -37,6 +37,7 @@
 //! | `admission` | [`admission`] |
 //! | `webrtc-join` (default) | [`webrtc_door`], [`webrtc_join`] |
 //! | `native` | [`carrier`], [`invitation`], [`line`], [`lifecycle`], [`session_loop`], [`session_notices`], [`endpoint_catalog`], [`projection_host`], [`network_carrier`], [`policy_projection`], and the host halves of [`webrtc_door`] |
+//! | `coop` | [`coop`] (the owner, the guest, `control` and `network`; on top of `native` and `custody-client`) |
 //! | `webrtc-session` | `webrtc_session` and [`projection_host`]'s WebRTC door |
 //!
 //! The default build, `admission` and no features at all build for
@@ -48,6 +49,9 @@
 #[cfg(feature = "admission")]
 pub mod admission;
 pub mod canary;
+/// One holder-owned graph with an invited guest (engine split D88).
+#[cfg(all(feature = "coop", not(target_arch = "wasm32")))]
+pub mod coop;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod carrier;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]

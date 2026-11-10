@@ -69,6 +69,18 @@ board = ["dep:pictograph"]
 # Producer-owned live-view records over an Eidetic store, moved from pandect
 # (engine split D86).
 live-view = ["dep:incipit", "incipit/view", "dep:eidetic", "dep:serde"]
+# One holder-owned graph with an explicitly invited guest: the owner, the
+# guest, the control surface and the network endpoint (engine split D88,
+# moved from the reference app).
+coop = [
+    "custody-client",
+    "dep:graphshell-door",
+    "graphshell-door/declaration",
+    "graphshell-client/pump",
+    "dep:kernel",
+    "dep:muniment",
+    "dep:pollster",
+]
 # The board's repulsion on the host's device (physics catalog, P5c).
 board-gpu = ["board", "pictograph/gpu"]
 
@@ -95,6 +107,10 @@ webrtc-carrier = { workspace = true, optional = true }
 pictograph = { workspace = true, optional = true, features = ["canvas"] }
 incipit = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
+graphshell-door = { workspace = true, optional = true }
+kernel = { workspace = true, optional = true }
+muniment = { workspace = true, optional = true }
+pollster = { version = "0.4", optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 pandect = { workspace = true, optional = true }
@@ -116,6 +132,7 @@ uuid.workspace = true
 transport = { workspace = true, features = ["test-identity"] }
 webrtc-carrier = { workspace = true, features = ["native"] }
 tempfile = "3"
+async-trait = "0.1"
 tokio = { version = "1", features = ["io-util", "macros", "net", "rt", "rt-multi-thread", "time"] }
 
 [[test]]
