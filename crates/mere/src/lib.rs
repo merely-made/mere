@@ -15,12 +15,7 @@
 //! - `graph`: portable graph and domain vocabulary;
 //! - `linked-data`: semantic import/export;
 //! - `canvas`: Mere's graph-aware visual surface;
-//! - `workbench`: app-host composition and routing.
-
-/// Mere's routing vocabulary over inker's host-neutral policy: the
-/// app-flavored host-handled ids + [`routing::route_policy`].
-#[cfg(feature = "workbench")]
-pub mod routing;
+//! - `workbench`: app-host composition.
 
 #[cfg(feature = "graph")]
 pub use incipit::forme;

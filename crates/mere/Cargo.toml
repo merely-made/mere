@@ -49,11 +49,10 @@ canvas-gpu = ["canvas", "pictograph/gpu"]
 # The Meaning channel's sentence model on the host's device (native hosts;
 # dynamics grammar plan, G2).
 canvas-meaning-gpu = ["canvas-gpu", "pictograph/meaning-gpu"]
-# App-host composition and routing. Native hosts use this today; portable
+# App-host composition. Native hosts use this today; portable
 # graph consumers do not need to pay for it.
 workbench = [
     "graph",
-    "dep:inker",
     "dep:platen",
     "dep:workbench",
 ]
@@ -72,7 +71,7 @@ uxtree = { workspace = true, optional = true }
 # forme, the arrangement authority, is incipit's `arrangement` feature (D28).
 incipit = { workspace = true, optional = true, features = ["graph"] }
 # The engine-management layer (genet component since 2026-07-10): the facade
-# composes mere's routing vocabulary over inker's host-neutral policy.
+# reads engine documents for its canvas surface.
 inker = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }
 linked-data = { workspace = true, optional = true }
