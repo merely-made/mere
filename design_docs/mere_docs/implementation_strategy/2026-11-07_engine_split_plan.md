@@ -451,7 +451,7 @@ module moves to its owner below both sides. No route is added. Steps, in depende
 - **S1, leaves with no dependents among the others.** `declaration` to `graphshell-door`;
   `kept_text` to Eidetic (D71); the goal surface's provider, facts and door to
   `graphshell-host` (D91); the whole of `coop` to `graphshell-host` (D88), after `declaration`; `carriage` and
-  `receipts` to the resident's `sync/` (D81).
+  `receipts` to the resident's `sync/` (D81), with the `receipt_ingest` bin (D92).
   - Done when: the resident and the app compile without those `graphshell::` paths, and the
     moved tests pass with unchanged counts.
 - **S2, the sync domain.** `access` and `personal_sync` to pandect (D69), which gains
@@ -1514,6 +1514,16 @@ revision and what crosses at frame rate.
   D71; applies D67.
 
   Links: area The stack · draws on engine-split D67, engine-split D71 · plans engine-split P3 · summary The goal surface's provider, facts and door live in graphshell-host behind a goal-surface feature, not in the resident.
+
+- **D92. receipt_ingest moves to the resident with receipts (Mark, 2026-11-09):** D81 sent
+  `receipts` to the resident's `sync/`. The lane found one app user that is not a test: the
+  `receipt_ingest` bin (151 lines, `personal-sync`), the CLI `remote-receipt.ps1` calls to write
+  receipts into the inbox. Offered both to the resident, `receipts` to pandect with the bin
+  staying in the app, or retiring the bin. Ruling: "Both to the resident (Recommended)".
+  `receipts` moves as D81 ruled, `receipt_ingest` becomes a resident bin beside it, and the
+  script is repointed. Outcome: applies D81.
+
+  Links: area The stack · draws on engine-split D81 · plans engine-split P3 · summary The receipt_ingest CLI is a resident bin beside receipts; receipt authoring stays in one place.
 
 ## Open questions
 
