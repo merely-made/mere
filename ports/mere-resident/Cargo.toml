@@ -122,7 +122,7 @@ chirograph.workspace = true
 dramatis.workspace = true
 personal-facts.workspace = true
 gaz.workspace = true
-incipit.workspace = true
+incipit = { workspace = true, features = ["view"] }
 # The operational works composed as this resident's fourth lane
 # (`src/resident_distillery.rs`). Default features only unless djinn's own
 # `trainer` feature is on: `remote` would pull the burn stack into the desktop

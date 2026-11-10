@@ -307,7 +307,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         &mut self,
         author: Author,
         key: ViewKey,
-        state: ViewIntent,
+        state: ViewState,
         at: SystemTime,
     ) -> Result<(), SessionError> {
         self.transact_change(at, false, move |candidate| {

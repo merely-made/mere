@@ -1881,7 +1881,11 @@ impl MereEndpoint {
                         fork.set_view_now(
                             author,
                             pandect::ViewKey::new(&app, payload.view).map_err(|e| e.to_string())?,
-                            payload.state,
+                            pandect::ViewState::encode(
+                                incipit::view::VIEW_INTENT_SCHEMA,
+                                &payload.state,
+                            )
+                            .map_err(|e| e.to_string())?,
                         )
                         .map_err(|e| e.to_string())?;
                     },
@@ -2819,7 +2823,7 @@ mod tests {
         let fixture = fixture(32, "divination").await;
         let mut first = fixture.attach("turnstone").await;
         let mut second = fixture.attach("knot-editor").await;
-        let state = pandect::ViewIntent {
+        let state = incipit::view::ViewIntent {
             strategy: Some("phyllotaxis.default".into()),
             ..Default::default()
         };
@@ -2878,7 +2882,7 @@ mod tests {
                 .invoke(on_item(
                     &other,
                     session_item::SET_VIEW_INTENT,
-                    serde_json::to_vec(&SetViewV1::new("reading", pandect::ViewIntent::default()))
+                    serde_json::to_vec(&SetViewV1::new("reading", incipit::view::ViewIntent::default()))
                         .unwrap()
                 ))
                 .unwrap(),
@@ -3654,7 +3658,7 @@ mod tests {
                     session_item::SET_VIEW_INTENT,
                     serde_json::to_vec(&SetViewV1::new(
                         "graphshell.mere",
-                        pandect::ViewIntent::default()
+                        incipit::view::ViewIntent::default()
                     ))
                     .unwrap()
                 ))
@@ -3957,7 +3961,7 @@ mod tests {
             assert!(panel.records().is_empty(), "{fault:?}");
             assert_eq!(
                 panel.saved_view(),
-                &pandect::ViewIntent::default(),
+                &incipit::view::ViewIntent::default(),
                 "{fault:?}"
             );
             assert!(panel.request(MereViewRequest::Mint).is_err(), "{fault:?}");

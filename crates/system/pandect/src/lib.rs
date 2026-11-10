@@ -96,7 +96,6 @@ pub mod graph_session;
 pub mod live_graph;
 // Producer-owned, content-addressed recipes for reopening a source at a
 // cursor with existing durable curation. Source resolution stays at the host.
-pub mod live_view;
 // Snapshot-level merge for codicil compose (Alembic tail B7): union two graph
 // snapshots by URL identity, retaining per-member provenance. Pure; the codicil
 // compose op (`graph_codicil::compose_graph_codicils`) layers on top.
@@ -138,7 +137,9 @@ pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so
 // they live in turnstone's `frisket::tearout` now.
-pub mod view_intent_store;
+// A view's state as the session stores it: a schema id and an opaque value
+// (engine split D44). ViewIntent itself is incipit's `view` feature (D78).
+pub mod view_state;
 
 pub use application_settings_store::{
     APPLICATION_SETTINGS_DIR, APPLICATION_SETTINGS_FILENAME, ApplicationSettings, ShellbarEdge,
@@ -190,12 +191,6 @@ pub use identity::StartupUnlockMode;
 // through pandect.
 pub use catchment::{GraphId, SessionId};
 pub use kernel::graph::{Author, AuthorKind, CapturedDelta, Part};
-pub use live_view::{
-    LIVE_VIEW_RECORD_SCHEMA_ID, LIVE_VIEW_RECORD_VERSION, LiveViewCursor, LiveViewRecord,
-    LiveViewRecordError, LiveViewSource, LiveViewSourceError, LiveViewSourceResolver,
-    live_view_schema_ref, load_live_view_record, load_live_view_record_sealed,
-    open_live_view_record, save_live_view_record, save_live_view_record_sealed,
-};
 pub use manifest::{
     CodicilId, GraphSessionManifest, LEGACY_HOST_KEYS, Lineage, MANIFEST_SCHEMA_VERSION,
     MergedMark, PersonaId, PickedFrom, TrashMark,
@@ -250,7 +245,7 @@ pub use switcher_thumbnail::{
     SwitcherThumbnail, SwitcherThumbnailOptions, ThumbnailEdge, ThumbnailNode,
     build_switcher_thumbnail_with,
 };
-pub use view_intent_store::{CameraSnapshot, HiddenRelationRecord, VIEW_INTENT_DIR, ViewIntent};
+pub use view_state::{UNTAGGED_VIEW_SCHEMA, ViewState};
 pub use web_facets::{
     WEB_COMPAT, WEB_CONTENT, WEB_FORM_DRAFT, WEB_PAGE_SCALE, WEB_SCROLL, WEB_VIEWER,
     read_web_states, write_web_state, write_web_states,

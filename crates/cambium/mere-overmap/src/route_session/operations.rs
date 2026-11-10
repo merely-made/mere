@@ -90,7 +90,7 @@ impl MereRouteSession {
     pub fn model(&self) -> &MereViewModel {
         &self.model
     }
-    pub fn saved_view(&self) -> &pandect::ViewIntent {
+    pub fn saved_view(&self) -> &incipit::view::ViewIntent {
         &self.saved_view
     }
     pub fn records(&self) -> &HashMap<String, chirograph::PortableCardV1> {

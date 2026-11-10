@@ -24,7 +24,8 @@
 use chirograph::{AdvertisedAction, IntentEffect, IntentReference};
 use kernel::graph::{CapturedDelta, Graph, NodeFacetStore};
 use kernel::persistence::GraphSnapshot;
-use pandect::{SessionId, ViewIntent};
+use incipit::view::ViewIntent;
+use pandect::SessionId;
 use scenotime::{Revision, SceneEpoch};
 use serde::{Deserialize, Serialize};
 

@@ -1362,6 +1362,14 @@ draws_on = ["engine-split D8"]
 amends = ["engine-split D75"]
 plans = ["engine-split"]
 
+[decisions."engine-split D86"]
+title = "live_view moves to graphshell-host (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "live_view is a graphshell-host feature; pandect no longer names incipit's view feature, sceno or hest."
+draws_on = ["engine-split D39", "engine-split D44", "engine-split D78"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

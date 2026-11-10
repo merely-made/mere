@@ -11,6 +11,9 @@
 //! it does not contain graph truth, Canvas physics, or a Scenotime revision.
 //! The source owner resolves the reference when a recipient opens the record,
 //! and reports a missing source, stale cursor, or denied disclosure explicitly.
+//!
+//! Moved from pandect to the host behind the `live-view` feature (engine split
+//! D86); the schema id is unchanged.
 
 use incipit::curation::FOLD_RECORD_VERSION;
 use eidetic::{
@@ -20,7 +23,7 @@ use eidetic::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::ViewIntent;
+use incipit::view::ViewIntent;
 
 /// First durable wire shape for a producer-owned live-view record.
 pub const LIVE_VIEW_RECORD_VERSION: u16 = 1;
@@ -298,7 +301,7 @@ mod tests {
     use uuid::Uuid;
 
     use super::*;
-    use crate::{CameraSnapshot, HiddenRelationRecord};
+    use incipit::view::{CameraSnapshot, HiddenRelationRecord};
 
     const CREATED_AT: Timestamp = Timestamp(1_723_000_000_000);
     const SOURCE_SCOPE: &str = "session:fixture/graph:root";

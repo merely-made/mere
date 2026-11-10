@@ -63,6 +63,8 @@ pub mod line;
 #[cfg(feature = "board")]
 pub mod board;
 pub mod live_endpoint;
+#[cfg(feature = "live-view")]
+pub mod live_view;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod network_carrier;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]

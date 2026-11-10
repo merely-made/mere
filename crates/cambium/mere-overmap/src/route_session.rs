@@ -55,7 +55,7 @@ pub struct MereRouteSession {
     notice: Option<String>,
     closed: bool,
     primary: Option<MountedScene>,
-    saved_view: pandect::ViewIntent,
+    saved_view: incipit::view::ViewIntent,
     read_only: bool,
     material: Option<crate::wire::SessionGraphV1>,
     records: HashMap<String, chirograph::PortableCardV1>,

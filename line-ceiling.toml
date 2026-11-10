@@ -196,10 +196,6 @@ reason = "Snapshot-level merge for codicil compose (Alembic tail B7 / decision 1
 
 
 [[exception]]
-path = "crates/system/pandect/src/view_intent_store.rs"
-reason = "Per-pane view-intent sidecar — durable storage for view-local state that doesn't belong in graph truth. Existing source-size debt; a responsibility split must preserve HiddenRelationRecord, CameraSnapshot, ViewIntent and existing module visibility."
-
-[[exception]]
 path = "crates/system/pandect/tests/graph_residency.rs"
 reason = "Graph residency. Existing source-size debt; a responsibility split must preserve ProbeBackend, ProbeBackend, ReadProbe and existing module visibility."
 

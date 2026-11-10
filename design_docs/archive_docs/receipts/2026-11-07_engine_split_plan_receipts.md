@@ -1104,3 +1104,32 @@ migration builds one from the raw `theme_id`/`theme_mode`. pandect drops `tabard
 - `cargo check --workspace --all-targets`: green, 1m28s. `cargo test -p pandect`: unit 266 to 267
   (one new test), integration unchanged.
 
+
+## 2026-11-09: P4 D44/D78/D86, view state opaque in pandect; ViewIntent to incipit; live_view to the host
+
+Rulings: F3 "incipit `view` feature" (D78), F7 "graphshell-host feature" (D86). Moved with history:
+- `pandect/src/view_intent_store.rs` (602) to `crates/incipit/src/view.rs` (266) and
+  `view/tests.rs` (348, 17 tests), behind `view = ["dep:serde_json", "dep:sceno", "dep:hest",
+  "dep:muniment"]`; adds `VIEW_INTENT_SCHEMA = "mere.view-intent/v1"`; `kernel` dev-dependency for
+  `relation_tag_round_trips_through_disk`. Its line-ceiling exception is removed.
+- `pandect/src/live_view.rs` (431) to `crates/graphshell/graphshell-host/src/live_view.rs` (434, 3
+  tests), behind `live-view = ["dep:incipit", "incipit/view", "dep:eidetic", "dep:serde"]`; schema id
+  `mere.live-view/v1` unchanged.
+- New `pandect/src/view_state.rs` (98, 3 tests). `ViewEntry.state`, `views`, `view`, `view_at`,
+  `set_view`, `set_view_now`, `transact_view` and the codicil's view record take `ViewState`.
+  pandect drops `incipit`, `sceno` and `hest`.
+- Consumers: mere-overmap (`wire.rs`, `route_session.rs`, `operations.rs`), graphshell-mere
+  (`connection_tests.rs`), graphshell port (`mere_host.rs` gains `encode_view`; `MereHost::view`
+  returns an owned decoded `ViewIntent`; `mere_host_resident.rs`), mere-resident
+  (`resident_mere.rs`); each takes `incipit` with `view`.
+
+Gates: `cargo check --workspace --all-targets` green (1m40s); `cargo check -p graphshell --features
+web --all-targets` green (3m45s). Tests before / after: pandect unit 267 / 250 (17 and 3 moved out,
+3 new), integration unchanged; incipit 11 / 28 with `view`; graphshell-host lib 24 / 27 with
+`live-view`; mere-overmap 17; graphshell-mere 46; graphshell `--features web --lib mere_host` 25;
+mere-resident lib 280 with the same two pre-existing failures as at `fe8c2d785`.
+`cargo tree -p pandect -e normal`: 158 packages; no incipit, tabard, sceno; hest via mere-kernel only.
+- `ports/graphshell/web` (its own workspace): `cargo check --target wasm32-unknown-unknown
+  --features product` first failed at `src/web_tree/product.rs:942` (`.cloned()` on the now-owned
+  `MereHost::view` result); fixed, then green with `--all-targets`. Its lock takes only the edge
+  changes (incipit gains hest, muniment, sceno; pandect loses hest, incipit, sceno, tabard).

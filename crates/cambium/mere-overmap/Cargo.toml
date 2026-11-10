@@ -26,6 +26,8 @@ ostiary = { workspace = true, optional = true, features = ["native"] }
 chirograph.workspace = true
 kernel.workspace = true
 pandect.workspace = true
+# The view state the route carries (engine split D78).
+incipit = { workspace = true, features = ["view"] }
 scenotime.workspace = true
 serde.workspace = true
 serde_json.workspace = true

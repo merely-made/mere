@@ -22,6 +22,11 @@ arrangement = ["dep:serde_json", "dep:taffy", "dep:petgraph"]
 # Native on-disk persistence of `FormeDocument`s (`incipit::forme::store`).
 # Off so wasm consumers stay `std::fs`-free; the native host enables it.
 arrangement-store = ["arrangement"]
+# `incipit::view`: a pane's durable view state (`ViewIntent`) and its sidecar,
+# moved from pandect (engine split D44, D78). It names Graphshell's contract
+# root (sceno's link keys, hest's command choices); the sidecar writes through
+# muniment's atomic file.
+view = ["dep:serde_json", "dep:sceno", "dep:hest", "dep:muniment"]
 
 [dependencies]
 # The graph and session ids live in catchment and are re-exported here
@@ -30,6 +35,9 @@ catchment.workspace = true
 serde.workspace = true
 uuid.workspace = true
 serde_json = { version = "1.0", optional = true }
+sceno = { workspace = true, optional = true }
+hest = { workspace = true, optional = true }
+muniment = { workspace = true, optional = true }
 # Forme's persisted arrangement vocabulary still uses the stable-0.11
 # `Dimension` API. This is independent of Livery/Buckram's current Taffy slot;
 # migrate it only with a serialization review.
@@ -39,6 +47,8 @@ taffy = { version = "=0.11.0-experimental-cache-fix.3", optional = true }
 petgraph = { version = "0.8", features = ["serde-1"], optional = true }
 
 [dev-dependencies]
+# The view sidecar's relation-tag test pins the kernel's tag ordinals.
+kernel.workspace = true
 serde_json = "1"
 proptest = "1.11"
 

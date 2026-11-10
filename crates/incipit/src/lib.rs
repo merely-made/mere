@@ -36,6 +36,9 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 pub mod curation;
+// A pane's durable view state and its sidecar (engine split D78).
+#[cfg(feature = "view")]
+pub mod view;
 #[cfg(feature = "arrangement")]
 pub mod forme;
 

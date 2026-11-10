@@ -55,7 +55,7 @@ use crate::graph_placement::{
 use crate::manifest::{GraphSessionManifest, Lineage, MergedMark, TrashMark};
 #[cfg(not(target_arch = "wasm32"))]
 use crate::scene_facets::copy_scene_facets;
-use crate::view_intent_store::ViewIntent;
+use crate::view_state::ViewState;
 
 /// Product-owned validation of a complete candidate before graph/history installation.
 pub type GraphValidator = Arc<dyn Fn(&Graph) -> Result<(), String> + Send + Sync>;
@@ -280,7 +280,7 @@ impl ViewKey {
 pub struct ViewEntry {
     pub author: Author,
     pub cursor: Seq,
-    pub state: ViewIntent,
+    pub state: ViewState,
 }
 
 /// What [`GraphSession::apply`] wrote.
@@ -405,7 +405,7 @@ async fn stored_contents_match<B: Backend>(
 
 #[derive(Clone, Default)]
 struct View {
-    current: ViewIntent,
+    current: ViewState,
     log: Journal<ViewEntry>,
     saved: Seq,
 }
@@ -1845,18 +1845,18 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Every view with state, in key order.
-    pub fn views(&self) -> impl Iterator<Item = (&ViewKey, &ViewIntent)> {
+    pub fn views(&self) -> impl Iterator<Item = (&ViewKey, &ViewState)> {
         self.views.iter().map(|(key, view)| (key, &view.current))
     }
 
     /// A view's current state.
-    pub fn view(&self, key: &ViewKey) -> Option<&ViewIntent> {
+    pub fn view(&self, key: &ViewKey) -> Option<&ViewState> {
         self.views.get(key).map(|view| &view.current)
     }
 
     /// A view's state as it stood at journal cursor `cursor`: its latest
     /// change made at or before that cursor.
-    pub fn view_at(&self, key: &ViewKey, cursor: Seq) -> Option<&ViewIntent> {
+    pub fn view_at(&self, key: &ViewKey, cursor: Seq) -> Option<&ViewState> {
         self.views
             .get(key)?
             .log
@@ -1874,7 +1874,7 @@ impl<B: Backend> GraphSession<B> {
         &mut self,
         author: Author,
         key: ViewKey,
-        state: ViewIntent,
+        state: ViewState,
     ) -> Result<(), SessionError> {
         self.set_view_now(author, key, state)?;
         self.store(wall_clock_now(), Vec::new(), false).await
@@ -1886,7 +1886,7 @@ impl<B: Backend> GraphSession<B> {
         &mut self,
         author: Author,
         key: ViewKey,
-        state: ViewIntent,
+        state: ViewState,
     ) -> Result<(), SessionError> {
         self.ensure_writable()?;
         let cursor = self.journal.live_cursor();
@@ -3595,7 +3595,7 @@ mod tests {
             ));
             assert!(matches!(
                 observer
-                    .set_view(person(), key, ViewIntent::default())
+                    .set_view(person(), key, ViewState::default())
                     .await,
                 Err(SessionError::Observing(_))
             ));
@@ -3640,10 +3640,10 @@ mod tests {
             live.set_view_now(
                 person(),
                 ViewKey::new("graphshell", "private").unwrap(),
-                ViewIntent {
-                    focus: Some("private source history".into()),
-                    ..Default::default()
-                },
+                ViewState::new(
+                    "test.view/v1",
+                    serde_json::json!({"focus": "private source history"}),
+                ),
             )
             .unwrap();
             let original = serde_json::to_value(live.graph().to_snapshot_at(0)).unwrap();
@@ -3746,13 +3746,13 @@ mod tests {
                 .await
                 .unwrap();
             let key = ViewKey::new("cleromancy", "scene").unwrap();
-            let view = ViewIntent {
-                focus: Some("https://1.example".into()),
-                camera: Some(crate::CameraSnapshot {
-                    coefficients: [1.0, 0.0, 0.0, 1.0, 42.0, 17.0],
+            let view = ViewState::new(
+                "test.view/v1",
+                serde_json::json!({
+                    "focus": "https://1.example",
+                    "camera": {"coefficients": [1.0, 0.0, 0.0, 1.0, 42.0, 17.0]},
                 }),
-                ..Default::default()
-            };
+            );
             live.set_view(person(), key.clone(), view.clone())
                 .await
                 .unwrap();
@@ -3827,7 +3827,7 @@ mod tests {
                 Err(SessionError::ReadOnly(_))
             ));
             assert!(matches!(
-                thaw.set_view(person(), key.clone(), ViewIntent::default())
+                thaw.set_view(person(), key.clone(), ViewState::default())
                     .await,
                 Err(SessionError::ReadOnly(_))
             ));
@@ -5110,19 +5110,16 @@ mod tests {
             let id = mere.mint(person(), None).await.unwrap().session_id;
             let mut session = mere.open(id).await.unwrap();
             let key = ViewKey::new("knot-editor", "main").unwrap();
-            let spectral = ViewIntent {
-                strategy: Some("spectral".into()),
-                ..ViewIntent::default()
-            };
+            let spectral = ViewState::new("test.view/v1", serde_json::json!({"strategy": "spectral"}));
             session
                 .set_view(knot(), key.clone(), spectral.clone())
                 .await
                 .unwrap();
             session.apply(person(), vec![add(1)]).await.unwrap();
-            let focused = ViewIntent {
-                focus: Some(Uuid::from_u128(1).to_string()),
-                ..spectral.clone()
-            };
+            let focused = ViewState::new(
+                "test.view/v1",
+                serde_json::json!({"strategy": "spectral", "focus": Uuid::from_u128(1).to_string()}),
+            );
             session
                 .set_view(knot(), key.clone(), focused.clone())
                 .await
@@ -5155,14 +5152,14 @@ mod tests {
             let mut session = mere.open(id).await.unwrap();
             assert!(!session.has_unstored());
             let key = ViewKey::new("graphshell", "commands").unwrap();
-            let menu = ViewIntent {
-                commands: Some(hest::menu::CommandChoices {
-                    added: vec!["add-address".into()],
-                    removed: vec!["zoom-out".into()],
-                    recent: vec!["zoom-in".into()],
-                }),
-                ..ViewIntent::default()
-            };
+            let menu = ViewState::new(
+                "test.view/v1",
+                serde_json::json!({"commands": {
+                    "added": ["add-address"],
+                    "removed": ["zoom-out"],
+                    "recent": ["zoom-in"],
+                }}),
+            );
             session
                 .set_view_now(person(), key.clone(), menu.clone())
                 .unwrap();

@@ -14,7 +14,7 @@ use pandect::graph_codicil::{
 };
 use pandect::manifest::PersonaId;
 use pandect::{
-    Author, CapturedDelta, DomainId, MereId, MereSessions, ReservoirStore, ViewIntent, ViewKey,
+    Author, CapturedDelta, DomainId, MereId, MereSessions, ReservoirStore, ViewKey, ViewState,
     open_mere_archive_backend, open_mere_backend, open_reservoir_backend,
 };
 use std::process::Command;
@@ -98,11 +98,13 @@ fn archive_survives_owner_exit_and_a_fresh_process_forks_the_thaw() {
         live.set_view(
             author(),
             ViewKey::new("cleromancy", "scene").unwrap(),
-            ViewIntent {
-                focus: Some("mere://v3/kept-reading".into()),
-                strategy: Some("spectral.default".into()),
-                ..Default::default()
-            },
+            ViewState::new(
+                "test.view/v1",
+                serde_json::json!({
+                    "focus": "mere://v3/kept-reading",
+                    "strategy": "spectral.default",
+                }),
+            ),
         )
         .await
         .unwrap();
@@ -233,7 +235,7 @@ fn archive_child_reopens_and_forks() {
         assert_eq!(state(thaw.graph()), expected);
         let key = ViewKey::new("cleromancy", "scene").unwrap();
         assert_eq!(
-            thaw.view(&key).unwrap().strategy.as_deref(),
+            thaw.view(&key).unwrap().value["strategy"].as_str(),
             Some("spectral.default")
         );
         let edit = CapturedDelta::ReplaySetNodeTitleById {

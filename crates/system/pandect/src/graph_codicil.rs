@@ -35,7 +35,7 @@ use kernel::types::ImageRole;
 use uuid::Uuid;
 
 use crate::graph_placement::{PlacementProfile, materialize_snapshot};
-use crate::{Change, GraphSessionManifest, NodeFacetStore, ViewEntry, ViewIntent};
+use crate::{Change, GraphSessionManifest, NodeFacetStore, ViewEntry, ViewState};
 use eidetic::manifest::load_manifest;
 use kernel::graph::AttributedDelta;
 
@@ -105,7 +105,7 @@ pub struct ArchivedSession {
 pub struct ArchivedView {
     pub app: String,
     pub view: String,
-    pub state: ViewIntent,
+    pub state: ViewState,
     pub log: Vec<ViewEntry>,
 }
 
