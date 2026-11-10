@@ -9,7 +9,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use incipit::forme::{GraphMemberId, SubgraphBinding, SubgraphId, SubgraphKind, SubgraphRef};
+use crate::forme::{GraphMemberId, SubgraphBinding, SubgraphId, SubgraphKind, SubgraphRef};
 use kernel::graph::{
     ContainmentSubKind, EdgeFamily, FieldDefinition, FieldExtent, FieldId, Graph, NodeKey,
     ProvenanceSubKind, RelationKind, RelationSelector, SemanticSubKind,
@@ -1357,7 +1357,7 @@ mod tests {
             id: 7,
             kind: Some(SubgraphKind::Facet),
             binding: SubgraphBinding::Linked {
-                spec: incipit::forme::SubgraphSpec {
+                spec: crate::forme::SubgraphSpec {
                     kind: SubgraphKind::Facet,
                     anchors: Vec::new(),
                     primary_anchor: None,

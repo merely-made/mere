@@ -147,7 +147,7 @@ reason = "The live half of the WebRTC door: the join sequence over a real channe
 
 
 [[exception]]
-path = "crates/mere/src/roster.rs"
+path = "crates/incipit/src/roster.rs"
 reason = "Neutral roster snapshot vocabulary and pure helpers, shared by host data builders and views. Existing source-size debt; a responsibility split must preserve RosterTab, RosterSubject, FacetSubject and existing module visibility."
 
 [[exception]]

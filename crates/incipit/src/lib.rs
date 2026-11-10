@@ -41,6 +41,12 @@ pub mod curation;
 pub mod view;
 #[cfg(feature = "arrangement")]
 pub mod forme;
+#[cfg(feature = "graph")]
+pub mod navigation;
+#[cfg(feature = "graph")]
+pub mod roster;
+#[cfg(feature = "graph")]
+pub mod trail;
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

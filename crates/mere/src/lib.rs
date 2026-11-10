@@ -34,16 +34,13 @@ pub mod gloss;
 pub mod glossary;
 #[cfg(feature = "graph")]
 pub use kernel;
+// Turnstone still names `mere::navigation`; retire with its repoint.
+#[cfg(feature = "graph")]
+pub use incipit::navigation;
 #[cfg(feature = "linked-data")]
 pub use linked_data;
 #[cfg(feature = "workbench")]
 pub use platen;
-#[cfg(feature = "graph")]
-pub mod navigation;
-#[cfg(feature = "graph")]
-pub mod roster;
-#[cfg(feature = "graph")]
-pub mod trail;
 #[cfg(feature = "workbench")]
 pub use workbench;
 
