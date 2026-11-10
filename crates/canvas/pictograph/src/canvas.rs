@@ -223,6 +223,7 @@ pub use ambient::{AmbientSim, GameOfLife, NBody, ParticleLife, SandFall, Tinctur
 /// the remote board and any other host share one inline/actor implementation.
 use seiche::Physics;
 
+mod backdrop_digest;
 pub mod backdrop_surface;
 /// The board's camera and the links its law reads (stack-lift D3).
 mod board_camera;

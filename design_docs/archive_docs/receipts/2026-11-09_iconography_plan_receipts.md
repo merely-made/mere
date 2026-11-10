@@ -107,3 +107,26 @@ workspace member and its lock row. The resident check log is
 `Code/output/pictograph-grammar/w1/mere-resident-check.log` and the guarded
 receipt is
 `Code/output/build-storage-receipts/2026-11-10/build-1144841dc85f4486bec7cec8267e319c.json`.
+
+## 2026-11-10 · B1 wash digest and IconVG
+
+Mere baseline `db45885e9`. Guarded Rust 1.99.1
+`test --locked --offline -p pictograph --features canvas --lib backdrop -j 4`
+passed 18 backdrop tests. The B1 cases verify same-cell movement,
+input-order independence, scope and held-channel reads, activity buckets,
+both grammar versions, both detail levels and caller-supplied colors.
+The 20-group overflow fixture merges to 16 clusters, decodes to 57
+subpaths, and fits within 4096 bytes. Boundary tests accept the exact
+limits and refuse a path or byte beyond them. The canvas case moves the
+live read model and camera while keeping the digest and registry run
+counts fixed.
+
+The same test executable passed 36 signal and arrangement tests, including
+the recency arithmetic and arrangement goldens. Logs are in
+`Code/output/pictograph-grammar/b1/`. The guarded native build receipt is
+`Code/output/build-storage-receipts/2026-11-10/build-38dffa1099c0483ca034938bcd99cfa8.json`.
+
+The standalone Graphshell web workspace passed
+`check --locked --offline --target wasm32-unknown-unknown --lib -j 4`.
+The guarded receipt is
+`Code/output/build-storage-receipts/2026-11-10/build-35e3b10c0847470da88e8479ab8262b6.json`.

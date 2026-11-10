@@ -6,7 +6,8 @@ face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
 vector images); T4 (mentions, guest pages included), F1 (typed blazon
 source), S1 (authored chrome symbols), S2 (Hocket icon pack on macOS and
-Windows) and W1 (named action icons) landed 2026-11-10.
+Windows), W1 (named action icons) and B1 (wash digest and IconVG) landed
+2026-11-10.
 D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
@@ -271,33 +272,39 @@ importance, recency, spectral coordinates and sites (`src/signals/registry.rs`).
 lowering refuses gradients (`flat_icon.rs`); the vello bridge
 supports them.
 
-**Design.** A pure function `derive_backdrop(&ViewDigest) -> Vec<u8>` in
-pictograph (grammar `wash`), fed by a digest the canvas builds, painted as a new
-bottom layer under territory, beside rather than instead of the existing paths.
+**Design.** Pictograph’s `backdrop::derive_backdrop` encodes a `ViewDigest`
+as IconVG under the `wash` grammar. The encoder returns a typed error if
+the file exceeds either limit. B2 will place the wash beneath territory.
 
-```rust
-// illustrative
-struct ViewDigest {
-    kinds: [u16; K],              // quantized kind histogram (media type and tag classes)
-    clusters: Vec<ClusterCell>,   // at most 16, sorted by (size desc, id)
-    density: u8,                  // log2 bucket of nodes per area
-    activity: u8,                 // 0..=3 from the recency span
-    bounds: [i32; 4],             // world rect snapped to a 64-unit lattice
-}
-struct ClusterCell { id_hash: u32, size: u8, cx: i16, cy: i16, hull: [(i16, i16); 8], entry: u8 }
-```
-
-- **Input** is cached facts only (held communities, sites, recency, node
-  count), quantized on a lattice; per-frame physics never enters, so nodes
-  drifting within a cell change nothing. Same digest, same bytes.
+- `Canvas::backdrop_digest` uses an explicit pause or the held
+  analytic arrangement, in that order. It filters anchors through the
+  current scope and folds. It reads fresh held communities, sites and
+  visits alongside materialized MIME hints and tags. A canvas without
+  anchors has no digest. Positions snap down onto 64-unit cells before any
+  accumulation. The world bounds add one cell of padding on each side.
+- The histogram counts document, image, audio, video, data,
+  collection and other. The `collection` tag takes precedence. Otherwise
+  the MIME hint supplies the class. Text, PDF, EPUB and XHTML are documents.
+  CSV, TSV, JSON, XML and RDF media are data. The first five class tags
+  serve as fallbacks when the MIME hint supplies no class.
+- Clusters use held community, then held site, then one
+  unassigned group. A held community uses its least member UUID as its
+  ID. Size orders the groups, with lexical IDs breaking ties.
+  Each cluster stores an integer centroid and at most eight extreme
+  points. Site names hash into five category slots and each cluster uses
+  its most frequent slot. Overflow merges the tail into one wash.
+  Density is the integer log₂ of nodes per 16 lattice cells, clamped to
+  0–7. Activity uses the span of held visits among anchored members.
+  No positive span gives 0, up to one hour gives 1, up to one day gives 2,
+  and longer spans give 3.
 - **Drawing:** one radial wash per cluster (centre at the centroid, radius from
   the hull, entries from the cluster's category), a low-alpha hull contour, a
   density motif whose pitch follows the density bucket and whose form follows
   the dominant kind, and an activity tint at the wash centre. Softness comes only
   from multi-stop gradients: IconVG has no blur or noise.
-- **Level of detail:** washes and hulls when zoomed out, motifs added when zoomed
-  in. `Host.height` is the backdrop's rendered height (viewport times zoom), with
-  host-side hysteresis around the threshold.
+- Washes and contours draw at every height. A
+  motif grid appears from 256 device pixels. `Host.height` is the
+  backdrop’s rendered height. B3 will add host hysteresis.
 - **Cadence:** re-derive only when the digest changes, after the change holds
   for several frames; between changes the decoded paths are cached in world
   space and only the camera moves. A change cross-fades host-side.
@@ -565,6 +572,15 @@ Provisional (recommended first; asked only if they become blocking):
   bytes. Rust producers using an `AdvertisedAction` struct literal supply
   the new field when they repin.
 
+- 2026-11-10: existing canvas membership retirement prunes both held
+  position sets. The channel registry can also expose held absolute visit
+  times without changing its public normalized recency summary. B1 uses
+  the absolute times only for the anchored members in scope.
+- 2026-11-10: the wash encoder uses scratch registers for gradient stops
+  and stores both grammar versions in two unused registers. Color sources
+  refer to the host palette. Both versions affect file identity even when
+  the drawing is identical.
+
 ## Progress
 
 - 2026-11-09: G landed in pictograph: `src/grammar.rs` (`Grammar`, `CELLS5`
@@ -672,3 +688,8 @@ Provisional (recommended first; asked only if they become blocking):
   labels in the HTML projection view and the retained browser remote
   controls. A single catalog lookup governs both surfaces. The live
   projection fixture advertises the generic action symbol.
+- 2026-11-10: B1 landed. The Canvas adapter reads held facts and emits an
+  integer digest. The wash encoder emits radial gradients, hull contours
+  and a detail motif from the dominant kind and density. It checks 64
+  subpaths and 4096 bytes across the whole file. B2 owns palette
+  qualification and painting under territory.

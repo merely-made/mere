@@ -17,7 +17,7 @@
 //! coordinates: `sceno`'s solvers never learn a source's native truth.
 
 use std::collections::{HashMap, VecDeque};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::UNIX_EPOCH;
 
 use kernel::graph::{Graph, NodeKey};
 
@@ -228,6 +228,17 @@ pub struct Recency {
 }
 
 pub fn recency(graph: &Graph) -> Recency {
+    recency_facts(graph).summary
+}
+
+#[derive(Clone, Debug)]
+pub(super) struct RecencyFacts {
+    pub summary: Recency,
+    #[cfg(feature = "canvas")]
+    pub visits: HashMap<NodeKey, f64>,
+}
+
+pub(super) fn recency_facts(graph: &Graph) -> RecencyFacts {
     let mut order = enumeration_order(graph);
     order.sort_by_key(|key| {
         let node = graph
@@ -238,34 +249,38 @@ pub fn recency(graph: &Graph) -> Recency {
             std::cmp::Reverse(node.id),
         )
     });
-    let values = normalized_recency(graph, &order);
-    Recency { order, values }
-}
-
-fn normalized_recency(graph: &Graph, keys: &[NodeKey]) -> HashMap<NodeKey, f32> {
-    let times: Vec<_> = keys
+    let times: Vec<_> = order
         .iter()
         .copied()
         .map(|key| {
             let seconds = graph
                 .node_last_visited(key)
-                .and_then(|time: SystemTime| time.duration_since(UNIX_EPOCH).ok())
-                .map(|duration| duration.as_secs_f64())
-                .unwrap_or(0.0);
+                .and_then(|time| time.duration_since(UNIX_EPOCH).ok())
+                .map(|duration| duration.as_secs_f64());
             (key, seconds)
         })
         .collect();
-    let minimum = times
-        .iter()
-        .map(|(_, time)| *time)
-        .fold(f64::INFINITY, f64::min);
-    let maximum = times
-        .iter()
-        .map(|(_, time)| *time)
+    let values = normalized_recency(&times);
+    #[cfg(feature = "canvas")]
+    let visits = times
+        .into_iter()
+        .filter_map(|(key, seconds)| Some((key, seconds?)))
+        .collect();
+    RecencyFacts {
+        summary: Recency { order, values },
+        #[cfg(feature = "canvas")]
+        visits,
+    }
+}
+
+fn normalized_recency(visits: &[(NodeKey, Option<f64>)]) -> HashMap<NodeKey, f32> {
+    let times = || visits.iter().map(|&(key, time)| (key, time.unwrap_or(0.0)));
+    let minimum = times().map(|(_, time)| time).fold(f64::INFINITY, f64::min);
+    let maximum = times()
+        .map(|(_, time)| time)
         .fold(f64::NEG_INFINITY, f64::max);
     let span = maximum - minimum;
-    times
-        .into_iter()
+    times()
         .map(|(key, time)| {
             let value = if span.is_finite() && span > f64::EPSILON {
                 ((time - minimum) / span) as f32

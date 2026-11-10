@@ -38,7 +38,7 @@ use kernel::graph::{Graph, GraphInputKey, NodeKey};
 
 #[cfg(feature = "canvas")]
 use super::physics::{self, PhysicsRuns, PhysicsView, PhysicsViewKey};
-use super::producers::{self, Recency};
+use super::producers::{self, Recency, RecencyFacts};
 use super::{
     AffinityScores, BridgeMetric, BridgeNodes, ClusterSet, ImportanceMetric, bridges,
     community_louvain, importance, structural_affinity,
@@ -105,7 +105,7 @@ pub struct ChannelRegistry {
     affinity: Slot<(GraphInputKey, u32), AffinityScores>,
     importance_degree: Slot<GraphInputKey, HashMap<NodeKey, f32>>,
     importance_betweenness: Slot<GraphInputKey, HashMap<NodeKey, f32>>,
-    recency: Slot<(GraphInputKey, GraphInputKey), Recency>,
+    recency: Slot<(GraphInputKey, GraphInputKey), RecencyFacts>,
     enumeration: Slot<GraphInputKey, Vec<NodeKey>>,
     spectral: Slot<(GraphInputKey, usize), HashMap<NodeKey, (f32, f32)>>,
     rings: Slot<(GraphInputKey, NodeKey), HashMap<NodeKey, u32>>,
@@ -366,16 +366,27 @@ impl ChannelRegistry {
     /// visits (F54).
     pub fn recency(&mut self, graph: &Graph) -> &Recency {
         self.bind_graph(graph);
-        self.recency.get(
-            (graph.structural_input_key(), graph.visit_input_key()),
-            &mut self.runs.recency,
-            || producers::recency(graph),
-        )
+        &self
+            .recency
+            .get(
+                (graph.structural_input_key(), graph.visit_input_key()),
+                &mut self.runs.recency,
+                || producers::recency_facts(graph),
+            )
+            .summary
     }
 
     /// The recency held, fresh or not.
     pub fn recency_held(&self) -> Option<&Recency> {
-        self.recency.value.as_ref()
+        self.recency.value.as_ref().map(|facts| &facts.summary)
+    }
+
+    /// Absolute visits already held for this graph revision.
+    #[cfg(feature = "canvas")]
+    pub(crate) fn visits_fresh(&self, graph: &Graph) -> Option<&HashMap<NodeKey, f64>> {
+        self.recency
+            .fresh_value((graph.structural_input_key(), graph.visit_input_key()))
+            .map(|facts| &facts.visits)
     }
 
     /// The enumeration order (`order.timeline`): the order every score's
