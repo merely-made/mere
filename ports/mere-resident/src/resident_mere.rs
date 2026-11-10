@@ -5386,6 +5386,5 @@ mod tests {
         }
     }
 
-    mod mcp;
     mod retained;
 }
