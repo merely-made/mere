@@ -215,3 +215,31 @@ fn caller_selected_handle_cannot_change_claim_with_distinct_handle_control() {
     assert!(graph.find_semantic_statement(&distinct).is_some());
     assert!(graph.find_semantic_statement(&held.statement_id).is_some());
 }
+
+#[test]
+fn held_pair_lookup_reads_only_the_pair_in_scan_order() {
+    let mut graph = Graph::new();
+    let [a, b, c] = ["a", "b", "c"]
+        .map(|name| graph.add_node(format!("https://example.org/{name}"), Default::default()));
+    let predicate = "https://example.org/predicate#rel";
+    let (first, held) = graph
+        .try_assert_semantic_statement(a, b, spec(predicate, "urn:author:first"))
+        .unwrap();
+    let (other, _) = graph
+        .try_assert_semantic_statement(a, c, spec(predicate, "urn:author:first"))
+        .unwrap();
+    assert_ne!(first, other);
+    // A parallel row carrying the same handle: the later edge by index wins,
+    // as it did when every Resource relation was scanned in index order.
+    let RelationKey::Resource(first_raw) = first else {
+        panic!("resource stratum")
+    };
+    let payload = graph.get_resource_edge(first_raw).unwrap().clone();
+    let (source, target) = graph.resources.inner().edge_endpoints(first_raw.raw()).unwrap();
+    let parallel = graph.connect_resource(source, target, payload);
+    let (again, reasserted) = graph
+        .try_assert_semantic_statement(a, b, spec(predicate, "urn:author:first"))
+        .unwrap();
+    assert_eq!(again, RelationKey::Resource(ResourceEdgeKey::from_raw(parallel)));
+    assert_eq!(reasserted.statement_id, held.statement_id);
+}

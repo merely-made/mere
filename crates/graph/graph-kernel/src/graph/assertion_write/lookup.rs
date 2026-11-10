@@ -29,9 +29,10 @@ impl Graph {
             .edges_connecting(from, to)
             .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
             .chain(
-                self.resource_relations()
-                    .filter(move |(_, source, target, _)| resource_pair == Some((*source, *target)))
-                    .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload)),
+                resource_pair
+                    .into_iter()
+                    .flat_map(|(source, target)| self.resource_relations_on_pair(source, target))
+                    .map(|(key, payload)| (RelationKey::Resource(key), payload)),
             )
         {
             for statement in payload
@@ -49,5 +50,26 @@ impl Graph {
             });
         }
         Ok(matches.into_values().next())
+    }
+
+    /// Resource relations from `from` to `to`, in `resource_relations` order
+    /// (by edge index), without walking the others.
+    fn resource_relations_on_pair(
+        &self,
+        from: Uuid,
+        to: Uuid,
+    ) -> Vec<(ResourceEdgeKey, &EdgePayload)> {
+        let (Some(source), Some(target)) = (self.resources.key_of(&from), self.resources.key_of(&to))
+        else {
+            return Vec::new();
+        };
+        let mut edges: Vec<_> = self
+            .resources
+            .inner()
+            .edges_connecting(source, target)
+            .map(|edge| (ResourceEdgeKey::from_raw(edge.id()), edge.weight()))
+            .collect();
+        edges.sort_by_key(|(key, _)| key.raw());
+        edges
     }
 }
