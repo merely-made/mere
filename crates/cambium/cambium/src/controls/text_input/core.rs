@@ -8,6 +8,7 @@
 
 use genet_text::{BoundaryKind, segments};
 
+use super::TextCommand;
 use crate::editor::EditHistory;
 
 /// The caret marker inserted into [`TextInput::display`]'s *textual* rendering
@@ -109,6 +110,9 @@ pub struct TextInput {
     /// The default editing path owns its undo/redo journal. A host that needs
     /// transaction-level grouping can still keep a separate [`EditHistory`].
     pub(super) history: EditHistory,
+    /// Every command applied since the last [`take_commands`](Self::take_commands),
+    /// when a host asked for them ([`record_commands`](Self::record_commands)).
+    pub(super) log: Option<Vec<TextCommand>>,
 }
 
 impl TextInput {
@@ -126,6 +130,7 @@ impl TextInput {
             ghost: String::new(),
             goal_col: None,
             history: EditHistory::new(),
+            log: None,
         }
     }
 
@@ -182,22 +187,6 @@ impl TextInput {
     /// Clear the IME composition (on `Ime::Commit` / `Ime::Disabled`).
     pub fn clear_preedit(&mut self) {
         self.composition = None;
-    }
-
-    /// The inline autocomplete suffix (empty when there is no completion).
-    pub fn ghost(&self) -> &str {
-        &self.ghost
-    }
-
-    /// Set the ghost-completion suffix shown dim after the text. Not committed to
-    /// the buffer until [`accept_ghost`](Self::accept_ghost).
-    pub fn set_ghost(&mut self, text: impl Into<String>) {
-        self.ghost = text.into();
-    }
-
-    /// Clear the ghost suffix.
-    pub fn clear_ghost(&mut self) {
-        self.ghost.clear();
     }
 
     /// Select the entire buffer (Ctrl / Cmd + A): anchor at the start, caret at

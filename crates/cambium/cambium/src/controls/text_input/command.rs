@@ -170,6 +170,13 @@ impl TextInput {
     /// changed. Mutating commands enter the built-in bounded undo journal;
     /// motion breaks typing coalescence without creating an undo step.
     pub fn apply(&mut self, command: TextCommand) -> bool {
+        if let Some(log) = &mut self.log {
+            log.push(command.clone());
+            if matches!(command, TextCommand::Undo | TextCommand::Redo) {
+                // The history is the recorder's: it replays the command there.
+                return false;
+            }
+        }
         match command {
             TextCommand::Undo => {
                 let current = self.snapshot();
@@ -256,6 +263,43 @@ impl TextInput {
         }
     }
 
+    /// The inline autocomplete suffix (empty when there is no completion).
+    pub fn ghost(&self) -> &str {
+        &self.ghost
+    }
+
+    /// Set the ghost-completion suffix shown dim after the text. Not committed to
+    /// the buffer until [`accept_ghost`](Self::accept_ghost).
+    pub fn set_ghost(&mut self, text: impl Into<String>) {
+        self.ghost = text.into();
+    }
+
+    /// Clear the ghost suffix.
+    pub fn clear_ghost(&mut self) {
+        self.ghost.clear();
+    }
+
+    /// Start or stop logging every applied command. While logging, `Undo` and
+    /// `Redo` only enter the log: the field keeps no history of its own to run
+    /// them on, and whoever drains the log applies them to the history they own.
+    pub fn record_commands(&mut self, on: bool) {
+        match (on, self.log.is_some()) {
+            (true, false) => self.log = Some(Vec::new()),
+            (false, true) => self.log = None,
+            _ => {},
+        }
+    }
+
+    /// Whether logged commands wait to be taken.
+    pub fn has_commands(&self) -> bool {
+        self.log.as_ref().is_some_and(|log| !log.is_empty())
+    }
+
+    /// Take the logged commands, oldest first.
+    pub fn take_commands(&mut self) -> Vec<TextCommand> {
+        self.log.as_mut().map(std::mem::take).unwrap_or_default()
+    }
+
     /// Apply a focused key/IME event using the shared command mapping.
     pub fn apply_key(&mut self, event: &KeyEvent, mode: TextFieldMode) -> bool {
         text_command_from_key(event, mode).is_some_and(|command| self.apply(command))
@@ -285,6 +329,30 @@ mod tests {
     use crate::{CompositionEvent, Key, KeyEvent, Modifiers};
 
     use super::*;
+
+    #[test]
+    fn a_recording_field_logs_every_command_and_leaves_undo_to_the_recorder() {
+        let mut input = TextInput::new("");
+        input.record_commands(true);
+        input.apply(TextCommand::Insert("a".into()));
+        input.apply(TextCommand::Insert("b".into()));
+        assert!(!input.apply(TextCommand::Undo));
+        assert_eq!(input.text(), "ab", "undo is the recorder's to run");
+        assert!(input.has_commands());
+        assert_eq!(
+            input.take_commands(),
+            vec![
+                TextCommand::Insert("a".into()),
+                TextCommand::Insert("b".into()),
+                TextCommand::Undo,
+            ]
+        );
+        assert!(!input.has_commands());
+        input.record_commands(false);
+        input.apply(TextCommand::Insert("c".into()));
+        assert!(input.take_commands().is_empty());
+        assert!(input.apply(TextCommand::Undo));
+    }
 
     #[test]
     fn primary_shortcuts_do_not_insert_literal_characters() {
