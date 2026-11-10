@@ -37,9 +37,9 @@ async fn invoke(
 }
 async fn open(route: &str) -> (AppBrokerClient, EndpointDescriptor) {
     let mut c = AppBrokerClient::open_declared_route(
-        AppId::new(graphshell::declaration::APP),
+        AppId::new(graphshell_door::declaration::APP),
         AppRouteId::new(route).unwrap(),
-        graphshell::declaration::declaration(),
+        graphshell_door::declaration::declaration(),
     )
     .await
     .unwrap();

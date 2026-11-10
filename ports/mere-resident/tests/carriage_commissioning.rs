@@ -15,7 +15,7 @@ use std::path::PathBuf;
 
 use mere_resident::door::browser_host::now_ms;
 use mere_resident::sync::carriage_host::{CarriageHost, CarriageHostConfig};
-use graphshell::carriage::CarriageCeilings;
+use mere_resident::sync::carriage::CarriageCeilings;
 use personae::Ed25519Keypair;
 
 /// The wrapping keys pairing retained, as the resident loads them.

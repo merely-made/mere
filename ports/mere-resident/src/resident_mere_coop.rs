@@ -78,8 +78,8 @@ impl Activities {
             let identity = Arc::new(
                 castellan_client::custody_identity::CustodyIdentity::connect_declared_at_timeout(
                     endpoint,
-                    graphshell::declaration::APP,
-                    graphshell::declaration::declaration(),
+                    graphshell_door::declaration::APP,
+                    graphshell_door::declaration::declaration(),
                     std::time::Duration::from_secs(10),
                 )
                 .map_err(|e| e.to_string())?,
@@ -197,7 +197,7 @@ pub(super) fn register(
         let route_id = route_id.clone();
         let domain = shared.domain.clone();
         let authorize = Arc::new(move || {
-            let app = AppId::new(graphshell::declaration::APP);
+            let app = AppId::new(graphshell_door::declaration::APP);
             for route in [mere_route_id(&domain), route_id.clone()] {
                 grants
                     .current()

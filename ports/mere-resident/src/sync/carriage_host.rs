@@ -36,7 +36,7 @@ use tokio::sync::RwLock;
 use transport::p2panda_transport::MdnsDiscoveryMode;
 use transport::{P2pandaTransport, PeerID, Transport, sync_overlay_topic};
 
-use graphshell::carriage::{
+use super::carriage::{
     CarriageAdmissionPolicy, CarriageCeilings, CarriageExt, CarriagePurgeProposal, HeldLease,
     carriage_log, carriage_topic, propose_carriage_purge, sign_lease,
 };

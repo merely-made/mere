@@ -14,6 +14,7 @@
 //! are still Graphshell's (`graphshell::personal_sync`, `transfer`,
 //! `transfer_offer`, `receipts`), which L13 moves later.
 
+pub mod carriage;
 pub mod carriage_host;
 pub mod graph_keys;
 pub mod personal_seals;

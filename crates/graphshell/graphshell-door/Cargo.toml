@@ -25,6 +25,9 @@ projection-provider = ["projection-offer", "ostiary/native", "dep:tokio"]
 # The Graphshell application's identity: the persona in use, as djinn releases it.
 profile = ["dep:ostiary", "ostiary/native", "dep:castellan-client", "castellan-client/client", "dep:dramatis", "dep:insigne", "dep:personae"]
 
+# Graphshell's declaration on the door hello (moved from the app, engine split S1).
+declaration = ["dep:ostiary"]
+
 [dependencies]
 chirograph.workspace = true
 graphshell-endpoint = { workspace = true, features = ["projection"] }

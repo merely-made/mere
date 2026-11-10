@@ -280,7 +280,7 @@ path = "ports/graphshell/src/capture.rs"
 reason = "Consented browser-history intake into Mere and Eidetic browsing memory. Existing source-size debt; a responsibility split must preserve CaptureBackend, StagedWrites, CaptureBatch and existing module visibility."
 
 [[exception]]
-path = "ports/graphshell/src/carriage.rs"
+path = "ports/mere-resident/src/sync/carriage.rs"
 reason = "The epoch carriage lane: leased slots for wrapped private-epoch material. Existing source-size debt; a responsibility split must preserve CarriageExt, HeldLease, CarriageCeilings and existing module visibility."
 
 [[exception]]

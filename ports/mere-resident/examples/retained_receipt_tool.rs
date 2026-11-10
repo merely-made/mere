@@ -31,7 +31,7 @@ async fn main() {
     match std::env::args().nth(1).as_deref() {
         Some("grants") => {
             let grants = vec![
-                grant_for(&AppId::new(graphshell::declaration::APP), &graphshell::declaration::declaration(), None),
+                grant_for(&AppId::new(graphshell_door::declaration::APP), &graphshell_door::declaration::declaration(), None),
                 grant_for(&AppId::new(LOCKER), &locker(), None),
             ];
             println!("{}", serde_json::to_string(&grants).unwrap());

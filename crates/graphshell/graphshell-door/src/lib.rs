@@ -22,6 +22,8 @@
 //! Projection and identity adapters use the independent Djinn door; native
 //! adapters are unavailable on Wasm.
 
+#[cfg(feature = "declaration")]
+pub mod declaration;
 #[cfg(all(feature = "profile", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod profile;
 #[cfg(all(
