@@ -1386,6 +1386,30 @@ summary = "All of coop, guest and shared tests included, lives in graphshell-hos
 draws_on = ["engine-split D67"]
 plans = ["engine-split"]
 
+[decisions."engine-split D89"]
+title = "The provenance tooling label is the caller's (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect's access takes the provenance tooling label from its caller; the app and the resident each name themselves."
+draws_on = ["engine-split D69"]
+plans = ["engine-split"]
+
+[decisions."engine-split D90"]
+title = "The block pane keeps one undo journal (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The block pane's widget sends undo and redo to the editor; the editor's journal is the only history."
+draws_on = ["engine-split D73"]
+plans = ["engine-split"]
+
+[decisions."engine-split D91"]
+title = "The goal surface's provider, facts and door are a graphshell-host feature (Mark, 2026-11-09)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The goal surface's provider, facts and door live in graphshell-host behind a goal-surface feature, not in the resident."
+draws_on = ["engine-split D67", "engine-split D71"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

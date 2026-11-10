@@ -449,14 +449,15 @@ places do: `mere-resident` (13 modules, about 23k lines, 36 non-test use lines),
 module moves to its owner below both sides. No route is added. Steps, in dependency order:
 
 - **S1, leaves with no dependents among the others.** `declaration` to `graphshell-door`;
-  `kept_text` to Eidetic (D71); the goal surface's provider, facts and door to the resident
-  (D71); the whole of `coop` to `graphshell-host` (D88), after `declaration`; `carriage` and
+  `kept_text` to Eidetic (D71); the goal surface's provider, facts and door to
+  `graphshell-host` (D91); the whole of `coop` to `graphshell-host` (D88), after `declaration`; `carriage` and
   `receipts` to the resident's `sync/` (D81).
   - Done when: the resident and the app compile without those `graphshell::` paths, and the
     moved tests pass with unchanged counts.
 - **S2, the sync domain.** `access` and `personal_sync` to pandect (D69), which gains
   stickleback and p2panda.
-  - Done when: Cleromancy builds with no `graphshell` package and its row is gone.
+  - Done when: Cleromancy's `graphshell` row is gone. The package still reaches it through
+    `mere-resident` until S6, which carries the no-package condition.
   - Needs: P4's pandect stages landed, since both edit pandect.
 - **S3, the endpoint closure.** `mere_host`, `handlers`, `session_item` and `resident_host`
   become graphshell-host's `mere-host` feature (D68).
@@ -1479,6 +1480,40 @@ revision and what crosses at frame rate.
   Outcome: refines S1's coop line; applies D67.
 
   Links: area The stack · draws on engine-split D67 · plans engine-split P3 · summary All of coop, guest and shared tests included, lives in graphshell-host behind a coop feature.
+
+- **D89. The provenance tooling label is the caller's (Mark, 2026-11-09):** S2 moved `access`
+  to pandect as it was (D69). It stamps stored records with a tooling label built from the
+  crate version, `graphshell/{version}` and `graphshell-access/{version}`, so new records read
+  `graphshell/0.2.0` (pandect's version) where they read `graphshell/0.0.2`. Schema ids are
+  unchanged. Offered the caller passing it, relabelling to `pandect/`, or leaving it. Ruling:
+  "Caller passes it (Recommended)". pandect takes the tooling string as an argument, and the
+  app and the resident each name themselves and their own version. Outcome: new; applies D69.
+
+  Links: area The stack · draws on engine-split D69 · plans engine-split P3 · summary pandect's access takes the provenance tooling label from its caller; the app and the resident each name themselves.
+
+- **D90. The block pane keeps one undo journal (Mark, 2026-11-09):** D73 took `input()` and
+  `input_mut()` off `BlockEditor`, so the pane owns its text widget. The lane landed the
+  widget's Ctrl+Z on the widget's own history, apart from the editor's journal: that history
+  resets when the editor changes the text, and the Undo button takes back one flush of typing
+  per step. Offered one shared journal, keeping it as landed, or a headed look first. Ruling:
+  "One shared journal (Recommended)". Ctrl+Z in the widget goes to the editor as an undo
+  message, the widget's local history is not used, and a coalesced run of typing is one step
+  as before. Outcome: refines D73.
+
+  Links: area The stack · draws on engine-split D73 · plans engine-split P3 · summary The block pane's widget sends undo and redo to the editor; the editor's journal is the only history.
+
+- **D91. The goal surface's provider, facts and door are a graphshell-host feature (Mark,
+  2026-11-09):** D71 sent them to the resident. The lane found the app's viewer uses all three:
+  `GoalSurface` holds `RetainedPages`, `suggest.rs` (326 lines) uses `GraphFacts` and
+  `RetainedPages`, the web tree uses `Origin`, and `graphshell-mere` calls `door::from_wire`.
+  In the resident they would make the app depend on the resident. Offered a graphshell-host
+  feature, a crate of its own, or splitting the viewer out to reach pages over the door.
+  Ruling: "graphshell-host feature (Recommended)". `provider`, `facts`, `door` and the fixture
+  (about 800 lines) become a `goal-surface` feature of `graphshell-host`, below both the app and
+  the resident; the viewer stays in the app and `kept_text` stays in Eidetic. Outcome: refines
+  D71; applies D67.
+
+  Links: area The stack · draws on engine-split D67, engine-split D71 · plans engine-split P3 · summary The goal surface's provider, facts and door live in graphshell-host behind a goal-surface feature, not in the resident.
 
 ## Open questions
 
