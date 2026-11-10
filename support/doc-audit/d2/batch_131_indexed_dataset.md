@@ -9,7 +9,7 @@ Written 2026-11-09 against Mere main `719686b3b` (the adapter_scale example comm
 ## mere_docs/technical_architecture/2026-11-09_indexed_dataset_brief.md
 
 - disposition: current
-- status line: "design brief from a Mark session; D1 to D5 ruled the same day ... Nothing implemented." — accurate: yes
+- status line: "design brief from a Mark session; D1 to D5 ruled the same day ... Implemented under the quad index plan: P1 and P2 landed 2026-11-10 ..." — accurate: yes
 - claims checked: 8 — holds: 8, stale: 0, unverifiable: 0
 
 ### Stale claims

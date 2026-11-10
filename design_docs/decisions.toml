@@ -1707,6 +1707,14 @@ summary = "The graph listings take the view, so a graph whose rows are all withd
 draws_on = ["indexed-dataset D5"]
 plans = ["quad-index"]
 
+[decisions."quad-index D8"]
+title = "Unknown query terms go through a per-query dictionary (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
+area = "The stack"
+summary = "Terms a query computes or names that the dataset lacks are interned in a per-query dictionary above the held ids."
+draws_on = ["indexed-dataset D2", "indexed-dataset D4"]
+plans = ["quad-index"]
+
 [decisions."ranged-fetch D1"]
 title = "One handle, three calls"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"

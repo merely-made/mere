@@ -9,7 +9,7 @@ Written 2026-11-09 against Mere main `75e26f56e` (the indexed dataset brief's ru
 ## mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md
 
 - disposition: current
-- status line: "plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: \"Land and start P2\"); P2 in its lane." — accurate: yes (updated 2026-11-10; the landing checked against eidetic main 60f3d60, 122 tests; Mere's lock at chartulary 60f3d60 since a9153fa6d)
+- status line: "plan, 2026-11-09; ... D8 ruled and P2 landed on Mere main 2026-11-10 ...; P3 open." — accurate: yes (updated 2026-11-10 at the P2 landing; 92 mere-rdf tests with the query feature)
 - claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims
