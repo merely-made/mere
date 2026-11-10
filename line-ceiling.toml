@@ -281,7 +281,7 @@ reason = "The block editing pane: Cambium view, toolbar and adapter calls over o
 
 [[exception]]
 path = "ports/graphshell/src/canvas_physics_tests.rs"
-reason = "Host acceptance tests of mere::canvas::physics_controls on Graphshell's reference fixture, as its tree page opens it. Existing source-size debt; a responsibility split must preserve NarrowedNumber and existing module visibility."
+reason = "Host acceptance tests of pictograph::canvas::physics_controls on Graphshell's reference fixture, as its tree page opens it. Existing source-size debt; a responsibility split must preserve NarrowedNumber and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/canvas_reader/tests.rs"

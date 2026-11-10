@@ -1,7 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/mere",
     "crates/canvas/cartography",
     "crates/canvas/pictograph",
     "crates/graph/graph-kernel",
@@ -221,7 +220,6 @@ ipc-channel = "0.23.1"
 # Exactly pinned: wit-parser states no API stability and ships a new 0.X
 # with every wasm-tools release (capability door D17).
 wit-parser = "=0.263.0"
-mere = { path = "crates/mere" }
 
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
 page-load = { package = "mere-pageload", version = "0.0.1", git = "https://github.com/merely-made/inker.git", branch = "main" }
@@ -584,7 +582,6 @@ backstep = { path = "crates/cambium/backstep" }
 errand = { git = "https://github.com/merely-made/errand.git", branch = "main" }
 incipit = { path = "crates/incipit" }
 luggage = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
-mere = { path = "crates/mere" }
 mere-cartography = { path = "crates/canvas/cartography" }
 mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-overmap = { path = "crates/cambium/mere-overmap" }

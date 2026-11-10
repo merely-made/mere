@@ -9418,22 +9418,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere"
-version = "0.0.2"
-dependencies = [
- "incipit",
- "inker",
- "mere-kernel",
- "mere-rdf",
- "pictograph",
- "platen",
- "serde",
- "serde_json",
- "uuid",
- "workbench",
-]
-
-[[package]]
 name = "mere-athanor"
 version = "0.0.1"
 dependencies = [

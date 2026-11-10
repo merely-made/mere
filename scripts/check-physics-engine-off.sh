@@ -7,13 +7,11 @@
 set -eu
 
 cargo check --locked -p pictograph --no-default-features --features canvas
-cargo check --locked -p mere --no-default-features --features graph,canvas
 cargo check --locked -p graphshell-host --no-default-features --features board
 
-for pkg in pictograph mere graphshell-host; do
+for pkg in pictograph graphshell-host; do
     case $pkg in
         pictograph) features=canvas ;;
-        mere) features=graph,canvas ;;
         graphshell-host) features=board ;;
     esac
     tree=$(cargo tree --locked -p "$pkg" --no-default-features --features "$features" -e normal --prefix none)
@@ -22,4 +20,4 @@ for pkg in pictograph mere graphshell-host; do
         exit 1
     fi
 done
-echo "physics-engine off: pictograph, mere and graphshell-host build, with no rapier, parry or nalgebra in their normal trees"
+echo "physics-engine off: pictograph and graphshell-host build, with no rapier, parry or nalgebra in their normal trees"
