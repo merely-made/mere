@@ -268,6 +268,10 @@ path = "ports/graphshell/src/bin/graphshell_coop.rs"
 reason = "Native Graphshell co-op surface. Existing source-size debt; a responsibility split must preserve Command, Update, App and existing module visibility."
 
 [[exception]]
+path = "ports/graphshell/src/block_pane.rs"
+reason = "The block editing pane: Cambium view, toolbar and adapter calls over one document. Existing source-size debt; a responsibility split must preserve Pane, PaneHost, PanePorts and existing module visibility."
+
+[[exception]]
 path = "ports/graphshell/src/canvas_physics_tests.rs"
 reason = "Host acceptance tests of mere::canvas::physics_controls on Graphshell's reference fixture, as its tree page opens it. Existing source-size debt; a responsibility split must preserve NarrowedNumber and existing module visibility."
 
