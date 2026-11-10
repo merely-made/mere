@@ -154,6 +154,9 @@ pub use palette::DerivedFacePalette;
 /// Face palettes clamped to read against a line of text's ground.
 pub mod text_palette;
 pub use text_palette::{TEXT_FACE_CONTRAST, TextFacePalette};
+/// Faces inline in text: the shared sizing and the paths a host paints.
+pub mod inline_face;
+pub use inline_face::{INLINE_FACE_MIN_DEVICE_PX, inline_face_commands, inline_face_style};
 /// The Map's theme roles, resolved once for every host.
 pub mod theme;
 pub use theme::{CanvasRoles, CanvasTheme};

@@ -2,8 +2,9 @@
 
 **Date:** 2026-11-09
 **Status (2026-11-09):** G landed (grammar identity, key domains, the full
-face cache key), T1 (the text arm, drawing version 2) and T2 (the
-contrast-clamped text palette); every other phase open. D1 (emblem's repository hosts the
+face cache key), T1 (the text arm, drawing version 2), T2 (the
+contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
+vector images); every other phase open. D1 (emblem's repository hosts the
 faces crate) and D2 (identity and drawing version separately) ruled 2026-11-09;
 every other fork carries a provisional recommendation. SVG output (emblem's
 plan) landed the same day.
@@ -454,7 +455,11 @@ Provisional (recommended first; asked only if they become blocking):
 - 2026-11-09: genet-livery's replaced elements are `img`, `canvas` and `iframe`
   (`layout.rs:2484-2495`); a vector inline element is new engine work.
 - 2026-11-09: whether `canvas/frame.rs` passes logical or device pixels as
-  `Host.height` is unverified; T3 settles it.
+  `Host.height` is unverified; T3 settles it. Settled 2026-11-09: the canvas
+  takes no device scale; `face_layer` passes the face's side in the canvas's
+  own screen pixels, which are device pixels only if the host frames the canvas
+  at its surface size. Inline faces take the scale explicitly
+  (`inline_face_commands`).
 
 - 2026-11-09: G keeps the address seed exactly (FNV-1a over the address,
   XORed with the seed version), so `KeyDomain::Address` needs no tag; a context
@@ -473,6 +478,12 @@ Provisional (recommended first; asked only if they become blocking):
   palette holds against both the page and the amber node-selection fill; a
   selected row or tab takes its own palette. On the light themes one palette
   fits all four grounds.
+- 2026-11-09: livery has no device scale either: it lays out in CSS pixels and
+  the renderer scales. So "rounded to a device pixel" is the host's CSS
+  (`round(nearest, max(8px / s, 1cap), 1px / s)`), and the vector image picks
+  its arm from its CSS height times the scale it was built for. Livery had no
+  `cap` unit; it now resolves one from the font like `ch`, so the face's
+  height is standard CSS rather than a face rule in the engine.
 
 ## Progress
 
@@ -504,3 +515,17 @@ Provisional (recommended first; asked only if they become blocking):
   ground; a moved entry keeps its hue and one step nearer would fail; a row's
   resting and hover grounds share one palette; outlined is exactly "below the
   floor"; alpha is kept and no grounds changes nothing.
+- 2026-11-09: T3 landed. genet c1d25be4a79: livery's CSS `cap` unit (the
+  font's cap height, or its ascent where it gives none) and embedder vector
+  images (`VectorImage`, `LiveryDocument::set_vector_image`): an `<img>` naming
+  one is laid out at its natural ratio and painted by its own paths, ahead of
+  raster bytes under the same URL. Its test places a vector square inline in
+  Ahem text at 12, 14 and 16 px and at 1× and 2× rounding: the box is the cap
+  height rounded to a device pixel, square, bottom on the baseline, painted
+  once into its own box; `cap` reads the font (16 px at 20 px Ahem, not the
+  0.7 em fallback); removing the image leaves no stale paths. Livery's and
+  genet-livery's 1032 tests pass. Mere: `canvas/inline_face.rs`
+  (`inline_face_style`, the one sizing helper; `inline_face_commands`, the
+  face's paths with the arm chosen by device height). Livery and Inker take no
+  pictograph dependency; the face reaches livery only through a host's
+  `VectorImage` (T4).
