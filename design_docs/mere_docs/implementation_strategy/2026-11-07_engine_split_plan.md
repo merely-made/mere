@@ -505,6 +505,7 @@ change. Measure per Constraints before the resource/surface join becomes a crate
   frame cost are measured against the P0 baseline and recorded; the example headless resource
   inspector runs.
 - Needs: P4 (so the profile is outside the crate), P3 (so the surface half has a home).
+- The dataset behind the query stage is designed and ruled in the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09): the generic id-level index in chartulary, the `spareval` seam here, dense ids rebuilt per revision, six orderings, one index for live and history. Its §1 measured the borrowed adapter, which is what this phase replaces.
 
 ### P6. Interpretation and identity stages
 

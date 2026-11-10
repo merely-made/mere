@@ -1,7 +1,7 @@
 # The indexed dataset: the engine's query store (design brief)
 
 **Date**: 2026-11-09
-**Status**: design brief from a Mark session. Mark ruled "Let's measure, and do the indexed dataset after" (2026-11-09); §1 is the measurement, §2 to §5 the design, §6 the forks as cards. Nothing implemented. The quadratic property append that the measurement also found is a separate session (Mark, 2026-11-09, "Separate session"), not this brief.
+**Status**: design brief from a Mark session; D1 to D5 ruled the same day. Mark ruled "Let's measure, and do the indexed dataset after" (2026-11-09); §1 is the measurement, §2 to §5 the design as ruled, §6 the forks as they were asked, Decisions the answers. Nothing implemented. The quadratic property append that the measurement also found is a separate session (Mark, 2026-11-09, "Separate session"), not this brief.
 **Related**: the [engine split plan](../implementation_strategy/2026-11-07_engine_split_plan.md) (The engine's stages, Model and Query rows; Constraints, "Measure before the join moves"; P5, "Oxigraph's component crates stay upstream behind the engine's dataset and loader interfaces"), the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows; the adapter layer "not scorable"), the [link model](2026-10-15_link_model.md) (what an assertion retains), the [statement kernel brief](2026-06-19_statement_kernel_brief.md) (the kernel as a statement store), the [linked-data platform lessons brief](../research/2026-11-06_linked_data_platform_lessons_brief.md) (the pack model that names predicates), doctrine Stack 1, Stack 3 and Stack 6.
 
 ## 1. The measurement
@@ -42,11 +42,13 @@ What the dataset must keep: the query tests in `crates/graph/linked-data/src/que
 
 **One dataset, held per revision, indexed, dictionary-encoded, fed to `spareval` through its own internal term.** The evaluator, optimizer, algebra and parsers stay upstream unchanged (P5); only the thing they evaluate over is ours.
 
-- **Dictionary.** Every term that appears in a quad is interned once: IRIs, blank or skolem nodes, literals with datatype and language. The dictionary maps a term to a small integer id and back. Resource IRIs already have a durable UUID; the dictionary's id is a projection of it with the revision's lifetime (Stack 6: identity is stable, representations are projections with their own lifetimes). Literals are interned by content.
-- **Quads as id tuples.** A quad is four ids, graph included (default graph is a reserved id), plus what a filter needs beside the triple: held or withdrawn, the asserter id, and the statement id for reifier lookups. The reifier metadata quads of today's projection are derived from that record rather than stored as extra tuples, so the live projection and the history projection are the same index read with and without the withdrawn rows.
-- **Orderings.** Sorted tuple vectors in the orderings that serve every pattern shape `spareval` asks for (`internal_quads_for_pattern` binds any subset of subject, predicate, object and graph). Three orderings cover bound prefixes of the triple; their graph-first twins cover a bound graph. A pattern binds a prefix and reads one contiguous range; nothing scans.
+- **Home (D1).** The generic part, a dictionary-plus-orderings quad index over ids, lives in Eidetic's `chartulary` with no Oxigraph dependency. Mere's engine crate wraps it: it supplies the terms from its facets and statements, owns the dictionary's external term type (`oxrdf`), and implements `spareval::QueryableDataset`. Eidetic indexes ids it is handed and never learns Mere's literal or reifier vocabulary.
+
+- **Dictionary (D2).** Every term that appears in a quad is interned once: IRIs, blank or skolem nodes, literals with datatype and language. The dictionary maps a term to a dense `u32` minted when the index is built, and back. Nothing of the id is persisted; resource IRIs keep their durable UUID and statements their id, and the dense id is a projection of them with the revision's lifetime (Stack 6: identity is stable, representations are projections with their own lifetimes). Literals are interned by content.
+- **Quads as id tuples, held and withdrawn (D5).** A quad is four ids, graph included (default graph is a reserved id), plus what a filter needs beside the triple: held or withdrawn, the asserter id, and the statement id for reifier lookups. The reifier metadata quads of today's projection are derived from that record rather than stored as extra tuples, so the live projection and the history projection are the same index read with and without the withdrawn rows; `dataset_quads_with_history` retires as a separate walk when the index lands.
+- **Orderings (D3).** Six sorted tuple vectors: SPO, POS, OSP and their graph-first twins, which serve every pattern shape `spareval` asks for (`internal_quads_for_pattern` binds any subset of subject, predicate, object and graph). A pattern binds a prefix and reads one contiguous range; nothing scans. 7.7 MB at 80k quads.
 - **The `spareval` seam.** `QueryableDataset` with `InternalTerm` = the dictionary id (a `u32` or `u64`: `Clone + Eq + Hash`, cheap to hash and compare, which is where today's `Term` clones cost). `internalize_term` is a dictionary lookup; a term the dictionary does not hold matches nothing. `externalize_term` is the reverse. The optional `externalize_expression_term` decodes a literal straight to the evaluator's typed `ExpressionTerm`, so a `FILTER` on a number or a date never rebuilds an `oxrdf` literal.
-- **Refresh.** Rebuilt per revision from the kernel's assertion records, keyed on the change counters above; the host holds the projection and reads it until the key moves. Incremental maintenance through the kernel's write paths is the second step, taken only if the rebuild cost shows at the scales the host sees (§4 says what to measure).
+- **Refresh (D4).** Rebuilt per revision from the kernel's assertion records, keyed on the change counters above; the host holds the projection and reads it until the key moves. Incremental maintenance through the kernel's write paths is the second step, taken only if the rebuild cost shows at the scales the host sees (§4 says what to measure).
 - **Writes do not go through the index.** SPARQL Update (ledger D65, "no update stage") would land through the kernel's assertion rules (separate assertions per asserter, withdrawal retained, no revival by a stale assert) and then refresh; the index is a read structure and never a second truth.
 
 Nothing here forks a crate. The parsers, `spargebra`, `sparopt` and `spareval` are consumed as they are; `oxrdf` remains the external term type at the seam.
@@ -68,7 +70,7 @@ Nothing here forks a crate. The parsers, `spargebra`, `sparopt` and `spareval` a
 
 ## 6. Forks
 
-Each is a card; the answer is recorded under Decisions in the words given.
+Asked as cards on 2026-11-09, in two rounds; the answers are the Decisions below, in the words given.
 
 - **F1. Home.** (a) A module of the `mere` engine crate's query stage, where `linked-data/query` folds under P5. (b) Its own crate in Mere, taking a freed family name before a new word is spent (plan Constraints). (c) A generic index over chartulary's semantic ring in Eidetic's data root, beside `chartulary::rdf`, with Mere supplying the term mapping. Evidence: nothing outside the engine queries the dataset today; chartulary's own projection already lists SPARQL as future work; Stack 1 says a module until the abstraction earns a crate.
 - **F2. Internal term.** (a) Dense ids minted per rebuild, smallest and simplest, no stability across revisions. (b) Durable ids (the resource UUID; a content hash for literals), stable across revisions, which incremental maintenance would need and which cost 128 bits per slot instead of 32.
@@ -78,4 +80,24 @@ Each is a card; the answer is recorded under Decisions in the words given.
 
 ## Decisions
 
-None yet. The forks above become D1 onward as they are answered.
+Ruled 2026-11-09, one session, each fork of §6 as a card.
+
+- **D1. Store in Eidetic, seam in Mere (Mark, 2026-11-09):** F1. First round, against the module, own-crate and Eidetic options: "3 sounds right but i'm unsure. 1 is ok". Put back with the Eidetic option split, since `chartulary` names no Oxigraph crate (serde, petgraph, muniment, rkyv, slotmap, uuid; 7,853 lines) and only Mere knows its literal and reifier vocabulary: "Store in Eidetic, seam in Mere (Recommended)". `chartulary` gets a generic dictionary-plus-orderings quad index over ids with no Oxigraph dependency; Mere's engine crate wraps it, supplies the terms from its facets and statements, and implements `spareval::QueryableDataset`. Outcome: applies Stack 1 (compose before implementing; the abstraction that earned a home is the generic index, and it goes to the crate reserved for the generic graph) and Stack 3 (the Oxigraph seam stays in the engine).
+
+  Links: area The stack · draws on mere:stack.1, mere:stack.3, engine-split D1 · plans engine-split P5 · summary The generic id-level quad index lives in chartulary; Mere's engine supplies the terms and the spareval seam.
+
+- **D2. Dense ids per rebuild (Mark, 2026-11-09):** F2. "Dense ids per rebuild (Recommended)". The internal term is a `u32` minted when the index is built; nothing of it is persisted; the resource UUID and the statement id remain the durable identities. Outcome: applies Stack 6.
+
+  Links: area The stack · draws on mere:stack.6 · plans engine-split P5 · summary The index's internal term is a dense id minted per rebuild; durable identity stays the UUID and the statement id.
+
+- **D3. Six orderings (Mark, 2026-11-09):** F3. "Six: three plus graph-first twins (Recommended)". SPO, POS, OSP and their graph-first twins; every pattern shape reads one contiguous range; 7.7 MB at 80k quads.
+
+  Links: area The stack · draws on indexed-dataset D2 · plans engine-split P5 · summary Six sorted orderings, three triple orderings and their graph-first twins, so every pattern reads one range.
+
+- **D4. Rebuild per revision, then measure (Mark, 2026-11-09):** F4. "Rebuild per revision, then measure (Recommended)". The index is rebuilt from the assertion records when a kernel change counter moves and held until the next; incremental maintenance waits on the load, mutation and refresh numbers of §4. Outcome: applies the plan's Constraints, "Measure before the join moves".
+
+  Links: area The stack · draws on engine-split D1 · plans engine-split P5 · summary The index is rebuilt per revision and held; incremental maintenance only if measured refresh cost demands it.
+
+- **D5. One index, held and withdrawn rows (Mark, 2026-11-09):** F5. "One index, held and withdrawn rows (Recommended)". Live and history are reads of one index with and without withdrawn rows; `dataset_quads_with_history` retires as a separate walk when the index lands.
+
+  Links: area The stack · draws on indexed-dataset D4 · plans engine-split P5 · summary Live and history are two reads of one index; the separate history walk retires.
