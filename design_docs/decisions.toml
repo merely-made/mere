@@ -1418,6 +1418,22 @@ summary = "The receipt_ingest CLI is a resident bin beside receipts; receipt aut
 draws_on = ["engine-split D81"]
 plans = ["engine-split"]
 
+[decisions."engine-split D93"]
+title = "The app's methods on MereHost become extension traits (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The app's product and capture methods on MereHost are extension traits over its public mutation primitives."
+draws_on = ["engine-split D68", "engine-split D70"]
+plans = ["engine-split"]
+
+[decisions."engine-split D94"]
+title = "The alembic workshop methods stay in the app (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The workshop methods on MereHost stay in the app as an extension over public accessors; graphshell-host names no athanor crate."
+draws_on = ["engine-split D68", "engine-split D93"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -460,7 +460,8 @@ module moves to its owner below both sides. No route is added. Steps, in depende
     `mere-resident` until S6, which carries the no-package condition.
   - Needs: P4's pandect stages landed, since both edit pandect.
 - **S3, the endpoint closure.** `mere_host`, `handlers`, `session_item` and `resident_host`
-  become graphshell-host's `mere-host` feature (D68).
+  become graphshell-host's `mere-host` feature (D68). The app's product and capture methods on
+  `MereHost` become extension traits (D93), and the workshop methods stay in the app (D94).
   - Done when: the resident's route provider and the app's roughly 60 users build against it.
 - **S4, transfer.** The data types, `transfer_offer` and the codicil decode move down with the
   sync domain (D70); the resident's tests stop calling `product`.
@@ -1524,6 +1525,30 @@ revision and what crosses at frame rate.
   script is repointed. Outcome: applies D81.
 
   Links: area The stack · draws on engine-split D81 · plans engine-split P3 · summary The receipt_ingest CLI is a resident bin beside receipts; receipt authoring stays in one place.
+
+- **D93. The app's methods on MereHost become extension traits (Mark, 2026-11-10):** S3 moved
+  `handlers` and `session_item` and stopped at `MereHost`. The app adds methods directly to it:
+  14 in `product.rs` and 4 in `capture.rs`, called at 172 sites in 19 files, and Rust forbids
+  that across crates. D70 keeps `product` in the app. The methods use four private primitives
+  (`mutate_product_graph`, `set_facet`, `edit_candidate`, `commit_candidate`) and one private
+  field. Offered extension traits in the app, free functions, or moving the methods down.
+  Ruling: "Extension traits in the app (Recommended)". The app defines `ProductHost` and
+  `CaptureHost`, implemented for graphshell-host's `MereHost`; call sites keep their shape and
+  gain a `use`. The four primitives become `MereHost`'s public mutation interface. Outcome:
+  new; applies D68 and D70.
+
+  Links: area The stack · draws on engine-split D68, engine-split D70 · plans engine-split P3 · summary The app's product and capture methods on MereHost are extension traits over its public mutation primitives.
+
+- **D94. The alembic workshop methods stay in the app (Mark, 2026-11-10):** `mere_host_alembic.rs`
+  (519 lines, feature `alembic-workshop`) is 10 more methods on `MereHost` over athanor's
+  workshop types, reading four private fields at 9 places. Only the app's `alembic_workshop`
+  calls it; the resident does not. Offered staying in the app or moving with `MereHost` behind a
+  graphshell-host feature that would name athanor and servitor. Ruling: "Stays in the app
+  (Recommended)". It becomes app code over `MereHost` the way D93's methods do, reading the
+  four fields through public accessors; graphshell-host gains no edge to athanor. Outcome:
+  applies D93.
+
+  Links: area The stack · draws on engine-split D68, engine-split D93 · plans engine-split P3 · summary The workshop methods on MereHost stay in the app as an extension over public accessors; graphshell-host names no athanor crate.
 
 ## Open questions
 
