@@ -29,6 +29,10 @@ bundled-contexts = []
 # Preserve directional JSON-LD terms previously enabled through Oxigraph.
 query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
 
+[[example]]
+name = "adapter_scale"
+required-features = ["query"]
+
 [dependencies]
 kernel.workspace = true
 serde_json.workspace = true
