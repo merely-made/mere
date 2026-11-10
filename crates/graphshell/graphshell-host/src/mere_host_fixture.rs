@@ -11,17 +11,17 @@
 //! record that the demo and the tests read back, and keeping it here leaves
 //! the host module about what the host does.
 
-use graphshell_host::handlers::HandlerRegistry;
-use mere::kernel::geometry::PortablePoint;
-use mere::kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta, assert_relation};
-use mere::kernel::graph::{
+use crate::handlers::HandlerRegistry;
+use kernel::geometry::PortablePoint;
+use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta, assert_relation};
+use kernel::graph::{
     ArrangementSubKind, ContainmentSubKind, Coupling, CouplingId, CouplingResponse, EdgeAssertion,
     Field, FieldDefinition, FieldExtent, FieldId, FieldLifecycle, Graph, NodeKey, NodeSelector,
     ProvenanceSubKind, RelationKind, ResourceNode, ScalarField, SemanticStatement, SemanticSubKind,
     VectorField,
 };
-use mere::kernel::persistence::PersistedResourceRecord;
-use mere::kernel::types::{AssertionBasis, AssertionMethod, GraphScope};
+use kernel::persistence::PersistedResourceRecord;
+use kernel::types::{AssertionBasis, AssertionMethod, GraphScope};
 use muniment::Backend;
 use serde_json::json;
 
@@ -217,7 +217,7 @@ impl<B: Backend + Clone> MereHost<B> {
                         to,
                         SemanticStatement {
                             statement_id: id.into(),
-                            predicate: mere::kernel::graph::predicate_iri(kind).to_owned(),
+                            predicate: kernel::graph::predicate_iri(kind).to_owned(),
                             recognized_sub_kind: Some(kind),
                             label: Some(note.into()),
                             basis: AssertionBasis {
@@ -341,7 +341,7 @@ impl<B: Backend + Clone> MereHost<B> {
                     b2,
                     SemanticStatement {
                         statement_id: "fixture:p6:family:resource-control".into(),
-                        predicate: mere::kernel::graph::predicate_iri(kind).into(),
+                        predicate: kernel::graph::predicate_iri(kind).into(),
                         recognized_sub_kind: Some(kind),
                         label: Some(note.into()),
                         basis: AssertionBasis {
@@ -413,7 +413,7 @@ impl<B: Backend + Clone> MereHost<B> {
                 },
             );
 
-            let predicate = mere::kernel::graph::predicate_iri(SemanticSubKind::Cites).to_owned();
+            let predicate = kernel::graph::predicate_iri(SemanticSubKind::Cites).to_owned();
             let rows = [
                 (
                     "fixture:p2:link-history:withdrawn-timed",

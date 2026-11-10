@@ -95,15 +95,26 @@ goal-surface = [
 # The board's repulsion on the host's device (physics catalog, P5c).
 board-gpu = ["board", "pictograph/gpu"]
 # The mere endpoint closure, below the app and the resident (engine split
-# D68): the handler registry and the session item. Native and wasm alike.
+# D68): MereHost, the handler registry, the session item and the resident
+# view. Native and wasm alike.
 mere-host = [
+    "dep:chartulary",
+    "dep:incipit",
+    "incipit/view",
     "dep:kernel",
+    "dep:mere",
     "dep:mere-overmap",
     "dep:muniment",
     "dep:pandect",
+    "dep:pictograph",
+    "dep:scenograph",
     "dep:serde",
     "dep:url",
+    "dep:uuid",
 ]
+# MereHost's test graphs for the app's and the resident's tests: products
+# enable it as a dev-dependency feature only.
+test-support = ["mere-host"]
 
 [dependencies]
 ostiary = { workspace = true, optional = true }
@@ -140,6 +151,10 @@ pollster = { version = "0.4", optional = true }
 pandect = { workspace = true, optional = true }
 mere-overmap = { workspace = true, optional = true }
 url = { version = "2", optional = true }
+scenograph = { workspace = true, optional = true }
+# `coupling_edit`, which lives in the facade itself (engine split D58
+# dissolves it later); every other facade path is named at its crate.
+mere = { path = "../../mere", default-features = false, features = ["graph"], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # An invitation's network id and session (`invitation`).
@@ -153,6 +168,8 @@ transport = { workspace = true, features = ["notochord"], optional = true }
 getrandom = { version = "0.3", features = ["wasm_js"], optional = true }
 
 [dev-dependencies]
+# The kernel's test graph builders (`graph::fixtures`), dev-only.
+kernel = { workspace = true, features = ["fixtures"] }
 muniment.workspace = true
 pollster = "0.4"
 uuid.workspace = true

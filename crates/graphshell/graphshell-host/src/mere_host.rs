@@ -18,16 +18,16 @@ use chirograph::{
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
-use graphshell_host::handlers::{
+use crate::handlers::{
     HandlerOffer, HandlerRegistry, OpenAddressV1, handler_from_intent, intent_id,
 };
-use graphshell_host::session_item;
-use mere::kernel::graph::apply::{GraphDelta, apply_graph_delta};
-use mere::kernel::graph::{
+use crate::session_item;
+use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+use kernel::graph::{
     Author, CapturedDelta, Graph, NodeFacetStore, NodeKey, RelationKey, RelationKind,
 };
-use mere::kernel::persistence::GraphSnapshot;
-use mere::kernel::time::wall_clock_now;
+use kernel::persistence::GraphSnapshot;
+use kernel::time::wall_clock_now;
 use muniment::{Backend, JsonSlots, StoreError};
 /// The view types a host writes through [`MereHost::set_view_now`].
 pub use incipit::view::ViewIntent as SessionViewIntent;
@@ -226,7 +226,7 @@ pub struct MereHost<B> {
     /// across calls for the current session's graph and reset when the
     /// session changes: a host without a canvas holds one (dynamics grammar
     /// plan, F87).
-    served_registry: std::sync::Mutex<mere::canvas::ChannelRegistry>,
+    served_registry: std::sync::Mutex<pictograph::canvas::ChannelRegistry>,
 }
 
 #[path = "mere_host_coupling.rs"]
@@ -235,10 +235,6 @@ mod coupling;
 mod resident_presentation;
 #[path = "mere_host_resident.rs"]
 mod resident_transaction;
-
-#[cfg(feature = "alembic-workshop")]
-#[path = "mere_host_alembic.rs"]
-mod alembic_owner;
 
 /// Changes not yet stored, taken as one batch by [`MereHost::prepare_store`]
 /// for its caller to write. Mark it stored once it commits.
@@ -271,7 +267,9 @@ impl Staged {
 
 /// A detached copy of the host's session with edits made on it, not yet
 /// committed.
-pub(crate) struct Candidate<B> {
+/// A detached candidate session [`MereHost::edit_candidate`] hands back for
+/// [`MereHost::commit_candidate`].
+pub struct Candidate<B> {
     session: GraphSession<B>,
     projection_revision: u64,
 }
@@ -288,6 +286,15 @@ fn encode_view(state: &ViewIntent) -> ViewState {
 
 fn author_of(persona: &SelectedPersonaRef, via: &str) -> Author {
     Author::person(persona.persona.clone()).via(via)
+}
+
+impl<B: Backend + Clone> MereHost<B> {
+    /// Replace the live session with a fresh recorded one by this host's
+    /// author, without retiring the old one (the alembic workshop, engine
+    /// split D94).
+    pub fn begin_recorded_session(&mut self) {
+        self.graph_session = self.sessions.begin_recorded(self.author(), None);
+    }
 }
 
 impl<B: Backend + Clone> MereHost<B> {
@@ -322,7 +329,7 @@ impl<B: Backend + Clone> MereHost<B> {
             resident_publication: false,
             resident_generation: None,
             resident_view: Default::default(),
-            served_registry: std::sync::Mutex::new(mere::canvas::ChannelRegistry::new()),
+            served_registry: std::sync::Mutex::new(pictograph::canvas::ChannelRegistry::new()),
         }
     }
 
@@ -521,7 +528,7 @@ impl<B: Backend + Clone> MereHost<B> {
             .served_registry
             .get_mut()
             .unwrap_or_else(|poisoned| poisoned.into_inner()) =
-            mere::canvas::ChannelRegistry::new();
+            pictograph::canvas::ChannelRegistry::new();
         self.projection_epoch = self.projection_epoch.wrapping_add(1);
         self.projection_revision = 1;
         self.resources.clear();
@@ -574,7 +581,7 @@ impl<B: LegacyTransactionBackend + Clone> MereHost<B> {
     /// `edit_now`) lands on the candidate and nothing live moves. Hand the
     /// candidate to [`commit_candidate`](Self::commit_candidate); dropping it
     /// discards the edits.
-    pub(crate) fn edit_candidate<R, E>(
+    pub fn edit_candidate<R, E>(
         &mut self,
         change: impl FnOnce(&mut Self) -> Result<R, E>,
     ) -> Result<(Candidate<B>, R), E> {
@@ -599,7 +606,7 @@ impl<B: LegacyTransactionBackend + Clone> MereHost<B> {
     /// they depend on, in one transaction, and install it. Sessions switched
     /// away from are stored first. A refusal leaves the live session, with
     /// whatever it had pending, as it was.
-    pub(crate) async fn commit_candidate(
+    pub async fn commit_candidate(
         &mut self,
         candidate: Candidate<B>,
         saved_at_secs: u64,
@@ -772,6 +779,34 @@ impl<B: Backend> MereHost<B> {
         self.resident_generation.as_deref()
     }
 
+    /// Install the generation an owner's own published write produced, and
+    /// move the projection (the alembic workshop, engine split D94).
+    pub fn install_published_generation(&mut self, generation: String) {
+        self.resident_generation = Some(generation);
+        self.projection_revision = self.projection_revision.wrapping_add(1);
+    }
+
+    /// Whether this host reopened a stored session rather than seeding one.
+    pub fn is_reopened(&self) -> bool {
+        self.reopened
+    }
+
+    /// The store's session index.
+    pub fn sessions(&self) -> &MereSessions<B> {
+        &self.sessions
+    }
+
+    /// Whether sessions switched away from are still waiting to be stored.
+    pub fn has_retired(&self) -> bool {
+        !self.retired.is_empty()
+    }
+
+    /// The live session, for an owner's own transactions over it (the alembic
+    /// workshop, engine split D94).
+    pub fn graph_session_mut(&mut self) -> &mut GraphSession<B> {
+        &mut self.graph_session
+    }
+
     pub fn with_session_item(mut self) -> Self {
         self.session_item = true;
         self
@@ -844,7 +879,7 @@ impl<B: Backend> MereHost<B> {
     /// carries is the registry's selection rather than an assertion. The
     /// offer's score and the snapshot come from this same call, which is what
     /// keeps them from disagreeing about a rung.
-    fn served_layout(&self) -> mere::canvas::CanvasStrategyProjection {
+    fn served_layout(&self) -> pictograph::canvas::CanvasStrategyProjection {
         let extents: HashMap<NodeKey, (f32, f32)> = self
             .graph()
             .nodes()
@@ -854,7 +889,7 @@ impl<B: Backend> MereHost<B> {
             .served_registry
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
-        mere::canvas::project_canvas_strategy_with_score_for_view(
+        pictograph::canvas::project_canvas_strategy_with_score_for_view(
             &mut registry,
             "phyllotaxis.default",
             self.graph(),
@@ -889,7 +924,9 @@ impl<B: Backend> MereHost<B> {
         result
     }
 
-    pub(crate) fn set_facet(
+    /// Set one facet on `key` as an edit of the live session; the projection
+    /// moves only when the value changed.
+    pub fn set_facet(
         &mut self,
         key: NodeKey,
         facet: &str,
@@ -908,14 +945,15 @@ impl<B: Backend> MereHost<B> {
         })?;
         if matches!(
             result,
-            mere::kernel::graph::apply::GraphDeltaResult::NodeMetadataUpdated(true)
+            kernel::graph::apply::GraphDeltaResult::NodeMetadataUpdated(true)
         ) {
             self.projection_revision = self.projection_revision.wrapping_add(1);
         }
         Ok(())
     }
 
-    pub(crate) fn mutate_product_graph<R>(
+    /// Apply `mutate` to the live graph as one edit and move the projection.
+    pub fn mutate_product_graph<R>(
         &mut self,
         mutate: impl FnOnce(&mut Graph) -> R,
     ) -> Result<R, MereHostError> {
@@ -1047,7 +1085,7 @@ impl<B: Backend> MereHost<B> {
         sessions: &pandect::MereSessions<B>,
         source: &mut MereHost<B>,
         pending: pandect::PendingMerge,
-        choices: &BTreeMap<mere::kernel::graph::Part, pandect::MergeChoice>,
+        choices: &BTreeMap<kernel::graph::Part, pandect::MergeChoice>,
         via: &str,
     ) -> Result<(), MereHostError>
     where
@@ -1090,7 +1128,7 @@ impl<B: Backend> MereHost<B> {
             .score
             .iter()
             .flat_map(|score| score.items.iter())
-            .filter(|item| item.source.adapter == mere::canvas::MERE_GRAPH_ADAPTER)
+            .filter(|item| item.source.adapter == pictograph::canvas::MERE_GRAPH_ADAPTER)
             .map(|item| (item.source.id.as_str(), &item.representation))
             .collect();
         let mut scene = Scene::new();
@@ -1297,7 +1335,7 @@ impl<B: Backend> MereHost<B> {
                 .get_node(relation.to)
                 .ok_or(MereHostError::MissingResource)?
                 .id;
-            let reading = mere::canvas::link_reading::read_link(
+            let reading = pictograph::canvas::link_reading::read_link(
                 self.graph(),
                 from_id,
                 to_id,
@@ -1385,11 +1423,11 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> MereHost<B> {
     pub async fn open_legacy_session_with_content_context(
         backend: B,
         id: SessionId,
-        cutoff: mere::kernel::graph::Seq,
+        cutoff: kernel::graph::Seq,
         origins: Vec<
-            mere::kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution,
+            kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution,
         >,
-        context: &mere::kernel::graph::legacy_resource_migration::LegacyContentContext,
+        context: &kernel::graph::legacy_resource_migration::LegacyContentContext,
         selected_persona: SelectedPersonaRef,
         handlers: HandlerRegistry,
         access_context: AccessContext,
@@ -1415,9 +1453,11 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> MereHost<B> {
     }
 }
 
-#[cfg(test)]
-pub(crate) fn placement_test_graph() -> Graph {
-    use mere::kernel::persistence::{
+/// A two-node graph with a held semantic link, for placement tests here and
+/// in products (`test-support`).
+#[cfg(any(test, feature = "test-support"))]
+pub fn placement_test_graph() -> Graph {
+    use kernel::persistence::{
         PersistedEdge, PersistedEdgeFamily, PersistedSemanticStatement,
     };
     let mut graph = Graph::new();
@@ -1426,11 +1466,11 @@ pub(crate) fn placement_test_graph() -> Graph {
         .into_iter()
         .zip(["https://profile.test/", "https://profile.test/child"])
     {
-        mere::kernel::graph::apply::add_node(
+        kernel::graph::apply::add_node(
             &mut graph,
             Some(id),
             iri.into(),
-            mere::kernel::geometry::PortablePoint::zero(),
+            kernel::geometry::PortablePoint::zero(),
         );
     }
     let mut snapshot = graph.to_snapshot();
@@ -1444,11 +1484,11 @@ pub(crate) fn placement_test_graph() -> Graph {
             predicate: "urn:mere:profile:held-custom".into(),
             recognized_sub_kind: None,
             label: Some("held Surface claim".into()),
-            basis: mere::kernel::types::AssertionBasis {
+            basis: kernel::types::AssertionBasis {
                 note: Some("held Surface claim".into()),
                 ..Default::default()
             },
-            graph_scope: mere::kernel::types::GraphScope::Default,
+            graph_scope: kernel::types::GraphScope::Default,
             provenance_iri: Some("urn:mere:profile:source".into()),
             asserted_at_ms: Some(42),
             first_asserted_ms: Some(42),
@@ -1576,8 +1616,8 @@ impl<B: Backend> IntentSink for MereHost<B> {
     }
 }
 
-fn address_kind_label(kind: mere::kernel::address::AddressKind) -> &'static str {
-    use mere::kernel::address::AddressKind;
+fn address_kind_label(kind: kernel::address::AddressKind) -> &'static str {
+    use kernel::address::AddressKind;
     match kind {
         AddressKind::Http => "web",
         AddressKind::File => "file",
@@ -1628,9 +1668,9 @@ fn relation_kind_label(kind: RelationKind) -> &'static str {
 
 /// The H1 fixture's two explicit handler choices.
 pub fn fixture_handlers() -> HandlerRegistry {
-    use mere::kernel::address::AddressKind;
+    use kernel::address::AddressKind;
     HandlerRegistry::new(vec![
-        graphshell_host::handlers::inspect_handler(),
+        crate::handlers::inspect_handler(),
         HandlerOffer {
             id: "system.default".to_string(),
             label: "Open in another application".to_string(),
@@ -1755,7 +1795,7 @@ mod tests {
             let surface_id = uuid::Uuid::from_u128(1);
             let key = original.get_node_key_by_id(surface_id).unwrap();
             let mut resource_property =
-                mere::kernel::types::NodeProperty::new("urn:test:predicate".into(), "exact".into())
+                kernel::types::NodeProperty::new("urn:test:predicate".into(), "exact".into())
                     .with_metadata(Some("urn:test:source".into()), Some(42));
             resource_property.statement_id = "resource-literal-handle".into();
             assert!(original.append_node_properties(key, vec![resource_property.clone()]));
@@ -1771,7 +1811,7 @@ mod tests {
                         .set(
                             surface_id,
                             chartulary::FacetId::new(
-                                mere::kernel::graph::node_facets::SEMANTIC_PROPERTIES,
+                                kernel::graph::node_facets::SEMANTIC_PROPERTIES,
                             ),
                             serde_json::to_value(vec![property.clone(), property]).unwrap(),
                             &chartulary::AcceptAll,
@@ -1968,13 +2008,13 @@ mod tests {
             );
             session.flush(saved_at(1_800_000_000)).await.unwrap();
             let id = session.id();
-            let context = mere::kernel::graph::legacy_resource_migration::LegacyContentContext {
+            let context = kernel::graph::legacy_resource_migration::LegacyContentContext {
                 original_mere_iri: "urn:mere:original-profile-fixture".into(),
             };
             let host = MereHost::open_legacy_session_with_content_context(
                 backend.clone(),
                 id,
-                mere::kernel::graph::Seq(0),
+                kernel::graph::Seq(0),
                 vec![],
                 &context,
                 selected_persona(),
@@ -2010,7 +2050,8 @@ mod tests {
 
     #[test]
     fn hosted_projection_lifts_content_and_resource_badges_across_aliases() {
-        use crate::product::EditableRelation;
+        use kernel::graph::apply::assert_relation;
+        use kernel::graph::{EdgeAssertion, SemanticSubKind};
         let mut host = MereHost::empty(
             MemoryBackend::new(),
             selected_persona(),
@@ -2035,9 +2076,38 @@ mod tests {
                 },
             )
         });
-        host.edit_node(first, "first", ["Shared".into()]).unwrap();
-        host.assert_product_relation(first, alias, EditableRelation::Cites)
-            .unwrap();
+        // The app's `edit_node` and `assert_product_relation` (engine split
+        // D93), each one product edit.
+        let alias_key = host.graph().get_node_key_by_id(alias).unwrap();
+        host.mutate_product_graph(|graph| {
+            apply_graph_delta(
+                graph,
+                GraphDelta::SetNodeTitle {
+                    key: first_key,
+                    title: "first".into(),
+                },
+            );
+            apply_graph_delta(
+                graph,
+                GraphDelta::InsertNodeTag {
+                    key: first_key,
+                    tag: "Shared".into(),
+                },
+            );
+        })
+        .unwrap();
+        host.mutate_product_graph(|graph| {
+            assert_relation(
+                graph,
+                first_key,
+                alias_key,
+                EdgeAssertion::Semantic {
+                    sub_kind: SemanticSubKind::Cites,
+                    label: None,
+                },
+            );
+        })
+        .unwrap();
         let request = host.local_request();
         let snapshot = host.snapshot(request).unwrap();
         assert_eq!(
@@ -2132,14 +2202,34 @@ mod tests {
                 access_context(),
             )
             .with_launch(5);
-            let first = host.create_address("https://launch.test/a", "a").unwrap();
+            // The app's `create_address` (engine split D93): one product edit.
+            let create_address = |host: &mut MereHost<MemoryBackend>, address: &str, title: &str| {
+                let id = uuid::Uuid::new_v4();
+                host.mutate_product_graph(|graph| {
+                    let key = kernel::graph::apply::add_node(
+                        graph,
+                        Some(id),
+                        address.to_string(),
+                        kernel::geometry::PortablePoint::new(0.0, 0.0),
+                    );
+                    apply_graph_delta(
+                        graph,
+                        GraphDelta::SetNodeTitle {
+                            key,
+                            title: title.to_string(),
+                        },
+                    );
+                })
+                .map(|_| id)
+            };
+            let first = create_address(&mut host, "https://launch.test/a", "a").unwrap();
             assert_eq!(stamp(&host, first), Some(0), "creating is not navigating");
             navigate(&mut host, first, "https://launch.test/a/next");
             assert_eq!(stamp(&host, first), Some(5));
 
             // A session begun later takes the launch from the host.
             host.begin_session(Graph::new());
-            let second = host.create_address("https://launch.test/b", "b").unwrap();
+            let second = create_address(&mut host, "https://launch.test/b", "b").unwrap();
             navigate(&mut host, second, "https://launch.test/b/next");
             assert_eq!(stamp(&host, second), Some(5));
             host.persist(1_800_000_000).await.unwrap();
@@ -2301,9 +2391,9 @@ mod tests {
             document
                 .graph
                 .resources
-                .push(mere::kernel::persistence::PersistedResourceRecord {
+                .push(kernel::persistence::PersistedResourceRecord {
                     canonical_iri: "https://invalid.test/resource".into(),
-                    facets: vec![mere::kernel::persistence::PersistedResourceFacet {
+                    facets: vec![kernel::persistence::PersistedResourceFacet {
                         facet: "test.data".into(),
                         value_json: "invalid JSON".into(),
                     }],

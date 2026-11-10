@@ -258,9 +258,11 @@ mod tests {
     use crate::sync::personal_sync_host::PersonalSyncHostConfig;
     use eidetic::PrivacyClass;
     use pandect::access::AccessContext;
-    use graphshell::mere_host::{MereHost, SelectedPersonaRef, fixture_handlers};
+    use graphshell_host::mere_host::{MereHost, SelectedPersonaRef, fixture_handlers};
     use pandect::personal_sync::{SyncRoster, SyncSelection};
-    use graphshell::product::{EditableRelation, ExportRequest, LocalFileMetadata, TransferScope};
+    use graphshell::product::{
+        EditableRelation, ExportRequest, LocalFileMetadata, ProductHost, TransferScope,
+    };
     use graphshell::transfer::{
         AccessTransferPolicy, ApplyTransferContext, TransferAuthorization, TransferEndpointV1,
         TransferRequest, TransferRouteV1, apply_transfer, prepare_transfer,

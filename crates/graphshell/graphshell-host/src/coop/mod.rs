@@ -372,7 +372,7 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> Owner<B> {
     pub async fn edit_owner(&mut self, edit: Edit) -> Result<(), String> {
         self.edit(self.saved.owner, edit).await
     }
-    pub async fn edit(&mut self, root: [u8; 32], edit: Edit) -> Result<(), String> {
+    async fn edit(&mut self, root: [u8; 32], edit: Edit) -> Result<(), String> {
         if edit.graph != self.saved.graph {
             return Err("edit names another graph".into());
         }
@@ -700,3 +700,5 @@ impl<B: pandect::graph_session::LegacyTransactionBackend + Clone> ProjectionNoti
 }
 #[cfg(test)]
 mod tests;
+#[cfg(all(test, feature = "mere-host"))]
+mod attached_tests;

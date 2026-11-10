@@ -320,11 +320,11 @@ path = "ports/graphshell/src/link_inspection/tests.rs"
 reason = "Link inspection tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]
-path = "ports/graphshell/src/mere_host.rs"
+path = "crates/graphshell/graphshell-host/src/mere_host.rs"
 reason = "Mere graph truth adapted to Graphshell's portable endpoint vocabulary. Existing source-size debt; a responsibility split must preserve SelectedPersonaRef, MereHostError, PersistedMereHost and existing module visibility."
 
 [[exception]]
-path = "ports/graphshell/src/mere_host_fixture.rs"
+path = "crates/graphshell/graphshell-host/src/mere_host_fixture.rs"
 reason = "The H1 reference fixture: literal demo truth for [MereHost]. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]

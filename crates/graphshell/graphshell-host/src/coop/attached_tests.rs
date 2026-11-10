@@ -4,23 +4,20 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The coop owner attached to the ordinary `MereHost`. It stayed here when
-//! `coop` moved to graphshell-host (engine split D88): `MereHost` and the
-//! handler registry are the app's, and graphshell-host cannot name them.
+//! The coop owner attached to the ordinary `MereHost` (engine split D88; it
+//! joined the coop tests when `MereHost` moved here, D68).
 
 use chirograph::Revision;
-use graphshell_host::coop::{
-    Contact, GraphAuthority, GraphReading, Operation, Owner, TERMS, hex, now_ms,
-};
-use mere::kernel::graph::{Author, apply::GraphDelta};
+use super::{Contact, GraphAuthority, GraphReading, Operation, Owner, TERMS, hex, now_ms};
+use kernel::graph::{Author, apply::GraphDelta};
 use personae::{IdentityProvider, InMemoryProvider};
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 
 #[test]
 fn attached_ordinary_host_is_the_only_writer_and_reopens_with_guest_authorship() {
+    use crate::handlers::HandlerRegistry;
     use crate::mere_host::{MereHost, SelectedPersonaRef};
-    use graphshell_host::handlers::HandlerRegistry;
     use pandect::access::AccessContext;
     struct Attached(Arc<Mutex<MereHost<muniment::MemoryBackend>>>);
     impl GraphAuthority for Attached {
@@ -114,8 +111,8 @@ fn attached_ordinary_host_is_the_only_writer_and_reopens_with_guest_authorship()
             pandect::CapturedDelta::ReplayAssertRelationByIds {
                 from_id: first.to_string(),
                 to_id: second.to_string(),
-                assertion: mere::kernel::graph::EdgeAssertion::Semantic {
-                    sub_kind: mere::kernel::graph::SemanticSubKind::Cites,
+                assertion: kernel::graph::EdgeAssertion::Semantic {
+                    sub_kind: kernel::graph::SemanticSubKind::Cites,
                     label: None,
                 },
             },

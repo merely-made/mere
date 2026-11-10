@@ -39,7 +39,7 @@ use chirograph::{
 };
 use pandect::access::AccessContext;
 use graphshell_host::handlers::HandlerRegistry;
-use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
+use graphshell_host::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
 use djinn::door::app_admission::AppRouteGrants;
 use ostiary::app_admission::{AppId, AppRequest, AppRouteId};
 use ostiary::route::ResidentEndpointRoute;

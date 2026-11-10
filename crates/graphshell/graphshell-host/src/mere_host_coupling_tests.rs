@@ -5,14 +5,51 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use crate::app::GraphshellApp;
-use crate::mere_host::{FIXTURE_PERSONA_ADDRESS, SelectedPersonaRef};
+use crate::mere_host::{
+    FIXTURE_DEVICE_TWO_ADDRESS, FIXTURE_PERSONA_ADDRESS, HOST_SLOT, MereHost, MereHostError,
+    SelectedPersonaRef, fixture_handlers,
+};
+use pandect::MereSessions;
+use pandect::access::AccessContext;
 use muniment::{Backend, MemoryBackend, StoreError, TransactFn, WriteOp};
 use std::sync::{
     Arc,
     atomic::{AtomicU8, Ordering},
 };
 use uuid::Uuid;
+
+/// The reference app's field-inspection opener, over the host alone: reopen
+/// the store's latest session, or seed the field-inspection fixture into an
+/// empty store.
+struct Opened<B> {
+    host: MereHost<B>,
+}
+
+impl<B: Backend + Clone> Opened<B> {
+    async fn open_or_field_inspection_fixture(
+        backend: B,
+        selected_persona: SelectedPersonaRef,
+    ) -> Result<Self, MereHostError> {
+        let sessions = MereSessions::new(backend.clone()).list().await?;
+        let old_slot = backend.get(HOST_SLOT).await?;
+        let host = if sessions.is_empty() && old_slot.is_none() {
+            MereHost::field_inspection_fixture(backend, selected_persona, fixture_handlers())?
+        } else {
+            MereHost::open(
+                backend,
+                selected_persona.clone(),
+                fixture_handlers(),
+                AccessContext {
+                    persona: selected_persona.persona,
+                    device: FIXTURE_DEVICE_TWO_ADDRESS.to_string(),
+                    at_ms: 3_000,
+                },
+            )
+            .await?
+        };
+        Ok(Self { host })
+    }
+}
 
 fn id(n: u128) -> CouplingId {
     CouplingId::from_uuid(Uuid::from_u128(n))
@@ -23,7 +60,7 @@ fn persona() -> SelectedPersonaRef {
         profile: "profile:coupling-qualification".into(),
     }
 }
-fn coupling<B: Backend>(app: &GraphshellApp<B>, n: u128) -> Coupling {
+fn coupling<B: Backend>(app: &Opened<B>, n: u128) -> Coupling {
     app.host
         .graph()
         .couplings()
@@ -70,7 +107,7 @@ impl Backend for ControlledStore {
 fn exact_strength_save_and_history_reopen_preserve_siblings_and_other_edits() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mut app = GraphshellApp::open_or_field_inspection_fixture(store.clone(), persona())
+        let mut app = Opened::open_or_field_inspection_fixture(store.clone(), persona())
             .await
             .unwrap();
         app.host.persist(10).await.unwrap();
@@ -87,8 +124,23 @@ fn exact_strength_save_and_history_reopen_preserve_siblings_and_other_edits() {
         // An unrelated source edit uses the ordinary channel and must survive
         // the coupling's saved undo, not become a whole-graph rollback.
         let member = app.host.graph().nodes().next().unwrap().1.id;
+        // The app's `edit_node` with no tags (engine split D93): one product
+        // edit that retitles the node and clears its tags.
+        let key = app.host.graph().get_node_key_by_id(member).unwrap();
+        let tags = app.host.graph().node_content_tags(key).unwrap();
         app.host
-            .edit_node(member, "Unrelated title", std::iter::empty())
+            .mutate_product_graph(|graph| {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::SetNodeTitle {
+                        key,
+                        title: "Unrelated title".into(),
+                    },
+                );
+                for tag in tags {
+                    apply_graph_delta(graph, GraphDelta::RemoveNodeTag { key, tag });
+                }
+            })
             .unwrap();
         app.host.persist(12).await.unwrap();
         assert!(app.host.coupling_history(id(201), false, 13).await.unwrap());
@@ -104,7 +156,7 @@ fn exact_strength_save_and_history_reopen_preserve_siblings_and_other_edits() {
             app.host.graph().get_node_by_id(member).unwrap().1.title,
             "Unrelated title"
         );
-        let mut reopened = GraphshellApp::open_or_field_inspection_fixture(store, persona())
+        let mut reopened = Opened::open_or_field_inspection_fixture(store, persona())
             .await
             .unwrap();
         assert_eq!(coupling(&reopened, 201).strength, 0.02);
@@ -128,7 +180,7 @@ fn failures_and_nontransactional_backend_preserve_graph_history_and_draft() {
             store: MemoryBackend::new(),
             mode: Arc::new(AtomicU8::new(0)),
         };
-        let mut app = GraphshellApp::open_or_field_inspection_fixture(store.clone(), persona())
+        let mut app = Opened::open_or_field_inspection_fixture(store.clone(), persona())
             .await
             .unwrap();
         app.host.persist(10).await.unwrap();
@@ -165,11 +217,11 @@ fn failures_and_nontransactional_backend_preserve_graph_history_and_draft() {
 fn stale_durable_session_refuses_before_overwriting_a_competing_save() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mut first = GraphshellApp::open_or_field_inspection_fixture(store.clone(), persona())
+        let mut first = Opened::open_or_field_inspection_fixture(store.clone(), persona())
             .await
             .unwrap();
         first.host.persist(10).await.unwrap();
-        let mut second = GraphshellApp::open_or_field_inspection_fixture(store.clone(), persona())
+        let mut second = Opened::open_or_field_inspection_fixture(store.clone(), persona())
             .await
             .unwrap();
         let mut draft = StrengthDraft::begin(
@@ -202,7 +254,7 @@ fn stale_durable_session_refuses_before_overwriting_a_competing_save() {
         assert_eq!(coupling(&first, 201).strength, 0.02);
         assert_eq!(draft.text, "0.5");
         assert!(!first.host.has_unstored());
-        let reopened = GraphshellApp::open_or_field_inspection_fixture(store, persona())
+        let reopened = Opened::open_or_field_inspection_fixture(store, persona())
             .await
             .unwrap();
         assert_eq!(coupling(&reopened, 201).strength, 0.25);
@@ -211,10 +263,10 @@ fn stale_durable_session_refuses_before_overwriting_a_competing_save() {
 
 #[test]
 fn invalid_and_changed_targets_keep_private_history_without_graph_mutation() {
-    use mere::kernel::graph::apply::{GraphDelta, apply_graph_delta};
+    use kernel::graph::apply::{GraphDelta, apply_graph_delta};
     pollster::block_on(async {
         let mut app =
-            GraphshellApp::open_or_field_inspection_fixture(MemoryBackend::new(), persona())
+            Opened::open_or_field_inspection_fixture(MemoryBackend::new(), persona())
                 .await
                 .unwrap();
         app.host.persist(10).await.unwrap();
@@ -241,11 +293,11 @@ fn invalid_and_changed_targets_keep_private_history_without_graph_mutation() {
 fn equal_coupling_ids_in_another_graph_cannot_accept_the_draft() {
     pollster::block_on(async {
         let mut first =
-            GraphshellApp::open_or_field_inspection_fixture(MemoryBackend::new(), persona())
+            Opened::open_or_field_inspection_fixture(MemoryBackend::new(), persona())
                 .await
                 .unwrap();
         let mut other =
-            GraphshellApp::open_or_field_inspection_fixture(MemoryBackend::new(), persona())
+            Opened::open_or_field_inspection_fixture(MemoryBackend::new(), persona())
                 .await
                 .unwrap();
         first.host.persist(10).await.unwrap();
