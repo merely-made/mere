@@ -17,6 +17,7 @@ pub(crate) struct Counts {
     pub(crate) fails: Vec<String>,
 }
 
+#[derive(Clone)]
 pub(crate) enum Outcome {
     Pass,
     Fail(String),

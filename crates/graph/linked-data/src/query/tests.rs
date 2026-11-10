@@ -262,7 +262,8 @@ fn adapter_patterns_preserve_graph_scopes_and_rdf_terms() {
     }
 
     let graph = rich_graph();
-    let adapter = GraphDataset::new(&graph);
+    let indexed = IndexedDataset::for_graph(&graph);
+    let adapter = indexed.read(View::Live);
     let materialized: oxrdf::Dataset = crate::dataset_quads(&graph).into_iter().collect();
     let oracle = &materialized;
     let user: Term = NamedNode::new(crate::GRAPH_SCOPE_USER).unwrap().into();

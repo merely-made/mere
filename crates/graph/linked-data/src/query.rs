@@ -6,11 +6,12 @@
 
 //! SPARQL query over the graph (the `query` feature).
 //!
-//! A borrowed, read-only kernel RDF projection evaluated with `spareval`.
-//! Each triple pattern streams the projection and deduplicates its matching
-//! quads. The adapter keeps kernel authority without rebuilding a whole
-//! materialized dataset before each query. Broad patterns still scan all rows.
-//! A materialized spareval dataset remains the test parity oracle.
+//! `spareval` evaluates over an [`IndexedDataset`]: the kernel's RDF
+//! projection interned into dense ids and indexed six ways, so every triple
+//! pattern reads one range. [`sparql`] builds one per call; a host that queries
+//! often holds one with [`IndexedDataset::for_graph`], rebuilds it when
+//! [`IndexedDataset::is_current`] turns false, and evaluates with
+//! [`sparql_on`]. A materialized spareval dataset remains the test parity oracle.
 
 #[cfg(test)]
 #[path = "query/coverage_tests.rs"]
@@ -18,12 +19,18 @@ mod coverage_tests;
 
 use kernel::graph::Graph;
 use oxrdf::Term;
-use spareval::{QueryEvaluator, QueryResults};
+use spareval::{QueryEvaluator, QueryResults, QueryableDataset};
 use spargebra::SparqlParser;
 
-mod dataset;
+#[path = "query/indexed.rs"]
+mod indexed;
 
-use dataset::GraphDataset;
+pub use chartulary::quads::View;
+pub use indexed::{IndexedDataset, IndexedRead};
+
+#[cfg(test)]
+#[path = "query/indexed_tests.rs"]
+mod indexed_tests;
 
 /// The rows of a SPARQL `SELECT` (or the boolean of an `ASK`).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -36,40 +43,60 @@ pub struct QueryRows {
     pub coverage: kernel::graph::CoverageNote,
 }
 
-/// Run `query` over `graph` and return the solution rows. The graph is
-/// read through a borrowed dataset adapter. Errors (parse,
-/// evaluation) are returned as their display string. `CONSTRUCT` / `DESCRIBE`
-/// are not supported in this cut.
+/// Run `query` over `graph` and return the solution rows. The graph's held
+/// projection is indexed once for the call. Errors (parse, evaluation) are
+/// returned as their display string. `CONSTRUCT` / `DESCRIBE` are not
+/// supported in this cut.
+///
+/// # Errors
+///
+/// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
+/// display string.
 pub fn sparql(graph: &Graph, query: &str) -> Result<QueryRows, String> {
-    let dataset = GraphDataset::new(graph);
-    let query = SparqlParser::new()
-        .parse_query(query)
-        .map_err(|e| e.to_string())?;
-    let evaluator = QueryEvaluator::new();
-    let results = evaluator
-        .prepare(&query)
-        .execute(dataset)
-        .map_err(|e| e.to_string())?;
-
-    query_rows(results, graph.coverage_note())
+    let dataset = IndexedDataset::for_graph(graph);
+    sparql_on(&dataset, query, View::Live, graph.coverage_note())
 }
 
 /// Run SPARQL over an explicit retained-history projection. The reserved
 /// `mere:graph#history` named graph contains withdrawn reifiers only; a query
 /// must name that graph to inspect tombstones. Default [`sparql`] stays held-only.
+///
+/// # Errors
+///
+/// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
+/// display string.
 pub fn sparql_with_history(graph: &Graph, query: &str) -> Result<QueryRows, String> {
-    let dataset: oxrdf::Dataset = crate::dataset_quads_with_history(graph)
-        .into_iter()
-        .collect();
+    let dataset = IndexedDataset::for_graph(graph);
+    sparql_on(&dataset, query, View::History, graph.coverage_note())
+}
+
+/// Run `query` over a held dataset through `view`. The coverage note is the
+/// one of the graph the dataset was built from, passed through to the rows.
+///
+/// # Errors
+///
+/// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
+/// display string.
+pub fn sparql_on(
+    dataset: &IndexedDataset,
+    query: &str,
+    view: View,
+    coverage: kernel::graph::CoverageNote,
+) -> Result<QueryRows, String> {
+    query_rows(evaluate(dataset.read(view), query)?, coverage)
+}
+
+fn evaluate<'a>(
+    dataset: impl QueryableDataset<'a>,
+    query: &str,
+) -> Result<QueryResults<'a>, String> {
     let query = SparqlParser::new()
         .parse_query(query)
-        .map_err(|error| error.to_string())?;
-    let evaluator = QueryEvaluator::new();
-    let results = evaluator
+        .map_err(|e| e.to_string())?;
+    QueryEvaluator::new()
         .prepare(&query)
-        .execute(&dataset)
-        .map_err(|error| error.to_string())?;
-    query_rows(results, graph.coverage_note())
+        .execute(dataset)
+        .map_err(|e| e.to_string())
 }
 
 fn query_rows(
@@ -109,19 +136,11 @@ fn query_rows(
     }
 }
 
-/// The former materialized query path, retained to verify adapter semantics.
+/// The former materialized query path, retained to verify the indexed dataset.
 #[cfg(test)]
 fn sparql_materialized(graph: &Graph, query: &str) -> Result<QueryRows, String> {
     let dataset: oxrdf::Dataset = crate::dataset_quads(graph).into_iter().collect();
-    let query = SparqlParser::new()
-        .parse_query(query)
-        .map_err(|error| error.to_string())?;
-    let evaluator = QueryEvaluator::new();
-    let results = evaluator
-        .prepare(&query)
-        .execute(&dataset)
-        .map_err(|error| error.to_string())?;
-    query_rows(results, graph.coverage_note())
+    query_rows(evaluate(&dataset, query)?, graph.coverage_note())
 }
 
 /// A bound term's display form for a result cell: the bare IRI / lexical value
@@ -149,19 +168,18 @@ pub struct ResourceQueryMembers {
 }
 
 /// Evaluate the named member column as Resource references.
+///
+/// # Errors
+///
+/// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
+/// display string.
 pub fn sparql_resource_members(
     graph: &Graph,
     query: &str,
     member_variable: &str,
 ) -> Result<ResourceQueryMembers, String> {
-    let query = SparqlParser::new()
-        .parse_query(query)
-        .map_err(|e| e.to_string())?;
-    let evaluator = QueryEvaluator::new();
-    let results = evaluator
-        .prepare(&query)
-        .execute(GraphDataset::new(graph))
-        .map_err(|e| e.to_string())?;
+    let dataset = IndexedDataset::for_graph(graph);
+    let results = evaluate(dataset.read(View::Live), query)?;
     let QueryResults::Solutions(solutions) = results else {
         return Err("saved-query membership requires SELECT".into());
     };

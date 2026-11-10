@@ -25,6 +25,7 @@ pub(crate) fn run_sparql(root: &Path, entries: &[Entry], report: &mut Report) {
         let update = kind.contains("Update");
         let syntax = (kind.starts_with("Positive") || kind.starts_with("Negative"))
             && kind.contains("Syntax");
+        let mut indexed_out = None;
         let (category, parser_out) = if syntax {
             let out = match e.action.as_ref().map(std::fs::read) {
                 Some(Ok(bytes)) => {
@@ -47,7 +48,9 @@ pub(crate) fn run_sparql(root: &Path, entries: &[Entry], report: &mut Report) {
             };
             ("syntax", out)
         } else if kind == "QueryEvaluationTest" {
-            ("query-eval", query_eval(root, e))
+            let (parser_out, out) = query_eval(root, e);
+            indexed_out = Some(out);
+            ("query-eval", parser_out)
         } else if kind == "UpdateEvaluationTest" {
             (
                 "update-eval",
@@ -62,6 +65,15 @@ pub(crate) fn run_sparql(root: &Path, entries: &[Entry], report: &mut Report) {
             )
         };
         report.record("parser", &manifest, category, &id, parser_out);
+        report.record(
+            "indexed",
+            &manifest,
+            category,
+            &id,
+            indexed_out.unwrap_or(Outcome::Skip(
+                "the indexed layer evaluates queries; syntax and update are the parser layer's",
+            )),
+        );
         report.record(
             "adapter",
             &manifest,
@@ -209,17 +221,32 @@ fn from_iris(text: &str, base: &str) -> Vec<oxrdf::NamedNode> {
         .collect()
 }
 
+/// Score one evaluation test on both layers: `spareval` over the loaded `oxrdf::Dataset`
+/// (parser) and over the same quads loaded through `IndexedDataset::from_quads` (indexed).
 #[cfg(feature = "query")]
-fn query_eval(root: &Path, e: &Entry) -> Outcome {
-    use sparesults::{QueryResultsFormat, QueryResultsParser, SliceQueryResultsParserOutput};
-    use spareval::{QueryEvaluator, QueryResults};
-    use spargebra::SparqlParser;
+fn query_eval(root: &Path, e: &Entry) -> (Outcome, Outcome) {
+    use linked_data::query::{IndexedDataset, View};
+    match query_case(root, e) {
+        Err(out) => (out.clone(), out),
+        Ok((data, text, q, res)) => {
+            let parser = evaluate(root, &q, &res, &text, &data);
+            let indexed = IndexedDataset::from_quads(data.iter().map(|quad| (quad.into_owned(), true)));
+            (parser, evaluate(root, &q, &res, &text, indexed.read(View::Live)))
+        },
+    }
+}
 
+/// A case's data (manifest data, graph data and FROM graphs), query text, query and result paths.
+#[cfg(feature = "query")]
+type Case = (oxrdf::Dataset, String, std::path::PathBuf, std::path::PathBuf);
+
+#[cfg(feature = "query")]
+fn query_case(root: &Path, e: &Entry) -> Result<Case, Outcome> {
     let (Some(q), Some(res)) = (
         e.parts.get("query").and_then(|v| v.first()),
         e.result.as_ref(),
     ) else {
-        return Outcome::Skip("no query or result file in the manifest entry");
+        return Err(Outcome::Skip("no query or result file in the manifest entry"));
     };
     let mut data = oxrdf::Dataset::new();
     let loaded = e
@@ -240,11 +267,11 @@ fn query_eval(root: &Path, e: &Entry) -> Outcome {
             Ok(d) => d.iter().for_each(|q| {
                 data.insert(q);
             }),
-            Err(err) => return Outcome::Fail(format!("data unreadable: {err}")),
+            Err(err) => return Err(Outcome::Fail(format!("data unreadable: {err}"))),
         }
     }
     let Ok(text) = std::fs::read_to_string(q) else {
-        return Outcome::Fail("query file unreadable".into());
+        return Err(Outcome::Fail("query file unreadable".into()));
     };
     // FROM and FROM NAMED name graphs: one the manifest data does not hold is loaded from the
     // suite directory, from the file the IRI addresses.
@@ -264,30 +291,51 @@ fn query_eval(root: &Path, e: &Entry) -> Outcome {
                 Ok(d) => d.iter().for_each(|q| {
                     data.insert(q);
                 }),
-                Err(err) => return Outcome::Fail(format!("FROM data unreadable: {err}")),
+                Err(err) => return Err(Outcome::Fail(format!("FROM data unreadable: {err}"))),
             }
         }
     }
+    Ok((data, text, q.clone(), res.clone()))
+}
+
+/// The solution-result format a result file's extension names.
+#[cfg(feature = "query")]
+fn results_format(res: &Path) -> Option<sparesults::QueryResultsFormat> {
+    use sparesults::QueryResultsFormat;
+    match res.extension().and_then(|x| x.to_str()).unwrap_or("") {
+        "srx" => Some(QueryResultsFormat::Xml),
+        "srj" => Some(QueryResultsFormat::Json),
+        "tsv" => Some(QueryResultsFormat::Tsv),
+        _ => None,
+    }
+}
+
+/// Evaluate a case's query over `dataset` and compare with the expected result.
+#[cfg(feature = "query")]
+fn evaluate<'a>(
+    root: &Path,
+    q: &Path,
+    res: &Path,
+    text: &str,
+    dataset: impl spareval::QueryableDataset<'a>,
+) -> Outcome {
+    use sparesults::{QueryResultsParser, SliceQueryResultsParserOutput};
+    use spareval::{QueryEvaluator, QueryResults};
+    use spargebra::SparqlParser;
+
     let run = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<bool, String> {
         let parser = SparqlParser::new()
             .with_base_iri(test_base(root, q))
             .map_err(|e| e.to_string())?;
         let query = parser
-            .parse_query(&text)
+            .parse_query(text)
             .map_err(|e| format!("rejected: {e}"))?;
         let results = QueryEvaluator::new()
             .prepare(&query)
-            .execute(&data)
+            .execute(dataset)
             .map_err(|e| format!("evaluation: {e}"))?;
-        let ext = res.extension().and_then(|x| x.to_str()).unwrap_or("");
         let result_bytes = std::fs::read(res).map_err(|e| e.to_string())?;
-        let format = match ext {
-            "srx" => Some(QueryResultsFormat::Xml),
-            "srj" => Some(QueryResultsFormat::Json),
-            "tsv" => Some(QueryResultsFormat::Tsv),
-            _ => None,
-        };
-        match (results, format) {
+        match (results, results_format(res)) {
             (QueryResults::Boolean(got), Some(format)) => {
                 match QueryResultsParser::from_format(format).for_slice(&result_bytes) {
                     Ok(SliceQueryResultsParserOutput::Boolean(want)) => Ok(got == want),

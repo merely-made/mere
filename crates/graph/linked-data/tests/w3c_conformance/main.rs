@@ -12,6 +12,8 @@
 //!   adapter's own feature set and options.
 //! - `adapter`: the crate's public entry points (`from_nquads`, `from_trig`,
 //!   `from_jsonld_with_contexts_and_base_iri`), where one exists for the format.
+//! - `indexed` (SPARQL query evaluation only): the case's data loaded through
+//!   `query::IndexedDataset::from_quads` and evaluated by the same `spareval`.
 //!
 //! Ignored by default and a clean skip when the suites are absent:
 //!

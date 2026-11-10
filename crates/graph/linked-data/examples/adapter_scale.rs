@@ -4,22 +4,24 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Scale measurement for the borrowed SPARQL adapter.
+//! Scale measurement for the SPARQL dataset.
 //!
 //! Builds a chain graph of N nodes (each node `next`-links to its successor and
-//! carries one literal property), then times four queries two ways: through the
-//! borrowed kernel adapter (`linked_data::query::sparql`) and over an indexed
-//! in-memory `oxrdf::Dataset` materialized from the same projection. The second
-//! is the floor an indexed dataset could reach.
+//! carries one literal property), then times four queries three ways: through
+//! `linked_data::query::sparql` (which indexes the graph on every call), over a
+//! held `IndexedDataset` built once (`sparql_on`), and over an `oxrdf::Dataset`
+//! materialized from the same projection, kept as the parity column. It also
+//! prints the index build time and the index's `memory_bytes()`.
 //!
 //! `cargo run --release -p mere-rdf --features query --example adapter_scale -- 1000 10000 100000`
 //!
 //! A query that took longer than the budget at one scale is skipped at the next.
+//! The borrowed adapter the first measurement timed was deleted with P2.
 
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{Graph, SemanticStatementSpec};
 use kernel::types::NodeProperty;
-use linked_data::query::sparql;
+use linked_data::query::{IndexedDataset, View, sparql, sparql_on};
 use spareval::{QueryEvaluator, QueryResults};
 use spargebra::SparqlParser;
 use std::time::{Duration, Instant};
@@ -99,7 +101,7 @@ fn materialized_rows(dataset: &oxrdf::Dataset, query: &str) -> Result<usize, Str
 }
 
 fn ms(d: Duration) -> String {
-    format!("{:.1}", d.as_secs_f64() * 1000.0)
+    format!("{:.2}", d.as_secs_f64() * 1000.0)
 }
 
 fn main() {
@@ -114,7 +116,9 @@ fn main() {
     };
     let mut over_budget = vec![false; QUERIES.len()];
 
-    println!("scale\tquads\tbuild_ms\tmaterialize_ms\tquery\tadapter_ms\tindexed_ms\trows");
+    println!(
+        "scale\tquads\tgraph_build_ms\tindex_build_ms\tindex_bytes\tmaterialize_ms\tquery\tsparql_call_ms\tindexed_ms\tmaterialized_ms\trows"
+    );
     for n in scales {
         let t = Instant::now();
         let graph = build(n);
@@ -126,29 +130,44 @@ fn main() {
         let dataset: oxrdf::Dataset = quads.into_iter().collect();
         let materialize_ms = t.elapsed();
 
+        let t = Instant::now();
+        let indexed = IndexedDataset::for_graph(&graph);
+        let index_ms = t.elapsed();
+        let prefix = format!(
+            "{n}\t{quad_count}\t{}\t{}\t{}\t{}",
+            ms(build_ms),
+            ms(index_ms),
+            indexed.memory_bytes(),
+            ms(materialize_ms)
+        );
+
         for (i, (name, query)) in QUERIES.iter().enumerate() {
             if over_budget[i] {
-                println!("{n}\t{quad_count}\t{}\t{}\t{name}\tskipped\t\t", ms(build_ms), ms(materialize_ms));
+                println!("{prefix}\t{name}\tskipped\t\t\t");
                 continue;
             }
             let t = Instant::now();
-            let adapter = sparql(&graph, query).map(|r| r.rows.len());
-            let adapter_ms = t.elapsed();
+            let call = sparql(&graph, query).map(|r| r.rows.len());
+            let call_ms = t.elapsed();
+            let coverage = graph.coverage_note();
             let t = Instant::now();
-            let indexed = materialized_rows(&dataset, query);
+            let held = sparql_on(&indexed, query, View::Live, coverage)
+                .map(|r| r.rows.len());
             let indexed_ms = t.elapsed();
-            let rows = match (&adapter, &indexed) {
-                (Ok(a), Ok(b)) if a == b => a.to_string(),
-                (a, b) => format!("MISMATCH adapter={a:?} indexed={b:?}"),
+            let t = Instant::now();
+            let materialized = materialized_rows(&dataset, query);
+            let materialized_ms = t.elapsed();
+            let rows = match (&call, &held, &materialized) {
+                (Ok(a), Ok(b), Ok(c)) if a == b && b == c => a.to_string(),
+                (a, b, c) => format!("MISMATCH call={a:?} indexed={b:?} materialized={c:?}"),
             };
             println!(
-                "{n}\t{quad_count}\t{}\t{}\t{name}\t{}\t{}\t{rows}",
-                ms(build_ms),
-                ms(materialize_ms),
-                ms(adapter_ms),
-                ms(indexed_ms)
+                "{prefix}\t{name}\t{}\t{}\t{}\t{rows}",
+                ms(call_ms),
+                ms(indexed_ms),
+                ms(materialized_ms)
             );
-            if adapter_ms > BUDGET {
+            if call_ms > BUDGET {
                 over_budget[i] = true;
             }
         }

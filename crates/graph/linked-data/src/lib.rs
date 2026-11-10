@@ -443,6 +443,16 @@ pub fn dataset_quads(graph: &Graph) -> Vec<Quad> {
 /// history graph with their original `GraphScope` carried separately.
 pub fn dataset_quads_with_history(graph: &Graph) -> Vec<Quad> {
     let mut quads = dataset_quads(graph);
+    quads.extend(withdrawn_reifier_quads(graph));
+    let mut seen = std::collections::HashSet::new();
+    quads.retain(|quad| seen.insert(quad.clone()));
+    quads
+}
+
+/// The reifiers of withdrawn assertions in the reserved history graph: what
+/// [`dataset_quads_with_history`] adds to [`dataset_quads`]. May repeat a quad.
+pub(crate) fn withdrawn_reifier_quads(graph: &Graph) -> Vec<Quad> {
+    let mut quads = Vec::new();
     let Ok(history_graph) = NamedNode::new(ASSERTION_HISTORY_GRAPH_IRI) else {
         return quads;
     };
@@ -497,8 +507,6 @@ pub fn dataset_quads_with_history(graph: &Graph) -> Vec<Quad> {
             );
         }
     }
-    let mut seen = std::collections::HashSet::new();
-    quads.retain(|quad| seen.insert(quad.clone()));
     quads
 }
 

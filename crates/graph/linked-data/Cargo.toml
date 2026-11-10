@@ -21,13 +21,14 @@ default = ["bundled-contexts"]
 # `@context` resolves offline via `ContextCache::full()`. Disable for a slimmer
 # binary — `full()` then equals `minimal()`. See `assets/NOTICE` for licensing.
 bundled-contexts = []
-# SPARQL query over the graph via spareval's `QueryableDataset` evaluated
-# directly over the projected quads (no store copy, no RocksDB, wasm-viable).
+# SPARQL query over the graph via spareval's `QueryableDataset`, evaluated
+# over a dictionary-encoded quad index (chartulary::quads) built from the
+# projected quads (no RocksDB, wasm-viable).
 # Off by default: base linked-data stays slim, only consumers that want SPARQL
 # pull the evaluator. Tests retain a materialized spareval dataset as the
-# parity oracle for the borrowed adapter.
+# parity oracle for the indexed dataset.
 # Preserve directional JSON-LD terms previously enabled through Oxigraph.
-query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
+query = ["dep:chartulary", "dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
 
 [[example]]
 name = "adapter_scale"
@@ -40,6 +41,8 @@ uuid.workspace = true
 oxjsonld = "0.2"
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
+# The id-level quad index the query feature's held dataset wraps.
+chartulary = { workspace = true, optional = true }
 # Preserve query extensions previously enabled transitively by Oxigraph.
 spareval = { version = "0.2.9", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
 spargebra = { version = "0.4", optional = true, features = ["sparql-12"] }

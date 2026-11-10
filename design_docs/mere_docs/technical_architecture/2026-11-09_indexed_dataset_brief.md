@@ -25,6 +25,23 @@ The cause is in `crates/graph/linked-data/src/query/dataset.rs`. `GraphDataset` 
 
 The 100k scale was not reached because building the graph is itself quadratic. Per phase at 500 / 1k / 2k nodes: `add_node` 1 / 2 / 3 ms, `assert_semantic_statement` 3 / 8 / 14 ms, `append_node_properties` 150 / 920 / 3,236 ms, and 257 s at 10k. `literal_handle_available` (`crates/graph/graph-kernel/src/graph/resource_properties.rs`) walks every held literal and every semantic statement per append to check a statement id is unused, deserializing each resource's properties facet as it goes. That is the kernel's and goes to its own session; the 100k row of the table above is measured once it lands.
 
+### 2026-11-10: the indexed dataset (quad index plan P2)
+
+Same instrument, release, 1k and 10k only (100k waits on the kernel session). The borrowed adapter is deleted, so its column is gone. Columns: `sparql()`, which now builds an `IndexedDataset::for_graph` on every call; a held `IndexedDataset` built once and read with `sparql_on`; the same quads materialized into an `oxrdf::Dataset`, kept for parity. Row counts agreed in every cell across all three.
+
+| nodes | quads | query | `sparql()` per call | held `IndexedDataset` | materialized `oxrdf::Dataset` |
+|---|---|---|---|---|---|
+| 1k | 8,000 | bound predicate, count | 35.8 ms | 0.26 ms | 3.8 ms |
+| 1k | 8,000 | point lookup, one subject | 34.2 ms | 0.09 ms | 0.05 ms |
+| 1k | 8,000 | two-hop join, count | 36.1 ms | 1.3 ms | 3.7 ms |
+| 1k | 8,000 | full scan, count | 42.8 ms | 1.6 ms | 3.8 ms |
+| 10k | 80,000 | bound predicate, count | 358 ms | 1.4 ms | 4.7 ms |
+| 10k | 80,000 | point lookup, one subject | 359 ms | 0.09 ms | 0.05 ms |
+| 10k | 80,000 | two-hop join, count | 370 ms | 9.6 ms | 30.6 ms |
+| 10k | 80,000 | full scan, count | 411 ms | 7.6 ms | 38.2 ms |
+
+Index build (`for_graph`: projection walk, interning, six orderings) 38 ms at 1k and 329 ms at 10k, against materialization's 85 ms and 923 ms in the same run. `memory_bytes()` (the quad index, not the dictionary's terms) 384,168 bytes at 1k and 3,840,168 at 10k. Against §4 at 10k: point lookup 0.09 ms (target under 1 ms), two-hop join 9.6 ms (under 50 ms), bound predicate 1.4 ms and full scan 7.6 ms (within 2× of 5 ms and 40 ms), build 329 ms (within 2× of 827 ms), index 3.8 MB (under 10 MB). All met. A `sparql()` call costs about one index build. A host that queries per frame holds the dataset and rebuilds on `is_current` (plan D3). Graph build in this run: 2.6 s at 1k and 266 s at 10k, nearly all `append_node_properties`, as above.
+
 ## 2. What the dataset is today
 
 The dataset is a derived projection, not a store. `dataset_quad_iter` in `crates/graph/linked-data/src/lib.rs` walks surface nodes (direct quads: the node IRI as subject, properties as literals, scoped statements into named graphs by `GraphScope`, then RDF 1.2 reifier metadata per statement: asserter, assertion time, withdrawal), resource nodes (resource metadata) and resource edges (held assertions and their metadata). Terms are built as `oxrdf` strings on every walk. Named graphs are assertion scopes; the reserved history graph (`ASSERTION_HISTORY_GRAPH_IRI`) carries withdrawn reifiers only in the explicit history projection.

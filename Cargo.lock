@@ -9752,6 +9752,7 @@ dependencies = [
 name = "mere-rdf"
 version = "0.0.1"
 dependencies = [
+ "chartulary",
  "getrandom 0.2.17",
  "getrandom 0.3.4",
  "mere-kernel",
