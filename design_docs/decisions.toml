@@ -1458,6 +1458,38 @@ summary = "Woodshed's test proves the block-guest wire; the document-undo and pa
 draws_on = ["engine-split D72"]
 plans = ["engine-split"]
 
+[decisions."engine-split D98"]
+title = "gloss and glossary go to mere-view (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "gloss and glossary live in mere-view behind a gloss feature."
+draws_on = ["engine-split D54", "engine-split D58"]
+plans = ["engine-split"]
+
+[decisions."engine-split D99"]
+title = "coupling_edit goes to graphshell-host (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The coupling strength draft lives in graphshell-host behind mere-host."
+draws_on = ["engine-split D58", "engine-split D68"]
+plans = ["engine-split"]
+
+[decisions."engine-split D100"]
+title = "clip is a graphshell-host feature (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Graph insertion for Fleece clips is a clip feature of graphshell-host."
+draws_on = ["engine-split D58", "engine-split D91"]
+plans = ["engine-split"]
+
+[decisions."engine-split D101"]
+title = "routing goes to Turnstone (Mark, 2026-11-10)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The app-flavoured route ids live in Turnstone, their one user."
+draws_on = ["engine-split D58"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

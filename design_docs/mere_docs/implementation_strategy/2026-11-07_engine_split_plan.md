@@ -493,6 +493,27 @@ because `MereHost` uses pictograph's canvas; Cleromancy's `inference_sync` and `
 tests call a now-private `Graph::facets_mut()` and did not compile before this slice either;
 no moved code was checked headed, and only the moved tests were run.
 
+**Slice 3: dissolve the `mere` facade (D58, D98 to D101).** Measured 2026-11-10 on `b7f05765a`:
+`crates/mere` is 3,522 lines in eight modules plus six re-exports. Family code names
+`mere::kernel` 447 times, `mere::canvas` 393, `mere::navigation` 18, `mere::platen` 15,
+`mere::forme` 11, and the rest four times or fewer; `mere::linked_data` and `mere::workbench`
+are named nowhere. Steps, in dependency order:
+
+- **T1, the modules.** `navigation`, `trail` and `roster` to incipit (D58); `gloss` and
+  `glossary` to mere-view's `gloss` feature (D98); `coupling_edit` to graphshell-host's
+  `mere-host` (D99); `clip` to a graphshell-host `clip` feature (D100); `routing` to Turnstone
+  (D101), which lands before Mere deletes it.
+  - Done when: the facade holds re-exports only, and the moved tests pass with unchanged counts.
+- **T2, the re-exports inside Mere.** Every Mere crate names `kernel`, `pictograph::canvas`,
+  `incipit::forme`, `platen` and the rest directly, and takes over the pictograph features the
+  facade forwarded (`physics-engine`, `image-decode`, `canvas-gpu`, `canvas-meaning-gpu`).
+  - Done when: no crate in Mere depends on the `mere` package.
+- **T3, the outside consumers.** Turnstone, Cleromancy, Isocosm, Murm's comms and any other
+  family manifest naming the package repoint the same way and drop the row.
+- **T4, close.** `crates/mere` is deleted and consumers are re-addressed (D66).
+  - Done when: `cargo tree -i mere` finds no package in any family lock root, and the family
+    cycle checker passes. The name is then free for P5's engine crate.
+
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
@@ -1596,6 +1617,40 @@ revision and what crosses at frame rate.
   test proves the wire. Outcome: applies D72.
 
   Links: area The stack · draws on engine-split D72 · plans engine-split P3 · summary Woodshed's test proves the block-guest wire; the document-undo and paint checks are an app-side test.
+
+- **D98. gloss and glossary go to mere-view (Mark, 2026-11-10):** Slice 3's assessment found the
+  facade at 3,522 lines. D58 sends `navigation`, `trail` and `roster` (2,206) to incipit; five
+  modules had no ruled home. `gloss` (458 lines: outline snapshot, minimap geometry, the
+  document outline into uxtree) needs pictograph, inker, tabard, netrender and accesskit;
+  `glossary` (362: graph digests) needs only the kernel. Nothing outside the facade names
+  `gloss`, and only `gloss` names `glossary`. Offered both to mere-view, splitting them, or
+  retiring both. Ruling: "Both to mere-view (Recommended)", behind a `gloss` feature.
+  Outcome: applies D58 and D54.
+
+  Links: area The stack · draws on engine-split D54, engine-split D58 · plans engine-split P3 · summary gloss and glossary live in mere-view behind a gloss feature.
+
+- **D99. coupling_edit goes to graphshell-host (Mark, 2026-11-10):** `coupling_edit` (208 lines)
+  drafts one coupling's authored strength; "Writing the candidate is the host's". Its users
+  are graphshell-host's `mere_host_coupling`, the one place graphshell-host names the facade,
+  and two files in the app's web tree. Offered graphshell-host or incipit. Ruling:
+  "graphshell-host (Recommended)", behind `mere-host`. Outcome: applies D58 and D68.
+
+  Links: area The stack · draws on engine-split D58, engine-split D68 · plans engine-split P3 · summary The coupling strength draft lives in graphshell-host behind mere-host.
+
+- **D100. clip is a graphshell-host feature (Mark, 2026-11-10):** `clip` (127 lines) records the
+  graph relation for a clip gathered by Fleece; it needs the kernel, incipit and Fleece, and
+  nothing calls it. Offered a graphshell-host feature, incipit, or retiring it. Ruling:
+  "graphshell-host feature (Recommended)": a `clip` feature beside the goal surface.
+  Outcome: applies D58.
+
+  Links: area The stack · draws on engine-split D58, engine-split D91 · plans engine-split P3 · summary Graph insertion for Fleece clips is a clip feature of graphshell-host.
+
+- **D101. routing goes to Turnstone (Mark, 2026-11-10):** `routing` (110 lines) is the
+  app-flavoured routing vocabulary over Inker's host-neutral policy; its one code user is
+  Turnstone's `standard_route_policy`. Offered Turnstone, graphshell-host or mere-fetch.
+  Ruling: "Turnstone (Recommended)". Outcome: applies D58.
+
+  Links: area The stack · draws on engine-split D58 · plans engine-split P3 · summary The app-flavoured route ids live in Turnstone, their one user.
 
 ## Open questions
 
