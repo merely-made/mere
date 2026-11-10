@@ -49,10 +49,8 @@ workbench = [
     "dep:platen",
     "dep:workbench",
 ]
-clip = ["graph", "dep:fleece", "fleece/clip"]
 
 [dependencies]
-fleece = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }

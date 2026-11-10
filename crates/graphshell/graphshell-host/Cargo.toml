@@ -111,6 +111,15 @@ mere-host = [
     "dep:url",
     "dep:uuid",
 ]
+# Graph insertion for a Fleece clip (engine split D100): `clip::write_clip_node`
+# records the clip and its relation to the source node. Beside the goal surface.
+clip = [
+    "dep:fleece",
+    "fleece/clip",
+    "dep:incipit",
+    "incipit/arrangement",
+    "dep:kernel",
+]
 # MereHost's test graphs for the app's and the resident's tests: products
 # enable it as a dev-dependency feature only.
 test-support = ["mere-host"]

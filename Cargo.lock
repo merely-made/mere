@@ -9420,7 +9420,6 @@ version = "0.0.2"
 dependencies = [
  "incipit",
  "inker",
- "mere-fleece",
  "mere-kernel",
  "mere-rdf",
  "pictograph",
