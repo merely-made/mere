@@ -9808,7 +9808,6 @@ dependencies = [
  "gemot",
  "gemot-site",
  "gemot-site-host",
- "graphshell",
  "graphshell-client",
  "graphshell-door",
  "graphshell-endpoint",
