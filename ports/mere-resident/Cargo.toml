@@ -107,8 +107,8 @@ chartulary.workspace = true
 eidetic = { workspace = true, features = ["pack-signing"] }
 # The reviewed wasm guests that decide a domain's authority (cycle breaks P3).
 authority-host.workspace = true
-p2panda-core = { package = "p2mere-core", version = "0.9" }
-p2panda-store = { package = "p2mere-store", version = "0.9", default-features = false }
+p2panda-core = { package = "p2mere-core", version = "0.10" }
+p2panda-store = { package = "p2mere-store", version = "0.10", default-features = false }
 stickleback.workspace = true
 blake3.workspace = true
 chatelaine.workspace = true
@@ -332,11 +332,11 @@ ostiary = { workspace = true, features = ["native"] }
 castellan-client = { workspace = true, features = ["client"] }
 pollster = "0.4"
 mere-view.workspace = true
-p2panda-core = { package = "p2mere-core", version = "0.9" }
+p2panda-core = { package = "p2mere-core", version = "0.10" }
 # The Knot residue test's baselines (iroh alone, p2panda-net alone), built as
 # mere-transport's seed residue test builds them; transport's own rows.
 iroh = "1.0.3"
-p2panda-net = { package = "p2mere-net", version = "0.9", default-features = false, features = [
+p2panda-net = { package = "p2mere-net", version = "0.10", default-features = false, features = [
   "address_book",
   "iroh_endpoint",
   "iroh_mdns",
