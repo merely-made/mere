@@ -332,11 +332,10 @@ impl Canvas {
         let marquee_cmds = self
             .marquee
             .map(|origin| marquee_rect_cmds(origin, self.cursor));
-        // The canvas's own opaque backdrop is the bottom layer (so the surface is
-        // dark without depending on the host clear color); then the living-backdrop
-        // scene orbs, then the underlay edges + demoted rects, then the on-screen node
-        // DOM, then any marquee on top.
+        // The canvas ground fills the viewport. The content wash sits just above
+        // it, under territory and the other scene layers.
         let bg_cmds = background_cmds(w, h, self.backdrop);
+        let wash_cmds = self.content_backdrop_commands();
         let territory_cmds = self.territory_commands();
         let projection_backdrop_cmds = self.projection_backdrop_commands();
         let strategy_region_cmds = self.strategy_region_commands();
@@ -366,6 +365,9 @@ impl Canvas {
             super::super::cull::visible_commands(nodes_plist.commands(), viewport_bounds);
         observer.mark(8);
         let mut layers = vec![CompositeLayer::commands_only(&bg_cmds)];
+        if !wash_cmds.is_empty() {
+            layers.push(CompositeLayer::commands_only(&wash_cmds));
+        }
         if !territory_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&territory_cmds));
         }

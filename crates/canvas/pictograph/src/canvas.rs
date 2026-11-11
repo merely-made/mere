@@ -224,6 +224,7 @@ pub use ambient::{AmbientSim, GameOfLife, NBody, ParticleLife, SandFall, Tinctur
 use seiche::Physics;
 
 mod backdrop_digest;
+mod backdrop_paint;
 pub mod backdrop_surface;
 /// The board's camera and the links its law reads (stack-lift D3).
 mod board_camera;
@@ -469,6 +470,7 @@ pub struct Canvas {
     /// The content-surface backdrop color (themed; the host pushes it via
     /// [`set_palette`](Self::set_palette)). Defaults to the dark slate.
     backdrop: ColorF,
+    content_backdrop: bool,
     projection_backdrops: Vec<projection_backdrops::ResolvedBackdrop>,
     /// Producer generation, bumped each rendered frame (positions / camera move).
     generation: u64,

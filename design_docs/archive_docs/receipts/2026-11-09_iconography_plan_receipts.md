@@ -130,3 +130,24 @@ The standalone Graphshell web workspace passed
 `check --locked --offline --target wasm32-unknown-unknown --lib -j 4`.
 The guarded receipt is
 `Code/output/build-storage-receipts/2026-11-10/build-35e3b10c0847470da88e8479ab8262b6.json`.
+
+## 2026-11-10 · B2 Canvas wash paint
+
+Mere baseline `764acd948`. Guarded Rust 1.99.1
+`test --locked --offline -p pictograph --features backdrop-cpu --lib -j 4`
+passed 710 tests, with 18 ignored. The five B2 tests verify palette swaps
+against one IconVG file, the 256 px motif threshold, the ground camera
+with yaw and tilt, palette luminance and alpha ceilings, and the
+position of the gradient between the ground and territory in the
+composited scene. The headless Vello CPU test samples the centre, falloff
+and unpainted ground on light and dark themes.
+
+The lane log is `Code/output/pictograph-grammar/b2/pictograph-final.log`
+and the guarded receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-b53652adf9374bb3969a023760dec37c.json`.
+
+The standalone Graphshell web workspace passed
+`check --locked --offline --target wasm32-unknown-unknown --lib -j 4`.
+The lane log is `Code/output/pictograph-grammar/b2/graphshell-web-check.log`
+and the guarded receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-97c83918e98445f681daa97aa80e12f5.json`.

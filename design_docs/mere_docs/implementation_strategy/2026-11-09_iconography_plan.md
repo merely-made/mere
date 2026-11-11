@@ -6,8 +6,8 @@ face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
 vector images); T4 (mentions, guest pages included), F1 (typed blazon
 source), S1 (authored chrome symbols), S2 (Hocket icon pack on macOS and
-Windows), W1 (named action icons) and B1 (wash digest and IconVG) landed
-2026-11-10.
+Windows), W1 (named action icons), B1 (wash digest and IconVG) and B2
+(theme and paint beneath territory) landed 2026-11-10.
 D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
@@ -259,8 +259,8 @@ remote controls draw known names from Pictograph’s eight-symbol catalog.
 
 ## B. A background that responds to the contents
 
-**What exists.** No backdrop reads the view's content through emblem. Portable
-scene backdrops (`sceno-backdrops`, a graphshell git dependency) render
+**What exists.** Canvas can paint an Emblem wash from held content facts.
+Portable scene backdrops (`sceno-backdrops`, a graphshell git dependency) render
 disclosed data, "never analysis"; `backdrop_surface.rs` realizes them with a
 seven-colour literal `SurfaceTheme`. `AmbientSim` (`canvas/ambient/mod.rs`) is
 decorative per-frame animation that reads no graph data. The one data-responsive
@@ -268,13 +268,14 @@ ground is territory (`canvas/territory.rs`): each site claims the ground nearest
 its nodes, as a per-frame grid of flat rects, capped at 2000 nodes, coloured by
 category. The signals pictograph already caches include communities, bridges,
 importance, recency, spectral coordinates and sites (`src/signals/registry.rs`).
-`cartography::Cluster` carries members, not geometry. The canvas's face
-lowering refuses gradients (`flat_icon.rs`); the vello bridge
-supports them.
+`cartography::Cluster` carries members, not geometry. Canvas lowers the
+wash's axis-aligned radial brushes and rectangular fills through the
+existing paint-list gradient primitive.
 
 **Design.** Pictograph’s `backdrop::derive_backdrop` encodes a `ViewDigest`
 as IconVG under the `wash` grammar. The encoder returns a typed error if
-the file exceeds either limit. B2 will place the wash beneath territory.
+the file exceeds either limit. With the wash enabled, Canvas places it
+above the ground fill and beneath territory.
 
 - `Canvas::backdrop_digest` uses an explicit pause or the held
   analytic arrangement, in that order. It filters anchors through the
@@ -388,10 +389,9 @@ because F, T and B all name grammars and versions.
   only; moving nodes within a lattice cell leaves it unchanged; insertion order
   does not change the bytes; a version bump does; the byte and path ceilings
   fail closed at their boundary; the kind source and its buckets are named.
-- **B2. Paint.** Done when: the canvas paints the bytes under territory through
-  a lowering that accepts gradients (the paint list gains linear and radial
-  gradients, or the layer uses the vello bridge); a palette swap recolours the
-  same bytes; the contrast and alpha ceilings are tested on light and dark grounds.
+- **B2. Paint.** Landed 2026-11-10. Canvas paints the bytes beneath territory
+  through the paint list's radial gradient. A palette swap recolours the same
+  bytes. Tests cover the contrast and alpha ceilings on light and dark grounds.
 - **B3. Cadence.** Done when: derivations are counted across many frames of node
   and camera motion and occur only on digest changes; a cluster oscillating
   across a lattice edge and a zoom oscillating across the threshold each cause at
@@ -693,3 +693,12 @@ Provisional (recommended first; asked only if they become blocking):
   and a detail motif from the dominant kind and density. It checks 64
   subpaths and 4096 bytes across the whole file. B2 owns palette
   qualification and painting under territory.
+- 2026-11-10: B2 landed. `Canvas::set_content_backdrop` enables the wash
+  in the normal frame path. The snapped bounds and ground camera project
+  the wash and supply its raster height. The palette uses the canvas
+  categories and edge ink, with relative luminance distance at most 0.183
+  for each entry, wash alpha at most 0.17, and motif alpha at most 0.085.
+  The pinned paint-list translator copies gradient stops directly into the
+  premultiplied scene representation, so the wash passes Emblem's
+  premultiplied channels at that seam. B3 owns derivation cadence and
+  transitions. B4 owns host switches and export.

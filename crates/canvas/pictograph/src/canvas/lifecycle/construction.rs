@@ -229,6 +229,7 @@ impl Canvas {
             camera: Camera::default(),
             style: dark_scene_style(),
             backdrop: surface_bg(),
+            content_backdrop: false,
             projection_backdrops: Vec::new(),
             generation: 0,
             last_translation_error: None,
