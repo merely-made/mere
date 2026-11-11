@@ -1553,6 +1553,22 @@ summary = "SymbolImage stays in pictograph behind a livery feature."
 draws_on = ["engine-split D38"]
 plans = ["engine-split"]
 
+[decisions."engine-split D110"]
+title = "Which design docs move to Graphshell (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "73 documents move to Graphshell: the 39 host documents, the UI-model designs, the resident and route documents and the canvas dynamics documents; mixed plans, stack-wide records and research stay in Mere."
+draws_on = ["engine-split D107"]
+plans = ["engine-split"]
+
+[decisions."engine-split D111"]
+title = "Graphshell's docs get responsa and line-ceiling; the archive stays; the docs move before the code (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Graphshell runs responsa and line-ceiling with its own manifest; archived host documents stay in Mere; the documents move ahead of the code."
+draws_on = ["engine-split D107", "engine-split D110"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

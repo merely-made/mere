@@ -1774,6 +1774,38 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D38 · plans engine-split P3 · summary SymbolImage stays in pictograph behind a livery feature.
 
+- **D110. Which design docs move to Graphshell (Mark, 2026-11-11):** The docs sort (evidence in
+  `Code/testing/engine-split/slice4_docs_sort.md`, Mere `0c4f551d6`) classed Mere's 227 active
+  documents: 39 plainly the host's (11,674 lines), 4 mixed, 50 unsure. Asked which set moves:
+  "Rule the 54 uncertain ones first". Ruled in six groups. To Graphshell, each "Graphshell
+  (Recommended)": the 9 UI-model designs in `mere_docs/design` (pane UX, gloss navigator, roster
+  and frame taxonomy, subgraph derivation, scope model, swatch, node card, one state N windows,
+  pool); the 15 resident, door, pairing and route documents (device pairing, family update
+  resident, resident inference, app projection offers, native confirmation, resident split, key
+  lane, resident host design, remote mere route spec and admission, transport agnosticism,
+  delegation petition, session merge-in, interaction model spine, one-node facets layer map);
+  and the 10 canvas dynamics and physics documents (node body and face model, dynamics grammar
+  plan and brief, graph behaviours, graph view curation, illume text lexer, physics catalog,
+  arrangement and dynamics, orrery physics environments, graph projections research). Staying
+  in Mere: the four mixed plans, "Stay in Mere whole (Recommended)" (ownership repair, Alembic
+  implementation, stack lift, capability door); the stack-wide records, "Stay in Mere as family
+  record (Recommended)" (ambiance, GUI catalog, projection scenes brief, Turnstone census,
+  application experience brief and plan, MCP-native graph, ranged fetch); and the product and
+  workspace research, "Stay in Mere (Recommended)". 73 documents move. Outcome: applies D107.
+
+  Links: area The stack · draws on engine-split D107 · plans engine-split P3 · summary 73 documents move to Graphshell: the 39 host documents, the UI-model designs, the resident and route documents and the canvas dynamics documents; mixed plans, stack-wide records and research stay in Mere.
+
+- **D111. Graphshell's docs get responsa and line-ceiling; the archive stays; the docs move
+  before the code (Mark, 2026-11-11):** Three rulings on the mechanics. Tooling: "responsa and
+  line-ceiling hooks (Recommended)": Graphshell gets a pre-commit config and its own generated
+  `decisions.toml`; the moved decisions leave Mere's manifest and other repos cite them as
+  `graphshell:<key>`. History: "Stay in Mere as history (Recommended)": the 139 host-leaning
+  archived files stay, cited across repos by path. Timing, offered with the cutover or before
+  it: "Now, before the code", over the recommended single repointing. The documents' path
+  citations into moved crates are repointed again at U4. Outcome: applies D107.
+
+  Links: area The stack · draws on engine-split D107, engine-split D110 · plans engine-split P3 · summary Graphshell runs responsa and line-ceiling with its own manifest; archived host documents stay in Mere; the documents move ahead of the code.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
