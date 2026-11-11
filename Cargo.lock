@@ -9596,7 +9596,6 @@ dependencies = [
  "crossbeam-channel",
  "euclid",
  "futures-util",
- "hest",
  "infer",
  "mime_guess",
  "minicbor-serde",

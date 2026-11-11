@@ -17,7 +17,6 @@
 //! - any platform I/O (file, network, browser APIs)
 
 pub mod accessibility;
-pub mod actions;
 pub mod address;
 pub mod async_host;
 pub mod async_request;
