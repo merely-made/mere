@@ -86,19 +86,23 @@ path = "crates/canvas/cartography/src/adapters/parity.rs"
 reason = "The scenograph absorption's parity gate. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]
-path = "crates/canvas/pictograph/src/canvas.rs"
+path = "crates/canvas/cartography/src/canvas.rs"
 reason = "The canvas as a reusable, window-agnostic content-root — the graph's spatial presentation (build item 1D of the genet-as-host flip; S1 of the modular integration plan). Existing source-size debt; a responsibility split must preserve AffinityBlend, Drag, EmptyPress and existing module visibility."
 
 [[exception]]
-path = "crates/canvas/pictograph/src/canvas/physics_catalog.rs"
+path = "crates/canvas/cartography/src/canvas/backdrop_paint.rs"
+reason = "The canvas's content wash beneath territory: derivation, cache, cross-fade and export (iconography B2 to B4). Existing source-size debt: 643 lines and no exception when it moved from pictograph (engine split D38); a responsibility split must preserve the Canvas content-backdrop methods and existing module visibility."
+
+[[exception]]
+path = "crates/canvas/cartography/src/canvas/physics_catalog.rs"
 reason = "The physics catalog: laws × overlays, and the named profiles over them. Existing source-size debt; a responsibility split must preserve PhysicsLaw, OverlayRefusal, PhysicsOverlay and existing module visibility."
 
 [[exception]]
-path = "crates/canvas/pictograph/src/canvas/physics_controls.rs"
+path = "crates/canvas/cartography/src/canvas/physics_controls.rs"
 reason = "Arrangement and physics actions a host's controls apply to the canvas. Existing source-size debt; a responsibility split must preserve PhysicsWrite, TwoLawMix, TwoLawGrouping and existing module visibility."
 
 [[exception]]
-path = "crates/canvas/pictograph/src/canvas/physics_form.rs"
+path = "crates/canvas/cartography/src/canvas/physics_form.rs"
 reason = "The Map's physics form: flat law, sources, overlays and profile; role, two-law mix, grouping, two-stage schedule and speed, as one model both hosts drive. Existing source-size debt; a responsibility split must preserve Slot, FieldId, Control and existing module visibility."
 
 [[exception]]
@@ -281,7 +285,7 @@ reason = "The block editing pane: Cambium view, toolbar and adapter calls over o
 
 [[exception]]
 path = "ports/graphshell/src/canvas_physics_tests.rs"
-reason = "Host acceptance tests of pictograph::canvas::physics_controls on Graphshell's reference fixture, as its tree page opens it. Existing source-size debt; a responsibility split must preserve NarrowedNumber and existing module visibility."
+reason = "Host acceptance tests of cartography::canvas::physics_controls on Graphshell's reference fixture, as its tree page opens it. Existing source-size debt; a responsibility split must preserve NarrowedNumber and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/src/canvas_reader/tests.rs"

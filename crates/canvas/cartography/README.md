@@ -18,7 +18,8 @@ Package `mere-cartography`, lib name `cartography`. Most contract types derive
 | `request` | `ProjectionRequest<'a>` (borrowed graph + signals, owned intent), `ViewIntent`, `FormFactor`, `ProjectionDimension`, `NodeFilter`, `TargetSize`, `AxisValue`. |
 | `projection` | `Projection`, `PositionedNode`, `PositionedEdge`, `ProjectionMetadata`. |
 | `overlay` | `Overlay`, whose variants are `ClusterHalo`, `ActivityHeat`, `BridgeEmphasis`, `ImportanceScale`, `EdgeWeight`. |
-| `signals` | `IntelligenceSignals`, `ClusterSet`, `Cluster`, `AffinityScores`, `BridgeNodes`, `ImportanceWeights`, `NodeEmbeddings`. |
+| `signals` | `IntelligenceSignals`, `ClusterSet`, `Cluster`, `AffinityScores`, `BridgeNodes`, `ImportanceWeights`, `NodeEmbeddings`; with `signals`, the producers and `ChannelRegistry`. |
+| `canvas` | With `canvas`: the graph canvas (engine split D38, from `pictograph`). |
 | `minimap` | `MinimapDescriptor`, `MinimapOverlayKind`. |
 | `representation` | Class profiles, primitive and behavior bindings, and ordered representation ladders built from measure/operation/threshold/hysteresis conditions. |
 | `scene_out` | `scene_from_projection`, `MERE_GRAPH_ADAPTER`, `HEAT_CHANNEL`, `BRIDGE_CHANNEL`. |
@@ -80,10 +81,10 @@ No cargo features; `default = []`.
   phyllotaxis, grid, radial, axial kanban/timeline, semantic embedding), with
   `LayoutStrategy` adapters in `arrangements::adapters`. Live force physics is
   `seiche`.
-- Renderer: pictograph's `canvas` module (`crates/canvas/pictograph`, feature
-  `canvas`) consumes `Projection`.
-- Signal producers: `pictograph::signals` and `crates/intel/embed` fill
-  `IntelligenceSignals`.
+- Renderer: this crate's `canvas` module (feature `canvas`) consumes
+  `Projection`; node faces come from `pictograph`.
+- Signal producers: this crate's `signals` producers (feature `signals`) and
+  `crates/intel/embed` fill `IntelligenceSignals`.
 
 ## Related
 

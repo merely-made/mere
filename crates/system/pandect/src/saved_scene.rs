@@ -9,7 +9,7 @@
 //! editor plan, SE14); Graphshell saves it on a `mere://scene/<name>` node and
 //! Turnstone on its graph's container node, so either host can open the
 //! other's. Capture, restore and the version 2/3 conversion live with the
-//! canvas that knows the vocabularies (`pictograph::canvas::saved_scene`);
+//! canvas that knows the vocabularies (`cartography::canvas::saved_scene`);
 //! this module holds only what is stored. The dynamics spec rides opaque
 //! (F114), so a newer spec passes through a host that cannot read it (F158).
 //!

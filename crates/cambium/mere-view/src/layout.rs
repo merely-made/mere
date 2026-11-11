@@ -11,7 +11,7 @@ use cartography::{Projection, ProjectionRequest, TargetSize, ViewIntent};
 use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{add_node, assert_relation};
 use kernel::graph::{EdgeAssertion, Graph, SemanticSubKind};
-use pictograph::signals::ChannelRegistry;
+use cartography::signals::ChannelRegistry;
 use uuid::Uuid;
 
 use crate::model::GraphModel;

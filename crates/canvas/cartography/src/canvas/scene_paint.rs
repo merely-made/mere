@@ -1,0 +1,380 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! Render a cartography [`Projection`] to a `paint_list_api` paint list — the
+//! canvas's host-agnostic scene underlay (the genet-as-host eval's "Layer 1").
+//!
+//! Platen is "the press": it already dispatches strategies to a `Projection`
+//! (see [`crate::canvas::cartography_scene`]); this turns that projection into the
+//! engine-agnostic [`PaintCmd`] stream `netrender` renders, the *same* output
+//! whether the host is Masonry today or genet later. Nodes render as rects and
+//! edges as straight strokes under a camera transform; richer visuals (glyphs,
+//! routed edges, external-texture node content) layer on later.
+//!
+//! This is deliberately minimal and does *not* reach into the 9.6k-LOC
+//! `graph-canvas` crate (whose own physics is superseded by `seiche` and whose
+//! projection overlaps cartography). It works off the cartography `Projection`
+//! abstraction, so any strategy's output — analytic or an seiche layout rebuilt
+//! into a projection — paints through one path.
+
+use std::collections::HashMap;
+
+use crate::Projection;
+use kernel::geometry::PortablePoint;
+use kernel::graph::NodeKey;
+use paint_list_api::{
+    ColorF, CommonPlacement, DeviceIntSize, EngineId, LayoutPoint, LayoutRect, LayoutTransform,
+    PaintCmd, PaintList, PathCommand, PathData, RectItem, StrokeCap, StrokeItem, StrokeJoin,
+    TransformKind, TransformSpec,
+};
+use serde::{Deserialize, Serialize};
+
+/// A concrete [`PaintList`] for canvas chrome (the canvas). Chrome is not a
+/// content engine, so it carries [`EngineId::UNASSIGNED`]; a dedicated canvas
+/// engine id is a small `paint_list_api` follow-up if chrome paint ever needs
+/// to be distinguished downstream.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CanvasPaintList {
+    commands: Vec<PaintCmd>,
+    viewport: DeviceIntSize,
+    generation: u64,
+}
+
+impl PaintList for CanvasPaintList {
+    fn engine_id(&self) -> EngineId {
+        EngineId::UNASSIGNED
+    }
+    fn viewport(&self) -> DeviceIntSize {
+        self.viewport
+    }
+    fn generation_id(&self) -> u64 {
+        self.generation
+    }
+    fn commands(&self) -> &[PaintCmd] {
+        &self.commands
+    }
+}
+
+impl CanvasPaintList {
+    /// Splice world-space overlay commands in just inside the camera transform
+    /// (immediately before the trailing `PopTransform`), so they share the
+    /// scene's world→view mapping. Lists from [`paint_projection`] always end in
+    /// that `PopTransform`; on the (unreachable) empty list this is a no-op tail
+    /// insert. Used by the visual-coupling pass ([`crate::canvas::coupling_paint`]).
+    pub fn splice_world_overlays(&mut self, overlays: impl IntoIterator<Item = PaintCmd>) {
+        let before_pop = self.commands.len().saturating_sub(1);
+        self.commands.splice(before_pop..before_pop, overlays);
+    }
+
+    /// Splice world-space overlay commands in at the **bottom** of the camera
+    /// transform (immediately after the leading `PushTransform`), so they share the
+    /// scene's world→view mapping but paint *beneath* the projection's nodes + edges.
+    /// The under-content twin of [`splice_world_overlays`] — for background regions
+    /// like field extents, which the graph should appear to sit *within*. On the
+    /// (unreachable) empty list this is a head insert.
+    pub fn splice_world_underlay(&mut self, overlays: impl IntoIterator<Item = PaintCmd>) {
+        let after_push = self.commands.len().min(1);
+        self.commands.splice(after_push..after_push, overlays);
+    }
+}
+
+/// World-to-view camera: pan, uniform zoom, plus an isometric orbit (`yaw`) and
+/// vertical foreshorten (`tilt`). The forward map is [`Camera::to_screen`], the
+/// inverse [`Camera::to_world`], and [`Camera::ground_transform`] is the affine the
+/// scene `PushTransform` carries for ground-plane paint. Plain top-down is the
+/// degenerate isometric at `yaw == 0.0`, `tilt == 1.0`, where the map reduces
+/// exactly to `screen = world * zoom + offset`. (Isometric camera P0.)
+#[derive(Clone, Copy, Debug)]
+pub struct Camera {
+    pub offset: (f32, f32),
+    pub zoom: f32,
+    /// Orbit angle about the vertical, radians. `0.0` is top-down.
+    pub yaw: f32,
+    /// Vertical foreshorten in `(0, 1]`. `1.0` is no foreshorten (top-down 2D); a
+    /// classic isometric squash is ~`0.55`.
+    pub tilt: f32,
+}
+
+impl Default for Camera {
+    fn default() -> Self {
+        Self {
+            offset: (0.0, 0.0),
+            zoom: 1.0,
+            yaw: 0.0,
+            tilt: 1.0,
+        }
+    }
+}
+
+impl Camera {
+    /// Whether the ground projection is finite and invertible. Presentation
+    /// geometry must check this before mapping screen attachments back to world.
+    pub fn is_valid(&self) -> bool {
+        let determinant = self.zoom * self.zoom * self.tilt;
+        self.offset.0.is_finite()
+            && self.offset.1.is_finite()
+            && self.zoom.is_finite()
+            && self.zoom >= f32::EPSILON
+            && self.yaw.is_finite()
+            && self.tilt.is_finite()
+            && self.tilt >= f32::EPSILON
+            && self.tilt <= 1.0
+            && determinant.is_finite()
+            && determinant > 0.0
+    }
+
+    /// Project a world point to screen px. At `(yaw 0, tilt 1)` this is exactly
+    /// `world * zoom + offset`; otherwise it rotates the ground plane by `yaw`,
+    /// foreshortens the vertical by `tilt`, scales by `zoom`, and translates by
+    /// `offset`. (Isometric camera P0.)
+    pub fn to_screen(&self, world: PortablePoint) -> (f32, f32) {
+        let (s, c) = self.yaw.sin_cos();
+        let rx = world.x * c - world.y * s;
+        let ry = world.x * s + world.y * c;
+        (
+            rx * self.zoom + self.offset.0,
+            ry * self.tilt * self.zoom + self.offset.1,
+        )
+    }
+
+    /// The inverse of [`Camera::to_screen`]: a screen-px point back to world space.
+    /// At `(yaw 0, tilt 1)` this is `(screen - offset) / zoom`. (Isometric camera P0.)
+    pub fn to_world(&self, screen: (f32, f32)) -> PortablePoint {
+        let z = self.zoom.max(f32::EPSILON);
+        let t = self.tilt.max(f32::EPSILON);
+        let px = (screen.0 - self.offset.0) / z;
+        let py = (screen.1 - self.offset.1) / (z * t);
+        let (s, c) = self.yaw.sin_cos();
+        // Inverse rotation (rotate by -yaw).
+        PortablePoint::new(px * c + py * s, -px * s + py * c)
+    }
+
+    /// The world->screen affine the scene `PushTransform` carries for **ground-plane**
+    /// paint (edges, field regions, demoted dots), so they recline onto the floor while
+    /// nodes stay upright billboards via [`Camera::to_screen`]. Built to match
+    /// `to_screen` exactly: rotate the ground by `yaw` (Z), foreshorten the vertical by
+    /// `tilt`, scale by `zoom`, translate by `offset`. Row-major, per euclid's
+    /// `transform_point2d` (`x' = x*m11 + y*m21 + m41`, `y' = x*m12 + y*m22 + m42`); at
+    /// `yaw 0` it reduces to `scale(zoom, tilt*zoom).then(translate(offset))`, and at
+    /// `(yaw 0, tilt 1)` to the plain top-down map. (Isometric camera P2 — yaw orbit.)
+    pub fn ground_transform(&self) -> LayoutTransform {
+        let (s, c) = self.yaw.sin_cos();
+        let z = self.zoom;
+        let tz = self.tilt * self.zoom;
+        LayoutTransform::new(
+            c * z,
+            s * tz,
+            0.0,
+            0.0,
+            -s * z,
+            c * tz,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            self.offset.0,
+            self.offset.1,
+            0.0,
+            1.0,
+        )
+    }
+}
+
+/// Visual knobs for the scene paint. Public so the host can theme it (the
+/// `tabard::theme` wiring lands later).
+#[derive(Clone, Copy, Debug)]
+pub struct ScenePaintStyle {
+    pub node_color: ColorF,
+    /// Node half-extent used when a `PositionedNode` reports `radius == 0`.
+    pub default_node_radius: f32,
+    pub edge_color: ColorF,
+    pub edge_width: f32,
+}
+
+impl Default for ScenePaintStyle {
+    fn default() -> Self {
+        Self {
+            node_color: ColorF::new(0.55, 0.72, 0.92, 1.0),
+            default_node_radius: 18.0,
+            edge_color: ColorF::new(0.5, 0.5, 0.55, 0.7),
+            edge_width: 1.5,
+        }
+    }
+}
+
+fn pt(p: PortablePoint) -> LayoutPoint {
+    LayoutPoint::new(p.x, p.y)
+}
+
+/// Render a [`Projection`] into a [`CanvasPaintList`]: a camera transform, then
+/// an edge stroke per edge (its routed `path` if present, else a straight line
+/// between the endpoint node positions) and a node rect per node. Edges paint
+/// under nodes.
+pub fn paint_projection(
+    projection: &Projection,
+    viewport: DeviceIntSize,
+    camera: Camera,
+    style: &ScenePaintStyle,
+    generation: u64,
+) -> CanvasPaintList {
+    paint_projection_filtered(projection, viewport, camera, style, generation, |_| true)
+}
+
+/// [`paint_projection`], but a node's rect is painted only when `draw_node`
+/// returns `true` for it. Edges always use every node's position (so an edge to
+/// an undrawn node still renders), so the canvas can **demote** off-screen nodes
+/// to the underlay (drawn as rects here) while on-screen nodes are drawn as
+/// richer host DOM and excluded from this pass — see
+/// [`crate::canvas::canvas::canvas_paint_list_demoted`].
+pub fn paint_projection_filtered(
+    projection: &Projection,
+    viewport: DeviceIntSize,
+    camera: Camera,
+    style: &ScenePaintStyle,
+    generation: u64,
+    draw_node: impl Fn(NodeKey) -> bool,
+) -> CanvasPaintList {
+    let mut commands = Vec::with_capacity(projection.edges.len() + projection.nodes.len() + 2);
+
+    let transform = camera.ground_transform();
+    commands.push(PaintCmd::PushTransform(TransformSpec {
+        origin: LayoutPoint::zero(),
+        transform,
+        kind: TransformKind::Standard,
+    }));
+
+    let node_pos: HashMap<NodeKey, PortablePoint> = projection
+        .nodes
+        .iter()
+        .map(|n| (n.node, n.position))
+        .collect();
+    // Each node's drawn radius (its own, or the style default for an un-sized node) —
+    // used to trim a straight edge so it meets the face, not the center.
+    let node_radius: HashMap<NodeKey, f32> = projection
+        .nodes
+        .iter()
+        .map(|n| {
+            (
+                n.node,
+                if n.radius > 0.0 {
+                    n.radius
+                } else {
+                    style.default_node_radius
+                },
+            )
+        })
+        .collect();
+    let radius_of = |key: &NodeKey| {
+        node_radius
+            .get(key)
+            .copied()
+            .unwrap_or(style.default_node_radius)
+    };
+
+    // Edges first (painted under the nodes).
+    for edge in &projection.edges {
+        let polyline: Vec<LayoutPoint> = if edge.path.len() >= 2 {
+            // A routed path is explicit — paint it as given, no face trim.
+            edge.path.iter().map(|p| pt(*p)).collect()
+        } else {
+            match (node_pos.get(&edge.from), node_pos.get(&edge.to)) {
+                // A straight edge stops at each endpoint's face (radius) rather than
+                // plunging to its center, so a sized node looks connected at its
+                // visual edge. (Node-rep Decision 5 — face geometry.)
+                (Some(&a), Some(&b)) => {
+                    trim_to_faces(a, b, radius_of(&edge.from), radius_of(&edge.to))
+                },
+                _ => continue,
+            }
+        };
+        let mut path_cmds = Vec::with_capacity(polyline.len());
+        path_cmds.push(PathCommand::MoveTo(polyline[0]));
+        for p in &polyline[1..] {
+            path_cmds.push(PathCommand::LineTo(*p));
+        }
+        commands.push(PaintCmd::DrawStroke(StrokeItem {
+            placement: CommonPlacement::new(bounds_of(&polyline)),
+            path: PathData {
+                commands: path_cmds,
+            },
+            color: style.edge_color,
+            // Edge weight (the multigraph multiplicity) thickens the stroke: weight 1 paints the
+            // normal width, heavier pairs scale up, capped so a busy pair stays legible. (Graph
+            // signals — edge-weight encoding.)
+            width: (style.edge_width * edge.weight.max(1.0)).min(style.edge_width * 4.0),
+            cap: StrokeCap::Round,
+            join: StrokeJoin::Round,
+            dash: None,
+        }));
+    }
+
+    // Nodes (only those the filter draws; edges above used every position).
+    for node in &projection.nodes {
+        if !draw_node(node.node) {
+            continue;
+        }
+        let r = if node.radius > 0.0 {
+            node.radius
+        } else {
+            style.default_node_radius
+        };
+        let c = pt(node.position);
+        let bounds = LayoutRect::new(
+            LayoutPoint::new(c.x - r, c.y - r),
+            LayoutPoint::new(c.x + r, c.y + r),
+        );
+        commands.push(PaintCmd::DrawRect(RectItem {
+            placement: CommonPlacement::new(bounds),
+            color: style.node_color,
+        }));
+    }
+
+    commands.push(PaintCmd::PopTransform);
+
+    CanvasPaintList {
+        commands,
+        viewport,
+        generation,
+    }
+}
+
+/// A straight segment `a`–`b` shortened so each end stops at the node's face — `a`
+/// pulled in by `ra`, `b` by `rb` — instead of meeting at the centers. When the
+/// centers are closer than the two radii (overlapping / touching faces, so there is
+/// no clean gap to draw into) the segment falls back to center-to-center, which is no
+/// worse than the un-trimmed line and avoids a reversed stroke. (Node-rep Decision 5.)
+fn trim_to_faces(a: PortablePoint, b: PortablePoint, ra: f32, rb: f32) -> Vec<LayoutPoint> {
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    let dist = (dx * dx + dy * dy).sqrt();
+    if dist <= ra + rb + 1.0 {
+        return vec![pt(a), pt(b)];
+    }
+    let (ux, uy) = (dx / dist, dy / dist);
+    vec![
+        LayoutPoint::new(a.x + ux * ra, a.y + uy * ra),
+        LayoutPoint::new(b.x - ux * rb, b.y - uy * rb),
+    ]
+}
+
+/// Axis-aligned bounds of a non-empty polyline.
+fn bounds_of(points: &[LayoutPoint]) -> LayoutRect {
+    let mut min = points[0];
+    let mut max = points[0];
+    for p in &points[1..] {
+        min.x = min.x.min(p.x);
+        min.y = min.y.min(p.y);
+        max.x = max.x.max(p.x);
+        max.y = max.y.max(p.y);
+    }
+    LayoutRect::new(min, max)
+}
+
+#[cfg(test)]
+#[path = "scene_paint/tests.rs"]
+mod tests;

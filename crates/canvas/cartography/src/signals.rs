@@ -23,6 +23,13 @@ use std::collections::BTreeMap;
 use kernel::graph::NodeKey;
 use serde::{Deserialize, Serialize};
 
+// The producers that fill this contract from the kernel graph. They were
+// `pictograph::signals` until engine split D38 folded them here.
+#[cfg(feature = "signals")]
+mod produce;
+#[cfg(feature = "signals")]
+pub use produce::*;
+
 /// The enumeration order every score's ordinal follows (F84): the order is
 /// computed once, by the host's registry, and travels in the request.
 pub const ORDER_TIMELINE: &str = "order.timeline";

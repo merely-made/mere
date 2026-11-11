@@ -54,7 +54,7 @@ def main():
                "platform": platform.platform(), "node_arch": subprocess.check_output(['node', '-p', 'process.arch'], text=True).strip(), "node": subprocess.check_output(['node', '--version'], text=True).strip(),
                "wasm_bindgen": subprocess.check_output(['wasm-bindgen', '--version'], text=True).strip(), "cases": {}}
     source_paths = subprocess.check_output(['git', 'ls-files', '-co', '--exclude-standard',
-        'crates/conatus/seiche', 'crates/canvas/pictograph', 'crates/system/state-witness',
+        'crates/conatus/seiche', 'crates/canvas/pictograph', 'crates/canvas/cartography', 'crates/system/state-witness',
         'support/seiche-replay', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml'], cwd=ROOT, text=True).splitlines()
     results['source_sha256'] = {path: sha(ROOT / path) for path in sorted(set(source_paths)) if (ROOT / path).is_file()}
     results['worktree_status'] = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True)
@@ -65,10 +65,10 @@ def main():
     failures = []
     case_matrix = [
         ('binding', 'crates/conatus/seiche/examples/binding_replay.json', 'run_replay'),
-        ('occurrence', 'crates/canvas/pictograph/examples/occurrence_replay.json', 'run_occurrence_replay'),
-        ('occurrence-mix', 'crates/canvas/pictograph/examples/occurrence_mix_replay.json', 'run_occurrence_replay'),
-        ('grouped', 'crates/canvas/pictograph/examples/grouped_replay.json', 'run_grouped_replay'),
-        ('schedule', 'crates/canvas/pictograph/examples/schedule_replay.json', 'run_schedule_replay'),
+        ('occurrence', 'crates/canvas/cartography/examples/occurrence_replay.json', 'run_occurrence_replay'),
+        ('occurrence-mix', 'crates/canvas/cartography/examples/occurrence_mix_replay.json', 'run_occurrence_replay'),
+        ('grouped', 'crates/canvas/cartography/examples/grouped_replay.json', 'run_grouped_replay'),
+        ('schedule', 'crates/canvas/cartography/examples/schedule_replay.json', 'run_schedule_replay'),
     ]
     selected = set(args.case or [name for name, _, _ in case_matrix])
     for name, relative, export in case_matrix:

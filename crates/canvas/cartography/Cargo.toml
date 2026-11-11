@@ -21,18 +21,146 @@ path = "src/lib.rs"
 # `adapters` module hands scores, matrix axes, and revision pairs to the
 # scenes family, which owns placement and the pure derivations (site canvas
 # plan, Ruling 142).
+[[example]]
+name = "backdrop_receipt"
+required-features = ["backdrop-cpu"]
+
+[[example]]
+name = "occurrence_replay"
+required-features = ["canvas", "physics-engine"]
+
+[[example]]
+name = "occurrence_replay_wasm"
+crate-type = ["cdylib"]
+required-features = ["canvas", "physics-engine"]
+
+[[example]]
+name = "grouped_replay"
+required-features = ["canvas", "physics-engine"]
+
+[[example]]
+name = "grouped_replay_wasm"
+crate-type = ["cdylib"]
+required-features = ["canvas", "physics-engine"]
+
+[[example]]
+name = "schedule_replay"
+required-features = ["canvas", "physics-engine"]
+
+[[example]]
+name = "schedule_replay_wasm"
+crate-type = ["cdylib"]
+required-features = ["canvas", "physics-engine"]
+
 [features]
+# The strategies and contracts alone; the canvas and the signal producers are
+# opt-in, so a default build stays as small as it was before they arrived
+# (engine split D38: they moved here from `pictograph`, which keeps the faces).
 default = []
+# The force engine in this crate's process: `Simulation`, rapier, the settle
+# drivers and the inline and actor `Physics` backends (seiche `actor`, which
+# implies seiche `engine`). Off, the canvas keeps the force structs, `Declared`,
+# the dynamics spec and the catalog builders (seiche compiled without
+# `engine`) and its physics is `Physics::Remote`: a Worker holds the engine
+# (Graphshell host plan, T7). Consumers that hard-wire `canvas` forward this.
+physics-engine = ["seiche?/actor"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111).
+image-decode = ["genet-livery?/image-decode"]
+# Graph-structural signal producers over the kernel graph
+# (`cartography::signals`, beside the contract they fill).
+signals = ["dep:chartulary", "dep:libm"]
+# The canvas's and the board's repulsion staged on the host's GPU
+# (`Canvas::set_physics_device`; physics catalog plan, P5c). Opt-in per consumer.
+gpu = ["canvas", "physics-engine", "seiche/gpu"]
+# The Meaning channel's sentence model on the host's own device
+# (`canvas::meaning_device`; dynamics grammar plan, G2, "Burn on the host
+# device, off-path"). Native hosts only: the wasm web build leaves it off and
+# takes the lexical fallback.
+meaning-gpu = ["gpu", "esp/bert-wgpu", "esp/index-burn-wgpu"]
+# The content backdrop rendered on the CPU, and exported as SVG.
+backdrop-cpu = ["canvas", "netrender/vello-cpu"]
+backdrop-svg = ["canvas", "emblem/svg"]
+# The graph canvas (`cartography::canvas`): graph truth presented through
+# seiche physics, the camera, the node-children pool and the scene-paint
+# underlay. Node faces, washes and symbols come from `pictograph`.
+canvas = [
+    "signals",
+    "dep:armillary",
+    # Permitted actions are chirograph's `AdvertisedAction`s (stack seams S3;
+    # dynamics grammar plan, G9).
+    "dep:chirograph",
+    "dep:emblem",
+    # The native fold record (mer3ly site plan, Rulings 153 and 163).
+    "dep:incipit",
+    "dep:esp",
+    "dep:euclid",
+    "dep:genet-livery",
+    "dep:genet-scripted-dom",
+    "dep:layout_dom_api",
+    "dep:netrender",
+    "dep:numen",
+    # The saved scene's shapes and the cartography geometry (pandect).
+    "dep:pandect",
+    "dep:paint_list_api",
+    "dep:paint_list_render",
+    "dep:petgraph",
+    "dep:pictograph",
+    "pictograph/wash",
+    # `pictograph::symbols::SymbolImage` for the hosts that draw the canvas.
+    "pictograph/livery",
+    "dep:sceno-backdrops",
+    "dep:scenograph",
+    # The arrangement transitions `canvas::physics_controls` schedules
+    # (Graphshell stack lift plan, P2 and L5).
+    "dep:scenotime",
+    "dep:seiche",
+    # The dynamics spec's wire (dynamics grammar plan, G4a).
+    "seiche/serde",
+    "dep:serde_json",
+    "dep:tincture",
+    "dep:tracing",
+    "dep:uuid",
+]
 
 [dependencies]
 kernel.workspace = true
 sceno.workspace = true
 scenomise.workspace = true
 serde = { version = "1.0", features = ["derive"] }
+armillary = { workspace = true, optional = true }
+chirograph = { workspace = true, optional = true }
+chartulary = { workspace = true, optional = true }
+emblem = { workspace = true, optional = true }
+incipit = { workspace = true, optional = true, features = ["arrangement"] }
+esp = { workspace = true, optional = true }
+euclid = { version = "0.22", optional = true }
+genet-livery = { workspace = true, optional = true }
+genet-scripted-dom = { workspace = true, optional = true }
+layout_dom_api = { workspace = true, optional = true }
+# The spectral producer's start vector (`signals`): the same bits on every
+# target, as scenomise's solvers (ruling S4).
+libm = { workspace = true, optional = true }
+netrender = { workspace = true, optional = true }
+numen = { workspace = true, optional = true }
+pandect = { workspace = true, optional = true }
+paint_list_api = { workspace = true, optional = true }
+paint_list_render = { workspace = true, optional = true }
+petgraph = { version = "0.8.3", optional = true }
+pictograph = { workspace = true, optional = true }
+sceno-backdrops = { workspace = true, optional = true }
+scenograph = { workspace = true, optional = true }
+scenotime = { workspace = true, optional = true }
+seiche = { workspace = true, optional = true }
+serde_json = { version = "1", optional = true }
+tincture = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+uuid = { version = "1", optional = true }
 
 [dev-dependencies]
 serde_json = "1.0"
 uuid = { version = "1.10", features = ["v4"] }
+state-witness = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+netrender_vello = { workspace = true, features = ["wgpu"] }
 # The parity goldens build graphs through the raw mutators, which are
 # `pub(crate)` on the kernel and reachable only through the `GraphFixtures`
 # extension trait behind this feature. Dev-only, as the feature requires.
@@ -40,3 +168,6 @@ kernel = { workspace = true, features = ["fixtures"] }
 
 [lints]
 workspace = true
+
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies]
+wasm-bindgen = "=0.2.129"

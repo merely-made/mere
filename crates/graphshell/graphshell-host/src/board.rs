@@ -21,8 +21,8 @@ use std::collections::{BTreeSet, HashMap};
 use crate::view::ProjectionLayoutView;
 use graphshell_client::MountedScene;
 use graphshell_client::frozen::Satisfaction;
-use pictograph::canvas::dynamics_spec::DynamicsSpec;
-use pictograph::canvas::{
+use cartography::canvas::dynamics_spec::DynamicsSpec;
+use cartography::canvas::{
     BoardBackdrop, BoardCard, BoardFootprint, BoardRect, BoardRelation, BoardScene, PhysicsBoard,
     PhysicsTransport,
     Speed,
@@ -209,7 +209,7 @@ impl RemoteBoard {
 
     /// Stage the board's repulsion on the host's device (P5c).
     #[cfg(feature = "board-gpu")]
-    pub fn set_physics_device(&mut self, device: Option<pictograph::canvas::PhysicsDevice>) {
+    pub fn set_physics_device(&mut self, device: Option<cartography::canvas::PhysicsDevice>) {
         self.board.set_physics_device(device);
     }
 
@@ -217,7 +217,7 @@ impl RemoteBoard {
     /// and, whenever the acknowledged revision moves, reconcile the bodies to
     /// the scene: a new card spawns at its slot with a settle burst, the
     /// others keep their simulated positions, every slot is re-anchored. The
-    /// stage is the canvas's [`live_stage_spec`](pictograph::canvas::Canvas::live_stage_spec)
+    /// stage is the canvas's [`live_stage_spec`](cartography::canvas::Canvas::live_stage_spec)
     /// (dynamics grammar plan, F150): its law or composition, the stage under
     /// way when a schedule runs. `None`, or a stage the board refuses, leaves
     /// the board's stage as it was.
@@ -292,7 +292,7 @@ impl RemoteBoard {
 
     /// The step budget the board's frames run under: the page's, as its
     /// canvas's.
-    pub fn set_step_budget(&mut self, budget: Option<pictograph::canvas::StepBudget>) {
+    pub fn set_step_budget(&mut self, budget: Option<cartography::canvas::StepBudget>) {
         self.board.set_step_budget(budget);
     }
 

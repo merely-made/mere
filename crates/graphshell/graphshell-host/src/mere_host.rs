@@ -226,7 +226,7 @@ pub struct MereHost<B> {
     /// across calls for the current session's graph and reset when the
     /// session changes: a host without a canvas holds one (dynamics grammar
     /// plan, F87).
-    served_registry: std::sync::Mutex<pictograph::canvas::ChannelRegistry>,
+    served_registry: std::sync::Mutex<cartography::canvas::ChannelRegistry>,
 }
 
 #[path = "mere_host_coupling.rs"]
@@ -329,7 +329,7 @@ impl<B: Backend + Clone> MereHost<B> {
             resident_publication: false,
             resident_generation: None,
             resident_view: Default::default(),
-            served_registry: std::sync::Mutex::new(pictograph::canvas::ChannelRegistry::new()),
+            served_registry: std::sync::Mutex::new(cartography::canvas::ChannelRegistry::new()),
         }
     }
 
@@ -528,7 +528,7 @@ impl<B: Backend + Clone> MereHost<B> {
             .served_registry
             .get_mut()
             .unwrap_or_else(|poisoned| poisoned.into_inner()) =
-            pictograph::canvas::ChannelRegistry::new();
+            cartography::canvas::ChannelRegistry::new();
         self.projection_epoch = self.projection_epoch.wrapping_add(1);
         self.projection_revision = 1;
         self.resources.clear();
@@ -879,7 +879,7 @@ impl<B: Backend> MereHost<B> {
     /// carries is the registry's selection rather than an assertion. The
     /// offer's score and the snapshot come from this same call, which is what
     /// keeps them from disagreeing about a rung.
-    fn served_layout(&self) -> pictograph::canvas::CanvasStrategyProjection {
+    fn served_layout(&self) -> cartography::canvas::CanvasStrategyProjection {
         let extents: HashMap<NodeKey, (f32, f32)> = self
             .graph()
             .nodes()
@@ -889,7 +889,7 @@ impl<B: Backend> MereHost<B> {
             .served_registry
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
-        pictograph::canvas::project_canvas_strategy_with_score_for_view(
+        cartography::canvas::project_canvas_strategy_with_score_for_view(
             &mut registry,
             "phyllotaxis.default",
             self.graph(),
@@ -1128,7 +1128,7 @@ impl<B: Backend> MereHost<B> {
             .score
             .iter()
             .flat_map(|score| score.items.iter())
-            .filter(|item| item.source.adapter == pictograph::canvas::MERE_GRAPH_ADAPTER)
+            .filter(|item| item.source.adapter == cartography::canvas::MERE_GRAPH_ADAPTER)
             .map(|item| (item.source.id.as_str(), &item.representation))
             .collect();
         let mut scene = Scene::new();
@@ -1335,7 +1335,7 @@ impl<B: Backend> MereHost<B> {
                 .get_node(relation.to)
                 .ok_or(MereHostError::MissingResource)?
                 .id;
-            let reading = pictograph::canvas::link_reading::read_link(
+            let reading = cartography::canvas::link_reading::read_link(
                 self.graph(),
                 from_id,
                 to_id,

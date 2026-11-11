@@ -20,8 +20,8 @@ use kernel::{
 };
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use mandrake::{CaptureRecord, Lane, LaneConfig, Product};
-use pictograph::canvas::fold_projection::FoldTraversalDirection;
-use pictograph::canvas::{CameraView, Canvas, FoldEndpoint, PointerButton};
+use cartography::canvas::fold_projection::FoldTraversalDirection;
+use cartography::canvas::{CameraView, Canvas, FoldEndpoint, PointerButton};
 use sprigging::ColorF;
 use std::{cell::RefCell, collections::BTreeSet, rc::Rc};
 use taproot::ProbeSnapshot;

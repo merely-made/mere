@@ -63,12 +63,12 @@ export CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 CARGO_INCREMENTAL=0 
 cargo build --locked -p seiche --no-default-features --features serde --example binding_replay
 cargo build --locked -p seiche --no-default-features --features serde --example binding_replay_wasm --target wasm32-unknown-unknown
 # In Mere (the Pictograph cases):
-cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay
-cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay_wasm --target wasm32-unknown-unknown
-cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay
-cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay_wasm --target wasm32-unknown-unknown
-cargo build --locked -p pictograph --no-default-features --features canvas --example schedule_replay
-cargo build --locked -p pictograph --no-default-features --features canvas --example schedule_replay_wasm --target wasm32-unknown-unknown
+cargo build --locked -p mere-cartography --features canvas --example occurrence_replay
+cargo build --locked -p mere-cartography --features canvas --example occurrence_replay_wasm --target wasm32-unknown-unknown
+cargo build --locked -p mere-cartography --features canvas --example grouped_replay
+cargo build --locked -p mere-cartography --features canvas --example grouped_replay_wasm --target wasm32-unknown-unknown
+cargo build --locked -p mere-cartography --features canvas --example schedule_replay
+cargo build --locked -p mere-cartography --features canvas --example schedule_replay_wasm --target wasm32-unknown-unknown
 python3 support/seiche-replay/run.py --target-dir target --output /tmp/seiche-replay --case occurrence --case occurrence-mix --case grouped --case schedule
 ```
 
@@ -86,6 +86,6 @@ Related focused native tests:
 
 ```sh
 cargo test --locked -p seiche --features serde --lib   # in a Seiche checkout
-cargo test --locked -p pictograph --no-default-features --features canvas --lib projection_dynamics
-cargo test --locked -p pictograph --no-default-features --features canvas --lib physics_registry
+cargo test --locked -p mere-cartography --features canvas --lib projection_dynamics
+cargo test --locked -p mere-cartography --features canvas --lib physics_registry
 ```

@@ -66,6 +66,10 @@
 #![doc(html_root_url = "https://docs.rs/cartography/0.0.1")]
 
 pub mod adapters;
+// The graph canvas, behind its own feature so the strategies stay light. It
+// was `pictograph::canvas` until engine split D38 (2026-11-09) folded it here.
+#[cfg(feature = "canvas")]
+pub mod canvas;
 pub mod minimap;
 pub mod overlay;
 pub mod projection;

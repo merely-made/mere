@@ -16,7 +16,7 @@ use incipit::forme::GraphMemberId;
 use inker::{Block, EngineDocument, inline_text};
 use kernel::graph::Graph;
 use netrender::Scene;
-use pictograph::canvas::NodeState;
+use cartography::canvas::NodeState;
 use tabard::theme::chrome::{ChromeTheme, Srgb};
 use uxtree::{UxTree, node_id_for_path};
 

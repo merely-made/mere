@@ -58,9 +58,9 @@ mod mapping {
         let counter = Rc::clone(&asked);
         let mut remote = RemoteBoard::when_needed(move || {
             counter.set(counter.get() + 1);
-            Some(Box::new(pictograph::canvas::UnavailableTransport::default()))
+            Some(Box::new(cartography::canvas::UnavailableTransport::default()))
         });
-        let stage = pictograph::canvas::PhysicsChoice::default().into_spec();
+        let stage = cartography::canvas::PhysicsChoice::default().into_spec();
         remote.sync(None, None, Some(&stage), Speed::REAL_TIME);
         assert_eq!(asked.get(), 0, "no scene, no Worker");
         remote.sync(client.mounted(&session), Some(1), Some(&stage), Speed::REAL_TIME);
@@ -78,7 +78,7 @@ mod mapping {
         remote.sync(
             client.mounted(&session),
             Some(1),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::REAL_TIME,
         );
         assert_eq!(remote.board().len(), 1);
@@ -89,14 +89,14 @@ mod mapping {
         remote.sync(
             client.mounted(&session),
             Some(1),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::REAL_TIME,
         );
         assert_eq!(remote.board().len(), 1);
         remote.sync(
             client.mounted(&session),
             Some(2),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::REAL_TIME,
         );
         assert_eq!(remote.board().len(), 2);
@@ -123,14 +123,14 @@ mod mapping {
         remote.sync(
             mounted,
             Some(1),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::REAL_TIME,
         );
         assert_eq!(steps(&mut remote, 4), 4, "1x: a tick a frame");
         remote.sync(
             mounted,
             Some(1),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::from_factor(5.0),
         );
         assert_eq!(remote.speed(), Speed::from_factor(5.0));
@@ -139,7 +139,7 @@ mod mapping {
         remote.sync(
             mounted,
             Some(1),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::REAL_TIME,
         );
         assert_eq!(steps(&mut remote, 4), 4);
@@ -170,7 +170,7 @@ mod scoped_session {
             Some(&thaw),
             Some(1),
             Some("thaw:spectral.default"),
-            Some(&pictograph::canvas::PhysicsChoice::default().into_spec()),
+            Some(&cartography::canvas::PhysicsChoice::default().into_spec()),
             Speed::REAL_TIME,
         );
         let mut original = thaw.clone();
@@ -187,7 +187,7 @@ mod scoped_session {
         }
         assert!(!remote.is_settling());
         for (width, height) in [(1100, 762), (1400, 900), (420, 600)] {
-            let fit = pictograph::canvas::BoardFit::new(24.0, 24.0, 24.0, 24.0);
+            let fit = cartography::canvas::BoardFit::new(24.0, 24.0, 24.0, 24.0);
             let rects = remote
                 .scene()
                 .card_rects(remote.board(), width, height, fit);

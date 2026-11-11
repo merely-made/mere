@@ -23,7 +23,7 @@ presentation-editor = []
 # The gloss outline and graph digests (moved from `mere`, D98): the outline
 # snapshot, minimap geometry and the document outline into uxtree.
 gloss = [
-    "pictograph/canvas",
+    "cartography/canvas",
     "dep:accesskit",
     "dep:inker",
     "dep:netrender",
@@ -36,11 +36,10 @@ gloss = [
 linked-data = { workspace = true, optional = true }
 platen = { path = "../../platen/platen", default-features = false, optional = true }
 cambium = { workspace = true }
-# Graph-only layouts by strategy id, over a kernel graph built from the model.
-cartography = { workspace = true }
-# The channel registry: the spectral coordinates a graph-only layout reads
+# Graph-only layouts by strategy id, over a kernel graph built from the model,
+# and the channel registry: the spectral coordinates a graph-only layout reads
 # (dynamics grammar plan, G2b, F53).
-pictograph = { workspace = true, features = ["signals"] }
+cartography = { workspace = true, features = ["signals"] }
 incipit = { workspace = true }
 kernel = { workspace = true }
 # The paint leaf's colour type; hosts supply the palette.
@@ -57,7 +56,7 @@ uxtree = { workspace = true, optional = true }
 
 [dev-dependencies]
 scenograph = { workspace = true, features = ["editor"] }
-pictograph = { workspace = true, features = ["canvas", "physics-engine"] }
+cartography = { workspace = true, features = ["canvas", "physics-engine"] }
 serde_json.workspace = true
 euclid = "0.22"
 kernel = { workspace = true, features = ["fixtures"] }
