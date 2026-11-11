@@ -179,6 +179,23 @@ pub fn sparql_resource_members(
     member_variable: &str,
 ) -> Result<ResourceQueryMembers, String> {
     let dataset = IndexedDataset::for_graph(graph);
+    sparql_resource_members_on(&dataset, graph, query, member_variable)
+}
+
+/// [`sparql_resource_members`] over a held dataset built from `graph`. The
+/// caller checks [`IndexedDataset::is_current`]; a stale dataset answers for
+/// the graph it was built from.
+///
+/// # Errors
+///
+/// A parse or evaluation error, a non-`SELECT` query, a missing member
+/// variable, or a member cell that is not an IRI, as its display string.
+pub fn sparql_resource_members_on(
+    dataset: &IndexedDataset,
+    graph: &Graph,
+    query: &str,
+    member_variable: &str,
+) -> Result<ResourceQueryMembers, String> {
     let results = evaluate(dataset.read(View::Live), query)?;
     let QueryResults::Solutions(solutions) = results else {
         return Err("saved-query membership requires SELECT".into());

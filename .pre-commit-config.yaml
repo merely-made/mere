@@ -23,6 +23,15 @@ repos:
         language: system
         files: '(^|/)(Cargo\.(toml|lock)|[^/]+\.rs)$'
         pass_filenames: false
+      # The query feature is off in the workspace build, so the hook above never
+      # compiles spareval or the indexed dataset; a lock that broke it went unseen
+      # on 2026-11-10.
+      - id: clippy-query
+        name: clippy (query feature)
+        entry: cargo clippy --locked --all-targets -p mere-rdf -p mere-view --features mere-rdf/query,mere-view/query
+        language: system
+        files: '(^|/)(Cargo\.(toml|lock)|[^/]+\.rs)$'
+        pass_filenames: false
       - id: dependency-bans
         name: dependency bans
         entry: cargo deny --locked check bans

@@ -112,3 +112,21 @@ fn for_graph_is_current_until_the_kernel_counters_move() {
     assert_eq!(sparql(&graph, query).unwrap().rows.len(), 1);
     assert!(!IndexedDataset::from_quads([]).is_current(&graph));
 }
+
+#[test]
+fn a_dataset_is_current_for_its_own_graph_not_an_equal_one() {
+    let build = || {
+        let mut graph = Graph::new();
+        graph.add_node("https://a.test/a".into(), Default::default());
+        graph
+    };
+    let mut a = build();
+    let b = build();
+    assert_eq!(a.revision(), b.revision());
+    assert_eq!(a.content_revision(), b.content_revision());
+    let dataset = IndexedDataset::for_graph(&a);
+    assert!(dataset.is_current(&a));
+    assert!(!dataset.is_current(&b), "same counters, different graph");
+    a.add_node("https://a.test/b".into(), Default::default());
+    assert!(!dataset.is_current(&a));
+}

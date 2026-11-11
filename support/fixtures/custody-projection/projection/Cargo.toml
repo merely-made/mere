@@ -12,6 +12,6 @@ forbidden-api = []
 [dependencies]
 ostiary = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", branch = "main", features = ["native"] }
 graphshell-door = { path = "../../../../crates/graphshell/graphshell-door", default-features = false, features = ["projection-door"] }
-graphshell-endpoint = { version = "0.0.3", git = "https://github.com/merely-made/graphshell.git", branch = "main", default-features = false, features = ["projection"] }
+graphshell-endpoint = { version = "0.0.4", git = "https://github.com/merely-made/graphshell.git", branch = "main", default-features = false, features = ["projection"] }
 serde_json = "1"
 

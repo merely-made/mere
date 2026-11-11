@@ -312,3 +312,20 @@ fn shape_and_query_freeze_resolve_members_in_their_own_strata_when_uuid_values_o
         "query ids already refer to Resources"
     );
 }
+
+#[test]
+fn saved_queries_at_one_revision_share_one_dataset_build() {
+    use std::sync::atomic::Ordering::Relaxed;
+    let (mut graph, _, _, claim) = source("shared");
+    let mut index = SessionSubgraphs::new();
+    let first = index.try_record_linked(&graph, spec()).unwrap();
+    let second = index.try_record_linked(&graph, spec()).unwrap();
+    assert_eq!(index.held.builds.load(Relaxed), 1, "one build, two queries");
+    assert!(!index.force_reconcile_all(&graph));
+    assert_eq!(index.held.builds.load(Relaxed), 1, "still current");
+    assert!(graph.retract_assertion(&claim));
+    assert!(index.reconcile_all(&graph));
+    assert_eq!(index.held.builds.load(Relaxed), 2, "one rebuild per revision");
+    assert!(index.get(first).unwrap().anchors.is_empty());
+    assert!(index.get(second).unwrap().anchors.is_empty());
+}

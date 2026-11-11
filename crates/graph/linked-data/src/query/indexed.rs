@@ -13,16 +13,19 @@ use std::cell::RefCell;
 use std::convert::Infallible;
 
 use chartulary::quads::{Dictionary, Quad, QuadIndex, QuadMeta, TermId, View};
-use kernel::graph::Graph;
+use kernel::graph::{Graph, GraphInputKey};
 use oxrdf::{GraphName, Term};
 use spareval::{InternalQuad, QueryableDataset};
 
-/// The kernel counters a dataset was built at; a move in any means rebuild.
+/// The kernel counters and input keys a dataset was built at; a move in any
+/// means rebuild. The keys tell two graphs with equal counters apart.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct RevisionKey {
     revision: u64,
     content: u64,
     semantic_observation: u64,
+    structural_input: GraphInputKey,
+    content_input: GraphInputKey,
 }
 
 impl RevisionKey {
@@ -31,6 +34,8 @@ impl RevisionKey {
             revision: graph.revision(),
             content: graph.content_revision(),
             semantic_observation: graph.semantic_observation_revision(),
+            structural_input: graph.structural_input_key(),
+            content_input: graph.content_input_key(),
         }
     }
 }
@@ -92,7 +97,8 @@ impl IndexedDataset {
         }
     }
 
-    /// Whether `graph` is still at the counters this dataset was built at.
+    /// Whether `graph` is the graph, at the counters and input keys, this dataset
+    /// was built at.
     /// Always `false` for a dataset built by [`IndexedDataset::from_quads`].
     pub fn is_current(&self, graph: &Graph) -> bool {
         self.key == Some(RevisionKey::of(graph))

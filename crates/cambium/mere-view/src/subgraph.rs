@@ -36,6 +36,8 @@ use serde::{Deserialize, Serialize};
 
 pub mod classifier;
 mod saved;
+#[cfg(feature = "query")]
+mod held;
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -70,6 +72,11 @@ pub struct SessionSubgraphs {
     #[cfg(test)]
     #[serde(skip)]
     derive_calls: std::cell::Cell<usize>,
+    /// The query dataset shared by saved SPARQL derivations at one graph revision.
+    /// A cache, never persisted.
+    #[cfg(feature = "query")]
+    #[serde(skip)]
+    held: held::HeldDataset,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -156,6 +163,10 @@ impl SessionSubgraphs {
     ) -> Result<DerivedMembers, String> {
         #[cfg(test)]
         self.derive_calls.set(self.derive_calls.get() + 1);
+        #[cfg(feature = "query")]
+        if let Some(derived) = self.held.derive(graph, spec) {
+            return derived;
+        }
         try_derive_members(graph, spec)
     }
 

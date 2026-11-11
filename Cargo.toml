@@ -187,10 +187,10 @@ esp = { version = "0.1.0", git = "https://github.com/merely-made/distillery.git"
 esp-testkit = { version = "0.1.0", git = "https://github.com/merely-made/distillery.git", branch = "main" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
-chirograph = { version = "0.0.4", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+chirograph = { version = "0.0.5", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
 graphshell-client = { version = "0.0.2", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
-graphshell-endpoint = { version = "0.0.3", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
+graphshell-endpoint = { version = "0.0.4", git = "https://github.com/merely-made/graphshell.git", branch = "main" }
 graphshell-door = { version = "0.0.1", path = "crates/graphshell/graphshell-door" }
 # The serving half: admission, the session loop, the catalog and the projection
 # host (Graphshell stack lift plan, L2, ruling R4). Default features off here;

@@ -58,6 +58,18 @@ Index build 3.03 s; `memory_bytes()` 38,400,168 (48 bytes per quad, the six ordi
 
 Graph build 89.6 s: `add_node` 0.3 s, `append_node_properties` 1.03 s (linear now), `assert_semantic_statement` 88.2 s. The last is the next kernel finding: 7 / 20 / 62 / 376 ms at 1k / 2k / 4k / 10k, faster than linear, its cause unconfirmed when its session opened (Mark, 2026-11-10: "Open a session to fix it now").
 
+
+### 2026-11-11: 100k again, with the kernel's pair lookup landed
+
+`assert_semantic_statement` no longer scans every resource relation per call (Mere main `42f5a2f4f`; 6.8 / 13.1 / 35.0 / 69.3 ms at 1k / 2k / 4k / 10k, from 7 / 20 / 62 / 376 ms). One run of `adapter_scale 10000 100000`, release.
+
+| nodes | graph build | `add_node` | `assert_semantic_statement` | `append_node_properties` |
+|---|---|---|---|---|
+| 10k | 0.14 s | 18 ms | 56 ms | 67 ms |
+| 100k | 2.02 s | 0.34 s | 0.86 s | 0.82 s |
+
+The 100k graph build was 89.6 s the day before and would have been hours on 2026-11-09. At 100k over the held index: point lookup 0.13 ms, bound predicate 6.7 ms, two-hop join 48 ms, full scan 57 ms; index build 1.93 s, 38.4 MB; materialization 6.47 s. The rebuild is now the same size as building the graph itself, so P3's refresh measurement starts from about 2 s per rebuild at this scale.
+
 ## 2. What the dataset is today
 
 The dataset is a derived projection, not a store. `dataset_quad_iter` in `crates/graph/linked-data/src/lib.rs` walks surface nodes (direct quads: the node IRI as subject, properties as literals, scoped statements into named graphs by `GraphScope`, then RDF 1.2 reifier metadata per statement: asserter, assertion time, withdrawal), resource nodes (resource metadata) and resource edges (held assertions and their metadata). Terms are built as `oxrdf` strings on every walk. Named graphs are assertion scopes; the reserved history graph (`ASSERTION_HISTORY_GRAPH_IRI`) carries withdrawn reifiers only in the explicit history projection.
