@@ -538,7 +538,8 @@ and full test suites beyond the app's lib tests and the moved tests.
 - **U3, Graphshell's docs (D107).** `design_docs/` and the canonical `DOC_POLICY.md` core in
   Graphshell; the list of host-layer documents is ruled, then moved.
 - **U4, the cutover (D102, D104, D106).** With history: the app, `graphshell-blocks`,
-  `graphshell-mcp`, `graphshell-mere` and `graphshell-dramatis-pane` to Turnstone; the 33
+  `graphshell-mcp`, `graphshell-mere` and `graphshell-dramatis-pane` to Turnstone; `athanor` to
+  the Distillery repository (D114); the other 32
   toolkit crates, `graphshell-door` and `block-adapter` to Graphshell's `host/`; the faces-only
   `pictograph` to the emblem repository. Mere keeps `mere-kernel`, `mere-rdf`, `catchment`,
   `pandect` and `mere-facts`.
@@ -1805,6 +1806,63 @@ revision and what crosses at frame rate.
   citations into moved crates are repointed again at U4. Outcome: applies D107.
 
   Links: area The stack · draws on engine-split D107, engine-split D110 · plans engine-split P3 · summary Graphshell runs responsa and line-ceiling with its own manifest; archived host documents stay in Mere; the documents move ahead of the code.
+
+- **D112. The moved documents are reviewed after the code (Mark, 2026-11-11):** After D110, on the
+  73 documents: "I bet some of that is irrelevant now or should be refactored/rewritten" and
+  "But, after the code". Asked whether the move waits too, he chose the former of two: move now
+  as they are, review after the cutover. The documents moved verbatim (Graphshell `7e34fec0`,
+  Mere `dbb505336`); the relevance review and rewrites follow U4. The area root
+  `graphshell_docs/` is kept: "Keep graphshell_docs/ (Recommended)". Outcome: applies D110.
+
+  Links: area The stack · draws on engine-split D110 · plans engine-split P3 · summary The 73 documents moved verbatim; their relevance review and rewrites come after the code cutover; graphshell_docs/ stays the area root.
+
+- **D113. What the cutover carries besides code (Mark, 2026-11-11):** Four rulings on U4's edges.
+  Hooks: "Carry all of Mere's hooks (Recommended)": clippy, the clippy query hook and cargo
+  deny come to Graphshell's two roots with `deny.toml` and the lint tables. App documents:
+  "To Turnstone with the app, in U4 (Recommended)" for the three app-only documents. Graphshell's
+  README and its `docs/2026-11-06_cut_over.md`: "At the cutover (Recommended)"; the README is
+  rewritten against the real tree and the note moves into `design_docs`. The headed check that
+  P3's done-condition asks for: "Once, after the cutover (Recommended)", in U6, covering
+  slices 2 to 4 together. Outcome: applies D102.
+
+  Links: area The stack · draws on engine-split D102 · plans engine-split P3 · summary Graphshell takes all of Mere's hooks at the cutover; the app's three documents go to Turnstone; Graphshell's README is rewritten then; one headed pass follows in U6.
+
+- **D114. athanor goes to Distillery; Moot's code stays a host port (Mark, 2026-11-11):** Two
+  corrections to slice 4's move set. `ports/distillery` is one package, `athanor` (6,076 lines,
+  holding the folded `mere-alembic` under D56); the slice 4 assessment classed it as toolkit,
+  but the Distillery extraction plan's D20 sends the workshop core to Distillery. Ruling:
+  "Distillery, as extraction D20 said". The U4 dry run measures whether that makes a cycle
+  between Distillery's root and Graphshell's `host/` root; if it does, that comes back as a
+  fork. Moot: the four Moot product documents go to Gemot ("Gemot"); shown that `mere-moot` is
+  5,776 lines with 643 touching the toolkit, and that in Gemot it would grow Gemot's build from
+  616 to about 1,009 packages and risk a cycle through the resident's site rows, the code:
+  "Graphshell, as D55 ruled (Recommended)". Outcome: refines D104; applies D55.
+
+  Links: area The stack · draws on engine-split D55, engine-split D56, engine-split D104 · plans engine-split P3 · summary athanor leaves for the Distillery repository at the cutover; mere-moot stays a host port in Graphshell and only Moot's product documents go to Gemot.
+
+- **D115. D52 waits for Graphshell; three set-asides start now (Mark, 2026-11-11):** D52's merge
+  of `block-host` and `authority-host` into `app-host`: "After the cutover, in Graphshell
+  (Recommended)". D64, the D53 brief and the move of Distillery's plans: "All three now". D64
+  landed in Murm (`6d354536e89`: `murm-ocapn`'s `native` feature); the D53 brief is in
+  graphshell.git; Distillery's documents are moving (D116). Also ruled: the app's dead
+  `p2panda-store` row is pruned before the move, "Prune p2panda-store only (Recommended)", and
+  Cleromancy's two tests that call the kernel's private `facets_mut()` are repointed, "Fix them
+  now (Recommended)". Outcome: applies D52, D53, D64.
+
+  Links: area The stack · draws on engine-split D52, engine-split D53, engine-split D64 · plans engine-split P3 · summary D52 is done in Graphshell after the cutover; D64, the uxtree brief and the Distillery document move run beside slice 4.
+
+- **D116. Ten documents move to Distillery, and a repo with rulings runs responsa (Mark,
+  2026-11-11):** The Distillery docs sort (`Code/testing/engine-split/distillery_docs_sort.md`)
+  found 3 documents plainly Distillery's, 2 mixed and 5 unsure. The three: "Move all three now
+  (Recommended)". The extraction plan, with 21 indexed decisions, offered staying, moving or
+  archiving: "2, they all should get responsa if they have docs, right?", so it moves whole and
+  Distillery adopts responsa and a manifest, cited from Mere as `distillery:<key>`. The six
+  remaining uncertain documents: "Move to Distillery". The Alembic implementation plan stays in
+  Mere under D110. How far the responsa rule goes: "Every repo that records rulings, after
+  slice 4 (Recommended)"; a sweep lists each repo whose docs hold decision headings, with
+  counts, before any hook is added. Outcome: new.
+
+  Links: area The stack · plans engine-split P3 · summary Ten Distillery documents, the extraction plan among them, move to distillery.git with responsa; after slice 4 every repo that records rulings gets the hook and a manifest.
 
 ## Open questions
 

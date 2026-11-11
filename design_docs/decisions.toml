@@ -1336,6 +1336,45 @@ summary = "Graphshell runs responsa and line-ceiling with its own manifest; arch
 draws_on = ["engine-split D107", "engine-split D110"]
 plans = ["engine-split"]
 
+[decisions."engine-split D112"]
+title = "The moved documents are reviewed after the code (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The 73 documents moved verbatim; their relevance review and rewrites come after the code cutover; graphshell_docs/ stays the area root."
+draws_on = ["engine-split D110"]
+plans = ["engine-split"]
+
+[decisions."engine-split D113"]
+title = "What the cutover carries besides code (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Graphshell takes all of Mere's hooks at the cutover; the app's three documents go to Turnstone; Graphshell's README is rewritten then; one headed pass follows in U6."
+draws_on = ["engine-split D102"]
+plans = ["engine-split"]
+
+[decisions."engine-split D114"]
+title = "athanor goes to Distillery; Moot's code stays a host port (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "athanor leaves for the Distillery repository at the cutover; mere-moot stays a host port in Graphshell and only Moot's product documents go to Gemot."
+draws_on = ["engine-split D55", "engine-split D56", "engine-split D104"]
+plans = ["engine-split"]
+
+[decisions."engine-split D115"]
+title = "D52 waits for Graphshell; three set-asides start now (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "D52 is done in Graphshell after the cutover; D64, the uxtree brief and the Distillery document move run beside slice 4."
+draws_on = ["engine-split D52", "engine-split D53", "engine-split D64"]
+plans = ["engine-split"]
+
+[decisions."engine-split D116"]
+title = "Ten documents move to Distillery, and a repo with rulings runs responsa (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Ten Distillery documents, the extraction plan among them, move to distillery.git with responsa; after slice 4 every repo that records rulings gets the hook and a manifest."
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
