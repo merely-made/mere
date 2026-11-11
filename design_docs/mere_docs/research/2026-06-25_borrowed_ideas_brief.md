@@ -98,7 +98,7 @@ and let internal agents consume MCP servers. Given the ecosystem this is the
 natural agent boundary, and it makes external agents first-class citizens without
 bespoke glue. **Net-new.** Connects to the document-script and harness lanes
 ([document script substrate](../../archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md),
-[local models harness brief](2026-06-24_local_models_harness_brief.md)).
+local models harness brief (`distillery/design_docs/research/2026-06-24_local_models_harness_brief.md`)).
 
 ### Speculative branches plus provenance (Patchwork / Upwell)
 
@@ -176,7 +176,7 @@ feature in itself:**
 - [document script substrate](../../archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md),
   [document script followons](../../archive_docs/2026-07-03_completed_plans/2026-06-23_document_script_followons_plan.md):
   agentic scripting, for MCP and live blocks.
-- [local models harness brief](2026-06-24_local_models_harness_brief.md): local AI
+- local models harness brief (`distillery/design_docs/research/2026-06-24_local_models_harness_brief.md`): local AI
   lane, for embeddings and agents.
 - [djot editor and knot nodes plan](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md):
   knot editor, for the `=query` block and live blocks.

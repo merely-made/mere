@@ -69,7 +69,7 @@ genet-probe, their work landing as journal ops with provenance, their
 authority a personae delegation chain (attenuation, depth bounds), revocation
 as the kill switch. Harnesses today sandbox by folder permission; this
 sandboxes by certificate. Extends the
-[agent harness brief](mere_docs/research/2026-07-03_agent_harness_brief.md)'s
+agent harness brief (`distillery/design_docs/research/2026-07-03_agent_harness_brief.md`)'s
 run loop with the authority grammar and probe-driven hands.
 *Disposition: endorsed; the first receipt is genet-side (an agent drives
 pelt, see the genet direction doc).*

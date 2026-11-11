@@ -1133,7 +1133,7 @@ revision and what crosses at frame rate.
   mechanics go to the store's memory program). Weigh it with the Eidetic squish F4, still open,
   since it grows `eidetic-core`'s product half.
 
-  Links: area The stack · amends distillery-extraction D12 · plans engine-split P4 · summary Memory levels, forgetting and retirement go to Eidetic; codicil consolidation stays in pandect; graph-reading proposals are pandect adapters.
+  Links: area The stack · amends distillery:distillery-extraction D12 · plans engine-split P4 · summary Memory levels, forgetting and retirement go to Eidetic; codicil consolidation stays in pandect; graph-reading proposals are pandect adapters.
 
 - **D46. Session distillation is reserved in Distillery (Mark, 2026-11-09):** Mark's account
   of the furnace's purpose is winnowing browsing sessions into an indexed slice to inform a
@@ -1257,7 +1257,7 @@ revision and what crosses at frame rate.
   in P3. Any later move to Distillery is one move. Frees `mere-alembic`. Outcome: refines the
   plan's "mere-alembic to Distillery"; applies D10.
 
-  Links: area The stack · draws on engine-split D10, distillery-extraction D12 · plans engine-split P3 · summary mere-alembic folds into mere-athanor, which moves with the host; a Distillery move later is one move.
+  Links: area The stack · draws on engine-split D10, distillery:distillery-extraction D12 · plans engine-split P3 · summary mere-alembic folds into mere-athanor, which moves with the host; a Distillery move later is one move.
 
 - **D57. djinn-testkit stays with the resident (Mark, 2026-11-09):** P0 F11. Its one dependent
   is mere-resident's tests, and it spawns the resident's own `djinn` binary. Ruling: "Stays with

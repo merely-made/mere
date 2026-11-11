@@ -17,9 +17,9 @@ Cross-refs:
 - [rdf_native_kernel_feasibility](../research/2026-06-18_rdf_native_kernel_feasibility.md)
   — the benchmark behind "petgraph is the runtime, never a triple store on the hot path."
 - [memory_tiers_brief](../research/2026-05-11_memory_tiers_brief.md);
-  [alembic_memory_and_engrams](2026-06-09_alembic_memory_and_engrams.md) — short-term
+  alembic_memory_and_engrams (`distillery/design_docs/technical_architecture/2026-06-09_alembic_memory_and_engrams.md`) — short-term
   vs long-term memory; the alembic model + the armillary distillation daemon.
-- [geist_models_brief](../research/2026-05-10_geist_models_brief.md) — personal LoRA
+- geist_models_brief (`distillery/design_docs/research/2026-05-10_geist_models_brief.md`) — personal LoRA
   adapters as engrams; the corpus as grounding for personal intelligence.
 
 ---

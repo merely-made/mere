@@ -36,7 +36,7 @@ and the resident library). A Djinn-launched resident and an application
 embedding the resident only execute it. A device that runs no Djinn, such as a
 phone, embeds the resident.
 
-Links: distillery-extraction D19 · summary store lifetimes belong to the
+Links: distillery:distillery-extraction D19 · summary store lifetimes belong to the
 reservoir store, not to a process
 
 ### D2. Working state follows the person (Mark, 2026-11-05)

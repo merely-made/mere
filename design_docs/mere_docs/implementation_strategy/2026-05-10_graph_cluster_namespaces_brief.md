@@ -10,7 +10,7 @@
 - [`2026-05-07_event_dag_substrate_brief.md`](2026-05-07_event_dag_substrate_brief.md) — parent brief; §5 (Willow re-evaluation), §8.8 (capability options), §14 (this direction's seed).
 - [`2026-05-07_moot_tiers_and_voluntary_hosting_brief.md`](2026-05-07_moot_tiers_and_voluntary_hosting_brief.md) — tier framework that namespaces ultimately serve.
 - [`../../graphshell_docs/implementation_strategy/2026-05-07_graph_canvas_field_algebra_plan.md`](../../graphshell_docs/implementation_strategy/2026-05-07_graph_canvas_field_algebra_plan.md) *(historical citation)* <!-- doc-audit: historical-link --> — the field algebra producing the graphs being clustered.
-- [`../research/2026-05-08_local_intelligence_integration_research.md`](../research/2026-05-08_local_intelligence_integration_research.md) — embeddings/distances feeding cluster algorithms.
+- `distillery/design_docs/research/2026-05-08_local_intelligence_integration_research.md` — embeddings/distances feeding cluster algorithms.
 
 ---
 

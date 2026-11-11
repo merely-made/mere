@@ -1,5 +1,5 @@
 {
-  "_comment": "Documents that left this repository with their subject. Their D2 records stay here as history, like an archived document's; each maps to its new home. Added 2026-10-09 with the dramatis repo plan's DR-D (ruling D19). Extended 2026-11-11 with the 73 host-layer documents that went to graphshell.git (engine split U3, D110).",
+  "_comment": "Documents that left this repository with their subject. Their D2 records stay here as history, like an archived document's; each maps to its new home. Added 2026-10-09 with the dramatis repo plan's DR-D (ruling D19). Extended 2026-11-11 with the 73 host-layer documents that went to graphshell.git (engine split U3, D110). Extended 2026-11-11 with the ten Distillery documents that went to distillery.git (the extraction plan, the models plan and eight other documents; the local checkout of that repository is repos/esp).",
   "moved": {
     "archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md": "repos/dramatis/design_docs/archive_docs/2026-08-06_completed_plans/2026-07-26_notochord_session_policy_spine_plan.md",
     "archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md": "repos/dramatis/design_docs/archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md",
@@ -110,6 +110,16 @@
     "mere_docs/research/2026-10-02_dynamics_grammar_brief.md": "repos/graphshell/design_docs/graphshell_docs/research/2026-10-02_dynamics_grammar_brief.md",
     "mere_docs/research/2026-10-03_arrangement_and_dynamics_brief.md": "repos/graphshell/design_docs/graphshell_docs/research/2026-10-03_arrangement_and_dynamics_brief.md",
     "mere_docs/research/2026-06-22_orrery_physics_environments_research.md": "repos/graphshell/design_docs/graphshell_docs/research/2026-06-22_orrery_physics_environments_research.md",
-    "mere_docs/research/2026-06-22_graph_projections_research.md": "repos/graphshell/design_docs/graphshell_docs/research/2026-06-22_graph_projections_research.md"
+    "mere_docs/research/2026-06-22_graph_projections_research.md": "repos/graphshell/design_docs/graphshell_docs/research/2026-06-22_graph_projections_research.md",
+    "mere_docs/implementation_strategy/2026-10-28_distillery_models_plan.md": "repos/distillery/design_docs/implementation_strategy/2026-10-28_distillery_models_plan.md",
+    "mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md": "repos/distillery/design_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md",
+    "mere_docs/research/2026-05-08_local_intelligence_integration_research.md": "repos/distillery/design_docs/research/2026-05-08_local_intelligence_integration_research.md",
+    "mere_docs/research/2026-05-10_geist_models_brief.md": "repos/distillery/design_docs/research/2026-05-10_geist_models_brief.md",
+    "mere_docs/research/2026-06-10_communal_compute_tiers_brief.md": "repos/distillery/design_docs/research/2026-06-10_communal_compute_tiers_brief.md",
+    "mere_docs/research/2026-06-24_local_models_harness_brief.md": "repos/distillery/design_docs/research/2026-06-24_local_models_harness_brief.md",
+    "mere_docs/research/2026-07-03_agent_harness_brief.md": "repos/distillery/design_docs/research/2026-07-03_agent_harness_brief.md",
+    "mere_docs/research/2026-07-04_burn_utilization_brief.md": "repos/distillery/design_docs/research/2026-07-04_burn_utilization_brief.md",
+    "mere_docs/technical_architecture/2026-06-09_alembic_memory_and_engrams.md": "repos/distillery/design_docs/technical_architecture/2026-06-09_alembic_memory_and_engrams.md",
+    "mere_docs/technical_architecture/2026-08-10_lease_bound_remote_sessions.md": "repos/distillery/design_docs/technical_architecture/2026-08-10_lease_bound_remote_sessions.md"
   }
 }

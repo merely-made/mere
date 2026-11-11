@@ -49,7 +49,7 @@ meadowcap-shaped structural caps exist only as a proof/probe
   the constitution should wrap / own, and the event-sourced fold (`from_events` /
   `apply` / `scores`) this brief proposes to mirror.
 - [`../research/2026-06-04_resource_coordination_brief.md`](../research/2026-06-04_resource_coordination_brief.md)
-  and [`../research/2026-05-10_geist_models_brief.md`](../research/2026-05-10_geist_models_brief.md)
+  and `distillery/design_docs/research/2026-05-10_geist_models_brief.md`
   — two of the briefs that defer load-bearing rules ("the moot's constitution
   declares...") to a primitive that did not exist. This is that primitive, with the
   caveat that fast-changing operational knobs remain governed configs/modules, not

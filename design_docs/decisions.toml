@@ -448,123 +448,6 @@ area = "stack"
 summary = "Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed."
 draws_on = ["stack.3"]
 
-[decisions."distillery-extraction D1"]
-title = "The move (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Distillery leaves Mere for the ESP repository, which becomes `distillery`; donor directories are removed."
-draws_on = ["house-style D12"]
-
-[decisions."distillery-extraction D2"]
-title = "The back edge (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Cut Distillery's Mere imports before moving it; the receiving repository takes no mere.git dependency."
-
-[decisions."distillery-extraction D3"]
-title = "Contents (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "ports/distillery and crates/distillery/alembic move together."
-
-[decisions."distillery-extraction D4"]
-title = "Consumers (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Every esp.git consumer moves to distillery.git in this pass, one source per graph."
-
-[decisions."distillery-extraction D5"]
-title = "mere-mesh (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "mere-mesh moves into the distillery repository."
-
-[decisions."distillery-extraction D6"]
-title = "Djinn holds no endpoints (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Djinn supervises and serves no endpoint; the adapter-port answer is superseded by D7."
-
-[decisions."distillery-extraction D7"]
-title = "Distillery is a producer (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Distillery keeps its surfaces as a producer over the published contract crates; no mere-distillery port."
-amends = ["distillery-extraction D6"]
-
-[decisions."distillery-extraction D8"]
-title = "Leaf and branch (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "An app is a branch only if it owns a graph and hosts others; otherwise it is a producer leaf."
-amends = ["stack.3"]
-
-[decisions."distillery-extraction D9"]
-title = "Any branch hosts (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Every branch can host producers; Graphshell is the reference host, Turnstone the flagship."
-amends = ["stack.3"]
-
-[decisions."distillery-extraction D10"]
-title = "Order (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Finish Distillery first; survey the other ports against D8 after."
-
-[decisions."distillery-extraction D11"]
-title = "Djinn is execution only (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Djinn should hold no meres; who owns store lifetimes is open."
-
-[decisions."distillery-extraction D12"]
-title = "Graph halves (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Graph halves become pandect modules; mere-alembic and mere-athanor leave Mere whole."
-draws_on = ["house-style D2"]
-
-[decisions."distillery-extraction D13"]
-title = "Atomic file replacement (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Atomic file replacement lives in muniment; pandect and Distillery share it."
-draws_on = ["house-style D2"]
-
-[decisions."distillery-extraction D14"]
-title = "Gate G1 (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Publish cambium 0.6.0 and sprigging 0.3.0 so Distillery's surface builds standalone."
-
-[decisions."distillery-extraction D15"]
-title = "Repairs to D8 (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Producers, hosts and runners; frames are not hosts; endpoints are producer-side; the graph core is contract tier."
-amends = ["distillery-extraction D8", "stack.3"]
-
-[decisions."distillery-extraction D16"]
-title = "Athanor and Alembic wait for their lane (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Distillery and mere-mesh move now; Athanor and Alembic wait for the Alembic lane's answer."
-amends = ["distillery-extraction D3"]
-
-[decisions."distillery-extraction D17"]
-title = "Republish the drifted contract crates (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Bump and republish the contract crates whose source drifted from crates.io."
-
-[decisions."distillery-extraction D18"]
-title = "Slim Djinn before publishing it (Mark, 2026-10-31)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Slim Djinn to the door before publishing; producers depend on the door's wire contract, not on Djinn."
-amends = ["distillery-extraction D17"]
-
-[decisions."distillery-extraction D19"]
-title = "The store owns its lifetimes (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "Store lifetimes belong to the reservoir store; Djinn and embedding hosts only execute it."
-
-[decisions."distillery-extraction D20"]
-title = "The workshop move does not wait for W3 (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "The workshop core moves on its existing bounded gates; W3 remains a product gate that travels with it."
-amends = ["distillery-extraction D16"]
-
-[decisions."distillery-extraction D21"]
-title = "Workshop destinations become a pandect feature (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
-summary = "The graph-writing workshop destinations are a pandect feature, not a new crate."
-draws_on = ["distillery-extraction D12"]
-amends = ["distillery-extraction D16"]
-
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
@@ -925,7 +808,7 @@ title = "The furnace splits by nature: retention to Eidetic, consolidation stays
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "Memory levels, forgetting and retirement go to Eidetic; codicil consolidation stays in pandect; graph-reading proposals are pandect adapters."
-amends = ["distillery-extraction D12"]
+amends = ["distillery:distillery-extraction D12"]
 plans = ["engine-split"]
 
 [decisions."engine-split D46"]
@@ -1011,7 +894,7 @@ title = "Alembic merges into Athanor, which stays with the host (Mark, 2026-11-0
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "mere-alembic folds into mere-athanor, which moves with the host; a Distillery move later is one move."
-draws_on = ["distillery-extraction D12", "engine-split D10"]
+draws_on = ["engine-split D10", "distillery:distillery-extraction D12"]
 plans = ["engine-split"]
 
 [decisions."engine-split D57"]
@@ -1832,7 +1715,7 @@ title = "Seams and formats"
 source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "Open contracts separate producers, hosts and runners; open formats first, useful cheap drafts included and labeled by status; capabilities name supplier, grant and lifetime owner; extension follows data (packs hold all recognition as open names over axes the core observes, compiled as enums that carry the rest), scripts, components and native crates by call cost."
-draws_on = ["distillery-extraction D8", "distillery-extraction D9", "distillery-extraction D15", "engine-split D1", "house-style D15", "linked-data-platform-lessons D2", "linked-data-platform-lessons D4", "linked-data-platform-lessons D6", "linked-data-platform-lessons D7", "linked-data-platform-lessons D31", "linked-data-platform-lessons D32", "isocosm:27", "isocosm:77", "isocosm:78", "isocosm:1000"]
+draws_on = ["engine-split D1", "house-style D15", "linked-data-platform-lessons D2", "linked-data-platform-lessons D4", "linked-data-platform-lessons D6", "linked-data-platform-lessons D7", "linked-data-platform-lessons D31", "linked-data-platform-lessons D32", "distillery:distillery-extraction D8", "distillery:distillery-extraction D9", "distillery:distillery-extraction D15", "isocosm:27", "isocosm:77", "isocosm:78", "isocosm:1000"]
 replaces = ["stack.5"]
 
 [statements."stack.4"]

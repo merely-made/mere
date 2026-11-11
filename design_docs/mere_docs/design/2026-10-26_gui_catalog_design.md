@@ -606,7 +606,7 @@ operations (fetch, upload, sync, pinning, storage repair, model jobs, mesh
 jobs, distillation passes, background tabs, failed retries) shown as status
 you can act on, reading armillary's actor constellation, with the rule that
 it shows genuine status and never a placebo; the 2026-06-09 correction
-(`../technical_architecture/2026-06-09_alembic_memory_and_engrams.md` §8)
+(`distillery/design_docs/technical_architecture/2026-06-09_alembic_memory_and_engrams.md` §8)
 split it from Apparatus on a live-versus-at-rest axis. Nothing built it. It
 is `SurfaceId::StewardPane` with an accessibility descriptor
 (`crates/graph/graph-kernel/src/accessibility.rs`) and a diagnostics channel

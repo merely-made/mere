@@ -313,6 +313,20 @@ became path citations (`graphshell/design_docs/...`, core §5); code-font paths 
 not repointed (the engine split plan's U4 carries them). Archived and historical host documents stay in
 `archive_docs/`.
 
+**Ten documents left for Distillery on 2026-11-11.** Distillery's plans and briefs followed their subject
+to `merely-made/distillery` (checked out locally as `repos/esp`) under Mark's rulings of 2026-11-11, with their history:
+the extraction plan and the models plan, lease-bound remote sessions, the Alembic memory and engrams
+design, and six research briefs (the local models harness, Burn utilization, geist models, local
+intelligence integration, communal compute tiers and the agent harness). Distillery keeps them under
+`implementation_strategy/`, `research/` and `technical_architecture/`, without an area root, and indexes
+them in that repository's `design_docs/DOC_README.md`. Their D2 records stay here and map to the new home
+in `support/doc-audit/d2/moved_out.json`. The extraction plan's 21 decisions went with it to
+`design_docs/decisions.toml` there and are cited from here as `distillery:distillery-extraction D<n>`.
+Markdown links and `design_docs/` paths from active documents became path citations
+(`distillery/design_docs/...`, core §5); code-font paths into the crates were not repointed. The Alembic
+implementation plan stays here whole (D110). The extraction plan's receipts and every archived Distillery
+document stay in `archive_docs/`, cited from Distillery by path.
+
 **Member-crate scatter was collapsed 2026-08-24.** Nine `crates/*/design_docs/`
 directories held 20 documents, 18 of which `DOC_README.md` did not index. They
 now live under the area roots above. Core §4 forbids reintroducing them.

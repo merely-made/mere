@@ -260,7 +260,7 @@ win.
   `archive_docs/2026-10-28/2026-07-06_node_image_externalization_plan.md:223-239`
 - **From the Distillery extraction (2026-10-31), for this lane.** Distillery and `mere-mesh`
   leave Mere for the ESP repository, renamed `distillery`, as a producer
-  ([distillery-extraction plan](2026-10-31_distillery_extraction_plan.md), D7, D15). Already
+  (distillery-extraction plan (`distillery/design_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md`), D7, D15). Already
   moved with Mark's ruling D12: `alembic::memory_levels` is `pandect::memory_levels` and
   Athanor's forgetting and consolidation passes are `pandect::furnace` (feature `furnace`).
   Open, for this lane to answer: (1) may `workshop_destination` and

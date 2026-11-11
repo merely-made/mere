@@ -120,11 +120,11 @@ Personal devices and granted kith run through permission and scheduler policy.
 ## 5. Communal Compute And Model Hosting
 
 **Authority**:
-[`2026-06-10_communal_compute_tiers_brief.md`](2026-06-10_communal_compute_tiers_brief.md)
+`distillery/design_docs/research/2026-06-10_communal_compute_tiers_brief.md`
 
 **Related**:
-[`2026-06-24_local_models_harness_brief.md`](2026-06-24_local_models_harness_brief.md),
-[`2026-05-10_geist_models_brief.md`](2026-05-10_geist_models_brief.md)
+`distillery/design_docs/research/2026-06-24_local_models_harness_brief.md`,
+`distillery/design_docs/research/2026-05-10_geist_models_brief.md`
 
 **Owns**: volunteer-computing lessons, time-bank policy presets, moot/moothold
 compute commons, BOINC-shaped data queues, LCZero-style data/eval contribution

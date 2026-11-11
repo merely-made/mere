@@ -342,7 +342,7 @@ navigating.
 
 Keeping runs **ambient → short-term → long-term → codicil**. The three upper
 levels are the Alembic memory design's
-([Alembic memory and codicils](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md)
+(Alembic memory and codicils (`distillery/design_docs/technical_architecture/2026-06-09_alembic_memory_and_engrams.md`)
 §2, written when codicils were called engrams). The ambient tier is the level
 below them.
 
@@ -563,7 +563,7 @@ Consequences:
 
 - [Browser multiplexer framing](../research/2026-05-11_browser_multiplexer_framing.md):
   the durable graph session, which is Mere's session.
-- [Alembic memory and codicils](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md):
+- Alembic memory and codicils (`distillery/design_docs/technical_architecture/2026-06-09_alembic_memory_and_engrams.md`):
   the three levels of memory, Athanor, and the structural event log. The
   [implementation plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md)
   records what has landed.
