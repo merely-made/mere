@@ -32,6 +32,42 @@ impl Canvas {
         self.content_backdrop = enabled;
     }
 
+    /// Whether the content-responsive wash is enabled.
+    pub fn content_backdrop_enabled(&self) -> bool {
+        self.content_backdrop
+    }
+
+    /// Physical pixels per logical canvas pixel, used for wash detail selection.
+    pub fn set_content_backdrop_device_scale(&mut self, scale: f32) {
+        self.content_backdrop_scale = if scale.is_finite() && scale > 0.0 {
+            scale
+        } else {
+            1.0
+        };
+    }
+
+    /// Export the selected wash arm in top-down world proportions with the active theme.
+    /// An absent or outdated scope has no export until the next frame.
+    ///
+    /// # Errors
+    ///
+    /// Returns the Emblem SVG error if the retained wash cannot be serialized.
+    #[cfg(feature = "backdrop-svg")]
+    pub fn content_backdrop_svg(&self) -> Result<Option<String>, emblem::svg::SvgError> {
+        if !self.content_backdrop
+            || !self.wash.matches_visibility(
+                self.scope
+                    .as_ref()
+                    .map(|scope| scope.iter().copied().collect()),
+                self.fold_hidden_keys(),
+            )
+            || self.backdrop_digest().is_none()
+        {
+            return Ok(None);
+        }
+        self.wash.svg(&self.content_backdrop_palette())
+    }
+
     pub(super) fn content_backdrop_commands(
         &mut self,
         dt: Duration,
@@ -49,6 +85,7 @@ impl Canvas {
             visibility_changed,
             dt,
             self.camera.ground_transform(),
+            self.content_backdrop_scale,
             &palette,
         )
     }
@@ -442,6 +479,139 @@ mod tests {
         canvas.scope_to_exact_members([]);
         let (scene, _) = canvas.frame(400, 320);
         assert_eq!(scene.iter_gradients().count(), 0);
+    }
+
+    #[cfg(feature = "backdrop-svg")]
+    #[test]
+    fn exported_svg_matches_the_selected_paint_arm_and_world_aspect() {
+        use paint_list_api::PathCommand;
+
+        fn path_tokens(path: &[PathCommand]) -> Vec<(char, Vec<f32>)> {
+            path.iter()
+                .map(|command| match command {
+                    PathCommand::MoveTo(p) => ('M', vec![p.x, p.y]),
+                    PathCommand::LineTo(p) => ('L', vec![p.x, p.y]),
+                    PathCommand::Close => ('Z', vec![]),
+                    _ => panic!("wash uses straight edges"),
+                })
+                .collect()
+        }
+        fn svg_path_tokens(path: &str) -> Vec<(char, Vec<f32>)> {
+            let mut segments: Vec<(char, Vec<f32>)> = Vec::new();
+            for part in path.split_whitespace() {
+                let first = part.as_bytes()[0];
+                if first.is_ascii_uppercase() {
+                    segments.push((char::from(first), Vec::new()));
+                    if part.len() > 1 {
+                        segments
+                            .last_mut()
+                            .unwrap()
+                            .1
+                            .push(part[1..].parse().unwrap());
+                    }
+                } else {
+                    segments.last_mut().unwrap().1.push(part.parse().unwrap());
+                }
+            }
+            segments
+        }
+        fn assert_coordinates(actual: &[f32], expected: &[f32]) {
+            assert_eq!(actual.len(), expected.len());
+            for (&a, &b) in actual.iter().zip(expected) {
+                assert!((a - b).abs() < 0.0001, "{a} differs from {b}");
+            }
+        }
+
+        let mut canvas = paused_canvas();
+        let first = canvas.graph.nodes().next().unwrap().0;
+        let points = [
+            PortablePoint::new(263.0, 120.0),
+            PortablePoint::new(121.0, 17.0),
+        ];
+        let extra = points.map(|point| {
+            let key = canvas
+                .graph
+                .add_node("https://other.example/".into(), point);
+            (key, point)
+        });
+        canvas.preview_paused_positions(&[
+            (first, PortablePoint::new(120.0, 120.0)),
+            extra[0],
+            extra[1],
+        ]);
+        canvas.set_content_backdrop(true);
+        assert!(canvas.content_backdrop_svg().unwrap().is_none());
+
+        for (scale, motif) in [(0.75, false), (1.5, true)] {
+            canvas.set_content_backdrop_device_scale(scale);
+            let (commands, _) =
+                canvas.content_backdrop_commands(Duration::ZERO, None, HashSet::new());
+            let svg = canvas.content_backdrop_svg().unwrap().unwrap();
+            assert!(svg.contains(r#"width="384" height="256" preserveAspectRatio="none""#));
+            assert!(svg.contains(r#"viewBox="-32 -32 64 64""#));
+            let mut paths = svg.match_indices("<path d=\"").map(|(i, prefix)| {
+                let start = i + prefix.len();
+                svg_path_tokens(svg[start..].split('"').next().unwrap())
+            });
+            let mut brushes =
+                svg.match_indices("gradientTransform=\"matrix(")
+                    .map(|(i, prefix)| {
+                        let start = i + prefix.len();
+                        svg[start..]
+                            .split(')')
+                            .next()
+                            .unwrap()
+                            .split_whitespace()
+                            .map(|number| number.parse::<f32>().unwrap())
+                            .collect::<Vec<_>>()
+                    });
+            let mut flat_paths = 0;
+            for command in commands {
+                let expected = match command {
+                    PaintCmd::DrawPath(path) => {
+                        flat_paths += 1;
+                        path_tokens(&path.path.commands)
+                    },
+                    PaintCmd::DrawRadialGradient(item) => {
+                        let brush = item.gradient;
+                        assert_coordinates(
+                            &brushes.next().unwrap(),
+                            &[
+                                brush.radius.width,
+                                0.0,
+                                0.0,
+                                brush.radius.height,
+                                brush.center.x,
+                                brush.center.y,
+                            ],
+                        );
+                        let min = item.placement.bounds.min;
+                        let max = item.placement.bounds.max;
+                        vec![
+                            ('M', vec![min.x, min.y]),
+                            ('L', vec![max.x, min.y]),
+                            ('L', vec![max.x, max.y]),
+                            ('L', vec![min.x, max.y]),
+                            ('L', vec![min.x, min.y]),
+                            ('Z', vec![]),
+                        ]
+                    },
+                    _ => continue,
+                };
+                let actual = paths.next().unwrap();
+                assert_eq!(actual.len(), expected.len());
+                for ((verb, values), (expected_verb, expected_values)) in
+                    actual.iter().zip(expected)
+                {
+                    assert_eq!(*verb, expected_verb);
+                    assert_coordinates(values, &expected_values);
+                }
+            }
+            assert_eq!(flat_paths, if motif { 2 } else { 1 });
+            assert!(paths.next().is_none() && brushes.next().is_none());
+        }
+        canvas.scope_to_exact_members([]);
+        assert!(canvas.content_backdrop_svg().unwrap().is_none());
     }
 
     #[cfg(feature = "backdrop-cpu")]

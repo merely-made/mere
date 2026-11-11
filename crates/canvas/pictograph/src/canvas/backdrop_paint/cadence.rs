@@ -51,6 +51,7 @@ impl WashPresentation {
         visibility_changed: bool,
         dt: Duration,
         camera: LayoutTransform,
+        device_scale: f32,
         palette: &Palette,
     ) -> (Vec<PaintCmd>, bool) {
         if self.outgoing.is_some() {
@@ -74,15 +75,15 @@ impl WashPresentation {
         {
             self.pending = None;
         } else if self.current.is_none() || visibility_changed {
-            self.replace(digest, &camera, false);
+            self.replace(digest, &camera, device_scale, false);
         } else {
-            self.observe(digest, &camera);
+            self.observe(digest, &camera, device_scale);
         }
 
         let mut commands = Vec::new();
         if let Some(current) = self.current.as_mut() {
             let projection = current.world.then(&camera);
-            current.update_detail(wash_height(&projection));
+            current.update_detail(wash_height(&projection) * device_scale);
             let incoming_alpha = if let Some(outgoing) = self.outgoing.as_mut() {
                 let progress = self.fade_elapsed.as_secs_f32() / FADE_DURATION.as_secs_f32();
                 outgoing.append(
@@ -101,6 +102,44 @@ impl WashPresentation {
         (commands, self.pending.is_some() || self.outgoing.is_some())
     }
 
+    #[cfg(feature = "backdrop-svg")]
+    pub(super) fn matches_visibility(
+        &self,
+        scope: Option<HashSet<NodeKey>>,
+        folded: HashSet<NodeKey>,
+    ) -> bool {
+        self.scope == scope && self.folded == folded
+    }
+
+    #[cfg(feature = "backdrop-svg")]
+    pub(super) fn svg(&self, palette: &Palette) -> Result<Option<String>, emblem::svg::SvgError> {
+        let Some(wash) = &self.current else {
+            return Ok(None);
+        };
+        let Some(file) = &wash.file else {
+            return Ok(None);
+        };
+        let svg = emblem::svg::to_svg(
+            file,
+            palette,
+            emblem::Host {
+                features: 0,
+                height: wash.arm_height(),
+            },
+            &emblem::svg::SvgOptions::default(),
+        )?;
+        let [left, top, right, bottom] = wash.digest.bounds().map(i64::from);
+        let lattice = i64::from(crate::backdrop::LATTICE);
+        let (width, height) = ((right - left) * lattice, (bottom - top) * lattice);
+        // Emblem writes wash coordinates in the IconVG view box. Use the same
+        // independent X/Y scaling as the world transform when opening the SVG.
+        Ok(Some(svg.replacen(
+            "<svg ",
+            &format!(r#"<svg width="{width}" height="{height}" preserveAspectRatio="none" "#),
+            1,
+        )))
+    }
+
     #[cfg(test)]
     pub(super) fn work(&self) -> (usize, usize) {
         (
@@ -109,27 +148,33 @@ impl WashPresentation {
         )
     }
 
-    fn observe(&mut self, digest: ViewDigest, camera: &LayoutTransform) {
+    fn observe(&mut self, digest: ViewDigest, camera: &LayoutTransform, device_scale: f32) {
         match &mut self.pending {
             Some((pending, frames)) if *pending == digest => {
                 *frames = frames.saturating_add(1);
                 // Finish the active fade before starting another, so two
                 // snapshots suffice even if changes keep arriving.
                 if *frames >= STABLE_FRAMES && self.outgoing.is_none() {
-                    self.replace(digest, camera, true);
+                    self.replace(digest, camera, device_scale, true);
                 }
             },
             _ => self.pending = Some((digest, 1)),
         }
     }
 
-    fn replace(&mut self, digest: ViewDigest, camera: &LayoutTransform, fade: bool) {
+    fn replace(
+        &mut self,
+        digest: ViewDigest,
+        camera: &LayoutTransform,
+        device_scale: f32,
+        fade: bool,
+    ) {
         #[cfg(test)]
         {
             self.derivations += 1;
         }
         let inherited_detail = self.current.as_ref().map(|wash| wash.detailed);
-        let next = Wash::new(digest, camera, inherited_detail);
+        let next = Wash::new(digest, camera, device_scale, inherited_detail);
         let previous = self.current.replace(next);
         self.outgoing = if fade { previous } else { None };
         self.fade_elapsed = Duration::ZERO;
@@ -151,7 +196,12 @@ struct Wash {
 }
 
 impl Wash {
-    fn new(digest: ViewDigest, camera: &LayoutTransform, detail: Option<bool>) -> Self {
+    fn new(
+        digest: ViewDigest,
+        camera: &LayoutTransform,
+        device_scale: f32,
+        detail: Option<bool>,
+    ) -> Self {
         let world = wash_world_transform(&digest);
         let file = derive_backdrop(&digest)
             .inspect_err(|error| tracing::debug!(%error, "could not derive content backdrop"))
@@ -160,7 +210,8 @@ impl Wash {
             digest,
             file,
             world,
-            detailed: detail.unwrap_or_else(|| wash_height(&world.then(camera)) >= LOD_HEIGHT),
+            detailed: detail
+                .unwrap_or_else(|| wash_height(&world.then(camera)) * device_scale >= LOD_HEIGHT),
             palette: None,
             arms: [None, None],
             #[cfg(test)]
@@ -174,6 +225,10 @@ impl Wash {
         } else {
             height >= LOD_HEIGHT + DETAIL_MARGIN
         };
+    }
+
+    fn arm_height(&self) -> f32 {
+        if self.detailed { LOD_HEIGHT } else { 0.0 }
     }
 
     fn append(
@@ -193,13 +248,13 @@ impl Wash {
             self.palette = Some(*palette);
             self.arms = [None, None];
         }
+        let height = self.arm_height();
         let arm = &mut self.arms[usize::from(self.detailed)];
         let ink = arm.get_or_insert_with(|| {
             #[cfg(test)]
             {
                 self.decodes += 1;
             }
-            let height = if self.detailed { LOD_HEIGHT } else { 0.0 };
             wash_commands(file, palette, height)
                 .inspect_err(|error| tracing::debug!(%error, "could not paint content backdrop"))
                 .unwrap_or_default()

@@ -151,7 +151,7 @@ kernel = { package = "mere-kernel", version = "0.0.3", path = "crates/graph/grap
 # product tier ladder, 2026-07-09 — see the boundary pass plan amendments).
 pictograph = { version = "0.2.0", path = "crates/canvas/pictograph", default-features = false }
 # The IconVG implementation pictograph encodes faces with (repos/emblem).
-emblem = "0.2.0"
+emblem = { git = "https://github.com/merely-made/emblem.git", rev = "4630fab62cca1a6f48dae920c29d6d43a54b01b6" }
 # Graph digest projections (djot outline, metrics) — `glossary` (was `mere-orrery`).
 
 # The actor-kernel runtime (host-neutral): the !Send host-kernel boundary + the

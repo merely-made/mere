@@ -181,3 +181,37 @@ The standalone Graphshell web workspace passed
 The lane log is `Code/output/pictograph-grammar/b3/graphshell-web-check.log`
 and the guarded receipt is
 `Code/output/build-storage-receipts/2026-11-11/build-d5d099269d9b428abe30b390ebafecc0.json`.
+
+## 2026-11-10 · B4 Graphshell switch and SVG export
+
+Mere baseline `2f34a8691`. Both lockfiles pin Emblem `4630fab6` for its
+SVG feature. Guarded Rust 1.99.1
+`test --locked --offline -p pictograph --features backdrop-svg,backdrop-cpu --lib -j 4`
+passed 716 tests, with 18 ignored. The export test compares each SVG
+path and radial brush against the paint commands for both detail arms.
+It covers non-square world bounds, a fractional device scale and an
+outdated scope before repaint. The lane log is
+`Code/output/pictograph-grammar/b4/pictograph-verified.log` and the receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-833d7bc838ab40b4999653a615652297.json`.
+
+The standalone browser proof built
+`--no-default-features --features content-backdrop,physics-engine,presentation-webgl2,without-classic-vello`
+for `wasm32-unknown-unknown` under the same guard. Its log is
+`Code/output/pictograph-grammar/b4/graphshell-browser-verified.log` and the
+receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-35c71dd1b4054dba953fbe7238ee21e5.json`.
+
+Headed Chrome on macOS selected WebGL2 at 1.5 device pixels per CSS pixel
+for the 12-document seed-9 fixture. The proof opened View controls,
+paused the graph, toggled Content backdrop, and downloaded the SVG.
+The centre crop contained 96,824 changed pixels. Every changed pixel
+returned to its initial value after disabling the wash. Captures,
+the download and `browser-proof.json` are under
+`Code/output/pictograph-grammar/b4/host/run.0mxroS/`. The SVG SHA-256 is
+`ece3e2ee777e432f4411cd4a676aee4c4c7aef05586f01e7ecb88694d9a765b0`.
+
+The default Graphshell product build passed
+`check --locked --offline --target wasm32-unknown-unknown --lib -j 4`.
+Its lane log is `Code/output/pictograph-grammar/b4/graphshell-product-check.log`
+and the guarded receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-21c18f84bef443f59cae8d3681f8c049.json`.

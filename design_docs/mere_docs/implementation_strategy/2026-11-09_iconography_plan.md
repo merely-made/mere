@@ -7,7 +7,8 @@ contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
 vector images); T4 (mentions, guest pages included), F1 (typed blazon
 source), S1 (authored chrome symbols), S2 (Hocket icon pack on macOS and
 Windows), W1 (named action icons), B1 (wash digest and IconVG), B2
-(theme and paint beneath territory) and B3 (wash cadence) landed 2026-11-10.
+(theme and paint beneath territory), B3 (wash cadence) and B4 (Graphshell
+switch and SVG export) landed 2026-11-10.
 D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
@@ -400,9 +401,10 @@ because F, T and B all name grammars and versions.
 - **B3. Cadence.** Landed 2026-11-10. Tests count derivations and decodes
   across node and camera motion, exercise the lattice and zoom thresholds,
   and check monotone cross-fade opacity while physics is paused.
-- **B4. Hosts and export.** Done when: the reference host or isocosm's
-  world-graph viewer shows it behind a switch, and its bytes export through
-  emblem's SVG plan with geometry matching the decoded paint list.
+- **B4. Hosts and export.** Graphshell's one-tree browser host offers a
+  Content backdrop toggle and an Export backdrop SVG control. The SVG uses
+  the retained IconVG, active palette, and selected detail arm. Its geometry
+  is checked against the decoded paint list.
 
 ## Decisions
 
@@ -712,3 +714,10 @@ Provisional (recommended first; asked only if they become blocking):
   physics is idle, and pending changes and fades request another frame.
   Hysteresis is currently per Canvas. A host sharing one Canvas across
   panes needs pane-local detail selection when enabling the wash in B4.
+- 2026-11-10: B4 landed in Graphshell's one-tree browser host. The product
+  bundle includes the controls, and standalone builds can opt in with
+  `content-backdrop`. The producer supplies physical pixels per logical
+  pixel for detail selection. This host has one Canvas per tree. Emblem
+  `4630fab6` writes the retained wash as standalone SVG with its top-down
+  world aspect ratio. Export captures the selected wash and palette
+  independently of camera position and transition opacity.

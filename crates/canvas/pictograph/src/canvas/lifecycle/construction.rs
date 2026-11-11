@@ -231,6 +231,7 @@ impl Canvas {
             style: dark_scene_style(),
             backdrop: surface_bg(),
             content_backdrop: false,
+            content_backdrop_scale: 1.0,
             wash: Default::default(),
             projection_backdrops: Vec::new(),
             generation: 0,
