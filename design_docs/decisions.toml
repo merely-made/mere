@@ -1423,6 +1423,14 @@ summary = "Moot's receipts stay in Mere's history; Graphshell's Moot build write
 draws_on = ["engine-split D113", "engine-split D120", "engine-split D121"]
 plans = ["engine-split"]
 
+[decisions."engine-split D123"]
+title = "Four forks from the app's first stage in Turnstone (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "In Turnstone the five code-read receipts become test fixtures, Moot's half sits at ports/graphshell/examples/capsule-library, the three used patch rows are carried, and target/ is ignored at every level."
+draws_on = ["engine-split D119", "engine-split D120", "engine-split D122"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -1953,6 +1953,22 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D113, engine-split D120, engine-split D121 · plans engine-split P3 · summary Moot's receipts stay in Mere's history; Graphshell's Moot build writes the toolkit digests into the site for Turnstone to read; Graphshell's cut-over note stays live under technical_architecture.
 
+- **D123. Four forks from the app's first stage in Turnstone (Mark, 2026-11-11):** The cutover is
+  pushed (Graphshell `893818f6`, emblem `e577e849`, Distillery `8908f7e4`, Mere `299d19b63`). The
+  app lane's first stage (`Code/testing/engine-split/slice5_app.md`) imported the app into scratch
+  Turnstone, 612 new commits and about 3 MiB, and raised four forks. Five receipt files are read
+  by the app's own code, an example and three tests: "Move to tests/fixtures (Recommended)",
+  renamed in the filter so no receipts directory appears in Turnstone's history, as Turnstone's
+  own rule of 2026-11-02 did. The Turnstone half of Moot's capsule-library scripts:
+  "ports/graphshell/examples/capsule-library (Recommended)". Mere's three crates.io patch rows
+  the app's graph uses, `cubek-matmul`, `light-file-dialog` and `peer-facts`: "Carry all three
+  (Recommended)", so the app builds against what it was tested with. Nested build directories:
+  "target/ at every level (Recommended)". Taken without a question: responsa is in Turnstone's
+  hook set as D120 ruled, ahead of D116's sweep (5 decisions found, none live). Outcome: applies
+  D119, D120, D122.
+
+  Links: area The stack · draws on engine-split D119, engine-split D120, engine-split D122 · plans engine-split P3 · summary In Turnstone the five code-read receipts become test fixtures, Moot's half sits at ports/graphshell/examples/capsule-library, the three used patch rows are carried, and target/ is ignored at every level.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
