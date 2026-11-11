@@ -525,6 +525,33 @@ unused `incipit/arrangement`, and `graphshell-blocks` keeps genet-parley's `comp
 through a direct row. Not verified: anything headed, Turnstone's non-default feature builds,
 and full test suites beyond the app's lib tests and the moved tests.
 
+**Slice 4: the toolkit and the app leave (D102 to D107).** Steps, in dependency order:
+
+- **U1, the canvas fold (D103, D38).** In Mere, `pictograph`'s `canvas` and `signals` move into
+  `mere-cartography`; `pictograph` keeps the faces. Every user repoints.
+  - Done when: `pictograph` has no `canvas` or `signals` feature, the 777 test attributes are
+    accounted for, and the feature sets of the app, the web crate and the resident are unchanged.
+- **U2, the kernel's hest edge (D105).** `kernel::actions` moves to `hest` in Graphshell's
+  contract root; the kernel drops the row.
+  - Done when: `mere-kernel` names nothing from `graphshell.git`.
+- **U3, Graphshell's docs (D107).** `design_docs/` and the canonical `DOC_POLICY.md` core in
+  Graphshell; the list of host-layer documents is ruled, then moved.
+- **U4, the cutover (D102, D104, D106).** With history: the app, `graphshell-blocks`,
+  `graphshell-mcp`, `graphshell-mere` and `graphshell-dramatis-pane` to Turnstone; the 33
+  toolkit crates, `graphshell-door` and `block-adapter` to Graphshell's `host/`; the faces-only
+  `pictograph` to the emblem repository. Mere keeps `mere-kernel`, `mere-rdf`, `catchment`,
+  `pandect` and `mere-facts`.
+  - Done when: Graphshell builds the host and the `mere-resident` assembly with Mere as a git
+    dependency; Turnstone builds the app; Mere's workspace holds the five crates and builds.
+- **U5, the consumers.** The 151 rows in Cleromancy, Isocosm, Knot, mer3ly, Murm, Woodshed and
+  Turnstone are re-addressed to `graphshell.git` (D66) and their 20 lock roots relocked.
+- **U6, close.** Mere's residue goes: patch rows, line-ceiling exceptions (127 of 150 name
+  leaving paths), scripts and hooks that name moved crates.
+  - Done when: the family cycle checker passes, no Mere crate depends on `graphshell.git`, and
+    P3's done-conditions are checked one by one and recorded.
+
+Held, not part of this slice: D52 (the three small hosts merge) and D64.
+
 ### P4. Pandect on the authority boundary
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
@@ -1662,6 +1689,68 @@ revision and what crosses at frame rate.
   Ruling: "Turnstone (Recommended)". Outcome: applies D58.
 
   Links: area The stack · draws on engine-split D58 · plans engine-split P3 · summary The app-flavoured route ids live in Turnstone, their one user.
+
+- **D102. Slice 4 is one step (Mark, 2026-11-11):** The slice 4 assessment (Mere `42f5a2f4f`;
+  evidence in `Code/testing/engine-split/slice4_assessment.md`) found 41 of Mere's 46 workspace
+  crates leave, 452,687 source lines, and 5 stay (`mere-kernel`, `mere-rdf`, `catchment`,
+  `pandect`, `mere-facts`, 93,911 lines). No staying crate depends on a leaving one. The move
+  order is dependents first, so the reference app (96,423 lines with its sub-crates) leaves
+  before or with the toolkit. Offered the app to Turnstone first, everything in one step, or
+  the app parked in Graphshell. Ruling: "Everything in one step", over the recommended two
+  landings. The toolkit's 33 crates and 13 layers: "One step for the toolkit (Recommended)".
+  The app goes to Turnstone and the toolkit to Graphshell in one cutover; the 151 rows in 7
+  consumer repos are re-addressed and their 20 lock roots relocked once. Outcome: new; applies
+  D23 and D66.
+
+  Links: area The stack · draws on engine-split D23, engine-split D66 · plans engine-split P3 · summary Slice 4 moves the app to Turnstone and the toolkit to Graphshell in one cutover, with consumers re-addressed once.
+
+- **D103. The canvas fold comes first, in Mere (Mark, 2026-11-11):** `pictograph` is still
+  71,819 lines; D38's fold of the canvas and signals into `mere-cartography` (5,404 lines) had
+  not happened, and iconography D1 sends the faces-only crate to the emblem repository. Offered
+  moving pictograph whole and folding later, folding first in Mere, or leaving it in Mere.
+  Ruling: "Fold the canvas first, in Mere", over the recommended fold-later. On sequencing
+  against the iconography session, which had committed to pictograph 14 times since
+  2026-11-09: "it's paused". The fold runs now, before anything moves. Outcome: applies D38.
+
+  Links: area The stack · draws on engine-split D13, engine-split D38 · plans engine-split P3 · summary The canvas and signals fold into mere-cartography in Mere before slice 4's move; pictograph leaves as faces only.
+
+- **D104. The four unassigned crates go by what they are (Mark, 2026-11-11):** The plan named no
+  home for `graphshell-door`, `block-adapter`, `graphshell-mere` and `graphshell-dramatis-pane`
+  (8,561 lines). Ruling: "By what they are (Recommended)". `graphshell-door` and
+  `block-adapter` are libraries below the app and go to Graphshell's `host/`; `graphshell-mere`
+  and `graphshell-dramatis-pane` are app pieces and go to Turnstone with the app. Outcome:
+  applies D36.
+
+  Links: area The stack · draws on engine-split D36 · plans engine-split P3 · summary graphshell-door and block-adapter go to Graphshell; graphshell-mere and graphshell-dramatis-pane go to Turnstone.
+
+- **D105. The kernel's hest edge is removed (Mark, 2026-11-11):** `mere-kernel` names `hest`
+  from Graphshell's contract root. D35 makes that acyclic, but P3's done-condition says "no
+  Mere crate depending back". Offered keeping it and rewording the condition, or removing it.
+  Ruling: "Remove the edge". The edge is one module, `kernel::actions` (207 lines and a
+  39-line test): `ActionId`, "the typed form of `hest`'s catalogue". No Mere crate outside the
+  kernel names `ActionId`; six Graphshell files do. The module moves to `hest`, beside the
+  catalogue it types, and the kernel drops its `hest` row. Outcome: amends D59, which moved no
+  kernel code in P3, by this one module.
+
+  Links: area The stack · amends engine-split D59 · draws on engine-split D35 · plans engine-split P3 · summary ActionId moves from the kernel to hest; mere-kernel names nothing in graphshell.git.
+
+- **D106. Slice 4 moves with history (Mark, 2026-11-11):** Slice 1 imported its five crates with
+  history (filter-repo, then a merge of unrelated histories). Offered the same for slice 4's 41
+  crates, or a copy at the tip. Ruling: "With history (Recommended)". The size the history
+  adds to Graphshell and Turnstone is reported before pushing. Outcome: applies slice 1's
+  method.
+
+  Links: area The stack · plans engine-split P3 · summary The toolkit and the app move with their git history, as slice 1 did.
+
+- **D107. Graphshell's design docs are set up in slice 4 (Mark, 2026-11-11):** Graphshell has no
+  `design_docs/` and no `DOC_POLICY.md`; Mere's policy moves docs with their code. Offered
+  leaving design docs in Mere this slice, or setting up Graphshell's now. Ruling: "Set up
+  Graphshell's docs now", over the recommended deferral. Graphshell gets `design_docs/` and the
+  canonical `DOC_POLICY.md` core, and the host layer's plans and briefs move with the code.
+  Which documents are the host's is sorted as a list and put back before any move. Outcome:
+  new.
+
+  Links: area The stack · plans engine-split P3 · summary Graphshell gets design_docs and the canonical DOC_POLICY core in slice 4, and the host layer's plans move with the code.
 
 ## Open questions
 
