@@ -1537,6 +1537,22 @@ area = "The stack"
 summary = "Graphshell gets design_docs and the canonical DOC_POLICY core in slice 4, and the host layer's plans move with the code."
 plans = ["engine-split"]
 
+[decisions."engine-split D108"]
+title = "flat_icon stays in pictograph and becomes public (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "flat_icon is a public pictograph module behind a paint-list feature; the canvas in cartography uses it from there."
+draws_on = ["engine-split D38", "engine-split D103"]
+plans = ["engine-split"]
+
+[decisions."engine-split D109"]
+title = "SymbolImage stays with the faces (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "SymbolImage stays in pictograph behind a livery feature."
+draws_on = ["engine-split D38"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

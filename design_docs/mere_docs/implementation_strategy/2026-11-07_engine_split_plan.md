@@ -529,7 +529,8 @@ and full test suites beyond the app's lib tests and the moved tests.
 
 - **U1, the canvas fold (D103, D38).** In Mere, `pictograph`'s `canvas` and `signals` move into
   `mere-cartography`; `pictograph` keeps the faces. Every user repoints.
-  - Done when: `pictograph` has no `canvas` or `signals` feature, the 777 test attributes are
+  - Done when: `pictograph` has no `canvas` or `signals` feature, the test attributes (820
+    measured across both crates on `0c4f551d6`, not D38's 777) are
     accounted for, and the feature sets of the app, the web crate and the resident are unchanged.
 - **U2, the kernel's hest edge (D105).** `kernel::actions` moves to `hest` in Graphshell's
   contract root; the kernel drops the row.
@@ -1751,6 +1752,27 @@ revision and what crosses at frame rate.
   new.
 
   Links: area The stack · plans engine-split P3 · summary Graphshell gets design_docs and the canonical DOC_POLICY core in slice 4, and the host layer's plans move with the code.
+
+- **D108. flat_icon stays in pictograph and becomes public (Mark, 2026-11-11):** The fold lane
+  measured the dividing line before moving anything. `flat_icon` (365 lines: lowering an icon
+  to paint-list commands, and the wash added this week) is private to pictograph and used by
+  the canvas, the icon pack and `SymbolImage`. The pack and `SymbolImage` stay, and pictograph
+  may not depend on cartography, so it cannot move with the canvas. Offered making it public in
+  pictograph, splitting the wash off to cartography, or two copies. Ruling: "Stays in
+  pictograph, made public (Recommended)", behind a `paint-list` feature that the pack enables
+  and cartography's canvas forwards. `palette_from_rgba` and three backdrop constants the
+  canvas reads become public with it. Outcome: refines D38.
+
+  Links: area The stack · draws on engine-split D38, engine-split D103 · plans engine-split P3 · summary flat_icon is a public pictograph module behind a paint-list feature; the canvas in cartography uses it from there.
+
+- **D109. SymbolImage stays with the faces (Mark, 2026-11-11):** `symbols::SymbolImage` (48
+  lines) sat behind pictograph's `canvas` feature only for genet-livery's `VectorImage` and
+  `flat_icon`; it never uses the canvas, and its one user is the app's web tree. Offered a new
+  pictograph feature or moving it with the canvas. Ruling: "Stays in pictograph, new feature
+  (Recommended)": a `livery` feature, forwarded by cartography's canvas so the app's manifest
+  does not change. Outcome: refines D38.
+
+  Links: area The stack · draws on engine-split D38 · plans engine-split P3 · summary SymbolImage stays in pictograph behind a livery feature.
 
 ## Open questions
 
