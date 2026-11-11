@@ -1,5 +1,0 @@
-*.log -text -diff
-*.png binary
-*.jpg binary
-*.json -text -diff
-*.mereclip -text

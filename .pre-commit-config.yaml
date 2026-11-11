@@ -28,7 +28,7 @@ repos:
       # on 2026-11-10.
       - id: clippy-query
         name: clippy (query feature)
-        entry: cargo clippy --locked --all-targets -p mere-rdf -p mere-view --features mere-rdf/query,mere-view/query
+        entry: cargo clippy --locked --all-targets -p mere-rdf --features mere-rdf/query
         language: system
         files: '(^|/)(Cargo\.(toml|lock)|[^/]+\.rs)$'
         pass_filenames: false

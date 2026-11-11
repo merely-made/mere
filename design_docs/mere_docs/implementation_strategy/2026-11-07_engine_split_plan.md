@@ -545,6 +545,8 @@ and full test suites beyond the app's lib tests and the moved tests.
   `pandect` and `mere-facts`.
   - Done when: Graphshell builds the host and the `mere-resident` assembly with Mere as a git
     dependency; Turnstone builds the app; Mere's workspace holds the five crates and builds.
+  - Landed 2026-11-11, pending consumers (U5): the receivers' branches and Mere's deletion
+    (Progress, 2026-11-11). Turnstone receives the app in its U5 step (D121).
 - **U5, the consumers.** In strict order with Turnstone last (D121); Inker is an eighth consumer.
   The 151 rows in Cleromancy, Isocosm, Knot, mer3ly, Murm, Woodshed and
   Turnstone are re-addressed to `graphshell.git` (D66) and their 20 lock roots relocked.
@@ -2537,3 +2539,25 @@ revision and what crosses at frame rate.
   at four sites; its lock pins an older Mere, so nothing breaks until a Turnstone lane swaps them for
   `backstep::nav::History`.
 
+- 2026-11-11: U4, the cutover (D102, D104, D106, D113, D114, D117 to D121), taken from mere.git
+  `325b0083b`. Left, with history: the host toolkit's 34 crates (`graphshell-door` and
+  `block-adapter` among them) and their non-members for Graphshell's `host/` at the same subpaths
+  (graphshell.git `893818f6c` on base `53584e76`; 2,047 commits with former paths, without
+  `mere-moot`'s receipts, which stay in this history under D122); `pictograph` for emblem's
+  `crates/pictograph` (emblem.git `e577e8498` on base `4630fab`; its current files' 46 commits;
+  emblem tracks its lock); `athanor` for Distillery's nested root `crates/athanor`
+  (distillery.git `8908f7e4a` on base `a3041eb`; 16 commits with former paths). The reference
+  app (`ports/graphshell`, `graphshell-mcp`), its four frame-receipt scripts and
+  `support/{graphshell-coop, browser-history-intake, instrument, link-model}` leave for
+  Turnstone, which imports them from `325b0083b` when it relocks last (D121). Deleted under D119:
+  `crates/probes/{pack-distribution, wing-three-paths}`,
+  `support/fixtures/custody-projection/{host, offer, projection, provider}`,
+  `support/family-promotion/native-id-consumer` and `support/patches/{burn-cubecl,
+  cubecl-runtime, cubecl-wgpu}`. To their subjects' repositories (D121), copied at
+  `325b0083b`: `crates/probes/murm-direct-phy` for Murm's `testing/`,
+  `ports/muniment-opfs-probe` for Eidetic's `crates/`. The backdrop study's records stay in
+  this history (D120); its ten JSON files went with the canvas (D119). The workspace keeps the
+  five crates; the lock went from 1,664 to 651 packages, removals only; 133 line-ceiling
+  exceptions left with their files, the query clippy hook checks `mere-rdf` alone, and the
+  arXiv corpus rule left `.gitattributes`. Staying documents' path citations into the crates
+  that left are U6's.

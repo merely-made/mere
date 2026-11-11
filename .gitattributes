@@ -24,11 +24,6 @@ crates/cambium/cambium/tests/fixtures/component_catalog_*.html text eol=lf
 tests/fixtures/luggage-comparison/** -text
 crates/cambium/cambium/examples/component_catalog.css text eol=lf
 
-# The Meaning receipt's arXiv corpus (CC0) is pinned by SHA-256 in its
-# provenance note; autocrlf must not rewrite its bytes (dynamics grammar plan,
-# G2, F43, 2026-10-03).
-crates/canvas/pictograph/src/canvas/tests/data/** text eol=lf
-
 # Preserve raw allocator diagnostic log bytes across checkout.
 ports/distillery/probe/receipts/2026-09-29_pre4_allocator_stop.log -text
 ports/distillery/probe/receipts/2026-09-30_pre4_allocator_control.log -text

@@ -1,3 +1,0 @@
-[patch."https://github.com/merely-made/woodshed.git"]
-woodshedding = { path = "/Users/markik/Code/worktrees/woodshed-arrangement-playback/crates/woodshedding" }
-woodshed-notation = { path = "/Users/markik/Code/worktrees/woodshed-arrangement-playback/crates/woodshed-notation" }
