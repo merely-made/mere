@@ -6804,7 +6804,6 @@ dependencies = [
  "notochord",
  "ostiary",
  "p2mere-core",
- "p2mere-store",
  "pandect",
  "pelt-core",
  "personae",
