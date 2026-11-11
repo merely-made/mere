@@ -1375,6 +1375,30 @@ area = "The stack"
 summary = "Ten Distillery documents, the extraction plan among them, move to distillery.git with responsa; after slice 4 every repo that records rulings gets the hook and a manifest."
 plans = ["engine-split"]
 
+[decisions."engine-split D117"]
+title = "athanor sits in its own workspace root in Distillery (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "athanor is a nested workspace root inside the Distillery repository, so Distillery's main root and Graphshell's host root do not name each other."
+draws_on = ["engine-split D35", "engine-split D114"]
+plans = ["engine-split"]
+
+[decisions."engine-split D118"]
+title = "How much history travels, and emblem's shape (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The toolkit moves with history including pre-rename paths; pictograph moves to emblem's crates/pictograph with only its current files' history; emblem tracks a lock."
+draws_on = ["engine-split D106"]
+plans = ["engine-split"]
+
+[decisions."engine-split D119"]
+title = "The cutover's loose ends (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Leftovers follow their nearest user or are deleted; ceiling exceptions now and splits later; document paths repointed at the cutover; backdrops with the canvas; the app builds the identity cards from the resident; consumers repoint to cartography in U5."
+draws_on = ["engine-split D102", "engine-split D111", "engine-split D112"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

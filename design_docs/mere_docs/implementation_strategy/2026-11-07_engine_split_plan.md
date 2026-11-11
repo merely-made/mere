@@ -1864,6 +1864,50 @@ revision and what crosses at frame rate.
 
   Links: area The stack · plans engine-split P3 · summary Ten Distillery documents, the extraction plan among them, move to distillery.git with responsa; after slice 4 every repo that records rulings gets the hook and a manifest.
 
+- **D117. athanor sits in its own workspace root in Distillery (Mark, 2026-11-11):** The U4 dry run
+  (`Code/testing/engine-split/slice4_u4_dryrun.md`; scratch Graphshell, emblem and a five-crate
+  Mere all build) found that D114 makes a cycle the checker would fail. Distillery names
+  Graphshell's `host/` because athanor's `workshop-native` feature names `cambium-desktop` (2
+  use lines); `host/` names Distillery because `mere-resident` names `distillery`, `mere-mesh`
+  and `esp`, and `mere-cartography` names `esp`. Offered a nested root, moving `workshop-native`
+  out, athanor to Graphshell after all, or an allowlist entry. Ruling: "athanor in its own root
+  in Distillery (Recommended)", the device Graphshell uses for `host/`. Distillery's main root
+  names no host crate. The dry run confirms how the checker classifies a nested root before the
+  cutover relies on it. Outcome: refines D114; applies D35.
+
+  Links: area The stack · draws on engine-split D35, engine-split D114 · plans engine-split P3 · summary athanor is a nested workspace root inside the Distillery repository, so Distillery's main root and Graphshell's host root do not name each other.
+
+- **D118. How much history travels, and emblem's shape (Mark, 2026-11-11):** The import tool cuts
+  history at a crate's last rename: with current paths Graphshell gains 1,043 commits (about
+  13 MiB) and `mere-resident` loses its months as `ports/djinn`; with the old paths, 1,402
+  commits. For pictograph, the whole directory is 297 commits and ten times emblem's size,
+  because it holds the deleted canvas; current files only is 46 commits and 121 KiB. Ruling:
+  "Old paths for the toolkit; current files for pictograph (Recommended)". The canvas's history
+  travels to Graphshell with `mere-cartography`. Emblem: "crates/pictograph, and a tracked lock
+  (Recommended)"; emblem starts tracking `Cargo.lock` so its gates run `--locked`. Outcome:
+  refines D106.
+
+  Links: area The stack · draws on engine-split D106 · plans engine-split P3 · summary The toolkit moves with history including pre-rename paths; pictograph moves to emblem's crates/pictograph with only its current files' history; emblem tracks a lock.
+
+- **D119. The cutover's loose ends (Mark, 2026-11-11):** Six rulings on the dry run's smaller forks.
+  Unowned leftovers in Mere (probes, fixtures that already do not build, the coop relay server,
+  retired patch crates, the resident's run scripts): "Follow the nearest user; delete what does
+  not build", over the recommended item-by-item round. The four toolkit files over the line
+  ceiling with no exception: "Exceptions now, splits after (Recommended)". Path citations in
+  the moved documents (107 in 28 Graphshell documents): "Repoint paths at the cutover
+  (Recommended)"; a path string is not a rewrite under D112. The backdrop studies read by both
+  the canvas and the app: "With the canvas in Graphshell (Recommended)". The resident test that
+  checks the app's committed `identity_cards.json`: shown that the file is the resident's own
+  projection, "The app builds it live from the resident (Recommended)"; the resident exports
+  the builder under `test-fixtures` and the file and its drift check go. Consumers that still
+  use pictograph's removed canvas features (Cleromancy 8 lines, Isocosm 3, Knot 13, Woodshed 13,
+  Turnstone 149): "In U5, with re-addressing (Recommended)". Taken without a question, as
+  having one answer: only used patch rows are carried, consumers relock in strict order with
+  Turnstone last, and Graphshell's toolchain file gains `wasm32-wasip2`. Outcome: applies D102,
+  D111, D112.
+
+  Links: area The stack · draws on engine-split D102, engine-split D111, engine-split D112 · plans engine-split P3 · summary Leftovers follow their nearest user or are deleted; ceiling exceptions now and splits later; document paths repointed at the cutover; backdrops with the canvas; the app builds the identity cards from the resident; consumers repoint to cartography in U5.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
