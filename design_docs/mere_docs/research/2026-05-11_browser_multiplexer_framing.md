@@ -10,7 +10,7 @@
 
 **Related**:
 
-- [`2026-05-10_cartography_layer_brief.md`](2026-05-10_cartography_layer_brief.md) — the projection/display layer this brief leans on for the "panes are projections" framing.
+- `2026-05-10_cartography_layer_brief.md` (`graphshell/design_docs/graphshell_docs/research/2026-05-10_cartography_layer_brief.md`) — the projection/display layer this brief leans on for the "panes are projections" framing.
 - Phase 1 / 1B / 2 work landed in `crates/mere-host/src/` *(historical citation)* <!-- doc-audit: historical-path --> — see `bootstrap.rs`, `graph_registry.rs`, `pane_state.rs`, `tearout.rs`, `graph_switcher.rs`, and the `mere-frame` crate's `FrameLayout` + `GraphId`.
 
 ---

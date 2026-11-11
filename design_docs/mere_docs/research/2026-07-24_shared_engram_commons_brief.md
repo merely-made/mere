@@ -31,7 +31,7 @@ What makes a graph communal is three declarations over that substrate:
 
 1. **a shared vocabulary of content classes** (page, post, place, person,
    file: each an engram schema per the
-   [one-node facets ruling](../technical_architecture/2026-07-18_one_node_facets_layer_map.md));
+   one-node facets ruling (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md`));
 2. **a replication policy for those classes**: what syncs to whom, under
    which privacy selection and byte budgets (stickleback's
    selector/budget seam; V10 of the

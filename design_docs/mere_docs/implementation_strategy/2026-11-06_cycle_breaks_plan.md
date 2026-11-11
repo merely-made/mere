@@ -238,7 +238,7 @@ block pane, wired into the private web page state (`TreePage`, `AppCtx`, `Logic`
 `ProbeSnapshot`) at nine call sites in `web_tree.rs`, `controls.rs` and `lane.rs`, and
 `graphshell-web` is a standalone cdylib with no crate above it to register anything. Woodshed
 therefore leaves as a runtime guest. The design is
-[guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md); **nothing moves until Mark
+guest_blocks (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-11-06_guest_blocks.md`); **nothing moves until Mark
 has reviewed it**, as with P1.
 
 **The seam, stated first.** A guest block adapter is a typed request/response component, the
@@ -432,7 +432,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Links: area stack · draws on cycle-breaks D5, D8, D9, host_guest_contract_brief · amends cycle-breaks D5 · plans cycle-breaks P7 · summary The block pane stays in Mere and Woodshed's progression and notation parts load as a reviewed wasm guest, so Mere names no Woodshed package.
 
 - **D13. The guest-blocks decisions (Mark, 2026-11-06):** the eight decisions of
-  [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md), answered as relayed:
+  guest_blocks (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-11-06_guest_blocks.md`), answered as relayed:
   1. Interface: "Put `block-adapter` in the graphshell protocol WIT, as a new `block-guest` world in
      merely-made/graphshell."
   2. View: "A `sceno` scene plus regions, but run a spike first. If the spike falls short, come back
@@ -456,7 +456,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   Links: area stack · draws on cycle-breaks D12, guest_blocks · plans cycle-breaks P7 · summary Mark's eight guest-blocks answers: the protocol WIT carries block-guest, Woodshed's adapter is a woodshedding feature, a native block pane is built, and the painting question is back with Mark after the spike.
 
 - **D16. Guest blocks: the three open questions answered (Mark, 2026-11-06):**
-  [guest_blocks](../technical_architecture/2026-11-06_guest_blocks.md) R1 to R3.
+  guest_blocks (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-11-06_guest_blocks.md`) R1 to R3.
   1. R1, the drawing: "Scene + vector sheet". The guest returns the `sceno` scene for regions plus a
      protocol-owned, versioned vector sheet (compound fills with a fill rule, strokes, theme-role
      paint and text runs), and the host paints it. Direct manipulation, if wanted later, gets its

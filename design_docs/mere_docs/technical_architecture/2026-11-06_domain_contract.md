@@ -480,7 +480,7 @@ function; it could ship as a WebAssembly component the owner installs, loaded sa
 the resident, on the family's own WIT idiom (host/guest brief, standards survey). Knot's lane
 cannot (it is iroh and a vault), and Cleromancy's validator would need its graph crates to
 build for wasm (unmeasured). Not proposed now; it is decision (d). Cycle breaks D12's
-[guest blocks design](2026-11-06_guest_blocks.md) already chooses a reviewed, signed wasm guest
+guest blocks design (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-11-06_guest_blocks.md`) already chooses a reviewed, signed wasm guest
 for Woodshed's parts; a validator component would share that delivery path, and (d) should be
 answered with it in view.
 
@@ -518,7 +518,7 @@ status lists registrations; events keep their names. Today only one inline test
 
 ### 7. Against the resident split plan, the host/guest brief, and D7 to D11
 
-**Resident split plan** ([2026-11-05](../implementation_strategy/2026-11-05_resident_split_plan.md)).
+**Resident split plan** (2026-11-05 (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-11-05_resident_split_plan.md`)).
 No slice is contradicted. Interactions:
 - *Constraint wording.* It says "concrete producer registration" stays in Mere, and its D2
   outcome repeats it. Cycle breaks D1 (later, Mark's) narrows that: the registry

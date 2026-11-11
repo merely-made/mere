@@ -14,7 +14,7 @@ in the [browser multiplexer framing brief](2026-05-11_browser_multiplexer_framin
 
 - [`2026-05-11_browser_multiplexer_framing.md`](2026-05-11_browser_multiplexer_framing.md)
   — the framing this brief refines.
-- [`2026-05-10_cartography_layer_brief.md`](2026-05-10_cartography_layer_brief.md)
+- `2026-05-10_cartography_layer_brief.md` (`graphshell/design_docs/graphshell_docs/research/2026-05-10_cartography_layer_brief.md`)
   — engines as content producers; cartography as the projection contract above.
 
 ---
@@ -277,7 +277,7 @@ shape, different impl (overlay rather than embedded frame).
 - [Multiplexer framing](2026-05-11_browser_multiplexer_framing.md) §5.4
   (engine profile boundary): this brief refines the persona-scoped UDF
   model into a concrete cross-engine continuity story.
-- [Cartography brief](2026-05-10_cartography_layer_brief.md): engines
+- Cartography brief (`graphshell/design_docs/graphshell_docs/research/2026-05-10_cartography_layer_brief.md`): engines
   are content producers; cartography projects truth into views.
   Cartography doesn't care which engine renders a tile — it consumes
   graph state regardless. This decision keeps that separation clean.

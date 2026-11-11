@@ -124,7 +124,7 @@ its lifetime or carry their own handle or copy. The domains, death kinds and
 crossing rule are argued in the
 [data-oriented doctrine brief](2026-07-02_data_oriented_doctrine_brief.md) §7.
 
-Links: draws on node-body-face-model D1, house-style D15 · summary Storage follows the death condition; mutable state has one owner, consumers borrow within its lifetime or carry a handle or copy; persist by durable identity.
+Links: draws on graphshell:node-body-face-model D1, house-style D15 · summary Storage follows the death condition; mutable state has one owner, consumers borrow within its lifetime or carry a handle or copy; persist by durable identity.
 
 *Refined 2026-11-02 (house-style D15): "Consolidate within the
 seven-statement budget (Recommended)"; ownership and lifetimes refine this

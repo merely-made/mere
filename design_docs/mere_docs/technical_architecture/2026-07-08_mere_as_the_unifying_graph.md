@@ -86,7 +86,7 @@ Nothing here is speculative plumbing; it is what G0-G5 produced:
 
 ## 5. Open questions
 
-> **Amended 2026-07-27** by [one node, atomic facets, and the layer map](2026-07-18_one_node_facets_layer_map.md):
+> **Amended 2026-07-27** by one node, atomic facets, and the layer map (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md`):
 > 5.1 is **closed**: the kernel `Node` is a physical wrapper around
 > `chartulary::Container`, with only content-addressed image references retained
 > as explicit D0 experience residue; all other optional metadata is atomic

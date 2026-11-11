@@ -315,7 +315,7 @@ Isocosm as neighbors (§2).
 ### Writing: Knot
 
 The Rosette entry in the
-[Scenograph content catalog](../research/2026-08-18_scenograph_content_catalog.md)
+Scenograph content catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-18_scenograph_content_catalog.md`)
 describes Knot as a creative-writing analysis scene over a document, where
 "derived analysis edges arrive as revealed cells and crystallize only when the
 writer keeps them". Revealed cells are the ambient tier of a text. Keeping one
@@ -403,7 +403,7 @@ coordinates from current membership".
 
 - **Focus never promotes.** Woodshed: "Focus never adds a Card or auditions it.
   Hear and Add remain explicit." Mere's
-  [subgraph derivation](2026-06-13_subgraph_derivation_from_selection.md) makes
+  subgraph derivation (`graphshell/design_docs/graphshell_docs/design/2026-06-13_subgraph_derivation_from_selection.md`) makes
   the same rule on the graph canvas: "Steps 1-4 are pure read-side projection
   over graph truth. Nothing is committed while you explore", and "Only
   crystallize writes". Athanor keeps it too: "Athanor does not directly mutate
@@ -452,7 +452,7 @@ LoRA, and settings/Timeline follow-ons remain deferred."
 
 *Not ruled, except where a ruling is cited.*
 
-The [swatch primitive design](2026-06-27_swatch_primitive_design.md) §2 splits
+The swatch primitive design (`graphshell/design_docs/graphshell_docs/design/2026-06-27_swatch_primitive_design.md`) §2 splits
 state into two planes: **truth**, "Changed only by assert / retract / delete",
 and **curation** ("scope, arrangement, lens, which cells are hidden, camera,
 selection, mode"), which is "Private to each instance". The ambient tier fits
@@ -569,14 +569,14 @@ Consequences:
   records what has landed.
 - [Lexicon brief](../../2026-05-04_lexicon_brief.md) §4.1: the tier-1 mere,
   "Backed by `eidetic`", and "All four tiers are **forkable**".
-- [Swatch primitive design](2026-06-27_swatch_primitive_design.md) §2: truth
+- Swatch primitive design (`graphshell/design_docs/graphshell_docs/design/2026-06-27_swatch_primitive_design.md`) §2: truth
   and curation, beside which §6 places ambiance.
-- [Subgraph derivation from selection](2026-06-13_subgraph_derivation_from_selection.md):
+- Subgraph derivation from selection (`graphshell/design_docs/graphshell_docs/design/2026-06-13_subgraph_derivation_from_selection.md`):
   reveal is a pure read and only crystallize writes.
 - [Projection scenes and the graph-native platform](../../2026-08-23_projection_scenes_and_graph_native_platform.md):
   §4, several instances of one source; receipt 7, view-state authority, which
   is curation rather than ambiance.
-- [Scenograph content catalog](../research/2026-08-18_scenograph_content_catalog.md):
+- Scenograph content catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-18_scenograph_content_catalog.md`):
   Rosette's revealed cells.
 - [Family composition thesis](../../2026-08-12_family_composition_thesis_brief.md):
   titled "every application its own datalake", and it holds that "Each
@@ -782,7 +782,7 @@ Foundations is not an arrangement, and one generic halo cannot substitute for
 the meaningful coordinates of a musical or quantitative reading.
 
 The seeded/anchored/pinned roles and encoded-axis constraints remain as ruled
-in the [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md).
+in the projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`).
 An encoded axis does not allow dragging a value into a false position. Report
 unsupported placement or an unmet constraint; offer inspection or another
 presentation. A held coordinate in a free topology view does not force an item
@@ -1034,8 +1034,8 @@ The same disclosed subject can support several presentations and lifetimes:
 | Source facts, saved queries, frozen selections and residency coverage | The [graph semantics plan](../../archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md) completes P1–P5 on main at source `7628ab689`. Its resident reader uses explicit checkpoint/refresh; edits still use the complete recorded session. This supplies graph mechanisms, not an ambient reason controller. |
 | Several appearances and linked comparison | The [Scenograph editor plan](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md) S2 owns linked swatches, coordinated selection and visibility. Source selection, appearance-part selection and instance dismissal must remain distinguishable; the part name awaits Mark under SE84. |
 | Ambient relevance and attention | This proposal applies the design language §9.2: selected or foreground-pinned subjects shape context; previously selected material survives in the background until dismissed; untouched context can withdraw when its reasons cease. The lens set and reason reducer are still proposed work. |
-| Scene placement, forme and dynamics | The design language §9.4 describes a field representing the recursive workbench arrangement. It does not define the sandbox's field physics, finish Scenograph B1 or change arrangement roles. The [Scenograph handoff](../research/2026-10-09_scenograph_codex_handoff.md) retains the ruled carrier, dynamics-axis, B1 and S2 work. |
-| One application inside another | The [app composition brief](../../cambium_docs/research/2026-10-06_app_composition_brief.md) owns retained sessions and host accessibility composition. Owner-served projections and locally granted applet execution have distinct lifecycle and authority boundaries; neither gives a lens access to undisclosed material. |
+| Scene placement, forme and dynamics | The design language §9.4 describes a field representing the recursive workbench arrangement. It does not define the sandbox's field physics, finish Scenograph B1 or change arrangement roles. The Scenograph handoff (`graphshell/design_docs/graphshell_docs/research/2026-10-09_scenograph_codex_handoff.md`) retains the ruled carrier, dynamics-axis, B1 and S2 work. |
+| One application inside another | The app composition brief (`graphshell/design_docs/cambium_docs/research/2026-10-06_app_composition_brief.md`) owns retained sessions and host accessibility composition. Owner-served projections and locally granted applet execution have distinct lifecycle and authority boundaries; neither gives a lens access to undisclosed material. |
 | Public site delivery | `merelyllc.com/docs/2026-09-30_graphshell_site_canvas_plan.md` R157–R160 owns the frozen-first delivery caps, viewer cutover and deferred grouping choice. Main contains the frozen-first lazy sandbox and shared providers; the Graphshell viewer has not replaced that sandbox. |
 
 An ambient controller should consume coverage rather than manufacture complete

@@ -104,7 +104,7 @@ preserved in full, including its uncommitted Task 7 WIP, at tag
 `fd1640d0e`; Tasks 1–6 end at `2530e44d0`). Its plan,
 `design_docs/archive_docs/2026-10-28/2026-10-09_resident_host_implementation_plan.md`,
 exists only on that tag. Main carries the
-[design](mere_docs/technical_architecture/2026-10-09_resident_host_design.md),
+design (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-10-09_resident_host_design.md`),
 still marked proposed, although the tag's plan records Mark's approval.
 
 This is a port, not a merge. C1 retired the browser modules the lane's

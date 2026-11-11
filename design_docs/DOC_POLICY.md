@@ -213,7 +213,7 @@ added, moved, or archived; the command must report full current-path coverage.
 
 ### Area roots
 
-Updated 2026-11-07 when the Inker crates left (below); before that, 2026-10-19 after the foundation family promotion. Eidetic, Armillary
+Updated 2026-11-11 when the host layer's design documents left for graphshell.git (below); before that, 2026-11-07 when the Inker crates left; before that, 2026-10-19 after the foundation family promotion. Eidetic, Armillary
 and community governance documentation now live with their owning repositories.
 
 ```
@@ -223,19 +223,18 @@ mere/design_docs/
 ├── TERMINOLOGY.md                 ← canonical terms
 ├── YYYY-MM-DD_<keyword>_brief.md  ← cross-cutting briefs
 ├── mere_docs/                     ← product-level concerns
-├── cambium_docs/                  ← the Cambium desktop-host/scene family
-│                                     (Meristem, Cambium, Sprigging, Workbench)
+├── cambium_docs/                  ← two receipt files only (testing/receipts/);
+│                                     the family's documents are in graphshell.git
 ├── dramatis_docs/                 ← castellan's custody (vault lock, Secret
 │                                     Service); the tier itself is in dramatis
 ├── intel_docs/                    ← Mere inference integrations (Vates, Sibylla)
 ├── murm_docs/                     ← bilateral comms
-├── scenograph_docs/               ← the scene contract
 └── archive_docs/                  ← superseded checkpoints
 ```
 
 **`cambium_docs/` founded 2026-09-03, ruled by Mark**, the day Cambium itself landed in this repository (platform boundary plan, P2). It collects two things that had scattered: the two live plans (`workbench_component_plan`, `host_ui_zoom_plan`) that moved with the code into `mere_docs/` as a two-document lodger, and `crates/cambium/docs/` *(historical citation)* <!-- doc-audit: historical-path -->, which was the member-crate scatter §4 forbids — the same defect the 2026-08-24 collapse fixed for the other nine `crates/*/design_docs/` directories.
 
-Every root above corresponds to code that lives in this repository. That is an
+Every root above, except the two receipt files left in `cambium_docs/`, corresponds to code that lives in this repository. That is an
 invariant now, not a coincidence — see below.
 
 **Three roots left on 2026-08-24 and came back on 2026-09-03.**
@@ -299,9 +298,20 @@ conatus/nexus alignment brief had no area root here and followed their subject,
 split plan, P2 and D25), with their history; they are indexed in that repository's
 `design_docs/DOC_README.md`. Their D2 records stay here and map to the new home in
 `support/doc-audit/d2/moved_out.json`. The dynamics grammar and physics catalog plans,
-which have consumers on both sides, stay here. Markdown links into the moved crates were
+which had consumers on both sides, stayed here then and went to Graphshell on 2026-11-11. Markdown links into the moved crates were
 repointed to the Seiche repository; code-font paths into them were not (the engine split
 plan's Open items carry the count).
+
+**Seventy-three documents left for Graphshell on 2026-11-11.** The host layer's plans, briefs and
+designs followed their subject to `merely-made/graphshell` under the engine split plan's P3 (D107,
+D110, D111), with their history: the 13 documents of `cambium_docs/` (its two receipt files stay
+under `cambium_docs/testing/receipts/`), the 2 of `scenograph_docs/` (the root is gone), and 58 of
+`mere_docs/`, which Graphshell keeps under `graphshell_docs/`. They are indexed in
+`repos/graphshell/design_docs/DOC_README.md`. Their D2 records stay here and map to the new home in
+`support/doc-audit/d2/moved_out.json`. Markdown links and `design_docs/` paths from active documents
+became path citations (`graphshell/design_docs/...`, core §5); code-font paths into the host crates were
+not repointed (the engine split plan's U4 carries them). Archived and historical host documents stay in
+`archive_docs/`.
 
 **Member-crate scatter was collapsed 2026-08-24.** Nine `crates/*/design_docs/`
 directories held 20 documents, 18 of which `DOC_README.md` did not index. They
@@ -314,14 +324,14 @@ therefore inert here rather than violated; founding one is open work.
 
 ### Inheritance and migration (graphshell donor)
 
-The donor graphshell repo was **GitHub-archived on 2026-05-27** (read-only at <https://github.com/mark-ik/graphshell>; local clone deleted). Its design docs are no longer a local sibling. Before archiving, all 633 donor docs were swept into two curated indexes that are now the entry points for any remaining pull: the [full docs harvest](mere_docs/research/2026-05-27_graphshell_docs_full_harvest.md) (what to pull, where it lives in the donor, which mere domain wants it) and the [concept brief](mere_docs/research/2026-05-17_graphshell_harvest_brief.md). Treat those indexes as canonical; fetch detail from the GitHub archive when a slice needs it.
+The donor graphshell repo was **GitHub-archived on 2026-05-27** (read-only at <https://github.com/mark-ik/graphshell>; local clone deleted). The repository was unarchived and transferred back on 2026-11-06 and now holds the host layer (see `graphshell/docs/2026-11-06_cut_over.md`); the donor's design docs are in its git history, not in its current tree. Before archiving, all 633 donor docs were swept into two curated indexes that are now the entry points for any remaining pull: the [full docs harvest](mere_docs/research/2026-05-27_graphshell_docs_full_harvest.md) (what to pull, where it lives in the donor, which mere domain wants it) and the [concept brief](mere_docs/research/2026-05-17_graphshell_harvest_brief.md). Treat those indexes as canonical; fetch detail from the GitHub archive when a slice needs it.
 
 The Graphshell name was reclaimed on 2026-07-22 for the family-wide remote
 projection host, and on 2026-07-23 the
 [repo consolidation plan](archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md)
 ruled Graphshell as Mere's shell and remote port, homed in this repository.
-Graphshell documentation belongs here under `mere_docs` (a dedicated
-`graphshell_docs/` area-root may be founded when volume warrants). The
+Graphshell documentation lived here under `mere_docs` until 2026-11-11, when the
+host layer's documents moved to `graphshell/design_docs/` (above). The
 archived donor and the current Graphshell must remain explicitly distinct in
 links and prose.
 

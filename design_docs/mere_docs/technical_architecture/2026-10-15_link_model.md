@@ -33,9 +33,9 @@ doc: [graph semantics plan](../../archive_docs/2026-10-28/2026-10-04_graph_seman
 (thread 2), the [petgraph-RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md)
 (2026-07-04 revision), the [statements-over-schema stance](2026-05-22_statements_over_schema_stance.md),
 the [statement kernel brief](2026-06-19_statement_kernel_brief.md),
-[projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md):89,
-[graph projections research](../research/2026-06-22_graph_projections_research.md),
-[swatch design](../design/2026-06-27_swatch_primitive_design.md) §7 and §11,
+projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`):89,
+graph projections research (`graphshell/design_docs/graphshell_docs/research/2026-06-22_graph_projections_research.md`),
+swatch design (`graphshell/design_docs/graphshell_docs/design/2026-06-27_swatch_primitive_design.md`) §7 and §11,
 the [dynamics grammar plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md)
 (design-language inputs) and [TERMINOLOGY](../../TERMINOLOGY.md).
 
@@ -68,7 +68,7 @@ what one means, or reads assertions for a view. Any other concept is retired.
    edges to its members (ruling L1). Ruling 1 (2026-10-04) already rejected
    "one claim with a supporter set" in favor of separate assertions grouped by
    the view, and the catalog's rule
-   [catalog](../research/2026-08-15_projection_grammar_catalog.md):89 says the same: "Multiple reasons
+   catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`):89 says the same: "Multiple reasons
    remain multiple relations even when a renderer visually bundles them". A
    stored link-node would hold no fact of its own and would need a sync join.
    It would also put a second identity beside the assertions, which already

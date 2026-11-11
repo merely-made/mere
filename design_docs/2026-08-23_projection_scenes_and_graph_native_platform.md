@@ -16,9 +16,9 @@ implementation and consumer adoption remain with the owning plans.
 
 **Related:**
 
-- [projection grammar catalog](mere_docs/research/2026-08-15_projection_grammar_catalog.md)
-- [Scenograph content catalog](mere_docs/research/2026-08-18_scenograph_content_catalog.md)
-- [shelfmark format note](mere_docs/technical_architecture/2026-08-16_shelfmark_format_note.md)
+- projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`)
+- Scenograph content catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-18_scenograph_content_catalog.md`)
+- shelfmark format note (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-08-16_shelfmark_format_note.md`)
 - [family composition thesis](2026-08-12_family_composition_thesis_brief.md)
 - [Turnstone suite composition and capability census](2026-08-22_turnstone_suite_composition_and_capability_census.md)
 - Genet `components/cambium/ARCHITECTURE.md` *(historical citation)* <!-- doc-audit: historical-path -->
@@ -257,7 +257,7 @@ Mark proposes leaves as places where graph exploration becomes a working
 surface: a snapshot/context card, document in a workbench, or nested scene.
 This is a presentation interpretation under review, not a new terminal graph
 entity or an implemented universal host contract. Projection eligibility follows
-the [agreed requirements/facets basis](mere_docs/research/2026-08-15_projection_grammar_catalog.md#projection-requirements-and-disclosed-facets-2026-09-05).
+the agreed requirements/facets basis (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md#projection-requirements-and-disclosed-facets-2026-09-05`).
 
 There are three relevant precedents:
 
@@ -265,7 +265,7 @@ There are three relevant precedents:
   explicitly calls a detached tile a leaf retaining its graph binding. Preserve
   that source custody without requiring every application to have a spatial
   graph as its privileged visible root.
-- The [July 1 summoning model](mere_docs/design/2026-07-01_node_card_summoning_design.md)
+- The July 1 summoning model (`graphshell/design_docs/graphshell_docs/design/2026-07-01_node_card_summoning_design.md`)
   distinguishes a visible node instance from cards about its source. Its
   snapshot audit corrects the earlier assumption that re-rendering cached
   content reproduces a captured live viewport. Capture identity, source
@@ -436,7 +436,7 @@ Shelfmark v1 names one authority and one projection. Matrix introduces a
 declared contract gap: its two readings may come from different authorities,
 and repeated source instances may require authored delta sections to address a
 particular projected instance. This direction note does not alter the v1
-envelope. The [shelfmark format note](mere_docs/technical_architecture/2026-08-16_shelfmark_format_note.md)
+envelope. The shelfmark format note (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-08-16_shelfmark_format_note.md`)
 owns the eventual citation shape after a forcing proof determines it.
 
 Catalog collapse also cannot silently reinterpret an identifier already
@@ -722,16 +722,16 @@ affects dynamics. No implementation completion is inferred from this record.
 | Iconography consumers | Emblem for vector graphics and Pictograph for derived node faces, integrated with theme palettes. |
 
 The [Scenograph editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md),
-[Cambium architecture](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md),
+Cambium architecture (`graphshell/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md`),
 and the other owning plans linked above remain the implementation homes.
 Apps can cite this section as the shared design direction rather than copying
 it into separate competing records.
 
 **Consumer reconciliation (2026-10-09):** the [ambient relation-lens proposal](mere_docs/design/2026-09-23_ambiance_design.md#10-proposal-focus-driven-relation-lenses-2026-10-07)
 applies §9.2 to temporary lens reasons and previously selected background
-membership, while preserving the keeping axis. The [app composition brief](cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09)
+membership, while preserving the keeping axis. The app composition brief (`graphshell/design_docs/cambium_docs/research/2026-10-06_app_composition_brief.md#11-current-consumers-and-design-direction-2026-10-09`)
 links retained sessions, owner-served projections and the separately granted
-Moot applet experiment. The [Scenograph handoff](mere_docs/research/2026-10-09_scenograph_codex_handoff.md)
+Moot applet experiment. The Scenograph handoff (`graphshell/design_docs/graphshell_docs/research/2026-10-09_scenograph_codex_handoff.md`)
 records current site state and overlapping viewer ownership. These are
 implementation context and proposals; they do not settle the open choices
 above or infer consumer completion from this direction record.
@@ -933,7 +933,7 @@ part of the study, including Emblem and Pictograph identity cues.
 The proposed authoring breakdown is reading; representation; encoding;
 arrangement and dynamics; composition; appearance and interaction. It helps
 discuss independently editable choices, but is not a replacement recipe
-schema. In the [projection grammar catalog](mere_docs/research/2026-08-15_projection_grammar_catalog.md),
+schema. In the projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`),
 representation choices belong to encoding; arrangement produces the scene,
 and realization supplies its measured content. A node may become an icon,
 card, thumbnail, live pane or nested view while retaining its source identity.

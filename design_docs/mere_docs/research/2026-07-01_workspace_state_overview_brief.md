@@ -147,7 +147,7 @@ complete), user zoom shipped, auto-DPI planned.
   per-session.
 - **Scope-model drift**: the wiring build instanced window-per-graphlet where
   the canonical model says scope the one Navigator;
-  [scope_model_reconciliation](../design/2026-06-27_scope_model_reconciliation.md)
+  scope_model_reconciliation (`graphshell/design_docs/graphshell_docs/design/2026-06-27_scope_model_reconciliation.md`)
   ruled it a correction, still pending in code.
 - **The privacy dial is named but not enforced**: `PrivacyClass` tags exist
   while engrams sit cleartext at rest; encrypt-LocalOnly was decided

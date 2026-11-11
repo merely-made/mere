@@ -17,7 +17,7 @@ intersect, because no incumbent holds that combination. The differentiators:
 
 - a graph data model with atomic facets (chartulary `Container` as the one
   node, per the
-  [one-node facets layer map](mere_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md));
+  one-node facets layer map (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md`));
 - physics fields as a graph primitive (conatus: numen defines, quint
   evaluates, seiche integrates);
 - DOM-carried automatability (genet-probe: a target is drivable only via
@@ -29,7 +29,7 @@ intersect, because no incumbent holds that combination. The differentiators:
 - an owned rendering engine embeddable behind `genet-host-api`;
 - a portable scene contract (sceno), already consumed by mere, isometry, and
   graphshell (see the
-  [scene contract note](scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md));
+  scene contract note (`graphshell/design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`));
 - a trust plane with attenuable, revocable delegation (personae).
 
 ## Candidate applications

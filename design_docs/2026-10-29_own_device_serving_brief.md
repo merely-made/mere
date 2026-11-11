@@ -11,7 +11,7 @@ vocabulary alignment are added here.
 (the own-device cluster and the "availability anchor"),
 [moot tiers and voluntary hosting brief](mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md),
 [Gemot author-offline publishing](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04) (open work continues in the [Moot publication plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md)),
-[family update resident plan](mere_docs/implementation_strategy/2026-10-28_family_update_resident_plan.md)
+family update resident plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-28_family_update_resident_plan.md`)
 (the built device resident and Djinn as desktop composition root),
 [Knot device resident V1 receipt](https://github.com/merely-made/knot-editor/blob/main/crates/knot-editor/docs/2026-08-22_device_resident_v1_receipt.md),
 [Knot governed native Scroll process receipt](https://github.com/merely-made/knot-editor/blob/main/design_docs/archive_docs/2026-11-02/2026-09-11_small_web_authoring_plan.md#governed-native-scroll-process-receipt-2026-10-22),

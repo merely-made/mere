@@ -22,14 +22,14 @@ Every crate is MPL-2.0 (see the repository `LICENSE`). Meristem (from
 `xilem_core`) and the Cambium files ported or adapted from `xilem_web` keep the
 Xilem Authors' Apache-2.0 notice in each derived file.
 
-See [the architecture doc](../../design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md)
+See the architecture doc (`graphshell/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md`)
 for the ownership rule and
-[the Xilem provenance ledger](../../design_docs/cambium_docs/technical_architecture/upstream-xilem.md)
+the Xilem provenance ledger (`graphshell/design_docs/cambium_docs/technical_architecture/upstream-xilem.md`)
 for provenance. Licenses are recorded in the repository
 [LICENSES.md](../../LICENSES.md), and the claimed package names in
-[the namespace-claims doc](../../design_docs/cambium_docs/technical_architecture/namespace-claims.md).
+the namespace-claims doc (`graphshell/design_docs/cambium_docs/technical_architecture/namespace-claims.md`).
 Standalone and sibling-checkout development are described in
-[the local Genet development doc](../../design_docs/cambium_docs/testing/local-genet-development.md).
+the local Genet development doc (`graphshell/design_docs/cambium_docs/testing/local-genet-development.md`).
 
 ## Shared appearance and title bars
 
@@ -72,13 +72,13 @@ cargo run -p cambium --example component_catalog --all-features
 ```
 
 The same assertions run in CI as an example test. See
-[the component-catalog doc](../../design_docs/cambium_docs/technical_architecture/component-catalog.md)
+the component-catalog doc (`graphshell/design_docs/cambium_docs/technical_architecture/component-catalog.md`)
 for the coverage rule.
 
 ## License
 
 MPL-2.0 (see the repository `LICENSE`). `meristem` and the `xilem_web`-derived
 files of `cambium` (listed in the
-[Xilem ledger](../../design_docs/cambium_docs/technical_architecture/upstream-xilem.md))
+Xilem ledger (`graphshell/design_docs/cambium_docs/technical_architecture/upstream-xilem.md`))
 retain the Xilem Authors' Apache-2.0 notice as derivatives; see the repository
 [`LICENSES.md`](../../LICENSES.md).

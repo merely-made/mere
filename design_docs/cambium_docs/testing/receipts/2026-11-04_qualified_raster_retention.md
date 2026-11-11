@@ -4,7 +4,7 @@
 R8 is complete. The four shared owners and Isocosm `da56ce39`
 are published with separate owner, native receiving, consumer build and C4
 receipts. The
-[owner plan](../../implementation_strategy/2026-11-04_qualified_raster_retention_plan.md)
+owner plan (`graphshell/design_docs/cambium_docs/implementation_strategy/2026-11-04_qualified_raster_retention_plan.md`)
 tracks the remaining performance and platform work.
 
 Retained evidence is under

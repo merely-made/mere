@@ -6,7 +6,7 @@ graph-kernel one-natured or two?), researched with two external fan-outs (Nova;
 ECS / relational / two-store prior art) and grounded against the live code. No
 code change is proposed here; this frames the question, the prior art, and a
 staged path. **Reconciled the same day with the
-[field-system decision](../technical_architecture/2026-05-30_field_system_extraction.md)**,
+field-system decision (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-30_field_system_extraction.md`)**,
 which lands a third kernel primitive and the `aether` / `gyre` naming this brief
 adopts (see §5).
 **Scope**: The graph-kernel's data-model shape. Whether the content/world
@@ -18,16 +18,16 @@ engine already inside it) bears on the answer.
 - [statements-over-schema stance](../technical_architecture/2026-05-22_statements_over_schema_stance.md)
   — the open-statement substrate and the world/experience cut this brief carries
   down to the engine layer.
-- [field-system extraction](../technical_architecture/2026-05-30_field_system_extraction.md)
+- field-system extraction (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-30_field_system_extraction.md`)
   — same-day decision: fields as a third kernel primitive, `Coupling` as a new
   relation family, and the `aether` (field algebra) / `gyre` (rapier integrator)
   rename. Reconciled in §5.
-- [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md)
+- composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`)
   — "graph truth, projected into surfaces"; the authority asymmetry this brief
   leans on (§14.1 pin/save write-back).
 - [genet-as-host eval](../technical_architecture/2026-05-29_genet_as_host_evaluation.md) *(historical citation)* <!-- doc-audit: historical-link -->
   — §6 orrery-as-element; the forcing function for naming the experience core.
-- [cartography-aether seam](../technical_architecture/2026-05-29_cartography_aether_layout_seam.md)
+- cartography-aether seam (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-29_cartography_aether_layout_seam.md`)
   — the rapier substrate (`gyre`, the crate formerly named `aether`) as a
   kernel-tier physics layer that speaks kernel types only.
 - Code: [`graph-kernel/.../edge_taxonomy.rs`](../../../crates/graph/graph-kernel/src/graph/edge_taxonomy.rs)
@@ -105,7 +105,7 @@ Mere already encodes that asymmetry:
 - The spine: "graph truth, projected into composable surfaces."
 - [genet-as-host §6](../technical_architecture/2026-05-29_genet_as_host_evaluation.md) *(historical citation)* <!-- doc-audit: historical-link -->:
   "petgraph stays the truth; the DOM children and the scene are a projection of it."
-- [spine §14.1](../technical_architecture/2026-05-21_mere_composition_spine.md):
+- spine §14.1 (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`):
   arrangement facts promote into durable graph Arrangement-relations "only on an
   explicit pin/save." That is the single write-back rule the prior art requires,
   already in place.
@@ -119,7 +119,7 @@ The rapier integrator (the **`gyre`** crate, renamed from `aether` per the
 field-system decision in §5, which freed `aether` for a new field-algebra
 crate) owns a stateful rapier world: bodies, colliders, the `QueryPipeline`,
 drag-pinning, and the `NodeExclusion` / `EdgeSpring` / `Boundary` force hooks. The
-[cartography-aether seam](../technical_architecture/2026-05-29_cartography_aether_layout_seam.md)
+cartography-aether seam (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-29_cartography_aether_layout_seam.md`)
 establishes that it *simulates* a layout (a stateful actor with collision and
 interaction) rather than *computing* one (a pure function), that it is kernel-tier
 (the same tier as kernel and petgraph), that it must not depend on the projection
@@ -144,7 +144,7 @@ logic. The two-natured framing says: name it as one entity-component store of
 
 ## 5. The fields decision, and how it fits
 
-The [field-system extraction](../technical_architecture/2026-05-30_field_system_extraction.md)
+The field-system extraction (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-30_field_system_extraction.md`)
 landed the same day and partly answers this brief's question directly. Its
 decisions:
 
@@ -314,7 +314,7 @@ Internal: the Related docs above, plus `edge_taxonomy.rs` for the live taxonomy.
   two-store prior art), grounded against `edge_taxonomy.rs`, the genet
   `Cargo.toml` script-engine wiring, the genet-as-host eval, the cartography-aether
   seam, and the composition spine. Reconciled the same day with the
-  [field-system extraction](../technical_architecture/2026-05-30_field_system_extraction.md):
+  field-system extraction (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-30_field_system_extraction.md`):
   adopted the `aether` (field algebra) / `gyre` (rapier integrator) naming, added
   §5 to fold in the `Field` third-primitive and `Coupling` family decisions, and
   noted the two orthogonal axes (content-vs-experience storage shape; node / edge /

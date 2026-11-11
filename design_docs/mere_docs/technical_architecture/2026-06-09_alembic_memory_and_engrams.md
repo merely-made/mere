@@ -7,11 +7,11 @@ distillation daemon, and graph engrams as one composable engram schema.
 
 **Related**:
 
-- [peripheral panes architecture](2026-06-06_peripheral_panes_architecture.md) — the dock/pane catalog Alembic joins; carries the 2026-06-09 Apparatus/Steward axis refinement this doc drove.
+- peripheral panes architecture (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-06_peripheral_panes_architecture.md`) — the dock/pane catalog Alembic joins; carries the 2026-06-09 Apparatus/Steward axis refinement this doc drove.
 - [memory tiers brief](../research/2026-05-11_memory_tiers_brief.md) — the prior two-tier (short/long) partition. This doc refines its vocabulary (see §2).
 - [geist models brief](../research/2026-05-10_geist_models_brief.md) — geists as base model + LoRA-adapter engrams; the loras lane. This doc names the geist as one engram schema (§6).
 - [system diagnostics + accessibility plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md) — Athanor is a first customer of its observability spine; the Apparatus/Steward correction lives there too.
-- [composition spine](2026-05-21_mere_composition_spine.md) — graph truth projected into surfaces; the orrery is the live graph's spatial surface, an engram is a frozen one.
+- composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`) — graph truth projected into surfaces; the orrery is the live graph's spatial surface, an engram is a frozen one.
 - Kernel snapshot: [`graph/snapshot/mod.rs`](../../../crates/graph/graph-kernel/src/graph/snapshot/mod.rs), node fields: [`graph/node.rs`](../../../crates/graph/graph-kernel/src/graph/node.rs).
 
 ---
@@ -163,7 +163,7 @@ decision; it defines what "compose" means.
 
 ## 5. Alembic, the pane
 
-A docked peripheral pane (per the [pane architecture](2026-06-06_peripheral_panes_architecture.md)),
+A docked peripheral pane (per the pane architecture (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-06_peripheral_panes_architecture.md`)),
 authority = the memory store. Sections:
 
 - **Recent** (short-term) — the working set / cache, with the eviction policy
@@ -250,7 +250,7 @@ preserve-duplicates, §4) are Athanor's, set in Apparatus (config).
 ## 8. Apparatus / Steward axis (correction this drove)
 
 Surfacing Athanor clarified the Apparatus/Steward boundary, and the correction is
-recorded in the [pane architecture](2026-06-06_peripheral_panes_architecture.md)
+recorded in the pane architecture (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-06_peripheral_panes_architecture.md`)
 and the [diagnostics plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md):
 
 *2026-10-28:* this axis is withdrawn with the Steward pane ([GUI catalog record](../design/2026-10-26_gui_catalog_design.md) §10): live job state is distillery's embeddable half, a presentation, and apparatus reads armillary's actor state beside its at-rest record.

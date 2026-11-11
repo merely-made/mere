@@ -40,7 +40,7 @@ Not here:
 - Custody policy: the custodian stays the only holder of secrets. This plan
   reuses its peer facts, not its grants.
 - UI across processes, and components that draw their own pixels: the
-  [app composition brief](../../cambium_docs/research/2026-10-06_app_composition_brief.md)'s
+  app composition brief (`graphshell/design_docs/cambium_docs/research/2026-10-06_app_composition_brief.md`)'s
   AC6 (paint lists and accessibility trees, research once AC1's path is
   proven). Under D3 a paint list is a serde payload.
 - The graph edit spine and the settings scope vocabulary, the
@@ -549,7 +549,7 @@ custody salt namespaces and persona use. Djinn routes from the declarations.
 The door's missing message: an application offers a route (a projection or
 another service) into Djinn's catalog. Mostly built for projections in
 `c3567c5ab`
-([application projection offers](2026-10-30_app_projection_offers.md)):
+(application projection offers (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-30_app_projection_offers.md`)):
 `ProviderCall` Offer, Next and Withdraw over the reserved
 `mere.projection-provider` route, owner-set provider permissions apart from
 viewer grants, and generation-bound leases withdrawn on disconnect, revocation

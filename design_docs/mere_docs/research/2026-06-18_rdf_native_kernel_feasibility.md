@@ -15,7 +15,7 @@ Cross-refs:
   federation.
 - [graph_query_layer_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md)
   — the shipped node_quads projection + ephemeral SPARQL this would subsume.
-- [interaction_model_spine](../technical_architecture/2026-06-18_interaction_model_spine.md)
+- interaction_model_spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-18_interaction_model_spine.md`)
   §6 (made-semantic).
 - Prompted by an external RDF-migration plan (reviewed 2026-06-18): its
   "RDF-as-durable-authority via a sidecar" was the over-reach; this is the

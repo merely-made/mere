@@ -196,7 +196,7 @@ That work may eventually justify `.knot`. Cuts 1 through 3 do not.
 An Ink & Switch harvest, read 2026-08-28. Three of the pieces bear directly on
 the cuts above; the scene and materials half of the same harvest (PlayBook,
 Drawdeck, Portemine, Potluck's reading shape) lands in the
-[projection grammar catalog](2026-08-15_projection_grammar_catalog.md) under
+projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`) under
 "Material systems and dynamic documents". Nothing here changes a cut's
 semantics; each entry states what it validates and what it warns against.
 

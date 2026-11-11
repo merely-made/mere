@@ -8,7 +8,7 @@ short list of cheap cross-cutting instruments that are worth sharing).
 **Scope:** cross-cutting. Companion to the
 [substrate/parallelism composition brief](2026-06-21_substrate_parallelism_composition_brief.md)
 (which owns the serialization seams this brief leans on) and the
-[composition spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
+composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`)
 (which owns the layer tower itself). The README's "stack's technical
 architecture" section is the public one-paragraph form of this brief.
 
@@ -414,7 +414,7 @@ own path) and the link-suggestion pass, which removes stale derived nodes and
 adds seeds in the same pass.
 
 Ruling, 2026-10-25, recorded as `node-body-face-model D1` in the
-[node body & face plan](mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md):
+node body & face plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md`):
 "Uuid keys, pruned", over keeping `NodeKey` and pruning by the lifetime
 witness. The five maps now key by member Uuid, reads go slot to
 member through `member_of`, and `reconcile_derived` drops members that left;
@@ -454,7 +454,7 @@ not allegiance to a particular allocator or paradigm.
 
 - [substrate_parallelism_composition_brief](2026-06-21_substrate_parallelism_composition_brief.md)
   (the serialization seams, §5/§5a measurements, the flat-Scene transfer path).
-- [mere_composition_spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
+- mere_composition_spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`)
   (the layer tower: kernel → forme → platen → surfaces → host).
 - [document_script_substrate_plan](archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md)
   (D-doc §10.2/§10.3: the per-turn batched mutation contract, instance 7a).

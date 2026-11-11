@@ -293,7 +293,7 @@ Review by responsibility rather than moving this entire resident to one owner:
   producers.
 
 The split is planned in
-[`2026-11-05_resident_split_plan.md`](../implementation_strategy/2026-11-05_resident_split_plan.md),
+`2026-11-05_resident_split_plan.md` (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-11-05_resident_split_plan.md`),
 which carries the per-owner slices and their done-conditions.
 
 Done when owner crates can be tested independently, Mere only supplies concrete
@@ -460,7 +460,7 @@ every copy is one more edge for a move to carry.
   `door::projection_offers` owns permission and lease handling. The standalone
   Knot directory endpoint is the first consumer. This addresses projection
   registration, not the full proposed app manifest, custody salt grants or
-  extraction of embedded resident lanes. See the [implementation plan](../implementation_strategy/2026-10-30_app_projection_offers.md)
+  extraction of embedded resident lanes. See the implementation plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-30_app_projection_offers.md`)
   and [qualification](../testing/receipts/2026-10-30_app_projection_offers.md).
 - Djinn and Cleromancy formed a repository cycle, **closed 2026-11-08** (cycle breaks P3):
   - Djinn used to install Cleromancy's divination validator in the mere route and

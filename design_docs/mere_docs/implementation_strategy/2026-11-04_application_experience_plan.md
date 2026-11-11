@@ -450,7 +450,7 @@ and Distillery enrichment do not enter this first delivery's dependency cone.
 
 ### N2. Portable surfaces across hosts
 
-**Needs.** Reuse the [Woodshed guest block's scene and vector sheet](../technical_architecture/2026-11-06_guest_blocks.md)
+**Needs.** Reuse the Woodshed guest block's scene and vector sheet (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-11-06_guest_blocks.md`)
 and Graphshell's existing projection offers and revision-checked actions. Take
 the reference product and supplier boundary from [engine split P3 and D23](2026-11-07_engine_split_plan.md).
 The portable view can be exercised with a local fixture before peer and replica

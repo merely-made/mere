@@ -257,8 +257,8 @@ evaluation. The consuming protocol owns the intent triple, and the host owns
 the clock. Incremental signal evaluation and renderer realization are later
 work.
 
-See [the scene contract note](../../../design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md)
-and [the epoch/diff note](../../../design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md).
+See the scene contract note (`graphshell/design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`)
+and the epoch/diff note (`graphshell/design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md`).
 
 ## License
 

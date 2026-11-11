@@ -206,7 +206,7 @@ standing alone is a feature of the plan rather than a delay.
 The adjacent altitudes are already surveyed: protocol adoption in the
 [p2p landscape brief](mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md),
 the projection engine in the
-[prior-art brief](mere_docs/research/2026-07-21_projection_engine_prior_art_brief.md),
+prior-art brief (`graphshell/design_docs/graphshell_docs/research/2026-07-21_projection_engine_prior_art_brief.md`),
 feature borrows in the
 [borrowed ideas brief](mere_docs/research/2026-06-25_borrowed_ideas_brief.md).
 Not yet surveyed is the *decomposition* altitude the chain speaks at: who owns
@@ -274,7 +274,7 @@ than flattening those levels into one kind of component.
 | Document storage and reachability | Genet `ScriptedDom`, runtime reflectors and pins | R2 tests reference validity and retention; an arena is not a durable identity system. |
 | Shared GPU device and resource lifetime | Embedder device/queue; Genet RenderCore; Netrender tenants; product-owned resources | Device ownership already has a contract. R1 investigates wake, cancellation, and disposal around it. |
 | Source authority and projections | Mere source bindings, Forme, sceno/scenomise/scenotime; product authorities | Existing [projection research](2026-08-23_projection_scenes_and_graph_native_platform.md); R2 challenges identity across source and derived instances. |
-| UI composition | Cambium, Meristem, Sprigging and Genet adapters | Existing [Cambium architecture](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md); extend its consumer proofs when a specific seam fails. |
+| UI composition | Cambium, Meristem, Sprigging and Genet adapters | Existing Cambium architecture (`graphshell/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md`); extend its consumer proofs when a specific seam fails. |
 | Geometry, text and presentation | Livery/Buckram/Parley; Netrender PaintList/Scene | Candidate contracts for geometry/selection agreement and renderer-neutral presentation, distinct from sharing a device. Scope a lane when a concrete cross-consumer disagreement is identified. |
 | Execution and lifetime | Retained document sessions, product runtime profiles, renderer tenants | R1 below; first investigate host drive demand and cancellation. |
 | Identity, provenance and custody | Product identities and revisions; document handles; Muniment; replication | R2 below; first investigate invalidation and retained provenance. |
@@ -919,7 +919,7 @@ domain requires. These are compatible uses of the primary model.
 This section is the canonical home for that direction. The
 [scene record](2026-08-23_projection_scenes_and_graph_native_platform.md#916-primary-model-portable-clips-and-live-entities-2026-10-11),
 [statement stance](mere_docs/technical_architecture/2026-05-22_statements_over_schema_stance.md)
-and [composition spine](mere_docs/technical_architecture/2026-05-21_mere_composition_spine.md)
+and composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`)
 apply it at their respective seams.
 
 ### Browsing encounters (2026-10-11)
@@ -1141,7 +1141,7 @@ The closest internal predecessor is the
 heterogeneous app data becomes a legible pool through graph relationships.
 The [generic substrate plan](archive_docs/2026-10-28/2026-07-08_generic_graph_substrate_plan.md)
 separates stable identity from optional content, address and graph capabilities.
-The [2026-09-02 composition assessment](mere_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md#4-the-crux-deterministic-domain-aware-projections-out-of-app-pattern-data)
+The 2026-09-02 composition assessment (`graphshell/design_docs/graphshell_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md#4-the-crux-deterministic-domain-aware-projections-out-of-app-pattern-data`)
 adds purposeful, domain-aware projections and typed intents. These are earlier
 forms of this direction, with dated mechanisms and different levels of proof.
 
@@ -1318,7 +1318,7 @@ origin still uses an actual supported owner interface.
 
 **Native host clarification (2026-10-20):** the winit host can reuse a caller's
 render core and event loop, and the multi-window entry shares its core across
-windows. The [Cambium architecture note](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20)
+windows. The Cambium architecture note (`graphshell/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20`)
 records those implemented choices. The embedding questions below concern
 adapting compatible caller-owned GPU contexts and targets across other host
 toolkits; they do not imply that native shared-core hosting is absent.

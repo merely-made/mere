@@ -25,112 +25,6 @@ summary = "begin with portable links and the browser companion using existing st
 draws_on = ["release-log D9", "release-log D10", "release-log D11"]
 plans = ["application-experience"]
 
-[decisions."cambium-composition D1"]
-title = "one flat owner table in the pane runner"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Live settings rows live in one flat owner table inside the pane's existing runner, not a runner and mount per row."
-
-[decisions."cambium-composition D2"]
-title = "hidden rows keep state and stop rendering"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Hidden rows keep their state and subscriptions but leave focus and accessibility and stop rendering."
-
-[decisions."cambium-composition D3"]
-title = "undoing a deletion recreates a clean control"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Undoing a confirmed deletion recreates a clean row from its descriptor; no tombstone cache."
-
-[decisions."cambium-composition D4"]
-title = "a move commits an active IME composition, then moves"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Moving a row mid-composition commits the IME text as a focus loss would, then moves."
-
-[decisions."cambium-composition D5"]
-title = "moves stay within one pane"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "The pilot moves rows only within one settings pane; cross-pane and cross-document moves are refused."
-
-[decisions."cambium-composition D6"]
-title = "outside changes are caught at Apply"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "A dirty row keeps its edit through outside changes; Apply's revision guard catches the conflict."
-
-[decisions."cambium-composition D7"]
-title = "a dirty row cannot be rebound"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Rebinding a row with an unapplied edit is blocked until the edit is applied or discarded."
-
-[decisions."cambium-composition D8"]
-title = "one write authority with revisions"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Turnstone's settings writes go through one application-owned authority with revision-guarded Apply."
-
-[decisions."cambium-composition D9"]
-title = "arrangement in pane config, view state apart"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "The authored arrangement is saved in the settings pane config; expansion and scroll in view-state."
-
-[decisions."cambium-composition D10"]
-title = "a small rows, groups and drawers tree"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "The authored composition is a small rows, groups and drawers tree."
-
-[decisions."cambium-composition D11"]
-title = "selective updates stay as P4"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Selective updates remain this plan's P4."
-
-[decisions."cambium-composition D12"]
-title = "Meristem reports through existing tracing"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Meristem reports its decisions through its existing tracing dependency, with no observer hook."
-
-[decisions."cambium-composition D13"]
-title = "producer references with multi-cause edges"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "Observations carry producer references, and bounded edge records keep every cause of a join."
-
-[decisions."cambium-composition D14"]
-title = "P4–P6 stay outlines until P2 lands"
-source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
-summary = "P4–P6 stay outlines with a goal and done-condition until P2 proves the retained table."
-
-[decisions."cambium-publish D1"]
-title = "Publish the app's GUI dependencies first (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "The Dramatis app's GUI chain goes to crates.io; mere.git main is the interim."
-
-[decisions."cambium-publish D2"]
-title = "`mesquite` becomes `mandrake` (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "The scenario lane publishes as mandrake."
-
-[decisions."cambium-publish D3"]
-title = "Rename everywhere, consumers now (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "Package, lib and imports take mandrake in Mere and its four consumer repositories now."
-
-[decisions."cambium-publish D4"]
-title = "Drop the accesskit patch (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "cambium-a11y remaps through accesskit's public API with an exhaustiveness canary; the local patch goes."
-
-[decisions."cambium-publish D5"]
-title = "Publish the vello sparse fork under Netrender names (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "The fork's sparse vello crates publish under Netrender names, keeping exact curve refusal and the tolerance fix."
-
-[decisions."cambium-publish D6"]
-title = "Bench embeddings leave rootstock (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "Toolkit-embedding benches live in a probe crate; published rootstock carries no git dependency."
-
-[decisions."cambium-publish D7"]
-title = "Publish after the move, from Graphshell (Mark, 2026-11-07)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md"
-summary = "The Cambium chain publishes once, from Graphshell, after engine-split P3; consumers track git main until then."
-plans = ["engine-split"]
-
 [decisions."capability-door D1"]
 title = "OS channels on one device"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
@@ -553,16 +447,6 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_
 area = "stack"
 summary = "Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed."
 draws_on = ["stack.3"]
-
-[decisions."device-pairing D1"]
-title = "the M4 stays on the work line"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
-summary = "The M4 lives on the work line at 192.168.1.224 and joins the mesh only while that line is down."
-
-[decisions."device-pairing D2"]
-title = "the relay runs on mesh machines behind a port forward"
-source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
-summary = "The self-hosted iroh relay runs on T-PC behind a mesh port forward and dynamic DNS, with idle mesh machines as further relays."
 
 [decisions."distillery-extraction D1"]
 title = "The move (Mark, 2026-10-31)"
@@ -1211,7 +1095,7 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 area = "The stack"
 summary = "The modules the resident, Cleromancy, Woodshed and Knot link from the app move to owners below both sides; no new routes; stack-lift Group 4 and key-lane D4's event-types clause are superseded."
 draws_on = ["engine-split D23"]
-amends = ["key-lane D4"]
+amends = ["graphshell:key-lane D4"]
 replaces = ["engine-split D41"]
 plans = ["engine-split"]
 
@@ -1704,32 +1588,6 @@ area = "Faces"
 summary = "A Knot link's face keys on the canonical file address of the document it resolves to."
 plans = ["iconography"]
 
-[decisions."key-lane D1"]
-title = "Prekeys travel on the lane (Mark, 2026-11-06)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
-summary = "Prekey bundles move onto GroupKeyLane as a version-2 record kind; all key material leaves the graph log."
-
-[decisions."key-lane D2"]
-title = "Reader-set intents stay in the graph log (Mark, 2026-11-06)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
-summary = "AdmitReader and RetireReader remain personal-graph events gated by SyncRoster; only cryptographic carriage moves."
-
-[decisions."key-lane D3"]
-title = "Clean break for old logs (Mark, 2026-11-06)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
-summary = "The PublishPrekey and GroupDispatch variants are removed; graphs keyed before the move are not carried forward."
-
-[decisions."key-lane D4"]
-title = "Graph-key carriage follows the resident (Mark, 2026-11-07)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-06_key_lane_plan.md"
-summary = "GraphKeyGroup and key_paired_devices move with mere-resident to Graphshell; the lane adoption is unchanged."
-plans = ["engine-split"]
-
-[decisions."node-body-face-model D1"]
-title = "Per-node overrides key by member, pruned (Mark, 2026-10-25)"
-source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"
-summary = "Per-node overrides key by member Uuid and are pruned when the member leaves; a reused slot starts clean."
-
 [decisions."quad-index D1"]
 title = "Reifier metadata rows are stored as tuples (Mark, 2026-11-09)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
@@ -1935,41 +1793,6 @@ summary = "durable lanes forget epoch secrets after N epochs or a set age, which
 amends = ["release-log D12"]
 plans = ["release-log"]
 
-[decisions."resident-split D1"]
-title = "Device conditions go to mesh-host (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "Device-condition sensing lives in Distillery's mesh-host; Mere selects it."
-
-[decisions."resident-split D2"]
-title = "Vault-lock triggers and identity dialogs go to Dramatis (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "Dramatis owns its vault-lock triggers and native identity dialogs."
-
-[decisions."resident-split D3"]
-title = "Moot publication to Gemot, NomadNet carriage to Murm (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "Moot publication goes to Gemot and its NomadNet carriage to Murm, licence gate kept."
-
-[decisions."resident-split D4"]
-title = "Leased blob custody goes to Eidetic (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "The resident's leased iroh blob custody becomes Eidetic storage machinery."
-
-[decisions."resident-split D5"]
-title = "The compute-endpoint protocol goes to Distillery (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "The signed compute-endpoint exchange moves to Distillery; Mere keeps the graph-authority adapter."
-
-[decisions."resident-split D6"]
-title = "The lifecycle event file goes to Armillary, its diagnostics copy stays (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "Djinn's lifecycle event file lives in Armillary; the registry-backed diagnostics copy stays in Mere."
-
-[decisions."resident-split D7"]
-title = "Plan adopting the separate key-agreement lane (Mark, 2026-11-05)"
-source = "design_docs/mere_docs/implementation_strategy/2026-11-05_resident_split_plan.md"
-summary = "Key agreement moves onto Eidetic's GroupKeyLane and Murm's GroupKeySync under its own plan; roster reconciliation stays in Mere."
-
 [decisions."stack-lift D1"]
 title = "the remote board's mapping lives in `graphshell-host`"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
@@ -2024,7 +1847,7 @@ title = "Storage follows the death condition"
 source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "Storage follows the death condition; mutable state has one owner, consumers borrow within its lifetime or carry a handle or copy; persist by durable identity."
-draws_on = ["house-style D15", "node-body-face-model D1"]
+draws_on = ["house-style D15", "graphshell:node-body-face-model D1"]
 
 [statements."stack.7"]
 title = "Source size"

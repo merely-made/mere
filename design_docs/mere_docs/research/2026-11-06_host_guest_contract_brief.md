@@ -168,7 +168,7 @@ for its own reasons; B no; C is honest if the cycle is accepted.
 - **Bottom of Mere.** Cheapest and wrong at repository level: Mere depends on Murm, which would depend
   on Mere. It works only with crates.io publication (consumers take registry versions, which the check
   ignores), at the price of the source-identity seam (`[patch.crates-io]` rows) that the
-  [Cambium publish plan](../implementation_strategy/2026-11-05_cambium_publish_plan.md) constrains ("one
+  Cambium publish plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-11-05_cambium_publish_plan.md`) constrains ("one
   source per graph").
 - **Revived Graphshell repository.** Wrong layer for the contract (see B); right layer for the host app.
 - **Constraints that bear:** Stack 3 (contract tier, published, "Mere consumes producers"); Stack 1 (a

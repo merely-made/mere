@@ -87,8 +87,8 @@ No cargo features; `default = []`.
 
 ## Related
 
-- [cartography layer brief](../../../design_docs/mere_docs/research/2026-05-10_cartography_layer_brief.md)
-- [cartography / aether layout seam](../../../design_docs/mere_docs/technical_architecture/2026-05-29_cartography_aether_layout_seam.md)
+- cartography layer brief (`graphshell/design_docs/graphshell_docs/research/2026-05-10_cartography_layer_brief.md`)
+- cartography / aether layout seam (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-29_cartography_aether_layout_seam.md`)
 
 ## Status
 

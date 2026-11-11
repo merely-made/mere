@@ -22,7 +22,7 @@ they disagreed, the forks went to Mark (Decisions).
 **Not here:** the vocabulary-pack model (the [linked-data platform lessons brief](../research/2026-11-06_linked_data_platform_lessons_brief.md),
 D1 to D32, and the declared-lens plan it owes); the family dependency cycles
 ([cycle breaks plan](2026-11-06_cycle_breaks_plan.md), whose D8 and D9 this plan refines);
-the resident's own split ([resident split plan](2026-11-05_resident_split_plan.md)); domain
+the resident's own split (resident split plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-11-05_resident_split_plan.md`)); domain
 adoption and the domain contract ([adoption plan](2026-11-05_domain_adoption_plan.md),
 [contract](../technical_architecture/2026-11-06_domain_contract.md)); Djinn's slimming
 (Armillary); the stance rewrite, which becomes the engine's charter and is written when the
@@ -1079,7 +1079,7 @@ revision and what crosses at frame rate.
   `capsule_applet`) link it too. Offered an extracted hosting crate, door and wire, or parking
   the app in Graphshell. Ruling: "Over the door or wire". The resident and the outside consumers
   reach the app through the door or the wire instead of linking it. That is the
-  [resident split plan](2026-11-05_resident_split_plan.md)'s ground, so P3's slices past the
+  resident split plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-11-05_resident_split_plan.md`)'s ground, so P3's slices past the
   first wait on it. Outcome: new; orders P3 after the resident's door and wire work.
 
   Links: area The stack · draws on engine-split D23 · plans engine-split P3 · summary The resident, Cleromancy and Woodshed stop linking the reference app and reach it over the door or the wire; P3's toolkit and canvas moves wait on that.
@@ -1364,7 +1364,7 @@ revision and what crosses at frame rate.
   superseded here. Outcome: replaces D41; applies domain contract C5; P3's later slices no
   longer wait on the resident split plan.
 
-  Links: area The stack · replaces engine-split D41 · amends key-lane D4 · draws on engine-split D23 · plans engine-split P3 · summary The modules the resident, Cleromancy, Woodshed and Knot link from the app move to owners below both sides; no new routes; stack-lift Group 4 and key-lane D4's event-types clause are superseded.
+  Links: area The stack · replaces engine-split D41 · amends graphshell:key-lane D4 · draws on engine-split D23 · plans engine-split P3 · summary The modules the resident, Cleromancy, Woodshed and Knot link from the app move to owners below both sides; no new routes; stack-lift Group 4 and key-lane D4's event-types clause are superseded.
 
 - **D68. The mere endpoint closure is a feature of graphshell-host (Mark, 2026-11-09):** D67's
   F3. `mere_host` (2,467 lines), `handlers` (328), `session_item` (81) and `resident_host` (305)

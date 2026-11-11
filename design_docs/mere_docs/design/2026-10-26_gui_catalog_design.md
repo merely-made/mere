@@ -29,9 +29,9 @@ authority's point of view, and none cross-references another (§1). The loops
 Mark names are the places where two of those catalogs claim the same cell (§4).
 Read against each other and the tree, the catalogs also disagree (§6).
 
-**Related:** the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md)
+**Related:** the composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`)
 (arrangement ontology), the
-[interaction model spine](../technical_architecture/2026-06-18_interaction_model_spine.md)
+interaction model spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-18_interaction_model_spine.md`)
 (the pipeline), the
 [design language record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#9-configurable-visual-and-interaction-language-2026-10-09)
 (selection, foreground, opening), the
@@ -44,10 +44,10 @@ Each is real and useful on its own axis. The gap is between them.
 
 | Catalog | Axis | Where | What it enumerates |
 |---|---|---|---|
-| Cambium component catalog | widgets, executable | [component-catalog](../../cambium_docs/technical_architecture/component-catalog.md), `crates/cambium/cambium/examples/component_catalog.rs` | button through data grid; command surfaces as palette, picker and context menu with disabled reasons; overlay; detail popover; selection bars and filter chips; pane shell and `setting_row` with empty, error and unavailable states; graph-canvas swatch; paint leaves |
-| Projection grammar catalog | graph visuals | [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md) | readings and operators, marks, visual channels, guides and backdrops, relation forms, arrangement families, interaction and change over time |
-| Frame-tree surfaces | roles, and panes by primary authority | [TERMINOLOGY, Surfaces](../../TERMINOLOGY.md#surfaces-frame-tree), consolidating the [frame taxonomy](2026-06-07_graph_roster_and_frame_taxonomy.md) §3 and the [peripheral panes](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) dock | frame; pane as roster, gloss, inspector, apparatus, comms, plus Index and Steward from the panes doc, grouped there by graph, runtime or social authority; tile and the workbench tile tree; shellbar |
-| Card family | summoned surfaces | [node card summoning](2026-07-01_node_card_summoning_design.md) §2 | preview, unvisited, connections swatch, object card |
+| Cambium component catalog | widgets, executable | component-catalog (`graphshell/design_docs/cambium_docs/technical_architecture/component-catalog.md`), `crates/cambium/cambium/examples/component_catalog.rs` | button through data grid; command surfaces as palette, picker and context menu with disabled reasons; overlay; detail popover; selection bars and filter chips; pane shell and `setting_row` with empty, error and unavailable states; graph-canvas swatch; paint leaves |
+| Projection grammar catalog | graph visuals | projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`) | readings and operators, marks, visual channels, guides and backdrops, relation forms, arrangement families, interaction and change over time |
+| Frame-tree surfaces | roles, and panes by primary authority | [TERMINOLOGY, Surfaces](../../TERMINOLOGY.md#surfaces-frame-tree), consolidating the frame taxonomy (`graphshell/design_docs/graphshell_docs/design/2026-06-07_graph_roster_and_frame_taxonomy.md`) §3 and the peripheral panes (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-06_peripheral_panes_architecture.md`) dock | frame; pane as roster, gloss, inspector, apparatus, comms, plus Index and Steward from the panes doc, grouped there by graph, runtime or social authority; tile and the workbench tile tree; shellbar |
+| Card family | summoned surfaces | node card summoning (`graphshell/design_docs/graphshell_docs/design/2026-07-01_node_card_summoning_design.md`) §2 | preview, unvisited, connections swatch, object card |
 | Capability-gate catalogue | refusals | [capability gate catalogue](../research/2026-05-14_capability_gate_catalogue_brief.md) | named gates, the policy chain (its chain superseded 2026-05-30 by the narrowing rule) |
 | The kernel's own surface list | UX event sources | `crates/graph/graph-kernel/src/accessibility.rs`, `SurfaceId` | Omnibar, CommandPalette, NodeFinder, ContextMenu, ConfirmDialog, NodeCreate, FrameRename, StatusBar, TreeSpine, NavigatorHost, TilePane, CanvasPane, BaseLayer, RosterPane, InspectorPane, StewardPane, GlossPane, ApparatusPane, CommsPane, WorkbenchPane |
 
@@ -127,11 +127,11 @@ will panic, hide, or lie in the profile that lacks its engine.
 Each item below is a column or a row the stack already has a record for and
 Mark's list did not name. The citation is where the stack already says it.
 
-- **Windows.** [One state, N windows](2026-07-05_one_state_n_windows_design.md)
+- **Windows.** One state, N windows (`graphshell/design_docs/graphshell_docs/design/2026-07-05_one_state_n_windows_design.md`)
   makes a window a projection of one app state, yet the panes doc says panes
   are per window. Window-local state is a column, not a footnote.
 - **Swatches and the LOD ladder.** A swatch is a view instance over shared
-  truth ([swatch primitive](2026-06-27_swatch_primitive_design.md)). The
+  truth (swatch primitive (`graphshell/design_docs/graphshell_docs/design/2026-06-27_swatch_primitive_design.md`)). The
   interaction spine's ladder is a glyph by default, a DOM subtree on focus, an
   underlay dot on cull, and "materialization is state", which puts the ladder
   in the persistence column.
@@ -286,7 +286,7 @@ the tree at `d969028be`:
 | Navigator and gloss | TERMINOLOGY ruled the Navigator is gloss expanded (2026-06-07) | `SurfaceId` carries both `GlossPane` and `NavigatorHost`; kernel `pane.rs`, chrome routing, forme's lens, `mere::glossary` and pictograph's gloss docs still say Navigator |
 | dock contract | the panes doc proposes one (kind, open, side, width, focus, context binding) | it exists twice and is shared by neither: `DockState` and `DockSide` in `murm/native/crates/comms/src/pane.rs`, whose module doc says they graduate to a shared dock, and the kernel's `PanePresentationMode` |
 | pane surfaces | `SurfaceId`'s doc says each surface is one variant and one emission site at its open and dismiss seams | four variants are emitted at real seams (CommandPalette, NodeFinder, ConfirmDialog, ContextMenu); every pane variant appears only in the descriptor table and ux-events' diagnostics map |
-| workbench | TERMINOLOGY's tile entry, the `workbench` crate ("split-and-tab workspace organization") and Mark's list: a tile tree | the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md), canonical for the arrangement ontology, makes the tree one of six projections and says the tree was masquerading as the ontology |
+| workbench | TERMINOLOGY's tile entry, the `workbench` crate ("split-and-tab workspace organization") and Mark's list: a tile tree | the composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`), canonical for the arrangement ontology, makes the tree one of six projections and says the tree was masquerading as the ontology |
 | cards | the summoning doc's family: preview, unvisited, connections swatch, object card | none of the four names is in code; Graphshell's card identifiers are `focus_card`, `PortableCard`, `receipt_card`, `card_offer`, `card_response`; Cambium's nearest is the detail popover |
 | orrery | TERMINOLOGY: a form factor. `cartography::FormFactor`: Canvas, Orrery, Volvelle, Astroid, Minimap | code and TERMINOLOGY agree; TERMINOLOGY's survivors row still waited on a `Scope::Orrery` that no longer exists (corrected 2026-10-26) |
 | swatch | TERMINOLOGY: a scope (node, subgraph, nested graph, mere) and a mode. `scenograph::Scope`: Node, Subgraph, Link, NestedGraph, Mere, Selection | agree; the entry omits Link and Selection |

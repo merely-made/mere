@@ -22,9 +22,9 @@ Not here, and cited instead of repeated:
   binding (P3, P4): [site_publication_plan](2026-10-28_site_publication_plan.md);
 - drop codec, retention and drop carriage over iroh and Retinue (M12):
   [murm_runtime_plan](2026-10-28_murm_runtime_plan.md);
-- device pairing: [device_pairing_plan](2026-10-28_device_pairing_plan.md);
+- device pairing: device_pairing_plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-28_device_pairing_plan.md`);
 - supervision, the scheduler (phase E), DNS-SD (F3) and the remote-listener rule
-  (F2): [family_update_resident_plan](2026-10-28_family_update_resident_plan.md);
+  (F2): family_update_resident_plan (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-28_family_update_resident_plan.md`);
 - distinct per-persona NodeIds and discovery off for non-main personas:
   [browser_carrier_plan](2026-10-28_browser_carrier_plan.md);
 - the p2panda-spaces deciding test: the stack ownership audit, item R25

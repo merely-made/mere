@@ -30,7 +30,7 @@ day.
 **Related**: the
 [statements-over-schema stance](../technical_architecture/2026-05-22_statements_over_schema_stance.md),
 the [link model](../technical_architecture/2026-10-15_link_model.md), the
-[composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md),
+composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`),
 the [standards survey](../../2026-08-24_standards_survey_brief.md), the
 [portable application experience brief](../../2026-11-04_portable_application_experience_brief.md),
 and genet's

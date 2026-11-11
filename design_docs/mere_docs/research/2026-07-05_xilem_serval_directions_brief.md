@@ -34,7 +34,7 @@ OS window, each window's view function a lens over shared state.
   a document (`moveBefore`). Cross-window state-preserving moves are ours
   alone; the runner-projection architecture is what makes them tractable.
 - **Graduated (same day):** the design landed as
-  [one_state_n_windows_design](../design/2026-07-05_one_state_n_windows_design.md),
+  one_state_n_windows_design (`graphshell/design_docs/graphshell_docs/design/2026-07-05_one_state_n_windows_design.md`),
   which resolves the divergence by dissolving it — one forest dom makes a
   cross-window move same-document, so the platform primitive covers it.
   Engine side: `genet/docs/2026-07-05_movebefore_dom_standard_plan.md`,

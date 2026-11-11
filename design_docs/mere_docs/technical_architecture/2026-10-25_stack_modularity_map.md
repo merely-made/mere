@@ -19,7 +19,7 @@ Turnstone already does for `weld`, `scry` and `servo` (`default = []`).
 This note maps the links. It is written as cues: what is wrong and what would
 improve the stack, not an order of work. The carriers themselves (stdio, local,
 QUIC, WebRTC, app door) are surveyed in the
-[transport agnosticism note](2026-10-15_transport_agnosticism_note.md); this
+transport agnosticism note (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md`); this
 note is about what a build links, not how a session is carried.
 
 ## How it was measured

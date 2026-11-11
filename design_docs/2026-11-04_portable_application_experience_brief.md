@@ -75,7 +75,7 @@ The existing **no injected web APIs** ruling remains: ordinary pages receive
 no ambient access to the host. A scoped cooperative web-applet interface would
 need its own design and review against that ruling. Its exact API is open.
 The [capability door](mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md)
-and [app projection offers](mere_docs/implementation_strategy/2026-10-30_app_projection_offers.md)
+and app projection offers (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-30_app_projection_offers.md`)
 provide existing authority and provider seams. The bounded capsule dialect in
 `ports/graphshell/src/capsule_applet.rs` is not a general applet SDK.
 

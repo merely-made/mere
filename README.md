@@ -73,7 +73,7 @@ The implemented [scene pipeline](crates/cambium/scenes/README.md) compiles suppo
 recipes and disclosed facts into layout instructions and a projected scene;
 the host draws it and supplies interaction. A renderer's drawing, such as a
 Vello scene, is a different object from that projected scene or a physics world.
-Cambium's [desktop host](design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20)
+Cambium's desktop host (`graphshell/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20`)
 supports a shared GPU render core and a caller-owned event loop; using the
 standalone entry point does not establish one device across independent hosts.
 

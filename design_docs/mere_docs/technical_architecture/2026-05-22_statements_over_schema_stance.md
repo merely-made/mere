@@ -2,7 +2,7 @@
 
 **Date**: 2026-05-22
 **Status**: Adopted principle. Applied incrementally; each application is its own dated plan.
-**Sibling**: the [composition spine](2026-05-21_mere_composition_spine.md) governs *how truth becomes surfaces*. This doc is about *what truth is* at the statement level, one layer beneath it.
+**Sibling**: the composition spine (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-05-21_mere_composition_spine.md`) governs *how truth becomes surfaces*. This doc is about *what truth is* at the statement level, one layer beneath it.
 
 ---
 

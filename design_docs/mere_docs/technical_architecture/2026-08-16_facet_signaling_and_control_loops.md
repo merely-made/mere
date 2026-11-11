@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-16
 **Status:** design round (Mark, 2026-08-16). Gives open question 4 of the
-[one node, atomic facets layer map](2026-07-18_one_node_facets_layer_map.md)
+one node, atomic facets layer map (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md`)
 ("facet grants") a definite shape, and names one verified gap in the servitor
 reactive substrate. Targets 1 through 3 landed 2026-08-18; target 4 remains
 open behind a real-consumer gate.

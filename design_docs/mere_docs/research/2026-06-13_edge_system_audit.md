@@ -231,8 +231,8 @@ same seam knot links ride).
    physics or ranking (traversal has counts, semantic has decay, arrangement has
    durability; layout wants one number). Per the configurability rule, the decay
    curve and the strength projection probably want to be settings, not constants.
-   This is the same strength the [subgraph
-   classifier](../design/2026-06-13_subgraph_derivation_from_selection.md) ranks
+   This is the same strength the subgraph
+   classifier (`graphshell/design_docs/graphshell_docs/design/2026-06-13_subgraph_derivation_from_selection.md`) ranks
    by.
 5. **Containment vs Arrangement overlap.** Both express grouping — Containment is
    "belongs to" (durable, semantic), Arrangement is "shown together" (often
