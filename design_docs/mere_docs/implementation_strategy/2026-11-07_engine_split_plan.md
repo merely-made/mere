@@ -1940,6 +1940,19 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D118, engine-split D119 · plans engine-split P3 · summary Consumers relock in strict order with Turnstone last and no bridge rows; fixtures are exposed by their owner crates; athanor moves with former-path history; the two unused probes go to Murm and Eidetic.
 
+- **D122. Three forks from the final rehearsal (Mark, 2026-11-11):** The final rehearsal
+  (`Code/testing/engine-split/slice4_u4_final.md`) built push-ready branches for Graphshell,
+  emblem, Distillery and Mere with every gate green, and raised three forks. `mere-moot` carries
+  its own receipts, 94 files and 6.8 MB under `ports/moot/docs/receipts`: "Stay in Mere's history
+  (Recommended)", the rule D120 set for the app's receipts; they are left out of Graphshell's
+  history as well as its tree. The Turnstone half of Moot's capsule-library check hashes four
+  toolkit sources that now live in Graphshell; offered the digests written into the site, cargo
+  metadata, a checkout argument, or dropping the hashes: "Graphshell writes the digests into the
+  site (Recommended)", so no path points into another repo. Graphshell's cut-over note, archived
+  or live: "Live, in technical_architecture (Recommended)". Outcome: applies D113, D120, D121.
+
+  Links: area The stack · draws on engine-split D113, engine-split D120, engine-split D121 · plans engine-split P3 · summary Moot's receipts stay in Mere's history; Graphshell's Moot build writes the toolkit digests into the site for Turnstone to read; Graphshell's cut-over note stays live under technical_architecture.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
