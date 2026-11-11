@@ -6,8 +6,8 @@ face cache key), T1 (the text arm, drawing version 2), T2 (the
 contrast-clamped text palette) and T3 (inline host: livery's `cap` unit and
 vector images); T4 (mentions, guest pages included), F1 (typed blazon
 source), S1 (authored chrome symbols), S2 (Hocket icon pack on macOS and
-Windows), W1 (named action icons), B1 (wash digest and IconVG) and B2
-(theme and paint beneath territory) landed 2026-11-10.
+Windows), W1 (named action icons), B1 (wash digest and IconVG), B2
+(theme and paint beneath territory) and B3 (wash cadence) landed 2026-11-10.
 D1 (emblem's repository hosts the faces crate) and D2 (identity and
 drawing version separately) ruled 2026-11-09, D3 (guest pages through a host
 style layer) and D4 (Knot keys a face on the resolved file's address)
@@ -303,12 +303,17 @@ above the ground fill and beneath territory.
   density motif whose pitch follows the density bucket and whose form follows
   the dominant kind, and an activity tint at the wash centre. Softness comes only
   from multi-stop gradients: IconVG has no blur or noise.
-- Washes and contours draw at every height. A
-  motif grid appears from 256 device pixels. `Host.height` is the
-  backdrop’s rendered height. B3 will add host hysteresis.
-- **Cadence:** re-derive only when the digest changes, after the change holds
-  for several frames; between changes the decoded paths are cached in world
-  space and only the camera moves. A change cross-fades host-side.
+- Washes and contours draw at every height. The initial motif arm uses
+  a 256 px threshold on the projected height. Once visible, the motif
+  leaves below 240 px and re-enters at 272 px. Canvas selects the arm by
+  passing its corresponding height to Emblem.
+- **Cadence:** the first available digest paints immediately. A changed digest
+  must hold for four consecutive frames before it is encoded. Canvas keeps the
+  IconVG bytes and the visited detail arms with their world placement, so camera
+  motion can reuse the decoded paths. A theme change refreshes the decoded arms
+  from those bytes. Stable content changes cross-fade over 160 ms, with one
+  outgoing wash at a time. A scope or fold change replaces the wash immediately,
+  and a graph switch drops the previous graph's wash.
 - **Bounds:** at most 16 clusters, 8 hull points each, 64 paths and 4 KiB;
   past that the smallest clusters merge into one "other" wash.
 - **Low salience by rule:** every entry's luminance distance from the ground is
@@ -392,10 +397,9 @@ because F, T and B all name grammars and versions.
 - **B2. Paint.** Landed 2026-11-10. Canvas paints the bytes beneath territory
   through the paint list's radial gradient. A palette swap recolours the same
   bytes. Tests cover the contrast and alpha ceilings on light and dark grounds.
-- **B3. Cadence.** Done when: derivations are counted across many frames of node
-  and camera motion and occur only on digest changes; a cluster oscillating
-  across a lattice edge and a zoom oscillating across the threshold each cause at
-  most one switch; the cross-fade's alpha is monotone.
+- **B3. Cadence.** Landed 2026-11-10. Tests count derivations and decodes
+  across node and camera motion, exercise the lattice and zoom thresholds,
+  and check monotone cross-fade opacity while physics is paused.
 - **B4. Hosts and export.** Done when: the reference host or isocosm's
   world-graph viewer shows it behind a switch, and its bytes export through
   emblem's SVG plan with geometry matching the decoded paint list.
@@ -702,3 +706,9 @@ Provisional (recommended first; asked only if they become blocking):
   premultiplied scene representation, so the wash passes Emblem's
   premultiplied channels at that seam. B3 owns derivation cadence and
   transitions. B4 owns host switches and export.
+- 2026-11-10: B3 landed. Canvas caches bytes and decoded detail arms per
+  wash, debounces changed digests over four frames, and cross-fades stable
+  changes over 160 ms. The timed frame path advances presentation while
+  physics is idle, and pending changes and fades request another frame.
+  Hysteresis is currently per Canvas. A host sharing one Canvas across
+  panes needs pane-local detail selection when enabling the wash in B4.

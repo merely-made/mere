@@ -471,6 +471,7 @@ pub struct Canvas {
     /// [`set_palette`](Self::set_palette)). Defaults to the dark slate.
     backdrop: ColorF,
     content_backdrop: bool,
+    wash: backdrop_paint::WashPresentation,
     projection_backdrops: Vec<projection_backdrops::ResolvedBackdrop>,
     /// Producer generation, bumped each rendered frame (positions / camera move).
     generation: u64,

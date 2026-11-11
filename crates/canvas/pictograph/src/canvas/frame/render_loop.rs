@@ -4,6 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use std::time::Duration;
+
+use super::super::elapsed::FrameElapsed;
 use super::*;
 
 impl Canvas {
@@ -11,7 +14,7 @@ impl Canvas {
         &mut self,
         w: u32,
         h: u32,
-        elapsed: Option<(std::time::Duration, seiche::ElapsedStepConfig)>,
+        elapsed: Option<FrameElapsed>,
         observer: &mut impl super::super::frame_profile::Observer,
     ) -> (Scene, bool) {
         let (w, h) = (w.max(1), h.max(1));
@@ -19,7 +22,12 @@ impl Canvas {
         self.view_h = h;
         let viewport = DeviceIntSize::new(w as i32, h as i32);
         // Host time for this frame, or one tick when the host gives none.
-        let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
+        let dt = elapsed
+            .as_ref()
+            .map_or(seiche::TICK_DT, |elapsed| elapsed.physics.as_secs_f32());
+        let presentation_dt = elapsed
+            .as_ref()
+            .map_or(Duration::from_secs_f32(seiche::TICK_DT), |elapsed| elapsed.presentation);
 
         self.apply_forme_region();
         self.sync_attention();
@@ -27,10 +35,10 @@ impl Canvas {
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
-        let settling = if let Some((elapsed, config)) = elapsed {
+        let settling = if let Some(elapsed) = elapsed {
             let report = self
                 .physics
-                .advance_elapsed(&mut self.view, elapsed, config);
+                .advance_elapsed(&mut self.view, elapsed.physics, elapsed.config);
             self.elapsed_step = Some(report);
             report.settling
         } else {
@@ -335,7 +343,8 @@ impl Canvas {
         // The canvas ground fills the viewport. The content wash sits just above
         // it, under territory and the other scene layers.
         let bg_cmds = background_cmds(w, h, self.backdrop);
-        let wash_cmds = self.content_backdrop_commands();
+        let (wash_cmds, wash_pending) =
+            self.content_backdrop_commands(presentation_dt, scoped, folded_members);
         let territory_cmds = self.territory_commands();
         let projection_backdrop_cmds = self.projection_backdrop_commands();
         let strategy_region_cmds = self.strategy_region_commands();
@@ -453,7 +462,8 @@ impl Canvas {
             || dragging
             || following
             || self.ambient.is_some()
-            || self.meaning_pending();
+            || self.meaning_pending()
+            || wash_pending;
         observer.mark(9);
         (scene, needs_redraw)
     }

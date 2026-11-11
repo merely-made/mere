@@ -86,6 +86,7 @@ impl Canvas {
             self.physics.unpin(key);
         }
         self.graph = graph;
+        self.wash = Default::default();
         // A graph switch ends every child life, even if member UUIDs recur.
         self.described_keys = Default::default();
         // NodeKeys do not survive a graph swap; an exact scope resolves its
@@ -230,6 +231,7 @@ impl Canvas {
             style: dark_scene_style(),
             backdrop: surface_bg(),
             content_backdrop: false,
+            wash: Default::default(),
             projection_backdrops: Vec::new(),
             generation: 0,
             last_translation_error: None,

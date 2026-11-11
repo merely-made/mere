@@ -80,8 +80,8 @@ impl Canvas {
     }
 
     /// Advance one frame at viewport `(w, h)` and return the composited content
-    /// scene plus whether the host should request another frame (sim still
-    /// settling, pan still gliding, or a node being dragged). Does not present.
+    /// scene plus whether the host should request another frame for ongoing
+    /// simulation, input motion or presentation. Does not present.
     pub fn frame(&mut self, w: u32, h: u32) -> (Scene, bool) {
         self.reset_frame_time();
         self.frame_observed(w, h, None, &mut super::frame_profile::Unprofiled)

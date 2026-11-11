@@ -151,3 +151,33 @@ The standalone Graphshell web workspace passed
 The lane log is `Code/output/pictograph-grammar/b2/graphshell-web-check.log`
 and the guarded receipt is
 `Code/output/build-storage-receipts/2026-11-11/build-97c83918e98445f681daa97aa80e12f5.json`.
+
+## 2026-11-10 · B3 Canvas wash cadence
+
+Mere baseline `c18f1856a`. The B2 control ran the new lattice-edge test
+against the existing paint path. It failed on the first crossing, moving
+the wash centre from 96 to 160 px. The control log is
+`Code/output/pictograph-grammar/b3/b2-control.log` and its guarded receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-959a316cdf474b05acc0e6ca2dca2d60.json`.
+
+The B3 backdrop tests pass that control and count work across 48 frames
+of camera and same-cell node motion. They observe one derivation and one
+decode over those frames, with a retheme adding only a decode. Repeated
+zoom crossings near 256 px keep the current arm until the hysteresis
+limit is crossed. The scope test replaces the wash when narrowing the
+roster and clears it for an empty scope.
+
+Guarded Rust 1.99.1
+`test --locked --offline -p pictograph --features backdrop-cpu --lib -j 4`
+passed 715 tests, with 18 ignored. The paused timed-frame test checks
+redraw requests through the four-frame confirmation and 160 ms fade,
+monotone complementary layer opacities, and headless Vello CPU pixels at
+both wash centres at the midpoint. The lane log is
+`Code/output/pictograph-grammar/b3/pictograph-verified.log` and the receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-23a0fd7900d54a4786230b72bb5fbceb.json`.
+
+The standalone Graphshell web workspace passed
+`check --locked --offline --target wasm32-unknown-unknown --lib -j 4`.
+The lane log is `Code/output/pictograph-grammar/b3/graphshell-web-check.log`
+and the guarded receipt is
+`Code/output/build-storage-receipts/2026-11-11/build-d5d099269d9b428abe30b390ebafecc0.json`.

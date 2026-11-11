@@ -4,15 +4,18 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use std::{collections::HashSet, time::Duration};
+
 use emblem::{Palette, Rgba, ViewBox};
-use paint_list_api::{
-    ColorF, LayoutPoint, LayoutTransform, PaintCmd, TransformKind, TransformSpec,
-};
+use kernel::graph::NodeKey;
+use paint_list_api::{ColorF, LayoutTransform, PaintCmd};
 
-use crate::backdrop::{CLEAR, LATTICE, MOTIF, OTHER, PALETTE_ENTRIES, ViewDigest, derive_backdrop};
-use crate::flat_icon::wash_commands;
+use crate::backdrop::{CLEAR, LATTICE, MOTIF, OTHER, PALETTE_ENTRIES, ViewDigest};
 
-use super::{Canvas, scene_paint::Camera, territory::TIER_ALPHA};
+use super::{Canvas, territory::TIER_ALPHA};
+
+mod cadence;
+pub(super) use cadence::WashPresentation;
 
 const WASH_ALPHA: u8 = (TIER_ALPHA[2] * 255.0) as u8;
 const MOTIF_ALPHA: u8 = WASH_ALPHA / 2;
@@ -23,37 +26,31 @@ const CHANNEL_DISTANCE: f32 = 0.08;
 impl Canvas {
     /// Paint the held view's content wash beneath territory. Off by default.
     pub fn set_content_backdrop(&mut self, enabled: bool) {
+        if !enabled && self.content_backdrop {
+            self.wash = WashPresentation::default();
+        }
         self.content_backdrop = enabled;
     }
 
-    pub(super) fn content_backdrop_commands(&self) -> Vec<PaintCmd> {
+    pub(super) fn content_backdrop_commands(
+        &mut self,
+        dt: Duration,
+        scope: Option<HashSet<NodeKey>>,
+        folded: HashSet<NodeKey>,
+    ) -> (Vec<PaintCmd>, bool) {
         if !self.content_backdrop || !self.camera.is_valid() {
-            return Vec::new();
+            return (Vec::new(), false);
         }
-        let Some(digest) = self.backdrop_digest() else {
-            return Vec::new();
-        };
-        let (transform, height) = wash_projection(&digest, self.camera);
-        let Ok(file) = derive_backdrop(&digest).inspect_err(|error| {
-            tracing::debug!(%error, "could not derive content backdrop");
-        }) else {
-            return Vec::new();
-        };
-        let Ok(mut commands) = wash_commands(&file, &self.content_backdrop_palette(), height)
-            .inspect_err(|error| tracing::debug!(%error, "could not paint content backdrop"))
-        else {
-            return Vec::new();
-        };
-        commands.insert(
-            0,
-            PaintCmd::PushTransform(TransformSpec {
-                origin: LayoutPoint::zero(),
-                transform,
-                kind: TransformKind::Standard,
-            }),
-        );
-        commands.push(PaintCmd::PopTransform);
-        commands
+        let digest = self.backdrop_digest();
+        let palette = self.content_backdrop_palette();
+        let visibility_changed = self.wash.update_visibility(scope, folded);
+        self.wash.present(
+            digest,
+            visibility_changed,
+            dt,
+            self.camera.ground_transform(),
+            &palette,
+        )
     }
 
     fn content_backdrop_palette(&self) -> Palette {
@@ -68,7 +65,7 @@ impl Canvas {
     }
 }
 
-fn wash_projection(digest: &ViewDigest, camera: Camera) -> (LayoutTransform, f32) {
+fn wash_world_transform(digest: &ViewDigest) -> LayoutTransform {
     let [left, top, right, bottom] = digest.bounds();
     let lattice = f64::from(LATTICE);
     let width = ((f64::from(right) - f64::from(left)) * lattice) as f32;
@@ -78,13 +75,14 @@ fn wash_projection(digest: &ViewDigest, camera: Camera) -> (LayoutTransform, f32
     let sy = height / (view.max_y - view.min_y);
     let x = (f64::from(left) * lattice) as f32 - view.min_x * sx;
     let y = (f64::from(top) * lattice) as f32 - view.min_y * sy;
-    let transform = LayoutTransform::scale(sx, sy, 1.0)
-        .then(&LayoutTransform::translation(x, y, 0.0))
-        .then(&camera.ground_transform());
+    LayoutTransform::scale(sx, sy, 1.0).then(&LayoutTransform::translation(x, y, 0.0))
+}
+
+fn wash_height(transform: &LayoutTransform) -> f32 {
     // Project the view box's vertical side to get its raster height, including
     // the ground plane's yaw and foreshortening.
-    let projected_height = transform.m21.hypot(transform.m22) * (view.max_y - view.min_y);
-    (transform, projected_height)
+    let view = ViewBox::default();
+    transform.m21.hypot(transform.m22) * (view.max_y - view.min_y)
 }
 
 fn wash_palette(ground: ColorF, colors: [[f32; 3]; PALETTE_ENTRIES]) -> Palette {
@@ -112,10 +110,13 @@ fn wash_palette(ground: ColorF, colors: [[f32; 3]; PALETTE_ENTRIES]) -> Palette 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::backdrop::{BackdropKind, BackdropNode, LOD_HEIGHT};
+    use crate::backdrop::{BackdropKind, BackdropNode, LOD_HEIGHT, derive_backdrop};
+    use crate::canvas::{CameraView, scene_paint::Camera};
+    use crate::flat_icon::wash_commands;
     use kernel::geometry::PortablePoint;
     use kernel::graph::{Graph, fixtures::GraphFixtures};
     use netrender::SceneOp;
+    use paint_list_api::LayoutPoint;
 
     #[test]
     fn one_backdrop_file_recolors_and_selects_motif_by_raster_height() {
@@ -210,7 +211,8 @@ mod tests {
             yaw: 0.51,
             tilt: 0.55,
         };
-        let (transform, height) = wash_projection(&digest, camera);
+        let transform = wash_world_transform(&digest).then(&camera.ground_transform());
+        let height = wash_height(&transform);
         let [left, top, right, bottom] = digest.bounds().map(|cell| (cell * LATTICE) as f32);
         for (icon, world) in [
             (
@@ -264,6 +266,182 @@ mod tests {
             .position(|op| matches!(op, SceneOp::Rect(rect) if rect.color[3] == TIER_ALPHA[2]))
             .expect("territory paints its top tier");
         assert!(0 < wash && wash < territory);
+    }
+
+    #[test]
+    fn wash_ignores_a_held_anchor_oscillating_across_a_lattice_edge() {
+        fn gradient_transform(scene: &netrender::Scene) -> netrender::Transform {
+            let gradient = scene.iter_gradients().next().unwrap();
+            scene.transforms[gradient.transform_id as usize]
+        }
+
+        let mut canvas = paused_canvas();
+        canvas.set_content_backdrop(true);
+        let key = canvas.graph.nodes().next().unwrap().0;
+        let (initial, _) = canvas.frame(320, 320);
+        let initial = gradient_transform(&initial);
+        for x in [129.0, 127.0].into_iter().cycle().take(20) {
+            canvas.preview_paused_positions(&[(key, PortablePoint::new(x, 120.0))]);
+            let (scene, _) = canvas.frame(320, 320);
+            assert_eq!(gradient_transform(&scene).m, initial.m);
+        }
+    }
+
+    #[test]
+    fn camera_motion_and_same_cell_node_motion_reuse_decoded_wash() {
+        let mut canvas = paused_canvas();
+        canvas.set_content_backdrop(true);
+        canvas.set_category_colors([[0; 3]; 5]);
+        let key = canvas.graph.nodes().next().unwrap().0;
+        let (first, _) = canvas.frame(320, 320);
+        let first = first.transforms[first.iter_gradients().next().unwrap().transform_id as usize];
+        for frame in 0..48 {
+            canvas.set_camera(CameraView {
+                offset: (frame as f32, 0.0),
+                zoom: if frame % 2 == 0 { 1.05 } else { 0.95 },
+            });
+            let x = 96.0 + (frame % 11) as f32;
+            canvas.preview_paused_positions(&[(key, PortablePoint::new(x, 120.0))]);
+            let (scene, _) = canvas.frame(320, 320);
+            let gradient = scene.iter_gradients().next().unwrap();
+            assert_ne!(scene.transforms[gradient.transform_id as usize].m, first.m);
+            assert_eq!(canvas.wash.work(), (1, 1));
+        }
+        canvas.set_category_colors([[255; 3]; 5]);
+        let _ = canvas.frame(320, 320);
+        assert_eq!(canvas.wash.work(), (1, 2), "retheme only decodes");
+    }
+
+    #[test]
+    fn zoom_hysteresis_switches_once_and_reuses_both_decoded_arms() {
+        fn detail_at(canvas: &mut Canvas, height: f32) -> bool {
+            // The one held cell's digest adds a cell on each side.
+            canvas.set_camera(CameraView {
+                offset: (0.0, 0.0),
+                zoom: height / (3 * LATTICE) as f32,
+            });
+            let (scene, _) = canvas.frame(320, 320);
+            scene.iter_shapes().next().is_some()
+        }
+
+        let mut canvas = paused_canvas();
+        canvas.set_render_gnodes_as_dom(true);
+        canvas.set_content_backdrop(true);
+        assert!(!detail_at(&mut canvas, 252.0));
+        for height in [260.0, 252.0].into_iter().cycle().take(24) {
+            assert!(!detail_at(&mut canvas, height));
+        }
+        assert!(detail_at(&mut canvas, 276.0));
+        for height in [260.0, 252.0].into_iter().cycle().take(24) {
+            assert!(detail_at(&mut canvas, height));
+        }
+        assert!(!detail_at(&mut canvas, 232.0));
+        assert!(detail_at(&mut canvas, 276.0));
+        assert_eq!(canvas.wash.work(), (1, 2));
+    }
+
+    #[test]
+    fn a_stable_change_cross_fades_monotonically_while_physics_is_paused() {
+        let mut canvas = paused_canvas();
+        canvas.set_render_gnodes_as_dom(true);
+        canvas.set_content_backdrop(true);
+        canvas.set_palette([0.1, 0.1, 0.1, 1.0], [1.0; 4]);
+        canvas.set_category_colors([[255; 3]; 5]);
+        let key = canvas.graph.nodes().next().unwrap().0;
+        let mut time_ms = 0;
+        let mut draw = |canvas: &mut Canvas| {
+            time_ms += 20;
+            canvas.frame_at(320, 320, Duration::from_millis(time_ms), Default::default())
+        };
+        let (initial, idle) = draw(&mut canvas);
+        assert!(!idle);
+        assert_eq!(initial.iter_gradients().count(), 1);
+        canvas.preview_paused_positions(&[(key, PortablePoint::new(257.0, 120.0))]);
+        for _ in 0..3 {
+            let (scene, pending) = draw(&mut canvas);
+            assert!(pending);
+            assert_eq!(canvas.wash.work(), (1, 1));
+            assert_eq!(scene.iter_gradients().count(), 1);
+        }
+        let (scene, fading) = draw(&mut canvas);
+        assert!(fading);
+        assert_eq!(canvas.wash.work(), (2, 0));
+        assert_eq!(scene.iter_gradients().count(), 1);
+
+        let mut previous = (1.0, 0.0);
+        for step in 1..=7 {
+            let (scene, fading) = draw(&mut canvas);
+            assert!(fading);
+            let weights: Vec<_> = scene
+                .ops
+                .iter()
+                .filter_map(|op| match op {
+                    SceneOp::PushLayer(layer) => Some(layer.alpha),
+                    _ => None,
+                })
+                .collect();
+            let [outgoing, incoming] = weights.as_slice() else {
+                panic!("expected outgoing and incoming wash layers");
+            };
+            assert!(*outgoing < previous.0 && *incoming > previous.1);
+            assert!((outgoing + incoming - 1.0).abs() < 1e-6);
+            assert_eq!(scene.iter_gradients().count(), 2);
+            previous = (*outgoing, *incoming);
+
+            if step == 4 {
+                assert_eq!(previous, (0.5, 0.5));
+                #[cfg(feature = "backdrop-cpu")]
+                {
+                    use netrender::vello_backends::{CpuSession, SparseResourceLimits};
+
+                    let mut cpu = CpuSession::new(SparseResourceLimits::default());
+                    let pixmap = cpu.render(&initial).unwrap();
+                    let pixels = pixmap.data_as_u8_slice();
+                    let full = pixels[(96 * 320 + 96) * 4];
+                    let ground = pixels[(96 * 320 + 288) * 4];
+                    let pixmap = cpu.render(&scene).unwrap();
+                    let pixels = pixmap.data_as_u8_slice();
+                    for center in [96, 288] {
+                        let ink = pixels[(96 * 320 + center) * 4];
+                        assert!(ground < ink && ink < full, "partial wash at {center}");
+                    }
+                }
+            }
+        }
+        let (scene, fading) = draw(&mut canvas);
+        assert!(!fading);
+        assert_eq!(scene.iter_gradients().count(), 1);
+        assert_eq!(canvas.wash.work(), (2, 1));
+    }
+
+    #[test]
+    fn scope_change_does_not_fade_the_previous_scope_over_the_new_one() {
+        let mut canvas = paused_canvas();
+        let (first, member) = canvas
+            .graph
+            .nodes()
+            .map(|(key, node)| (key, node.id))
+            .next()
+            .unwrap();
+        let far = PortablePoint::new(300.0, 120.0);
+        let second = canvas.graph.add_node("https://far.example/".into(), far);
+        canvas
+            .preview_paused_positions(&[(first, PortablePoint::new(120.0, 120.0)), (second, far)]);
+        canvas.set_content_backdrop(true);
+        let (scene, _) = canvas.frame(400, 320);
+        let previous =
+            scene.transforms[scene.iter_gradients().next().unwrap().transform_id as usize];
+        canvas.scope_to_exact_members([member]);
+        let (scene, _) = canvas.frame(400, 320);
+        assert_eq!(scene.iter_gradients().count(), 1);
+        let transform =
+            scene.transforms[scene.iter_gradients().next().unwrap().transform_id as usize];
+        assert_ne!(transform.m, previous.m);
+        assert_eq!(canvas.wash.work(), (2, 1));
+
+        canvas.scope_to_exact_members([]);
+        let (scene, _) = canvas.frame(400, 320);
+        assert_eq!(scene.iter_gradients().count(), 0);
     }
 
     #[cfg(feature = "backdrop-cpu")]
