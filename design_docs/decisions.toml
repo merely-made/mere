@@ -1399,6 +1399,22 @@ summary = "Leftovers follow their nearest user or are deleted; ceiling exception
 draws_on = ["engine-split D102", "engine-split D111", "engine-split D112"]
 plans = ["engine-split"]
 
+[decisions."engine-split D120"]
+title = "The app in Turnstone (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The app moves to Turnstone at ports/graphshell without its receipts, keeps the package name until a later rename, and Turnstone runs the same hooks as Graphshell."
+draws_on = ["engine-split D23", "engine-split D113"]
+plans = ["engine-split"]
+
+[decisions."engine-split D121"]
+title = "Order, fixtures and the last leftovers (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Consumers relock in strict order with Turnstone last and no bridge rows; fixtures are exposed by their owner crates; athanor moves with former-path history; the two unused probes go to Murm and Eidetic."
+draws_on = ["engine-split D118", "engine-split D119"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -545,7 +545,8 @@ and full test suites beyond the app's lib tests and the moved tests.
   `pandect` and `mere-facts`.
   - Done when: Graphshell builds the host and the `mere-resident` assembly with Mere as a git
     dependency; Turnstone builds the app; Mere's workspace holds the five crates and builds.
-- **U5, the consumers.** The 151 rows in Cleromancy, Isocosm, Knot, mer3ly, Murm, Woodshed and
+- **U5, the consumers.** In strict order with Turnstone last (D121); Inker is an eighth consumer.
+  The 151 rows in Cleromancy, Isocosm, Knot, mer3ly, Murm, Woodshed and
   Turnstone are re-addressed to `graphshell.git` (D66) and their 20 lock roots relocked.
 - **U6, close.** Mere's residue goes: patch rows, line-ceiling exceptions (127 of 150 name
   leaving paths), scripts and hooks that name moved crates.
@@ -1908,6 +1909,34 @@ revision and what crosses at frame rate.
   D111, D112.
 
   Links: area The stack · draws on engine-split D102, engine-split D111, engine-split D112 · plans engine-split P3 · summary Leftovers follow their nearest user or are deleted; ceiling exceptions now and splits later; document paths repointed at the cutover; backdrops with the canvas; the app builds the identity cards from the resident; consumers repoint to cartography in U5.
+
+- **D120. The app in Turnstone (Mark, 2026-11-11):** The app dry run (`slice4_u4_dryrun.md`, section
+  "App lane") built scratch Turnstone with the app: 297 and 320 lib tests and 585 test attributes
+  match Mere. Four rulings. Receipts: the app's history is 1,234 commits; with its receipt
+  directories Turnstone grows by 128 MiB, without them by 7.4 MiB, and Turnstone has ruled since
+  2026-11-02 that receipts leave the repo: "No; they stay in Mere's history (Recommended)".
+  Name: the package is `graphshell` while D23 says the name stops meaning an application:
+  "Rename after the cutover (Recommended)"; it moves as `graphshell` and is renamed in Turnstone
+  afterwards, the name chosen then. Placement: "Mirror Mere's subpaths (Recommended)",
+  `ports/graphshell` and `crates/graphshell/graphshell-mcp`, as rehearsed. Hooks: "The same set
+  as Graphshell (Recommended)"; workspace clippy, cargo deny and responsa. Outcome: applies D23,
+  D113.
+
+  Links: area The stack · draws on engine-split D23, engine-split D113 · plans engine-split P3 · summary The app moves to Turnstone at ports/graphshell without its receipts, keeps the package name until a later rename, and Turnstone runs the same hooks as Graphshell.
+
+- **D121. Order, fixtures and the last leftovers (Mark, 2026-11-11):** Order: the app lane needed six
+  bridge patch rows because Knot and Woodshed still name leaving crates from mere.git, and found
+  Inker is an eighth consumer the earlier count missed: "Strict order, no bridge (Recommended)".
+  Graphshell, emblem and Distillery are pushed; Mere deletes the moved crates; Inker, Cleromancy,
+  Knot, Woodshed, Isocosm, mer3ly and Murm's signalman-desktop are re-addressed and relocked;
+  Turnstone goes last and receives the app in that step. Cross-repo fixture reads (the blocks
+  test loading block-host's fixture guest by path; Moot's capsule-library scripts reading app
+  files): "The owner crate exposes them (Recommended)"; no path points into another repo.
+  athanor's history: "With former paths, like the toolkit (Recommended)". The two probes that
+  build but have no user, `murm-direct-phy` and `muniment-opfs-probe`: "To their subjects' repos
+  (Recommended)", Murm and Eidetic. Outcome: applies D118, D119.
+
+  Links: area The stack · draws on engine-split D118, engine-split D119 · plans engine-split P3 · summary Consumers relock in strict order with Turnstone last and no bridge rows; fixtures are exposed by their owner crates; athanor moves with former-path history; the two unused probes go to Murm and Eidetic.
 
 ## Open questions
 
