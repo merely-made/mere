@@ -1229,7 +1229,7 @@ revision and what crosses at frame rate.
     diagnostics;
   - Turnstone's generic a11y pieces are audited for promotion.
   Outcome: new; refines the 2026-11-07 finding that uxtree stays whole, and gives it a
-  direction.
+  direction. The brief is written (2026-11-11): `graphshell/design_docs/graphshell_docs/research/2026-11-11_uxtree_spine_brief.md`; its nine forks wait for Mark.
 
   Links: area The stack · draws on engine-split D10, engine-split D26 · plans engine-split P3 · summary uxtree becomes the one accessibility and automation tree: grafted subtrees, path-addressed automation, invariant lints through diagnostics.
 
