@@ -70,6 +70,39 @@ Graph build 89.6 s: `add_node` 0.3 s, `append_node_properties` 1.03 s (linear no
 
 The 100k graph build was 89.6 s the day before and would have been hours on 2026-11-09. At 100k over the held index: point lookup 0.13 ms, bound predicate 6.7 ms, two-hop join 48 ms, full scan 57 ms; index build 1.93 s, 38.4 MB; materialization 6.47 s. The rebuild is now the same size as building the graph itself, so P3's refresh measurement starts from about 2 s per rebuild at this scale.
 
+### P5 baseline (pre-fold), 2026-11-12
+
+The engine split plan's P5 asks that "load, mutation, projection refresh and frame cost are measured against the P0 baseline". P0 recorded no performance baseline, so this is the baseline: the commit before the fold, Mere `0fad5b831` with the instrument extended (`adapter_scale` now also times per-edit assert and withdraw, the refresh after one edit, and the engine's share of a frame; the engine code is unchanged, and Mere main's next commit, `d12080e63`, is docs only). It is also the measurement the quad index plan's P3 owes. Release build, debug info off, rustc 1.100.0 (2026-11-09), Windows 11, AMD Ryzen 9 7940HS (16 threads), 31 GB. Five runs of `adapter_scale 10000 100000`; each figure is the median of the five runs' medians (a run's own reps: 51 for assert, withdraw and steady frames; 21 rebuilds at 10k, 7 at 100k). The machine was not quiet: two other lanes were building, 25 to 54% of the CPU busy before each run and 2 to 9 cargo or rustc processes after, and the instrument is single-threaded. Read the spread (the receipts hold the per-run figures) before reading a ratio. Raw tables: the engine split plan's receipts, "2026-11-12: P5 baseline, pre-fold".
+
+Load (one run's graph build, `add_node` plus `assert_semantic_statement` plus `append_node_properties`; index build is the first `IndexedDataset::for_graph`):
+
+| nodes | quads | graph build | index build | `memory_bytes()` |
+|---|---|---|---|---|
+| 10k | 80,000 | 186 ms | 241 ms | 3.84 MB |
+| 100k | 800,000 | 2.31 s | 3.29 s (a warm rebuild is 2.6 s, below) | 38.4 MB |
+
+Mutation and refresh, one edit on the built graph (an edit is one new statement on a pair with none, or the withdrawal of one):
+
+| measure | 10k | 100k |
+|---|---|---|
+| assert, per edit | 0.004 ms | 0.010 ms |
+| withdraw, per edit | 0.12 ms | 5.0 ms |
+| `is_current`, stale or fresh | under 0.001 ms | under 0.001 ms |
+| rebuild of the held index after an assert | 243 ms | 2.61 s |
+| rebuild after a withdrawal | 233 ms | 2.66 s |
+| edit, then `is_current`, then rebuild (total, after assert) | 243 ms | 2.61 s |
+
+Engine share of a frame, headless (the edit itself is the host's action and is not in it):
+
+| frame | 10k | 100k |
+|---|---|---|
+| steady: `is_current` plus coverage note plus one held point lookup | 0.011 ms | 0.017 ms |
+| steady: `is_current` plus one held two-hop join | 5.8 ms | 72 ms |
+| after one edit: `is_current`, rebuild, point lookup | 258 ms | 2.67 s |
+| after one edit: `is_current`, rebuild, two-hop join | 262 ms | 2.87 s |
+
+No pass or fail threshold is set (the frame budget stays with P8). What the numbers say: an unchanged frame costs the query and nothing else, because `is_current` is a counter compare; a frame after an edit costs one full rebuild, which at 10k is about 15 times a 60 Hz frame and at 100k about 160 times; and the rebuild is the whole refresh cost, since the edit and the check are microseconds. Withdrawal is the one kernel cost that scales badly (0.12 ms at 10k, 5.0 ms at 100k: 40 times for 10 times the nodes), found here and not chased (the engine is unchanged in this lane). The two-hop join at 100k, 72 ms steady, is over a frame by itself.
+
 ## 2. What the dataset is today
 
 The dataset is a derived projection, not a store. `dataset_quad_iter` in `crates/graph/linked-data/src/lib.rs` walks surface nodes (direct quads: the node IRI as subject, properties as literals, scoped statements into named graphs by `GraphScope`, then RDF 1.2 reifier metadata per statement: asserter, assertion time, withdrawal), resource nodes (resource metadata) and resource edges (held assertions and their metadata). Terms are built as `oxrdf` strings on every walk. Named graphs are assertion scopes; the reserved history graph (`ASSERTION_HISTORY_GRAPH_IRI`) carries withdrawn reifiers only in the explicit history projection.

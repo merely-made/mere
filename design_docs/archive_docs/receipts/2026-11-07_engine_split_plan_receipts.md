@@ -1208,3 +1208,62 @@ name a path absent at the cutover `299d19b63` and 18 a path present; `299d19b63`
 those 18, none missing. At `0c4f551d6`, where U6's line was written, the file held 150, of which 132
 name a path absent at `299d19b63`; U1 (`ea049e09a`) then replaced four pictograph rows with five
 `mere-cartography` rows (the four moved files and `backdrop_paint.rs`).
+
+## 2026-11-12: P5 baseline, pre-fold (Mere `0fad5b831` plus the instrument)
+
+P0 recorded no performance baseline, so this run is the baseline P5's "measured against the P0 baseline" is met by (D141): the commit before the fold. The instrument is `crates/graph/linked-data/examples/adapter_scale.rs`, extended to time per-edit assert and withdraw, the refresh after one edit, and the engine's share of a frame; no engine code changed (Mere main's later `d12080e63` is docs only). Command, five times in sequence: `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_RELEASE_DEBUG=0 cargo build -j 4 --release -p mere-rdf --features query --example adapter_scale`, then `target/release/examples/adapter_scale.exe 10000 100000`. Machine: AMD Ryzen 9 7940HS, 16 threads, 31 GB, Windows 11 (10.0.26320); rustc 1.100.0 (0ef1bc386 2026-11-09), fresh resolve (no lock tracked). Machine state: not quiet. Two other lanes were building; total CPU before each run was 51, 37, 54, 46 and 25% (three one-second samples averaged), and 4, 7, 9, 4 and 2 cargo, rustc or link processes were alive after runs 1 to 5. The instrument is single-threaded, so the contention is memory and clock, not cores; the min..max columns show its size (about plus or minus 20% on the 10k rebuild, up to 2.7 times at the worst 100k rebuild). Every held-query row count agreed with the `sparql()` and materialized columns in every cell, and the instrument asserts `is_current` is false after an edit and true after the rebuild, and that the held point lookup and two-hop join return one row after every edit.
+
+What an edit is: `assert_semantic_statement` of a statement with a predicate no edge carries yet, on a node pair with no statement (so it changes the graph; a repeat of a withdrawn statement does not, by the no-revival rule); withdraw is `withdraw_semantic_assertion` of the same handle. Refresh is `is_current` (stale), `IndexedDataset::for_graph`, `is_current` (fresh). A frame is `is_current` plus the coverage note plus one held query (steady), or `is_current` then rebuild then the query after one assert. All times in ms; each cell below is one run's median over its reps.
+
+### Edit, refresh and frame (median of per-run medians, five runs)
+
+| scale | measure | reps per run | run 1 | run 2 | run 3 | run 4 | run 5 | median | min..max |
+|---|---|---|---|---|---|---|---|---|---|
+| 10000 | edit_assert | 51 | 0.0037 | 0.0038 | 0.0042 | 0.004 | 0.0035 | 0.0038 | 0.0035..0.0042 |
+| 10000 | edit_withdraw | 51 | 0.1452 | 0.096 | 0.1322 | 0.1169 | 0.0869 | 0.1169 | 0.0869..0.1452 |
+| 10000 | is_current_stale_after_assert | 21 | 0 | 0 | 0 | 0 | 0 | 0 | 0..0 |
+| 10000 | rebuild_after_assert | 21 | 276.686 | 227.222 | 242.83 | 265.219 | 206.19 | 242.83 | 206.19..276.686 |
+| 10000 | is_current_fresh_after_assert | 21 | 0.0004 | 0.0004 | 0.0005 | 0.0003 | 0.0004 | 0.0004 | 0.0003..0.0005 |
+| 10000 | refresh_total_after_assert | 21 | 276.687 | 227.223 | 242.831 | 265.219 | 206.19 | 242.831 | 206.19..276.687 |
+| 10000 | is_current_stale_after_withdraw | 21 | 0.0002 | 0.0001 | 0.0001 | 0.0001 | 0.0001 | 0.0001 | 0.0001..0.0002 |
+| 10000 | rebuild_after_withdraw | 21 | 283.668 | 227.161 | 232.56 | 255.939 | 213.524 | 232.56 | 213.524..283.668 |
+| 10000 | is_current_fresh_after_withdraw | 21 | 0.0004 | 0.0004 | 0.0004 | 0.0004 | 0.0004 | 0.0004 | 0.0004..0.0004 |
+| 10000 | refresh_total_after_withdraw | 21 | 283.668 | 227.161 | 232.561 | 255.939 | 213.524 | 232.561 | 213.524..283.668 |
+| 10000 | frame_steady_point | 51 | 0.0112 | 0.0101 | 0.0117 | 0.011 | 0.0102 | 0.011 | 0.0101..0.0117 |
+| 10000 | frame_after_edit_point | 21 | 282.338 | 259.682 | 228.806 | 258.109 | 209.523 | 258.109 | 209.523..282.338 |
+| 10000 | frame_steady_two_hop | 51 | 6.5281 | 5.8487 | 5.2612 | 5.8267 | 5.0472 | 5.8267 | 5.0472..6.5281 |
+| 10000 | frame_after_edit_two_hop | 21 | 303.432 | 284.252 | 229.884 | 262.404 | 210.29 | 262.404 | 210.29..303.432 |
+| 100000 | edit_assert | 51 | 0.0065 | 0.01 | 0.0209 | 0.0039 | 0.0183 | 0.01 | 0.0039..0.0209 |
+| 100000 | edit_withdraw | 51 | 6.8534 | 7.3068 | 5.0356 | 4.8686 | 4.8598 | 5.0356 | 4.8598..7.3068 |
+| 100000 | is_current_stale_after_assert | 7 | 0.0001 | 0 | 0 | 0 | 0 | 0 | 0..0.0001 |
+| 100000 | rebuild_after_assert | 7 | 3483.1 | 4622.48 | 2606.93 | 2446 | 2286.58 | 2606.93 | 2286.58..4622.48 |
+| 100000 | is_current_fresh_after_assert | 7 | 0.0004 | 0.0004 | 0.0005 | 0.0004 | 0.0004 | 0.0004 | 0.0004..0.0005 |
+| 100000 | refresh_total_after_assert | 7 | 3483.11 | 4622.48 | 2606.93 | 2446 | 2286.58 | 2606.93 | 2286.58..4622.48 |
+| 100000 | is_current_stale_after_withdraw | 7 | 0.0002 | 0.0002 | 0.0002 | 0.0001 | 0.0001 | 0.0002 | 0.0001..0.0002 |
+| 100000 | rebuild_after_withdraw | 7 | 3640.72 | 6329.03 | 2598.89 | 2265.89 | 2663.86 | 2663.86 | 2265.89..6329.03 |
+| 100000 | is_current_fresh_after_withdraw | 7 | 0.0003 | 0.0004 | 0.0006 | 0.0003 | 0.0004 | 0.0004 | 0.0003..0.0006 |
+| 100000 | refresh_total_after_withdraw | 7 | 3640.72 | 6329.03 | 2598.89 | 2265.89 | 2663.86 | 2663.86 | 2265.89..6329.03 |
+| 100000 | frame_steady_point | 51 | 0.017 | 0.0191 | 0.0169 | 0.0098 | 0.0149 | 0.0169 | 0.0098..0.0191 |
+| 100000 | frame_after_edit_point | 7 | 3419.61 | 6128.85 | 2669.13 | 2251.16 | 2418.06 | 2669.13 | 2251.16..6128.85 |
+| 100000 | frame_steady_two_hop | 51 | 74.1903 | 126.437 | 57.0916 | 48.9403 | 71.8496 | 71.8496 | 48.9403..126.437 |
+| 100000 | frame_after_edit_two_hop | 7 | 3069.96 | 6144.17 | 2866.72 | 2378.69 | 2440.63 | 2866.72 | 2378.69..6144.17 |
+
+### Load and queries (median over five runs, min..max in brackets)
+
+| scale | quads | graph build ms | index build ms | index bytes | materialize ms |
+|---|---|---|---|---|---|
+| 10000 | 80,000 | 185.92 (158.41..219.17) | 240.74 (200.87..252.67) | 3,840,168 | 621.71 (542.68..729.99) |
+| 100000 | 800,000 | 2314.37 (1666.98..2803.41) | 3288.49 (1986.07..3736.93) | 38,400,168 | 8554.08 (6491.9..10784.6) |
+
+| scale | query | `sparql()` per call ms | held `IndexedDataset` ms | materialized `oxrdf::Dataset` ms |
+|---|---|---|---|---|
+| 10000 | bound predicate | 250.46 (224.42..293.05) | 1.02 (0.82..1.38) | 3.8 (3.38..4.75) |
+| 10000 | point lookup | 256.05 (226.22..293.16) | 0.08 (0.08..0.1) | 0.05 (0.04..0.06) |
+| 10000 | two-hop join | 268.68 (213.24..314.49) | 6.4 (5.06..8.82) | 17.95 (16.24..21.81) |
+| 10000 | full scan | 267.63 (214.73..278.91) | 5.97 (5.76..6.93) | 27.87 (26.58..32.71) |
+| 100000 | bound predicate | 3056.27 (2259.24..3614.36) | 10.37 (7.07..11.85) | 45.94 (34.41..53.94) |
+| 100000 | point lookup | 3271.83 (2271.79..4915.53) | 0.2 (0.18..0.24) | 0.05 (0.04..0.06) |
+| 100000 | two-hop join | 3162.47 (2290.67..4698.08) | 53.7 (52.04..60.78) | 190.72 (175.58..257.36) |
+| 100000 | full scan | 3141.47 (2338.57..4776.53) | 63.07 (59.7..74.94) | 345.69 (313.89..421.97) |
+
+The 100k withdraw (5.0 ms, against 0.12 ms at 10k) is a kernel cost found by this run and not investigated here. The index build column is the first build after the graph; the warm rebuilds in the edit table are the refresh figures.

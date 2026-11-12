@@ -17,13 +17,20 @@
 //!
 //! A query that took longer than the budget at one scale is skipped at the next.
 //! The borrowed adapter the first measurement timed was deleted with P2.
+//!
+//! After each scale's query rows it prints a second table (`edit_scale` header):
+//! per-edit assert and withdraw on the built graph, the refresh after one edit
+//! (`is_current`, then rebuild of the held index), and the engine's share of a
+//! frame measured headlessly. Each row is the median, min and max over its reps
+//! within the run; the recorded figure is the median of several runs.
 
 use kernel::graph::fixtures::GraphFixtures;
-use kernel::graph::{Graph, SemanticStatementSpec};
+use kernel::graph::{Graph, NodeKey, SemanticStatementSpec};
 use kernel::types::NodeProperty;
 use linked_data::query::{IndexedDataset, View, sparql, sparql_on};
 use spareval::{QueryEvaluator, QueryResults};
 use spargebra::SparqlParser;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::{Duration, Instant};
 
 const NEXT: &str = "https://example.test/vocab#next";
@@ -45,7 +52,7 @@ const QUERIES: &[(&str, &str)] = &[
     ("full scan", "SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o }"),
 ];
 
-fn build(n: usize) -> Graph {
+fn build(n: usize) -> (Graph, Vec<NodeKey>) {
     let mut graph = Graph::new();
     let t = Instant::now();
     let keys: Vec<_> = (0..n)
@@ -75,7 +82,7 @@ fn build(n: usize) -> Graph {
     }
     let properties_ms = t.elapsed().as_secs_f64() * 1000.0;
     eprintln!("build {n}: add_node {nodes_ms:.1} ms, assert_semantic_statement {statements_ms:.1} ms, append_node_properties {properties_ms:.1} ms");
-    graph
+    (graph, keys)
 }
 
 fn materialized_rows(dataset: &oxrdf::Dataset, query: &str) -> Result<usize, String> {
@@ -121,7 +128,7 @@ fn main() {
     );
     for n in scales {
         let t = Instant::now();
-        let graph = build(n);
+        let (mut graph, keys) = build(n);
         let build_ms = t.elapsed();
 
         let t = Instant::now();
@@ -131,7 +138,7 @@ fn main() {
         let materialize_ms = t.elapsed();
 
         let t = Instant::now();
-        let indexed = IndexedDataset::for_graph(&graph);
+        let mut indexed = IndexedDataset::for_graph(&graph);
         let index_ms = t.elapsed();
         let prefix = format!(
             "{n}\t{quad_count}\t{}\t{}\t{}\t{}",
@@ -171,5 +178,134 @@ fn main() {
                 over_budget[i] = true;
             }
         }
+        edit_scale(n, &mut graph, &keys, &mut indexed);
+    }
+}
+
+static EDIT_SEQ: AtomicUsize = AtomicUsize::new(0);
+const POINT: &str = QUERIES[1].1;
+const TWO_HOP: &str = QUERIES[2].1;
+
+fn median_row(scale: usize, name: &str, mut samples: Vec<Duration>) {
+    samples.sort();
+    let at = |i: usize| format!("{:.4}", samples[i].as_secs_f64() * 1000.0);
+    println!(
+        "{scale}\t{name}\t{}\t{}\t{}\t{}",
+        samples.len(),
+        at(samples.len() / 2),
+        at(0),
+        at(samples.len() - 1)
+    );
+}
+
+fn edit_spec(tag: &str, k: usize) -> SemanticStatementSpec {
+    SemanticStatementSpec {
+        predicate: format!("https://example.test/vocab#{tag}{k}"),
+        ..Default::default()
+    }
+}
+
+/// Assert one new statement (a predicate no edge carries yet) on a node pair
+/// that has no statement; returns its handle.
+fn edit_assert(graph: &mut Graph, keys: &[NodeKey], tag: &str) -> String {
+    // A fresh predicate per call: a withdrawn statement is never revived by a
+    // repeat assert, so reusing one would change nothing.
+    let k = EDIT_SEQ.fetch_add(1, Ordering::Relaxed);
+    let n = keys.len();
+    let (_, outcome) = graph
+        .assert_semantic_statement(keys[k % n], keys[(k + 7) % n], edit_spec(tag, k))
+        .expect("edit assert applies");
+    assert!(outcome.changed, "edit assert must change the graph");
+    outcome.statement_id
+}
+
+fn query_rows(indexed: &IndexedDataset, graph: &Graph, query: &str) -> usize {
+    sparql_on(indexed, query, View::Live, graph.coverage_note())
+        .expect("held query")
+        .rows
+        .len()
+}
+
+/// Per-edit, refresh and headless frame-share measurements on a built graph.
+fn edit_scale(n: usize, graph: &mut Graph, keys: &[NodeKey], indexed: &mut IndexedDataset) {
+    let rebuilds = if n >= 100_000 { 7 } else { 21 };
+    let edits = 51;
+    println!("scale\tmeasure\treps\tmedian_ms\tmin_ms\tmax_ms\t# edit_scale");
+
+    // Per-edit assert, then per-edit withdraw of the same statements.
+    let mut asserts = Vec::new();
+    let mut ids = Vec::new();
+    for k in 0..edits {
+        let t = Instant::now();
+        let id = edit_assert(graph, keys, "assertEdit");
+        asserts.push(t.elapsed());
+        ids.push(id);
+    }
+    median_row(n, "edit_assert", asserts);
+    let mut withdraws = Vec::new();
+    for id in &ids {
+        let t = Instant::now();
+        let applied = graph.withdraw_semantic_assertion(id, None, None);
+        withdraws.push(t.elapsed());
+        assert!(applied, "withdraw must apply to a held statement");
+    }
+    median_row(n, "edit_withdraw", withdraws);
+
+    // Refresh after one edit: is_current (stale), rebuild, is_current (fresh).
+    // Two edit kinds: one new assertion, one withdrawal.
+    for kind in ["assert", "withdraw"] {
+        let (mut stale, mut rebuild, mut fresh, mut total) = (vec![], vec![], vec![], vec![]);
+        for k in 0..rebuilds {
+            let id = edit_assert(graph, keys, "refreshEdit");
+            if kind == "withdraw" {
+                // Refresh the index to the assert first, untimed, then withdraw.
+                *indexed = IndexedDataset::for_graph(graph);
+                assert!(graph.withdraw_semantic_assertion(&id, None, None));
+            }
+            let t0 = Instant::now();
+            let was_current = indexed.is_current(graph);
+            let t1 = Instant::now();
+            assert!(!was_current, "is_current must be false after an edit");
+            *indexed = IndexedDataset::for_graph(graph);
+            let t2 = Instant::now();
+            let now_current = indexed.is_current(graph);
+            let t3 = Instant::now();
+            assert!(now_current, "is_current must be true after the rebuild");
+            stale.push(t1 - t0);
+            rebuild.push(t2 - t1);
+            fresh.push(t3 - t2);
+            total.push(t3 - t0);
+        }
+        median_row(n, &format!("is_current_stale_after_{kind}"), stale);
+        median_row(n, &format!("rebuild_after_{kind}"), rebuild);
+        median_row(n, &format!("is_current_fresh_after_{kind}"), fresh);
+        median_row(n, &format!("refresh_total_after_{kind}"), total);
+    }
+
+    // A frame's engine share, headless. Steady: is_current (true) plus one
+    // held query. Edit: is_current (false), rebuild, one held query, after one
+    // assert. Two queries: the point lookup and the two-hop join.
+    for (name, query, expect) in [("point", POINT, 1usize), ("two_hop", TWO_HOP, 1)] {
+        let mut steady = vec![];
+        for _ in 0..edits {
+            let t = Instant::now();
+            assert!(indexed.is_current(graph));
+            let rows = query_rows(indexed, graph, query);
+            steady.push(t.elapsed());
+            assert_eq!(rows, expect, "held {name} row count");
+        }
+        median_row(n, &format!("frame_steady_{name}"), steady);
+        let mut edited = vec![];
+        for k in 0..rebuilds {
+            edit_assert(graph, keys, &format!("frame{name}"));
+            let t = Instant::now();
+            if !indexed.is_current(graph) {
+                *indexed = IndexedDataset::for_graph(graph);
+            }
+            let rows = query_rows(indexed, graph, query);
+            edited.push(t.elapsed());
+            assert_eq!(rows, expect, "held {name} row count after edit");
+        }
+        median_row(n, &format!("frame_after_edit_{name}"), edited);
     }
 }
