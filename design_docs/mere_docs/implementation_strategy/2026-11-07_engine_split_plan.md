@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D136 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D137 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2317,6 +2317,31 @@ revision and what crosses at frame rate.
   D135; applies D69, D131.
 
   Links: area The stack · draws on engine-split D69, engine-split D131, engine-split D134, engine-split D135 · plans engine-split P4 · summary SavedSceneV2 and CartographyGeometry stay in pandect as sync-grammar types with strict decoding; the old sha1 leaves by a str0m bump in Murm so scoped updates have nothing to re-pick.
+
+- **D137. A flipped edge is a duplicate to remove (Mark, 2026-11-12):** P4's relocks
+  (`Code/testing/engine-split/p4_lane_a.md`) showed that a scoped update which moves `mere-rdf`
+  re-resolves spareval's `sha1` edge. In Graphshell `host/` it fell to 0.10.7 on every attempt
+  that moved mere.git (mere-only, and all family repositories together), breaking the
+  query-feature build. The same mechanism moved `gpu-allocator`'s `windows` edge 0.62 to 0.57 in
+  Woodshed's root lock, breaking wgpu-hal's dx12 backend. Each happens because two versions of one
+  third-party crate are locked and a wide range accepts both. The first reader offered a
+  substitution script, a restore script, or fixing each break. Mark took none of the three: "Sounds
+  like it is doing what it should: revealing cruft and papered over duplication. You should be
+  happy to resolve these conflicts". So D131 stands unchanged, and a flipped edge is not routed
+  around. It marks a duplicate: find the package that holds the older version and get it off it
+  (bump that dependent in whichever family repository names it, or drop a dependency nobody uses),
+  then rerun the one scoped update. No substitution, no edge restore, no hold as policy. Murm's
+  `str0m` 0.25 bump (`9e094b6c3f2`) was one such resolution. `zip` 0.6.6 under Burn's optional
+  libtorch backend (`burn-dispatch` to `burn-tch` to `tch` and `torch-sys`) still holds `sha1`
+  0.10.7 in Graphshell `host/`, and what holds `windows` 0.57 in Woodshed is being traced. A scoped
+  update names every package of each family repository it moves (D136). The three relocks that
+  showed no drift: "Land now", without a baseline run first; knot-editor `3effc7a`, cleromancy
+  `617e005` and isocosm `89c2e207` are on main. Their two failing test targets are Findings in
+  their own plans, read and not baselined: Cleromancy `2374bb5`, Isocosm `3236e7ee`. Graphshell
+  `host/` stays at mere `325b0083b`, and Woodshed on its old locks, until their duplicates are
+  removed. Outcome: refines D131; applies D136.
+
+  Links: area The stack · draws on engine-split D131, engine-split D136 · plans engine-split P4 · summary A scoped update that flips a third-party edge has found a duplicated crate; remove the duplicate by bumping or dropping its holder, then rerun the update, never edit or restore the lock.
 
 ## Open questions
 

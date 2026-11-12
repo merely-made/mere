@@ -1535,6 +1535,14 @@ summary = "SavedSceneV2 and CartographyGeometry stay in pandect as sync-grammar 
 draws_on = ["engine-split D69", "engine-split D131", "engine-split D134", "engine-split D135"]
 plans = ["engine-split"]
 
+[decisions."engine-split D137"]
+title = "A flipped edge is a duplicate to remove (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A scoped update that flips a third-party edge has found a duplicated crate; remove the duplicate by bumping or dropping its holder, then rerun the update, never edit or restore the lock."
+draws_on = ["engine-split D131", "engine-split D136"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
