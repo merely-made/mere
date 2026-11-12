@@ -2068,6 +2068,24 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D113, engine-split D128 · plans engine-split P3 · summary The coop harness is brought up to custody isolation, admission by consent and the two-repository layout inside U6, forks first, and the split closes only when the door surface passes headed.
 
+- **D130. How the coop harness is repaired (Mark, 2026-11-11):** The assessment
+  (`Code/testing/engine-split/slice6_u6_harness_assessment.md`) confirmed three causes and found a
+  fourth: `verify.py` requires a Darwin x86_64 owner. Seven rulings. Custody: "Fixture custodian
+  process (Recommended)"; a Graphshell example starts the djinn-custodian fixture and the
+  production `passphrase-fd` Djinn is handed `--custodian`; the receipt proves Djinn's custody
+  client and grant checks, not the custodian binary or its confinement. Consent: "Grant written
+  by Graphshell's own code (Recommended)", a `grant` subcommand of `coop_existing_graph` calling
+  the resident's `grant_for`, so the grant cannot drift from the declaration; it proves the state
+  after a real yes, not the dialog. Two repositories: "Turnstone is the root (Recommended)";
+  Graphshell is checked out at the revision Turnstone's lock pins and both commits and locks are
+  recorded and verified. Machines: "Single-machine baseline mode (Recommended)" with a positive
+  control gates U6; the two-machine co-op phases come back afterwards. Home: "Harness in
+  Turnstone, new Turnstone plan (Recommended)". Owner platform: "Owner may be Linux or macOS, any
+  arch (Recommended)", recorded in the receipt. The custody fixture's S79 receipt: "Add a
+  one-line prose note" in its citing document, over leaving it. Outcome: refines D129.
+
+  Links: area The stack · draws on engine-split D129 · plans engine-split P3 · summary The coop harness gets a fixture custodian, a grant from Graphshell's own code, Turnstone-rooted two-repository builds and a single-machine baseline with a positive control, owned by a new Turnstone plan.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

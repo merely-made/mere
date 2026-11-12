@@ -1479,6 +1479,14 @@ summary = "The coop harness is brought up to custody isolation, admission by con
 draws_on = ["engine-split D113", "engine-split D128"]
 plans = ["engine-split"]
 
+[decisions."engine-split D130"]
+title = "How the coop harness is repaired (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The coop harness gets a fixture custodian, a grant from Graphshell's own code, Turnstone-rooted two-repository builds and a single-machine baseline with a positive control, owned by a new Turnstone plan."
+draws_on = ["engine-split D129"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
