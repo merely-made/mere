@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D140 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D141 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -698,6 +698,12 @@ change. Measure per Constraints before the resource/surface join becomes a crate
   frame cost are measured against the P0 baseline and recorded; the example headless resource
   inspector runs.
 - Needs: P4 (so the profile is outside the crate), P3 (so the surface half has a home).
+- Reading, 2026-11-12 (D141): under D59 the kernel stays whole in Mere until P8, so "fold the
+  resource half" is an in-repo seam: the new `mere` crate takes linked-data, the assertion model
+  and the resource graph, and `mere-kernel` stays in Mere as the surface graph composed over
+  `mere`, re-exporting the moved names its consumers use until it moves at P8. P0 recorded no
+  performance baseline, so the baseline is taken at the commit before the fold; "frame cost" is
+  the engine's share of a frame measured headlessly, and the frame budget stays with P8's contract.
 - The dataset behind the query stage is designed and ruled in the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09): the generic id-level index in chartulary, the `spareval` seam here, dense ids rebuilt per revision, six orderings, one index for live and history. Its §1 measured the borrowed adapter, which is what this phase replaces.
 
 ### P6. Interpretation and identity stages
@@ -2446,6 +2452,41 @@ revision and what crosses at frame rate.
   only Knot's domain. Outcome: refines D133; applies contract C5.
 
   Links: area The stack · draws on engine-split D133, engine-split D136, domain-contract C5 · plans engine-split P4 · summary knot-sync proves P4's second condition with a generic store module behind a domain trait and Knot's domain beside it; the generic half is lifted into the stack later, so other domains do not copy a crate.
+
+- **D141. What P5 folds, and what it measures (first reader, 2026-11-12, listed to Mark):** The P5
+  assessment (`Code/testing/engine-split/p5_assessment.md`, read-only at Mere `70cec005e`) found
+  that P5 as written conflicts with D59: P5 folds "the resource half of `graph-kernel`" and needs P3
+  "so the surface half has a home", while D59 keeps the kernel's split for P8 and P3 moved only
+  `kernel::actions` (D105). The seam is one struct, `kernel::graph::Graph`, holding surfaces,
+  resources, their join (`shown_resources`), shared revision counters and one capture hook.
+  `EdgePayload`'s assertion rules serve both halves, `CapturedDelta` has 50 variants of which 3 are
+  resource, and the snapshot is the authority-guest wire format. About 1,460 lines name `kernel::`
+  outside it. The assessment also found that no P0 performance baseline exists, though P0's ledger
+  reruns with identical counts and the indexed-dataset brief's D1 to D5 are built. Two forks, decided
+  by the first reader under Mark's "you're allowed to think about it and argue" and listed to him:
+  what P5 folds is an in-repo seam. A new `mere` crate takes linked-data, the assertion model and
+  `ResourceGraph`; `mere-kernel` stays in Mere as the surface graph over `mere` and re-exports, at
+  their old paths, only the moved names that something outside Mere uses (grep first). The
+  re-exports are the kernel's public surface until P8 and retire when the kernel moves, not a
+  standing compatibility layer. This keeps D59's substance (the kernel's move and the split's final
+  shape follow the P8 contract) and gives P5 an engine crate that owns its model and builds with no
+  host. Folding the whole kernel would put surfaces and navigation in the engine; the full split now
+  reverses D59; linked-data alone leaves `accesskit` in the engine's closure. Frame cost is the
+  engine's share of a frame, measured headlessly (per-edit assert and withdraw, edit then
+  `is_current` then rebuild, at 10k and 100k); the frame budget stays with P8, which owns "what
+  crosses at frame rate" (D4). This is also the measurement the quad index plan's P3 owes, so it is
+  taken once. The assessment's twelve smaller forks stand as it decided them: stage modules only
+  where code exists; the baseline taken at the commit before the fold; the surface projection and
+  `apply_contribution` become `mere-kernel`'s `rdf` module (the "legacy snapshot adapter", which
+  leaves with the kernel at P8); additive first, consumers repoint, then delete (under D139 a
+  repoint is a manifest row); no SPARQL Update stage (D65); an `engine` layer in the ledger; format
+  entry points take a base IRI and return a dataset through `IndexedDataset::from_quads`, so the
+  ledger and the query path share one dataset type; no Oxigraph fork; the inspector is
+  `mere/examples/inspect.rs`; package `mere`, publishable, versioned above 0.0.2; no new
+  dataset-revision id before P8; the kernel's unused host vocabulary goes to Mark as a list later.
+  Outcome: refines P5; applies D59, D4, D65.
+
+  Links: area The stack · draws on engine-split D4, engine-split D59, engine-split D65 · plans engine-split P5 · summary P5 folds linked-data, the assertion model and the resource graph into a new mere crate inside Mere, with mere-kernel re-exporting until P8; frame cost is the engine's headless share and the budget stays with P8.
 
 ## Open questions
 

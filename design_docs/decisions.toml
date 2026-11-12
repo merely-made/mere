@@ -1567,6 +1567,14 @@ summary = "knot-sync proves P4's second condition with a generic store module be
 draws_on = ["engine-split D133", "engine-split D136"]
 plans = ["engine-split"]
 
+[decisions."engine-split D141"]
+title = "What P5 folds, and what it measures (first reader, 2026-11-12, listed to Mark)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P5 folds linked-data, the assertion model and the resource graph into a new mere crate inside Mere, with mere-kernel re-exporting until P8; frame cost is the engine's headless share and the budget stays with P8."
+draws_on = ["engine-split D4", "engine-split D59", "engine-split D65"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
