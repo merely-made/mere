@@ -142,5 +142,5 @@ Genet `5af76a0cb8c` (2026-09-07) removed it and carved out `genet-compositor`;
 - `IndexedDbBackend::transact` is check-compiled only (wasm32, offline); it
   has no browser-driven test in this crate, consistent with the rest of that
   backend's test coverage (none of `IndexedDbBackend`'s other methods have
-  in-crate browser tests either — `ports/muniment-opfs-probe` is where browser
+  in-crate browser tests either — `ports/muniment-opfs-probe` *(historical citation)* <!-- doc-audit: historical-path --> is where browser
   runs happen for this backend family).

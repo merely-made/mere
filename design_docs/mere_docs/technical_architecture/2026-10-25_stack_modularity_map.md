@@ -83,7 +83,7 @@ What the table says in one line each:
 ## Landed
 
 - **Workshop beside its host (2026-10-26).** `tabard-workshop` moved from
-  `crates/cambium/` to `ports/tabard/workshop`, so the toolkit directory
+  `graphshell/host/crates/cambium` to `ports/tabard/workshop`, so the toolkit directory
   carries no document-stack link and `check_port_boundaries.py` refuses any new
   one. Embedding is unchanged: Pelt and the Tabard desktop take it by workspace
   path.
@@ -116,7 +116,7 @@ What the table says in one line each:
   without `peers` it links no iroh, quinn, p2panda-net, p2panda-sync or reqwest
   (`p2panda-core`, `-store` and `-encryption` remain: operation format, local
   store, group crypto). `check_profile.py library` and `default` hold that, with a
-  positive control. Djinn opts in by name (`ports/mere-resident/Cargo.toml`); Turnstone
+  positive control. Djinn opts in by name (`graphshell/host/ports/mere-resident/Cargo.toml`); Turnstone
   does the same in its own repository.
 
 ## Cues: what is wrong, and what would improve the stack
@@ -208,7 +208,7 @@ if Mark wants that stricter reading.
 ### Djinn's `personal-sync` gates code but not the dependencies it implies
 
 `personal-sync = []` is empty, yet 91 `cfg(feature = "personal-sync")` sites in
-`ports/mere-resident/src` hang off it, and `cxf` and `inference-stages` name it. The
+`graphshell/host/ports/mere-resident/src` hang off it, and `cxf` and `inference-stages` name it. The
 sync stack's dependencies (`p2panda-core`, `p2panda-store`, `stickleback`,
 `transport`, `knot-editor`) are unconditional, so a build without
 `personal-sync` compiles less of Djinn and still links all of the stack. Making
@@ -240,7 +240,7 @@ and its stylesheet specimen links `genet-livery`, `genet-scripted-dom` and
 dev-dependency. So any grouping that files the workshop with the toolkit makes
 the toolkit depend on the document stack while the document stack depends on
 the toolkit's token library. The 2026-10-08 theme-modes decision put the
-workshop under `crates/cambium/` so applications other than the Tabard port
+workshop under `graphshell/host/crates/cambium` so applications other than the Tabard port
 could embed it; a crate is embeddable from any directory, so the location is
 the open part: beside its desktop host under `ports/tabard/`, or left where it
 is with its specimens behind features. `scripts/check_port_boundaries.py`
@@ -248,7 +248,7 @@ refuses a new unconditional toolkit-to-document-stack link.
 
 Ruled and landed 2026-10-26: Mark chose "beside its host"; the package is
 `ports/tabard/workshop`, embedded by workspace path as before, and no crate
-under `crates/cambium/` links the document stack. The web host's
+under `graphshell/host/crates/cambium` links the document stack. The web host's
 `shared_recovery` wasm example mounted the workshop as a dev-dependency; Mark
 ruled that a dev-only link from a crate to a port is refused like any other, so
 the example moved into `ports/tabard/workshop/examples/` and the boundary check
@@ -274,7 +274,7 @@ split.
   `knot-editor` library without `peers`.
 - Neither check covers the *carried* links above; both print them, so a reader
   can see the gap close.
-- No crate under `crates/cambium/` can gain an unconditional link to the
+- No crate under `graphshell/host/crates/cambium` can gain an unconditional link to the
   document stack (`inker`, `document-canvas`, `mere-lanes`, `nematic`,
   `fleece`, `mere-pageload`, `mere-fetch`, `knot-editor-host`) unnoticed; none
   does since `tabard-workshop` moved to `ports/tabard/workshop` (2026-10-26).

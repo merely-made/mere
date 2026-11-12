@@ -172,13 +172,13 @@ the host's existing endpoint.
 
 ## Findings
 
-- 2026-10-30: [`ocapn_coop`](../../../ports/moot/src/ocapn_coop.rs) and its
+- 2026-10-30: `graphshell/host/ports/moot/src/ocapn_coop.rs` and its
   optional port feature expose one configured collection through immutable
   admitted context. Current Notochord authority, Gemot membership and typed
   collection grants are rechecked under the owner coordinator. Callback queue
   insertion is bounded and repeats current authority at a fresh owner clock;
   accepted work may finish according to the documented linearization policy.
-- 2026-10-30: the [isolated source consumer](../../../testing/moot-ocapn-coop/README.md)
+- 2026-10-30: the isolated source consumer (`graphshell/host/testing/moot-ocapn-coop/README.md`)
   uses published Git suppliers and actual scoped native endpoints before CapTP
   and Gemot calls. A proposal enters the host's ordinary authorized command and
   outbound path, then an independent Moot ingests that signed operation.
@@ -189,7 +189,7 @@ the host's existing endpoint.
 - 2026-07-26: done-conditions are claims about the tree and decay as the tree moves; three had drifted (Phase E #1 already met, Phase F's subjects gone, Phase G void). Auditing them costs one pass whenever a phase is declared complete. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:556-596`
 - 2026-10-11: Murm's `RetentionCheckpoint` extension (post type 6) carries p2panda's `PruneFlag` and a signed authority revision; the default conversation policy refuses it, possession of a cabal secret grants no retention authority, and older Murm readers refuse the unknown kind. The checkpoint removes only the signer's own earlier log records and is not a snapshot of old topics. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:1146-1180`
 - 2026-10-13: Murm's `local_peer_id` returned the persona master key although production transports accept a scoped `DerivedKeypair`; it now reads the transport's own identity. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:1238-1255`
-- 2026-10-06: surfaces read the authorized fauna view in three places (`ports/moot/src/captured_web.rs` and two Turnstone place files). From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:913-922`
+- 2026-10-06: surfaces read the authorized fauna view in three places (`graphshell/host/ports/moot/src/captured_web.rs` and two Turnstone place files). From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:913-922`
 
 ## Progress
 

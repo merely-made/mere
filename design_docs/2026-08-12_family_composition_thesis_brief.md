@@ -823,7 +823,7 @@ headed pixels and durable deposit are explicitly out of scope for S9.
 the host suspends (surface lost) rather than reused against a new renderer
 instance on resume.
 
-**Owner:** Mere `crates/cambium/cambium-genet-winit-host` (Cambium's genet/
+**Owner:** Mere `graphshell/host/crates/cambium/cambium-genet-winit-host` (Cambium's genet/
 winit host adapter); Cambium architecture doc
 (`repos/mere/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md`).
 
@@ -832,7 +832,7 @@ design — only fragment IDs are cleared, per the commit).
 
 **Failure tests:** no named regression test found in the diff itself; commit
 `fe2e24e9` (`git -C repos/mere show --stat fe2e24e9`) is a 3-file, 20-line
-change touching `crates/cambium/cambium-genet-winit-host/src/lib.rs` (the
+change touching `graphshell/host/crates/cambium/cambium-genet-winit-host/src/lib.rs` (the
 `.clear()` on `self.s.leaf_fragments` in `suspended()`), the family-composition
 brief, and the Cambium architecture doc. The bounded-continuation table (S8)
 says: *"Cambium native invalidation committed `fe2e24e9`; independent source
@@ -1224,7 +1224,7 @@ recorded consumer pins qualify `5758724e`, before later Mere dependency work.
   protocol or proof of general media support.
 - **Retained source documents:** `turnstone/src/trail_memory.rs` deposits exact
   acquired bytes and a Fleece record as `LocalOnly`. Its captured-collection
-  adapter and [Moot projection](../ports/moot/src/captured_web.rs) consume
+  adapter and Moot projection (`graphshell/host/ports/moot/src/captured_web.rs`) consume
   authority-filtered contributions, retain separate share/capture provenance,
   and expose missing or unsupported records explicitly. The Fleece record
   carries its canonical text, which may extend beyond the selected passage.
@@ -1331,11 +1331,11 @@ toolkits; they do not imply that native shared-core hosting is absent.
 | Inker `SurfaceProducer` | Producer commands/events from raw native frames, format, synchronization and allocation epoch | Preserve native interop and backend/thread requirements while fitting another host's render schedule |
 | Mere view model and requests | Presentation from session/storage authority | Adapt toolkit input, focus and accessibility while retaining the same owner requests |
 
-Source homes are `crates/cambium/sprigging/src/lib.rs`,
+Source homes are `graphshell/host/crates/cambium/sprigging/src/lib.rs`,
 `seiche/crates/conatus/tenant/src/device.rs`,
-`crates/cambium/cambium-rootstock/src/lib.rs`,
+`graphshell/host/crates/cambium/cambium-rootstock/src/lib.rs`,
 `inker/crates/inker/inker/src/surface_engine.rs` and
-`crates/cambium/mere-view/src/lib.rs`.
+`graphshell/host/crates/cambium/mere-view/src/lib.rs`.
 The external trio is Scrying, Graft and Weld, with opt-in Inker adapters;
 native Pelt/Genet remains the baseline under the
 [suite composition ruling](2026-08-22_turnstone_suite_composition_and_capability_census.md).
@@ -1398,7 +1398,7 @@ text/WAV packets, image content and an actual Mere Canvas in both toolkit
 callbacks, including clipping, repeated appearance state, source identity and
 host generation replacement. Input conversion tests and GPU readbacks are
 separate evidence from physical toolkit-window IME/AT acceptance. Receipts live
-in `ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/`; pending
+in `ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/` *(historical citation)* <!-- doc-audit: historical-path -->; pending
 checks are not passing receipts. The executed headless bench produced sixteen
 byte-identical egui/Iced image pairs, with outside-clip, scale and independent
 access checks. Rehydration changes caller generation on the same Device/Queue
@@ -1440,7 +1440,7 @@ Genet's page-facing WebGL API and WebGL2 conformance are independent work.
 #### Verified starting point
 
 Source inspection used Mere `0b9b7a9b2`. Rootstock's `Surface` in
-`crates/cambium/cambium-rootstock/src/lib.rs` exposes `RenderCore`,
+`graphshell/host/crates/cambium/cambium-rootstock/src/lib.rs` exposes `RenderCore`,
 `TextureFormat` and `SurfaceTexture`. `ProducerContext` and `ProducedTexture`
 in `src/producer.rs` also expose wgpu handles. Cambium's web host `surface.rs`
 and Graphshell's `src/web_gpu.rs` boot that core. The browser manifest enables

@@ -17,7 +17,7 @@ and `turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` gate 1.
 
 ## What was ruled (Mark, 2026-09-20)
 
-- The ranged contract is a trait in Mere's fetch crate (`crates/system/fetch`),
+- The ranged contract is a trait in Mere's fetch crate (`graphshell/host/crates/system/fetch`),
   with Redshank as its first consumer.
 - It sits there behind features: the actor, persona cookie persistence and flip
   export become default-on features, so today's consumers (Turnstone,
@@ -120,7 +120,7 @@ so that it can answer a range from a stored body. The page-side media element.
 The native session store plan (`archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md`,
 archived whole in the 2026-10-28 cut) left these open; this plan owns them now,
 beside lane T2, because the jar, the persona partitioning and the fetch worker
-are one substrate (`crates/system/fetch`, Turnstone's cookie custody).
+are one substrate (`graphshell/host/crates/system/fetch`, Turnstone's cookie custody).
 
 - No production `CookieProvider` is wired in mere, genet or Turnstone (genet's
   two are test-only), so script cookie writes cannot reach the jar.
@@ -159,7 +159,7 @@ are one substrate (`crates/system/fetch`, Turnstone's cookie custody).
 - **2026-09-20:** plan written from the R3 rulings; D1 to D7 decided the same day.
 - **2026-09-20, lane F on `slice/ranged-fetch-20260920`, not merged:**
   - F2 and F3 landed (`af6dbc7a`): `Fetch`, `NetFetch`, `Stores` and the reply
-    types in `crates/system/fetch/src/handle.rs`, with seven tests against a real
+    types in `graphshell/host/crates/system/fetch/src/handle.rs`, with seven tests against a real
     local server moved in from the R3-A probe, the pinned cache negative
     included. One addition to D2's names: `Facts` (final URL, content type,
     declared length, validators) rides on every reply, and `Body` is what
@@ -289,7 +289,7 @@ independent `wire` workspace. Canonical move authority:
 Mere adopts Genet `b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084` as one coherent
 Genet cohort. That supplier selects `murm-wire` at
 `80d9959000fcd913634fd223538dfdbbec1f5e4f`, whose ancestry retains the unfiltered
-original Genet source commit. `crates/system/fetch/src/crawler.rs` now adapts
+original Genet source commit. `graphshell/host/crates/system/fetch/src/crawler.rs` now adapts
 an explicit `HttpTransport::webpki(false)` through `netfetcher::WireTransport`;
 its duplicate hyper request/exchange implementation and direct wire-library
 dependencies are removed. The crawler retains a separate Mozilla-rooted pool,

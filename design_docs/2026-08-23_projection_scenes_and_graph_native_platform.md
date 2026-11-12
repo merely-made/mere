@@ -667,9 +667,9 @@ useful defaults. No single palette or quiet visual treatment is mandated
 across the apps. Defaults can provide coherent starting arrangements; users
 must be able to customize them.
 
-*Checked precedent:* [Tabard's theme model](../crates/system/tabard/src/lib.rs) carries
+*Checked precedent:* Tabard's theme model (`graphshell/host/crates/system/tabard/src/lib.rs`) carries
 seed-based definitions, modes and custom mode sheets; its
-[registry](../crates/system/tabard/src/theme/registry.rs) distinguishes built-ins from
+registry (`graphshell/host/crates/system/tabard/src/theme/registry.rs`) distinguishes built-ins from
 user themes and supports forking a user copy. Woodshed's
 `woodshed/crates/woodshed-views/src/theme.rs` at
 `e08bf4b9875a7efb02b1c17bf9fac56708712cee` has Slate, Ember, Light, Dusk,
@@ -681,7 +681,7 @@ owns its implementation history and remaining consumer work.
 Mark also named **Emblem and Pictograph for iconography**. The existing roles
 fit together: [Emblem](https://crates.io/crates/emblem) encodes/decodes compact
 IconVG vector graphics, including icons and glyphs; palette references permit
-retheming. [Pictograph](../crates/canvas/pictograph/README.md) derives
+retheming. Pictograph (`emblem/crates/pictograph/README.md`) derives
 deterministic node faces from content addresses, with palette slots and
 coarse/full levels of detail, using Emblem's encoding. Authored symbols and
 derived entity faces can share the rendering and theme mechanisms. This does
@@ -981,12 +981,12 @@ that precedence or whether a layout lock pauses motion.
 **Checked substrate at published Mere `7bfb293d`:**
 [Forme's arrangement](../crates/forme/forme/src/arrangement.rs) is a semantic
 graph; it deliberately excludes coordinates and split ratios. Geometry belongs
-to projection state. [Platen's workbench](../crates/platen/platen/src/workbench.rs)
+to projection state. Platen's workbench (`graphshell/host/crates/platen/platen/src/workbench.rs`)
 already projects its recursive layout into Genet's `TileTree`, with host
 events applied back to the owning layout. The missing bridge is from those
 existing identities, geometry and document sessions into the scene's forme
 presentation, not a second authoritative tile tree. The current
-[Scenomise compiler](../crates/cambium/scenes/scenomise/src/projection.rs)
+Scenomise compiler (`graphshell/host/crates/cambium/scenes/scenomise/src/projection.rs`)
 emits card representations; the richer mixed-content realization and generic
 presentation-rule editor still need integration. Graphshell supplies graph
 context, Pelt retained document viewing, and Turnstone their browsing
@@ -1176,7 +1176,7 @@ Reading and domain content retain their own typography and presentation.
 Tabard supplies configurable appearance; Cambium supplies the presentation
 components; Forme/Frisket retains arrangement; Mere's source/session authority
 retains the material. Shared pane furniture must not become a second data
-model. The existing [mere-view](../crates/cambium/mere-view/src/lib.rs) and
+model. The existing mere-view (`graphshell/host/crates/cambium/mere-view/src/lib.rs`) and
 [Graphshell route adapter](../ports/graphshell/src/mere_route.rs) already expose
 host-fed retained sessions and source keys without owning another store.
 
@@ -1186,7 +1186,7 @@ live actions and app-entry bindings require their actual owner/consumer paths;
 the Turnstone/Woodshed/Knot/capsule example is direction, not an executed
 interop receipt. Visual and input qualification remain source-bound.
 
-`ports/graphshell/web/workspace.html` is the local retained-data reference
+`turnstone/ports/graphshell/web/workspace.html` is the local retained-data reference
 entry: it mounts the existing `app=local` graph/session store and existing
 Forme workbench, with Tabard application appearance. The original fixture,
 generated-graph and read-only presenter routes keep their current framing.
@@ -1237,7 +1237,7 @@ The first implementation adds pure, versioned recipe compilation in
 scenes, and shared Cambium occurrence controls and inspection. Graphshell admits
 recipes, supplies applied appearance and fonts, owns view state and rendering
 resources, and provides JSON input/export. Shared crates do not depend on a port
-or acquire domain stores. The [scene README](../crates/cambium/scenes/README.md#portable-backdrop-recipes)
+or acquire domain stores. The scene README (`graphshell/host/crates/cambium/scenes/README.md`)
 owns the API and reproduction details.
 
 Supplied facts retain source identity and revision. Repeated fret positions can
@@ -1248,7 +1248,7 @@ unmeasured areas mask it, and unknown device locations receive no invented
 position. Selection and retained attention change presentation only. Invalid
 recipe replacement leaves the current accepted reading intact.
 
-The [implementation receipts](../support/design-studies/backdrops/receipt/qualification.json)
+The [implementation receipts](../support/design-studies/backdrops/receipt/qualification.json) *(historical citation)* <!-- doc-audit: historical-link -->
 record the exercised source, CPU rendering and browser checks. The included
 recipes are illustrative fixtures. App-owned source adapters are described
 below; native host qualification remains separate work. Graphshell establishes
@@ -1263,7 +1263,7 @@ refusal and candidate-stress disclosure. Woodshed preserves tuning orientation,
 occurrence identity and musical degree roles. Signalman displays GPX segments
 and track-sample landmarks while capture identities stay unplaced; timestamps
 and track names do not become position authority. Actual RF coverage and native
-host acceptance remain separate work. The [adapter receipt](../support/design-studies/backdrops/adapters/qualification.json)
+host acceptance remain separate work. The [adapter receipt](../support/design-studies/backdrops/adapters/qualification.json) *(historical citation)* <!-- doc-audit: historical-link -->
 records the cross-repository source cohort and exercised export/render paths.
 
 The sequence-template follow-up uses Woodshed progressions as a second
@@ -1273,5 +1273,5 @@ alignments. Metre keeps stress/rhyme semantics while sharing foot grouping and
 position geometry. Woodshed exports relative roles and supplied song-block
 arrangements, including sustained blocks and rests, with no inferred harmonic
 judgment. Graphshell's Portable scenes includes actual exports in C and G.
-The [decision and qualification guide](../support/design-studies/backdrops/templates/README.md)
+The [decision and qualification guide](../support/design-studies/backdrops/templates/README.md) *(historical citation)* <!-- doc-audit: historical-link -->
 records limits, reproduction and the exercised host paths.

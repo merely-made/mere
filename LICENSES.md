@@ -77,11 +77,11 @@ The tool skips them, as it skips Retained licenses.
 | `Code/testing/mere/design_docs/cambium_docs/testing/receipts/native_image_atlas_20261010/original-control/tabard-patchless-atlas-repro.rs` | `tabard-patchless-atlas-repro-build.json` beside it; `source_sha256` matches the separately retained canonical Git-byte copy, while the Windows checkout form is also preserved | Existing frozen-source rule, 2026-10-06 ruling S79 of the [stack seams plan](design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md); recorded 2026-10-10 |
 | `design_docs/mere_docs/receipts/natal-cap-20261017/narrow-lock-cache.py` | `mere-preservation-before.json` in the adjacent `shared_resident_materialization_20261018` packet | S79, recorded 2026-11-05 |
 | `design_docs/mere_docs/receipts/shared_resident_materialization_20261018/verify.py` | `artifact-hashes.json` beside it | S79, recorded 2026-11-05 |
-| `ports/graphshell/docs/receipts/coop_20261020` | `artifact-sha256.json`, including the prior cohort | S79, recorded 2026-11-05 |
-| `ports/graphshell/docs/receipts/coop_graph_view_20261020` | `artifact-sha256.json`, including the prior cohort | S79, recorded 2026-11-05 |
-| `ports/graphshell/docs/receipts/coop_mac_thinkpad_20261020` | `artifact-sha256.json` | S79, recorded 2026-11-05 |
-| `ports/graphshell/docs/receipts/coop_relay_20261020` | `artifact-sha256.json`, including the relay source | S79, recorded 2026-11-05 |
-| `ports/graphshell/docs/receipts/coop_two_machines_20261020` | `artifact-sha256.json`, including the diagnostic scripts | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_20261020` *(historical citation)* <!-- doc-audit: historical-path --> | `artifact-sha256.json`, including the prior cohort | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_graph_view_20261020` *(historical citation)* <!-- doc-audit: historical-path --> | `artifact-sha256.json`, including the prior cohort | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_mac_thinkpad_20261020` *(historical citation)* <!-- doc-audit: historical-path --> | `artifact-sha256.json` | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_relay_20261020` *(historical citation)* <!-- doc-audit: historical-path --> | `artifact-sha256.json`, including the relay source | S79, recorded 2026-11-05 |
+| `ports/graphshell/docs/receipts/coop_two_machines_20261020` *(historical citation)* <!-- doc-audit: historical-path --> | `artifact-sha256.json`, including the diagnostic scripts | S79, recorded 2026-11-05 |
 | `support/family-promotion/contextual-navigation-publication/macos-intel-chrome` | `file-manifest.json` and `continuation-manifest.json` | S79, recorded 2026-11-05 |
 | `support/receipts/domain-actions-live-20261020/run.py` | `artifact-sha256.json` and `accepted/qualification.json` | S79, recorded 2026-11-05 |
 | `support/receipts/dramatis-authentication-20261021/freeze.py` | `artifact-manifest.json` beside it | S79, recorded 2026-11-05 |

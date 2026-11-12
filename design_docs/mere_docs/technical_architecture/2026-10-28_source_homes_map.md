@@ -58,15 +58,15 @@ each package's coupling measured in files.
 | Packages | Used inside Mere by | Used outside Mere by | Coupling to Mere | Home that fits | Standing |
 | --- | --- | --- | --- | --- | --- |
 | `station-custody` | nothing | Murm `apps/signalman-desktop` | `pandect` in 9 files, `graphshell_endpoint` in 6 | Murm, beside `signalman-desktop` and outside Murm's root workspace (Murm already takes Pandect from Mere there) | No ruling found. It is the only route by which Mere's graph resolves `retinue`, `outrider`, `radio-hand` and `tulle` (Reticulum License); without it, 20 more packages leave Mere's resolution, among them `postilion`, `seneschal`, `selvage`, `radio-face` and the serial stack. |
-| `mere-comms` | `mere-moot` (2 files) | Murm `apps/signalman` (`comms` feature) | none: its dependencies are `serde`, `async-trait`, and optional `murm` and `misfin` | Murm | Moved 2026-11-06 (cycle breaks D4, P6) to `murm/native/crates/comms`, history kept; Mere's `ports/moot` and `ports/graphshell` take it from `murm.git`. |
+| `mere-comms` | `mere-moot` (2 files) | Murm `apps/signalman` (`comms` feature) | none: its dependencies are `serde`, `async-trait`, and optional `murm` and `misfin` | Murm | Moved 2026-11-06 (cycle breaks D4, P6) to `murm/native/crates/comms`, history kept; Mere's `graphshell/host/ports/moot` and `turnstone/ports/graphshell` take it from `murm.git`. |
 | `distillery`, `mere-athanor`, `mere-alembic`, `mere-mesh` | Djinn and Graphshell (Distillery, Mesh); Pandect (Alembic) | Turnstone (Athanor, Distillery), Cleromancy and merelyllc.com (Alembic) | Mesh: none. Distillery uses Mere in five adapter files (2026-10-27 count). Two edges point back: Pandect imports Alembic's `EvictionPolicy` (`persona_settings_store.rs`), and Graphshell depends on Distillery for a test and the optional `distillery-chronicle-fixture` feature. | ESP's repository, as Distillery's (the 2026-10-27 proposal) | Proposal, not ruled. Family promotion F3. |
 | `djinn`, `djinn-testkit`, `castellan`, `djinn-custodian`, `custody-wire`, `graphshell-mcp` | Djinn is the only user of the other five | Cleromancy (Djinn, Castellan) | Inherent: `graphshell_endpoint` in 45 Djinn files, `graphshell_host` in 23, `chirograph` in 23, `pandect` in 18 (2026-10-27) | A resident repository, or Armillary's (the 2026-10-27 proposal) | F3 and the custody plan. The custody packages move together. |
-| `mere-moot` (`ports/moot`), `mere-site` | `mere-site`: Djinn | Turnstone (`moot`) | Moot: `app_host` in 1 file, `comms` in 2, `fleece` in 1. Site: none (`mien`, `muniment`, `mere-proofs`, `servitor`) | Gemot, the governed-space family | No ruling. The murm runtime plan withdrew a separate Moot repository (its Phase G) but kept its two requirements: Mere builds offline, and no manifest carries a local path. Moot in Gemot would give Gemot a Mere edge for `app-host` and `fleece`. |
-| `dramatis-app` (deleted from Mere 2026-11-08; `apps/dramatis` in merely-made/dramatis was then retired the same day under cycle-breaks D26: Dramatis is the producer `dramatis-surface`, and the pane that draws it is Mere's `graphshell-dramatis-pane` in `ports/graphshell`, mounted by `graphshell-mere`), `gazette`, `mere-facts` | `gazette`: Castellan; `mere-facts`: Djinn | Cleromancy (`mere-facts`) | App: `graphshell_endpoint` in 4 files, `mesquite` in 2, `cambium` and `persona_picker` in 1 each. Gazette: `chirograph`, `incipit` and `sceno` in 2 files each. Facts: `mere-kernel` in 2. | Dramatis; the app as a separate root, as Murm keeps `signalman-desktop` | No ruling. The Dramatis repository plan (DR-D, 2026-10-09) moved the identity libraries and left these three. |
+| `mere-moot` (`graphshell/host/ports/moot`), `mere-site` | `mere-site`: Djinn | Turnstone (`moot`) | Moot: `app_host` in 1 file, `comms` in 2, `fleece` in 1. Site: none (`mien`, `muniment`, `mere-proofs`, `servitor`) | Gemot, the governed-space family | No ruling. The murm runtime plan withdrew a separate Moot repository (its Phase G) but kept its two requirements: Mere builds offline, and no manifest carries a local path. Moot in Gemot would give Gemot a Mere edge for `app-host` and `fleece`. |
+| `dramatis-app` (deleted from Mere 2026-11-08; `apps/dramatis` in merely-made/dramatis was then retired the same day under cycle-breaks D26: Dramatis is the producer `dramatis-surface`, and the pane that draws it is Mere's `graphshell-dramatis-pane` in `turnstone/ports/graphshell`, mounted by `graphshell-mere`), `gazette`, `mere-facts` | `gazette`: Castellan; `mere-facts`: Djinn | Cleromancy (`mere-facts`) | App: `graphshell_endpoint` in 4 files, `mesquite` in 2, `cambium` and `persona_picker` in 1 each. Gazette: `chirograph`, `incipit` and `sceno` in 2 files each. Facts: `mere-kernel` in 2. | Dramatis; the app as a separate root, as Murm keeps `signalman-desktop` | No ruling. The Dramatis repository plan (DR-D, 2026-10-09) moved the identity libraries and left these three. |
 | `conatus`, `modulus`, `nisus`, `tenant` | nothing | Isocosm (all four) | `conatus` uses `seiche` in 5 files and `nisus` in 2. `tenant` brings the kiss3d fork into Mere's graph. | Isocosm, or a Conatus repository. `numen` and `seiche` stay, because the kernel and Pictograph use them. | The workspace manifest says "Cambium and Conatus remain platform components" (2026-07-23 consolidation, restated at the 2026-10-19 promotion). |
 | `mere-edit` (`source-edit`), `mora-cmudict`, `reference-data` | nothing | Knot | none | Knot; `mora-cmudict` could go beside `mora` instead | No ruling found. |
 | `document-host`, `ux-events` | nothing | nothing in the nine repositories read | — | — | Workspace members with no consumer. |
-| `support/graphshell-coop/relay_server`, `support/patches/burn-remote`, `crates/probes/murm-direct-phy` | the co-op harness; Distillery `remote` | — | — | The relay and the Burn patch: murm `design_docs/2026-10-28_transport_consolidation_plan.md`, T5 and T4. The probe: Murm. | Transport plan. |
+| `support/graphshell-coop/relay_server`, `support/patches/burn-remote`, `crates/probes/murm-direct-phy` *(historical citation)* <!-- doc-audit: historical-path --> | the co-op harness; Distillery `remote` | — | — | The relay and the Burn patch: murm `design_docs/2026-10-28_transport_consolidation_plan.md`, T5 and T4. The probe: Murm. | Transport plan. |
 
 **2026-11-03 ownership update:** the table retains its original audit basis.
 Castellan, Sporran and Gazette's domain now live in Dramatis (D11-D13), and
@@ -120,7 +120,7 @@ owners. Qualification is Murm's transport consolidation plan, T7.
 | Turquet and shared Sky, moved 2026-11-04 | Cleromancy `3e97e137` owns the independent Turquet 0.17 workspace and MPL-2.0 `cleromancy-sky`, adopted from Turnstone's named-zone timeline and receipt source. Cleromancy and Turnstone call that shared capability. | Scientific source/vector/notice blobs are preserved; 159 native scientific and 18 shared Sky tests pass, with Cleromancy's UTC/twilight, named-zone and natal consumers. Turnstone retains its pane/navigation and its receiving gate; historical 0.13 V1 receipts preserve their original bytes and identity. The owning consolidation is `cleromancy/design_docs/2026-10-18_duplication_reduction_plan.md`, section "Turquet and shared daily sky". |
 | `modulus`, `tenant`, `conatus`, `nisus` | Modulus and Tenant have only Isocosm consumers. Seiche now optionally imports Conatus for GPU evaluation; Numen and Seiche still serve the graph toolkit. | Review Modulus/Tenant as a bounded games-wing slice. A bulk four-crate games-only move is stale: first qualify Seiche's GPU path and choose a portable engine owner for Conatus/Nisus. Preserve the host's shared device. Numen/Seiche remain platform components under this scope. |
 | `ports/dramatis` | A real packaged `dramatis-ui` binary, not an unused library; 1,464 Rust lines. It uses Cambium/Desktop, Mesquite, Taproot and Persona Picker. | Candidate Dramatis application root with a standalone producer/SDK gate and preserved packaging/profile behavior. Core Dramatis must remain free of GUI dependencies. Persona Picker stays reusable GUI code; Woodshed also consumes it. |
-| `ports/distillery/athanor`, `crates/distillery/alembic` | 5,222 and 738 Rust lines. The `workshop-destination` feature still imports Kernel/Pandect; graph destinations call Athanor validation and share a durable operation transaction. | D16 still applies. Separate Mere's graph-destination adapter from the graph-free workshop core, then move that core to Distillery after the W3 recovery/two-host gate. A Pandect feature must take admitted effects/injected checks rather than import agent-domain authority. Preserve operation ids, sealed contexts, transactions and recovery semantics. |
+| `distillery/crates/athanor`, `crates/distillery/alembic` | 5,222 and 738 Rust lines. The `workshop-destination` feature still imports Kernel/Pandect; graph destinations call Athanor validation and share a durable operation transaction. | D16 still applies. Separate Mere's graph-destination adapter from the graph-free workshop core, then move that core to Distillery after the W3 recovery/two-host gate. A Pandect feature must take admitted effects/injected checks rather than import agent-domain authority. Preserve operation ids, sealed contexts, transactions and recovery semantics. |
 
 `mere-moot` and `mere-facts` contain graph/application adapters, so a Gemot or
 Dramatis name alone is insufficient reason to move them. The Comms contract
@@ -184,14 +184,14 @@ Directory cleanup follows these cuts:
 1. Move ready owner-specific leaves first, updating workspace members, scripts,
    fixtures, notices, source pins and actual consumers together. Remove a donor
    only after the receiving source is pushed and its blobs are verified.
-2. The remaining `ports/distillery/athanor` and `crates/distillery/alembic`
+2. The remaining `distillery/crates/athanor` and `crates/distillery/alembic`
    directories are live held code. Remove those misleading parent groupings
    when the workshop split lands; an interim cosmetic move adds another path
    migration without settling ownership.
 3. Keep standalone applications in `ports/` and reusable graph/host adapters
-   in the existing `crates/` groups. Classify `ports/moot` by its library role
+   in the existing `crates/` groups. Classify `graphshell/host/ports/moot` by its library role
    before a mechanical relocation; preserve public crate and protocol names.
-4. `crates/probes/murm-direct-phy` belongs with Murm's physical harnesses.
+4. `crates/probes/murm-direct-phy` *(historical citation)* <!-- doc-audit: historical-path --> belongs with Murm's physical harnesses.
    The co-op relay belongs beside Murm's transport pin, but its frozen input
    hashes require a new harness cohort. `testing/moot-ocapn-coop` needs its
    Gemot/Murm consumer boundary recorded before relocation. Keep historical
@@ -230,7 +230,7 @@ small, so it proves the move procedure before the larger workshop cut.
    registered paths, separately from changing product source.
 
    Live remainder: `crates/distillery/alembic` (four Rust files, 738 lines) and
-   `ports/distillery/athanor` (seven, 5,222 lines), counted recursively under
+   `distillery/crates/athanor` (seven, 5,222 lines), counted recursively under
    `src`, including tests. Alembic supplies records/controls; Athanor supplies
    workshop authority, driver and sealed state. Move their graph-free core and
    producer surfaces into Distillery (distillery-extraction D20). The concrete
@@ -259,7 +259,7 @@ small, so it proves the move procedure before the larger workshop cut.
 
 4. **Review communications and community adapters by role.** `mere-comms` has
    both Moot and Signalman consumers; its contract may stay, while concrete
-   protocol adapters belong to Murm/Errand. `ports/moot` is a library (15 files,
+   protocol adapters belong to Murm/Errand. `graphshell/host/ports/moot` is a library (15 files,
    5,776 source lines), not an executable. Governed domain behavior belongs to
    Gemot, transport to Murm, and graph/capture projection to Mere. Split only
    where that removes a real back edge. `mere-facts` imports Kernel, Dramatis
@@ -311,9 +311,9 @@ After ownership cuts, group by role with package and wire names unchanged:
 | Current path | Proposed role/home |
 | --- | --- |
 | `ports/gazette-ledger` | Reusable projection under `crates/`, alongside graph integration; it is a two-file library already published as `gazette-ledger`. |
-| `ports/moot` | Reusable community/graph integration under `crates/`; move graph-free domain pieces to Gemot only after the feature split. |
+| `graphshell/host/ports/moot` | Reusable community/graph integration under `crates/`; move graph-free domain pieces to Gemot only after the feature split. |
 | `ports/tabard/workshop` | Shared Tabard library under `crates/`; desktop frame stays an application. |
-| `ports/graphshell` | Separate reusable graph host/composition from `graphshell-mere`'s executable frame before choosing paths. Keep the standalone web host independently buildable. |
+| `turnstone/ports/graphshell` | Separate reusable graph host/composition from `graphshell-mere`'s executable frame before choosing paths. Keep the standalone web host independently buildable. |
 | `ports/pelt/{core,desktop}` | Core is shared by Graphshell; keep the browser integration library distinct from its executable frame. |
 | Application frames | A consistent `apps/` layout is reasonable once library/frame boundaries are explicit; do not merely rename all of `ports/`. |
 | `crates/probes`, `support`, `testing` | Tracked probes follow capability owners; source fixtures stay with readers. Frozen receipts keep cited identities and maps. |
@@ -411,7 +411,7 @@ every copy is one more edge for a move to carry.
     - Every installer defines one principal, `djinn`.
     - Its grants (`repos/dramatis/crates/djinn-custodian/packaging/djinn-grants.json.in`) are the union of
       every app's salts.
-    - They repeat Djinn's `ReleasePolicy` (`ports/mere-resident/src/custody.rs`). One
+    - They repeat Djinn's `ReleasePolicy` (`graphshell/host/ports/mere-resident/src/custody.rs`). One
       test is the only check that the two agree.
 - **Transport.**
   - Consumers call `P2pandaTransport`'s own p2panda and iroh methods rather
@@ -465,8 +465,8 @@ every copy is one more edge for a move to carry.
 - Djinn and Cleromancy formed a repository cycle, **closed 2026-11-08** (cycle breaks P3):
   - Djinn used to install Cleromancy's divination validator in the mere route and
     depend on `cleromancy-core` by git. It now loads an owner-approved wasm authority
-    guest from the persona's guest store (`ports/mere-resident/src/authority_guest.rs`,
-    host `crates/script/authority-host`); the guest source is Cleromancy's `authority-guest/`.
+    guest from the persona's guest store (`graphshell/host/ports/mere-resident/src/authority_guest.rs`,
+    host `graphshell/host/crates/script/authority-host`); the guest source is Cleromancy's `authority-guest/`.
   - Cleromancy links `mere-resident`; Mere's resident names no Cleromancy crate.
 - The door could carry an app manifest: routes, projections, salt namespaces
   and persona use. With one, each piece above could live with its owner, and
@@ -478,12 +478,12 @@ every copy is one more edge for a move to carry.
 - **The projection protocol:** Chirograph, the endpoint traits and
   `graphshell-client`. Since 2026-08-01, `crates/graphshell` has had 79
   commits and Chirograph 20.
-- **The graph product:** `ports/graphshell`, with 93.6k lines in `src` and 925
+- **The graph product:** `turnstone/ports/graphshell`, with 93.6k lines in `src` and 925
   commits over the same period.
   - About 9.1k of its lines are adapters for other owners: Woodshed practice,
     Knot blocks, Pelt retained content, Moot resources, the Alembic workshop
     and Distillery.
-  - `ports/graphshell/docs` holds about 269 MB of committed receipts.
+  - `turnstone/ports/graphshell/docs` holds about 269 MB of committed receipts.
 - **Djinn's client library:** the `door` module in `graphshell-endpoint`,
   about 4.5k lines, which handles app admission and acts as the custody client.
   - The socket (`graphshell-app.sock`), the environment variables
@@ -514,7 +514,7 @@ traits and carriers, the one `mere:script` WIT world, `graphshell-client`, `scri
 `script-witgen`. The `door` module left `graphshell-endpoint` for Mere's `graphshell-door`
 (features `projection-door`, `projection-offer`, `projection-provider`, `profile`), which
 depends on the endpoint; `graphshell-host`, `graphshell-mcp` and the reference host
-`ports/graphshell` stay here. `mere-curation`, `scenograph` and `scenomise` stay: no moved
+`turnstone/ports/graphshell` stay here. `mere-curation`, `scenograph` and `scenomise` stay: no moved
 crate uses them.
 
 ### Two graph edit spines

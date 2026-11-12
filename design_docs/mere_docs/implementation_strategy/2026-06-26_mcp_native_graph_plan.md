@@ -32,7 +32,7 @@ F2, over djinn's authenticated agent door.
 **Open, raised by the S14 pass (2026-10-06):** which substrate does the expose half ride
 now? Options: Graphshell's intent grammar (H9's adapter); djinn's authenticated agent
 door (F2's adapter).
-**Answered 2026-10-25:** both, as one adapter. [`graphshell-mcp`](../../../crates/graphshell/graphshell-mcp/README.md)
+**Answered 2026-10-25:** both, as one adapter. `turnstone/crates/graphshell/graphshell-mcp/README.md`
 serves any admitted Graphshell route as stdio MCP and dials djinn's owner-only
 application door, so the grant, the admission and the attribution stay djinn's.
 
@@ -137,7 +137,7 @@ that remainder, since the adapter above is the MCP surface.
   D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md (the status line held): the
   retired command-registry substrate annotated, the Graphshell H9 and djinn F2 adapters
   named, and the expose half's substrate written in as an open question.
-- **2026-10-25, expose half built (stdio, local).** `crates/graphshell/graphshell-mcp`: a
+- **2026-10-25, expose half built (stdio, local).** `turnstone/crates/graphshell/graphshell-mcp`: a
   stdio MCP server, MCP 2026-07-28 plus the handshake revisions, over one admitted
   Graphshell route. Projections are resources; the route's advertised actions are listed by
   `mere_actions` and invoked through one envelope tool, `mere_invoke`, carrying the

@@ -144,7 +144,7 @@ optimization pass.
 **Owner:** Graphshell shared host/web port; receiving Turnstone profile.
 
 Separate normal extension startup from scenario seeding in
-`ports/graphshell/src/web_tree/product.rs`. Give the installed profile a
+`turnstone/ports/graphshell/src/web_tree/product.rs`. Give the installed profile a
 stable local provenance/store identity and explicit lifecycle; retain fixture
 identity only in fixture entry points. Reuse the existing product/viewer
 feature split rather than pulling authoring, native engines or custody into
@@ -281,7 +281,7 @@ credential operations require an explicitly capable route; the public profile
 refuses them. Add Gopher/Micron only through the same profile and their own
 protocol tests, not by labelling rendered HTML as original bytes.
 Adapt Nematic's portable document output to the existing Graphshell reading
-presentation in `ports/graphshell/src/web_tree/reading.rs`; native Pelt/window
+presentation in `turnstone/ports/graphshell/src/web_tree/reading.rs`; native Pelt/window
 hosting is not the browser retrieval implementation.
 
 Bound decoded and encoded bytes, metadata, redirects, time, concurrency and
@@ -300,7 +300,7 @@ downgrade. Never upload history/graph for selection. A one-gateway fixture or
 manual URL configuration alone does not qualify out-of-box public retrieval.
 
 Search retained resources through the existing
-`ports/graphshell/src/web_tree/product/query.rs` and retained-content query
+`turnstone/ports/graphshell/src/web_tree/product/query.rs` and retained-content query
 seams. A remote
 smolweb search provider is separately configured and receives the submitted
 query only; its results are references opened through the selected reader
@@ -501,15 +501,15 @@ platform's editor mount and return behavior separately.
   active-document acquisition or gateway-host permissions above. The action
   currently opens `graph.html`; `bridge.js` owns native connection separately.
   `loader.js` prepares capture then mounts the Wasm portal. Sources:
-  `ports/graphshell/web/extension/README.md`, manifests/background/bridge and
-  `ports/graphshell/web/loader.js`.
+  `turnstone/ports/graphshell/web/extension/README.md`, manifests/background/bridge and
+  `turnstone/ports/graphshell/web/loader.js`.
 - The current product mount opens IndexedDB but constructs
   `SelectedPersonaRef` with `FIXTURE_PERSONA_ADDRESS` and calls
-  `GraphshellApp::open_or_fixture`: `ports/graphshell/src/web_tree/product.rs`.
+  `GraphshellApp::open_or_fixture`: `turnstone/ports/graphshell/src/web_tree/product.rs`.
   That is a reusable reference host, not qualified production profile identity.
 - Address offers already exist in `ports/graphshell/src/handlers.rs`; the
   receiving native web-only dispatch is
-  `ports/graphshell/mere/src/browser.rs`. Neither proves a browser clipboard
+  `turnstone/ports/graphshell/mere/src/browser.rs`. Neither proves a browser clipboard
   or attached-tab realization exists.
 - `inker/crates/fleece/src/page_links.rs` resolves/deduplicates targets. Genet's
   `genet/components/fleece/src/lib.rs` has a rect-free `Link` with href/text/rel
@@ -520,7 +520,7 @@ platform's editor mount and return behavior separately.
   without traversing private backing or external source URLs.
 - `inker/crates/system/page-load/src/lib.rs` already gates outcomes by request and
   carries typed input, client-certificate and certificate-change failures.
-  `crates/system/fetch/src/handle.rs` is explicitly blocking and refuses
+  `graphshell/host/crates/system/fetch/src/handle.rs` is explicitly blocking and refuses
   unsupported rich requests. Reuse the former in Wasm; reuse the latter only
   behind the native adapter.
 - `genet/components/genet-host-api/lib.rs` has portable request/response
@@ -810,7 +810,7 @@ an API being documented is not a passing receiving test.
     its passage); `smoke-keep-text.mjs` (queue, drain, ack, failure, bounds,
     permission removal, extractor) and the existing smokes; the Wasm build; a
     headed Chrome 156 run with a local server and a cold reopen, receipt
-    `ports/graphshell/docs/receipts/keep_content_20261106/`.
+    `ports/graphshell/docs/receipts/keep_content_20261106/` *(historical citation)* <!-- doc-audit: historical-path -->.
   - Open: the native access prompt was not driven (the run pre-granted it in the
     manifest); Firefox; real data; the drain waits for a visible writer tab.
 - 2026-11-07, P0 follower panes (Graphshell port):

@@ -365,7 +365,7 @@ their distinct owners. The native source cut does not implement that workflow.
   forks and withdrawal; a collection may hold several sites, and the host selects a share explicitly at an observed
   version instead of inferring one from timestamps or titles. Source: same file `:302-312`.
 - 2026-10-21: Errand's Titan fetch emits a zero-byte upload and its Spartan query fetch emits a request body; Mere's read
-  redirect loop (`crates/system/fetch/src/lib.rs`) can cross into either, and Turnstone's interception of an initial
+  redirect loop (`graphshell/host/crates/system/fetch/src/lib.rs`) can cross into either, and Turnstone's interception of an initial
   Titan address does not establish redirect admission. A shared source does not establish native completeness. Source:
   same file `:470-480`.
 - 2026-10-22: a NomadNet empty byte response cannot distinguish an empty page from a host refusal. Retinue's request

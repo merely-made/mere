@@ -28,7 +28,7 @@ Six Mere crates pinned by git rev, plus two published Genet crates from crates.i
 | `cambium` | crates.io `0.3.2` | site views serialized to static HTML |
 | `genet-scripted-dom` | crates.io `0.1.0` | scripted DOM lane |
 
-**Drift is near zero on the surfaces that matter.** The site pins mere at `8a7ede70` (2026-08-12) and mere is 112 commits ahead as of today, but exactly one of those commits touched `crates/scenograph/`, `crates/canvas/cartography/`, or `crates/canvas/arrangements/` *(historical citation)* <!-- doc-audit: historical-path -->, and it changed a single line of a design doc. The freeze is holding, and the site is live proof of it.
+**Drift is near zero on the surfaces that matter.** The site pins mere at `8a7ede70` (2026-08-12) and mere is 112 commits ahead as of today, but exactly one of those commits touched `crates/scenograph/`, `graphshell/host/crates/canvas/cartography`, or `crates/canvas/arrangements/` *(historical citation)* <!-- doc-audit: historical-path -->, and it changed a single line of a design doc. The freeze is holding, and the site is live proof of it.
 
 ## The two paths
 

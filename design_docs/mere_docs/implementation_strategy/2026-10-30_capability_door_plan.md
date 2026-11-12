@@ -584,7 +584,7 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
 - Needs: C0.
 - Settings built (D22, Mere `7c1053de1`): the `settings` interface and a
   `settings-provider` world in `mere:script`, bound in
-  `crates/system/settings-wit` and from app-host's `guest-settings`. `caps`
+  `graphshell/host/crates/system/settings-wit` and from app-host's `guest-settings`. `caps`
   and `actions` stay: `caps` reports the host's grant and names no
   capability, and a grant of settings shows as `settings` being linked;
   `actions` is the stable action envelope (2026-07-23), and settings writes
@@ -634,10 +634,10 @@ error types settle.
   below.
 - 2026-10-30: Djinn grants routes by label in code: identity, Knot, site,
   devices, status, control, custody, reservoir, chronicle and inference
-  (`ports/mere-resident/src/bin/djinn.rs:1245-1339`). `CUSTODY_APPS` lists ten labels
-  (`ports/mere-resident/src/custody.rs:46`) and a `first_party` list four
+  (`graphshell/host/ports/mere-resident/src/bin/djinn.rs:1245-1339`). `CUSTODY_APPS` lists ten labels
+  (`graphshell/host/ports/mere-resident/src/custody.rs:46`) and a `first_party` list four
   (`bin/djinn.rs:1284`). Djinn launches no applications; its only child
-  processes are identity dialogs (`ports/mere-resident/src/identity_ui.rs`).
+  processes are identity dialogs (`graphshell/host/ports/mere-resident/src/identity_ui.rs`).
 - 2026-10-30: `custody-wire`'s `Peer` already reads OS peer facts:
   `SO_PEERCRED`, `getpeereid` and `LOCAL_PEERPID`, a macOS audit token checked
   against the code signature's team and identifier, and a Windows pipe
@@ -649,11 +649,11 @@ error types settle.
   launch-handle shape D2 uses.
 - 2026-10-30: `mere:script@0.1.0` has two worlds, `app-core` and
   `document-core` (`graphshell/crates/graphshell-endpoint/wit/world.wit:168,183`), hosted on Wasmtime
-  45 by `crates/script/app-host` and `document-host`. Its `caps` is a list of
+  45 by `graphshell/host/crates/script/app-host` and `document-host`. Its `caps` is a list of
   strings and its `actions` a name with a JSON payload; it declares no
   resources. The Moot capsule-library guest uses `app-core`, and its native
   host checks each action against signed Servitor delegations
-  (`ports/moot/examples/capsule-library/native.rs`).
+  (`graphshell/host/ports/moot/examples/capsule-library/native.rs`).
 - 2026-10-30: chirograph is 2,019 lines with 63 serde types, using
   `BTreeMap` fields and boxed variants (`graphshell/crates/chirograph/src/lib.rs`). WIT
   has no recursive types (component-model `WIT.md`: "Types, however, cannot
@@ -682,13 +682,13 @@ error types settle.
 - 2026-10-30, revision: `c3567c5ab` ("Admit application projection offers
   through leased resident routes", 01:52, seven minutes after this plan)
   added the provider route, owner policy and leases S1 describes, for
-  projections (`ports/mere-resident/src/door/projection_offers.rs`,
-  `crates/graphshell/graphshell-door/src/projection_offer.rs`).
+  projections (`graphshell/host/ports/mere-resident/src/door/projection_offers.rs`,
+  `graphshell/host/crates/graphshell/graphshell-door/src/projection_offer.rs`).
   `675540865` then moved the neutral door modules (`app_admission`, `wire`,
   `frame`, `local_endpoint`, `app_client`, the custody modules) to Armillary's
   `djinn` 0.0.3, pinned at `721e17d`
   (`armillary/design_docs/armillary_docs/implementation_strategy/2026-10-30_djinn_ownership.md`);
-  Mere's resident composition is `ports/mere-resident` (renamed from
+  Mere's resident composition is `graphshell/host/ports/mere-resident` (renamed from
   `ports/djinn` in `28a39cef2`).
 - 2026-10-30, revision: the Armillary door checks only that a peer is the
   same user (a 0600 socket on Unix, SID equality on Windows,
@@ -710,10 +710,10 @@ error types settle.
   subject admission and domain authority per method, with no deputy
   (`MootSessionAuthority::from_admitted`, then lapse, coverage, Moot
   membership and `authorize_current_capability`,
-  `ports/moot/src/ocapn_coop.rs:65-360`). Graphshell's viewer sessions keep
+  `graphshell/host/ports/moot/src/ocapn_coop.rs:65-360`). Graphshell's viewer sessions keep
   `RetainedAuthority` in `SessionAuthority` and name the application in
   `AdmittedEndpointContext` as attribution only
-  (`crates/graphshell/graphshell-host/src/lifecycle.rs:105-150`). Djinn's
+  (`graphshell/host/crates/graphshell/graphshell-host/src/lifecycle.rs:105-150`). Djinn's
   `AppAuthority` is declaration and owner grant with no persona term
   (Armillary `d0c79f5`, `crates/djinn/src/door/declaration.rs:244-340`).
 - 2026-10-31, review of `d0c79f5` and `b6578ee` against D7 and I1: D7 holds
@@ -877,7 +877,7 @@ error types settle.
 - 2026-11-01, C0 promoted (Mere `32be2f0b0`, D18, D19): `script-witgen` (the
   generator, a build-dependency only) and `script-wire` (value encoding,
   `Transport`, OS-pipe and, behind `ipc`, ipc-channel 0.23.1 transports) in
-  `crates/script`; the projection-session interface and a
+  `graphshell/host/crates/script`; the projection-session interface and a
   `projection-provider` world in `mere:script`; graphshell-endpoint's `wit`
   feature with `WitCarrier` (a chirograph `Carrier` over any
   `SessionCalls`), `WitServer` (a complete endpoint behind the generated

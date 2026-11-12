@@ -97,7 +97,7 @@ and offers either to install the launch counter or to remove the session clock,
 
 ### D. Athanor: scheduling, facet pass and surfacing
 The forgetting and consolidation passes exist (`propose_forgetting`, `apply_forgetting`,
-`propose_consolidation`, `apply_consolidation` in `ports/distillery/athanor/src/lib.rs`). Open: the
+`propose_consolidation`, `apply_consolidation` in `distillery/crates/athanor/src/lib.rs`). Open: the
 steady-heat actor that runs them in the background (the crate's module doc says "still to come", and
 its 2026-09-02 ruling gives the scheduler to Djinn), the facet pass, surfacing live passes, and
 thresholds as settings. This plan owns D's remaining workshop integration; automatic cadence and
@@ -369,10 +369,10 @@ automation, credentials, grants or publication.
   (`save_graph_codicil`, `open_codicil_as_session`, `list_graph_codicils`, schema
   `mere.graph-snapshot/v2`, v1 read as legacy); merge by identity is `compose_graph_codicils`.
 - 2026-10-24: Turnstone's `src/resident_runs.rs` persists narrow run records and defaults to
-  untracked external handoff; Graphshell's `ports/graphshell/src/retained_content/producer.rs` and
+  untracked external handoff; Graphshell's `turnstone/ports/graphshell/src/retained_content/producer.rs` and
   `mere_host.rs` supply source presentation and an owned writer.
 - 2026-10-25: the W0 shared records and controls are in `crates/distillery/alembic/src/workshop.rs`,
-  Athanor's workshop domain and native worker adapter in `ports/distillery/athanor/src/workshop.rs`,
+  Athanor's workshop domain and native worker adapter in `distillery/crates/athanor/src/workshop.rs`,
   the furnace source unchanged in `src/furnace.rs` under a default `furnace` feature. The core's
   normal dependency graph excludes Armillary, Tokio, ESP, Burn and CubeCL, the UI and kernel, and
   the inference and cache crates, and it checks for wasm32 with defaults and Armillary disabled.

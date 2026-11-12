@@ -69,7 +69,7 @@ saved dynamics specification requires host validation and a runtime binding.
 
 A workbench's own structure of frames, tiles, and splits is a *forme*, not an arrangement. A physics simulation's bodies, joints, fields, and emitters are a *world*, not a scene.
 
-The implemented [scene pipeline](crates/cambium/scenes/README.md) compiles supported
+The implemented scene pipeline (`graphshell/host/crates/cambium/scenes/README.md`) compiles supported
 recipes and disclosed facts into layout instructions and a projected scene;
 the host draws it and supplies interaction. A renderer's drawing, such as a
 Vello scene, is a different object from that projected scene or a physics world.
@@ -87,7 +87,7 @@ desktop resident), castellan (credential keeper), distillery (model works),
 gazette (the directory port), moot (community: murmurs, moots, and coop), pelt
 (the reference browser port over Genet's engine and Cambium's shell), signalman
 (commissioning and operating Retinue stations). Tabard is the shared theme
-authoring library under `crates/system/tabard`, used by platform crates and ports.
+authoring library under `graphshell/host/crates/system/tabard`, used by platform crates and ports.
 [Knot Editor](https://github.com/merely-made/knot-editor) is an independent
 repository, not a Mere port: it owns files-in-place authoring, document and
 vault authority, evidence, sync and publishing, and Djinn and Turnstone consume
@@ -101,8 +101,8 @@ cargo test -p mere-kernel    # single crate, by package name
 
 ```
 
-`ports/graphshell` has no default binary; pick one explicitly (see
-[`ports/graphshell/README.md`](ports/graphshell/README.md)).
+`turnstone/ports/graphshell` has no default binary; pick one explicitly (see
+`turnstone/ports/graphshell/README.md`).
 
 ### Portable and local dependencies
 

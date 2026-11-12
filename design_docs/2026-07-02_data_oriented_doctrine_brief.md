@@ -273,8 +273,8 @@ unreachability, which no event names (§7.3).
 The device-epoch row is new. The note put the GPU device under Process, but
 cambium-rootstock carries a device generation through every embedding and a
 recovery path that refuses to reattach a lost surface
-([recovery.rs](../crates/cambium/cambium-rootstock/src/recovery.rs),
-[embedding/gpu.rs](../crates/cambium/cambium-rootstock/src/embedding/gpu.rs)).
+(`graphshell/host/crates/cambium/cambium-rootstock/src/recovery.rs`,
+`graphshell/host/crates/cambium/cambium-rootstock/src/embedding/gpu.rs`).
 Device loss is a death event in the middle of a process, and everything
 allocated against the old device dies with it.
 
@@ -368,7 +368,7 @@ means.
 
 The stack's other answer to slot reuse is to never reuse: the scripted DOM's
 monotonic ids with a document tag in the high bits, cambium's projection
-slots ([multi.rs](../crates/cambium/cambium/src/multi.rs)), and scenotime's
+slots (`graphshell/host/crates/cambium/cambium/src/multi.rs`), and scenotime's
 tombstoned slots.
 
 ### 7.7 Case: scene handles keying per-node overrides
@@ -377,7 +377,7 @@ petgraph 0.8.3's `StableGraph` puts a removed node's slot at the head of its
 free list and hands it to the next `add_node`, with no generation
 (`stable_graph/mod.rs`, `remove_node` and `add_node`). graphshell's
 `recycled_slot_fixture`
-([canvas_reader/tests.rs](../ports/graphshell/src/canvas_reader/tests.rs))
+(`turnstone/ports/graphshell/src/canvas_reader/tests.rs`)
 asserts the reuse at runtime, and the accessibility path guards against it: a
 produced action carries the member's Uuid beside its key.
 

@@ -77,7 +77,7 @@ Vulkan WebGPU device loads the WebGPU artifact; same-state comparisons pass at
 both scales with the figures above. Evidence:
 `Code/testing/mere/verify-90ce8f12d-20261015`.
 
-Reproduction is now committed. `ports/graphshell/web/tests/README.md` gives
+Reproduction is now committed. `turnstone/ports/graphshell/web/tests/README.md` gives
 the whole sequence: `build-viewer.py` with wasm-bindgen 0.2.129 and Terser
 5.51.2, the six routes, then the scale 1 and 1.25 comparisons. The fixture's
 `?mode=compare` and `?mode=auto-choice` replace the uncommitted per-route HTML

@@ -3,8 +3,8 @@
 These self-contained HTML files are generated from the same retained
 `ScriptedDom` and application stylesheet as the executable component catalog:
 
-- [component_catalog_narrow.html](../../../../crates/cambium/cambium/tests/fixtures/component_catalog_narrow.html): 420 px browser viewport, 22 rem specimen
-- [component_catalog_regular.html](../../../../crates/cambium/cambium/tests/fixtures/component_catalog_regular.html): 900 px browser viewport, 48 rem specimen
+- `graphshell/host/crates/cambium/cambium/tests/fixtures/component_catalog_narrow.html`: 420 px browser viewport, 22 rem specimen
+- `graphshell/host/crates/cambium/cambium/tests/fixtures/component_catalog_regular.html`: 900 px browser viewport, 48 rem specimen
 
 These are executable test inputs under the Cambium crate's `tests/fixtures/`,
 relocated unchanged on 2026-11-04. The explicit writer below updates that same

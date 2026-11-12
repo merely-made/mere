@@ -269,7 +269,7 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | Classic-reification JSON-LD bridge (ruling 43) | Keep | Carries the same terms. |
 | `RelationCell` / `EdgeCell` / `CellOwner` / `PairInputs` (`relationship_topology.rs`, `types.rs`) | Retire | Link plus assertion. A cell is coarser than an assertion: two same-kind assertions share one cell. |
 | Roster `LinkBundle` / `RelationCell` / `LinkCard` (`crates/mere/src/roster.rs`) | Subsume | The link reading. Its card becomes the opened link (§7.2). |
-| Graphshell `LinkTarget` / `LinkInspection` (`ports/graphshell/src/link_inspection.rs`) | Subsume | The link reading. Its detail panel becomes the opened link. |
+| Graphshell `LinkTarget` / `LinkInspection` (`turnstone/ports/graphshell/src/link_inspection.rs`) | Subsume | The link reading. Its detail panel becomes the opened link. |
 | Woodshed `compact_relation_summaries`, `SetGraphRelationChoice`, `StageRelationKey` | Subsume | The link reading over Woodshed's disclosed assertions. Hide and select key on the assertion id. |
 | Knot operation-hash assertion id | Keep | The assertion id when Knot assertions are ingested. Its signed `asserted_at_ms` is kept as given. |
 | Four member-identity schemes (StageRelationKey, EdgeCell, statement id with ordinal buckets, Knot op hash) | Subsume | One: the assertion id. |

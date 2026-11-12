@@ -46,7 +46,7 @@ and seiche keeps two generators (`emitter.rs`, `laws/mod.rs`).
   document, timed by the host's clock, so no editor builds its own.
   *Annotation, 2026-10-08:* built. The Scenograph editor plan's E1 landed it as
   Cambium's one undo `History` over any snapshot (`de06e4f0`, 2026-10-07), and
-  SE10 to SE13 moved it to the leaf crate `crates/cambium/backstep` (then `edit-history`)
+  SE10 to SE13 moved it to the leaf crate `graphshell/host/crates/cambium/backstep` (then `edit-history`)
   (`bfaf0191`). The mer3ly site's Ruling 133 builds on it: scenotime's
   `SceneTrace` is a pure, serializable record (a base, labelled steps, chain
   validation, replay to any step) with no cursor of its own, and moving the
@@ -165,10 +165,10 @@ state offscreen and captures it. `scripts/e2e.sh` runs its self-tests headless.
 The rule transfers; no code does.
 
 *What it meets.* Cambium is already the toolkit a Scenograph editor is built
-with. It has workbench tiles (`crates/cambium/workbench`), one command model
-(`crates/cambium/cambium/src/command_surface.rs`), the graph canvas, and
+with. It has workbench tiles (`graphshell/host/crates/cambium/workbench`), one command model
+(`graphshell/host/crates/cambium/cambium/src/command_surface.rs`), the graph canvas, and
 rootstock's texture producers for a viewport
-(`crates/cambium/cambium-rootstock/src/producer.rs`).
+(`graphshell/host/crates/cambium/cambium-rootstock/src/producer.rs`).
 `ports/graphshell/src/projection_editor.rs` is host-neutral editor state: a
 draft and a typed `EditorAction` reducer, over workbench tiles. It
 "deliberately has no graph, endpoint, or authority handle". mesquite
@@ -225,7 +225,7 @@ balaur's TOML document, not worth porting.
 holds a `ProjectionDraft`, which is small, `Clone`, `Eq` and serializable. It
 reduces typed actions (`reduce`, L265–309) and has no undo. Its preview already
 works the way balaur's mirror does. `ProjectionCompiler`
-(`crates/cambium/scenes/scenomise/src/projection.rs`, L530–614) compiles from the
+(`graphshell/host/crates/cambium/scenes/scenomise/src/projection.rs`, L530–614) compiles from the
 draft, the dataset and the host's item sizes as a pure function. So the
 preview is rebuilt from the document on every edit.
 
@@ -276,9 +276,9 @@ though, is bound to hecs entities and to get and apply hooks on balaur's
 
 *What it meets.* Rust types close most of Scenograph's authored surface:
 `Encoding`, `Arrangement`, `Interaction` and the rest, in
-`crates/cambium/scenes/scenograph/src/lib.rs`. The exception is
+`graphshell/host/crates/cambium/scenes/scenograph/src/lib.rs`. The exception is
 `Arrangement.options`, an open string map by design. Refusal already exists.
-`Options` in `crates/cambium/scenes/scenomise/src/catalog.rs` (L380–506)
+`Options` in `graphshell/host/crates/cambium/scenes/scenomise/src/catalog.rs` (L380–506)
 records every key a family reads through its typed readers: `finite`,
 `positive`, `count`, `depth`, `flag`, `choice` and `list`. `finish` refuses
 any other key with "does not read this option".
@@ -286,7 +286,7 @@ any other key with "does not read this option".
 What is missing is the declaration as data. A family's options exist only as
 the calls its code makes. So the projection editor can't list them, show their
 types, defaults or choices, or generate a row for each one.
-`SolverCapability` (`crates/cambium/scenes/scenomise/src/registry.rs`, L56)
+`SolverCapability` (`graphshell/host/crates/cambium/scenes/scenomise/src/registry.rs`, L56)
 advertises a solver's id, name, determinism, disclosures and tags, but not its
 options. A registered solver's options are just as invisible.
 
@@ -491,7 +491,7 @@ override expansion is editor Rune over TOML. The ideas stand alone.
 
 *What it meets.* Scenograph's `ProjectionVariant`, applied by
 `AuthoredProjectionDefinition::arrangement_with_variant`
-(`crates/cambium/scenes/scenograph/src/lib.rs`, L671–696), already patches
+(`graphshell/host/crates/cambium/scenes/scenograph/src/lib.rs`, L671–696), already patches
 rather than replaces, one level deep. A variant names its definition and
 carries sparse arrangement options, inserted over the base. A variant for
 another definition is refused.

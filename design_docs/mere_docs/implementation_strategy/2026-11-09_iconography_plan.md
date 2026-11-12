@@ -40,7 +40,7 @@ See the [implementation receipts](../../archive_docs/receipts/2026-11-09_iconogr
 - **pictograph** has one face grammar: hash of an address to `Params` (three
   symmetries, block or diamond, primary and accent among eight palette entries,
   a 5×5 grid), encoded with a 3×3 arm below 32 px and the full arm above
-  (`crates/canvas/pictograph/src/lib.rs:87-140`, `202-330`). One global
+  (`emblem/crates/pictograph/src/lib.rs:87-140`, `202-330`). One global
   `DERIVATION_VERSION = 3`, mixed into an FNV-1a seed (`lib.rs:160-167`). Its
   only consumer is the canvas's `Face::Derived` arm, keyed on `node.url()` and
   cached by `(DERIVATION_VERSION, address)` (`canvas/frame.rs:130-150`).
@@ -200,7 +200,7 @@ Knot and Signalman package nothing. The only `.icns` and `.ico` are Servo's,
 left in `genet/resources/`. No Cambium window sets an icon; the one
 `with_window_icon` in the tree is Pelt's hand-filled 32×32
 (`ports/pelt/desktop/static_viewer.rs:274-278`). Shell activity buttons map
-Unicode marks to seven kinds (`crates/cambium/cambium/src/shell.rs:149-158`) and
+Unicode marks to seven kinds (`graphshell/host/crates/cambium/cambium/src/shell.rs:149-158`) and
 draw each from five CSS boxes (`shell.css:42-54`). netrender's vello-cpu renders
 a `Scene` headless (`examples/backdrop_receipt.rs`).
 

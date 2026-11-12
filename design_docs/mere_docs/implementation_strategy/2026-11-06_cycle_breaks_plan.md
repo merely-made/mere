@@ -138,10 +138,10 @@ parameterisation lands first. Tests keep their counts and the door route has its
 
 ### P2. D1 Mere stops naming Knot (reshaped by D14 and D15)
 
-**Status 2026-11-08 (last): done for the resident; one edge remains, open.** `ports/mere-resident` names no Knot crate
+**Status 2026-11-08 (last): done for the resident; one edge remains, open.** `graphshell/host/ports/mere-resident` names no Knot crate
 (Mere `cacf7094f`, Knot `fc8ab8e41`); the supervised host, its door-backed evidence, the multi-process test and the
 moves are built (Progress). `scripts/check_family_cycles.py --remote` exits 0. **Not done:** the allowlist entry
-`mere -> knot-editor` stays, because `ports/graphshell`'s optional `knot-document` row (`editable-blocks`, `block_editing.rs`)
+`mere -> knot-editor` stays, because `turnstone/ports/graphshell`'s optional `knot-document` row (`editable-blocks`, `block_editing.rs`)
 still names Knot; it leaves when D23 moves that port to Turnstone (Findings, "P2 remainder").
 
 **Status 2026-11-08 (later, superseded above): step (1) done; step (2) settled by D24 (a pending slot until M4; nothing to build);
@@ -157,7 +157,7 @@ this step. **(3)** The supervised sync host: Knot's `knot_sync_host` (and `knot_
 route) run as an application the resident keeps running while the vault is unlocked, over the
 door's custody and blob routes; a generic owner setting names the application; on lock the
 resident refuses keys and ends the child; the lifecycle event names (`knot-closed`,
-`knot-reopened`) are kept. **(4)** Drop the rows. Done when `ports/mere-resident` and every Mere
+`knot-reopened`) are kept. **(4)** Drop the rows. Done when `graphshell/host/ports/mere-resident` and every Mere
 manifest drop `knot-editor` and `knot-document` (`Cargo.toml` rows, the `[patch]` redirect
 section for `mere.git` packages Knot names, the `peers` and `mere-overlay` features), compared by
 the resolved graph and not by the manifest comment; `resident_knot.rs`, `OwnerSettings.knot`
@@ -220,8 +220,8 @@ Murm still reaches Gemot through another edge, the check names it and the phase 
 **Paused 2026-11-06 (Mark) pending the [host/guest contract brief](../research/2026-11-06_host_guest_contract_brief.md); unpaused the same day by D7 to D9.** The scene vocabulary (`sceno`, `scenotime`) now lives in `merely-made/graphshell`, below Murm, so Signalman's `sceno` edge is legal. What is left of P6 is `mere-comms` and F1's `scenomise` edge.
 
 Done when `crates/shell/comms` (package `mere-comms`, lib `comms`; `serde`, `async-trait`,
-optional `murm` and `misfin`, dev `identity`, `transport`) lives in Murm; Mere's `ports/moot`
-and `ports/graphshell` (`comms` feature) consume it from `murm.git`; Murm's `signalman` takes
+optional `murm` and `misfin`, dev `identity`, `transport`) lives in Murm; Mere's `graphshell/host/ports/moot`
+and `turnstone/ports/graphshell` (`comms` feature) consume it from `murm.git`; Murm's `signalman` takes
 `comms` from its own workspace. **Signalman's `portable-scenes` feature still names Mere
 `sceno` and `scenomise`, so the cycle is not broken until F1 is closed;** P6 is done when
 F1 is closed and the standard conditions hold with Murm's resolved graph free of `mere.git`.
@@ -233,7 +233,7 @@ F1 is closed and the standard conditions hold with Murm's resolved graph free of
 **Reshaped 2026-11-06 by D12** (Mark: "D: Woodshed as a guest"). D5's first wording moved the
 two adapters into Woodshed behind its features. A read of the code showed that cannot be done
 by moving files: `ports/graphshell/src/block_editing/bars.rs` (741 lines, 8 tests) is a data
-adapter, but `ports/graphshell/src/web_tree/blocks.rs` (1,315 lines, no tests) is the whole
+adapter, but `turnstone/ports/graphshell/src/web_tree/blocks.rs` (1,315 lines, no tests) is the whole
 block pane, wired into the private web page state (`TreePage`, `AppCtx`, `Logic`, `Child`,
 `ProbeSnapshot`) at nine call sites in `web_tree.rs`, `controls.rs` and `lane.rs`, and
 `graphshell-web` is a standalone cdylib with no crate above it to register anything. Woodshed
@@ -264,17 +264,17 @@ Done when (amended by D12):
   `woodshed-notation`'s feature `block-guest`, built as a signed wasm component pack; the 8
   `bars` tests count 8 before and 8 after (5 move unchanged, 3 rewritten against the adapter's own
   types) plus one conformance test in Woodshed that loads the real pack through Mere's host;
-- Mere has a host-neutral `block_pane`, a `crates/script/block-host` for the `block-guest` world
+- Mere has a host-neutral `block_pane`, a `graphshell/host/crates/script/block-host` for the `block-guest` world
   and a native `graphshell-blocks` shell that loads the same pack under the same review (D13,
   ruling 6);
 - the guest-blocks open questions R1 to R3 are answered (D16);
 - `editable-blocks` stays as the generic pane's feature but loses `dep:woodshedding`; the
-  `woodshedding` row in `ports/graphshell/Cargo.toml` and the `woodshed-notation` row and its
-  `product` entry in `ports/graphshell/web/Cargo.toml` are gone;
-- `ports/graphshell/web/Cargo.lock` and Mere's main lock hold no Woodshed package, and no Mere
+  `woodshedding` row in `turnstone/ports/graphshell/Cargo.toml` and the `woodshed-notation` row and its
+  `product` entry in `turnstone/ports/graphshell/web/Cargo.toml` are gone;
+- `turnstone/ports/graphshell/web/Cargo.lock` and Mere's main lock hold no Woodshed package, and no Mere
   test, dev-dependency or committed fixture names a Woodshed package or contains a Woodshed pack
   (D6);
-- the web build (`ports/graphshell/web/scripts/build-viewer.py`, with its delivery budget)
+- the web build (`turnstone/ports/graphshell/web/scripts/build-viewer.py`, with its delivery budget)
   still builds and its digest is checked the way the repo does;
 - the standard conditions hold.
 
@@ -360,7 +360,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   2026-11-06):** "we can use it as the bottom layer. unarchive, hard cut, i'm ok with that" and
   "graphshell = the protocol". `mark-ik/graphshell` was unarchived and transferred to
   `merely-made/graphshell`; it is cut over to hold only the contract, with no transitional copy
-  left in Mere. The Graphshell reference host (`ports/graphshell`, `graphshell-mere`,
+  left in Mere. The Graphshell reference host (`turnstone/ports/graphshell`, `graphshell-mere`,
   `graphshell-host`) stays above Mere. Outcome: new.
 
   Links: area stack · draws on cycle-breaks D7 · plans cycle-breaks P6 · summary The revived merely-made/graphshell repository is the bottom protocol layer; the reference host stays above Mere.
@@ -444,7 +444,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
      for the adapter logic; the view and component entry go in a `woodshed-notation` feature,
      because `woodshed-notation` depends on `woodshedding` (guest_blocks R2).
   6. Native: "Build a native block pane now, over `app-host`." Not the design's recommendation.
-     `app-host` binds only `app-core`, so the host is a sibling `crates/script/block-host`, and the
+     `app-host` binds only `app-core`, so the host is a sibling `graphshell/host/crates/script/block-host`, and the
      pane is extracted from `web_tree` into a host-neutral `block_pane` (guest_blocks, Native).
   7. Tests: "Rewrite them against the guest's own types, and add one conformance test through
      Mere's host."
@@ -583,7 +583,7 @@ map's "Repository cycles" bullet is rewritten from "already work this way" to wh
   blocked reason), so no contract change is carried and nothing waits on a publish. Stdio carrier: until
   the peer-authentication work on the stdio carrier lands, a custody surface does not cross an unauthenticated
   pipe; the surface runs in the host's process and the stdio child form waits. Built: Dramatis
-  `crates/dramatis-surface` (published contract crates only), Mere `ports/graphshell/dramatis-pane` and its
+  `crates/dramatis-surface` (published contract crates only), Mere `turnstone/ports/graphshell/dramatis-pane` and its
   mount in `graphshell-mere`. Outcome: settles D21's tentative direction as shape A; removes the Dramatis
   window, the `cambium`, `cambium-desktop`, `mandrake` and `taproot` rows and the dev `luggage` row.
 
@@ -596,12 +596,12 @@ Verified 2026-11-06 against a fresh clone of Mere at `4e2cba4d9` and the other r
 clones; its raw edges are not committed).
 
 - **Cycle list, with the closing edge:**
-  - C1 Mere↔Knot: down `ports/mere-resident/Cargo.toml:143` (`knot-editor`, feature `peers`; dev
+  - C1 Mere↔Knot: down `graphshell/host/ports/mere-resident/Cargo.toml:143` (`knot-editor`, feature `peers`; dev
     `:295`, feature `mere-overlay`) with root rows `Cargo.toml:283-284`; up
     `knot-editor/crates/knot-editor/Cargo.toml` (optional `mere-overmap`, `mere-view`,
     `mere-fetch`) and `apps/desktop`. Held acyclic at the package level only by the
     `[patch]` section near `Cargo.toml:650`.
-  - C2 Mere↔Cleromancy: down `ports/mere-resident/Cargo.toml:117`
+  - C2 Mere↔Cleromancy: down `graphshell/host/ports/mere-resident/Cargo.toml:117`
     (`cleromancy-domain = { package = "cleromancy-core", ... }`); up `cleromancy/core/Cargo.toml`
     (`mere`, `graphshell-client`, `pandect`, `chirograph`, `sceno`, `seiche`, `mere-facts`).
   - C3 Mere↔Woodshed: down `ports/graphshell/Cargo.toml:56,221` (`editable-blocks`,
@@ -634,15 +634,15 @@ clones; its raw edges are not committed).
   text for `comms` treats as a single edge.
 - **Non-canonical rows found in the sources this plan touches** (not touched here; the
   `branch = "main"` lane owns the Mere side): `rev =` pins and a `www.github.com` host in
-  `ports/graphshell/Cargo.toml:221` and `ports/graphshell/web/Cargo.toml:53` (Woodshed,
+  `turnstone/ports/graphshell/Cargo.toml:221` and `turnstone/ports/graphshell/web/Cargo.toml:53` (Woodshed,
   `a0ae58f`), in `murm-resolve` (`gemot-address`, `cd795b0`), in `knot-editor`
   (`gemot-site`, `204ee03`) and in `cleromancy/core/Cargo.toml` (`eidetic` at `86e78dd`).
   The check should treat `www.github.com` and `.git` suffix variants as one repository.
 - **Where the cycle map and the docs differ:** the map names `ports/graphshell/web_tree/blocks.rs`;
-  the file is `ports/graphshell/src/web_tree/blocks.rs` (a private module of the `graphshell-web`
+  the file is `turnstone/ports/graphshell/src/web_tree/blocks.rs` (a private module of the `graphshell-web`
   cdylib, not of the `graphshell` library; see P7 and D12). The map says `mere-comms` has "tiny
   blast radius: `mere-moot` in 2 files plus Signalman"; the consumers are the `moot` port
-  (`ports/moot/Cargo.toml:60`) and Graphshell's `comms` and `workspace-editor` features
+  (`graphshell/host/ports/moot/Cargo.toml:60`) and Graphshell's `comms` and `workspace-editor` features
   (`ports/graphshell/Cargo.toml:76,235`). The map calls C4's `comms` half "Open" in one place
   and the resident split plan has it as an adapter question; D4 closes both.
 
@@ -659,7 +659,7 @@ Verified against Mere `49571db83`, the Graphshell repository and the consumers.
 - **Split, `graphshell-endpoint`:** the `door` module (`projection`, `resident_mere_proxy`,
   `projection_offer`, `projection_provider`, `profile`) and the four features that pulled
   Ostiary, Castellan, Dramatis, Insigne and Personae became Mere's `graphshell-door`
-  (`crates/graphshell/graphshell-door`, features `projection-door`, `projection-offer`,
+  (`graphshell/host/crates/graphshell/graphshell-door`, features `projection-door`, `projection-offer`,
   `projection-provider`, `profile`, names unchanged, empty by default). Named for the
   existing `graphshell-host` and `graphshell-mcp` siblings, which are the other
   `graphshell-*` crates that stay in Mere above the protocol.
@@ -709,7 +709,7 @@ Verified against Mere `49571db83`, the Graphshell repository and the consumers.
   `fjall` store needs `muniment/fjall` as an ESP dev feature (Fjall comes with Muniment's git
   source, so Distillery's lock grew 159 lines and no manifest gained a patch row).
 - **Consumer.** Only Graphshell's `goal-surface-model` named `EspGoalEmbedder`
-  (`ports/graphshell/src/goal_surface/model_path.rs`); it now imports
+  (`turnstone/ports/graphshell/src/goal_surface/model_path.rs`); it now imports
   `esp::embed::goal_model` and the feature reads `["goal-surface", "dep:esp", "esp/goal-model",
   "esp/bert", "dep:sha2"]`. Its `esp` row was already
   `git = distillery.git, branch = "main"`. A grep over Mere, Distillery, Gemot, Graphshell, Murm,
@@ -719,7 +719,7 @@ Verified against Mere `49571db83`, the Graphshell repository and the consumers.
 - **Locks.** Eidetic's lock is 879 packages down to 411 (468 removed, none added) and holds no `esp`
   (nor does `responsa` or `line-ceiling`). Distillery's root lock names one Eidetic source; its
   probe locks resolve their own single source and none holds `esp` through Eidetic. Mere's root
-  and `ports/graphshell/web` locks were relocked with `cargo update -p eidetic -p esp`, one
+  and `turnstone/ports/graphshell/web` locks were relocked with `cargo update -p eidetic -p esp`, one
   Eidetic source each, `esp` no longer lists `eidetic-search`'s `esp` edge, 1 unused patch in web
   (as before), none in the root.
 - **Where the plan was loose.** "A `Cargo.lock` records optional dependencies" is true for the
@@ -774,12 +774,12 @@ Verified against Murm `45b1cf47`, Gemot `df6da4a`, Mere `ad63714ec` (before this
   doctest each, in Mere before and in Murm after. `misfin` is taken from Errand's git source
   (Mere reached it through a `[patch.crates-io]` row); `murm`, `transport` and `identity` are the
   native workspace's.
-- **P6, Mere's side.** `ports/moot` and `ports/graphshell` (`comms` feature) take `mere-comms` from
+- **P6, Mere's side.** `graphshell/host/ports/moot` and `turnstone/ports/graphshell` (`comms` feature) take `mere-comms` from
   `murm.git` (`branch = "main"`); `crates/shell/comms` is deleted. The only Mere user of the `murm`
   crate was `mere-comms`'s optional adapter, so the root lock no longer holds `murm`; its workspace row
-  and the two `[patch]` rows for it left with it (otherwise two unused patches). `ports/graphshell/web`
+  and the two `[patch]` rows for it left with it (otherwise two unused patches). `turnstone/ports/graphshell/web`
   relocked. `mere-moot` lib 25 passed; `graphshell --features workspace-editor --all-targets` clean and
-  the three `comms` lib tests pass; `ports/graphshell/web` check clean. Murm: `signalman --features
+  the three `comms` lib tests pass; `turnstone/ports/graphshell/web` check clean. Murm: `signalman --features
   comms` all-targets check clean, 75 lib tests pass; `signalman-desktop --locked --all-targets` check
   clean.
 - **P6, mere.git edges left in Murm's resolved graph (F1's measurement).** Only the `portable-scenes`
@@ -804,14 +804,14 @@ Verified against Murm `45b1cf47`, Gemot `df6da4a`, Mere `ad63714ec` (before this
     imports only `crate::template` (206 lines, no further crate-internal edge), `sceno` and `serde`.
     Inside Mere, `scenomise::backdrops` is also used by `cambium/src/backdrop_scene.rs`,
     `pictograph` (`backdrop_surface.rs`, its tests, the `backdrop_receipt` example),
-    `ports/graphshell` (`block_editing/rhyme.rs`, `web_tree/backdrop.rs`, `web_tree/blocks.rs`) and by
+    `turnstone/ports/graphshell` (`block_editing/rhyme.rs`, `web_tree/backdrop.rs`, `web_tree/blocks.rs`) and by
     `scenomise`'s own `document.rs`, `document/djot.rs` and `span_edit.rs`; its tests are 8 in
     `tests/backdrop_scenes.rs` and 4 in `tests/sequence_templates.rs`.
 - **P6, mere↔murm: exactly which edges remain** (cycle proof, all lock roots, dev edges counted).
   Murm to Mere: in `murm/Cargo.lock`, `signalman` to `scenomise`; in `apps/signalman-desktop`, the
   eight rows above. Mere to Murm (legal direction): `mere-comms`, `mere-transport`, `murm-sync`,
   `murm-webrtc`, `retinue`, `murm-ocapn`, `murm-ocapn-transport`, in the Mere root,
-  `ports/graphshell/web` and `testing/moot-ocapn-coop`. The cycle is therefore not broken, by one
+  `turnstone/ports/graphshell/web` and `testing/moot-ocapn-coop`. The cycle is therefore not broken, by one
   optional feature and one isolated root.
 - **F1 options, not ruled** (each leaves Murm's root lock free of `mere.git` except where noted):
   1. *The `backdrops` slice moves into `merely-made/graphshell` as a contract helper.* Moves
@@ -859,10 +859,10 @@ Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the c
 - **Mere's side, direct imports, no re-export.** `scenomise` no longer has `backdrops` or `template`
   modules (D8's hard cut: no transitional copy). Files that changed an import: `cambium`
   (`backdrop_scene.rs`), `pictograph` (`backdrop_surface.rs`, its tests, the `backdrop_receipt`
-  example), `ports/graphshell` (`block_editing/bars.rs`, `block_editing/rhyme.rs`,
+  example), `turnstone/ports/graphshell` (`block_editing/bars.rs`, `block_editing/rhyme.rs`,
   `web_tree/backdrop.rs`, `web_tree/blocks.rs`), and `scenomise` itself (`document.rs`,
   `document/djot.rs`, `span_edit.rs`, two tests). Manifests: the workspace row, and `scenomise`,
-  `cambium`, `pictograph` and `ports/graphshell` take `sceno-backdrops`. Another consumer outside Mere:
+  `cambium`, `pictograph` and `turnstone/ports/graphshell` take `sceno-backdrops`. Another consumer outside Mere:
   Woodshed (its Progress entry).
 - **Tests, before and after.** Moved: `backdrop_scenes` 8 and `sequence_templates` 4 (12), now in
   Graphshell (`cargo test -p sceno-backdrops`: 8 and 4). `scenomise` stays: lib 199 and 199,
@@ -879,7 +879,7 @@ Verified against Graphshell `2f771813`, Murm `525d948b`, Mere `794a88c77` (the c
   --all-features`, dev edges counted, direct and transitive, excluding only the declared isolated root
   `murm/apps/signalman-desktop`): Murm to Mere: none, in any root. Mere to Murm: `mere-comms`,
   `mere-transport`, `murm-sync`, `murm-webrtc`, `retinue`, `murm-ocapn`, `murm-ocapn-transport` in the Mere
-  root, `ports/graphshell/web` and `testing/moot-ocapn-coop`. No reverse pair: the cycle is gone.
+  root, `turnstone/ports/graphshell/web` and `testing/moot-ocapn-coop`. No reverse pair: the cycle is gone.
   Including the isolated root, Murm to Mere remains there only (eight direct rows, 24 packages).
   Skipped as before (stale lock or network; no `murm` or `mere-comms` in them): Mere `guest-settings`,
   `native-id-consumer`, `luggage-comparison`, Murm `fuzz`.
@@ -991,8 +991,8 @@ Mark's review of the spike gates step (3).
 ### P3 guest (2026-11-08)
 
 **What was built.** Protocol layer (Graphshell `4d971f3`): `authority-guest` world and `domain-authority` interface in
-`world.wit`, with a test beside `block_guest_world`. Mere: `crates/script/authority-host` (the wasmtime host, 9 tests
-over a fixture guest), `ports/mere-resident/src/authority_guest.rs` (candidate encoding, `GuestRuntime`, owner review,
+`world.wit`, with a test beside `block_guest_world`. Mere: `graphshell/host/crates/script/authority-host` (the wasmtime host, 9 tests
+over a fixture guest), `graphshell/host/ports/mere-resident/src/authority_guest.rs` (candidate encoding, `GuestRuntime`, owner review,
 pin, `GuestStore`) and `Authority::Guest` carrying a running guest; `tests/authority_guest.rs` 6, a route test in
 `resident_mere` 1. Cleromancy: `authority-guest/` (own lock root, toolchain pin, `cleromancy-core`'s
 `validate_divination_graph` unchanged behind the WIT). Design is in the domain contract, "The authority guest".
@@ -1005,7 +1005,7 @@ pin, `GuestStore`) and `Authority::Guest` carrying a running guest; `tests/autho
 - No on-disk precompiled artifact: `Component::deserialize` is `unsafe` and a stored file would bypass the pinned hash.
   The component compiles once per process (about a second, optimised).
 - The review reuses D12's signed pack (`eidetic` pack signing) and the one power `power:domain-authority`, but not
-  `CapsuleMount::review` itself: that lives in `ports/graphshell` and is tied to Moot capsule disclosures. The
+  `CapsuleMount::review` itself: that lives in `turnstone/ports/graphshell` and is tied to Moot capsule disclosures. The
   resident's `AuthorityReview::prepare`/`approve` does the same checks and adds the author-key binding and the pin.
 - Guests install through a per-persona store under the shared root, read by `MereRoutes::with_resident_defaults`, so
   every composition picks them up and none names an application. `resident_defaults` now takes the store.
@@ -1206,7 +1206,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   `esp` dependencies and the workspace `esp` row (lock 879 to 411 packages, no `esp`); Distillery
   `ca9334d` relocked onto it (one Eidetic source); Mere (the commit carrying this entry) repointed
   Graphshell's `goal-surface-model` to `esp/goal-model` and relocked the root and
-  `ports/graphshell/web`. Counts, before in Eidetic and after in ESP: lexical receipt 2 passed, 1
+  `turnstone/ports/graphshell/web`. Counts, before in Eidetic and after in ESP: lexical receipt 2 passed, 1
   ignored (default) and 4 passed with `bert --include-ignored` (before 4, after 4);
   `eidetic-recall` example tests 4 and 4; `goal_model_minilm` `adapter_end_to_end` ok and
   `calibrate_match_similarity` failing the same way in both (Findings). `eidetic-search` default
@@ -1228,9 +1228,9 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   yet (P0 is not built); delete it with P0's allowlist.
 - 2026-11-06: P6 / D4, `mere-comms` half landed; F1 and P6 stay open. Murm `559470b6` (history merge,
   128 commits, tree equal to the donor's) and `45b1cf47` (workspace member, Signalman by path, both
-  locks); this Mere commit deletes `crates/shell/comms`, points `ports/moot` and `ports/graphshell`
+  locks); this Mere commit deletes `crates/shell/comms`, points `graphshell/host/ports/moot` and `turnstone/ports/graphshell`
   at `murm.git`, drops the now-unused `murm` row and its two patch rows, and relocks the root and
-  `ports/graphshell/web`. Mere-moot lib 25 passed, `graphshell --features workspace-editor` clean, the
+  `turnstone/ports/graphshell/web`. Mere-moot lib 25 passed, `graphshell --features workspace-editor` clean, the
   three `comms` tests pass; `mere-comms` 28 default and 38 all-features tests pass in Murm as in
   Mere. Cycle proof: Murm to Mere edges remain (Findings, P5 and P6 findings) and Mere to Murm
   unchanged in direction, so the cycle stands, held by `portable-scenes` and `signalman-desktop`.
@@ -1245,7 +1245,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
 - 2026-11-06: D17 / P6 closed. Graphshell `504097c1` and merge `5b25f351` (history import, crate
   `sceno-backdrops`, with a doc fix `e00f7edf`), `2f771813` (`SpanTarget`, `strict_core_records`); Murm
   `525d948b` (`portable-scenes` onto the crate, root lock free of Mere); Mere `794a88c77` (direct
-  imports, `scenomise` loses the two modules, relocked root and `ports/graphshell/web`). Cycle proof and
+  imports, `scenomise` loses the two modules, relocked root and `turnstone/ports/graphshell/web`). Cycle proof and
   counts in Findings (D17 findings): no Murm package depends on a Mere package outside
   `signalman-desktop`, the declared isolated root. P8's allowlist therefore keeps that second isolated
   entry. Woodshed follows in the next entry.
@@ -1260,7 +1260,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   (argument and pattern fields). Mere, in order: `deb7bc974` (Pandect `Backend` impl non-`Send` on wasm,
   the web wasm build was already broken there), `ea1103089` (BlockAdapter trait, registry, memo, rhyme as
   the built-in adapter, sheet painter; also relocks the web lock's `md-5` and `sha1` to 0.10 because
-  `spareval` mixed digest versions on wasm), `88834c656` (`crates/script/block-host` with a Mere-built
+  `spareval` mixed digest versions on wasm), `88834c656` (`graphshell/host/crates/script/block-host` with a Mere-built
   fixture guest, 5 tests), `a8ab87b15` (`power:block-adapter`), `9749d7cac` and `a321a2ac8` (rows and
   fields), `85a7d4f06` (WorkerAdapter and memo), `fc0278801` (the pane dispatches through the
   registry; guest views painted from the vector sheet; unclaimed class disabled, named, with
@@ -1277,7 +1277,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   host and a headless render receipt, not a window); the web Worker's JavaScript side and the
   headed web check (no node, jco or wasm-bindgen CLI on this Mac; the web wasm still checks and the
   `WorkerAdapter` is tested against a scripted transport); the four notation scenarios under
-  `ports/graphshell/web/scenarios/` still name the old Woodshed controls. Details in
+  `turnstone/ports/graphshell/web/scenarios` still name the old Woodshed controls. Details in
   guest_blocks "Implementation status".
 - 2026-11-07: P7's missing pieces, in order. (1) `1d6b2bc48` extracts `graphshell::block_pane` (host-neutral
   `Pane`, adapters and views over a `PaneHost` and `PanePorts`; the web page binds it thinly in
@@ -1290,7 +1290,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   `blocks-view-mode`, `blocks-event-selected`, `blocks-adapters`) and adds 3 tests that they parse and
   name real controls. **(2) is not done**: the web Worker and the disclose, review and load host for
   block adapter packs need `@bytecodealliance/jco` 1.37.0, which the applet path takes from npm
-  (`ports/moot/examples/capsule-library`, a pnpm lock) and which is neither vendored nor on this
+  (`graphshell/host/ports/moot/examples/capsule-library`, a pnpm lock) and which is neither vendored nor on this
   machine; the brief said to stop rather than fetch it. Web today: progression blocks open as text,
   the command disabled and the class named, with "Review block adapters" setting a flag and a
   status line.
@@ -1318,7 +1318,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   four modes, Ink and Accent, 192 runs, lowest 4.81:1; the default surface theme; the fallback; CSS colour; the
   contrast function), `graphshell-blocks` scenarios 3 to 4 (the pane must set the colour); `graphshell` lib with
   `editable-blocks` 372 pass. Screenshots in `testing/mere/guest_blocks_contrast_20261107/`. **Moot disclosure.**
-  `ports/moot/examples/block_adapter_disclosure.rs` shares a signed block-adapter pack into a Moot, selects it into a
+  `graphshell/host/ports/moot/examples/block_adapter_disclosure.rs` shares a signed block-adapter pack into a Moot, selects it into a
   collection, ships it as a plain drop to a retaining member that re-verifies it, and writes `moot-disclosure.json`;
   `build_block_adapters.mjs --moot DIR` builds the site from it with the real Moot, collection and revision in each
   entry's `CapsuleDisclosure`; the web review panel and receipt name them (checked headed in the browser pane with
@@ -1326,7 +1326,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   Moot connection, so the native shell has no Moot path of its own). `--pack`/`--component`, `adapters.json` and
   `--adapter` stay as development inputs. Not done: no network in the proof, no live fetch by either host.
   **Stale locks.** Distillery's `probe`, `remote-fixture` and `session-fixture` roots moved from Eidetic `2df00e0` to
-  `71188bb` (remote-fixture's `insigne` and `personae` followed to Dramatis `696472da`); Mere's `ports/graphshell/web`
+  `71188bb` (remote-fixture's `insigne` and `personae` followed to Dramatis `696472da`); Mere's `turnstone/ports/graphshell/web`
   no longer carries the unused `netrender-vello-shaders` patch (the graph takes shaders at the rev
   `netrender-vello-encoding` names), and its lock lost the matching `patch.unused` entry. Each touched root passes
   `metadata --locked` twice with no diff and `check --locked`. Distillery `94e4fb2`; Mere `b27e07466`, merged to main as `25b19570e`. Woodshed needed no change (the guest paints labels in ink; its conformance test builds `SheetTheme` literals, which this change leaves as they were).
@@ -1339,7 +1339,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
 - 2026-11-08: P2a landed (the blob door route). Decision (f) first: `LEGACY_KNOT_LEASE` left `resident_blobs.rs` for
   `resident_knot.rs` (the lane passes its own lease name; the shared file names no application). Then the route
   `blob-custody-v1`: shape stated first in the domain contract ("The blob door route", sections 1 to 5), built the same
-  day (section 6). Server `ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `djinn`); wire
+  day (section 6). Server `graphshell/host/ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `djinn`); wire
   and client `graphshell-door` feature `blob-door` (`BlobDoorClient`); `ResidentBlobCustody` gained the durable scope
   owner record (`claim_scope`, `reserve_scope`, `withdraw_serving`). Grant: the route in the application's declaration
   and the owner's grant, plus first-binder scope ownership (the resident's own personal scope is reserved). Revocation:
@@ -1400,7 +1400,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   `dramatis-app` lock entry, the four packages only it reached (`cargo update -w`), and the six
   `support/dramatis_*` receipt scripts and `scripts/test_dramatis_auth_tools.py` that hashed it (Dramatis holds
   its own copies under `support/`). No other family repo named the copy by path or by git package. Root
-  `cargo check --workspace --locked` and `ports/graphshell/web` `cargo check --locked --target
+  `cargo check --workspace --locked` and `turnstone/ports/graphshell/web` `cargo check --locked --target
   wasm32-unknown-unknown` pass. The stdio carrier's peer authentication is a design awaiting Mark's ruling R1:
   transport agnosticism note, section 10.
 - 2026-11-08: D26 (Mark: shape A only, pane only, no interim, in process until the stdio carrier authenticates its
@@ -1408,17 +1408,17 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
   the app, then served as titulus cards and `ActionFormV1` actions over `ostiary`, with 11 surface tests and the
   app's 5 state tests; no contract change) and `a96e22df8` (`apps/dramatis`, its packaging and its receipt drivers
   deleted, the `cambium`, `cambium-desktop`, `mandrake`, `taproot` and dev `luggage` rows with them). Mere
-  `f957c7299`: `ports/graphshell/dramatis-pane` (`graphshell-dramatis-pane`, 12 tests rebuilt from the window's
+  `f957c7299`: `turnstone/ports/graphshell/dramatis-pane` (`graphshell-dramatis-pane`, 12 tests rebuilt from the window's
   interaction tests: focus order, zoom and narrow layout, focus-follow against manual scroll, live region and
   heading stability, disabled-while-busy) and its mount in `graphshell-mere` (3 tests; 44 before, 47 after);
   Mere's lock moves `dramatis.git` to the surface commit. `scripts/check_family_cycles.py --remote` passes (The P0 result).
 - 2026-11-08 (host placement): engine-split P3 had not landed when the Dramatis pane was placed (Mere `183acf839`, Graphshell
   `4d971f38`: the Graphshell repository still holds only the contract root, and Cambium is in Mere), so the pane is Mere's
-  `ports/graphshell/dramatis-pane` plus a mount in `ports/graphshell/mere`. Both sit inside `ports/graphshell`, which D23
+  `turnstone/ports/graphshell/dramatis-pane` plus a mount in `turnstone/ports/graphshell/mere`. Both sit inside `turnstone/ports/graphshell`, which D23
   moves to Turnstone, so the P3 lane carries them with it: the pane crate names only `cambium`, `cambium-desktop`,
   `cambium-rootstock`, the published projection contract and `dramatis-surface`, and needs no change but its path.
 - 2026-11-08: P2 steps (3) and (4) built and pushed (Mark: no pins, no locks, track main). **Mere `cacf7094f` (main):**
-  `ports/mere-resident` drops `knot-editor` (both rows, the `peers` and `mere-overlay` features, the `knot_residue` `[[test]]`),
+  `graphshell/host/ports/mere-resident` drops `knot-editor` (both rows, the `peers` and `mere-overlay` features, the `knot_residue` `[[test]]`),
   `resident_knot.rs`, `knot_relation_intake.rs` and `OwnerSettings.knot`. New: `supervisor.rs` (`AppSupervisor`: starts a
   named command with `GRAPHSHELL_APP_ENDPOINT` set to the door, kills it on lock, restarts it on unlock and after a crash
   with a 5 s back-off; `{data_root}` and `{endpoint}` placeholders; 3 tests) and `OwnerSettings.supervised`
@@ -1470,9 +1470,9 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
 
 ### P2 remainder (2026-11-08)
 
-- **`mere -> knot-editor` is not gone.** The resident's rows are; `ports/graphshell/Cargo.toml:223` (`knot-document`,
+- **`mere -> knot-editor` is not gone.** The resident's rows are; `turnstone/ports/graphshell/Cargo.toml:223` (`knot-document`,
   optional, `editable-blocks`, used by `src/block_editing.rs` for `KnotEditor`) remains, so the allowlist entry stays
-  (its reason now names that row). Options: (A) leave it until D23 moves `ports/graphshell` to Turnstone (which already
+  (its reason now names that row). Options: (A) leave it until D23 moves `turnstone/ports/graphshell` to Turnstone (which already
   names `knot-document`), my recommendation since engine-split P3 owns that move; (B) move `block_editing.rs` and the
   `editable-blocks` feature to Knot, which would make Knot name Graphshell's block applet host.
 - **The two `knot_overlay_*` tests were not ported.** They drive Knot's `MereOverlay` against `resident_mere`'s private test
@@ -1495,7 +1495,7 @@ cross-repository manifest edges, 91 lock roots. Exit 1.
 
 ### `block_editing` (2026-11-08, ruling 1; done 2026-11-09 by Mark's choice A, "Small default in Graphshell")
 
-Mark ruled that `block_editing.rs` moves into Knot so `ports/graphshell` stops naming `knot-document`. The move is not
+Mark ruled that `block_editing.rs` moves into Knot so `turnstone/ports/graphshell` stops naming `knot-document`. The move is not
 mechanical, and the docs do not settle what replaces it, so it stopped here with nothing changed and the
 `mere -> knot-editor` allowlist entry still in place.
 
@@ -1515,11 +1515,11 @@ mechanical, and the docs do not settle what replaces it, so it stopped here with
   Mere builds until then. (C) leave it until D23 (the earlier recommendation, now overruled by ruling 1, so asking
   whether A or B is meant).
 
-**Done (2026-11-09).** `ports/graphshell/src/block_editing.rs` now holds a `BlockEditor` trait (source, selection, apply, input,
+**Done (2026-11-09).** `turnstone/ports/graphshell/src/block_editing.rs` now holds a `BlockEditor` trait (source, selection, apply, input,
 input_mut, is_dirty, accept_saved_source), `BufferEditor` (a cambium `TextInput` with its undo journal, the default) and
 `register_editor(factory)`, a once-only registration seam; `Document { id, editor: Box<dyn BlockEditor> }` takes the
 registered editor or the default, so `block_pane`, the `blocks` binary and the web `product` feature were not touched.
-`ports/graphshell` and the workspace drop `knot-document`; the `mere -> knot-editor` allowlist entry is deleted and
+`turnstone/ports/graphshell` and the workspace drop `knot-document`; the `mere -> knot-editor` allowlist entry is deleted and
 `scripts/check_family_cycles.py --remote` exits 0 without it. Knot (`block-editor` feature on `knot-editor`,
 `src/block_editor.rs`) implements the trait over `KnotEditor` (`KnotBlockEditor`) and exposes `register()`; the host that
 composes the pane with Knot calls it before the pane opens. Tests: Graphshell's six `block_editing` document tests stay and

@@ -10,7 +10,7 @@ pass against the current stack ... Pulling, updating, etc."
 
 **Method and limits.** Mere `b12fdcfa7` (main), fresh HTTPS clones at several paths, `cargo +1.99.1 build
 --locked --profile viewer --target wasm32-unknown-unknown --no-default-features --features presentation-webgpu`
-(the route `ports/graphshell/web/scripts/build-viewer.py` builds), `wasm-bindgen` 0.2.129 with
+(the route `turnstone/ports/graphshell/web/scripts/build-viewer.py` builds), `wasm-bindgen` 0.2.129 with
 `--remove-name-section`, sizes are the Wasm file alone at gzip level 6 (`mtime=0`), the number the cap gates.
 `twiggy` and `wasm-opt` are not installed and nothing was installed; attribution is a small script that reads the
 Wasm name section of a `strip=none` build and sums function-body bytes by defining crate, and marginal gzip is
@@ -38,10 +38,10 @@ nothing below says what the live site loads today.
 
 ## 1. What the viewer is for today
 
-**Who loads it.** Only `ports/graphshell/web/viewer.html` (and the qualification fixture
+**Who loads it.** Only `turnstone/ports/graphshell/web/viewer.html` (and the qualification fixture
 `tests/presentation-webgl-fixture.html`, which the runner serves with `pkg/{webgpu,webgl2}/`) import `viewer.js`.
 The README says a site host loads it on first interaction and keeps its own frozen first reading
-(`ports/graphshell/README.md`, "Read-only viewer delivery"). Eleven other pages (`index.html`, `tree.html`,
+(`turnstone/ports/graphshell/README.md`, "Read-only viewer delivery"). Eleven other pages (`index.html`, `tree.html`,
 `workspace.html`, `practice*.html`, `co_op.html`, `dataset.html`, `grouped-dataset.html`, `responsive-links.html`,
 `embed.html`) and the extension's `graph.html` load `loader.js`, which imports the full `./pkg/graphshell_web.js`
 (`extension/prepare-extension.sh` copies that `pkg/`). So the cap binds exactly one consumer: the public site,
@@ -65,7 +65,7 @@ Latin and Greek text only (Arabic, CJK and Thai glyphs are missing; T7 says so).
 | Non-WebGPU fallback: Auto loads webgpu if a device exists, else remounts on webgl2 | `mount.js` `chooseArtifact`, `WEBGPU_ONLY_REFUSAL`; tests README | **Removed 2026-11-08.** It was current in code and in the six-route runner when this audit was written; the one-artifact ruling below deleted the probe and the remount. |
 | Wasm cap 3.25, then 3.30, 3.50 MiB | one-tree plan `:1213-1219`; presentation plan `:25` | **Superseded** by the 5.00 MiB ruling (T7, 2026-11-07). The presentation plan's Constraints still say 3.30 MiB; it needs the same amendment. |
 | "Select a reproducible shipping profile"; "every `cargo build --release --locked` of a commit makes the same bundle" | one-tree plan `:1229-1230`; `web/Cargo.toml` profile comment | **Stale.** Same path gives identical bytes; different paths give 3.62 or 3.71 MB (section 3). |
-| "An automated regression gate"; "the portable workflow's `viewer-delivery` job" | one-tree plan `:1298-1306`; README | **Stale.** The tree holds no such workflow (the only workflow file is `crates/cambium/.github/workflows/ci.yml`), Actions are disabled, so the gate is `build-viewer.py` plus `test_viewer_budget.py` run by hand. |
+| "An automated regression gate"; "the portable workflow's `viewer-delivery` job" | one-tree plan `:1298-1306`; README | **Stale.** The tree holds no such workflow (the only workflow file is `graphshell/host/crates/cambium/.github/workflows/ci.yml`), Actions are disabled, so the gate is `build-viewer.py` plus `test_viewer_budget.py` run by hand. |
 | "Remove capabilities outside the read-only cone" | one-tree plan `:1229` | **Partly stale.** The cone still holds the graph kernel, physics, a PNG encoder/decoder (`mandrake/src/pixels.rs`, unconditional `png`), the full table/CSS layout engine and `serde_json` (section 2). |
 | T7: "`cambium` default scripting, about 45 KB" | host plan T7 | **Stale or mistaken.** `cambium` has one feature, `highlight`; there is no scripting default. `genet-scripted-dom` is the mutable DOM arena (`LayoutDom` over `NodeId`), a hard dependency with `regress` and `html5ever` inside it. Its code is about 55 KB gzip but it is the tree, not scripting. |
 | T7: "physics through `seiche`, about 200 KB gzip" | host plan T7 | **Understated and not a flag.** Marginal gzip of the physics crates is 290 to 364 KB; `pictograph`'s `canvas` feature hard-wires `dep:seiche` (278 `seiche` references in 30 files), so there is nothing to switch off. |
@@ -166,7 +166,7 @@ Eight checkouts of the same commit, same flags, same toolchain (gzip6 of the web
 
 ## 4. Pull and update
 
-Scratch clone, branch `scratch/relock-never-push`, `cargo +1.97.1 update` in `ports/graphshell/web`, not pushed.
+Scratch clone, branch `scratch/relock-never-push`, `cargo +1.97.1 update` in `turnstone/ports/graphshell/web`, not pushed.
 
 - 1,140 to 1,151 lock entries. **134 registry bumps** (for instance `serde_json` 1.0.151 to 1.0.154, `rapier2d`
   0.36.0 to 0.36.1, `uuid` 1.27 to 1.29, `syn` 3.0.6 to 3.0.9, `smallvec`, `zerocopy`, `tokio`, `object` 0.37 to

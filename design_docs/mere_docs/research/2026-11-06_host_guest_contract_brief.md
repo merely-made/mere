@@ -68,17 +68,17 @@ dependency rule.
   things") already calls the `door` module a custody and admission client, not projection. The guest-facing
   wire (`wire`, `frame`, hello, `AppId`, grants) would move down; custody and identity stay out.
 - `scenomise` (the compiler) depends on `scenograph`; its `authoring` feature pulls `backstep` and
-  `workbench` from `crates/cambium`. It is an implementation, not a wire. But Signalman's
+  `workbench` from `graphshell/host/crates/cambium`. It is an implementation, not a wire. But Signalman's
   `portable-scenes` feature uses `scenomise::backdrops` (`murm/apps/signalman/src/survey/scene.rs:8`, read
   from the local clone), so a vocabulary-only contract leaves that feature one crate short (F1).
 
-**Runtime (Mere).** `ports/mere-resident` (doors, reservoir), `graphshell-host` (admission, WebRTC door,
+**Runtime (Mere).** `graphshell/host/ports/mere-resident` (doors, reservoir), `graphshell-host` (admission, WebRTC door,
 fixtures; its `native` feature pulls `pandect`, `transport`, `ostiary`), `crates/cambium/*` as the GUI
 hosting runtime, `pandect`, Djinn. The map counts `chirograph` in 23 Djinn files (2026-10-27); that heavy
 use inside the runtime is the evidence against option 1, since it would make Mere depend upward on
 whichever repository owns projection.
 
-**Host app.** `ports/graphshell` (93.6k lines in `src`, about 9.1k of them adapters for other owners, per
+**Host app.** `turnstone/ports/graphshell` (93.6k lines in `src`, about 9.1k of them adapters for other owners, per
 the map). The old repository exists archived at `github.com/mark-ik/graphshell` ("Archived 2026-07-23:
 moved into merely-made/mere", checked today); `merely-made/graphshell` does not exist. Reviving it means
 unarchiving and transferring that one, or creating a new one.

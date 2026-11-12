@@ -77,13 +77,13 @@ graph. The Graph tools physics panel (`physics`, `6279ca31`, 2026-10-01) and
 the Remote session section (`session`, `sections`, `draft`, `remote_seen`,
 `remote_link_seen`, `tools_open`; `e9d95554`, 2026-10-01, and `9adc4415`,
 2026-10-02) are on the tree, on both tree routes
-(`ports/graphshell/src/web_tree.rs`).
+(`turnstone/ports/graphshell/src/web_tree.rs`).
 
 ## Owners and seams
 
 | Concern | Existing owner and integration point |
 | --- | --- |
-| Graph and product operations | `ports/graphshell/src/app.rs`: `GraphshellApp<B>`; `mere_host.rs` and `product.rs` retain product authority. |
+| Graph and product operations | `turnstone/ports/graphshell/src/app.rs`: `GraphshellApp<B>`; `mere_host.rs` and `product.rs` retain product authority. |
 | Canvas rendering, picking and physics | Pictograph `Canvas`; `web_tree.rs::CanvasProducer` borrows the host's `ProducerContext.core`. Retain this producer rather than replacing it with Cambium's separate graph swatch renderer. |
 | Canvas commands | `canvas_controls.rs::CanvasCommand`; browser `web.rs::pan`, `zoom`, `fit_content` and `web_product.rs::toggle_physics` call it. Bindings choose distances; Canvas owns state. |
 | Application state still in the old presenter | `web.rs::BrowserHost`: IndexedDB app, remote session and physics board, selection/detail, action draft, saved scene, filters, representation, projection editor, live projection and practice state. Separate these from `GpuPresenter`, canvas DOM handles, chrome scene and scenario plumbing as each surface moves. |
@@ -152,7 +152,7 @@ also requires the parent plan's entire receipt and five-page gates.
 
 ## Pages and scenario obligations
 
-There are 40 `.scn` files in `ports/graphshell/web/scenarios/` at this inventory.
+There are 40 `.scn` files in `turnstone/ports/graphshell/web/scenarios` at this inventory.
 **Corrected 2026-10-06 (S14 pass):** that count is the tree before this
 inventory's own commit: 40 at `bb52201c^`, 87 at `26060e88`.
 Preserve assertions about product behavior while replacing component DOM verbs

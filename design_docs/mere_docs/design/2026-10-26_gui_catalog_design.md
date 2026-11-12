@@ -44,7 +44,7 @@ Each is real and useful on its own axis. The gap is between them.
 
 | Catalog | Axis | Where | What it enumerates |
 |---|---|---|---|
-| Cambium component catalog | widgets, executable | component-catalog (`graphshell/design_docs/cambium_docs/technical_architecture/component-catalog.md`), `crates/cambium/cambium/examples/component_catalog.rs` | button through data grid; command surfaces as palette, picker and context menu with disabled reasons; overlay; detail popover; selection bars and filter chips; pane shell and `setting_row` with empty, error and unavailable states; graph-canvas swatch; paint leaves |
+| Cambium component catalog | widgets, executable | component-catalog (`graphshell/design_docs/cambium_docs/technical_architecture/component-catalog.md`), `graphshell/host/crates/cambium/cambium/examples/component_catalog.rs` | button through data grid; command surfaces as palette, picker and context menu with disabled reasons; overlay; detail popover; selection bars and filter chips; pane shell and `setting_row` with empty, error and unavailable states; graph-canvas swatch; paint leaves |
 | Projection grammar catalog | graph visuals | projection grammar catalog (`graphshell/design_docs/graphshell_docs/research/2026-08-15_projection_grammar_catalog.md`) | readings and operators, marks, visual channels, guides and backdrops, relation forms, arrangement families, interaction and change over time |
 | Frame-tree surfaces | roles, and panes by primary authority | [TERMINOLOGY, Surfaces](../../TERMINOLOGY.md#surfaces-frame-tree), consolidating the frame taxonomy (`graphshell/design_docs/graphshell_docs/design/2026-06-07_graph_roster_and_frame_taxonomy.md`) §3 and the peripheral panes (`graphshell/design_docs/graphshell_docs/technical_architecture/2026-06-06_peripheral_panes_architecture.md`) dock | frame; pane as roster, gloss, inspector, apparatus, comms, plus Index and Steward from the panes doc, grouped there by graph, runtime or social authority; tile and the workbench tile tree; shellbar |
 | Card family | summoned surfaces | node card summoning (`graphshell/design_docs/graphshell_docs/design/2026-07-01_node_card_summoning_design.md`) §2 | preview, unvisited, connections swatch, object card |
@@ -68,7 +68,7 @@ Four readings of the table:
   with no open or dismiss seam. The panes themselves are built unevenly and
   outside the Graphshell port: Comms is a view-model crate
   (`murm/native/crates/comms/src/pane.rs`), gloss is swatch geometry in pictograph,
-  diagnostic observations come from Registry (`crates/system/registry`)
+  diagnostic observations come from Registry (`graphshell/host/crates/system/registry`)
   through Armillary's `apparatus-core`, and product views own their inspection
   UI. Cambium's detail panel and sectioned list name Apparatus rows beside
   Steward's, and Graphshell names Inspector and Roster. The dock contract the panes doc proposed exists twice
@@ -136,7 +136,7 @@ Mark's list did not name. The citation is where the stack already says it.
   underlay dot on cull, and "materialization is state", which puts the ladder
   in the persistence column.
 - **Scope and the trail.** `ScopeNavigation<P, A>` in
-  `crates/cambium/cambium/src/scope_navigation/` landed in Woodshed and Knot on
+  `graphshell/host/crates/cambium/cambium/src/scope_navigation` landed in Woodshed and Knot on
   2026-10-23 ([contextual navigation](../../archive_docs/2026-10-28/2026-10-23_contextual_navigation_plan.md)).
   Mark's 2026-10-25 description of settings reached as "context cards opened
   from the context menu as a peek-down scope" is the same mechanism.
@@ -160,7 +160,7 @@ Mark's list did not name. The citation is where the stack already says it.
   R8); disabled reasons; empty, error and unavailable states; typed offline
   refusals. These are one row today only in Cambium's catalog.
 - **Accessibility and input.** The web host's a11y mirror
-  (`crates/cambium/cambium-genet-web-host/src/a11y.rs`), `SurfaceId` as the
+  (`graphshell/host/crates/cambium/cambium-genet-web-host/src/a11y.rs`), `SurfaceId` as the
   event source list, AccessKit as the provider-side tree, and inker's
   `SurfaceProducer` / `WebSurface` with `capabilities()` as the input contract.
   Every row has to answer this column; only the Cambium catalog asserts it.
@@ -202,7 +202,7 @@ Each is a place where two catalogs, or two authorities, claim the same cell.
 The evidence is cited; what would improve the stack follows it.
 
 1. **Forme, platen, pictograph.** `platen` depends on `forme` and `workbench`
-   (`crates/platen/platen/Cargo.toml`); Graphshell's `forme_session` and
+   (`graphshell/host/crates/platen/platen/Cargo.toml`); Graphshell's `forme_session` and
    `forme_workspace` use `platen::TileLayout` and `TreeGeometry` and touch
    pictograph, so they cannot move into `forme`, and only the `mere` facade
    sees all four ([stack lift](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
@@ -369,7 +369,7 @@ cabal types (the survivor rule).
    doc gains a line per code word; nothing renames. Options set aside: the code
    vocabulary as the live family; the four kinds becoming identifiers under the
    survivor rule.
-5. **The dock contract. Ruled: Cambium's shell.** `crates/cambium/cambium/src/shell`
+5. **The dock contract. Ruled: Cambium's shell.** `graphshell/host/crates/cambium/cambium/src/shell`
    owns dock state (open, side, width, focus, context binding) as the pane
    shell's contract, beside the overlay's edge placement. `DockState` and
    `DockSide` move out of the comms pane; the kernel keeps
@@ -612,7 +612,7 @@ is `SurfaceId::StewardPane` with an accessibility descriptor
 (`crates/graph/graph-kernel/src/accessibility.rs`) and a diagnostics channel
 pair (`crates/system/ux-events/src/ux_diagnostics.rs`), and Cambium's list and
 detail components name "Steward (active / queued)" as a predicted consumer
-(`crates/cambium/cambium/src/sectioned_list.rs`, `detail_panel.rs`).
+(`graphshell/host/crates/cambium/cambium/src/sectioned_list.rs`, `detail_panel.rs`).
 Distillery's crate doc (`ports/distillery/src/lib.rs`) already describes an
 embeddable half any host composes: the job board, lease and heartbeat tiles,
 the device roster, retention and device-policy panes, model-manifest browsing

@@ -296,7 +296,7 @@ words are under each, unnumbered until he numbers them:
   adapters in `capture/replay_outcome.rs` go.
   Landed the same evening (`5936edf2c`): migration refuses the record naming node and facet; the adapters are gone.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
-  2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
+  2026-10-26). `tabard-workshop` is the only crate under `graphshell/host/crates/cambium` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
   could embed it. Either it stays and a toolkit grouping carries the document stack; or it moves
   beside its desktop host under `ports/tabard/`, still embeddable by path; or its reader and
@@ -709,7 +709,7 @@ Mark's answer follows each.
   scripts **"Re-document, keep bytes (Recommended)"**; GPU patches **"Ledger all 11
   (Recommended)"**; Q052 **"Narrow claim, report all (Recommended)"**. First crate landed on
   branch `l6/misleading-success` (not merged): Q052 repaired (verdict extracted to
-  `ports/mere-resident/tests/residue_verdict`, unjudged host blocks printed with their reason, regression
+  `graphshell/host/ports/mere-resident/tests/residue_verdict`, unjudged host blocks printed with their reason, regression
   `residue_verdict_classifier` 5 tests, mutation control fails 4 of 5, the audit's probe rerun 5
   passed), Q054 verified in the worktree (djinn-testkit 14 passed), GPU findings added to the
   upstream ledger as item 14. Receipt: `support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json`.
@@ -734,7 +734,7 @@ Mark's answer follows each.
   Mark's ruling the same evening; `GraphSession` is the one persistence owner (A004 drops to
   three paths). The two reopen integration tests that were gated on the feature now run against
   a test-only `graph.json` helper. Kernel lib 484/484, integration 2/2. Receipt updated.
-- 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `crates/cambium/` to
+- 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `graphshell/host/crates/cambium` to
   `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
   README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
   theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
@@ -763,7 +763,7 @@ Mark's answer follows each.
   and whether migration drops or refuses a malformed facet record. Receipt updated.
 - 2026-10-26 (L1, chartulary): Q001, Q003 and Q019 repaired on eidetic main (`af17fe7`; branch
   `l1-chartulary` merged and pruned) and mere repinned to it, in the workspace and in
-  `ports/graphshell/web`, lockfiles changed in their source revs only. Q001 follows Mark's creator
+  `turnstone/ports/graphshell/web`, lockfiles changed in their source revs only. Q001 follows Mark's creator
   ruling (re-parent to the deleted owner's creator, else clear) and also clears a survivor's pending
   origin parent that the deletion collected; Q019 writes snapshot bindings and owned visits in index
   order; Q003 archives a shared nested graph only when its last bearer leaves. One regression each

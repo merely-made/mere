@@ -835,7 +835,7 @@ was committed, and they corrected this brief rather than the world:
   A generated table and hand-edited rows do not compose: the corrections belong
   in the generator, or in a diff applied after it, never only in the output.
 - **Five ADOPT rows named the wrong consumer** and are corrected in place: MLS
-  pointed at `ports/moot` (a 43-line reservation that explicitly disclaims the
+  pointed at `graphshell/host/ports/moot` (a 43-line reservation that explicitly disclaims the
   role), VC 2.0 and RFC 5869 HKDF were listed against reservations and candidate
   future sites as though they were shipped dependencies, CSS Color 4 named
   `genet-livery` (an integration wrapper with zero colour code) where the same

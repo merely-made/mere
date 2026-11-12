@@ -77,7 +77,7 @@ need its own design and review against that ruling. Its exact API is open.
 The [capability door](mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md)
 and app projection offers (`graphshell/design_docs/graphshell_docs/implementation_strategy/2026-10-30_app_projection_offers.md`)
 provide existing authority and provider seams. The bounded capsule dialect in
-`ports/graphshell/src/capsule_applet.rs` is not a general applet SDK.
+`turnstone/ports/graphshell/src/capsule_applet.rs` is not a general applet SDK.
 
 ## 3. Focused applications and composing hosts
 
@@ -122,7 +122,7 @@ with smolweb search and reading in the attached browser. It should:
 
 A PWA does not acquire extension tab/history access by sharing its UI. Browser
 capture needs deliberate permissions and local provenance. The current
-[extension portal](../ports/graphshell/web/extension/README.md) is a starting
+extension portal (`turnstone/ports/graphshell/web/extension/README.md`) is a starting
 seam, not proof of this complete experience.
 
 **60 fps is the interaction target**, across declared supported hardware and

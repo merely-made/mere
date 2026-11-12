@@ -185,7 +185,7 @@ Landed as the cycle breaks plan's P1b (`022560ff1`):
 `mere_defaults` and divination still registered by Mere until that plan's
 P3. The text below is the original statement.
 
-Before P1b, the daemon (`ports/mere-resident/src/bin/djinn.rs`, around line 1406)
+Before P1b, the daemon (`graphshell/host/ports/mere-resident/src/bin/djinn.rs`, around line 1406)
 and the embedded reservoir (`embedded_reservoir.rs`, around line 250) are
 hard-coded to install Cleromancy's authority. Replace them with one registry
 that both compositions read, where each domain names its id, its validator
@@ -237,7 +237,7 @@ D2 makes this a requirement, not a nicety. It is listed in the reservoir plan
 as "Sync, branch and merge of meres across the identity's devices, which rides
 Stickleback personal sync and codicil lineage (tracked, not scheduled)". The
 resident's personal sync knows only `mere.graphshell/personal-graph/v1`
-(`ports/mere-resident/src/personal_sync.rs`), and the expanded personal-sync
+(`graphshell/host/ports/mere-resident/src/personal_sync.rs`), and the expanded personal-sync
 reopen test hang is still open.
 - Done when: an edit to a registered domain on one paired device appears on a
   second, concurrent edits from both merge or surface as a branch, and the

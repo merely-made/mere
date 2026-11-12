@@ -54,7 +54,7 @@ The standalone host and Turnstone must consume the same product model and
 surface. A second implementation with similar labels does not pass this test.
 
 **2026-10-07 implementation boundary:** Tabard's shared authoring library now
-lives at `crates/system/tabard`; its product charter remains the appearance
+lives at `graphshell/host/crates/system/tabard`; its product charter remains the appearance
 workshop below. Alembic's embeddable recall library lives at
 `crates/distillery/alembic`, with Distillery retaining its domain ownership.
 These shared libraries cannot live under ports once platform crates consume
@@ -111,9 +111,9 @@ not claim those packaging or combined-runtime gates are complete. Shared
 Frisket/Workbench furniture, Forme arrangements and Scenograph projections are
 available to both applications. An app's Mere keeps its durable authority.
 
-The first implementation lives in `ports/pelt/core/src/native.rs`,
+The first implementation lives in `graphshell/host/ports/pelt/core/src/native.rs`,
 `inker/crates/system/document-lanes/src/retained_clip.rs` and
-`ports/graphshell/src/retained_content.rs`. It handles held HTML, normalized
+`turnstone/ports/graphshell/src/retained_content.rs`. It handles held HTML, normalized
 text, encoded images and selected text/WAV clips through retained Pelt sessions.
 Graphshell mounts the same portable input view and producer in its Workbench.
 An undeclared resource or absent retained-link destination stays unavailable;
@@ -122,7 +122,7 @@ The old viewer-and-redirector restriction above is superseded by this ruling.
 
 ### Djinn is currently a stale reservation
 
-`ports/mere-resident` currently describes itself as a possible public name for Knot.
+`graphshell/host/ports/mere-resident` currently describes itself as a possible public name for Knot.
 That meaning is obsolete under this ruling. Djinn is the logical
 user-scoped resident already embodied first by `graphshell_device_host` and
 the device-resident consolidation work.
@@ -432,8 +432,8 @@ and invents nothing — so the same precedent puts Athanor's authority (what a
 furnace pass is, what it may propose, the grants, runs, petitions, and
 revocation over bounded actors) in Distillery, with Djinn scheduling it and
 keeping the proposals-not-truth invariant. **Shape:** flat under the port, as
-`ports/graphshell/web` and `knot-editor/crates/knot-editor` already are —
-`ports/distillery/alembic` *(historical citation)* <!-- doc-audit: historical-path --> (moved) and `ports/distillery/athanor` (founded);
+`turnstone/ports/graphshell/web` and `knot-editor/crates/knot-editor` already are —
+`ports/distillery/alembic` *(historical citation)* <!-- doc-audit: historical-path --> (moved) and `distillery/crates/athanor` (founded);
 no intermediate `ports/` or `crates/` directory. **Names:** `mere-alembic` /
 `alembic` unchanged; `mere-athanor` / `athanor`, free on crates.io at the
 ruling and claimed the same day: `mere-athanor 0.0.1` published from mere
@@ -552,7 +552,7 @@ incumbent application.
 
 1. Amend the Graphshell product description around overmap and routing while
    preserving its completed receipts.
-2. Repurpose `ports/mere-resident` from the Knot-name stub to the logical resident
+2. Repurpose `graphshell/host/ports/mere-resident` from the Knot-name stub to the logical resident
    package and composition root.
 3. Write and execute the Knot shared-UI plan, using status as its first
    standalone plus Turnstone receipt.
@@ -562,7 +562,7 @@ incumbent application.
    `mere-comms`, with the murmur surface mountable alone; Turnstone's
    placeholder Comms pane and Signalman are its consumers. *(Amended
    2026-08-22: one port, two surfaces, per 7.1. **Stub founded 2026-08-23**
-   at `ports/moot`, MPL-2.0, registered and compiling; no implementation.
+   at `graphshell/host/ports/moot`, MPL-2.0, registered and compiling; no implementation.
    **Published 2026-08-24** as `mere-moot` 0.0.1, the name claimed per the
    heddle lesson.)*
 6. Plan the moot community surface as that port's second surface, separate
@@ -613,7 +613,7 @@ This continuation supersedes the August product naming above. **Gemot** is the
 community surface containing **murmurs** (secret conversations), **moots**
 (spaces of agreement), and **coop** (shared activities among peers). Explain
 conversations, communities, and particular activities plainly within those
-names. Write `coop` without a hyphen. Technical coordinates remain `ports/moot`,
+names. Write `coop` without a hyphen. Technical coordinates remain `graphshell/host/ports/moot`,
 package `mere-moot`, library `moot`; `gemot` remains the governance library.
 
 The product starts with the hardware people already have and voluntary sharing
@@ -910,7 +910,7 @@ flood a peer could cause. Slice 2 extracts the shared lifecycle contract.
 
 ### I3 slice 2 done, 2026-09-18
 
-The shared lifecycle contract is `moot::coop` in `ports/moot` (`4837248d`): a
+The shared lifecycle contract is `moot::coop` in `graphshell/host/ports/moot` (`4837248d`): a
 versioned, serde report (verdict, reason, membership, grant, revocation,
 reading, clock) and `conform`, one walk of the I3 sequence against whatever
 driver a consumer supplies, with declared capabilities carrying the recorded

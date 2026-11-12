@@ -96,7 +96,7 @@ store rather than separate work on the linear journal.
 ## What a client may do
 
 Cleromancy's path is the precedent
-(`cleromancy/src/ui/worker.rs`, `ports/mere-resident/src/embedded_reservoir.rs`):
+(`cleromancy/src/ui/worker.rs`, `graphshell/host/ports/mere-resident/src/embedded_reservoir.rs`):
 
 - **Open:** try the Djinn door's `reservoir` route, `ensure` the domain,
   then open `mere/<domain>`. Embed the resident only when no door answers
@@ -260,7 +260,7 @@ replication (M4), the wire protocol (the Graphshell layer).
   domain without a validator only for the literal list `"divination" | "personal-facts"`
   (`resident_mere.rs:374`).
 - **The presenting half is already registered at runtime, out of process.** README "App-owned
-  projections" (`ports/mere-resident/README.md`): an application connects to the app door,
+  projections" (`graphshell/host/ports/mere-resident/README.md`): an application connects to the app door,
   offers a projection, and the owner's `projection_providers` setting permits it. Knot's
   `knot_endpoint projection-provider` does this with no Knot-specific registration in Djinn
   ("Djinn neither opens it nor creates a Knot-specific registration"). Per the
@@ -371,7 +371,7 @@ own store's owner, and the daemon's builder chooses what the daemon carries.
 
 ### 3. What the resident needs from a domain today, by name
 
-**Knot** (the only lane). Quoted from `ports/mere-resident` at `1a26ec4e6`.
+**Knot** (the only lane). Quoted from `graphshell/host/ports/mere-resident` at `1a26ec4e6`.
 
 | Need | Call site | Kind |
 |---|---|---|
@@ -434,7 +434,7 @@ neither. Three launches exist today.
 The only change is whose name the call carries. The embedded default
 (`ReservoirAttachment::open`, `embedded_reservoir.rs:241-250`) stops installing anything.
 
-**The daemon (`djinn`).** `ports/mere-resident/src/bin/djinn.rs` (1,712 lines) composes
+**The daemon (`djinn`).** `graphshell/host/ports/mere-resident/src/bin/djinn.rs` (1,712 lines) composes
 everything in `run(args, events)` (`:1069`, about 580 lines), including the Knot lane
 (`resident.rs`) and the routes (`:1397-1408`). It is built from Mere's manifests, so it
 cannot link Knot or Cleromancy. Therefore:
@@ -449,7 +449,7 @@ cannot link Knot or Cleromancy. Therefore:
   argument, and `--installed`, `--launch <app>` (descriptor 3 handle) and `--resident-status`
   are unchanged.
 
-**graphshell-mere** (`ports/graphshell/mere`, bin `graphshell_mere`). Door client only: its
+**graphshell-mere** (`turnstone/ports/graphshell/mere`, bin `graphshell_mere`). Door client only: its
 manifest names `graphshell-door` (`projection-door`), `mere-overmap`, `mere-view`, not
 `mere-resident`. It has nothing to register and nothing changes. It views whichever meres
 the resident serves; a domain the resident does not carry shows as unavailable. The
@@ -495,7 +495,7 @@ It is not wholly Cleromancy's:
 | Product replay: `published_divination_authority_survives_three_real_resident_owner_processes` (`:258-318`) and `mod published_replay_regression` | `258-318`, `577-1370` | 1 + 6 | moves to Cleromancy as a consumer; needs the two-process child harness |
 
 The child harness (spawn self as owner, endpoint, durable-bytes check) is shared by both, so
-the split also moves it somewhere both can use: `crates/system/djinn-testkit`, which is "path
+the split also moves it somewhere both can use: `graphshell/host/crates/system/djinn-testkit`, which is "path
 only, unpublished, so packaging drops it" (`Cargo.toml` dev-dependencies), becomes a git
 dev-dependency of the app repositories (`branch = "main"`). A dev edge from an app to Mere is
 the legal direction under D6.
@@ -749,7 +749,7 @@ Closes D1 for both. C3/C6, custody: unchanged from today. Synergy with D12: none
   guest links Mere's graph crates itself, which a guest above Mere may.
 - **What moves.** In Cleromancy: a thin component crate over `validate_divination_graph` (the
   validator, which is already pure), a signed pack (the D12 path: `PackManifest`, `eidetic` pack
-  signing). In Mere: a wasmtime host in the resident (`crates/script/app-host` already carries
+  signing). In Mere: a wasmtime host in the resident (`graphshell/host/crates/script/app-host` already carries
   `wasmtime = "45"`, shared with `document-host`; `mere-resident` links none today), a loader,
   and a native review and pin store (today's `CapsuleMount::review` is web only). Nothing in
   Mere names Cleromancy; `Authority::Guest(ComponentRef)` joins `Authority::Graph(closure)`.
@@ -931,7 +931,7 @@ prerequisite for moving Knot's lane out of the resident.
 
 ### 1. What exists, and what is asked of the route
 
-`ResidentBlobCustody` (`ports/mere-resident/src/resident_blobs.rs`) owns the resident's one iroh
+`ResidentBlobCustody` (`graphshell/host/ports/mere-resident/src/resident_blobs.rs`) owns the resident's one iroh
 store and one `BlobReadAuthorizer`. Two in-process lanes borrow it today: personal-graph transfers
 (`personal_sync.rs`, scope = the graph) and Knot's evidence (`resident_knot.rs`, scope = the
 Knot space id). A lane uses six things: `blobs()` (put under a `BlobLease`, lease and release an
@@ -1015,9 +1015,9 @@ and copies only blobs the legacy store retains.
 
 ### 6. As built (2026-11-08)
 
-- **Server:** `ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `bin/djinn.rs`
+- **Server:** `graphshell/host/ports/mere-resident/src/resident_blob_door.rs` (`BlobDoor`, registered by `bin/djinn.rs`
   beside the published-site route; `BlobDoor::revoke` and `restore`). **Wire and client:**
-  `crates/graphshell/graphshell-door/src/blob_door.rs`, feature `blob-door`
+  `graphshell/host/crates/graphshell/graphshell-door/src/blob_door.rs`, feature `blob-door`
   (`BlobDoorClient`: `bind_scope`, `put`, `lease`, `release`, `lease_hash`, `retain`, `unretain`,
   `allow_reader`, `deny_reader`, `replace_readers`, `allows`, `migrate_legacy`, `read`, `ledger`).
   **Custody:** `ResidentBlobCustody` gained `claim_scope`, `reserve_scope`, `scope_owner`,
@@ -1173,7 +1173,7 @@ cannot decode, and the guest refuses them. A change to that shape therefore need
 
 ### 2. The host
 
-`crates/script/authority-host` (wasmtime 45; the sibling of `block-host`) runs one component:
+`graphshell/host/crates/script/authority-host` (wasmtime 45; the sibling of `block-host`) runs one component:
 
 - **A fresh instance per call**, from the once-compiled, pre-linked component. A fuel cut-off or a panic
   traps the instance and a trapped instance cannot be re-entered, and an instance that kept state
