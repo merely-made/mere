@@ -1,13 +1,15 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-08: D1 to D30 are ruled (D21 reverts D20; D30 supersedes D29's frame-model shape). Moved:
-`merely-made/inker` holds eleven crates with history (the twelfth, `knot-editor-host`, retired under D17; main
-`174ae7b` at 2026-11-08) and `merely-made/seiche` holds the seven spatial crates, `seiche-model` included (main
-`4109f0b` at 2026-11-08); Mere takes both as `branch = "main"` git dependencies and every family consumer
-named in Open is repinned (P1 and P2, below). P0's squishes have landed in part (D14, D26 to D28). P3 (the
-hosting in Graphshell), P4 to P8 and the consolidations C have not started: `errand`, `emblem` and `wavicle`
-are still separate repositories. The engine-to-workspace contract is deferred by D4; the Pandect sidecar
-owners and the lanes' forks are open.
+**Status:** 2026-11-12: D1 to D131 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
+git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
+assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
+holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-facts`) that name nothing from
+graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
+the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
+P0's squishes have landed in part (D14, D26 to D28), and P4's stages in part (Findings, 2026-11-09). P5 to
+P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
 linked-data graph, in the posture Genet takes toward the web platform: dereference, parse,
@@ -299,6 +301,14 @@ Knot to the canonical source. Mere receives Inker as a supplier.
   `mere.git` patch table holds no Inker or Seiche redirect row; Inker (`174ae7b`) no longer names Cambium (it
   dropped the unused workspace row when `knot-editor-host` retired), so its one remaining Mere edge is the
   optional `mere-fleece -> linked-data` row (F3). `knot-editor-host` has no consumer in any manifest.
+  *Layout test, back-filled 2026-11-12 from the locks (receipts file):* a change in Inker reaches
+  Turnstone by repinning 1 repository, Turnstone (the owner is not counted). Turnstone's lock at its P1
+  repin `841c8117` and at the redirect cleanup `6c4d278b` holds `inker.git` once (`branch = "main"`,
+  `436c841`), and Mere's and Knot's rows for Inker resolve to that source, at `841c8117` through
+  Turnstone's five redirect rows. Before P1 the same change cost the same 1, Turnstone's relock of
+  `mere.git`. One source per shared package: 3 names in Turnstone come from two sources involving a family
+  repository (`servo-media-{player,streams,traits}`, Genet's copy beside Servo's), as before P1, and none
+  in Knot `a58ba28`; both locks also hold `netrender-vello{,-encoding}` at two revisions of the vello fork.
 
 **Lane state, 2026-11-07 (worktree branch `worktree-agent-a61f20e98db5486a2`; receipts in the
 plan's receipt file).** Landed in the worktree: Fleece's `crawl` takes `Fetched` from
@@ -418,6 +428,12 @@ projection crates that consume the workspace kernel stay with the host.
   1.99.1), a lock seeded from Mere's, fork (1) settled, and repins in Mere (`pictograph`,
   `graph-kernel`), Isocosm (Eponym, Mesocosm, Isometer, parry-ground), Cleromancy, Knot,
   Murm's signalman-desktop and mer3ly (which pins `www.github.com/.../mere.git` by rev).
+- Layout test (back-filled 2026-11-12 from the locks, receipts file): a change in Seiche reaches Turnstone
+  by repinning 1 repository, Turnstone (the owner is not counted). Turnstone first locked `seiche.git` at
+  `f3a455d3` (its relock of Mere to `52047e58`, 2026-11-08) and holds it once there and at `c24b5e0d` and
+  `b12348d9`, where its redirect rows went (`branch = "main"`, `f0e18dd`); Mere's and Knot's rows resolve
+  to that source. One source per shared package: the same 3 Turnstone names as at P1, none in Knot
+  `189487c1`.
 
 ### P3. Graphshell: the host
 
@@ -433,6 +449,64 @@ crates.
   names no app-level crate.
 - Needs: P1 (Inker as a supplier), P2 (Seiche as a supplier), cycle-breaks P6; the checker
   change of D35; past the first slice, the dissolution of the app's linked modules (D67, which replaced D41).
+- State (2026-11-12): **done**, after slices 1 to 4 and U6 (Progress, 2026-11-12). Evidence:
+  `Code/testing/engine-split/slice6_p3_doneconditions.md`, `slice6_u6_headed.md`,
+  `slice6_u6_door_fedora.md` and `slice6_u6_harness_repair.md`.
+
+**Done-conditions, 2026-11-12 (U6).** Each condition as written above, what it names in today's
+layout and the ruling that put it there, then the verdict.
+
+- "Graphshell builds the reference host and `mere-resident` assembly with Mere as a git dependency
+  and no Mere crate depending back." The reference host application is Turnstone's
+  `ports/graphshell` (D23, D120); what Graphshell builds is its `host/` workspace (D37), the toolkit
+  and `mere-resident` together (D102, D104); Mere's side is the five crates U4 left (D102), with
+  the kernel's `hest` edge removed (D105). **Met.** `host/Cargo.toml` names mere.git five times,
+  `branch = "main"`; `cargo check --locked --workspace --all-targets` in `host/` passed at Graphshell
+  `aed944eb` (39 members, `mere-resident` among them), and `ed2dc6e6` above it moves test modules
+  only. No Mere manifest or lock names graphshell.git (`08810f5d6`), and no mere.git package in the
+  host, Turnstone or Knot lock reaches a Graphshell package (the check's closure walk, with a
+  positive control).
+- "Turnstone and Pelt run from it with today's headed receipts." Turnstone takes the toolkit from
+  graphshell.git, one source for 47 packages (D66, U5); Pelt's binary is Turnstone's `ports/pelt`,
+  and Graphshell holds the `pelt-core` and `pelt-desktop` libraries (D36). The headed check is U6's
+  one pass (D113), with the door surface on Fedora (D126) through the repaired co-op harness (D129,
+  D130). **Met.** Windows, Turnstone `2672b635`: 6 of 9 Turnstone and app surfaces pass and Pelt
+  runs 9 of 10 receipts; the 3 failing surfaces and Pelt's `reader` fail the same way on a same-day
+  pre-split build (Turnstone `ea971f17`, Mere `325b0083b`), and no defect is attributable to the
+  split; the five pre-split defects are Findings in Turnstone's plans (D126, D127). Fedora: the
+  resident and the native viewer over the door give an `ok` baseline whose positive control fails
+  as expected, and `verify.py` passes at Turnstone `534e774c` with Graphshell `aed944eb`. The
+  single-machine baseline is what gates U6 (D130); the two-machine co-op phases did not run.
+- "the layout test's repin count is recorded." The test is the source homes map's "A test that
+  compares layouts" ([source homes map](../technical_architecture/2026-10-28_source_homes_map.md)),
+  adopted in Constraints, per phase. A repository counts when its pin or lock must move; the owning
+  repository is not counted, since the change is made there rather than repinned (reading accepted
+  2026-11-12). **Met by this record**, from the locks at Graphshell `ed2dc6e6`, Mere `08810f5d6`,
+  Turnstone `c9efade0` and Knot `ef69aef` (receipts file): a change in a Graphshell toolkit crate
+  reaches Turnstone by repinning **1** repository, Turnstone. Its lock holds graphshell.git once
+  (`branch = "main"`, 47 packages), and every family row in its graph that names Graphshell
+  (Distillery, Knot, Woodshed, Dramatis, Inker) resolves to that source. Mere's five crates, emblem's
+  `pictograph` and Distillery's `athanor` cost the same 1, as the toolkit did in Mere before the split
+  (`ea971f17`). P1 and P2 are back-filled in their sections: 1 each. Note: the one case where
+  Graphshell, which owns the toolkit and the resident, also holds a lock that must move is the
+  resident the door harness builds from `host/Cargo.lock`, beside the viewer from Turnstone's lock
+  (D130). That path costs 2. The host lock still pins mere.git `325b0083b` (the five crates are
+  unchanged since) and moves at the next scoped `cargo update -p` there (D131). The test's other
+  half: Turnstone resolves one source per shared package but 5 names (`regress`,
+  `servo-media-{player,streams,traits}`, `servo-xpath`: Genet's copy beside crates.io's), the same 5
+  as pre-split `ea971f17`; Knot's 15 names from both crates.io and family git are the same 15 as
+  before slice 2 (`38ea372`), the toolkit's now from graphshell.git where they came from mere.git.
+- "the bottom root still names no app-level crate." The bottom root is Graphshell's contract
+  workspace at the repository root, beside `host/` (D37) and its own node for the cycle checker
+  (D35); the app-level crates are the host workspace's and Turnstone's (D23, D37, D120). **Met.**
+  The root's 11 members (`chirograph`, `graphshell-client`, `graphshell-endpoint`, `hest`, `sceno`,
+  `sceno-backdrops`, `scenotime`, `script-wire`, `script-witgen`, `tinct`, `vector-sheet`) are path
+  members with no git row, its lock (164 packages) holds nothing from git, and it names `host` only
+  in `exclude`.
+
+U6's own conditions: the family cycle checker passes (`--remote`, 2026-11-12: exit 0 over 35 repositories and 94 lock roots at Graphshell `ed2dc6e6`, Mere `08810f5d6` and
+Turnstone `c9efade0`, warning of a resolved cycle inside 12 locks, as the check's run did);
+no Mere crate depends on graphshell.git (above); and this is the one-by-one record.
 
 **Drift line for P3 (2026-11-08, from the D29 lane; Mark: "Record it as a P3 drift line; keep the
 contract").** `mere-chrome`'s frame model (`FrameHostInput`, `FrameViewModel`, now `FrameStep` with
@@ -551,10 +625,13 @@ and full test suites beyond the app's lib tests and the moved tests.
   The 151 rows in Cleromancy, Isocosm, Knot, mer3ly, Murm, Woodshed and
   Turnstone are re-addressed to `graphshell.git` (D66) and their 20 lock roots relocked.
   - Landed 2026-11-11 (Progress, 2026-11-11): six consumers relocked, then Turnstone with the app.
-- **U6, close.** Mere's residue goes: patch rows, line-ceiling exceptions (127 of 150 name
-  leaving paths), scripts and hooks that name moved crates.
+- **U6, close.** Mere's residue goes: patch rows, line-ceiling exceptions (133 of the 151 at
+  the cutover base `325b0083b` name leaving paths, recounted 2026-11-12; all 133 left in U4,
+  `299d19b63` keeping 18), scripts and hooks that name moved crates.
   - Done when: the family cycle checker passes, no Mere crate depends on `graphshell.git`, and
     P3's done-conditions are checked one by one and recorded.
+  - Landed 2026-11-12 (Progress, 2026-11-12); the check is recorded under P3 ("Done-conditions,
+    2026-11-12").
 
 Held, not part of this slice: D52 (the three small hosts merge) and D64.
 
@@ -2746,3 +2823,43 @@ revision and what crosses at frame rate.
   Isocosm's `family_network`, mer3ly's favicon test. Not verified: anything headed, Linux or
   macOS, Mesocosm's long tests on the final base. Evidence: `Code/testing/engine-split/`
   `slice4_u4_final.md`, `slice5_u5.md`, `slice5_app.md`. U6 remains.
+- 2026-11-12: U6, the close (D125 to D131), and **P3 done**. Mere's residue: 254 path citations
+  repointed in 40 documents, README and `LICENSES.md` (`1aa026a39`); 35 dead ignore and attribute
+  rows dropped (`ae1ed8ff8`); the probes convention dropped (`e96579125`). Scripts that served
+  departed crates (D125, D127): `check-physics-engine-off.sh` and the toolkit half of
+  `check_port_boundaries.py` to Graphshell's `host/scripts` (`4c91721ef`; Graphshell `d6a53eb7`,
+  `587c7d2a`), its app half to Turnstone (`3618fa25`), `cross-repo-smoke.ps1` and
+  `dr_c_receipts.py` deleted (`4b0acb7f1`); the four frame-receipt scripts went from Turnstone to
+  Graphshell's `host/scripts` (Turnstone `b4961fdb`, Graphshell `21c9d70b`, D126). Mere's patch
+  table holds no row for a moved crate; its line-ceiling file keeps 18 exceptions, none naming a
+  missing file, while its `[[exclude]] support/patches/` and `.prekignore`'s `/support/patches/`
+  still name the directory D119 deleted. Licences followed their content (D126 to D128): Graphshell's
+  `LICENSES.md` with four rows (`558cfa70`) and its part of the 2026-08-27 derivatives paragraph
+  (`e1dbf762`), the rows gone from Mere (`2ddf02455`, `f5dd9c170`), tucket's sentence in Murm's
+  notices (`f5759dbc`). The custody fixture's `combined/` moved to Graphshell (Mere `bb16a78b0`,
+  Graphshell `9cd48e19`), its S79 receipt noted as historical (`79df0f689`, D128, D130). Graphshell's
+  moved documents: broken relative links 45 to 0, citations resolving nowhere 130 to 5
+  (`7a1b25cb`); its line-ceiling exceptions 107 to 99 (`ed2dc6e6`, eight test modules to sibling
+  files), with a second pass uncommitted. Headed on Windows (D113, D126): Turnstone `2672b635`, the
+  app's web root and Pelt draw as a same-day pre-split build does, and the five pre-split defects
+  are Findings in Turnstone's plans (`0c1bb869`, D127). The door on Fedora: two runs stopped in the
+  co-op harness, which predated custody isolation and admission by consent (D128, D129); the harness
+  was repaired (D130; Graphshell `aed944eb`, Turnstone `f8b58565` to `c9efade0`, under
+  `turnstone/design_docs/2026-11-11_coop_harness_plan.md`), and its first single-machine baseline on
+  the Fedora ThinkPad is `ok`, its positive control failed as expected, and `verify.py` passed at
+  Turnstone `534e774c` (packet `Code/testing/turnstone/2026-11-11_engine_split_headed/fedora/run3/`).
+  It proves Djinn's custody client against a fixture custodian, the grant checks behind the door
+  with a grant from Graphshell's own `grant_for`, and the door serving the seeder and the viewer;
+  not the custodian binary or its confinement, the consent dialog, or co-op between devices. Two UI
+  defects in its captures are not the door's: the sessions column clips its top entry's buttons (a
+  Finding in that plan), and the co-op panel offers "Use this graph for co-op" with no graph
+  attached (in `Code/testing/engine-split/slice6_u6_harness_repair.md`, not yet a Finding).
+  Turnstone's lock moved to Graphshell `aed944eb` by substitution (`5db9c7c5`) and stands under
+  D131; Graphshell's `host/Cargo.lock` still pins mere.git `325b0083b` and moves at the next scoped
+  `cargo update -p` there (D131), and 19 shared packages resolve differently between it and
+  Turnstone's lock, which the harness records. The family cycle checker (`--remote`) exits 0 over
+  35 repositories and 94 lock roots at Graphshell `ed2dc6e6`, Mere `08810f5d6` and Turnstone
+  `c9efade0`; no Mere manifest or lock names graphshell.git. P3's done-conditions are checked one by
+  one under P3 ("Done-conditions, 2026-11-12"): all four met, with the layout test's repin count
+  recorded there for P3 and back-filled under P1 and P2, 1 repository at each phase. Evidence:
+  `Code/testing/engine-split/slice6_*.md`.

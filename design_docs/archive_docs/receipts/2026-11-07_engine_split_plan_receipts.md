@@ -1170,3 +1170,41 @@ feature edit. Relock by revision substitution only: 12 eidetic.git rows in `Carg
 - `cargo test -p pandect --features furnace --locked`: unit 264 to 256; default unit 256 to 248
   (the 8 moved tests leave); integration unchanged.
 - `ports/graphshell/web`: `cargo check --target wasm32-unknown-unknown --locked`: green.
+
+## 2026-11-12: the layout test per phase (P3 condition 3, P1 and P2 back-filled)
+
+Read-only. Each lock read with `git show <rev>:<lock>` and parsed with Python's `tomllib`; for each
+lock, the family git sources (`merely-made`, and the `mark-ik` forks) with their query and revision
+and the package count from each, and the package names present from two or more sources where one is
+a `merely-made` source. No build, no checkout. A repository counts toward the repin figure when its pin
+or lock must move for the change to reach Turnstone; the owner is not counted. A family source held
+once in Turnstone's lock, with `branch = "main"` and no `rev` row for it anywhere in its graph (no
+`merely-made` `rev =` row in Turnstone's manifests at `c9efade0`), moves with one relock of Turnstone.
+
+| Phase | Lock | Owner's source in it | Names from two sources (family) |
+|---|---|---|---|
+| before P1 | Turnstone `841c8117~1` | mere.git `28a0be22`, 53 packages (Inker still in Mere) | 3 (`servo-media-{player,streams,traits}`: Genet beside Servo git) |
+| P1 | Turnstone `841c8117` | inker.git `436c8413`, 12 | 3, the same |
+| P1 | Turnstone `6c4d278b` | inker.git `436c8413`, 11 | 3, the same |
+| P1 | Knot `a58ba28` | inker.git `436c8413`, 8 | 0 |
+| P2 | Turnstone `f3a455d3` (first lock with seiche.git) | seiche.git `f0e18dd9`, 3 | 3, the same |
+| P2 | Turnstone `c24b5e0d`, `b12348d9` | seiche.git `f0e18dd9`, 3 | 3, the same |
+| P2 | Knot `189487c1` | seiche.git `f0e18dd9`, 3 | 0 |
+| before P3 | Turnstone `ea971f17` | mere.git `a9153fa6`, 33 (toolkit still in Mere) | 5 (`regress`, `servo-media-*` x3, `servo-xpath`: Genet beside crates.io) |
+| P3 | Turnstone `c9efade0` | graphshell.git `aed944eb`, 47; mere.git `a9a125f2`, 5; emblem `e577e849`, 2; distillery `8908f7e4`, 4 | 5, the same names |
+| before P3 | Knot `38ea372` | mere.git `3494d980`, 35 | 15 (crates.io beside family git) |
+| P3 | Knot `ef69aef` | graphshell.git `893818f6`, 36 | 15, the same names |
+| P3 | Graphshell `host/Cargo.lock` at `ed2dc6e6` | mere.git `325b0083`, 5 (contract root by path) | 1 (`regress`) |
+
+At P1 and P2 both Turnstone's and Knot's locks also hold `netrender-vello` and `netrender-vello-encoding`
+at two revisions of the `mark-ik/vello` fork (`77846139`, `dfb9b53b`); the P3 locks hold one. Every
+owner source above is held once per lock, so each phase's figure is 1 (Turnstone). The family cycle
+checker, `python scripts/check_family_cycles.py --remote`, run once the same day: exit 0, 35
+repositories, 94 lock roots, 1,303 cross-repository manifest edges, resolved-cycle warnings inside 12
+locks; heads graphshell `ed2dc6e68`, mere `08810f5d6`, turnstone `c9efade0e`, knot-editor `ef69aef0d`.
+
+The line-ceiling recount for U6: `line-ceiling.toml` at `325b0083b` holds 151 exceptions, of which 133
+name a path absent at the cutover `299d19b63` and 18 a path present; `299d19b63` and `08810f5d6` hold
+those 18, none missing. At `0c4f551d6`, where U6's line was written, the file held 150, of which 132
+name a path absent at `299d19b63`; U1 (`ea049e09a`) then replaced four pictograph rows with five
+`mere-cartography` rows (the four moved files and `backdrop_paint.rs`).
