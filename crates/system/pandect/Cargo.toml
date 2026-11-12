@@ -33,7 +33,6 @@ muniment.workspace = true
 kernel.workspace = true
 # The native fold record (mer3ly site plan, Rulings 153 and 163).
 identity.workspace = true
-notochord.workspace = true
 sporran.workspace = true
 blake3 = "1.5"
 # The wallet's CBOR, called directly: p2panda-core's helpers were these two

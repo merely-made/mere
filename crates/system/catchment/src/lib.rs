@@ -28,7 +28,8 @@
 //! Its default feature is the ids alone; the service is the `store` feature.
 //! It names no graph or host type. A domain's grammar, fold and
 //! admission policy are the domain's; Pandect supplies the graph domain's.
-//! Replication is the resident's (`personal_sync`) today.
+//! Generic replication is catchment's when the domain adoption plan's M4 builds
+//! it; the graph domain's sync is pandect's `personal_sync` (D69, D133).
 //!
 //! Split from `pandect::reservoir` under engine split P4 (D3, D9). The stored
 //! slot keys and schema strings keep their `pandect` names, because they are

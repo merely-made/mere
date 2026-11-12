@@ -54,7 +54,6 @@ use crate::graph_placement::{
 };
 use crate::manifest::{GraphSessionManifest, Lineage, MergedMark, TrashMark};
 #[cfg(not(target_arch = "wasm32"))]
-use crate::scene_facets::copy_scene_facets;
 use crate::view_state::ViewState;
 
 /// Product-owned validation of a complete candidate before graph/history installation.
@@ -2027,8 +2026,17 @@ pub fn picked_session_name(source: Option<&str>) -> String {
 }
 
 /// The graph a component fork starts from: the connected component around
-/// `seed`, copied with its facets through the id remap, and the donor
-/// container's scene settings carried to the fork's container. The
+/// `seed`, copied with its facets through the id remap, and every facet of the
+/// donor container carried to the fork's container.
+///
+/// The container is one more remap pair, `(donor_container, fork_container)`,
+/// so its facets travel verbatim and this crate names no namespace (engine
+/// split D134). The values are the donor's exactly: a facet that names members
+/// (a saved scene's selection, arrangement regions, a mosaic) still names the
+/// donor's ids, including nodes outside the component, which the fork does not
+/// hold. Those ids are inert references; the host that opens the fork reads
+/// them against the fork's own nodes and may rewrite them. A donor container
+/// with no facets leaves the fork's with none, which reads as the defaults. The
 /// product-neutral half of Turnstone's tear-out; nested worlds and resident
 /// admissions stay Turnstone's to carry. `None` when `seed` names no node;
 /// refused when the carried facets fail the handle rule. Native only, as the
@@ -2046,8 +2054,9 @@ pub fn fork_component_graph(
         return Ok(None);
     }
     let mut facets = NodeFacetStore::new();
-    copy_node_facets(donor.facets(), &mut facets, &copy.id_remap);
-    copy_scene_facets(donor.facets(), &mut facets, donor_container, fork_container);
+    let mut remap = copy.id_remap.clone();
+    remap.push((donor_container, fork_container));
+    copy_node_facets(donor.facets(), &mut facets, &remap);
     // The copy stamped each minted node's derivation from its donor; the
     // overlay below would drop it, so keep it aside and set it again.
     let derivation = FacetId::new(PROVENANCE_DERIVATIONS);

@@ -50,22 +50,6 @@ pub mod application_settings_store;
 // snapshots). Eidetic owns the content-addressed bytes; this adapter owns
 // ImageRef conversion and graph-aware retention decisions.
 pub mod image_store;
-// Per-node browser-state working set (scroll / form draft / viewer override /
-// compat mode / content-on / page-zoom scale) — browser-runtime state that
-// doesn't belong in graph truth (boundary pass slice C). Persistence converged
-// onto web.* facets (web_facets); the module's browser_nodes.json IO remains
-// as legacy read-only.
-pub mod browser_node_state;
-// The web.* facet namespace: browser_node_state's persistence boundary — one
-// atomic facet per field (web.scroll / form_draft / viewer / compat / content
-// / page_scale) in facets.json, replacing the bespoke browser_nodes.json
-// document.
-pub mod web_facets;
-// The denizen.* facet namespace: which graph nodes are participants (servitor /
-// agent / peer / scenario / pack) and where each one's nested graph lives —
-// a facet bundle on the node, in facets.json. Supersedes the transitional
-// denizen_bindings.json sidecar (removed before any host wrote one).
-pub mod denizen_facets;
 // The family-shared root moved to catchment with the reservoir (engine split
 // P4); the module path stays for its callers.
 pub use catchment::shared_root;
@@ -76,19 +60,9 @@ pub use catchment::shared_root;
 pub mod facet_store;
 #[cfg(feature = "furnace")]
 pub mod furnace;
-// The arrangement.* facet namespace: cartography's per-node data (position
-// first; size/sprite/hull/material/face follow) as facets in facets.json —
-// born as facets, since the bespoke cartography sidecar was never wired.
-pub mod arrangement_facets;
-pub mod cartography_geometry;
 // The compare-and-replace over a muniment slot moved to catchment (engine
 // split D84); the module path stays for its callers.
 pub use catchment::slot_guard;
-// The scene.* facet namespace: the graph-scene's own view settings (sizing
-// mode, importance metric, physics damping) as facets of the CONTAINER node
-// (keyed by the session's root_graph_id) — scene-scoped, not per-node.
-pub mod saved_scene;
-pub mod scene_facets;
 pub mod graph_codicil;
 pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
@@ -101,8 +75,6 @@ pub mod live_graph;
 // Snapshot-level merge for codicil compose (Alembic tail B7): union two graph
 // snapshots by URL identity, retaining per-member provenance. Pure; the codicil
 // compose op (`graph_codicil::compose_graph_codicils`) layers on top.
-#[cfg(not(target_arch = "wasm32"))]
-pub mod notochord_policy_store;
 #[cfg(test)]
 mod resource_content_merge_tests;
 pub mod snapshot_merge;
@@ -118,27 +90,14 @@ pub mod memory_levels;
 // pandect types.
 /// The retention passes live in Eidetic (engine split D45, D87); the path stays.
 pub use eidetic::memory as retention;
-pub mod manifest_store;
 // The session graph file's name and path (graph.json; GraphSession writes it);
 // native-only so the crate stays wasm-clean (wasm hosts use a different storage
 // backend).
 #[cfg(not(target_arch = "wasm32"))]
 pub mod session_graph_store;
-// Session/dataspace settings sidecar (settings.json). A flat JSON document beside
-// graph.json; the host loads it on launch and saves on change. Application and
-// device preferences have their own stores and must not travel with it.
-pub mod settings_store;
 // The chosen theme as stored values; the host converts to its theming type
 // (engine split D79).
 pub mod stored_theme;
-// DocumentScript origin->component bindings sidecar (script-bindings.json): the
-// auto-attach list (§11.4 follow-on #2). Native-only (filesystem).
-#[cfg(not(target_arch = "wasm32"))]
-pub mod script_bindings_store;
-// Per-persona UI settings (`personas/<id>/settings/ui.json`) — persona-scoped config
-// distinct from the session/dataspace settings_store and the application/device
-// stores; first field is the configurable menu.
-pub mod persona_settings_store;
 // The personal graph's device synchronization over Stickleback and p2panda
 // (engine split D69, from the reference app, as it was).
 #[cfg(all(feature = "personal-sync", not(target_arch = "wasm32")))]
@@ -147,11 +106,14 @@ pub mod personal_sync;
 // transfer writes (engine split D70, from the reference app). Ungated: the
 // app's export and transfer build them for the browser too.
 pub mod product_codicil;
+// The saved scene's stored shapes: the grammar the sync lane and the codicil
+// carry (D69); capture and restore are the canvas's, in mere-cartography.
+pub mod cartography_geometry;
+pub mod saved_scene;
 pub mod transfer;
 // Transfer offers over the personal graph (D70), beside the sync they ride.
 #[cfg(all(feature = "personal-sync", not(target_arch = "wasm32")))]
 pub mod transfer_offer;
-pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so
 // they live in turnstone's `frisket::tearout` now.
@@ -164,22 +126,6 @@ pub use application_settings_store::{
     application_settings_exist, application_settings_path, load_application_settings,
     save_application_settings,
 };
-pub use arrangement_facets::{
-    ARRANGEMENT_FACE, ARRANGEMENT_MATERIAL, ARRANGEMENT_MOSAIC, ARRANGEMENT_POSITION,
-    ARRANGEMENT_REGIONS, ARRANGEMENT_SEED, ARRANGEMENT_SIZE, ARRANGEMENT_SPRITE,
-    ARRANGEMENT_SPRITE_HULL, arrangement_position_facet,
-    read_arrangement_faces, read_arrangement_materials, read_arrangement_mosaic,
-    read_arrangement_positions, read_arrangement_regions, read_arrangement_seed,
-    read_arrangement_sizes, read_arrangement_sprite_hulls, read_arrangement_sprites,
-    retain_present_nodes, write_arrangement_faces, write_arrangement_materials,
-    write_arrangement_mosaic, write_arrangement_positions, write_arrangement_regions,
-    write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
-    write_arrangement_sprites, clear_arrangement, read_arrangement_geometry,
-};
-pub use denizen_facets::{
-    DENIZEN_BINDING, DenizenBinding, DenizenKind, is_denizen, read_denizen_binding,
-    read_denizen_bindings, remove_denizen_binding, write_denizen_binding,
-};
 /// Compatibility names for published consumers. Schema content and validation
 /// are implemented by Eidetic; new callers use `eidetic::schema_facets`.
 pub use eidetic::schema_facets::{
@@ -189,7 +135,7 @@ pub use eidetic::schema_facets::{
 /// Top-level subdirectory holding per-persona state, under a data root.
 pub use sporran::PERSONAS_DIR;
 /// Top-level subdirectory holding per-session state. Matches the
-/// [`ManifestStore`] layout convention.
+/// layout convention of the host's manifest store.
 pub const SESSIONS_DIR: &str = "sessions";
 pub use facet_store::{
     AcceptAll, ExpiringFacet, FacetError, FacetId, FacetValidator, NODE_FACETS_FILE,
@@ -213,15 +159,6 @@ pub use manifest::{
     CodicilId, GraphSessionManifest, LEGACY_HOST_KEYS, Lineage, MANIFEST_SCHEMA_VERSION,
     MergedMark, PersonaId, PickedFrom, TrashMark,
 };
-pub use manifest_store::{LoadFailure, LoadReport, MANIFEST_FILE, ManifestStore, TRASH_DIR};
-#[cfg(not(target_arch = "wasm32"))]
-pub use notochord_policy_store::{
-    NOTOCHORD_POLICY_FILENAME, load_notochord_policy, notochord_policy_path, save_notochord_policy,
-};
-pub use persona_settings_store::{
-    PERSONA_SETTINGS_DIR, PERSONA_UI_FILENAME, PersonaSettings, load_persona_settings,
-    persona_settings_path, record_launch, save_persona_settings,
-};
 // The reservoir service is catchment's (engine split P4, D3, D9): every mere a
 // persona holds, one per data domain. These names stay for cutover; access
 // decisions are attributed with the journal's `Author`.
@@ -243,28 +180,8 @@ pub type ReservoirStore<B> = catchment::ReservoirStore<B, Author>;
 pub type MereApplicationAccess = catchment::MereApplicationAccess<Author>;
 pub use cartography_geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
 pub use saved_scene::{
-    DEFAULT_ARRANGEMENT, SAVED_SCENE_FACET, SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3,
-    SavedDynamics, SavedRolesV1, SavedSceneV2, SavedSceneV3, StoredScene, stored_scene,
-    write_saved_scene,
-};
-pub use scene_facets::{
-    DEFAULT_PHYSICS_DAMPING, SCENE_IMPORTANCE_METRIC, SCENE_PHYSICS_DAMPING, SCENE_SIZE_BY_DEGREE,
-    SCENE_SIZE_BY_IMPORTANCE, SceneFacets, clear_scene_facets, copy_scene_facets,
-    has_scene_facets, read_scene_facets, write_scene_facets,
-};
-#[cfg(not(target_arch = "wasm32"))]
-pub use script_bindings_store::{SCRIPT_BINDINGS_FILENAME, ScriptBinding};
-pub use settings_store::{
-    LegacySettingsMigration, PersistedSettings, SETTINGS_FILENAME, SettingsLoad,
-    load_settings_with_legacy,
+    SAVED_SCENE_FACET, SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3, SavedDynamics, SavedRolesV1,
+    SavedSceneV2, SavedSceneV3,
 };
 pub use stored_theme::{FontStacks, StoredTheme};
-pub use switcher_thumbnail::{
-    SwitcherThumbnail, SwitcherThumbnailOptions, ThumbnailEdge, ThumbnailNode,
-    build_switcher_thumbnail_with,
-};
 pub use view_state::{UNTAGGED_VIEW_SCHEMA, ViewState};
-pub use web_facets::{
-    WEB_COMPAT, WEB_CONTENT, WEB_FORM_DRAFT, WEB_PAGE_SCALE, WEB_SCROLL, WEB_VIEWER,
-    read_web_states, write_web_state, write_web_states,
-};

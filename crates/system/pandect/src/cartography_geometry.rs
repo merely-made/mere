@@ -10,7 +10,7 @@
 //! decomposition: this is graph-scene material (member-keyed world positions
 //! plus the per-member representation overrides), so it lives with the canvas;
 //! platen keeps the Tree (pane) geometry. The host persists it as the
-//! `arrangement.*` facet family (`arrangement_facets`, in `facets.json`) or,
+//! `arrangement.*` facet family (mere-cartography's `arrangement_facets`, in `facets.json`) or,
 //! whole, inside a saved scene (`saved_scene`). Moved from pictograph's canvas
 //! when the scene shapes left Graphshell, so both hosts and the canvas read one
 //! shape; pictograph depends on this crate for it.
@@ -27,8 +27,8 @@ use uuid::Uuid;
 /// The save-time snapshot of the canvas's *settled* layout: the live positions
 /// live in the seiche read model and the kernel graph carries none at all, so
 /// without persisting this a session's layout is lost on reload. The host
-/// persists it family-by-family as `arrangement.*` facets (pandect
-/// `arrangement_facets`), one facet id per field group below.
+/// persists it family-by-family as `arrangement.*` facets
+/// (`arrangement_facets` in mere-cartography), one facet id per field group below.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CartographyGeometry {
     positions: Vec<(Uuid, (f32, f32))>,
@@ -303,6 +303,6 @@ impl CartographyGeometry {
     // `to_persisted_json` / `from_persisted_json` — the bespoke-sidecar half —
     // left with the facet convergence: no host ever wired the cartography.json
     // sidecar, and the durable arrangement now persists as `arrangement.*`
-    // facets (pandect `arrangement_facets`). This type remains as the
+    // facets (mere-cartography `arrangement_facets`). This type remains as the
     // canvas's save-time read surface (`Canvas::cartography_geometry`).
 }

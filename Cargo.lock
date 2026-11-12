@@ -3966,7 +3966,6 @@ dependencies = [
  "mere-transport",
  "muniment",
  "murm-sync",
- "notochord",
  "p2mere-core",
  "p2mere-store",
  "personae",

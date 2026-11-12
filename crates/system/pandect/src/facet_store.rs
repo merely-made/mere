@@ -14,14 +14,13 @@
 //! type and its validation seam live in [`chartulary::facet`]; this module is the
 //! mere-side **wiring**: it persists a [`FacetStore<Uuid>`](chartulary::FacetStore)
 //! (mere's node id is a `Uuid`) beside the session graph, on the same sidecar
-//! pattern as [`browser_node_state`](crate::browser_node_state) and
-//! [`denizen_bindings`](crate::denizen_bindings).
+//! pattern as Turnstone's `browser_node_state` and `denizen_bindings`.
 //!
 //! ```text
 //! <sessions_dir>/<session_id>/
 //! ├── graph.json               ← GraphSession
-//! ├── browser_nodes.json       ← browser_node_state   (web.* facets, later)
-//! ├── denizen_bindings.json    ← denizen_bindings     (denizen.* facets, later)
+//! ├── browser_nodes.json       ← Turnstone's browser_node_state (web.* facets)
+//! ├── denizen_bindings.json    ← Turnstone's denizen_facets (denizen.* facets)
 //! └── facets.json              ← this module
 //! ```
 //!
@@ -95,9 +94,8 @@ pub fn save_node_facets(session_dir: &Path, facets: &NodeFacetStore) -> io::Resu
 /// layout, `web.*` browser state, foreign/mod namespaces) without this module
 /// knowing any namespace. `remap` is the `(source id, new id)` list the
 /// kernel's `copy_component_from` returns; donor nodes absent from the store
-/// contribute nothing. The container-scoped `scene.*` carry is separate
-/// (`scene_facets::copy_scene_facets`) — container ids are not graph nodes, so
-/// no remap names them.
+/// contribute nothing. A container's facets (`scene.*`, saved scenes, regions) travel the same
+/// way: the caller adds the pair `(donor_container, fork_container)` to `remap`.
 pub fn copy_node_facets(donor: &NodeFacetStore, fork: &mut NodeFacetStore, remap: &[(Uuid, Uuid)]) {
     for (source, new) in remap {
         let Some(facets) = donor.facets_of(source) else {

@@ -11,7 +11,7 @@
 //!
 //! This module ships only the **types**. Lifecycle (load-all-at-
 //! startup, persist-on-mutation, archive-on-kill) lands in the
-//! `manifest_store` module per the 2026-05-11 manifest plan.
+//! host's `manifest_store` (Turnstone) per the 2026-05-11 manifest plan.
 //!
 //! v0 fields are minimal; later plans (`SessionServiceRunner`,
 //! engine profile boundary, capability gates, fork-on-divergence)
