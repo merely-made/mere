@@ -444,7 +444,7 @@ fn legacy_resource_migration_preserves_baseline_handles_and_uncertainty_with_sur
     assert_eq!(claim.asserted_at_ms, Some(100));
     assert_eq!(
         claim.provenance_iri.as_deref(),
-        Some(super::super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+        Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
     );
     let held_surface = replay.graph.persisted_edges_between(a, b);
     assert_eq!(

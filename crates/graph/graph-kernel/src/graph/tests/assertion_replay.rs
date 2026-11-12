@@ -348,7 +348,7 @@ fn exact_replay_normalizes_legacy_buckets_and_aggregate_predicates() {
         assert_eq!(statements[index].statement_id, id);
         assert_eq!(statements[index].asserted_at_ms, Some(time));
     }
-    let unknown = super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+    let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
     assert_eq!(statements[0].provenance_iri.as_deref(), Some(unknown));
     assert_eq!(statements[1].provenance_iri.as_deref(), Some(unknown));
     assert_eq!(

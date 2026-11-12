@@ -21,13 +21,9 @@
 //! bytes out-of-line into an actual blob store (and content-addressing fetched web
 //! pages, which live in mere's own cache, not on the node) is the follow-on step.
 
-use chartulary::{
-    Address, Addressed, Classified, ContentBearing, GraphBearing, Identified, Labeled, Predicated,
-    RelationClass,
-};
+use chartulary::{Address, Addressed, ContentBearing, GraphBearing, Identified, Labeled};
 use uuid::Uuid;
 
-use super::edge_payload::EdgePayload;
 use super::node::Node;
 
 impl Identified for Node {
@@ -73,41 +69,13 @@ impl GraphBearing for Node {
     }
 }
 
-/// The single predicate IRI a semantic edge projects, or `None` if the edge
-/// carries no semantic relation (an experience-layer edge: Traversal, Containment,
-/// Arrangement, Imported). Withdrawn assertions remain in history but do not
-/// project. This single-predicate capability selects the first held semantic
-/// statement; readers needing every statement use the assertion APIs.
-fn edge_predicate(payload: &EdgePayload) -> Option<&str> {
-    payload
-        .held_semantic_statements()
-        .next()
-        .map(|statement| statement.predicate.as_str())
-}
-
-impl Predicated for EdgePayload {
-    fn predicate(&self) -> Option<&str> {
-        edge_predicate(self)
-    }
-}
-
-impl Classified for EdgePayload {
-    fn class(&self) -> RelationClass {
-        match edge_predicate(self) {
-            // A semantic edge joins the shared ring as an open predicate (its IRI),
-            // so it projects to RDF.
-            Some(iri) => RelationClass::open(iri.to_string()),
-            // An experience-layer edge is mere's private family: it does not project.
-            None => RelationClass::app("mere", 0),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::super::edge_data::{SemanticData, SemanticStatementSpec, predicate_iri};
-    use super::super::edge_taxonomy::{EdgeAssertion, SemanticSubKind};
     use super::*;
+    use chartulary::{Classified, Predicated};
+    use mere::model::EdgePayload;
+    use mere::model::edge_data::{SemanticData, SemanticStatementSpec, predicate_iri};
+    use mere::model::edge_taxonomy::{EdgeAssertion, SemanticSubKind};
 
     #[test]
     fn web_node_satisfies_the_container_capabilities() {

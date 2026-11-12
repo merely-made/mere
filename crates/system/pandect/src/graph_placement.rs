@@ -449,7 +449,7 @@ mod tests {
 
     #[test]
     fn recorded_receipt_preserves_same_host_resource_containment_without_surface_duplicates() {
-        use kernel::persistence::PersistedContainmentSubKind;
+        use mere::model::PersistedContainmentSubKind;
         let original = kernel::graph::replay_captured_deltas([
             CapturedDelta::ReplayAddNodeWithIdIfMissing {
                 id: Uuid::from_u128(1).to_string(),

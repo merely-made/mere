@@ -31,7 +31,10 @@ fn cold(graph: &Graph) -> Graph {
 
 fn found(graph: &Graph, id: &str) -> Option<RelationKey> {
     let warm = graph.find_semantic_statement(id).map(|(key, _)| key);
-    assert_eq!(warm, cold(graph).find_semantic_statement(id).map(|(key, _)| key));
+    assert_eq!(
+        warm,
+        cold(graph).find_semantic_statement(id).map(|(key, _)| key)
+    );
     warm
 }
 
@@ -42,7 +45,11 @@ fn available(graph: &Graph, resource: Uuid, held: &NodeProperty) -> bool {
 }
 
 fn statement_on(graph: &Graph, from: NodeKey, to: NodeKey) -> (RelationKey, String) {
-    let key = graph.projected_relations_between(from, to).next().unwrap().0;
+    let key = graph
+        .projected_relations_between(from, to)
+        .next()
+        .unwrap()
+        .0;
     let id = graph.get_relation(key).unwrap().assertions()[0]
         .statement_id
         .clone();
@@ -85,7 +92,10 @@ fn warm_index_tracks_semantic_writes_and_mutable_handouts() {
 #[test]
 fn warm_index_tracks_literals_on_resources_and_surfaces() {
     let (mut graph, [a, b, c]) = three();
-    let (ra, rb) = (graph.shown_resource_id(a).unwrap(), graph.shown_resource_id(b).unwrap());
+    let (ra, rb) = (
+        graph.shown_resource_id(a).unwrap(),
+        graph.shown_resource_id(b).unwrap(),
+    );
     assert!(available(&graph, ra, &property("held", "1")));
     assert!(graph.append_node_properties(a, vec![property("held", "1")]));
     assert!(available(&graph, ra, &property("held", "1")));
@@ -157,7 +167,14 @@ fn withdrawals_match_a_scan_and_a_state_rebuilt_from_scratch() {
             .unwrap()
             .0;
         ids.push(
-            graph.get_relation(key).unwrap().assertions().last().unwrap().statement_id.clone(),
+            graph
+                .get_relation(key)
+                .unwrap()
+                .assertions()
+                .last()
+                .unwrap()
+                .statement_id
+                .clone(),
         );
     }
     ids.push("absent".into());
@@ -165,7 +182,10 @@ fn withdrawals_match_a_scan_and_a_state_rebuilt_from_scratch() {
     // its lookups is rebuilt from scratch; the live graph keeps its warm index.
     let mut reference = graph.clone();
     for id in &ids {
-        assert_eq!(graph.semantic_statement_owner_keys(id), owners_by_scan(&graph, id));
+        assert_eq!(
+            graph.semantic_statement_owner_keys(id),
+            owners_by_scan(&graph, id)
+        );
     }
     for id in &ids {
         reference.clear_handle_index();
@@ -176,13 +196,20 @@ fn withdrawals_match_a_scan_and_a_state_rebuilt_from_scratch() {
         // A second withdrawal of the same id applies nothing.
         assert!(!graph.withdraw_semantic_assertion(id, Some(8), None));
         for probe in &ids {
-            assert_eq!(graph.semantic_statement_owner_keys(probe), owners_by_scan(&graph, probe));
+            assert_eq!(
+                graph.semantic_statement_owner_keys(probe),
+                owners_by_scan(&graph, probe)
+            );
         }
     }
     for id in &ids {
         assert_eq!(
-            graph.find_semantic_statement(id).map(|(k, s)| (k, s.withdrawn.clone())),
-            reference.find_semantic_statement(id).map(|(k, s)| (k, s.withdrawn.clone())),
+            graph
+                .find_semantic_statement(id)
+                .map(|(k, s)| (k, s.withdrawn.clone())),
+            reference
+                .find_semantic_statement(id)
+                .map(|(k, s)| (k, s.withdrawn.clone())),
         );
     }
     // Interleave a fresh assert after withdrawals: the index still tracks it.
@@ -192,6 +219,9 @@ fn withdrawals_match_a_scan_and_a_state_rebuilt_from_scratch() {
     };
     graph.assert_semantic_statement(b, c, spec);
     let (key, id) = statement_on(&graph, b, c);
-    assert_eq!(graph.semantic_statement_owner_keys(&id), owners_by_scan(&graph, &id));
+    assert_eq!(
+        graph.semantic_statement_owner_keys(&id),
+        owners_by_scan(&graph, &id)
+    );
     assert!(graph.semantic_statement_owner_keys(&id).contains(&key));
 }

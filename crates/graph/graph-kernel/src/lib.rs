@@ -34,11 +34,18 @@ pub mod permissions;
 pub mod persistence;
 /// Edge persistence types (`PersistedEdge` et al.), re-exported through
 /// [`persistence`]. Separate file to keep `persistence.rs` under the ceiling.
-pub mod persistence_edge;
+/// Moved to `mere::model::persistence_edge` (engine split P5 L3); the names
+/// other repositories use stay here until the kernel moves at P8.
+pub mod persistence_edge {
+    pub use mere::model::persistence_edge::{PersistedEdge, PersistedSemanticStatement};
+}
 /// Field-layer persistence DTOs (`PersistedField`/`PersistedCoupling`),
 /// re-exported through [`persistence`]. Separate file to keep `persistence.rs`
 /// under the per-file ceiling.
 pub mod persistence_fields;
+/// The surface half of the RDF projection and the contribution importer: the
+/// legacy snapshot adapter, which leaves with the kernel at P8.
+pub mod rdf;
 pub mod signal_router;
 pub mod time;
 pub mod types;

@@ -6,6 +6,8 @@
 
 use super::*;
 use crate::graph::{Graph, SurfaceNode};
+use crate::persistence::PersistedResourceFacet;
+use chartulary::{Address, Addressed, Identified};
 
 fn record(iri: &str, value_json: &str) -> PersistedResourceRecord {
     PersistedResourceRecord {
@@ -42,7 +44,7 @@ fn resource_record_validation_is_atomic_and_replacement_clears_old_facets() {
     assert!(graph.resource_record(id).unwrap().facets.is_empty());
     assert!(graph.set_resource_record(id, None));
     assert!(graph.resource(id).is_none());
-    assert!(graph.resource_facets.facets_of(&id).is_none());
+    assert!(graph.resource_facets().facets_of(&id).is_none());
 }
 
 #[test]

@@ -717,10 +717,10 @@ pub struct GraphSession<B> {
     observing: bool,
 }
 
-#[path = "graph_session_transaction.rs"]
-mod transaction;
 #[path = "graph_session_operation.rs"]
 mod operation;
+#[path = "graph_session_transaction.rs"]
+mod transaction;
 pub use operation::OperationReceipt;
 
 #[path = "graph_session_merge.rs"]
@@ -1836,7 +1836,11 @@ impl<B: Backend> GraphSession<B> {
                 .graph_at(self.journal.entries(), cursor)
                 .ok()
                 .flatten(),
-            None => self.journal.snapshot_at_from(&self.baseline, cursor).ok().flatten(),
+            None => self
+                .journal
+                .snapshot_at_from(&self.baseline, cursor)
+                .ok()
+                .flatten(),
         }?;
         graph.validate_active_resource_assertion_handles().ok()?;
         graph.set_known_coverage(self.graph.known_coverage().clone());
@@ -2564,16 +2568,16 @@ mod tests {
                 .iter()
                 .filter_map(|record| match record.predicate.as_str() {
                     "https://mere.computer/ns/rel#containment.url-path" => {
-                        Some(kernel::persistence::PersistedContainmentSubKind::UrlPath)
+                        Some(mere::model::PersistedContainmentSubKind::UrlPath)
                     },
                     "https://mere.computer/ns/rel#containment.domain" => {
-                        Some(kernel::persistence::PersistedContainmentSubKind::Domain)
+                        Some(mere::model::PersistedContainmentSubKind::Domain)
                     },
                     _ => None,
                 })
                 .collect();
             if !containment.is_empty() {
-                edge.containment = Some(kernel::persistence::PersistedContainmentEdgeData {
+                edge.containment = Some(mere::model::PersistedContainmentEdgeData {
                     sub_kinds: containment,
                 });
             }
@@ -3614,9 +3618,7 @@ mod tests {
                 Err(SessionError::Observing(_))
             ));
             assert!(matches!(
-                observer
-                    .set_view(person(), key, ViewState::default())
-                    .await,
+                observer.set_view(person(), key, ViewState::default()).await,
                 Err(SessionError::Observing(_))
             ));
             observer.flush(wall_clock_now()).await.unwrap();
@@ -5130,7 +5132,8 @@ mod tests {
             let id = mere.mint(person(), None).await.unwrap().session_id;
             let mut session = mere.open(id).await.unwrap();
             let key = ViewKey::new("knot-editor", "main").unwrap();
-            let spectral = ViewState::new("test.view/v1", serde_json::json!({"strategy": "spectral"}));
+            let spectral =
+                ViewState::new("test.view/v1", serde_json::json!({"strategy": "spectral"}));
             session
                 .set_view(knot(), key.clone(), spectral.clone())
                 .await

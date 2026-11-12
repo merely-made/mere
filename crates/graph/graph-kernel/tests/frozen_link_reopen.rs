@@ -10,10 +10,10 @@ mod graph_file;
 
 use kernel::graph::apply::add_node;
 use kernel::graph::{
-    FrozenLinkSource, FrozenSourceBinding, FrozenSourceRevision, Graph, GraphStratum,
-    SemanticStatementSpec,
+    FrozenLinkSource, FrozenSourceRevision, Graph, GraphStratum, SemanticStatementSpec,
 };
 use kernel::types::GraphScope;
+use mere::model::FrozenSourceBinding;
 use std::path::Path;
 use std::process::Command;
 use uuid::Uuid;

@@ -84,7 +84,7 @@ fn content_migration_baseline_requires_original_mere_only_for_unknown_tags() {
         migrated.graph.resource_properties(id)[0]
             .provenance_iri
             .as_deref(),
-        Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+        Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
     );
     let variants = migrated.graph.resource_classification_variants(id);
     assert_eq!(

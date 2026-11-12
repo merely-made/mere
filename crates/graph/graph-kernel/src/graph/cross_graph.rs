@@ -236,7 +236,7 @@ impl Graph {
         let declared = |predicate: &str| {
             let id = chartulary::resource_id_from_canonical_iri(predicate);
             source
-                .resource_facets
+                .resource_facets()
                 .get(&id, &declarations)
                 .is_some()
                 .then_some(id)
@@ -271,7 +271,7 @@ impl Graph {
                 }
             }
             for id in &resources {
-                if let Some(value) = source.resource_facets.get(id, &properties) {
+                if let Some(value) = source.resource_facets().get(id, &properties) {
                     predicates.extend(
                         serde_json::from_value::<Vec<crate::types::NodeProperty>>(value.clone())
                             .unwrap_or_default()

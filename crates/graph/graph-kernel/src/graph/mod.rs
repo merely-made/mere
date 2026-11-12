@@ -71,15 +71,12 @@ mod assertion_write;
 pub mod pending_links;
 pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, PendingLinkState};
 pub mod frozen_selection;
-pub use frozen_selection::{FrozenSelection, OpenedFrozenSelection};
+pub use frozen_selection::OpenedFrozenSelection;
 pub mod frozen_link;
 mod handle_index;
 #[cfg(test)]
 mod handle_index_tests;
-pub use frozen_link::{
-    FROZEN_LINK, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource, FrozenSourceBinding,
-    FrozenSourceRevision, OpenedFrozenLink,
-};
+pub use frozen_link::{FrozenLink, FrozenLinkSource, FrozenSourceRevision, OpenedFrozenLink};
 #[cfg(test)]
 mod assertion_handles_tests;
 pub mod coverage;
@@ -90,9 +87,15 @@ mod frozen_selection_tests;
 mod residency;
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 mod edge_admission;
-pub mod edge_data;
-pub mod edge_payload;
-pub mod edge_taxonomy;
+/// Moved to `mere::model` (engine split P5 L3). The names other repositories
+/// name at this path stay re-exported here until the kernel moves at P8.
+pub mod edge_data {
+    pub use mere::model::edge_data::{Traversal, UNKNOWN_LEGACY_ASSERTER_IRI};
+}
+/// Moved to `mere::model` (engine split P5 L3); see [`edge_data`].
+pub mod edge_taxonomy {
+    pub use mere::model::edge_taxonomy::NavigationTrigger;
+}
 pub mod facet_projection;
 pub mod filter;
 /// Test-fixture escape hatch over the `pub(crate)` mutators (write-path
@@ -112,7 +115,6 @@ pub mod node;
 pub mod node_facets;
 pub mod node_props;
 pub mod predicate_declarations;
-pub mod predicate_registry;
 mod relation_read;
 pub mod resource;
 pub mod resource_classifications;
@@ -161,13 +163,11 @@ pub use identity::{
 // continues to resolve.
 pub use assertion_write::StatementWriteError;
 pub use edge_ops::Retraction;
+pub(crate) use mere::model::{built_in_predicate_stratum, built_in_relation_stratum};
 pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
 pub use predicate_declarations::{
     PredicateDeclaration, PredicateDeclarationError, PredicateDeclarations,
-};
-pub use predicate_registry::{
-    GraphStratum, built_in_predicate_stratum, built_in_relation_stratum, default_predicate_stratum,
 };
 pub use resource::ResourceNode;
 
@@ -202,17 +202,18 @@ pub use revert::{
 pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public
 // surface, re-exported so consumers name it without a direct muniment dep.
-pub use edge_data::{
+// The assertion model moved to `mere::model` (engine split P5 L3). Names other
+// repositories use are re-exported publicly; the rest only for the kernel.
+#[allow(unused_imports)]
+pub(crate) use mere::model::{
     ArrangementData, AssertionData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData,
-    REL_VOCAB, RelationAssertion, RelationAssertionSpec, SemanticData, SemanticStatement,
-    SemanticStatementSpec, StatementAssert, Traversal, TraversalData, all_semantic_sub_kinds,
-    predicate_iri, sub_kind_from_iri,
+    REL_VOCAB, RelationAssertion, RelationAssertionSpec, RelationDurability, SemanticData,
+    StatementAssert, Traversal, TraversalData, all_semantic_sub_kinds,
 };
-pub use edge_payload::EdgePayload;
-pub use edge_taxonomy::{
-    ArrangementSubKind, ContainmentSubKind, EdgeAssertion, EdgeFamily, ImportedSubKind,
-    NavigationTrigger, ProvenanceSubKind, RelationDurability, RelationKind, RelationSelector,
-    SemanticSubKind,
+pub use mere::model::{
+    ArrangementSubKind, ContainmentSubKind, EdgeAssertion, EdgeFamily, EdgePayload, GraphStratum,
+    ImportedSubKind, NavigationTrigger, ProvenanceSubKind, RelationKind, RelationSelector,
+    SemanticStatement, SemanticStatementSpec, SemanticSubKind, predicate_iri, sub_kind_from_iri,
 };
 pub use muniment::{LogId, Seq};
 
@@ -361,10 +362,11 @@ pub struct Graph {
     /// Runtime membership witnesses; cloned with candidates, never snapshotted.
     surface_node_lifetimes: HashMap<Uuid, SurfaceNodeLifetime>,
 
-    /// Resource truth beneath surfaces, indexed by the prepared identity IRI.
-    pub(crate) resources: chartulary::Graph<ResourceNode, EdgePayload>,
-    /// The one live authority for ordinary resource metadata.
-    pub(crate) resource_facets: chartulary::FacetStore<Uuid>,
+    /// Resource truth beneath surfaces, indexed by the prepared identity IRI,
+    /// with the one live authority for ordinary resource metadata (its facets).
+    /// The engine's model (`mere::model::ResourceGraph`); `pub(crate)` so every
+    /// write goes through a recorded `Graph` method, as for `inner`.
+    pub(crate) resources: mere::model::ResourceGraph,
     /// Explicit surface UUID to resource UUID associations.
     pub(crate) shown_resources: BTreeMap<Uuid, Uuid>,
     /// `shown_resources` inverted: the surfaces showing each resource. Kept

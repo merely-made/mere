@@ -7,78 +7,9 @@
 //! Known limits of the supplied graph, not a claim of world completeness.
 
 use super::{Graph, ResourceNode};
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum CoverageLayer {
-    Possession,
-    Residency,
-    Disclosure,
-    Synchronization,
-    Projection,
-}
-
-impl CoverageLayer {
-    pub const ALL: [Self; 5] = [
-        Self::Possession,
-        Self::Residency,
-        Self::Disclosure,
-        Self::Synchronization,
-        Self::Projection,
-    ];
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CoverageLimit {
-    pub layer: CoverageLayer,
-    pub reason: String,
-    /// Empty scope means the entire supplied graph. Hosts own these observations.
-    #[serde(default)]
-    pub resources: Vec<Uuid>,
-    /// Surface scope; empty scopes together mean the supplied graph.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub surfaces: Vec<Uuid>,
-    /// None means the number beyond this boundary is unknown.
-    #[serde(default)]
-    pub count: Option<usize>,
-}
-
-impl CoverageLimit {
-    pub fn new(layer: CoverageLayer, reason: impl Into<String>) -> Self {
-        Self {
-            layer,
-            reason: reason.into(),
-            resources: vec![],
-            surfaces: vec![],
-            count: None,
-        }
-    }
-}
-
-/// An empty note means no known limit within this supplied graph.
-/// It never means all relevant data exists here or anywhere else.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CoverageNote {
-    pub limits: Vec<CoverageLimit>,
-}
-
-impl CoverageNote {
-    pub fn push(&mut self, limit: CoverageLimit) {
-        if !self.limits.contains(&limit) {
-            self.limits.push(limit);
-        }
-    }
-    pub fn add_count(&mut self, layer: CoverageLayer, reason: impl Into<String>, count: usize) {
-        if count == 0 {
-            return;
-        }
-        let mut limit = CoverageLimit::new(layer, reason);
-        limit.count = Some(count);
-        self.push(limit);
-    }
-}
+pub use mere::model::coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 
 impl Graph {
     pub fn known_coverage(&self) -> &CoverageNote {

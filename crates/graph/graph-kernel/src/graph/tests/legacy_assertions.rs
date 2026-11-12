@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::super::*;
-use crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
 use crate::persistence::{PersistedSemanticEdgeData, PersistedSemanticSubKind};
+use mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
 
 #[test]
 fn legacy_statement_load_preserves_ids_times_and_known_attribution() {

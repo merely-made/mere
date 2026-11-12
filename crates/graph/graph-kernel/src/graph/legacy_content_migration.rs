@@ -179,7 +179,7 @@ impl ContentReplay {
                         .and_then(|existing| existing.provenance_iri.clone())
                         .or_else(|| {
                             Some(author.map(Author::asserter_iri).unwrap_or_else(|| {
-                                super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()
+                                mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()
                             }))
                         });
                 }
@@ -223,7 +223,7 @@ impl ContentReplay {
                         None,
                         GraphScope::Default,
                         Some(author.map(Author::asserter_iri).unwrap_or_else(|| {
-                            super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()
+                            mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()
                         })),
                         None,
                     );

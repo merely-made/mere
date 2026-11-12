@@ -88,3 +88,6 @@ crates/system/pandect/tests/fixtures/pre_p4_** -text
 
 # The snapshot digest is pinned over CRLF bytes (the original Windows checkout).
 support/doc-audit/d2/snapshot_281_aggregate.json text eol=crlf
+
+# The engine split P5 L3 wire fixtures are byte-compared; never convert them.
+crates/graph/graph-kernel/tests/fixtures/wire/** -text

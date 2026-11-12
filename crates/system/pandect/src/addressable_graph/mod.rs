@@ -71,8 +71,8 @@ mod schema;
 mod write;
 use kernel::graph::NodeFacetStore;
 use schema::*;
-pub use write::PreparedGraphPublication;
 use std::collections::BTreeMap;
+pub use write::PreparedGraphPublication;
 
 pub struct AddressableGraphStore<B> {
     backend: B,

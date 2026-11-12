@@ -206,7 +206,10 @@ mod tests {
         ] {
             let settings: ApplicationSettings = serde_json::from_str(fixture).unwrap();
             assert!(settings.theme.is_some());
-            assert_eq!(serde_json::to_string_pretty(&settings).unwrap(), fixture.trim_end());
+            assert_eq!(
+                serde_json::to_string_pretty(&settings).unwrap(),
+                fixture.trim_end()
+            );
         }
         let fonts: ApplicationSettings = serde_json::from_str(include_str!(
             "../tests/fixtures/application_settings_theme_fonts.json"

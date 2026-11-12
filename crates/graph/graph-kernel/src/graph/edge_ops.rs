@@ -22,13 +22,13 @@ use uuid::Uuid;
 use crate::time::unix_epoch_millis;
 use crate::types::GraphScope;
 
-use super::edge_data::Traversal;
-use super::edge_data::{SemanticStatement, SemanticStatementSpec, StatementAssert};
-use super::edge_payload::EdgePayload;
-use super::edge_taxonomy::{EdgeAssertion, RelationKind, RelationSelector, SemanticSubKind};
 use super::identity::{EdgeKey, NodeKey, RelationKey};
 use super::{DissolvedTraversalRecord, Graph};
 use crate::persistence::PersistedEdge;
+use mere::model::edge_data::Traversal;
+use mere::model::edge_data::{SemanticStatement, SemanticStatementSpec, StatementAssert};
+use mere::model::edge_payload::EdgePayload;
+use mere::model::edge_taxonomy::{EdgeAssertion, RelationKind, RelationSelector, SemanticSubKind};
 
 /// What a selector retraction did to the statements it found: those it
 /// withdrew, and those the caller's predicate refused, which stay held.
@@ -316,7 +316,7 @@ impl Graph {
         allow: &mut dyn FnMut(&SemanticStatement) -> bool,
     ) -> Retraction {
         let matches_selector = |statement: &SemanticStatement| {
-            super::edge_payload::selector_matches_kind(selector, statement.relation_kind())
+            mere::model::edge_payload::selector_matches_kind(selector, statement.relation_kind())
         };
         let mut found = self
             .inner
@@ -508,7 +508,7 @@ impl Graph {
         &mut self,
         from: NodeKey,
         to: NodeKey,
-        trigger: super::edge_taxonomy::NavigationTrigger,
+        trigger: mere::model::edge_taxonomy::NavigationTrigger,
         timestamp_ms: Option<u64>,
     ) -> bool {
         let traversal = match timestamp_ms {

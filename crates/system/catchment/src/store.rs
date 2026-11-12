@@ -17,8 +17,8 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::{
-    DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_INDEX_SCHEMA,
-    RESERVOIR_INDEX_SLOT, ReservoirError,
+    DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_INDEX_SCHEMA, RESERVOIR_INDEX_SLOT,
+    ReservoirError,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -58,7 +58,10 @@ impl<B: Backend, A: Clone + Serialize + DeserializeOwned> ReservoirStore<B, A> {
     /// a stored index is verified before it is trusted.
     pub async fn open(backend: B, persona: PersonaId) -> Result<Self, ReservoirError> {
         let slots = JsonSlots::new(backend);
-        let index = match slots.load::<ReservoirIndex<A>>(RESERVOIR_INDEX_SLOT).await? {
+        let index = match slots
+            .load::<ReservoirIndex<A>>(RESERVOIR_INDEX_SLOT)
+            .await?
+        {
             None => ReservoirIndex {
                 schema: RESERVOIR_INDEX_SCHEMA.to_string(),
                 persona,
@@ -98,11 +101,7 @@ impl<B: Backend, A: Clone + Serialize + DeserializeOwned> ReservoirStore<B, A> {
         })
     }
 
-    pub fn application_access(
-        &self,
-        mere: MereId,
-        app: &str,
-    ) -> Option<&MereApplicationAccess<A>> {
+    pub fn application_access(&self, mere: MereId, app: &str) -> Option<&MereApplicationAccess<A>> {
         self.index.access.get(&mere)?.get(app)
     }
 

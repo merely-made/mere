@@ -10,7 +10,7 @@ use super::*;
     clippy::too_many_arguments,
     reason = "the helper mirrors the complete RDF statement metadata tuple"
 )]
-pub(super) fn push_statement_metadata_quads(
+pub fn push_statement_metadata_quads(
     quads: &mut Vec<Quad>,
     subject: &NamedNode,
     statement_id: &str,
@@ -75,7 +75,7 @@ pub(super) fn push_statement_metadata_quads(
     }
 }
 
-pub(super) fn push_semantic_statement_metadata_quads(
+pub fn push_semantic_statement_metadata_quads(
     quads: &mut Vec<Quad>,
     subject: &NamedNode,
     predicate: &str,
@@ -274,7 +274,7 @@ pub(super) fn push_reifier_literal(
     }
 }
 
-pub(super) fn withdrawal_activity_id(statement_id: &str) -> String {
+pub fn withdrawal_activity_id(statement_id: &str) -> String {
     let mut encoded = String::from(WITHDRAWAL_ACTIVITY_PREFIX);
     const HEX: &[u8; 16] = b"0123456789abcdef";
     for byte in statement_id.bytes() {
@@ -295,7 +295,7 @@ pub(super) fn graph_scope_marker(scope: &GraphScope) -> (&'static str, Option<St
     }
 }
 
-pub(super) fn property_literal(property: &NodeProperty) -> Literal {
+pub fn property_literal(property: &NodeProperty) -> Literal {
     if let Some(lang) = property.lang.as_deref()
         && let Ok(literal) = Literal::new_language_tagged_literal(property.value.clone(), lang)
     {
@@ -310,7 +310,7 @@ pub(super) fn property_literal(property: &NodeProperty) -> Literal {
     Literal::new_simple_literal(property.value.clone())
 }
 
-pub(super) fn asserted_at_literal(asserted_at_ms: u64) -> Option<Literal> {
+pub fn asserted_at_literal(asserted_at_ms: u64) -> Option<Literal> {
     let timestamp =
         OffsetDateTime::from_unix_timestamp_nanos(i128::from(asserted_at_ms) * 1_000_000).ok()?;
     let lexical = timestamp.format(&Rfc3339).ok()?;

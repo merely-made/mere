@@ -10,12 +10,13 @@
 //! supplies the shared causal authoring helpers, policy-before-insert storage,
 //! and LogSync join/drain used by Commons and Knot.
 
-use insigne::CheckFault;
 use identity::AttestationKeys;
+use insigne::CheckFault;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use eidetic::PrivacyClass;
+use identity::{IdentityError, IdentityProvider};
 use insigne::DerivedKeyAttestation;
 use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
@@ -25,7 +26,6 @@ use muniment::Backend;
 use p2panda_core::cbor::{decode_cbor_strict, encode_cbor};
 use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
 use p2panda_store::topics::TopicStore;
-use identity::{IdentityError, IdentityProvider};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use stickleback::{
@@ -1832,17 +1832,17 @@ fn relation_key(assertion: &EdgeAssertion) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::access::{AccessAction, AccessTransition};
     use crate::CartographyGeometry;
+    use crate::access::{AccessAction, AccessTransition};
+    use identity::{IdentityProvider, InMemoryProvider};
     use kernel::graph::{
         ArrangementSubKind, ContainmentSubKind, EdgeFamily, ImportedSubKind, ProvenanceSubKind,
         RelationKind, SemanticSubKind,
     };
     use muniment::{MemoryBackend, RedbBackend};
-    use identity::{IdentityProvider, InMemoryProvider};
+    use murm_sync::JoinedSpace;
     use std::sync::Arc;
     use std::time::Duration;
-    use murm_sync::JoinedSpace;
     use transport::{P2pandaTransport, PeerID, sync_overlay_topic};
 
     const GRAPH: [u8; 32] = [0x77; 32];
@@ -1928,9 +1928,7 @@ mod tests {
         )
     }
 
-    fn assertion_statements(
-        projection: &SyncProjection,
-    ) -> Vec<kernel::graph::SemanticStatement> {
+    fn assertion_statements(projection: &SyncProjection) -> Vec<kernel::graph::SemanticStatement> {
         let from = projection.graph.get_node_key_by_id(A).unwrap();
         let to = projection.graph.get_node_key_by_id(B).unwrap();
         projection
@@ -2100,10 +2098,7 @@ mod tests {
             assert_eq!(statement.provenance_iri.as_deref(), Some(alice.as_str()));
             assert_eq!(statement.asserted_at_ms, statement.first_asserted_ms);
             assert!(statement.asserted_at_ms.is_some());
-            assert_eq!(
-                statement.graph_scope,
-                kernel::types::GraphScope::Default
-            );
+            assert_eq!(statement.graph_scope, kernel::types::GraphScope::Default);
             assert_eq!(statement.basis.note.as_deref(), Some("signed sync fixture"));
             assert_eq!(
                 statement.basis.evidence,

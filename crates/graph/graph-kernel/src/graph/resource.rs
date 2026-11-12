@@ -7,103 +7,34 @@
 //! Resource identity beneath browsing surfaces.
 
 use super::{Graph, NodeKey};
-use crate::persistence::{PersistedEdge, PersistedResourceFacet, PersistedResourceRecord};
-use chartulary::{Address, Addressed, Identified};
+use crate::persistence::{PersistedEdge, PersistedResourceRecord};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
 pub use super::resource_pair_bounds::ResourceEdgesBoundError;
-
-/// A tagging assertion points from the tagged resource to its concept resource.
-pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
-
-/// One resource identified by a canonical IRI.
-///
-/// Identity and address are immutable together. Content records will be
-/// attached through the kernel's recorded write path.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ResourceNode {
-    container: chartulary::Container<Uuid>,
-    pub(super) nested_selection: Option<super::FrozenSelection>,
-    pub(super) nested_link: Option<super::FrozenLink>,
-}
-
-impl ResourceNode {
-    /// Identify a resource using the common canonicalizer and UUID namespace.
-    pub fn new(iri: &str) -> Self {
-        let canonical = chartulary::canonical_url(iri);
-        Self::from_canonical_iri(&canonical)
-    }
-
-    /// Identify a vocabulary term by its exact IRI, including fragment and case.
-    /// Page resources use [`Self::new`] instead.
-    pub fn for_term(iri: &str) -> Self {
-        Self::from_canonical_iri(iri)
-    }
-
-    pub(crate) fn from_canonical_iri(canonical: &str) -> Self {
-        Self {
-            nested_selection: None,
-            nested_link: None,
-            container: chartulary::Container::with_identity(
-                chartulary::resource_id_from_canonical_iri(canonical),
-            )
-            .with_address_record(Address::new(canonical)),
-        }
-    }
-
-    /// Immutable nested selection borne by this Resource, when frozen.
-    pub fn nested_selection(&self) -> Option<&super::FrozenSelection> {
-        self.nested_selection.as_ref()
-    }
-
-    /// Immutable link reading borne by this Resource, when frozen.
-    pub fn nested_link(&self) -> Option<&super::FrozenLink> {
-        self.nested_link.as_ref()
-    }
-
-    /// The stable identity, shared by every surface showing this resource.
-    pub fn id(&self) -> Uuid {
-        self.container.id
-    }
-
-    /// The canonical IRI from which the stable identity was derived.
-    pub fn canonical_iri(&self) -> &str {
-        self.container.addresses[0].as_str()
-    }
-}
+pub use mere::model::resource::{ResourceNode, TAGGED_WITH_IRI};
 
 impl Graph {
     /// Read a resource by its stable identity.
     pub fn resource(&self, id: Uuid) -> Option<&ResourceNode> {
-        self.resources.get(&id)
+        self.resources.resource(id)
     }
 
     /// The resources currently held in this graph.
     pub fn resource_nodes(&self) -> impl Iterator<Item = &ResourceNode> {
-        self.resources.nodes().map(|(_, resource)| resource)
+        self.resources.resource_nodes()
     }
 
     /// Resource edges with their resource endpoints. Surface indices never cross this seam.
     pub fn resource_edges(
         &self,
     ) -> impl Iterator<Item = (&ResourceNode, &ResourceNode, &super::EdgePayload)> {
-        self.resources.inner().edge_references().map(|edge| {
-            (
-                self.resources
-                    .node(edge.source())
-                    .expect("resource endpoint exists"),
-                self.resources
-                    .node(edge.target())
-                    .expect("resource endpoint exists"),
-                edge.weight(),
-            )
-        })
+        self.resources.resource_edges()
     }
 
     /// Resource metadata, separate from surface metadata.
     pub fn resource_facets(&self) -> &chartulary::FacetStore<Uuid> {
-        &self.resource_facets
+        self.resources.facets()
     }
 
     /// The resource explicitly shown by a surface, when recorded.
@@ -122,21 +53,7 @@ impl Graph {
     }
 
     pub fn resource_record(&self, id: Uuid) -> Option<PersistedResourceRecord> {
-        let resource = self.resource(id)?;
-        let facets = self
-            .resource_facets
-            .facets_of(&id)
-            .into_iter()
-            .flat_map(|facets| facets.iter())
-            .map(|(facet, value)| PersistedResourceFacet {
-                facet: facet.as_str().to_string(),
-                value_json: serde_json::to_string(value).expect("JSON value serializes"),
-            })
-            .collect();
-        Some(PersistedResourceRecord {
-            canonical_iri: resource.canonical_iri().to_string(),
-            facets,
-        })
+        self.resources.resource_record(id)
     }
 
     pub(crate) fn set_resource_record(
@@ -161,7 +78,7 @@ impl Graph {
                 return false;
             }
             self.resources.remove(key);
-            self.resource_facets.remove_node(&id);
+            self.resources.facets_mut().remove_node(&id);
             self.bump_revision();
             return true;
         };
@@ -183,7 +100,7 @@ impl Graph {
             .resource(id)
             .is_some_and(|resource| resource.nested_selection().is_some())
         {
-            let stored = self.resource_facets.get(
+            let stored = self.resources.facets().get(
                 &id,
                 &chartulary::FacetId::new(super::frozen_selection::FROZEN_SELECTION),
             );
@@ -209,7 +126,7 @@ impl Graph {
             .resource(id)
             .is_some_and(|resource| resource.nested_link().is_some())
         {
-            let stored = self.resource_facets.get(
+            let stored = self.resources.facets().get(
                 &id,
                 &chartulary::FacetId::new(super::frozen_link::FROZEN_LINK),
             );
@@ -224,8 +141,7 @@ impl Graph {
                 return false;
             }
         }
-        resource.nested_selection = selection;
-        resource.nested_link = link;
+        resource = resource.with_frozen(selection, link);
         if resource.id() != id {
             return false;
         }
@@ -251,7 +167,7 @@ impl Graph {
             .resource(id)
             .is_some_and(|existing| existing == &resource)
             && self
-                .resource_facets
+                .resource_facets()
                 .facets_of(&id)
                 .map(|values| {
                     values
@@ -265,9 +181,10 @@ impl Graph {
             return false;
         }
         self.resources.insert(resource);
-        self.resource_facets.remove_node(&id);
+        self.resources.facets_mut().remove_node(&id);
         for (facet, value) in facets {
-            self.resource_facets
+            self.resources
+                .facets_mut()
                 .set(id, facet, value, &chartulary::AcceptAll)
                 .expect("permissive facet validator");
         }
@@ -412,20 +329,6 @@ impl Graph {
         }
         self.bump_revision();
         true
-    }
-}
-
-impl Identified for ResourceNode {
-    type Id = Uuid;
-
-    fn id(&self) -> &Uuid {
-        &self.container.id
-    }
-}
-
-impl Addressed for ResourceNode {
-    fn addresses(&self) -> Vec<Address> {
-        self.container.addresses.clone()
     }
 }
 

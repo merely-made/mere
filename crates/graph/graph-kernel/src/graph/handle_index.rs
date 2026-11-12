@@ -14,7 +14,9 @@
 //! index, and the next read rebuilds it.
 
 use super::node_facets::SEMANTIC_PROPERTIES;
-use super::{EdgeKey, EdgePayload, Graph, NodeKey, RelationKey, ResourceEdgeKey, SemanticStatement};
+use super::{
+    EdgeKey, EdgePayload, Graph, NodeKey, RelationKey, ResourceEdgeKey, SemanticStatement,
+};
 use crate::types::NodeProperty;
 use petgraph::stable_graph::EdgeIndex;
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
@@ -76,7 +78,11 @@ impl Graph {
             }
             for resource in self.resource_nodes() {
                 for held in self.resource_properties(resource.id()) {
-                    add(&mut holders.resource_literals, &held.statement_id, resource.id());
+                    add(
+                        &mut holders.resource_literals,
+                        &held.statement_id,
+                        resource.id(),
+                    );
                 }
             }
             for (key, node) in self.nodes() {
@@ -130,7 +136,11 @@ impl Graph {
             .unwrap_or_default();
         if let Some(holders) = self.handle_index.built.get_mut() {
             for property in held {
-                add(&mut holders.surface_literals, &property.statement_id, node_id);
+                add(
+                    &mut holders.surface_literals,
+                    &property.statement_id,
+                    node_id,
+                );
             }
         }
     }

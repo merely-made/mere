@@ -22,11 +22,11 @@
 use euclid::default::Point2D;
 use uuid::Uuid;
 
-use super::edge_payload::EdgePayload;
 use super::{
     Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeFacetStore, NodeKey, RelationKey,
     RelationSelector,
 };
+use mere::model::edge_payload::EdgePayload;
 
 /// Raw-mutator access for test fixtures. Every method delegates to the
 /// `pub(crate)` inherent mutator of the same name.

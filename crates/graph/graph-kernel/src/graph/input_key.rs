@@ -34,6 +34,10 @@ impl GraphInputKey {
     }
     /// Clones retain their source; independently materialized graphs do not.
     /// Equality additionally requires the same input version, including forks.
+    /// The source and version, for a key composed from several inputs.
+    pub(crate) fn parts(self) -> (u64, u64) {
+        (self.source, self.version)
+    }
     pub fn same_source(self, other: Self) -> bool {
         self.source == other.source
     }

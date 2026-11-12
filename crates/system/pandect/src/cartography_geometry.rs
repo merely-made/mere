@@ -111,9 +111,7 @@ pub struct SavedRegion {
 
 impl CartographyGeometry {
     /// Collect a member-keyed position set (e.g. the canvas's live node positions).
-    pub fn from_positions(
-        positions: impl IntoIterator<Item = (Uuid, (f32, f32))>,
-    ) -> Self {
+    pub fn from_positions(positions: impl IntoIterator<Item = (Uuid, (f32, f32))>) -> Self {
         Self {
             positions: positions.into_iter().collect(),
             ..Self::default()
@@ -147,10 +145,7 @@ impl CartographyGeometry {
     }
 
     /// Attach per-member sprite faces (chainable). (Node-rep — sprite persistence.)
-    pub fn with_sprites(
-        mut self,
-        sprites: impl IntoIterator<Item = (Uuid, String)>,
-    ) -> Self {
+    pub fn with_sprites(mut self, sprites: impl IntoIterator<Item = (Uuid, String)>) -> Self {
         self.sprites = sprites.into_iter().collect();
         self
     }
@@ -231,10 +226,7 @@ impl CartographyGeometry {
     }
 
     /// Attach the saved seed (chainable); `None` is the recipe seed.
-    pub fn with_seed(
-        mut self,
-        seed: Option<impl IntoIterator<Item = (Uuid, (f32, f32))>>,
-    ) -> Self {
+    pub fn with_seed(mut self, seed: Option<impl IntoIterator<Item = (Uuid, (f32, f32))>>) -> Self {
         self.seed = seed.map(|seed| seed.into_iter().collect());
         self
     }

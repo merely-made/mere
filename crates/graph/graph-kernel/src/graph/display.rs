@@ -305,16 +305,10 @@ mod tests {
         let mut g = Graph::new();
         let url = "https://en.wikipedia.org/wiki/Rust";
         let page = add(&mut g, url);
-        assert_eq!(
-            g.node_display_label(page),
-            "en.wikipedia.org/wiki/Rust"
-        );
+        assert_eq!(g.node_display_label(page), "en.wikipedia.org/wiki/Rust");
         // A title that is only the host is no more specific than no title.
         g.get_node_mut(page).unwrap().title = "en.wikipedia.org".to_string();
-        assert_eq!(
-            g.node_display_label(page),
-            "en.wikipedia.org/wiki/Rust"
-        );
+        assert_eq!(g.node_display_label(page), "en.wikipedia.org/wiki/Rust");
     }
 
     #[test]

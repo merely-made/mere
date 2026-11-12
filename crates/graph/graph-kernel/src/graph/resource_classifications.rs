@@ -7,27 +7,11 @@
 //! Complete classification variants, retained origins and exact review edits.
 
 use super::resource_content::{ContentError, RESOURCE_CLASSIFICATIONS};
-use super::{Author, Graph, NodeKey};
+use super::{Graph, NodeKey};
 use crate::types::{ClassificationScheme, ClassificationStatus, NodeClassification};
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ClassificationOrigin {
-    pub surface_id: Uuid,
-    pub author: Option<Author>,
-    pub uncertainty: Option<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ClassificationVariant {
-    pub variant_id: String,
-    /// Original record identity shared by divergent review versions.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub original_variant_id: Option<String>,
-    pub classification: NodeClassification,
-    pub origins: Vec<ClassificationOrigin>,
-}
+pub use mere::model::resource_content::{ClassificationOrigin, ClassificationVariant};
 
 pub(crate) fn validate_variants(variants: &[ClassificationVariant]) -> Result<(), ContentError> {
     let mut ids = std::collections::BTreeMap::new();

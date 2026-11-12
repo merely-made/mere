@@ -371,9 +371,11 @@ fn current_live_relation_commands_reject_the_retired_decay_field() {
         assertion: semantic(SemanticSubKind::Cites, "independent reason"),
     };
     let current = serde_json::to_value(&command).unwrap();
-    assert!(current["AssertRelation"]["assertion"]["Semantic"]
-        .get("decay_progress")
-        .is_none());
+    assert!(
+        current["AssertRelation"]["assertion"]["Semantic"]
+            .get("decay_progress")
+            .is_none()
+    );
     assert!(serde_json::from_value::<LiveCommand>(current.clone()).is_ok());
     for retired_value in [serde_json::Value::Null, serde_json::json!(0.25)] {
         let mut old_command = current.clone();

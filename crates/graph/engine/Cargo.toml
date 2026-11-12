@@ -5,7 +5,7 @@ version = "0.1.0"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Mere, the semantic-web engine: linked-data formats, ingest, the graph projection and SPARQL query."
+description = "Mere, the semantic-web engine: the assertion model and resource graph, linked-data formats, ingest, the RDF projection and SPARQL query."
 publish = true
 keywords = ["json-ld", "rdf", "linked-data", "graph", "semantic-web"]
 categories = ["web-programming", "data-structures"]
@@ -28,21 +28,26 @@ bundled-contexts = []
 # pull the evaluator. Tests retain a materialized spareval dataset as the
 # parity oracle for the indexed dataset.
 # Preserve directional JSON-LD terms previously enabled through Oxigraph.
-query = ["dep:chartulary", "dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
-
-[[example]]
-name = "adapter_scale"
-required-features = ["query"]
+query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
 
 [dependencies]
-kernel.workspace = true
-serde_json.workspace = true
-uuid.workspace = true
+serde.workspace = true
+# Captured facets are decimal JSON and must replay to the same floating-point bits.
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+uuid = { workspace = true, features = ["v5"] }
+# The model's persisted types keep their rkyv archive shape (engine split P5 L3).
+rkyv = { version = "0.8", features = ["std"] }
+strum = { version = "0.28", features = ["derive"] }
+petgraph = { version = "0.8.3", features = ["serde-1"] }
+url = "2.5"
+# SystemTime::now() through Date.now() in wasm32 browser hosts.
+web-time = "1"
 oxjsonld = "0.2"
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
-# The id-level quad index the query feature's held dataset wraps.
-chartulary = { workspace = true, optional = true }
+# The resource graph's substrate, and the id-level quad index the query
+# feature's held dataset wraps.
+chartulary.workspace = true
 # Preserve query extensions previously enabled transitively by Oxigraph.
 spareval = { version = "0.2.9", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
 spargebra = { version = "0.4", optional = true, features = ["sparql-12"] }
@@ -59,7 +64,7 @@ oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
 getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optional = true }
 
 [dev-dependencies]
-kernel = { workspace = true, features = ["fixtures"] }
+postcard = { version = "1", features = ["alloc"] }
 # The W3C conformance harness (tests/w3c_conformance): RDF/XML parsing and SPARQL result files.
 oxrdfxml = { version = "0.2", features = ["rdf-12"] }
 sparesults = { version = "0.3", features = ["sparql-12"] }

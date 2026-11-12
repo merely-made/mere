@@ -4,16 +4,15 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-
 //! Sealing a store's values: a muniment backend whose values are sealed by
 //! the persona's custody before they reach the inner backend. A mere's
 //! retained store is sealed this way when its owner composes it over custody.
 
 use std::sync::Arc;
 
+use muniment::Backend;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use muniment::Backend;
 
 use async_trait::async_trait;
 use eidetic::{Hash, PayloadSealer, SealedBlobRef};

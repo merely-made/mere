@@ -7,7 +7,7 @@
 //! Independent assertion identities and legacy attribution.
 
 use super::super::*;
-use crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+use mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
 
 fn claim(asserter: &str, time: u64) -> SemanticStatementSpec {
     SemanticStatementSpec {

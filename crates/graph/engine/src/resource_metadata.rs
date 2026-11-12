@@ -6,15 +6,16 @@
 
 //! RDF-profile metadata for each shared Resource, independent of its surfaces.
 
+use crate::model::{ClassificationScheme, ResourceGraph, ResourceNode};
 use crate::{
-    ClassificationScheme, Graph, GraphScope, Literal, NamedNode, Quad, RDF_TYPE, Term,
-    property_literal, push_quad, push_statement_metadata_quads,
+    GraphScope, Literal, NamedNode, Quad, RDF_TYPE, Term, property_literal, push_quad,
+    push_statement_metadata_quads,
 };
 
-const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
-const SKOS_PREF_LABEL: &str = "http://www.w3.org/2004/02/skos/core#prefLabel";
+pub const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
+pub const SKOS_PREF_LABEL: &str = "http://www.w3.org/2004/02/skos/core#prefLabel";
 
-pub(crate) fn quads(graph: &Graph, resource: &kernel::graph::ResourceNode) -> Vec<Quad> {
+pub(crate) fn quads(graph: &ResourceGraph, resource: &ResourceNode) -> Vec<Quad> {
     let mut quads = Vec::new();
     let Ok(subject) = NamedNode::new(resource.canonical_iri()) else {
         return quads;
@@ -84,11 +85,3 @@ pub(crate) fn quads(graph: &Graph, resource: &kernel::graph::ResourceNode) -> Ve
     quads.retain(|quad| seen.insert(quad.clone()));
     quads
 }
-
-#[cfg(test)]
-#[path = "resource_metadata/tests.rs"]
-mod tests;
-
-#[cfg(test)]
-#[path = "resource_metadata/attribution_tests.rs"]
-mod attribution_tests;

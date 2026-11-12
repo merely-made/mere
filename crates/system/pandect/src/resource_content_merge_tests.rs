@@ -7,9 +7,9 @@
 use crate::snapshot_merge::try_merge_snapshots;
 use kernel::graph::Graph;
 use kernel::graph::apply::add_node;
-use kernel::types::{
+use kernel::types::NodeProperty;
+use mere::model::{
     ClassificationProvenance, ClassificationScheme, ClassificationStatus, NodeClassification,
-    NodeProperty,
 };
 
 fn graph(status: ClassificationStatus, author: &str, handle: &str) -> Graph {

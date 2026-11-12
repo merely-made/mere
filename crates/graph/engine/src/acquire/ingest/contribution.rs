@@ -412,7 +412,7 @@ pub(super) fn collect_contribution<E: std::fmt::Display>(
             method: statement
                 .method_iri
                 .clone()
-                .map(|iri| kernel::types::AssertionMethod {
+                .map(|iri| crate::model::AssertionMethod {
                     iri,
                     version: statement.method_version.clone(),
                 }),

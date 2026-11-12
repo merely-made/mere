@@ -6,34 +6,10 @@
 
 //! Immutable selections owned by Resources, independent of local appearances.
 use super::{CoverageNote, Graph, GraphStratum};
-use crate::persistence::PersistedEdge;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-pub const FROZEN_SELECTION: &str = "graph.frozen-selection/v1";
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct FrozenSelection {
-    version: u32,
-    spec: serde_json::Value,
-    revision: u64,
-    members: Vec<Uuid>,
-    statements: Vec<PersistedEdge>,
-}
-impl FrozenSelection {
-    pub fn spec(&self) -> &serde_json::Value {
-        &self.spec
-    }
-    pub fn revision(&self) -> u64 {
-        self.revision
-    }
-    pub fn members(&self) -> &[Uuid] {
-        &self.members
-    }
-    pub fn statements(&self) -> &[PersistedEdge] {
-        &self.statements
-    }
-}
+pub use mere::model::frozen::{FROZEN_SELECTION, FrozenSelection};
+
 pub struct OpenedFrozenSelection<'a> {
     pub selection: &'a FrozenSelection,
     pub coverage: CoverageNote,
@@ -123,21 +99,21 @@ pub(crate) fn selection_from_record(
         }
     }
     validate_retained_keys(&raw, &known)?;
-    if selection.version != 1 {
+    if selection.version() != 1 {
         return Err("unsupported frozen selection version".into());
     }
-    let members: std::collections::BTreeSet<_> = selection.members.iter().copied().collect();
-    if members.len() != selection.members.len() || members.contains(&Uuid::nil()) {
+    let members: std::collections::BTreeSet<_> = selection.members().iter().copied().collect();
+    if members.len() != selection.members().len() || members.contains(&Uuid::nil()) {
         return Err("invalid frozen member references".into());
     }
     super::assertion_handles::validate_assertion_handles(
         selection
-            .statements
+            .statements()
             .iter()
             .map(|edge| (GraphStratum::Resource, edge)),
     )
     .map_err(|error| error.to_string())?;
-    for edge in &selection.statements {
+    for edge in selection.statements() {
         let from = edge
             .from_node_id
             .parse::<Uuid>()
@@ -207,13 +183,7 @@ impl Graph {
                 super::snapshot::persisted_edge_for_ids(from.id(), to.id(), payload)
             })
             .collect();
-        let selection = FrozenSelection {
-            version: 1,
-            spec,
-            revision: self.revision(),
-            members,
-            statements,
-        };
+        let selection = FrozenSelection::v1(spec, self.revision(), members, statements);
         // A fresh address gives this record its own deterministic Resource identity.
         if nonce.is_nil() {
             return Err("frozen Resource nonce must be fresh".into());
@@ -292,13 +262,7 @@ mod canonical_record_tests {
 
     fn record(statements: Vec<PersistedEdge>) -> PersistedResourceRecord {
         let members = (1..=3).map(Uuid::from_u128).collect();
-        let selection = FrozenSelection {
-            version: 1,
-            spec: serde_json::json!({}),
-            revision: 1,
-            members,
-            statements,
-        };
+        let selection = FrozenSelection::v1(serde_json::json!({}), 1, members, statements);
         PersistedResourceRecord {
             canonical_iri: "urn:uuid:selection".into(),
             facets: vec![PersistedResourceFacet {

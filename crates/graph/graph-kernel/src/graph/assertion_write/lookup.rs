@@ -59,7 +59,8 @@ impl Graph {
         from: Uuid,
         to: Uuid,
     ) -> Vec<(ResourceEdgeKey, &EdgePayload)> {
-        let (Some(source), Some(target)) = (self.resources.key_of(&from), self.resources.key_of(&to))
+        let (Some(source), Some(target)) =
+            (self.resources.key_of(&from), self.resources.key_of(&to))
         else {
             return Vec::new();
         };

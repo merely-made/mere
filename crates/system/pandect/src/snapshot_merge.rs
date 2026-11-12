@@ -546,7 +546,8 @@ mod tests {
     #[test]
     fn mixed_legacy_and_canonical_snapshots_merge_without_losing_claims_or_placement() {
         use kernel::graph::{ContainmentSubKind, RelationKind};
-        use kernel::persistence::{PersistedContainmentEdgeData, PersistedEdgeFamily};
+        use kernel::persistence::PersistedEdgeFamily;
+        use mere::model::PersistedContainmentEdgeData;
 
         let mut legacy = snap(&["https://sub.example.test/a", "https://target.test/"]);
         let mut canonical = legacy.clone();
@@ -561,7 +562,7 @@ mod tests {
             semantic: None,
             traversal: None,
             containment: Some(PersistedContainmentEdgeData {
-                sub_kinds: vec![kernel::persistence::PersistedContainmentSubKind::CollectionMember],
+                sub_kinds: vec![mere::model::PersistedContainmentSubKind::CollectionMember],
             }),
             arrangement: None,
             imported: None,

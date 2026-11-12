@@ -97,7 +97,7 @@ impl LegacyFamilyAttribution {
     /// Does not change IDs, timestamps, canonical carried records, or Resource
     /// assertions.
     pub(crate) fn repair_checkpoint(&self, graph: &mut Graph) {
-        let unknown = super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+        let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
         let keys: Vec<_> = graph
             .surface_relation_buckets()
             .filter_map(|(key, from, to, payload)| {
@@ -166,7 +166,7 @@ fn merge_known_author(slot: &mut Option<String>, ambiguous: &mut bool, incoming:
 
 fn held_surface_members(graph: &Graph) -> BTreeMap<Member, (Option<String>, bool)> {
     let mut result = BTreeMap::<Member, (Option<String>, bool)>::new();
-    let unknown = super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+    let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
     for (_, from, to, payload) in graph.surface_relation_buckets() {
         let Some(from_id) = graph.inner.node(from).map(|node| *node.id()) else {
             continue;
@@ -286,8 +286,7 @@ mod tests {
             .find(|statement| statement.is_held())
             .unwrap();
         statement.statement_id = format!("{LEGACY_FAMILY_ASSERTION_ID_PREFIX}test-id");
-        statement.provenance_iri =
-            Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
+        statement.provenance_iri = Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
         // Keep an explicitly unknown first time as a guard against causality
         // repair accidentally fabricating clocks.
         statement.first_asserted_ms = None;
@@ -379,7 +378,7 @@ mod tests {
             label: Some("folder".into()),
             basis: AssertionBasis::default(),
             graph_scope: GraphScope::User,
-            provenance_iri: Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
+            provenance_iri: Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
             first_asserted_ms: None,
             asserted_at_ms: None,
             withdrawn: None,
@@ -417,7 +416,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             added.provenance_iri.as_deref(),
-            Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+            Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
         );
     }
 
@@ -444,13 +443,12 @@ mod tests {
             .find(|statement| statement.is_held())
             .unwrap();
         statement.statement_id = "urn:carried:canonical-id".into();
-        statement.provenance_iri =
-            Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
+        statement.provenance_iri = Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
 
         attribution.repair_checkpoint(&mut graph);
         assert_eq!(
             source(&graph).as_deref(),
-            Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+            Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
         );
     }
 
@@ -514,7 +512,7 @@ mod tests {
             label: None,
             basis: AssertionBasis::default(),
             graph_scope: GraphScope::User,
-            provenance_iri: Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
+            provenance_iri: Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
             first_asserted_ms: None,
             asserted_at_ms: None,
             withdrawn: None,
@@ -526,7 +524,7 @@ mod tests {
         attribution.repair_checkpoint(&mut graph);
         assert_eq!(
             source(&graph).as_deref(),
-            Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+            Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
         );
     }
 }

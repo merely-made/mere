@@ -74,7 +74,10 @@ mod tests {
     fn a_tagged_state_round_trips() {
         let state = ViewState::new("test.view/v1", json!({"focus": "n1"}));
         let stored = serde_json::to_string(&state).unwrap();
-        assert_eq!(stored, r#"{"schema":"test.view/v1","value":{"focus":"n1"}}"#);
+        assert_eq!(
+            stored,
+            r#"{"schema":"test.view/v1","value":{"focus":"n1"}}"#
+        );
         assert_eq!(serde_json::from_str::<ViewState>(&stored).unwrap(), state);
     }
 
@@ -92,7 +95,10 @@ mod tests {
     #[test]
     fn decode_checks_the_schema() {
         let state = ViewState::encode("a/v1", &json!({"x": 1})).unwrap();
-        assert_eq!(state.decode::<serde_json::Value>("a/v1"), Some(json!({"x": 1})));
+        assert_eq!(
+            state.decode::<serde_json::Value>("a/v1"),
+            Some(json!({"x": 1}))
+        );
         assert_eq!(state.decode::<serde_json::Value>("b/v1"), None);
     }
 }

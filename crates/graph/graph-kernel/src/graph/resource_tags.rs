@@ -11,24 +11,10 @@ use super::resource_content::{ContentError, TAG_CONCEPT};
 use super::{CapturedDelta, EdgePayload, Graph, NodeKey, ResourceNode, SemanticStatement};
 use crate::persistence::PersistedResourceRecord;
 use crate::types::GraphScope;
-use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct TagConcept {
-    pub owner_iri: String,
-    pub label: String,
-}
-
-/// The exact label and explicit owner form one unambiguous identity key.
-pub fn tag_concept_iri(owner_iri: &str, label: &str) -> String {
-    let key = serde_json::to_vec(&(owner_iri, label)).expect("string tuple serializes");
-    format!(
-        "https://mere.computer/ns/tag#{}",
-        Uuid::new_v5(&Uuid::NAMESPACE_URL, &key)
-    )
-}
+pub use mere::model::resource_content::{TagConcept, tag_concept_iri};
 
 pub(crate) fn validate_tag_concept(iri: &str, concept: &TagConcept) -> Result<(), ContentError> {
     for (role, value) in [("concept", iri), ("owner", concept.owner_iri.as_str())] {

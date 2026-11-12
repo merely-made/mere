@@ -6,18 +6,29 @@
 
 //! # mere-rdf
 //!
-//! A re-export shim over the `mere` engine crate (engine split P5 L2, F6). Every
+//! A re-export shim over the `mere` engine crate (engine split P5 L2, F6) and,
+//! for the surface projection and importer that moved there in P5 L3, over
+//! `kernel::rdf`. Every
 //! path this crate had still resolves, so consumers build unchanged until they
 //! repoint to `mere` and this crate is deleted.
 
-pub use mere::acquire::ingest;
+/// The ingest module, with the importer that moved to `kernel::rdf` (P5 L3).
+pub mod ingest {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub use kernel::rdf::{
+        ApplyOutcome, apply_contribution, apply_contribution_with_identity, apply_import,
+        apply_import_with_identity,
+    };
+    pub use mere::acquire::ingest::*;
+}
 pub use mere::formats::serialize;
 pub use mere::profile::vocab;
 #[cfg(feature = "query")]
 pub use mere::query;
 
+pub use kernel::rdf::node_quads;
 #[cfg(not(target_arch = "wasm32"))]
-pub use mere::{
+pub use kernel::rdf::{
     ApplyOutcome, apply_contribution, apply_contribution_with_identity, apply_import,
     apply_import_with_identity,
 };
@@ -28,9 +39,9 @@ pub use mere::{
     from_jsonld_envelope_with_contexts, from_jsonld_envelope_with_contexts_and_base_iri,
     from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_nquads,
     from_nquads_envelope, from_quads, from_quads_envelope, from_trig, from_trig_envelope,
-    is_bundled_context, node_quads, referenced_context_urls, to_jsonld, to_jsonld_compact,
-    to_jsonld_string, to_jsonld_with_history, to_nquads, to_nquads_with_history, to_trig,
-    to_trig_with_history, vocabulary_alignment_quads,
+    is_bundled_context, referenced_context_urls, to_jsonld, to_jsonld_compact, to_jsonld_string,
+    to_jsonld_with_history, to_nquads, to_nquads_with_history, to_trig, to_trig_with_history,
+    vocabulary_alignment_quads,
 };
 
 #[cfg(test)]

@@ -12,34 +12,13 @@
 use std::cell::RefCell;
 use std::convert::Infallible;
 
+use crate::{ProjectionKey, RdfSource};
 use chartulary::quads::{Dictionary, Quad, QuadIndex, QuadMeta, TermId, View};
-use kernel::graph::{Graph, GraphInputKey};
 use oxrdf::{GraphName, Term};
 use spareval::{InternalQuad, QueryableDataset};
 
 /// The kernel counters and input keys a dataset was built at; a move in any
 /// means rebuild. The keys tell two graphs with equal counters apart.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-struct RevisionKey {
-    revision: u64,
-    content: u64,
-    semantic_observation: u64,
-    structural_input: GraphInputKey,
-    content_input: GraphInputKey,
-}
-
-impl RevisionKey {
-    fn of(graph: &Graph) -> Self {
-        Self {
-            revision: graph.revision(),
-            content: graph.content_revision(),
-            semantic_observation: graph.semantic_observation_revision(),
-            structural_input: graph.structural_input_key(),
-            content_input: graph.content_input_key(),
-        }
-    }
-}
-
 const WITHDRAWN: QuadMeta = QuadMeta {
     held: false,
     asserter: None,
@@ -52,7 +31,7 @@ pub struct IndexedDataset {
     terms: Dictionary<Term>,
     index: QuadIndex,
     /// The kernel counters at build; `None` for a dataset not built from a graph.
-    key: Option<RevisionKey>,
+    key: Option<ProjectionKey>,
 }
 
 impl IndexedDataset {
@@ -86,13 +65,14 @@ impl IndexedDataset {
 
     /// Index the graph's projection: the held quads, and the withdrawn
     /// assertions' reifiers in the reserved history graph as withdrawn rows.
-    pub fn for_graph(graph: &Graph) -> Self {
-        let held = crate::dataset_quad_iter(graph).map(|quad| (quad, true));
-        let withdrawn = crate::withdrawn_reifier_quads(graph)
+    pub fn for_graph<S: RdfSource + ?Sized>(graph: &S) -> Self {
+        let held = graph.held_quads().map(|quad| (quad, true));
+        let withdrawn = graph
+            .withdrawn_reifier_quads()
             .into_iter()
             .map(|quad| (quad, false));
         Self {
-            key: Some(RevisionKey::of(graph)),
+            key: Some(graph.projection_key()),
             ..Self::from_quads(held.chain(withdrawn))
         }
     }
@@ -100,8 +80,8 @@ impl IndexedDataset {
     /// Whether `graph` is the graph, at the counters and input keys, this dataset
     /// was built at.
     /// Always `false` for a dataset built by [`IndexedDataset::from_quads`].
-    pub fn is_current(&self, graph: &Graph) -> bool {
-        self.key == Some(RevisionKey::of(graph))
+    pub fn is_current<S: RdfSource + ?Sized>(&self, graph: &S) -> bool {
+        self.key == Some(graph.projection_key())
     }
 
     /// Stored rows (distinct quad and held flag).

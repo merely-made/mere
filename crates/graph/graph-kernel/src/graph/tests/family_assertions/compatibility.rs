@@ -162,7 +162,7 @@ fn legacy_four_sidecar_json_migrates_to_stable_unknown_records() {
     for record in first_records {
         assert_eq!(
             record.provenance_iri.as_deref(),
-            Some(crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+            Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
         );
         assert_eq!(record.first_asserted_ms, None);
         assert_eq!(record.asserted_at_ms, None);

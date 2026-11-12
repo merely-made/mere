@@ -11,13 +11,13 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use eidetic::{PageTextStore, ResourceCaptureStore};
-use muniment::{Backend, MemoryBackend};
-use identity::PersonaId;
 use catchment::{
     DomainId, KeepPageText, Keeping, MereId, PlainCustody, RetainedCustody, RetainedText,
     open_mere_retained_backend, open_reservoir_backend, retained_path,
 };
+use eidetic::{PageTextStore, ResourceCaptureStore};
+use identity::PersonaId;
+use muniment::{Backend, MemoryBackend};
 use uuid::Uuid;
 
 fn persona() -> PersonaId {
@@ -177,7 +177,13 @@ fn a_sealed_backend_keeps_the_same_records_unreadable_without_custody() {
         }
         // Reading the raw backend as a plain store finds no page text.
         let plain = PageTextStore::new(raw);
-        assert!(plain.text_for("https://example.test/s").await.is_err()
-            || plain.text_for("https://example.test/s").await.unwrap().is_none());
+        assert!(
+            plain.text_for("https://example.test/s").await.is_err()
+                || plain
+                    .text_for("https://example.test/s")
+                    .await
+                    .unwrap()
+                    .is_none()
+        );
     });
 }

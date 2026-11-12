@@ -13,8 +13,8 @@ use crate::{
 use kernel::graph::{
     Author, EdgeAssertion, Graph, GraphStratum, RelationKind,
     apply::{GraphDelta, apply_graph_delta},
-    built_in_relation_stratum,
 };
+use mere::model::built_in_relation_stratum;
 use std::collections::BTreeSet;
 use uuid::Uuid;
 

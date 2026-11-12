@@ -13,9 +13,9 @@ use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
-pub const RESOURCE_PROPERTIES: &str = "semantic.properties";
-pub const RESOURCE_CLASSIFICATIONS: &str = "semantic.classification-variants/v1";
-pub const TAG_CONCEPT: &str = "semantic.tag-concept/v1";
+pub use mere::model::resource_content::{
+    RESOURCE_CLASSIFICATIONS, RESOURCE_PROPERTIES, TAG_CONCEPT,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ContentError {

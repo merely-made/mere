@@ -369,7 +369,7 @@ fn legacy_resource_migration_probe_reports_mixed_raw_and_carried_evidence_withou
     );
     let mut marker = carried.clone();
     marker.assertions.statements[0].provenance_iri =
-        Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
+        Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
     let mut uncertain = journal.entries()[..2].to_vec();
     uncertain.push(AttributedDelta {
         author: Author::person("later-author"),

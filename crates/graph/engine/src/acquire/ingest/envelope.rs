@@ -8,12 +8,12 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use kernel::types::{GraphScope, NodeProperty};
+use crate::model::{GraphScope, NodeProperty};
 use oxrdf::{GraphName, Quad, Term};
 
 use super::{GraphContribution, PROV_WAS_ATTRIBUTED_TO, RDF_TYPE, XSD_STRING, subject_iri};
 
-pub(super) const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
+pub const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
 const SKOS_PREF_LABEL: &str = "http://www.w3.org/2004/02/skos/core#prefLabel";
 
 /// An RDF contribution and the parser evidence needed to import its definitions.
@@ -30,6 +30,11 @@ impl ImportEnvelope {
         &self.contribution
     }
 
+    /// The parser evidence the importer needs for definitions and plain rows.
+    pub fn evidence(&self) -> &ImportEvidence {
+        &self.evidence
+    }
+
     /// Discard the profile evidence for a caller that needs the legacy DTO API.
     pub fn into_contribution(self) -> GraphContribution {
         self.contribution
@@ -37,13 +42,13 @@ impl ImportEnvelope {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(super) struct ConceptDefinition {
+pub struct ConceptDefinition {
     pub label: String,
     pub owner: String,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub(super) struct ImportEvidence {
+pub struct ImportEvidence {
     pub definitions: BTreeMap<String, ConceptDefinition>,
     plain_properties: BTreeSet<(String, String)>,
     plain_edges: BTreeSet<usize>,

@@ -14,9 +14,9 @@ use serde::{Serialize, Serializer};
 use uuid::Uuid;
 
 use super::{EdgeFamily, EdgePayload, Graph, SemanticStatement};
-use crate::graph::edge_data::TraversalData;
 use crate::persistence::PersistedEdge;
 use crate::types::GraphScope;
+use mere::model::edge_data::TraversalData;
 
 /// A bounded pair capture refused without returning any partial rows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

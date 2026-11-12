@@ -31,9 +31,9 @@
 //! contexts without network access. Class-IRI projection policy and complete
 //! named-graph and assertion metadata are shared across all supported formats.
 
+use crate::model::{AssertionBasis, AssertionWithdrawal, GraphScope, NodeProperty};
 use crate::reifier::statement_id_from_reifier;
 use crate::{SCHEMA_KEYWORDS, SCHEMA_NAME};
-use kernel::types::{AssertionBasis, AssertionWithdrawal, GraphScope, NodeProperty};
 use oxjsonld::{JsonLdParser, JsonLdRemoteDocument};
 use oxrdf::{NamedOrBlankNode, Quad, Term};
 use std::collections::BTreeMap;
@@ -83,7 +83,8 @@ pub struct NodeContribution {
 }
 
 impl NodeContribution {
-    fn new(id: &str) -> Self {
+    /// An empty contribution for one subject.
+    pub fn new(id: &str) -> Self {
         Self {
             id: id.to_string(),
             types: Vec::new(),
@@ -127,7 +128,8 @@ pub struct GraphContribution {
     pub edges: Vec<EdgeContribution>,
 }
 
-mod envelope;
+/// Parser evidence the importer reads beside a contribution.
+pub mod envelope;
 pub use envelope::ImportEnvelope;
 
 /// RDF ingest failure (JSON-LD, N-Quads, or TriG).
@@ -540,7 +542,8 @@ const SCHEMA_ORG_URLS: &[&str] = &[
 
 /// The vendored ActivityStreams 2.0 context (see `assets/NOTICE`; W3C license).
 #[cfg(feature = "bundled-contexts")]
-const ACTIVITYSTREAMS_CONTEXT: &[u8] = include_bytes!("../../assets/activitystreams.context.jsonld");
+const ACTIVITYSTREAMS_CONTEXT: &[u8] =
+    include_bytes!("../../assets/activitystreams.context.jsonld");
 
 #[cfg(feature = "bundled-contexts")]
 const ACTIVITYSTREAMS_URLS: &[&str] = &[
@@ -557,16 +560,6 @@ const DUBLIN_CORE_URLS: &[&str] = &[
     "http://purl.org/dc/terms/",
     "http://purl.org/dc/elements/1.1/",
 ];
-
-mod apply;
-#[cfg(not(target_arch = "wasm32"))]
-pub use apply::ApplyOutcome;
-#[cfg(not(target_arch = "wasm32"))]
-pub use apply::{
-    apply_contribution, apply_contribution_with_identity, apply_import, apply_import_with_identity,
-};
-#[cfg(test)]
-mod tests;
 
 #[path = "ingest/contribution.rs"]
 mod contribution;

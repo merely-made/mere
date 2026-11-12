@@ -58,8 +58,8 @@ pub mod store;
 
 #[cfg(feature = "store")]
 pub use catalog::{
-    DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_INDEX_SCHEMA,
-    RESERVOIR_INDEX_SLOT, ReservoirError,
+    DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_INDEX_SCHEMA, RESERVOIR_INDEX_SLOT,
+    ReservoirError,
 };
 #[cfg(feature = "store")]
 pub use paths::{MERES_DIR, RESERVOIR_DB_FILENAME, RESERVOIR_DIR, mere_dir, reservoir_dir};

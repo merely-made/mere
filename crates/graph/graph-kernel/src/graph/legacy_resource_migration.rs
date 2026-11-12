@@ -153,7 +153,8 @@ pub fn probe_legacy_mint_links(
                             .find(|carried| carried.statement_id == statement.statement_id)
                             .and_then(|carried| carried.provenance_iri.as_ref())
                             .filter(|source| {
-                                source.as_str() != super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
+                                source.as_str()
+                                    != mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
                             });
                         for (raw_index, raw_pair, earlier, earlier_endpoints) in &raw {
                             if *raw_pair == pair

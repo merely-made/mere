@@ -13,11 +13,8 @@
 //! [`IndexedDataset::is_current`] turns false, and evaluates with
 //! [`sparql_on`]. A materialized spareval dataset remains the test parity oracle.
 
-#[cfg(test)]
-#[path = "query/coverage_tests.rs"]
-mod coverage_tests;
-
-use kernel::graph::Graph;
+use crate::RdfSource;
+use crate::model::CoverageNote;
 use oxrdf::Term;
 use spareval::{QueryEvaluator, QueryResults, QueryableDataset};
 use spargebra::SparqlParser;
@@ -28,10 +25,6 @@ mod indexed;
 pub use chartulary::quads::View;
 pub use indexed::{IndexedDataset, IndexedRead};
 
-#[cfg(test)]
-#[path = "query/indexed_tests.rs"]
-mod indexed_tests;
-
 /// The rows of a SPARQL `SELECT` (or the boolean of an `ASK`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct QueryRows {
@@ -40,7 +33,7 @@ pub struct QueryRows {
     /// One entry per solution; each is the bound term per variable (display
     /// form), or `None` when the variable is unbound in that solution.
     pub rows: Vec<Vec<Option<String>>>,
-    pub coverage: kernel::graph::CoverageNote,
+    pub coverage: CoverageNote,
 }
 
 /// Run `query` over `graph` and return the solution rows. The graph's held
@@ -52,7 +45,7 @@ pub struct QueryRows {
 ///
 /// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
 /// display string.
-pub fn sparql(graph: &Graph, query: &str) -> Result<QueryRows, String> {
+pub fn sparql<S: RdfSource + ?Sized>(graph: &S, query: &str) -> Result<QueryRows, String> {
     let dataset = IndexedDataset::for_graph(graph);
     sparql_on(&dataset, query, View::Live, graph.coverage_note())
 }
@@ -65,7 +58,10 @@ pub fn sparql(graph: &Graph, query: &str) -> Result<QueryRows, String> {
 ///
 /// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
 /// display string.
-pub fn sparql_with_history(graph: &Graph, query: &str) -> Result<QueryRows, String> {
+pub fn sparql_with_history<S: RdfSource + ?Sized>(
+    graph: &S,
+    query: &str,
+) -> Result<QueryRows, String> {
     let dataset = IndexedDataset::for_graph(graph);
     sparql_on(&dataset, query, View::History, graph.coverage_note())
 }
@@ -81,7 +77,7 @@ pub fn sparql_on(
     dataset: &IndexedDataset,
     query: &str,
     view: View,
-    coverage: kernel::graph::CoverageNote,
+    coverage: CoverageNote,
 ) -> Result<QueryRows, String> {
     query_rows(evaluate(dataset.read(view), query)?, coverage)
 }
@@ -99,10 +95,7 @@ fn evaluate<'a>(
         .map_err(|e| e.to_string())
 }
 
-fn query_rows(
-    results: QueryResults<'_>,
-    coverage: kernel::graph::CoverageNote,
-) -> Result<QueryRows, String> {
+fn query_rows(results: QueryResults<'_>, coverage: CoverageNote) -> Result<QueryRows, String> {
     match results {
         QueryResults::Solutions(solutions) => {
             let variables: Vec<String> = solutions
@@ -137,8 +130,12 @@ fn query_rows(
 }
 
 /// The former materialized query path, retained to verify the indexed dataset.
-#[cfg(test)]
-fn sparql_materialized(graph: &Graph, query: &str) -> Result<QueryRows, String> {
+/// SPARQL over a materialized `oxrdf::Dataset` of the projection: the parity
+/// oracle the held index is checked against.
+pub fn sparql_materialized<S: RdfSource + ?Sized>(
+    graph: &S,
+    query: &str,
+) -> Result<QueryRows, String> {
     let dataset: oxrdf::Dataset = crate::dataset_quads(graph).into_iter().collect();
     query_rows(evaluate(&dataset, query)?, graph.coverage_note())
 }
@@ -154,17 +151,13 @@ fn term_to_string(term: &Term) -> String {
     }
 }
 
-#[cfg(test)]
-#[path = "query/tests.rs"]
-mod tests;
-
 /// A SELECT roster of held Resource identities, with limits of this evaluation.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResourceQueryMembers {
     pub members: Vec<uuid::Uuid>,
     /// Requested Resource IRIs not held here; retained for coverage refresh.
     pub missing_resources: Vec<uuid::Uuid>,
-    pub coverage: kernel::graph::CoverageNote,
+    pub coverage: CoverageNote,
 }
 
 /// Evaluate the named member column as Resource references.
@@ -173,8 +166,8 @@ pub struct ResourceQueryMembers {
 ///
 /// A parse or evaluation error, or a `CONSTRUCT` / `DESCRIBE` query, as its
 /// display string.
-pub fn sparql_resource_members(
-    graph: &Graph,
+pub fn sparql_resource_members<S: RdfSource + ?Sized>(
+    graph: &S,
     query: &str,
     member_variable: &str,
 ) -> Result<ResourceQueryMembers, String> {
@@ -190,9 +183,9 @@ pub fn sparql_resource_members(
 ///
 /// A parse or evaluation error, a non-`SELECT` query, a missing member
 /// variable, or a member cell that is not an IRI, as its display string.
-pub fn sparql_resource_members_on(
+pub fn sparql_resource_members_on<S: RdfSource + ?Sized>(
     dataset: &IndexedDataset,
-    graph: &Graph,
+    graph: &S,
     query: &str,
     member_variable: &str,
 ) -> Result<ResourceQueryMembers, String> {
@@ -208,6 +201,7 @@ pub fn sparql_resource_members_on(
         return Err(format!("SELECT has no member variable ?{member_variable}"));
     }
     let identities: std::collections::HashMap<_, _> = graph
+        .resource_graph()
         .resource_nodes()
         .map(|r| (r.canonical_iri(), r.id()))
         .collect();
@@ -226,7 +220,7 @@ pub fn sparql_resource_members_on(
         if let Some(id) = identities.get(iri.as_str()) {
             members.insert(*id);
         } else {
-            missing.insert(kernel::graph::ResourceNode::for_term(iri.as_str()).id());
+            missing.insert(crate::model::ResourceNode::for_term(iri.as_str()).id());
         }
     }
     let missing_resources: Vec<_> = missing.into_iter().collect();
@@ -236,10 +230,3 @@ pub fn sparql_resource_members_on(
         missing_resources,
     })
 }
-
-#[cfg(test)]
-mod resource_member_tests;
-
-#[cfg(test)]
-#[path = "query/history_projection_tests.rs"]
-mod history_projection_tests;

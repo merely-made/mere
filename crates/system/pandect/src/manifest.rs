@@ -21,8 +21,8 @@
 use std::path::PathBuf;
 use std::time::SystemTime;
 
-pub use identity::PersonaId;
 use catchment::{GraphId, SessionId};
+pub use identity::PersonaId;
 use kernel::time::wall_clock_now;
 use serde::{Deserialize, Serialize};
 
@@ -286,7 +286,6 @@ impl<'de> Deserialize<'de> for GraphSessionManifest {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -331,7 +330,9 @@ mod tests {
         assert_eq!(restored.consolidated_codicils, m.consolidated_codicils);
         assert_eq!(restored.extension, m.extension);
         assert_eq!(
-            restored.extension_get::<String>("engine_profile").as_deref(),
+            restored
+                .extension_get::<String>("engine_profile")
+                .as_deref(),
             Some("SessionScoped")
         );
     }
@@ -461,14 +462,22 @@ mod tests {
             Some(vec!["FetcherPool".to_string()])
         );
         assert_eq!(
-            restored.extension_get::<String>("engine_profile").as_deref(),
+            restored
+                .extension_get::<String>("engine_profile")
+                .as_deref(),
             Some("SessionScoped")
         );
-        assert!(!restored.extension.contains_key("policy"), "a default is dropped");
+        assert!(
+            !restored.extension.contains_key("policy"),
+            "a default is dropped"
+        );
 
         let written = serde_json::to_value(&restored).unwrap();
         for (key, _) in LEGACY_HOST_KEYS {
-            assert!(written.get(key).is_none(), "{key} is not written at the top level");
+            assert!(
+                written.get(key).is_none(),
+                "{key} is not written at the top level"
+            );
         }
         let again: GraphSessionManifest = serde_json::from_value(written).unwrap();
         assert_eq!(again.extension, restored.extension);

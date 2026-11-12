@@ -22,12 +22,12 @@ use petgraph::graph::DiGraph;
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
-use super::edge_payload::EdgePayload;
-use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
 use super::identity::{EdgeKey, NodeKey, RelationKey};
 use super::node::Node;
 use super::snapshot::containment_parent_url;
 use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, SemanticEdgeView};
+use mere::model::edge_payload::EdgePayload;
+use mere::model::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
 
 /// Expand one pair-local edge bucket into held [`RelationView`] rows: one
 /// per held semantic statement (`Semantic(sub_kind)` when recognized, else
@@ -38,7 +38,7 @@ use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, Seman
 /// Row families agree with [`EdgePayload::families`] for every edge
 /// shape (Q1 ruling, 2026-09-12; pinned by `row_family_parity_tests`).
 fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<RelationView> {
-    use super::edge_taxonomy::RelationKind;
+    use mere::model::edge_taxonomy::RelationKind;
     let mut out: Vec<RelationView> = Vec::new();
     for statement in payload.held_assertions() {
         out.push(RelationView {

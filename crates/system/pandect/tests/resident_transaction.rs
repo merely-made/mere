@@ -97,7 +97,10 @@ fn add(n: u128) -> Vec<kernel::graph::apply::GraphDelta> {
 
 async fn durable(
     backend: &FaultBackend,
-) -> (pandect::GraphSession<FaultBackend>, MereSessions<FaultBackend>) {
+) -> (
+    pandect::GraphSession<FaultBackend>,
+    MereSessions<FaultBackend>,
+) {
     let sessions = MereSessions::new(backend.clone());
     let mut session = sessions.begin_recorded(author(), None);
     session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
@@ -271,7 +274,10 @@ fn undo_and_redo_publish_with_the_history_they_move() {
             .await
             .unwrap();
         assert!(redone.is_some());
-        assert_eq!(again, edited, "the same graph publishes the same generation");
+        assert_eq!(
+            again, edited,
+            "the same graph publishes the same generation"
+        );
         backend.set(REFUSE);
         let held = bytes(&backend.inner).await;
         assert!(
@@ -322,10 +328,17 @@ fn a_live_edit_is_observed_published_and_refused_whole_on_any_fault() {
         let before = bytes(&backend.inner).await;
         // A stale observation is refused before any write.
         let stale = session
-            .transact_live(author(), vec![pin(id, "not-the-record")], SystemTime::UNIX_EPOCH)
+            .transact_live(
+                author(),
+                vec![pin(id, "not-the-record")],
+                SystemTime::UNIX_EPOCH,
+            )
             .await
             .unwrap_err();
-        assert!(matches!(stale, pandect::live_graph::LiveEditError::Stale(_)), "{stale:?}");
+        assert!(
+            matches!(stale, pandect::live_graph::LiveEditError::Stale(_)),
+            "{stale:?}"
+        );
         // A storage refusal leaves the session, history and storage alone.
         backend.set(REFUSE);
         let cursor = session.journal().live_cursor();
@@ -358,6 +371,9 @@ fn a_live_edit_is_observed_published_and_refused_whole_on_any_fault() {
             .transact_live(author(), vec![pin(id, &digest)], SystemTime::UNIX_EPOCH)
             .await
             .unwrap_err();
-        assert!(matches!(replay, pandect::live_graph::LiveEditError::Stale(_)), "{replay:?}");
+        assert!(
+            matches!(replay, pandect::live_graph::LiveEditError::Stale(_)),
+            "{replay:?}"
+        );
     });
 }

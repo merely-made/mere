@@ -82,7 +82,7 @@ fn legacy_journal_assertions_use_each_entry_author_on_full_and_prefix_replay() {
     assert!(
         legacy_attributions
             .iter()
-            .all(|(_, iri)| iri == crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
+            .all(|(_, iri)| iri == mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)
     );
 }
 
@@ -180,7 +180,7 @@ fn legacy_exact_capture_attribution_matches_checkpoint_replay() {
                 baseline.persisted_edges_between(from, to)[0].retained_assertions()[0]
                     .provenance_iri
                     .as_deref(),
-                Some(super::super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI),
+                Some(mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI),
                 "an unattributed baseline handle stays unknown"
             );
         }

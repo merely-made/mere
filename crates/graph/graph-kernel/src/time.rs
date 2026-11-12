@@ -44,14 +44,8 @@ use serde::{Deserialize, Serialize};
 /// `web_time` re-exports `std::time` on native targets and uses `Date.now()` in
 /// browser WASM, so persisted graph timestamps never call the unsupported
 /// `std::time::SystemTime::now()` implementation.
-pub(crate) fn unix_epoch_millis() -> u64 {
-    web_time::SystemTime::now()
-        .duration_since(web_time::UNIX_EPOCH)
-        .map(|duration| duration.as_millis() as u64)
-        .unwrap_or(0)
-}
+pub(crate) use mere::model::clock::unix_epoch_millis;
 
-/// Wall-clock seconds since the Unix epoch.
 pub(crate) fn unix_epoch_seconds() -> u64 {
     web_time::SystemTime::now()
         .duration_since(web_time::UNIX_EPOCH)

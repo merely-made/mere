@@ -39,7 +39,10 @@ fn a_product_codicil_written_before_the_change_re_encodes_unchanged() {
     let bytes: &[u8] = include_bytes!("fixtures/pre_p4_product_codicil_with_scene.json");
     let codicil = pandect::product_codicil::decode_profiled_codicil(bytes)
         .expect("the old codicil decodes and materializes");
-    let scene = codicil.scene.as_ref().expect("the codicil carries its scene");
+    let scene = codicil
+        .scene
+        .as_ref()
+        .expect("the codicil carries its scene");
     assert_eq!(scene.name, "Codicil scene");
     assert_eq!(
         serde_json::to_vec_pretty(&codicil).expect("re-encodes"),

@@ -8,18 +8,19 @@
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 
-use kernel::graph::{Graph, sub_kind_from_iri};
+use crate::RdfSource;
+use crate::model::sub_kind_from_iri;
 use oxrdf::{GraphName, NamedNode, NamedOrBlankNode, Quad, Term, Triple};
 use serde_json::{Map, Value, json};
 
 use crate::{RDF_REIFIES, RDF_TYPE, SCHEMA_KEYWORDS, SCHEMA_NAME};
 
-pub(crate) const RDF_STATEMENT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement";
-pub(crate) const RDF_SUBJECT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject";
-pub(crate) const RDF_PREDICATE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate";
-pub(crate) const RDF_OBJECT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#object";
+pub const RDF_STATEMENT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement";
+pub const RDF_SUBJECT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#subject";
+pub const RDF_PREDICATE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate";
+pub const RDF_OBJECT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#object";
 
-pub(crate) fn is_statement_metadata(predicate: &str) -> bool {
+pub fn is_statement_metadata(predicate: &str) -> bool {
     matches!(
         predicate,
         crate::RDFS_LABEL
@@ -38,7 +39,7 @@ pub(crate) fn is_statement_metadata(predicate: &str) -> bool {
     )
 }
 
-pub(crate) fn representable_metadata(predicate: &str, object: &Term) -> bool {
+pub fn representable_metadata(predicate: &str, object: &Term) -> bool {
     match (predicate, object) {
         (crate::RDFS_LABEL, Term::Literal(literal)) => {
             literal.language().is_none() && literal.datatype().as_str() == crate::XSD_STRING
@@ -173,20 +174,20 @@ fn subject_object(
     Value::Object(object)
 }
 
-pub(crate) fn export(graph: &Graph, compact: bool) -> Value {
+pub fn export<S: RdfSource + ?Sized>(graph: &S, compact: bool) -> Value {
     export_with_projection(graph, compact, crate::AssertionProjection::Held)
 }
 
-pub(crate) fn export_with_projection(
-    graph: &Graph,
+pub fn export_with_projection<S: RdfSource + ?Sized>(
+    graph: &S,
     compact: bool,
     projection: crate::AssertionProjection,
 ) -> Value {
     let mut graphs: BTreeMap<Option<String>, Subjects> = BTreeMap::new();
     // Preserve the legacy presentation of otherwise undescribed surfaces.
     let default = graphs.entry(None).or_default();
-    for (_, node) in graph.nodes() {
-        default.entry(crate::node_id(node)).or_default();
+    for subject in graph.listed_subjects() {
+        default.entry(subject).or_default();
     }
     let dataset = match projection {
         crate::AssertionProjection::Held => crate::dataset_quads(graph),
@@ -229,7 +230,7 @@ pub(crate) fn export_with_projection(
 
 /// Lift only a complete, single-valued classic record whose base is asserted.
 /// Other descriptions keep all their ordinary RDF quads.
-pub(crate) fn bridge_classic_reification(quads: Vec<Quad>) -> Vec<Quad> {
+pub fn bridge_classic_reification(quads: Vec<Quad>) -> Vec<Quad> {
     let present: HashSet<_> = quads.iter().cloned().collect();
     let mut groups: HashMap<(NamedOrBlankNode, GraphName), Vec<&Quad>> = HashMap::new();
     let mut record_graphs: HashMap<NamedOrBlankNode, HashSet<GraphName>> = HashMap::new();
@@ -386,6 +387,3 @@ pub(crate) fn bridge_classic_reification(quads: Vec<Quad>) -> Vec<Quad> {
     }
     result
 }
-
-#[cfg(test)]
-mod tests;

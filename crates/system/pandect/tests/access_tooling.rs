@@ -54,7 +54,9 @@ fn the_schema_and_each_record_carry_the_label_their_caller_passed() {
             .unwrap();
 
         assert_eq!(
-            tooling_of(&mut store, AccessRecord::schema_ref().0).await.as_deref(),
+            tooling_of(&mut store, AccessRecord::schema_ref().0)
+                .await
+                .as_deref(),
             Some("probe-app/9.8.7")
         );
         assert_eq!(

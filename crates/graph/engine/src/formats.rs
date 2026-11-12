@@ -6,7 +6,8 @@
 
 //! The formats stage: parsers and serializers over `oxjsonld` and `oxttl`.
 
-pub(crate) mod jsonld;
+/// JSON-LD export and the classic-reification bridge.
+pub mod jsonld;
 
 /// Turtle-family file I/O (N-Quads / TriG) for the RDF projection, via `oxttl`.
 pub mod serialize;

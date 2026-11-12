@@ -24,13 +24,21 @@ pub use crate::persistence_fields::{
 
 // Edge persistence types live in their own file (per-file ceiling); re-exported
 // here so `crate::persistence::PersistedEdge` etc. continue to resolve.
-pub use crate::persistence_edge::{
+// Edge and resource-record persistence moved to `mere::model` (engine split P5
+// L3) with their encodings unchanged. Names other repositories use stay public
+// here; the rest are re-exported for the kernel only.
+#[allow(unused_imports)]
+pub(crate) use mere::model::{
     PersistedArrangementEdgeData, PersistedArrangementSubKind, PersistedContainmentEdgeData,
-    PersistedContainmentSubKind, PersistedEdge, PersistedEdgeAssertion, PersistedEdgeFamily,
-    PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger,
-    PersistedProvenanceEdgeData, PersistedProvenanceSubKind, PersistedRelationSelector,
+    PersistedContainmentSubKind, PersistedEdgeAssertion, PersistedImportedEdgeData,
+    PersistedImportedSubKind, PersistedNavigationTrigger, PersistedProvenanceEdgeData,
+    PersistedProvenanceSubKind, PersistedRelationSelector, PersistedTraversalMetrics,
+    PersistedTraversalRecord,
+};
+pub use mere::model::{
+    PersistedEdge, PersistedEdgeFamily, PersistedResourceFacet, PersistedResourceRecord,
     PersistedSemanticEdgeData, PersistedSemanticStatement, PersistedSemanticSubKind,
-    PersistedTraversalEdgeData, PersistedTraversalMetrics, PersistedTraversalRecord,
+    PersistedTraversalEdgeData,
 };
 
 use crate::graph::SharedNavigationMemory;
@@ -224,40 +232,6 @@ pub struct PersistedNode {
     /// inspectable and lets snapshots written before this field load as None.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
-}
-
-/// Ordinary metadata on a resource, encoded without a JSON codec assumption.
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-pub struct PersistedResourceFacet {
-    pub facet: String,
-    pub value_json: String,
-}
-
-/// One resource's identity and metadata; its edges are stored separately.
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-pub struct PersistedResourceRecord {
-    pub canonical_iri: String,
-    pub facets: Vec<PersistedResourceFacet>,
 }
 
 /// A surface's current resource association, with explicit strata.

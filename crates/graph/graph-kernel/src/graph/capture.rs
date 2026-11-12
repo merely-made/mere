@@ -306,7 +306,7 @@ impl CapturedDelta {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
                 assertion: assertion.clone(),
-                asserter_iri: super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
+                asserter_iri: mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
             },
             Self::ReplayRemoveNodeById { node_id } => GraphDelta::ReplayRemoveNodeById {
                 node_id: parse_uuid(node_id),
@@ -509,7 +509,7 @@ impl CapturedDelta {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
                 predicate: predicate.clone(),
-                asserter_iri: super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
+                asserter_iri: mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
             },
             Self::ReplayAssertSemanticPredicateByIds {
                 from_id,
@@ -519,7 +519,7 @@ impl CapturedDelta {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
                 predicate: predicate.clone(),
-                asserter_iri: super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
+                asserter_iri: mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
             },
             Self::ReplayAppendFrameLayoutHintById { node_id, hint } => {
                 GraphDelta::ReplayAppendFrameLayoutHintById {
@@ -895,10 +895,9 @@ impl ReplayAttribution {
                 self.0
                     .entry(statement.statement_id.clone())
                     .or_insert_with(|| {
-                        statement
-                            .provenance_iri
-                            .clone()
-                            .unwrap_or_else(|| super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into())
+                        statement.provenance_iri.clone().unwrap_or_else(|| {
+                            mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()
+                        })
                     });
             }
         }
@@ -917,7 +916,7 @@ impl ReplayAttribution {
         &self,
         graph: &mut chartulary::Graph<N, super::EdgePayload>,
     ) -> bool {
-        let unknown = super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+        let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
         let keys: Vec<_> = graph.inner().edge_indices().collect();
         let mut changed = false;
         for key in keys {

@@ -235,12 +235,19 @@ fn held_pair_lookup_reads_only_the_pair_in_scan_order() {
         panic!("resource stratum")
     };
     let payload = graph.get_resource_edge(first_raw).unwrap().clone();
-    let (source, target) = graph.resources.inner().edge_endpoints(first_raw.raw()).unwrap();
+    let (source, target) = graph
+        .resources
+        .inner()
+        .edge_endpoints(first_raw.raw())
+        .unwrap();
     let parallel = graph.connect_resource(source, target, payload);
     let (again, reasserted) = graph
         .try_assert_semantic_statement(a, b, spec(predicate, "urn:author:first"))
         .unwrap();
-    assert_eq!(again, RelationKey::Resource(ResourceEdgeKey::from_raw(parallel)));
+    assert_eq!(
+        again,
+        RelationKey::Resource(ResourceEdgeKey::from_raw(parallel))
+    );
     assert_eq!(reasserted.statement_id, held.statement_id);
 }
 

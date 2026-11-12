@@ -8,6 +8,7 @@ use super::*;
 use crate::graph::apply::add_node;
 use crate::persistence::PersistedResourceFacet;
 use crate::types::{AssertionBasis, GraphScope};
+use mere::model::{FROZEN_LINK, FrozenSourceBinding};
 use std::sync::{Arc, Mutex};
 
 fn available_source() -> FrozenLinkSource {

@@ -519,7 +519,9 @@ mod seal_wiring {
     #[tokio::test]
     async fn a_private_record_is_unreadable_on_disk_and_reads_back_through_the_sealer() {
         let mut store = MemoryBackend::new();
-        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING).await.unwrap();
+        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING)
+            .await
+            .unwrap();
         let sealer = sealer();
         let record = record(PrivacyClass::LocalOnly);
 
@@ -545,7 +547,9 @@ mod seal_wiring {
     #[tokio::test]
     async fn a_reader_without_the_epoch_says_so_instead_of_reporting_no_history() {
         let mut store = MemoryBackend::new();
-        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING).await.unwrap();
+        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING)
+            .await
+            .unwrap();
         save_access_record_sealed(
             &mut store,
             Some(&sealer()),
@@ -568,7 +572,9 @@ mod seal_wiring {
     #[tokio::test]
     async fn the_public_lane_stays_cleartext_under_the_same_sealer() {
         let mut store = MemoryBackend::new();
-        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING).await.unwrap();
+        bootstrap_access_record_schema(&mut store, SCHEMA_TOOLING)
+            .await
+            .unwrap();
         let record = record(PrivacyClass::PublicPortable);
 
         save_access_record_sealed(&mut store, Some(&sealer()), &record, RECORD_TOOLING)

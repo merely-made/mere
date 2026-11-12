@@ -7,113 +7,14 @@
 //! Immutable, source-qualified link readings borne by Resources.
 
 use super::{CoverageNote, Graph, GraphStratum};
-use crate::persistence::{PersistedEdge, PersistedResourceFacet, PersistedResourceRecord};
+use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-pub const FROZEN_LINK: &str = "graph.frozen-link/v1";
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct FrozenLinkEndpoint {
-    pub id: Uuid,
-    pub resource: Option<Uuid>,
-    pub address: Option<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct FrozenSourceBinding {
-    pub authority: String,
-    pub domain: String,
-    pub resource: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "status", rename_all = "snake_case", deny_unknown_fields)]
-pub enum FrozenSourceRevision {
-    Available { revision: String },
-    Unavailable { reason: String },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "status", rename_all = "snake_case", deny_unknown_fields)]
-pub enum FrozenLinkSource {
-    Available {
-        binding: FrozenSourceBinding,
-        revision: FrozenSourceRevision,
-    },
-    Unavailable {
-        reason: String,
-    },
-}
-
-impl FrozenLinkSource {
-    fn validate(&self) -> Result<(), String> {
-        let nonempty = |value: &str| !value.trim().is_empty() && value == value.trim();
-        match self {
-            Self::Available { binding, revision } => {
-                if !nonempty(&binding.authority)
-                    || !nonempty(&binding.domain)
-                    || !nonempty(&binding.resource)
-                {
-                    return Err("frozen source binding fields must be nonempty and trimmed".into());
-                }
-                match revision {
-                    FrozenSourceRevision::Available { revision } if nonempty(revision) => Ok(()),
-                    FrozenSourceRevision::Available { .. } => {
-                        Err("frozen source revision must be nonempty and trimmed".into())
-                    },
-                    FrozenSourceRevision::Unavailable { reason } if nonempty(reason) => Ok(()),
-                    FrozenSourceRevision::Unavailable { .. } => {
-                        Err("unavailable source revision requires a reason".into())
-                    },
-                }
-            },
-            Self::Unavailable { reason } if nonempty(reason) => Ok(()),
-            Self::Unavailable { .. } => Err("unavailable frozen source requires a reason".into()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct FrozenLink {
-    version: u32,
-    stratum: GraphStratum,
-    first: FrozenLinkEndpoint,
-    second: FrozenLinkEndpoint,
-    revision: u64,
-    source: FrozenLinkSource,
-    coverage: CoverageNote,
-    statements: Vec<PersistedEdge>,
-}
-
-impl FrozenLink {
-    pub fn stratum(&self) -> GraphStratum {
-        self.stratum
-    }
-    pub fn first(&self) -> &FrozenLinkEndpoint {
-        &self.first
-    }
-    pub fn second(&self) -> &FrozenLinkEndpoint {
-        &self.second
-    }
-    /// The local structural revision observed at freeze time; not a public source revision.
-    pub fn revision(&self) -> u64 {
-        self.revision
-    }
-    pub fn source(&self) -> &FrozenLinkSource {
-        &self.source
-    }
-    pub fn coverage(&self) -> &CoverageNote {
-        &self.coverage
-    }
-    pub fn statements(&self) -> &[PersistedEdge] {
-        &self.statements
-    }
-}
+pub use mere::model::frozen::{
+    FROZEN_LINK, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource, FrozenSourceBinding,
+    FrozenSourceRevision,
+};
 
 pub struct OpenedFrozenLink<'a> {
     pub link: &'a FrozenLink,
@@ -158,14 +59,14 @@ pub(super) fn validate_frozen_link_record(
         }
     }
     super::frozen_selection::validate_retained_keys(&raw, &known)?;
-    if link.version != 1 {
+    if link.version() != 1 {
         return Err("unsupported frozen link version".into());
     }
-    link.source.validate()?;
-    if link.first.id > link.second.id {
+    link.source().validate()?;
+    if link.first().id > link.second().id {
         return Err("frozen link endpoints must be in canonical order".into());
     }
-    for endpoint in [&link.first, &link.second] {
+    for endpoint in [&link.first(), &link.second()] {
         if endpoint.id.is_nil()
             || endpoint.resource.is_some_and(|id| id.is_nil())
             || endpoint
@@ -176,14 +77,14 @@ pub(super) fn validate_frozen_link_record(
             return Err("invalid frozen link endpoint".into());
         }
     }
-    if link.stratum == GraphStratum::Resource
-        && (link.first.resource != Some(link.first.id)
-            || link.second.resource != Some(link.second.id))
+    if link.stratum() == GraphStratum::Resource
+        && (link.first().resource != Some(link.first().id)
+            || link.second().resource != Some(link.second().id))
     {
         return Err("resource link endpoints must retain resource identity".into());
     }
-    if link.stratum == GraphStratum::Resource
-        && [&link.first, &link.second].into_iter().any(|endpoint| {
+    if link.stratum() == GraphStratum::Resource
+        && [&link.first(), &link.second()].into_iter().any(|endpoint| {
             endpoint.address.as_ref().is_none_or(|address| {
                 chartulary::resource_id_from_canonical_iri(address) != endpoint.id
             })
@@ -191,14 +92,14 @@ pub(super) fn validate_frozen_link_record(
     {
         return Err("resource endpoint address does not match its identity".into());
     }
-    if link.statements.is_empty() {
+    if link.statements().is_empty() {
         return Err("frozen link must retain at least one pair bucket".into());
     }
     super::assertion_handles::validate_assertion_handles(
-        link.statements.iter().map(|edge| (link.stratum, edge)),
+        link.statements().iter().map(|edge| (link.stratum(), edge)),
     )
     .map_err(|error| error.to_string())?;
-    for edge in &link.statements {
+    for edge in link.statements() {
         let from = edge
             .from_node_id
             .parse::<Uuid>()
@@ -207,8 +108,8 @@ pub(super) fn validate_frozen_link_record(
             .to_node_id
             .parse::<Uuid>()
             .map_err(|_| "invalid frozen link target id")?;
-        let valid_pair = (from == link.first.id && to == link.second.id)
-            || (from == link.second.id && to == link.first.id);
+        let valid_pair = (from == link.first().id && to == link.second().id)
+            || (from == link.second().id && to == link.first().id);
         if from.to_string() != edge.from_node_id || to.to_string() != edge.to_node_id || !valid_pair
         {
             return Err("frozen link bucket is outside its canonical endpoint pair".into());
@@ -375,16 +276,15 @@ impl Graph {
         } else {
             Vec::new()
         };
-        Ok(FrozenLink {
-            version: 1,
+        Ok(FrozenLink::v1(
             stratum,
-            first: first_endpoint,
-            second: second_endpoint,
-            revision: self.revision(),
+            first_endpoint,
+            second_endpoint,
+            self.revision(),
             source,
-            coverage: self.link_coverage(&resource_refs, &surface_refs),
+            self.link_coverage(&resource_refs, &surface_refs),
             statements,
-        })
+        ))
     }
 
     /// Freeze a link in one graph stratum as a distinct immutable Resource.
@@ -400,7 +300,7 @@ impl Graph {
             return Err("frozen Resource nonce must be non-nil".into());
         }
         let link = self.read_link_snapshot(stratum, first, second, source)?;
-        if link.statements.is_empty() {
+        if link.statements().is_empty() {
             return Err("cannot freeze a link with no pair buckets".into());
         }
         let iri = format!("urn:uuid:{nonce}");
@@ -431,12 +331,12 @@ impl Graph {
             .resource(owner)
             .and_then(|resource| resource.nested_link())
             .ok_or("resource bears no frozen link")?;
-        let resource_refs = [link.first.resource, link.second.resource]
+        let resource_refs = [link.first().resource, link.second().resource]
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        let surface_refs = if link.stratum == GraphStratum::Surface {
-            vec![link.first.id, link.second.id]
+        let surface_refs = if link.stratum() == GraphStratum::Surface {
+            vec![link.first().id, link.second().id]
         } else {
             Vec::new()
         };

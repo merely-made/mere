@@ -230,15 +230,24 @@ fn query_eval(root: &Path, e: &Entry) -> (Outcome, Outcome) {
         Err(out) => (out.clone(), out),
         Ok((data, text, q, res)) => {
             let parser = evaluate(root, &q, &res, &text, &data);
-            let indexed = IndexedDataset::from_quads(data.iter().map(|quad| (quad.into_owned(), true)));
-            (parser, evaluate(root, &q, &res, &text, indexed.read(View::Live)))
+            let indexed =
+                IndexedDataset::from_quads(data.iter().map(|quad| (quad.into_owned(), true)));
+            (
+                parser,
+                evaluate(root, &q, &res, &text, indexed.read(View::Live)),
+            )
         },
     }
 }
 
 /// A case's data (manifest data, graph data and FROM graphs), query text, query and result paths.
 #[cfg(feature = "query")]
-type Case = (oxrdf::Dataset, String, std::path::PathBuf, std::path::PathBuf);
+type Case = (
+    oxrdf::Dataset,
+    String,
+    std::path::PathBuf,
+    std::path::PathBuf,
+);
 
 #[cfg(feature = "query")]
 fn query_case(root: &Path, e: &Entry) -> Result<Case, Outcome> {
@@ -246,7 +255,9 @@ fn query_case(root: &Path, e: &Entry) -> Result<Case, Outcome> {
         e.parts.get("query").and_then(|v| v.first()),
         e.result.as_ref(),
     ) else {
-        return Err(Outcome::Skip("no query or result file in the manifest entry"));
+        return Err(Outcome::Skip(
+            "no query or result file in the manifest entry",
+        ));
     };
     let mut data = oxrdf::Dataset::new();
     let loaded = e

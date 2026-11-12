@@ -1049,7 +1049,10 @@ fn preparation_has_no_writes_and_observations_use_complete_records() {
         // complete record, so the resident digest matches the publication's.
         let resource = GraphAddress::Resource(resources[0]);
         assert_eq!(view.status(resource), ResidencyStatus::Loaded);
-        assert_eq!(view.record_digest(resource), prepared.record_digest(resource));
+        assert_eq!(
+            view.record_digest(resource),
+            prepared.record_digest(resource)
+        );
         assert!(view.graph().resource_nodes().count() < graph.resource_nodes().count());
         assert_eq!(
             view.record_digest(GraphAddress::Surface(Uuid::from_u128(9000))),
@@ -1080,7 +1083,10 @@ fn preparation_matches_publication_and_refuses_limited_views_before_writes() {
         prepared_keys.sort();
         assert_eq!(prepared_keys, keys);
         for key in keys {
-            assert_eq!(backend.get(&key).await.unwrap(), published.get(&key).await.unwrap());
+            assert_eq!(
+                backend.get(&key).await.unwrap(),
+                published.get(&key).await.unwrap()
+            );
         }
         // A residency-limited view cannot be prepared as complete truth.
         store

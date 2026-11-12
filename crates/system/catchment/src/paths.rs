@@ -17,9 +17,9 @@ use std::path::{Path, PathBuf};
 use identity::PersonaId;
 use sporran::PERSONAS_DIR;
 
+use crate::catalog::MereId;
 #[cfg(not(target_arch = "wasm32"))]
 use crate::catalog::ReservoirError;
-use crate::catalog::MereId;
 
 /// The reservoir's directory under a persona's shared-root directory.
 pub const RESERVOIR_DIR: &str = "reservoir";

@@ -6,8 +6,8 @@
 
 //! Tests for edge taxonomy (RelationKind tag round-trips, predicate IRI mapping).
 
-use super::super::edge_data::{predicate_iri, sub_kind_from_iri};
-use super::super::edge_taxonomy::*;
+use mere::model::edge_data::{predicate_iri, sub_kind_from_iri};
+use mere::model::edge_taxonomy::*;
 use strum::IntoEnumIterator;
 
 #[test]

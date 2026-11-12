@@ -36,7 +36,7 @@
 //! drops it ([`is_vocabulary_quad`]), keeping a round trip through a shared file
 //! lossless.
 
-use kernel::graph::{SemanticSubKind, all_semantic_sub_kinds, predicate_iri};
+use crate::model::{SemanticSubKind, all_semantic_sub_kinds, predicate_iri};
 use oxrdf::{GraphName, NamedNode, Quad};
 
 /// The named graph carrying Mere's vocabulary alignment. Kept out of the default

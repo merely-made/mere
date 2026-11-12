@@ -116,7 +116,7 @@ impl Graph {
         &mut self,
         from_id: Uuid,
         to_id: Uuid,
-        trigger: super::super::edge_taxonomy::NavigationTrigger,
+        trigger: mere::model::edge_taxonomy::NavigationTrigger,
         timestamp_ms: u64,
     ) -> bool {
         let Some(from_key) = self.get_node_key_by_id(from_id) else {

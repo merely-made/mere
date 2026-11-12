@@ -27,8 +27,8 @@ use std::collections::HashMap;
 
 use kernel::graph::{Graph, NodeKey};
 
-pub use eidetic::memory::levels::{EvictionPolicy, MemoryCensus, MemoryLevel, MemoryRecord};
 use eidetic::memory::levels;
+pub use eidetic::memory::levels::{EvictionPolicy, MemoryCensus, MemoryLevel, MemoryRecord};
 
 /// One graph node as the memory program sees it.
 struct GraphNodeMemory<'a> {
@@ -90,7 +90,13 @@ pub fn evictable_short_term(
     now_ms: u64,
     current_session: u64,
 ) -> Vec<String> {
-    levels::evictable_short_term(records(graph), last_visit_ms, policy, now_ms, current_session)
+    levels::evictable_short_term(
+        records(graph),
+        last_visit_ms,
+        policy,
+        now_ms,
+        current_session,
+    )
 }
 
 /// Count a graph's memory levels and how many the `policy` would evict now.
@@ -101,7 +107,13 @@ pub fn census(
     now_ms: u64,
     current_session: u64,
 ) -> MemoryCensus {
-    levels::census(records(graph), last_visit_ms, policy, now_ms, current_session)
+    levels::census(
+        records(graph),
+        last_visit_ms,
+        policy,
+        now_ms,
+        current_session,
+    )
 }
 
 #[cfg(test)]
