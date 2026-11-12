@@ -1988,6 +1988,22 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D119, engine-split D121 · plans engine-split P3 · summary Consumers lock Genet and Distillery at the revisions Graphshell's host lock records; new action icons are None for now; patch rows already unused are removed now; Isocosm lands on a rebase with the fast gates; Inker needed no change.
 
+- **D125. The close's document and tooling forks (Mark, 2026-11-11):** U6's first pass
+  (`Code/testing/engine-split/slice6_u6_docs.md`) repointed 254 path citations in 40 of Mere's
+  documents and removed 35 dead ignore and attribute rows (Mere `ae1ed8ff8`). Four rulings. The
+  four uxtree documents in Graphshell hold 25 stale paths, 19 of them written as `mere.git` plus
+  a path under "paths as of the audit base": "Only the 6 present-tense paths (Recommended)";
+  the 19 stand as the documents' own record. Graphshell's other active documents: 16 citations
+  lack `host/`, 125 resolve nowhere there (30 exist in Turnstone, 14 in Mere, 81 nowhere) and 45
+  relative links are broken: "Now, the resolvable ones (Recommended)"; the 81 take the policy's
+  historical-citation note. Mere's ignore and workspace-exclude rows for `crates/probes/`:
+  "Remove it (Recommended)"; the 19 probes are parked in `Code/probes` until sorted. Five
+  scripts in Mere that only served crates that left: "Follow the nearest user (Recommended)";
+  each moves to the repo whose code it checks if it still runs there and is deleted if not.
+  Outcome: applies D112, D119.
+
+  Links: area The stack · draws on engine-split D112, engine-split D119 · plans engine-split P3 · summary In the uxtree documents only present-tense paths are repointed; Graphshell's resolvable citations are fixed now and the rest marked historical; Mere drops its probes convention; scripts that served departed crates follow their nearest user or are deleted.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
