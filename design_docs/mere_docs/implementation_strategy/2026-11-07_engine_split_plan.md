@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D137 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D138 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2342,6 +2342,36 @@ revision and what crosses at frame rate.
   removed. Outcome: refines D131; applies D136.
 
   Links: area The stack · draws on engine-split D131, engine-split D136 · plans engine-split P4 · summary A scoped update that flips a third-party edge has found a duplicated crate; remove the duplicate by bumping or dropping its holder, then rerun the update, never edit or restore the lock.
+
+- **D138. How C7's split is built, and P4's third condition met (first reader, 2026-11-12, listed to
+  Mark):** Under D133's "Now, in P4", the view lane's design (`Code/testing/engine-split/p4_lane_b.md`)
+  found that a view is an opaque `ViewState` in pandect's view log. Its evidence on the attention
+  fields: `focus` has one writer, `RouteSession::view_invocation` in `mere-overmap`, set on Activate;
+  `camera` and `mirror_tiles` have no production writer or reader; `live_view` (D86) embeds the whole
+  `ViewIntent` in `mere.live-view/v1` records; and Turnstone writes no attention into `ViewIntent`.
+  The design is C7 as ruled. `ViewIntent` becomes arrangement-only, stored as `mere.view-intent/v2`,
+  and the decoder reads v1 and v2, leaving old entries untouched. Attention (`camera`, `focus`,
+  `mirror_tiles`) moves to an `AttentionState` in a device-local slot, never in the journal or view log
+  and never synced. Seven forks were answered by the first reader from C7's words and existing rules,
+  with no card, because Mark said the split is what P4 waits on. Attention found in v1 entries is
+  dropped on read, since seeding a device slot from a possibly foreign entry is the import C7 forbids.
+  The device store is a `JsonSlots` slot keyed by root graph, on the `ResidentSettings` precedent, not
+  a second mechanism (Stack 1). `AttentionState` and `CameraSnapshot` live in `incipit::view`
+  (Constraints: nothing lower names anything higher). A new `SET_ATTENTION` intent and
+  `SessionGraphV1.attention` carry attention, so the replicated wire type stops mixing the two planes.
+  As a result, attention can be set on a read-only archive: looking is not writing, and a test proves
+  the journal and view log stay byte-identical while `SET_VIEW` is still refused. `live_view` recipes
+  become arrangement-only with no schema bump, because old blobs still decode (DOC_POLICY §3).
+  Turnstone only consumes the arrangement-only type; "one schema bump in Graphshell and Turnstone" was
+  the option's wording, and Turnstone's native `view-intent.json` holds no attention. The Turnstone
+  half rides its next relock. `camera` and `mirror_tiles` keep their place in the type, with no paths
+  built for them. Separately, P4's third condition is met under D133:
+  `mere_host::cursor_tests::a_view_is_rebuilt_from_its_cursor_after_later_edits_and_a_reopen`
+  (Graphshell `657e9ed8`) sets a view at cursor N, edits past it, reopens and compares `graph_at(N)`
+  and `view_at(N)` with what was captured at N, with positive controls. It compares state, not the
+  projected scene, which is P8's probe (D4). Outcome: applies D133 and contract C7.
+
+  Links: area The stack · draws on engine-split D86, engine-split D133, domain-contract C7 · plans engine-split P4 · summary ViewIntent becomes arrangement-only at view-intent/v2 with attention in a device-local slot keyed by root graph; P4's third condition is met by a journal-cursor host test.
 
 ## Open questions
 

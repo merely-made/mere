@@ -1543,6 +1543,14 @@ summary = "A scoped update that flips a third-party edge has found a duplicated 
 draws_on = ["engine-split D131", "engine-split D136"]
 plans = ["engine-split"]
 
+[decisions."engine-split D138"]
+title = "How C7's split is built, and P4's third condition met (first reader, 2026-11-12, listed to Mark)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "ViewIntent becomes arrangement-only at view-intent/v2 with attention in a device-local slot keyed by root graph; P4's third condition is met by a journal-cursor host test."
+draws_on = ["engine-split D86", "engine-split D133"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
