@@ -1,13 +1,14 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D131 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D134 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
 holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-facts`) that name nothing from
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
-P0's squishes have landed in part (D14, D26 to D28), and P4's stages in part (Findings, 2026-11-09). P5 to
+P0's squishes have landed in part (D14, D26 to D28), and P4's stages in part (Findings, 2026-11-09); P4's
+done-conditions are read and its remaining owners ruled (D133, D134), and its work is under way. P5 to
 P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
@@ -112,7 +113,8 @@ the pack loader (new).
 fold, branch, merge, replay; its reservoir half becomes the reservoir service crate, its
 sessions, manifests, view sidecars, worker declarations, settings and furnace paths are traced
 to their owners in P4), the reservoir service (new crate from `pandect::reservoir`:
-persona and domain catalog, access, store lifetimes, sealing, replication), `mere-facts` (the persona's facts domain; its admission policy stays with
+persona and domain catalog, access, store lifetimes, sealing, and generic replication when the
+domain adoption plan's M4 builds it, D133), `mere-facts` (the persona's facts domain; its admission policy stays with
 the domain owner, as the contract says). The reservoir service crate is `catchment` (D9). `mere-framing` and `state-witness`
 moved to Eidetic under D12 and are no longer Mere's.
 
@@ -639,17 +641,27 @@ Held, not part of this slice: D52 (the three small hosts merge) and D64.
 
 Split `pandect` three ways. The graph-domain revision lifecycle stays as `pandect`: how a
 graph-domain operation becomes a durable, reopenable revision (admission, fold, branch,
-merge, replay), with Stickleback supplying the log and the domain interface and the engine
-supplying assertion semantics. `pandect::reservoir` becomes `catchment`, the reservoir service crate in
-Mere (D3, D9): persona and domain catalog, access, store lifetimes, sealing, replication. Sessions,
-manifests, view sidecars, worker declarations, settings and furnace paths are traced to
-their owners, most to the host; an authored arrangement replicates through the domain log
-(contract C7) while Graphshell defines and edits it.
+merge, replay), over today's per-session journal, with the engine supplying assertion
+semantics; contract C2's single causal log, with Stickleback supplying the log and the domain
+interface, is built under the domain adoption plan, not here (D133). `pandect::reservoir` becomes
+`catchment`, the reservoir service crate in Mere (D3, D9): persona and domain catalog, access,
+store lifetimes, sealing, and generic replication when the adoption plan's M4 builds it; the
+graph domain's sync stays pandect's `personal_sync` (D69, D133). Sessions, manifests, view
+sidecars, worker declarations, settings and furnace paths are traced to their owners (D43 to
+D47, D77 to D79, D86, D87, D134), most to the host; an authored arrangement stays in the view log
+while Graphshell defines and edits it, and its attention half (camera, focus, mirrored tiles) is
+device-local (contract C7, D133).
 - Done when: a graph edit reopens at the same revision; a non-graph domain (Woodshed's
   `mere/music`, or the Knot store) opens through the same reservoir with no graph or host
   crate in its dependency path; a Graphshell view is rebuilt from the dataset revision it
   cites; each traced sidecar has an owner recorded in P0's lines.
 - Needs: P0; the domain contract's C1 to C8 as written.
+- Reading, 2026-11-12 (D133): the second condition is proved by Knot's sync grammar, fold and
+  store carved into a pure crate and tested through catchment, with `cargo tree -i catchment`
+  naming only that crate; Eidetic's generic `chartulary` and `petgraph` on catchment's own path
+  are not "a graph crate" for it (the first reader's reading). The third condition's "dataset
+  revision" is the journal cursor until P5, proved by one Graphshell `host/` test; P8 revisits it
+  with the dataset. The first condition stands on today's journal.
 
 ### P5. The engine crate
 
@@ -2198,6 +2210,54 @@ revision and what crosses at frame rate.
   D119; applies D121, D125.
 
   Links: area The stack · draws on engine-split D119, engine-split D121, engine-split D125 · plans engine-split P3 · summary The parked probes move to the repository of their subject if they build there; the six that no longer build are archived under Code/archive; stale lock-only directories are deleted.
+
+- **D133. What P4's done-conditions mean (Mark, 2026-11-12):** The P4 assessment
+  (`Code/testing/engine-split/p4_assessment.md`, read-only, catchment 26 and pandect 281 tests
+  passing at `255a12838`) found the first condition met for today's per-session journal but not
+  in contract C2's single causal log; the second met only by catchment's stand-in test, since
+  Woodshed has no music domain, Knot's `KnotSyncStore` opens its own redb, and every client path
+  today names the host and pandect; the third met for storage only, a view stamped with a journal
+  cursor that nothing rebuilds from, with "dataset revision" not existing until P5; and C7's split
+  not applied to `ViewIntent`, which holds arrangement and attention in one record. Four rulings,
+  put to Mark by the first reader. What proves the second condition: "A real Knot domain crate
+  over catchment (Recommended)"; Knot carves its sync grammar, fold and store into a pure crate
+  and tests it through catchment, `cargo tree -i catchment` names only that crate, one Knot change,
+  and where Knot's store lives on disk stays Knot's own plan. The question said catchment's path
+  carries Eidetic's generic `chartulary` and `petgraph`; the first reader reads the answer as
+  those not counting as "a graph crate" for this condition, which Mark was not asked separately.
+  The third condition before P5: "Journal cursor counts, one host test (Recommended)"; one test in
+  Graphshell `host/` sets a view at cursor N, edits past it, reopens, rebuilds from `graph_at(N)`
+  and `view_at(N)` and compares, with no format change, and P8 revisits it with the real dataset.
+  C7's split of `ViewIntent`: "Now, in P4 (Recommended)"; arrangement stays in the view log,
+  attention (camera, focus, `mirror_tiles`) moves to a device-local host store, one schema bump in
+  Graphshell and Turnstone, proved by a reopen test over a store written before the change. C2 in
+  P4: "No: P4 is ownership (Recommended)"; C2 is built under the domain adoption plan with
+  replication, P4's sentence is corrected, and the first condition stands on today's journal.
+  Separately, the first reader answered where replication lives from D9 and D69 without a ruling:
+  generic replication is catchment's when the adoption plan's M4 builds it and the graph domain's
+  sync stays pandect's `personal_sync`, so catchment's crate doc and the Crate dispositions line are
+  corrected. Outcome: refines P4; applies D9, D69 and contract C7.
+
+  Links: area The stack · draws on engine-split D9, engine-split D69, domain-contract C2, domain-contract C7 · plans engine-split P4 · summary P4's second condition is proved by a pure Knot sync crate over catchment, the third by a journal-cursor host test, C7's attention split happens now, and C2 stays with domain adoption.
+
+- **D134. Owners for pandect's remaining sidecars (Mark, 2026-11-12):** The same assessment's
+  fourth condition: fourteen job-3 modules in pandect (about 5,000 lines) had a P0 owner
+  candidate and no ruling. Four rulings, put to Mark by the first reader. `switcher_thumbnail`,
+  `script_bindings_store`, `settings_store` and `persona_settings_store`: "Retire two, settings to
+  the resident (Recommended)"; the first two, with no users found, are deleted (git keeps them),
+  and the two settings stores move to `mere-resident` in Graphshell. `web_facets` and
+  `browser_node_state`: "Turnstone (Recommended)". `cartography_geometry`, `saved_scene`,
+  `scene_facets` and `arrangement_facets`: "mere-cartography and incipit (Recommended)"; the canvas
+  three go to `mere-cartography`, `arrangement_facets` to incipit's arrangement, and a session fork
+  copies container facets generically instead of naming scene facets, proved by a reopen test over
+  a store written before the change. The remaining four: "Recommended set"; `facet_store` stays in
+  pandect as graph state beside the journal, `manifest_store` goes to Turnstone's legacy adapter,
+  `denizen_facets` to Turnstone pending Gemot, and `notochord_policy_store` to Dramatis.
+  `application_settings_store` stays in pandect under D79. A move that changes a type other
+  repositories construct lands its registry consumers first, then Mere, then Knot, and locks move
+  by scoped `cargo update -p` (D131). Outcome: applies P4; refines the P0 audit's candidates.
+
+  Links: area The stack · draws on engine-split D79, engine-split D131 · plans engine-split P4 · summary Two of pandect's unruled sidecars are retired, settings go to the resident, web state to Turnstone, canvas facets to mere-cartography and incipit, policy to Dramatis; facet_store stays.
 
 ## Open questions
 
