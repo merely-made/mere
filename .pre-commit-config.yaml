@@ -1,4 +1,4 @@
-# house hooks --deny --clippy '--all-targets -p mere-rdf --features mere-rdf/query'
+# house hooks --deny --clippy '--all-targets -p mere -p mere-rdf --features mere/query,mere-rdf/query'
 # Written by `house hooks` (eidetic, crates/house); `house hooks --check` fails when this file drifts from it.
 # `house` is on the PATH: cargo install --git https://github.com/merely-made/eidetic house
 fail_fast: true
@@ -28,8 +28,8 @@ repos:
         files: '(^|/)(Cargo\.toml|rust-toolchain\.toml|[^/]+\.rs)$'
         pass_filenames: false
       - id: clippy-2
-        name: clippy --all-targets -p mere-rdf --features mere-rdf/query
-        entry: cargo clippy --all-targets -p mere-rdf --features mere-rdf/query
+        name: clippy --all-targets -p mere -p mere-rdf --features mere/query,mere-rdf/query
+        entry: cargo clippy --all-targets -p mere -p mere-rdf --features mere/query,mere-rdf/query
         language: system
         files: '(^|/)(Cargo\.toml|rust-toolchain\.toml|[^/]+\.rs)$'
         pass_filenames: false

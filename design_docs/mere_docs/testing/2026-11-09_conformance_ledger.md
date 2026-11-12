@@ -9,9 +9,9 @@ the [receipts](../../archive_docs/receipts/2026-11-07_engine_split_plan_receipts
 
 ## How a result is scored
 
-- **Harness**: `crates/graph/linked-data/tests/w3c_conformance/` (`main.rs` plus five modules) (package `mere-rdf`, lib
-  `linked_data`). Ignored by default; skips cleanly if the suites are absent. Command:
-  `W3C_SUITES_DIR=<Code/crates> cargo test -p mere-rdf --features query --test w3c_conformance -- --ignored --nocapture`
+- **Harness**: `crates/graph/engine/tests/w3c_conformance/` (`main.rs` plus five modules) (package `mere`, lib
+  `mere`; moved from `crates/graph/linked-data` by engine split P5 L2, 2026-11-12). Ignored by default; skips cleanly if the suites are absent. Command:
+  `W3C_SUITES_DIR=<Code/crates> cargo test -p mere --features query --test w3c_conformance -- --ignored --nocapture`
   (`W3C_VERBOSE=1` lists failing tests).
 - **Two layers.** `parser` runs the parsers the adapter wraps (`oxttl`, `oxrdfxml`, `oxjsonld`, `spargebra`, `spareval`, `sparesults`)
   with the adapter's features and options, and scores what the suite specifies: accept or reject
@@ -20,7 +20,7 @@ the [receipts](../../archive_docs/receipts/2026-11-07_engine_split_plan_receipts
   `from_jsonld_with_contexts_and_base_iri`) and can score accept or reject only: they return a
   graph contribution, not an RDF dataset, and take no base IRI or processing mode.
 - **The `indexed` layer** (SPARQL query evaluation only, from 2026-11-10, quad index plan P2) loads each case's data
-  through `linked_data::query::IndexedDataset::from_quads` and evaluates with the same `spareval`, scored as the
+  through `mere::query::IndexedDataset::from_quads` and evaluates with the same `spareval`, scored as the
   parser layer is; it is the engine's own query dataset, so a difference from the parser layer is the dataset's.
 - **Counts** are `pass / run`, where run excludes skipped tests. A skip is a test the layer cannot
   express (reason given); it is not a pass. Isomorphism uses `oxrdf`'s dataset canonicalisation,

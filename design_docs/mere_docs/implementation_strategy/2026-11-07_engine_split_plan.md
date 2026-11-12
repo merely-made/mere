@@ -3221,3 +3221,19 @@ revision and what crosses at frame rate.
   five Windows access-denied session tests (`db8c33ed`), Cleromancy core's test targets (`2374bb5`),
   Isocosm's stale mesocosm test (`3236e7ee`), knot-editor's nine Windows-only failures, and
   mere-resident's two. Evidence: `Code/testing/engine-split/p4_*.md` and `p4/`.
+- 2026-11-12: P5 L2 landed, additive (D141, F6). The `mere` crate (`crates/graph/engine`, package
+  `mere` 0.1.0, lib `mere`, `publish = true`; crates.io's index lists only 0.0.1) took linked-data's
+  files by `git mv` and `mere-rdf` (`crates/graph/linked-data`, lib `linked_data`) is a `pub use`
+  shim with the same features, so no consumer changed. Stage mapping: `acquire/ingest*` (the
+  contribution profile, `apply_*` and the offline `@context` loader `ingest/contexts.rs`, which
+  is loader code); `formats/jsonld*` and `formats/serialize` (parsers and serializers);
+  `query/` (the spareval seam and `IndexedDataset`, unmoved); `profile/vocab` (vocabulary
+  alignment; the predicate registry stays in `mere-kernel` until L3). At the crate root, with
+  the reason that each is the graph-to-RDF projection that L4 sends to `kernel::rdf` or its
+  support: `lib.rs`, `statement_metadata`, `resource_metadata*`, `reifier`, `tests*`. No
+  `model`, interpret, identity or script module exists (F3). All 93 unit tests, the ledger harness
+  and `adapter_scale` moved to `mere`; the shim keeps one path-resolution test. Gates: 93 tests
+  pass; ledger counts identical (SPARQL 1.1 230/244, 1.2 64/65, toRdf 439 parser and 441 adapter,
+  TriG adapter syntax 199/214); `mere` checks on wasm32 with and without `query`; Graphshell's
+  `mere-view` query build passes against the branch by `--config` patch. The clippy hook now names
+  both packages.

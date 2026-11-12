@@ -34,7 +34,7 @@ pub(super) fn collect_contribution<E: std::fmt::Display>(
     for quad in &quads {
         if quad.predicate.as_str() == RDF_TYPE
             && matches!(&quad.object, Term::NamedNode(node)
-                if node.as_str() == crate::jsonld::RDF_STATEMENT)
+                if node.as_str() == crate::formats::jsonld::RDF_STATEMENT)
         {
             let reifier = subject_iri(&quad.subject, namespace);
             statement_id_from_reifier(&reifier).map_err(|error| {
@@ -43,13 +43,13 @@ pub(super) fn collect_contribution<E: std::fmt::Display>(
             classic_reifiers.insert(reifier);
         }
     }
-    let quads = crate::jsonld::bridge_classic_reification(quads);
+    let quads = crate::formats::jsonld::bridge_classic_reification(quads);
     let descriptions: std::collections::HashSet<_> = quads
         .iter()
         .filter(|quad| {
             quad.predicate.as_str() == RDF_TYPE
                 && matches!(&quad.object, Term::NamedNode(node)
-                    if node.as_str() == crate::jsonld::RDF_STATEMENT)
+                    if node.as_str() == crate::formats::jsonld::RDF_STATEMENT)
         })
         .map(|quad| subject_iri(&quad.subject, namespace))
         .collect();
@@ -121,7 +121,7 @@ pub(super) fn collect_contribution<E: std::fmt::Display>(
             if reified.get(&reifier).is_some_and(|statement| {
                 (!classic_reifiers.contains(&reifier)
                     || statement.graph_scope == scope_from_graph_name(&quad.graph_name, namespace))
-                    && (crate::jsonld::representable_metadata(
+                    && (crate::formats::jsonld::representable_metadata(
                         quad.predicate.as_str(),
                         &quad.object,
                     ) || (!classic_reifiers.contains(&reifier)

@@ -27,8 +27,8 @@
 use kernel::graph::Graph;
 use oxttl::{NQuadsParser, NQuadsSerializer, TriGParser, TriGSerializer};
 
-use crate::ingest::{GraphContribution, ImportEnvelope, IngestError, from_quads_envelope};
-use crate::vocab::is_vocabulary_quad;
+use crate::acquire::ingest::{GraphContribution, ImportEnvelope, IngestError, from_quads_envelope};
+use crate::profile::vocab::is_vocabulary_quad;
 use crate::{dataset_quads, dataset_quads_with_history, vocabulary_alignment_quads};
 
 /// The whole graph as **N-Quads**: instance quads (scoped) plus the vocabulary
@@ -116,7 +116,7 @@ pub fn from_trig_envelope(text: &str, namespace: &str) -> Result<ImportEnvelope,
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ingest::apply_import;
+    use crate::acquire::ingest::apply_import;
     use kernel::graph::apply::assert_semantic_relation_in_scope;
     use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::{SemanticStatementSpec, SemanticSubKind};

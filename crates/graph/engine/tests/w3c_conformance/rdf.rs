@@ -102,12 +102,12 @@ pub(crate) fn adapter_accepts(fmt: Fmt, bytes: &[u8]) -> Option<Result<(), Strin
     };
     match fmt {
         Fmt::NQuads => Some(
-            linked_data::from_nquads(text, "urn:w3c")
+            mere::from_nquads(text, "urn:w3c")
                 .map(|_| ())
                 .map_err(|e| e.to_string()),
         ),
         Fmt::TriG => Some(
-            linked_data::from_trig(text, "urn:w3c")
+            mere::from_trig(text, "urn:w3c")
                 .map(|_| ())
                 .map_err(|e| e.to_string()),
         ),

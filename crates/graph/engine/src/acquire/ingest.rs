@@ -527,7 +527,7 @@ const MERE_MINIMAL_CONTEXT: &[u8] = br#"{"@context":{"name":"https://schema.org/
 
 /// The vendored schema.org context (see `assets/NOTICE`; CC BY-SA 3.0).
 #[cfg(feature = "bundled-contexts")]
-const SCHEMA_ORG_CONTEXT: &[u8] = include_bytes!("../assets/schema.org.context.jsonld");
+const SCHEMA_ORG_CONTEXT: &[u8] = include_bytes!("../../assets/schema.org.context.jsonld");
 
 /// The `@context` URLs a document may reference for schema.org.
 #[cfg(feature = "bundled-contexts")]
@@ -540,7 +540,7 @@ const SCHEMA_ORG_URLS: &[&str] = &[
 
 /// The vendored ActivityStreams 2.0 context (see `assets/NOTICE`; W3C license).
 #[cfg(feature = "bundled-contexts")]
-const ACTIVITYSTREAMS_CONTEXT: &[u8] = include_bytes!("../assets/activitystreams.context.jsonld");
+const ACTIVITYSTREAMS_CONTEXT: &[u8] = include_bytes!("../../assets/activitystreams.context.jsonld");
 
 #[cfg(feature = "bundled-contexts")]
 const ACTIVITYSTREAMS_URLS: &[&str] = &[
@@ -550,7 +550,7 @@ const ACTIVITYSTREAMS_URLS: &[&str] = &[
 
 /// A small Mere-authored Dublin Core context (MPL; not a third-party asset).
 #[cfg(feature = "bundled-contexts")]
-const DUBLIN_CORE_CONTEXT: &[u8] = include_bytes!("../assets/dublin-core.context.jsonld");
+const DUBLIN_CORE_CONTEXT: &[u8] = include_bytes!("../../assets/dublin-core.context.jsonld");
 
 #[cfg(feature = "bundled-contexts")]
 const DUBLIN_CORE_URLS: &[&str] = &[

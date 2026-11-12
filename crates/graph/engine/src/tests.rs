@@ -241,7 +241,7 @@ fn instance_objects(document: &serde_json::Value, reifier_count: usize) -> serde
     let is_reifier = |node: &&serde_json::Value| {
         node["@type"].as_array().is_some_and(|types| {
             types.contains(&serde_json::Value::String(
-                crate::jsonld::RDF_STATEMENT.into(),
+                crate::formats::jsonld::RDF_STATEMENT.into(),
             ))
         })
     };

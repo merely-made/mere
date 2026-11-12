@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use crate::ingest::{IngestError, from_quads};
+use crate::acquire::ingest::{IngestError, from_quads};
 use crate::reifier::statement_reifier_id;
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::resource::ResourceNode;
@@ -176,7 +176,7 @@ mod profile;
 #[cfg(feature = "query")]
 mod directional_descriptions {
     use super::*;
-    use crate::ingest::GraphContribution;
+    use crate::acquire::ingest::GraphContribution;
     use oxjsonld::JsonLdParser;
     use oxrdf::BaseDirection;
 

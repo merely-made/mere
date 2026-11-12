@@ -55,7 +55,7 @@ pub(crate) fn representable_metadata(predicate: &str, object: &Term) -> bool {
             Term::Literal(literal),
         ) => {
             literal.datatype().as_str() == crate::XSD_DATETIME
-                && crate::ingest::parse_xsd_datetime_ms(literal.value()).is_some()
+                && crate::acquire::ingest::parse_xsd_datetime_ms(literal.value()).is_some()
         },
         (
             crate::MERE_METHOD_VERSION
@@ -67,7 +67,7 @@ pub(crate) fn representable_metadata(predicate: &str, object: &Term) -> bool {
         (crate::PROV_WAS_ASSOCIATED_WITH, Term::NamedNode(_)) => true,
         (crate::PROV_GENERATED_AT_TIME, Term::Literal(literal)) => {
             literal.datatype().as_str() == crate::XSD_DATETIME
-                && crate::ingest::parse_xsd_datetime_ms(literal.value()).is_some()
+                && crate::acquire::ingest::parse_xsd_datetime_ms(literal.value()).is_some()
         },
         _ => false,
     }

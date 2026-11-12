@@ -1,0 +1,68 @@
+[package]
+rust-version = "1.97.1"
+name = "mere"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Mere, the semantic-web engine: linked-data formats, ingest, the graph projection and SPARQL query."
+publish = true
+keywords = ["json-ld", "rdf", "linked-data", "graph", "semantic-web"]
+categories = ["web-programming", "data-structures"]
+
+[lib]
+name = "mere"
+path = "src/lib.rs"
+
+[features]
+default = ["bundled-contexts"]
+# Vendored standard-vocabulary JSON-LD contexts (schema.org, ActivityStreams 2.0,
+# plus a small Mere-authored Dublin Core context; ~220 KB) so an arbitrary remote
+# `@context` resolves offline via `ContextCache::full()`. Disable for a slimmer
+# binary — `full()` then equals `minimal()`. See `assets/NOTICE` for licensing.
+bundled-contexts = []
+# SPARQL query over the graph via spareval's `QueryableDataset`, evaluated
+# over a dictionary-encoded quad index (chartulary::quads) built from the
+# projected quads (no RocksDB, wasm-viable).
+# Off by default: base linked-data stays slim, only consumers that want SPARQL
+# pull the evaluator. Tests retain a materialized spareval dataset as the
+# parity oracle for the indexed dataset.
+# Preserve directional JSON-LD terms previously enabled through Oxigraph.
+query = ["dep:chartulary", "dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
+
+[[example]]
+name = "adapter_scale"
+required-features = ["query"]
+
+[dependencies]
+kernel.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+oxjsonld = "0.2"
+oxttl = { version = "0.2", features = ["rdf-12"] }
+oxrdf = { version = "0.3", features = ["rdf-12"] }
+# The id-level quad index the query feature's held dataset wraps.
+chartulary = { workspace = true, optional = true }
+# Preserve query extensions previously enabled transitively by Oxigraph.
+spareval = { version = "0.2.9", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
+spargebra = { version = "0.4", optional = true, features = ["sparql-12"] }
+time = { version = "0.3", features = ["formatting", "parsing"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# oxrdf's random blank-node support reaches getrandom 0.3. Browser builds also
+# pass `--cfg getrandom_backend="wasm_js"`, following Mere's existing web lanes.
+getrandom = { version = "0.3", features = ["wasm_js"] }
+# Every prepared SPARQL query initializes NOW and its planning timer, even
+# without an explicit NOW expression. Use the evaluator's browser clock.
+oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
+# The evaluator's rand 0.8 has its own entropy backend, distinct from oxrdf.
+getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optional = true }
+
+[dev-dependencies]
+kernel = { workspace = true, features = ["fixtures"] }
+# The W3C conformance harness (tests/w3c_conformance): RDF/XML parsing and SPARQL result files.
+oxrdfxml = { version = "0.2", features = ["rdf-12"] }
+sparesults = { version = "0.3", features = ["sparql-12"] }
+
+[lints]
+workspace = true

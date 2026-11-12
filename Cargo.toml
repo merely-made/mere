@@ -5,6 +5,7 @@ resolver = "2"
 # the reference app to Turnstone, pictograph to emblem (D102 to D104).
 members = [
     "crates/graph/graph-kernel",
+    "crates/graph/engine",
     "crates/graph/linked-data",
     "crates/system/catchment",
     "crates/system/pandect",

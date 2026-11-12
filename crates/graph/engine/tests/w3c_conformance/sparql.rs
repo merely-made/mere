@@ -225,7 +225,7 @@ fn from_iris(text: &str, base: &str) -> Vec<oxrdf::NamedNode> {
 /// (parser) and over the same quads loaded through `IndexedDataset::from_quads` (indexed).
 #[cfg(feature = "query")]
 fn query_eval(root: &Path, e: &Entry) -> (Outcome, Outcome) {
-    use linked_data::query::{IndexedDataset, View};
+    use mere::query::{IndexedDataset, View};
     match query_case(root, e) {
         Err(out) => (out.clone(), out),
         Ok((data, text, q, res)) => {

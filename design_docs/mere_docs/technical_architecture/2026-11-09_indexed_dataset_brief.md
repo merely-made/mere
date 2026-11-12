@@ -6,7 +6,7 @@
 
 ## 1. The measurement
 
-Instrument: `crates/graph/linked-data/examples/adapter_scale.rs` (package `mere-rdf`, release only, behind the `query` feature; landed on main 2026-11-09). It builds a chain graph of N nodes, each with one semantic statement to the next node and one literal property, which projects to 8 quads per node, and times four queries through today's adapter (`linked_data::query::sparql`) and through the same quads materialized into an `oxrdf::Dataset` and evaluated by the same `spareval`. Row counts agreed in every cell.
+Instrument: `crates/graph/engine/examples/adapter_scale.rs` (package `mere`; was `crates/graph/linked-data` before engine split P5 L2, release only, behind the `query` feature; landed on main 2026-11-09). It builds a chain graph of N nodes, each with one semantic statement to the next node and one literal property, which projects to 8 quads per node, and times four queries through today's adapter (`linked_data::query::sparql`) and through the same quads materialized into an `oxrdf::Dataset` and evaluated by the same `spareval`. Row counts agreed in every cell.
 
 | nodes | quads | query | adapter | materialized `oxrdf::Dataset` | ratio |
 |---|---|---|---|---|---|

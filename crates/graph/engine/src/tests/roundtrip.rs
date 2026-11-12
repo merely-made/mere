@@ -327,10 +327,10 @@ fn dataset_round_trip_is_lossless_under_the_profile() {
         "one shared triple term"
     );
 
-    let contribution = crate::ingest::from_quads_envelope(crate::dataset_quads(&graph), "gate")
+    let contribution = crate::acquire::ingest::from_quads_envelope(crate::dataset_quads(&graph), "gate")
         .expect("quad ingest");
     let mut reimported = Graph::new();
-    let outcome = crate::ingest::apply_import(&mut reimported, &contribution);
+    let outcome = crate::acquire::ingest::apply_import(&mut reimported, &contribution);
     assert!(outcome.edges_skipped == 0, "self-contained contribution");
     assert_eq!(
         outcome.edges_asserted, 5,

@@ -8,7 +8,7 @@
 //!
 //! Builds a chain graph of N nodes (each node `next`-links to its successor and
 //! carries one literal property), then times four queries three ways: through
-//! `linked_data::query::sparql` (which indexes the graph on every call), over a
+//! `mere::query::sparql` (which indexes the graph on every call), over a
 //! held `IndexedDataset` built once (`sparql_on`), and over an `oxrdf::Dataset`
 //! materialized from the same projection, kept as the parity column. It also
 //! prints the index build time and the index's `memory_bytes()`.
@@ -27,7 +27,7 @@
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{Graph, NodeKey, SemanticStatementSpec};
 use kernel::types::NodeProperty;
-use linked_data::query::{IndexedDataset, View, sparql, sparql_on};
+use mere::query::{IndexedDataset, View, sparql, sparql_on};
 use spareval::{QueryEvaluator, QueryResults};
 use spargebra::SparqlParser;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -132,7 +132,7 @@ fn main() {
         let build_ms = t.elapsed();
 
         let t = Instant::now();
-        let quads = linked_data::dataset_quads(&graph);
+        let quads = mere::dataset_quads(&graph);
         let quad_count = quads.len();
         let dataset: oxrdf::Dataset = quads.into_iter().collect();
         let materialize_ms = t.elapsed();

@@ -47,7 +47,7 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
     };
 
     // Every JSON-LD document in the suite, served to the adapter layer as a ContextCache.
-    let mut cache = linked_data::ContextCache::new();
+    let mut cache = mere::ContextCache::new();
     let mut stack = vec![tests.clone()];
     while let Some(dir) = stack.pop() {
         let Ok(rd) = std::fs::read_dir(&dir) else {
@@ -162,7 +162,7 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
             continue;
         }
         let adapted =
-            linked_data::from_jsonld_with_contexts_and_base_iri(&bytes, cache.clone(), Some(&base));
+            mere::from_jsonld_with_contexts_and_base_iri(&bytes, cache.clone(), Some(&base));
         let out = match (adapted, negative) {
             (Err(err), true) if err.to_string().contains("refused remote @context") => {
                 Outcome::Skip("rejected only because a context lives outside the suite")
