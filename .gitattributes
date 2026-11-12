@@ -85,3 +85,6 @@ crates/system/pandect/tests/fixtures/*.json text eol=lf
 
 # Fixtures written by pre-P4 code: byte-exact, no line-ending conversion.
 crates/system/pandect/tests/fixtures/pre_p4_** -text
+
+# The snapshot digest is pinned over CRLF bytes (the original Windows checkout).
+support/doc-audit/d2/snapshot_281_aggregate.json text eol=crlf

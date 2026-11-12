@@ -209,7 +209,7 @@ def scaffold():
         write(root / "README.md", intro)
         write(root / "design_docs/DOC_POLICY.md", (MERE / "design_docs/DOC_POLICY.md").read_text(encoding="utf-8-sig").split("## Local addendum")[0])
         write(root / "design_docs/DOC_README.md", f"# {family.capitalize()} documentation\n\nPreserve host-owned authority, existing formats and independent crate feature boundaries. Read [documentation policy](DOC_POLICY.md) before editing.\n\nCanonical migration and current receipts: `mere/design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md`.\n")
-        ci = "name: Library gates\non: [push, pull_request]\njobs:\n  libraries:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: dtolnay/rust-toolchain@1.99.1\n      - run: cargo test --workspace --locked\n      - run: cargo check --workspace --no-default-features --locked\n"
+        ci = "name: Library gates\non: [push, pull_request]\njobs:\n  libraries:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: dtolnay/rust-toolchain@1.99.1\n      - run: cargo test --workspace\n      - run: cargo check --workspace --no-default-features\n"
         # Preserve Smolweb's stronger existing protocol conformance workflow.
         if family != "errand":
             write(root / ".github/workflows/libraries.yml", ci)

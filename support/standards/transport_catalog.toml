@@ -27,8 +27,8 @@ url = "https://www.rfc-editor.org/"
 status = "Primary publication metadata and selected clauses checked; errata review incomplete except recorded RaptorQ erratum."
 
 [sources.mere_pin]
-authority = "Mere Cargo.lock at inspected origin/main"
-path = "Cargo.lock"
+authority = "Mere resolved-versions git note at the inspected origin/main commit (no Cargo.lock is tracked since D139)"
+locator = "house resolved show <revision>"
 revision = "0e78fcffb140395a5c0d2f64a4dfda2b81751681"
 status = "Source locator and exact p2panda dependency family; no downstream behavior qualification."
 

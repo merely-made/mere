@@ -9,7 +9,7 @@ Written 2026-11-09 against Mere main `75e26f56e` (the indexed dataset brief's ru
 ## mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md
 
 - disposition: current
-- status line: "plan, 2026-11-09; ... D8 ruled and P2 landed on Mere main 2026-11-10 ...; P3 open." — accurate: yes (updated 2026-11-10 at the P2 landing; 92 mere-rdf tests with the query feature)
+- status line: "plan, 2026-11-09; ... D8 ruled and P2 landed on Mere main 2026-11-10 ...; P3 open." — accurate: yes
 - claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -26,7 +26,7 @@ Written 2026-11-09 against Mere main `75e26f56e` (the indexed dataset brief's ru
 
 ### Notes
 
-Checked at `75e26f56e`: the indexed dataset brief exists with D1 to D5; `crates/graph/linked-data/src/query/dataset.rs`
+Status updated 2026-11-10 at the P2 landing (92 mere-rdf tests with the query feature). Checked at `75e26f56e`: the indexed dataset brief exists with D1 to D5; `crates/graph/linked-data/src/query/dataset.rs`
 is 80 lines and `query.rs` 210; the `query` feature in `crates/graph/linked-data/Cargo.toml`; the conformance
 harness file `crates/graph/linked-data/tests/w3c_conformance/sparql.rs`; Mere's `chartulary` row names
 `eidetic.git` on `branch = "main"`; Eidetic's `crates/chartulary/src` is 7,278 lines over 15 files, largest
