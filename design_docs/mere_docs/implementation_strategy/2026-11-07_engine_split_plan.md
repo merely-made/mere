@@ -1,14 +1,14 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D139 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D140 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
 holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-facts`) that name nothing from
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
-P0's squishes have landed in part (D14, D26 to D28), and P4's stages in part (Findings, 2026-11-09); P4's
-done-conditions are read and its remaining owners ruled (D133 to D136), and its work is under way. P5 to
+P0's squishes have landed in part (D14, D26 to D28). **P4 (Pandect on the authority boundary) is done,
+2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). P5 to
 P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
@@ -112,7 +112,8 @@ the pack loader (new).
 **Stay in Mere, beside the engine.** `pandect` (graph-domain revision lifecycle only: admission,
 fold, branch, merge, replay; its reservoir half becomes the reservoir service crate, its
 sessions, manifests, view sidecars, worker declarations, settings and furnace paths are traced
-to their owners in P4), the reservoir service (new crate from `pandect::reservoir`:
+to their owners in P4: D43 to D47, D77 to D79, D86, D87 and D134 to D136, with `facet_store` and
+the saved-scene wire types staying as graph state), the reservoir service (new crate from `pandect::reservoir`:
 persona and domain catalog, access, store lifetimes, sealing, and generic replication when the
 domain adoption plan's M4 builds it, D133), `mere-facts` (the persona's facts domain; its admission policy stays with
 the domain owner, as the contract says). The reservoir service crate is `catchment` (D9). `mere-framing` and `state-witness`
@@ -662,6 +663,25 @@ device-local (contract C7, D133).
   are not "a graph crate" for it (the first reader's reading). The third condition's "dataset
   revision" is the journal cursor until P5, proved by one Graphshell `host/` test; P8 revisits it
   with the dataset. The first condition stands on today's journal.
+- Done-conditions, 2026-11-12 (the sentences above stand as written; each is mapped to its evidence):
+  - "a graph edit reopens at the same revision": met on today's per-session journal (D133).
+    pandect's `operation_revision_binds_content_and_survives_reopen` and
+    `archive_survives_owner_exit_and_a_fresh_process_forks_the_thaw` pass, in the 252 pandect tests
+    run with every feature at Mere `3f7224520`.
+  - "a non-graph domain ... opens through the same reservoir with no graph or host crate in its
+    dependency path": met by Knot's `knot-sync` (Knot `55edde8`, D133, D140). It opens a Knot store
+    through catchment, writes, reopens and reads back. `cargo tree -p knot-sync -F reservoir -e
+    normal -i catchment` names only `knot-sync`, and its own tree names no `pandect`,
+    `mere-kernel`, `incipit`, `graphshell-host`, `scenograph` or `cambium`.
+  - "a Graphshell view is rebuilt from the dataset revision it cites": met for the journal cursor
+    by `mere_host::cursor_tests::a_view_is_rebuilt_from_its_cursor_after_later_edits_and_a_reopen`
+    (Graphshell `657e9ed8`, D138). It compares state, not the projected scene; P8 revisits it with
+    the dataset. C7's split, which D133 also put in P4, landed at Graphshell `16be4789`, and
+    Turnstone took it at `77c05dfc`.
+  - "each traced sidecar has an owner recorded in P0's lines": met. pandect's line under Crate
+    dispositions names the rulings (D43 to D47, D77 to D79, D86, D87, D134 to D136). The moves
+    landed in D121's order: Dramatis `b54da0a`, Graphshell `ca14acaf`, Mere `f4aef3e68`, then
+    Turnstone `9bb21d0b`.
 
 ### P5. The engine crate
 
@@ -2395,6 +2415,38 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D131, engine-split D136, engine-split D137 · plans engine-split P4 · summary No Cargo.lock is tracked in the family; builds resolve fresh and what they resolved is a git note on each commit; a failing fresh resolve is fixed by bumping the dependent.
 
+- **D140. knot-sync proves P4's second condition and is not the pattern (Mark, 2026-11-12):**
+  Carrying out D133's Knot carve, the lane's first map missed that `CollectionItem` also holds
+  `projection_recipe`, typed with scenograph and scenomise types (scenograph reaches incipit and
+  catchment). The first reader's A1 reading, which kept the record typed, therefore failed the tree
+  check. It was replaced: `knot-sync` carries the recipe as exact-text JSON (`RawValue`, since
+  `serde_json::Value` widens f32 to f64 and re-sorts keys, which breaks byte identity), and the
+  scenomise-backed recipe validator is supplied by the domain, so admission keeps its check. That
+  follows contract C5 and pandect's own `GraphValidator`. A recipe refused today is refused through
+  the carved store with the same text, for both the shape check and the 1 MiB bound. `metre_scene`
+  stays typed: `sceno` and `sceno-backdrops` are the published scene contract, not a graph or host
+  crate. Mark then asked: "what you've done here is set a model that other repos would need to
+  adhere to. is that what we want: knot-sync and cleromancy-sync and woodshed-sync? or is there a
+  simpler way that doesn't result in duplicated work". Contract C5 already answers that a domain
+  supplies grammar, fold and validator while the stack supplies the log and store, so the carve is
+  shaped not to be copied. Shown the two shapes, his choice was "In knot-sync now, lifted later
+  (Recommended)", with "you're allowed to think about it and argue. idk, 1". From that answer on,
+  forks of that size are argued, decided and listed by the first reader and this plan's lanes, not
+  carded. So `knot-sync` has two modules with a hard line between them. `generic/` (1,545 lines)
+  holds the store over a backend, generic over a `SyncDomain` trait, and names no Knot type.
+  `knot/` (7,159 lines) holds Knot's grammar, fold and validator, and is the only way to build a
+  Knot store; no accept-all domain is exported. Left Knot-side because each would need a design
+  choice to go generic: the error enum, checkpoint build, save, load and repair, epoch pruning and
+  member recovery, the projection fold and the sealed-variant methods, relations, predicates,
+  `did_key`, `djot_merge`, the composition records and checkpoint history, the projection strictness
+  policy, and two Knot-named strings in `generic/migration.rs`. Production Knot is unchanged:
+  catchment sits behind a `reservoir` feature that knot-editor does not enable, and where Knot's
+  store lives on disk stays Knot's plan. The follow-up, under the domain adoption plan, is lifting
+  `generic/` into the stack (Stickleback or catchment, per C5) as a move, after which `knot-sync` is
+  only Knot's domain. Outcome: refines D133; applies contract C5.
+
+  Links: area The stack · draws on engine-split D133, engine-split D136, domain-contract C5 · plans engine-split P4 · summary knot-sync proves P4's second condition with a generic store module behind a domain trait and Knot's domain beside it; the generic half is lifted into the stack later, so other domains do not copy a crate.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -3079,3 +3131,22 @@ revision and what crosses at frame rate.
   one under P3 ("Done-conditions, 2026-11-12"): all four met, with the layout test's repin count
   recorded there for P3 and back-filled under P1 and P2, 1 repository at each phase. Evidence:
   `Code/testing/engine-split/slice6_*.md`.
+- 2026-11-12, P4 done. The pandect sidecars went to their owners (D134 to D136) in D121's order:
+  Dramatis `b54da0a` (sporran's notochord store behind a directory API), Graphshell `ca14acaf`
+  (settings stores in the resident, the four canvas facet modules in mere-cartography), Mere
+  `148dd6b44`/`3f7224520`/`f4aef3e68` (eleven modules deleted, the saved-scene wire types kept,
+  the fork copies container facets namespace-blind; wire-byte and container-fork fixtures written by
+  the code before the change), Turnstone `9bb21d0b`. Graphshell was cross-checked against Mere's
+  branch by `--config` patch before Mere was pushed. The consumers relocked one scoped update at a
+  time (D131, D136, D137): Knot `3effc7a`, Cleromancy `617e005`, Isocosm `89c2e207`, Woodshed
+  `1a87a563`. Each flipped edge was a duplicate removed by bumping its holder: Murm str0m 0.25
+  (`9e094b6c3f2`), Woodshed's vendored BLE crate on windows 0.62 (`7e648d24`), Distillery on Burn
+  0.23.0-pre.2 (`d563e42`, `2dbdf97`), Seiche on Burn 0.23 and cubecl 0.12 (`2f168ef`). Graphshell
+  host (`ae03d38e`) and Turnstone (`77c05dfc`) then landed with one cubecl, one Burn and, in host/,
+  one sha1; Turnstone's second sha1 is third-party `headers` 0.4.2 (a Finding there). Then D139
+  ended tracked locks; its rollout follows. Condition 3: Graphshell `657e9ed8`. C7: Graphshell
+  `16be4789` (D138). Condition 2: Knot `ce95e72` and `55edde8` (D140). Pre-existing failures met on
+  the way were measured against their bases and recorded as Findings in their own plans: Turnstone's
+  five Windows access-denied session tests (`db8c33ed`), Cleromancy core's test targets (`2374bb5`),
+  Isocosm's stale mesocosm test (`3236e7ee`), knot-editor's nine Windows-only failures, and
+  mere-resident's two. Evidence: `Code/testing/engine-split/p4_*.md` and `p4/`.

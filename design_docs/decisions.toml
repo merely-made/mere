@@ -1559,6 +1559,14 @@ summary = "No Cargo.lock is tracked in the family; builds resolve fresh and what
 draws_on = ["engine-split D131", "engine-split D136", "engine-split D137"]
 plans = ["engine-split"]
 
+[decisions."engine-split D140"]
+title = "knot-sync proves P4's second condition and is not the pattern (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "knot-sync proves P4's second condition with a generic store module behind a domain trait and Knot's domain beside it; the generic half is lifted into the stack later, so other domains do not copy a crate."
+draws_on = ["engine-split D133", "engine-split D136"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
