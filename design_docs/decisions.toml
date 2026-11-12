@@ -1551,6 +1551,14 @@ summary = "ViewIntent becomes arrangement-only at view-intent/v2 with attention 
 draws_on = ["engine-split D86", "engine-split D133"]
 plans = ["engine-split"]
 
+[decisions."engine-split D139"]
+title = "No tracked locks (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "No Cargo.lock is tracked in the family; builds resolve fresh and what they resolved is a git note on each commit; a failing fresh resolve is fixed by bumping the dependent."
+draws_on = ["engine-split D131", "engine-split D136", "engine-split D137"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

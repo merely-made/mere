@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D138 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D139 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2372,6 +2372,28 @@ revision and what crosses at frame rate.
   projected scene, which is P8's probe (D4). Outcome: applies D133 and contract C7.
 
   Links: area The stack · draws on engine-split D86, engine-split D133, domain-contract C7 · plans engine-split P4 · summary ViewIntent becomes arrangement-only at view-intent/v2 with attention in a device-local slot keyed by root graph; P4's third condition is met by a journal-cursor host test.
+
+- **D139. No tracked locks (Mark, 2026-11-12):** P4's relocks (D131, D136, D137) spent the day moving
+  locks one scoped update at a time and chasing third-party edges that flipped between two locked
+  versions (spareval's `sha1`, `gpu-allocator`'s `windows`, a second `cubecl` cohort). Put to Mark
+  by the first reader. His words: "i would like to be done with locks, to not even use them, at this
+  point". When the first reader argued for keeping a record of what each build resolved, so an old
+  commit can be rebuilt and a regression bisected: "sure ... if it doesn't generate churn work
+  cycles and is just a matter of correctly noting commits". So no `Cargo.lock` is tracked in any
+  family repository. Each is untracked and ignored, and no hook or workflow passes `--locked`. A
+  consumer takes its dependencies' mains by building, and nothing is relocked. What cargo resolved
+  rides on each commit as a git note under `refs/notes/resolved`. Distillery's
+  `scripts/record-resolved.sh` attaches every lock in the working tree after a commit and pushes the
+  notes beside the branch, and `git notes --ref=resolved show <commit>` prints them. A first
+  lock-free build that resolves newer third-party versions and fails is cruft revealed: the fix is a
+  bump of the dependent, never a pin (D137's reading carries over). Receipts and verifiers that hash
+  a tracked lock, such as the coop harness's `lock_sha256`, read the note instead, a follow-up for
+  the harness. Rolled out repository by repository, starting with Distillery (`5902e90`); the first
+  reader takes Eidetic, Murm, Dramatis, Woodshed, Cleromancy, Isocosm and the smaller repositories,
+  and this plan's lanes take Mere, Graphshell, Turnstone, Knot and Seiche. Outcome: supersedes D131;
+  refines D137.
+
+  Links: area The stack · draws on engine-split D131, engine-split D136, engine-split D137 · plans engine-split P4 · summary No Cargo.lock is tracked in the family; builds resolve fresh and what they resolved is a git note on each commit; a failing fresh resolve is fixed by bumping the dependent.
 
 ## Open questions
 
