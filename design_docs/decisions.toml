@@ -1431,6 +1431,14 @@ summary = "In Turnstone the five code-read receipts become test fixtures, Moot's
 draws_on = ["engine-split D119", "engine-split D120", "engine-split D122"]
 plans = ["engine-split"]
 
+[decisions."engine-split D124"]
+title = "The consumer relock's forks (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Consumers lock Genet and Distillery at the revisions Graphshell's host lock records; new action icons are None for now; patch rows already unused are removed now; Isocosm lands on a rebase with the fast gates; Inker needed no change."
+draws_on = ["engine-split D119", "engine-split D121"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -1969,6 +1969,24 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D119, engine-split D120, engine-split D122 · plans engine-split P3 · summary In Turnstone the five code-read receipts become test fixtures, Moot's half sits at ports/graphshell/examples/capsule-library, the three used patch rows are carried, and target/ is ignored at every level.
 
+- **D124. The consumer relock's forks (Mark, 2026-11-11):** The relock lane
+  (`Code/testing/engine-split/slice5_u5.md`) built one gated commit each for Murm, Cleromancy,
+  Knot, Woodshed, Isocosm and mer3ly; no crates.io version moved in any lock. It found Inker's
+  main names nothing from mere.git, so Inker needs no commit, which corrects D121's count of an
+  eighth consumer. Four rulings. Graphshell's toolkit needs Genet at `c1d25be4` or later and
+  Cleromancy's old Distillery pin doubled chirograph; which revisions the locks take: "The
+  revisions Graphshell's host lock records (Recommended)", Genet `3fa3ec62` and Distillery
+  `30bf5510`, over each family's main. chirograph 0.0.5's new `icon` field on `AdvertisedAction`,
+  at 6 sites in Cleromancy and 2 in Isocosm: "icon: None now (Recommended)"; real icons come
+  under the iconography plan. Patch rows already unused before the split (Cleromancy 7, Knot 3,
+  and no-op `[patch."mere.git"]` tables): "Remove now", over the recommended wait for U6; a
+  second commit per repo, each row proved dead by an unchanged lock, and the same rule is applied
+  to Turnstone's 26. Isocosm's main moved three times during the run: "Rebase and push with the
+  fast gates (Recommended)"; check on all seven lock roots and the hooks, since the full tests
+  passed on the previous base. Outcome: refines D121; applies D119.
+
+  Links: area The stack · draws on engine-split D119, engine-split D121 · plans engine-split P3 · summary Consumers lock Genet and Distillery at the revisions Graphshell's host lock records; new action icons are None for now; patch rows already unused are removed now; Isocosm lands on a rebase with the fast gates; Inker needed no change.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
