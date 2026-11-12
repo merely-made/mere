@@ -19,7 +19,7 @@ native = subprocess.check_output(["rustc", "-vV"], text=True).split("host: ")[1]
 def metadata(name, target):
     manifest = str(base / name / "Cargo.toml")
     raw = subprocess.check_output([
-        "cargo", "metadata", "--locked", "--format-version", "1",
+        "cargo", "metadata", "--format-version", "1",
         "--manifest-path", manifest, "--filter-platform", target,
     ])
     (out / f"{name}-{target}.json").write_bytes(raw)
@@ -59,10 +59,10 @@ for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "cus
                         ("portable", "app_client"), ("offer", "app_client"), ("provider", "custody_client"), ("host", None)]:
     manifest = str(base / name / "Cargo.toml")
     metadata(name, native)
-    subprocess.run(["cargo", "test", "--locked", "--manifest-path", manifest], check=True)
+    subprocess.run(["cargo", "test", "--manifest-path", manifest], check=True)
     if forbidden:
         result = subprocess.run([
-            "cargo", "check", "--locked", "--manifest-path", manifest,
+            "cargo", "check", "--manifest-path", manifest,
             "--features", "forbidden-api",
         ], capture_output=True, text=True)
         (out / f"{name}-forbidden-api.log").write_text(result.stdout + result.stderr)
@@ -72,5 +72,5 @@ for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "cus
 for name in ["portable", "offer", "host"]:
     target = "wasm32-unknown-unknown"
     metadata(name, target)
-    subprocess.run(["cargo", "check", "--locked", "--manifest-path",
+    subprocess.run(["cargo", "check", "--manifest-path",
                     str(base / name / "Cargo.toml"), "--target", target], check=True)

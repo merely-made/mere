@@ -48,7 +48,7 @@ Every phase below ends on these four, then its own:
    (`find . -name Cargo.lock` outside fixtures, receipts and `support/patches`), the resolved
    graph, `cargo metadata --format-version 1 --locked` with all features, has no package of
    repository A that depends on a package of repository B while a package of B depends on a
-   package of A. The P0 check (`scripts/check_family_cycles.py`) reports it and the
+   package of A. The P0 check (`house cycles`) reports it and the
    decision's allowlist entry is deleted in the same commit.
 2. **Consumers still build and test.** Locked `cargo check` and the targeted tests of every
    actual consumer of the moved item, in the repositories that consume it.
@@ -61,7 +61,7 @@ Every phase below ends on these four, then its own:
 
 ### P0. The cycle check
 
-Design in "Keeping cycles out" below. Done when: `scripts/check_family_cycles.py` and its
+Design in "Keeping cycles out" below. Done when: `house cycles` (Eidetic; it replaced `scripts/check_family_cycles.py`, 2026-11-12) and its
 tests exist; the check runs in the local gate; its allowlist names exactly the cycles open at
 that date (C1 to C6 below, plus the permanent isolated Genet/Murm entry) with this plan cited
 per entry; a synthetic two-repository fixture proves it fails on a new cycle and on a stale
@@ -1049,8 +1049,9 @@ client (the resident validated before serving).
 
 ## Keeping cycles out: the check
 
-`scripts/check_family_cycles.py`, with tests beside it in `scripts/test_check_family_cycles.py`
-(`test_cargo_mode.py` style). The text below is the original design; **as built (2026-11-08)** it
+`house cycles` (Eidetic). Until 2026-11-12 it was `scripts/check_family_cycles.py` with tests in
+`scripts/test_check_family_cycles.py`; those were deleted when `house cycles` took over with the same options,
+output and exit codes, and the dated Progress entries below name the script as it was. The text below is the original design; **as built (2026-11-08)** it
 differs in three ways, each because a lock cannot tell the kind of an edge:
 
 - The family-wide scope reads **manifests**, not locks: every `git = ".../merely-made/<repo>"` row
@@ -1065,7 +1066,7 @@ differs in three ways, each because a lock cannot tell the kind of an edge:
   graph, so what remains must be acyclic) and `[[isolated]]` (a manifest root left out of the family-wide
   graph), each with `decision` and `reason`. An entry on no cycle fails.
 
-Run it: `python3 scripts/check_family_cycles.py` (checkouts beside Mere; each directory is named by its
+Run it: `house cycles` (checkouts beside Mere; each directory is named by its
 `origin`, so worktree names do not matter), `--family-dir DIR`, or `--remote` (shallow-clones every
 `merely-made` repository; about 80 s). It needs `tomllib` (Python 3.11) and falls back to `tomli` or
 pip's vendored copy, which is what runs on this Mac's system Python 3.9. The original design follows.

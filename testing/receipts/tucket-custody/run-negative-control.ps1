@@ -38,7 +38,7 @@ $failure=$null
 try {
     [IO.File]::WriteAllText($sourcePath,$original.Replace($needle,$fallback))
     $mutated=(Get-FileHash $sourcePath).Hash
-    cargo build --locked --offline -p mere-signalman --example tucket_custody_receipt -j 2 *> (Join-Path $PSScriptRoot 'negative-build.log')
+    cargo build --offline -p mere-signalman --example tucket_custody_receipt -j 2 *> (Join-Path $PSScriptRoot 'negative-build.log')
     if($LASTEXITCODE -ne 0){throw 'Negative-control build failed.'}
     & (Join-Path $repo 'testing/run_tucket_custody.ps1') -HostBinary 'C:\t\cargo-targets\mere\debug\tucket-custody-receipt-host.exe' -ProbeBinary 'C:\t\cargo-targets\mere\debug\examples\tucket_custody_receipt.exe' -OutputDirectory (Join-Path $PSScriptRoot 'negative-control') -ExpectFallbackFailure
 } catch {$failure=$_}
@@ -48,7 +48,7 @@ finally {
     (Get-Item -LiteralPath $sourcePath).LastWriteTimeUtc=[DateTime]::UtcNow
     $restored=(Get-FileHash $sourcePath).Hash
     if($before -ne $restored){throw 'Exact source restoration failed.'}
-    cargo build --locked --offline -p mere-signalman --example tucket_custody_receipt -j 2 *> (Join-Path $PSScriptRoot 'restored-build.log')
+    cargo build --offline -p mere-signalman --example tucket_custody_receipt -j 2 *> (Join-Path $PSScriptRoot 'restored-build.log')
     $cleanExit=$LASTEXITCODE
     [ordered]@{before_sha256=$before;negative_sha256=$mutated;restored_sha256=$restored;clean_build_exit=$cleanExit;source_restored=($before -eq $restored)}|ConvertTo-Json|Set-Content (Join-Path $PSScriptRoot 'source-restoration.json')
     if($cleanExit -ne 0){throw 'Restored-source build failed.'}

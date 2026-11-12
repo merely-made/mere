@@ -25,7 +25,7 @@ env['CARGO_TARGET_DIR'] = r'C:\t\cargo-targets\mere'
 env['CARGO_BUILD_BUILD_DIR'] = r'C:\t\cargo-targets\mere\build'
 report_path = HERE / 'consumer-source-validation.json'
 previous = json.loads(report_path.read_text()) if os.environ.get('FAMILY_PROMOTION_RETRY_FAILED') and report_path.exists() else []
-results = [r for r in previous if not (r['exit_code'] or r.get('locked_exit_code') or r.get('source_issues'))]
+results = [r for r in previous if not (r['exit_code'] or r.get('source_issues'))]
 if previous:
     roots = {Path(r['root']) for r in previous if r not in results}
 for root in sorted(roots, key=lambda p: (p != HERE.parents[1], str(p))):
@@ -50,14 +50,11 @@ for root in sorted(roots, key=lambda p: (p != HERE.parents[1], str(p))):
             if len(values) != 1 or not all(f'https://github.com/merely-made/{family}.git?rev={revisions[family]}#' in value for value in values):
                 issues.append({'package': name, 'sources': sorted(values)})
         record.update(packages=len(data['packages']), promoted_sources={k: sorted(v) for k, v in sources.items()}, source_issues=issues)
-        locked = subprocess.run(command + ['--locked'], cwd=root, env=env, capture_output=True, text=True, errors='replace')
-        record['locked_exit_code'] = locked.returncode
-        record['locked_diagnostics'] = locked.stderr[-8000:]
-        print(f"Resolved {len(data['packages'])} packages; source issues {len(issues)}; locked exit {locked.returncode}", flush=True)
+        print(f"Resolved {len(data['packages'])} packages; source issues {len(issues)}", flush=True)
     else:
         print('Resolution failed: ' + p.stderr[-1600:], flush=True)
     results.append(record)
     (HERE / 'consumer-source-validation.json').write_text(json.dumps(results, indent=2) + '\n', encoding='utf-8')
-failed = [r for r in results if r['exit_code'] or r.get('locked_exit_code') or r.get('source_issues')]
+failed = [r for r in results if r['exit_code'] or r.get('source_issues')]
 print(f'Consumer roots: {len(results)}; unresolved roots: {len(failed)}', flush=True)
 raise SystemExit(bool(failed))

@@ -50,7 +50,6 @@ def verify(source_snapshot=None):
         assert hashlib.sha256(data).hexdigest() == entry["sha256"], entry["path"]
         assert hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest() == entry["git_blob"], entry["path"]
     receipt = read("receipt.json")
-    assert hashlib.sha256((source_root / receipt["cargo_lock"]).read_bytes()).hexdigest() == receipt["cargo_lock_sha256"], receipt["cargo_lock"]
     for entry in receipt["luggage_sources"]:
         assert hashlib.sha256((source_root / entry["path"]).read_bytes()).hexdigest() == entry["sha256"], entry["path"]
     for entry in receipt["evidence"]:

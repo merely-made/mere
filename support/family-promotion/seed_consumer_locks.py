@@ -25,7 +25,18 @@ roots.discard(BASE / 'isocosm')  # Its unpublished main commit is deliberately i
 roots.add(Path(r'C:\Users\mark_\Code\worktrees\isocosm-family-promotion'))
 report = []
 for root in sorted(roots):
-    files = subprocess.check_output(['git', 'ls-files', '--', 'Cargo.lock', '**/Cargo.lock'], cwd=root, text=True).splitlines()
+    # No lock is tracked: use the ones on disk (ignored or not); when the root has none, ask
+    # the resolved note of HEAD for it.
+    def lock_files():
+        listing = ['git', 'ls-files', '-c', '-o', '--', 'Cargo.lock', '**/Cargo.lock']
+        ignored = ['git', 'ls-files', '-o', '-i', '--exclude-standard', '--', 'Cargo.lock', '**/Cargo.lock']
+        found = subprocess.check_output(listing, cwd=root, text=True).splitlines()
+        found += subprocess.check_output(ignored, cwd=root, text=True).splitlines()
+        return sorted(set(found))
+    files = lock_files()
+    if 'Cargo.lock' not in files:
+        subprocess.run(['house', 'resolved', 'show', 'HEAD', '--write'], cwd=root, capture_output=True)
+        files = lock_files()
     for rel in files:
         path = root / rel
         if root == BASE / 'mere' and rel == 'Cargo.lock':

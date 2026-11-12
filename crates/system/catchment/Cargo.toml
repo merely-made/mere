@@ -43,7 +43,7 @@ eidetic = { workspace = true, optional = true }
 # Where personas and the identity wallet live under the shared root.
 sporran = { workspace = true, optional = true }
 # The platform data dir, for the family-shared root.
-dirs = { version = "5", optional = true }
+dirs = { version = "7", optional = true }
 serde_json = { version = "1", optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

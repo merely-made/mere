@@ -4,7 +4,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 # SPDX-License-Identifier: MPL-2.0
 
-"""Offline regression checks for nested lock selection and portable provenance."""
+"""Offline regression checks for nested lock selection."""
 import os
 import json
 from pathlib import Path
@@ -39,8 +39,7 @@ class CargoModeTests(unittest.TestCase):
             self.command(["cargo", "generate-lockfile", "--offline"], cwd=root)
         (self.root / ".cargo").mkdir()
         (self.root / ".cargo/config.toml").write_text('[alias]\nprobe = "check"\n')
-        self.command(["git", "add", "Cargo.toml", "Cargo.lock", "src", "nested"])
-
+        
     def command(self, args, cwd=None, success=True):
         result = subprocess.run(args, cwd=cwd or self.root, env=self.env,
                                 text=True, capture_output=True)
@@ -66,29 +65,6 @@ class CargoModeTests(unittest.TestCase):
         self.assertEqual(before, [(self.root / p).read_bytes() for p in ["Cargo.lock", "nested/Cargo.lock"]])
         self.mode("setup")  # Idempotent: preserve existing local resolution.
         self.assertEqual((self.root / ".cargo/local/Cargo.lock").read_bytes(), root_local)
-        self.mode("verify", "--metadata-only")
-
-    def test_portable_rejects_redirect_before_resolution(self):
-        self.mode("setup")
-        self.env["CARGO_RESOLVER_LOCKFILE_PATH"] = str(self.root / "elsewhere/Cargo.lock")
-        result = self.mode("verify", "--metadata-only", success=False)
-        self.assertIn("environment override", result.stderr)
-        self.env.pop("CARGO_RESOLVER_LOCKFILE_PATH")
-        (self.root / ".cargo/config.toml").write_text('[resolver]\nlockfile-path = "elsewhere/Cargo.lock"\n')
-        result = self.mode("verify", "--metadata-only", success=False)
-        self.assertIn("redirect-free", result.stderr)
-
-    def test_portable_rejects_external_path_package(self):
-        self.mode("setup")
-        external = self.root.parent / "external"
-        (external / "src").mkdir(parents=True)
-        (external / "src/lib.rs").write_text("")
-        (external / "Cargo.toml").write_text('[package]\nname="external"\nversion="0.1.0"\n')
-        with (self.root / "Cargo.toml").open("a") as manifest:
-            manifest.write('[dependencies]\nexternal = { path = "../external" }\n')
-        self.command(["cargo", "generate-lockfile", "--offline"])
-        result = self.mode("verify", "--metadata-only", success=False)
-        self.assertIn("Outside path package", result.stderr)
 
     def test_local_config_keeps_relative_patch_base(self):
         self.mode("setup")

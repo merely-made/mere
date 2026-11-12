@@ -26,9 +26,10 @@ $probeProcess=$null
 $activeRoot=$null
 $report=[ordered]@{schema=1;result='not_completed';device_id=$taskDevice;realm=$realm;source=(git -C (Join-Path $PSScriptRoot '..') rev-parse HEAD).Trim();host_sha256=(Get-FileHash $HostBinary).Hash.ToLowerInvariant();probe_sha256=(Get-FileHash $ProbeBinary).Hash.ToLowerInvariant();expected_fallback_failure=[bool]$ExpectFallbackFailure;cases=@();private_runtime_excluded=$true}
 $report.source_sha256=@{}
-foreach($sourcePath in @('Cargo.lock','ports/mere-resident/src/custody.rs','ports/mere-resident/src/bin/tucket_custody_receipt_host.rs','ports/signalman/src/authority.rs','ports/signalman/src/authority/tucket.rs','ports/signalman/examples/tucket_custody_receipt.rs','testing/run_tucket_custody.ps1')){
+foreach($sourcePath in @('ports/mere-resident/src/custody.rs','ports/mere-resident/src/bin/tucket_custody_receipt_host.rs','ports/signalman/src/authority.rs','ports/signalman/src/authority/tucket.rs','ports/signalman/examples/tucket_custody_receipt.rs','testing/run_tucket_custody.ps1')){
     $report.source_sha256[$sourcePath]=(Get-FileHash (Join-Path $PSScriptRoot "../$sourcePath")).Hash.ToLowerInvariant()
 }
+if(Test-Path -LiteralPath (Join-Path $PSScriptRoot '../Cargo.lock')){$report.source_sha256['Cargo.lock']=(Get-FileHash (Join-Path $PSScriptRoot '../Cargo.lock')).Hash.ToLowerInvariant()}
 function Wait-Ready([string]$Path,[Diagnostics.Process]$Process){
     $until=[DateTime]::UtcNow.AddSeconds(20)
     while(!(Test-Path -LiteralPath $Path)){

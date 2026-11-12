@@ -4,7 +4,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 # SPDX-License-Identifier: MPL-2.0
 
-# Ruled, documented repository back edges for scripts/check_family_cycles.py.
+# Ruled, documented repository back edges for `house cycles` (Eidetic).
 # Plan: design_docs/mere_docs/implementation_strategy/2026-11-06_cycle_breaks_plan.md
 #
 # [[edge]]     a directed repository pair (from names to) that the plan has ruled to

@@ -55,7 +55,10 @@ def main():
                "wasm_bindgen": subprocess.check_output(['wasm-bindgen', '--version'], text=True).strip(), "cases": {}}
     source_paths = subprocess.check_output(['git', 'ls-files', '-co', '--exclude-standard',
         'crates/conatus/seiche', 'crates/canvas/pictograph', 'crates/canvas/cartography', 'crates/system/state-witness',
-        'support/seiche-replay', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml'], cwd=ROOT, text=True).splitlines()
+        'support/seiche-replay', 'Cargo.toml', 'rust-toolchain.toml'], cwd=ROOT, text=True).splitlines()
+    # No lock is tracked: hash the one on disk when there is one (what this run resolved).
+    if (ROOT / 'Cargo.lock').is_file():
+        source_paths.append('Cargo.lock')
     results['source_sha256'] = {path: sha(ROOT / path) for path in sorted(set(source_paths)) if (ROOT / path).is_file()}
     results['worktree_status'] = subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True)
     (out / 'qualified-source.patch').write_bytes(subprocess.check_output(['git', 'diff', '--binary', 'HEAD'], cwd=ROOT))

@@ -106,11 +106,11 @@ cargo test -p mere-kernel    # single crate, by package name
 
 ### Portable and local dependencies
 
-The root `Cargo.lock` records the portable graph. Use `cargo check --workspace
---locked` for that graph. Python 3.11+ can additionally check configuration,
-package provenance and lock preservation with `python scripts/cargo_mode.py
-verify`. Run acceptance checks in a clean checkout with documented platform
-prerequisites; a local-path build is a separate receipt.
+No `Cargo.lock` is tracked. What cargo resolved for a commit rides on it as a
+git note: `house resolved show <commit>` prints it and `--write` puts it back
+as `Cargo.lock`. A lock on disk is used when it is there; otherwise cargo
+resolves afresh. Run acceptance checks in a clean checkout with documented
+platform prerequisites; a local-path build is a separate receipt.
 
 For sibling development, copy `.cargo/config.toml.example` to
 `.cargo/config.local.toml` and adjust its paths for your checkout layout. Existing
@@ -123,7 +123,7 @@ python scripts/cargo_mode.py local check --workspace
 python scripts/cargo_mode.py local check --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown
 ```
 
-The launcher requires Cargo 1.97+ and selects `<workspace>/.cargo/local/Cargo.lock`
+The launcher selects `<workspace>/.cargo/local/Cargo.lock`
 even with `--manifest-path`. Commands run from the selected workspace root;
 other relative command arguments are interpreted there. Local commands load
 root and nested local configs;

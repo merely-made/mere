@@ -208,7 +208,7 @@ records, and archived records remain as history. A batch record for a
 document the snapshot already covers is a later judgment and supersedes the
 snapshot's record for that document; the snapshot file itself is never edited
 (amended 2026-10-06, ruling S34 of the stack seams plan). Run
-`python scripts/mere_doc_judgment_audit.py` whenever an active document is
+`house doc-audit` whenever an active document is
 added, moved, or archived; the command must report full current-path coverage.
 
 ### Area roots

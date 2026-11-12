@@ -28,9 +28,9 @@ class HistoricalSource(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             snapshot = Path(directory) / "source"
             shutil.copytree(verify.INPUTS / "retained-source", snapshot)
-            lock = snapshot / "support/luggage-comparison/Cargo.lock"
-            lock.write_bytes(lock.read_bytes() + b"\n# changed\n")
-            with self.assertRaisesRegex(AssertionError, "Cargo.lock"):
+            source = snapshot / "crates/system/luggage/src/lib.rs"
+            source.write_bytes(source.read_bytes() + b"\n// changed\n")
+            with self.assertRaisesRegex(AssertionError, "lib.rs"):
                 verify.verify(snapshot)
 
 

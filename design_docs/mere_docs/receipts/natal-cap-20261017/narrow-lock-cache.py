@@ -20,6 +20,7 @@ for co in (original/'git/checkouts').iterdir():
   (dest/child.name).symlink_to(child,target_is_directory=child.is_dir())
 (home/'registry').symlink_to(original/'registry',target_is_directory=True)
 lock=pathlib.Path('Cargo.lock')
+if not lock.exists():subprocess.run(['house','resolved','show','HEAD','--write'],check=True)
 shutil.copyfile(lock,base/'narrow-Cargo.lock.before')
 inputs={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in pathlib.Path('.').rglob('Cargo.toml') if '.git' not in p.parts and 'target' not in p.parts}
 for p in [pathlib.Path('.cargo/config.toml'),pathlib.Path('ports/djinn/src/resident_mere.rs'),*pathlib.Path('ports/djinn/tests/fixtures').rglob('*')]:

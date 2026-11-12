@@ -10,7 +10,7 @@ Cargo.lock. The product workspace lock and Hocket pins stay untouched.
 
 ```powershell
 $env:LUGGAGE_COMPARISON_VERSION = '0.1.0'
-cargo build --locked --manifest-path support/luggage-comparison/Cargo.toml --bin merely-release-comparison --target-dir C:/t/cargo-targets/mere --jobs 1
+cargo build --manifest-path support/luggage-comparison/Cargo.toml --bin merely-release-comparison --target-dir C:/t/cargo-targets/mere --jobs 1
 C:/t/cargo-targets/mere/debug/merely-release-comparison.exe luggage
 ```
 
@@ -40,7 +40,7 @@ delta size from this toy payload is not an estimate for a Genet application.
 For TUF:
 
 ```powershell
-cargo build --locked --manifest-path support/luggage-comparison/Cargo.toml --features tuf --bin tuf-comparison --target-dir C:/t/cargo-targets/mere --jobs 1
+cargo build --manifest-path support/luggage-comparison/Cargo.toml --features tuf --bin tuf-comparison --target-dir C:/t/cargo-targets/mere --jobs 1
 C:/t/cargo-targets/mere/debug/tuf-comparison.exe C:/Users/mark_/Code/repos/mere/tests/fixtures/luggage-comparison/public
 ```
 

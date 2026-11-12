@@ -40,7 +40,7 @@ def run(args, name, *, env=None, timeout=180):
 
 def build(version):
     env = dict(os.environ, LUGGAGE_COMPARISON_VERSION=version)
-    run(["cargo", "build", "--locked", "--manifest-path", "support/luggage-comparison/Cargo.toml",
+    run(["cargo", "build", "--manifest-path", "support/luggage-comparison/Cargo.toml",
          "--bin", "merely-release-comparison", "--target-dir", TARGET, "--jobs", "1"],
         "build-" + version, env=env)
     inputs = WORK / "package-input"
