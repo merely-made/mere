@@ -737,7 +737,7 @@ Mark's answer follows each.
 - 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `graphshell/host/crates/cambium` to
   `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
   README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
-  theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
+  theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` *(historical citation)* <!-- doc-audit: historical-path --> now
   needs no toolkit carve-out. A proposal to print rather than refuse a dev-only link from a crate
   to a port (the web host's `shared_recovery` wasm example mounted the workshop) was put to Mark
   and reversed the same evening: **"the guard refuses dev-only crate-to-port links too"**, so the

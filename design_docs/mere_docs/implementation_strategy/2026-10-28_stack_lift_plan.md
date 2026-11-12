@@ -181,7 +181,7 @@ Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by t
 - 2026-10-28: the app-facing half of the port is the `door` feature on `graphshell-endpoint`; Signalman and `ports/dramatis` build without the `graphshell` package. Knot's recipe editor and the shared option helpers are siblings, not copies.
 - 2026-10-28: the `web_tree` views are page-shaped; twelve of its files call no browser API.
 - 2026-10-28: `capture` (consented browser-history intake into Mere and Eidetic memory) is not Turnstone's today and waits on the Eidetic plan's P0 inventory.
-- 2026-10-28: `scripts/check_port_boundaries.py` does not check dependency direction between ports, so Djinn depending on `graphshell` passes it.
+- 2026-10-28: `scripts/check_port_boundaries.py` *(historical citation)* <!-- doc-audit: historical-path --> does not check dependency direction between ports, so Djinn depending on `graphshell` passes it.
 
 - 2026-10-31: under each law with the scene's relations as edges, two linked triangles dealt alternately along a row (mean gap within a triangle, then across): Springs 170 and 307, Charge 173 and 437, Stress 170 and 306, Energy 116 and 712; unlinked, within exceeds across under each (Springs 673 and 509). A start with every card on one line leaves every force on that line, and the triangles do not separate (within 154, across 117). `crates/canvas/pictograph/src/canvas/board_camera.rs` holds the Springs case.
 

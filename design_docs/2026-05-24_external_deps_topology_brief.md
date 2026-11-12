@@ -54,7 +54,7 @@ fork's main) lives there alongside the `imaging` fork it depends on.
 The lattice has no CI, so a `git pull` (or an agent edit) in any sibling can
 break the others silently — the audit's standing "no net under the
 five-checkout lattice" gap. The net is
-[`repos/mere/scripts/cross-repo-smoke.ps1`](../scripts/cross-repo-smoke.ps1):
+[`repos/mere/scripts/cross-repo-smoke.ps1`](../scripts/cross-repo-smoke.ps1) *(historical citation)* <!-- doc-audit: historical-link -->:
 targeted `cargo check`s of the load-bearing crates in dependency order,
 innermost first (netrender → netfetcher → genet components → pelt → orrery →
 meerkat), so a failure names the repo that introduced it; `-Tests` adds the
@@ -80,14 +80,14 @@ owner moved `mark-ik` → `merely-made`, and on 2026-08-01
 genet and netrender, so every patch in it had been inert and the committed
 103 MB wasm artifact was built against the remotes rather than the sibling
 checkouts. Cargo does say so, as `patch ... was not used in the crate graph`.
-Read that warning; `scripts/cross-repo-smoke.ps1` now fails on it.
+Read that warning; `scripts/cross-repo-smoke.ps1` *(historical citation)* <!-- doc-audit: historical-path --> now fails on it.
 
 Note that these configs are gitignored, so a correction on one machine does not
 reach the others. Check each machine's own copy.
 
 The Meerkat runner scripts that this section used to describe
 (`scripts/meerkat.ps1` and its wrappers) were removed on 2026-08-01 with the
-app itself; `scripts/cross-repo-smoke.ps1` is the surviving local net.
+app itself; `scripts/cross-repo-smoke.ps1` *(historical citation)* <!-- doc-audit: historical-path --> is the surviving local net.
 
 ## Path-dep convention (`repos/` → `crates/`)
 

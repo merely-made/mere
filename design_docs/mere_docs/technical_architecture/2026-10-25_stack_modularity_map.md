@@ -243,7 +243,7 @@ the toolkit's token library. The 2026-10-08 theme-modes decision put the
 workshop under `graphshell/host/crates/cambium` so applications other than the Tabard port
 could embed it; a crate is embeddable from any directory, so the location is
 the open part: beside its desktop host under `ports/tabard/`, or left where it
-is with its specimens behind features. `scripts/check_port_boundaries.py`
+is with its specimens behind features. `scripts/check_port_boundaries.py` *(historical citation)* <!-- doc-audit: historical-path -->
 refuses a new unconditional toolkit-to-document-stack link.
 
 Ruled and landed 2026-10-26: Mark chose "beside its host"; the package is

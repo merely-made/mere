@@ -1090,7 +1090,7 @@ pip's vendored copy, which is what runs on this Mac's system Python 3.9. The ori
   root). A cycle not on the list fails; an entry no cycle uses fails too, so the list only
   shrinks. The report prints each cycle with the closing edge, the package pair, the
   manifest path and, where known, the feature that enables it.
-- **Gate.** Part of the local gate beside `scripts/check_port_boundaries.py`; the family-wide
+- **Gate.** Part of the local gate beside `scripts/check_port_boundaries.py` *(historical citation)* <!-- doc-audit: historical-path -->; the family-wide
   scope runs wherever the sibling clones exist and is skipped with a stated reason otherwise,
   and the per-root scope always runs. A pin-only repin triggers no new allowlist entry
   (hygiene plan).
