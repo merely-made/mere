@@ -149,25 +149,6 @@ impl Graph {
         true
     }
 
-    pub(super) fn semantic_statement_owner_keys(&self, statement_id: &str) -> Vec<RelationKey> {
-        self.inner
-            .inner()
-            .edge_references()
-            .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
-            .chain(
-                self.resource_relations()
-                    .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload)),
-            )
-            .filter(|(_, payload)| {
-                payload
-                    .assertions()
-                    .iter()
-                    .any(|statement| statement.statement_id == statement_id)
-            })
-            .map(|(key, _)| key)
-            .collect()
-    }
-
     /// Ensure an assertion by its L13 reason key. Method version and note may
     /// update on the same ID; a changed method IRI or evidence set creates a
     /// new independently withdrawable assertion.

@@ -62,6 +62,13 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
   38.4 MB at 100k with reifier rows stored, which answers the memory question for D1: deriving on read
   is not needed. That run was on a busy machine and is being repeated quietly. Open in P3:
   `externalize_expression_term` on a `FILTER` over a numeric literal. The refresh number opened P4 (D9).
+- Progress, 2026-11-12 (withdraw scan): the scan was `Graph::semantic_statement_owner_keys`, which walked every
+  Surface and Resource edge to find the buckets holding a statement id, and every withdrawal (and
+  `update_assertion_record`) called it. It now reads the handle index the way `find_semantic_statement` does
+  (indexed holders plus the dirty list, each checked, in scan order); no new structure, no persisted change.
+  `edit_withdraw` median of 3 runs, release: 0.081 ms to 0.0011 ms at 10k nodes and 4.40 ms to 0.0010 ms at
+  100k, flat in graph size. Machine busy only with this session's builds (none running during the runs). Test:
+  `withdrawals_match_a_scan_and_a_state_rebuilt_from_scratch` in `handle_index_tests.rs`.
 
 ## P4. Incremental maintenance
 

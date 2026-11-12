@@ -122,3 +122,76 @@ fn wholesale_facet_replacement_clears_the_index() {
     graph.install_facets(facets).unwrap();
     assert!(!available(&graph, ra, &property("legacy", "1")));
 }
+
+/// The pre-index owner lookup: walk every Surface and Resource relation.
+fn owners_by_scan(graph: &Graph, id: &str) -> Vec<RelationKey> {
+    use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+    graph
+        .inner
+        .inner()
+        .edge_references()
+        .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
+        .chain(
+            graph
+                .resource_relations()
+                .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload)),
+        )
+        .filter(|(_, payload)| payload.assertions().iter().any(|s| s.statement_id == id))
+        .map(|(key, _)| key)
+        .collect()
+}
+
+#[test]
+fn withdrawals_match_a_scan_and_a_state_rebuilt_from_scratch() {
+    let (mut graph, [a, b, c]) = three();
+    let mut ids = Vec::new();
+    for (i, (from, to)) in [(a, b), (b, c), (a, c), (a, b)].into_iter().enumerate() {
+        let spec = SemanticStatementSpec {
+            predicate: format!("https://example.test/vocab#p{i}"),
+            ..Default::default()
+        };
+        graph.assert_semantic_statement(from, to, spec);
+        let key = graph
+            .projected_relations_between(from, to)
+            .last()
+            .unwrap()
+            .0;
+        ids.push(
+            graph.get_relation(key).unwrap().assertions().last().unwrap().statement_id.clone(),
+        );
+    }
+    ids.push("absent".into());
+    // A reference graph clears its index before every operation, so each of
+    // its lookups is rebuilt from scratch; the live graph keeps its warm index.
+    let mut reference = graph.clone();
+    for id in &ids {
+        assert_eq!(graph.semantic_statement_owner_keys(id), owners_by_scan(&graph, id));
+    }
+    for id in &ids {
+        reference.clear_handle_index();
+        let live = graph.withdraw_semantic_assertion(id, Some(7), Some("urn:w".into()));
+        let rebuilt = reference.withdraw_semantic_assertion(id, Some(7), Some("urn:w".into()));
+        assert_eq!(live, rebuilt);
+        assert_eq!(live, id != "absent");
+        // A second withdrawal of the same id applies nothing.
+        assert!(!graph.withdraw_semantic_assertion(id, Some(8), None));
+        for probe in &ids {
+            assert_eq!(graph.semantic_statement_owner_keys(probe), owners_by_scan(&graph, probe));
+        }
+    }
+    for id in &ids {
+        assert_eq!(
+            graph.find_semantic_statement(id).map(|(k, s)| (k, s.withdrawn.clone())),
+            reference.find_semantic_statement(id).map(|(k, s)| (k, s.withdrawn.clone())),
+        );
+    }
+    // Interleave a fresh assert after withdrawals: the index still tracks it.
+    let spec = SemanticStatementSpec {
+        predicate: "https://example.test/vocab#late".into(),
+        ..Default::default()
+    };
+    graph.assert_semantic_statement(b, c, spec);
+    let (key, id) = statement_on(&graph, b, c);
+    assert_eq!(graph.semantic_statement_owner_keys(&id), owners_by_scan(&graph, &id));
+    assert!(graph.semantic_statement_owner_keys(&id).contains(&key));
+}

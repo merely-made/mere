@@ -163,6 +163,33 @@ impl Graph {
         self.resources.edge_mut(key)
     }
 
+    /// Every relation that retains `statement_id`, in scan order (Surface
+    /// edges, then Resource edges). Looked up through the handle index, not by
+    /// walking every edge; duplicates across buckets are all returned.
+    pub(super) fn semantic_statement_owner_keys(&self, statement_id: &str) -> Vec<RelationKey> {
+        let indexed = self
+            .handle_holders()
+            .relations
+            .get(statement_id)
+            .into_iter()
+            .flatten();
+        let mut keys: Vec<RelationKey> = indexed
+            .chain(&self.handle_index.dirty)
+            .copied()
+            .filter(|key| {
+                self.get_relation(*key).is_some_and(|payload| {
+                    payload
+                        .assertions()
+                        .iter()
+                        .any(|statement| statement.statement_id == statement_id)
+                })
+            })
+            .collect();
+        keys.sort_by_key(|key| scan_order(*key));
+        keys.dedup();
+        keys
+    }
+
     /// Locate any retained handle, including withdrawn history, independent of
     /// current nature. Use `find_held_semantic_statement` for default reads.
     pub fn find_semantic_statement(
