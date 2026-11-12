@@ -547,9 +547,10 @@ and full test suites beyond the app's lib tests and the moved tests.
     dependency; Turnstone builds the app; Mere's workspace holds the five crates and builds.
   - Landed 2026-11-11, pending consumers (U5): the receivers' branches and Mere's deletion
     (Progress, 2026-11-11). Turnstone receives the app in its U5 step (D121).
-- **U5, the consumers.** In strict order with Turnstone last (D121); Inker is an eighth consumer.
+- **U5, the consumers.** In strict order with Turnstone last (D121); Inker needed no change (D124).
   The 151 rows in Cleromancy, Isocosm, Knot, mer3ly, Murm, Woodshed and
   Turnstone are re-addressed to `graphshell.git` (D66) and their 20 lock roots relocked.
+  - Landed 2026-11-11 (Progress, 2026-11-11): six consumers relocked, then Turnstone with the app.
 - **U6, close.** Mere's residue goes: patch rows, line-ceiling exceptions (127 of 150 name
   leaving paths), scripts and hooks that name moved crates.
   - Done when: the family cycle checker passes, no Mere crate depends on `graphshell.git`, and
@@ -2608,3 +2609,26 @@ revision and what crosses at frame rate.
   exceptions left with their files, the query clippy hook checks `mere-rdf` alone, and the
   arXiv corpus rule left `.gitattributes`. Staying documents' path citations into the crates
   that left are U6's.
+- 2026-11-11: U5, the consumers (D121, D123, D124), all pushed as fast-forwards. One relock
+  commit each, no crates.io version moved in any lock, no bridge rows: Murm `fba8d83a` (6 rows,
+  signalman-desktop), Cleromancy `28801b73` (25 rows, 8 canvas lines to `mere-cartography`),
+  Knot `165dae81` (20 rows, 13 lines), Woodshed `8b726b69` (31 rows in 4 lock roots, 13 lines),
+  mer3ly `7952bad5` (18 rows), Isocosm `50accf72` (32 rows in 7 lock roots, 3 lines; rebased
+  onto a moving main and landed on the fast gates under D124). Inker's main names nothing from
+  mere.git and took no commit. Genet and Distillery are locked at the revisions Graphshell's
+  host lock records. Turnstone went last, `2672b635` on base `fd57dd3f`: the reference app at
+  `ports/graphshell` and `crates/graphshell/graphshell-mcp` with 612 new commits and no receipts
+  directory in its history, the five code-read receipts as test fixtures, Moot's half at
+  `ports/graphshell/examples/capsule-library`, three documents, the support harnesses, the three
+  carried patch rows, and Graphshell's hook set; 297 and 320 lib tests and 585 test attributes
+  match the dry run, and its lock takes only the five engine crates from mere.git. A second
+  commit per repo removed patch rows that were already unused, each proved by an unchanged lock
+  (Cleromancy `c7ca8ed0`, Knot `ef69aef0`, Woodshed `f96b878a`, Murm `111bdf9d`, mer3ly
+  `f5d6f06e`, Isocosm `413489b9`; Turnstone's 26 in `2672b635`). The family cycle checker, run
+  with `--remote` over 35 repositories and 94 lock roots at these heads, exits 0; it warns of a
+  resolved cycle inside three locks (Cleromancy, Graphshell `host/`, Turnstone) where athanor and
+  the resident meet in one graph. Failing identically before and after, not fixed: Turnstone's
+  48 Windows lib tests, Knot's 18, Cleromancy's `granted_ambient` and `authority_corpus`,
+  Isocosm's `family_network`, mer3ly's favicon test. Not verified: anything headed, Linux or
+  macOS, Mesocosm's long tests on the final base. Evidence: `Code/testing/engine-split/`
+  `slice4_u4_final.md`, `slice5_u5.md`, `slice5_app.md`. U6 remains.
