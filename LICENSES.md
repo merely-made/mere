@@ -99,21 +99,7 @@ line, and every upstream copyright line above it is kept verbatim. Apply with
 `--retain-notice`, which preserves foreign copyright lines while replacing
 Mark's own.
 
-| Path | Upstream | Notices kept |
-|---|---|---|
-| `crates/system/luggage` (moved to Eidetic 2026-10-19; see Source promotions below) | [cargo-packager-updater](https://github.com/crabnebula-dev/cargo-packager), MIT OR Apache-2.0 | `Copyright 2019-2023 Tauri Programme within The Commons Conservancy`; `Copyright 2023-2023 CrabNebula Ltd.` |
-
-Ruled 2026-08-27, on the brief's substantial-derivative precedent: tucket keeps
-MeshCore's MIT notice, and cambium and meristem go MPL-2.0 with the Apache
-notice retained. The Apache-2.0 sources are Linebender's `xilem_core` (all of
-meristem) and `xilem_web` (six cambium files: `splice.rs`, `optional_action.rs`,
-`text.rs`, `pod.rs`, `element.rs`, `event.rs`), each keeping `Copyright <year>
-the Xilem Authors`; the
-Xilem ledger (`graphshell/design_docs/cambium_docs/technical_architecture/upstream-xilem.md`)
-lists the files and the audit base. Both MIT and Apache-2.0 permit relicensing a derivative so
-long as the notice travels with it. luggage is published (0.1.0, MIT OR
-Apache-2.0); that version keeps its grant permanently and MPL-2.0 ships at its
-next functional bump, per the sweep plan's invariant 8.
+**None in this repository.**
 
 **This section is deliberately not the skip list.** The tool reads only the
 `## Retained licenses` and `## Frozen evidence` tables above. Adding a path
