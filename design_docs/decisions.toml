@@ -1455,6 +1455,14 @@ summary = "The door surface is checked on Fedora; the frame-receipt scripts move
 draws_on = ["engine-split D113", "engine-split D119", "engine-split D120"]
 plans = ["engine-split"]
 
+[decisions."engine-split D127"]
+title = "The close's second round (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The derivatives ruling is split into per-repo paragraphs that Mark reads first; the port-boundary check is split between Graphshell and Turnstone; two historical cross-repo scripts are deleted; the custody fixture generator moves to Graphshell if its hashes still match."
+draws_on = ["engine-split D125", "engine-split D126"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

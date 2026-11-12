@@ -2022,6 +2022,23 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D113, engine-split D119, engine-split D120 · plans engine-split P3 · summary The door surface is checked on Fedora; the frame-receipt scripts move to Graphshell; five pre-split defects are recorded as findings; licence rows follow their content to the repo that holds it.
 
+- **D127. The close's second round (Mark, 2026-11-11):** The docs lane's second pass is pushed
+  (Graphshell `21c9d70b`: broken relative links 45 to 0, citations resolving nowhere 130 to 5, a
+  `LICENSES.md` with 4 rows, `check-physics-engine-off.sh` and the four frame-receipt scripts
+  under `host/scripts`; Turnstone `b4961fdb`; Mere `4c91721ef`). Four rulings on what it stopped
+  at. Mere's "Ruled 2026-08-27" derivatives paragraph covers Xilem-derived code now in Graphshell
+  and tucket and luggage in Eidetic: "Split into per-repo paragraphs", over the recommended
+  verbatim copy; each paragraph is drafted beside the original and read by Mark before it is
+  committed. `check_port_boundaries.py`, three checks with two homes: "Split it in two
+  (Recommended)". `cross-repo-smoke.ps1` and `dr_c_receipts.py`: "Delete both", over the
+  recommended move of the smoke to Turnstone. The custody-projection fixture generator, already
+  failing in Mere: "Move the whole combined/ directory to Graphshell (Recommended)"; it is run
+  once there and committed only if its hashes match what the S79 receipts pin. Taken without a
+  question: each pre-split defect is recorded in the Findings of the Turnstone plan that owns
+  its surface. Outcome: applies D125, D126.
+
+  Links: area The stack · draws on engine-split D125, engine-split D126 · plans engine-split P3 · summary The derivatives ruling is split into per-repo paragraphs that Mark reads first; the port-boundary check is split between Graphshell and Turnstone; two historical cross-repo scripts are deleted; the custody fixture generator moves to Graphshell if its hashes still match.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
