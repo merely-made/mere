@@ -3,12 +3,8 @@
 # — `crates/probes/` is a separate workspace whose target/ is multi-GB.
 target/
 
-# Root portable lock is tracked. Nested locks remain explicitly opt-in while
-# their independent platform/fixture gates are inventoried.
+# No Cargo.lock is tracked; see scripts/record-resolved.sh.
 Cargo.lock
-!/Cargo.lock
-!/support/fixtures/armillary-consumer/Cargo.lock
-!/tests/fixtures/luggage-comparison/retained-source/support/luggage-comparison/Cargo.lock
 **/.cargo/local/
 **/.cargo/config.local.toml
 
@@ -102,9 +98,6 @@ __pycache__/
 
 # Claude Code agent worktrees (machine-local)
 .claude/
-
-# Reproducible independent consumer of the extracted observation core.
-!support/fixtures/apparatus-core-consumer/Cargo.lock
 
 # Installed JavaScript tooling dependencies are reproducible local output.
 node_modules/
