@@ -1487,6 +1487,14 @@ summary = "The coop harness gets a fixture custodian, a grant from Graphshell's 
 draws_on = ["engine-split D129"]
 plans = ["engine-split"]
 
+[decisions."engine-split D131"]
+title = "How a lock moves (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "From 2026-11-12 a lock moves only by a scoped cargo update -p, never by editing its text; the eight locks moved by substitution stand."
+draws_on = ["engine-split D119", "engine-split D124"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

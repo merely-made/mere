@@ -2086,6 +2086,22 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D129 · plans engine-split P3 · summary The coop harness gets a fixture custodian, a grant from Graphshell's own code, Turnstone-rooted two-repository builds and a single-machine baseline with a positive control, owned by a new Turnstone plan.
 
+- **D131. How a lock moves (Mark, 2026-11-12):** The P3 done-conditions check
+  (`Code/testing/engine-split/slice6_p3_doneconditions.md`) asked whether Graphshell's
+  `host/Cargo.lock`, still pinning mere.git `325b0083b`, should be relocked. That surfaced a
+  conflict: Mark had said on 2026-11-09, in another session and recorded nowhere, "Stop pinning.
+  Stop hand pinning. Stop editing locks.", while every relock of this split (U5's seven, the coop
+  harness's Turnstone move to Graphshell `aed944eb`) moved lock text by substitution under a
+  standing no-`cargo update` rule; no crates.io version moved in any of them. Put to Mark through
+  the first-reader session. Which rule governs moving a lock: "cargo update, scoped to packages
+  (Recommended)"; a lock moves by `cargo update -p <family package>`, cargo writes it, crates.io
+  versions stay unless a dependency requires it, and no lock text is edited. The eight locks
+  already moved by substitution: "Leave them; new rule from here (Recommended)"; they stand and
+  the harness lock lands as it is. Graphshell's `host/Cargo.lock` moves when a scoped update next
+  runs there. Outcome: refines D119, D124.
+
+  Links: area The stack · draws on engine-split D119, engine-split D124 · plans engine-split P3 · summary From 2026-11-12 a lock moves only by a scoped cargo update -p, never by editing its text; the eight locks moved by substitution stand.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
