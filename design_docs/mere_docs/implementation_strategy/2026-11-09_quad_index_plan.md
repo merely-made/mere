@@ -1,7 +1,7 @@
 # The quad index: implementation plan
 
 **Date**: 2026-11-09
-**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
+**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
 **Related**: the brief (the measurement in its §1, the shape in §3, the budget in §4); the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows); Eidetic's chartulary notes (`eidetic/design_docs/eidetic_docs/technical_architecture/2026-07-08_chartulary_g0.md` to `g2`); doctrine Stack 1, Stack 3, Stack 6, Stack 7.
 
 ## What the brief ruled, carried here
@@ -54,6 +54,29 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
 - Load, mutation, refresh and frame cost measured separately (engine split plan, Constraints). Incremental maintenance is opened as its own plan only if the refresh number at the scales the host sees demands it (D4); deriving reifier rows on read only if the memory number does (plan D1). Neither is started on a hunch.
 - Done when: the brief's §1 holds the 100k row and the refresh numbers, and each refinement either has a number that justified it or a line saying it was not needed.
 - Needs: P2; the kernel statement-id index session.
+- Progress, 2026-11-12: the engine split's P5 baseline (pre-fold, Mere `0f641d525`, `adapter_scale`'s
+  `edit_scale` table; brief §1, "P5 baseline (pre-fold)") holds the 100k row and the refresh numbers.
+  Refresh after one edit is a full rebuild: 243 ms at 10k nodes, 2.61 s at 100k. Per-edit assert is
+  0.004 and 0.010 ms, and `is_current` is under 1 µs. Withdraw is 0.12 ms at 10k and 5.0 ms at 100k
+  (40x for 10x the nodes, a scan in the kernel's withdraw path, chased in its own lane). The index is
+  38.4 MB at 100k with reifier rows stored, which answers the memory question for D1: deriving on read
+  is not needed. That run was on a busy machine and is being repeated quietly. Open in P3:
+  `externalize_expression_term` on a `FILTER` over a numeric literal. The refresh number opened P4 (D9).
+
+## P4. Incremental maintenance
+
+- The held index applies the kernel's captured deltas between two revisions instead of rebuilding.
+  The dictionary is append-only, so a new term takes the next dense id. An asserted quad is inserted
+  into the six orderings (a binary search and a shift). A withdrawal flips the row's held flag, which
+  the live view already skips, so nothing is removed and history stays one index (indexed-dataset D5).
+  `is_current` becomes "caught up to this revision". A full rebuild stays as the fallback and as the
+  oracle in tests.
+- Done when: after any sequence of asserts and withdrawals, the incrementally maintained index equals
+  a fresh `for_graph` (a property test over generated edit sequences); one edit at 100k nodes costs
+  under 1 ms through the index; the P5 baseline's refresh rows are rerun and recorded beside the old
+  ones.
+- Needs: the engine split's P5 fold landed (it moves the code this touches); the kernel's withdraw
+  scan fixed, since the kernel's per-edit cost is what a person then waits for.
 
 ## Decisions
 
@@ -90,3 +113,15 @@ D1 to D3 ruled 2026-11-09, one round, before the plan was written. D4 to D7 rule
 - **D8. Unknown query terms go through a per-query dictionary (Mark, 2026-11-10):** the P2 lane showed the plan's "maps to a reserved id" cannot hold: `spareval` internalizes every computed value (BIND, aggregates, VALUES) and compares ids for joins and grouping, so one shared id would merge them all. It built a per-query overflow dictionary whose ids sit above the held dictionary's, with a test over VALUES and grouping on a computed term. Against a side table on the held dataset: "Accept the per-query dictionary (Recommended)". The held dataset stays immutable and nothing grows across queries. Outcome: refines P2's wording; applies indexed-dataset D2 and D4.
 
   Links: area The stack · draws on indexed-dataset D2, indexed-dataset D4 · plans quad-index P2 · summary Terms a query computes or names that the dataset lacks are interned in a per-query dictionary above the held ids.
+
+- **D9. The refresh number opens incremental maintenance (first reader, 2026-11-12, listed to Mark):**
+  the indexed-dataset brief's D4 left incremental maintenance for "only when measured refresh cost
+  demands it", and P3 asked for the number at the scales the host sees. The P5 baseline answers it
+  without waiting for a host's edit rate: one edit costs a 243 ms rebuild at 10k nodes, past the
+  100 ms a person notices, and 10k nodes is a small browsing history; at 100k it is 2.6 s. So P4 is
+  opened, scheduled after the engine split's P5 fold, with its equality test as the done-condition.
+  The shape refines indexed-dataset D2 and D4 without reversing them: the append-only dictionary,
+  ordered inserts and the held-flag flip, with a rebuild as fallback and oracle. Outcome: applies
+  indexed-dataset D4; refines indexed-dataset D2.
+
+  Links: area The stack · draws on indexed-dataset D2, indexed-dataset D4 · plans quad-index P3, quad-index P4 · summary A 243 ms rebuild per edit at 10k nodes opens incremental index maintenance, after the P5 fold, proved equal to a fresh rebuild.

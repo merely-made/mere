@@ -1782,6 +1782,14 @@ summary = "Terms a query computes or names that the dataset lacks are interned i
 draws_on = ["indexed-dataset D2", "indexed-dataset D4"]
 plans = ["quad-index"]
 
+[decisions."quad-index D9"]
+title = "The refresh number opens incremental maintenance (first reader, 2026-11-12, listed to Mark)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-09_quad_index_plan.md"
+area = "The stack"
+summary = "A 243 ms rebuild per edit at 10k nodes opens incremental index maintenance, after the P5 fold, proved equal to a fresh rebuild."
+draws_on = ["indexed-dataset D2", "indexed-dataset D4"]
+plans = ["quad-index"]
+
 [decisions."ranged-fetch D1"]
 title = "One handle, three calls"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
