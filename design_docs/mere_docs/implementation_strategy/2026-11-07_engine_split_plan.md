@@ -480,8 +480,8 @@ layout and the ruling that put it there, then the verdict.
 - "the layout test's repin count is recorded." The test is the source homes map's "A test that
   compares layouts" ([source homes map](../technical_architecture/2026-10-28_source_homes_map.md)),
   adopted in Constraints, per phase. A repository counts when its pin or lock must move; the owning
-  repository is not counted, since the change is made there rather than repinned (reading accepted
-  2026-11-12). **Met by this record**, from the locks at Graphshell `ed2dc6e6`, Mere `08810f5d6`,
+  repository is not counted, since the change is made there rather than repinned (the first reader's reading of the test's own
+  words under the fork protocol, listed to Mark 2026-11-12; not a ruling). **Met by this record**, from the locks at Graphshell `ed2dc6e6`, Mere `08810f5d6`,
   Turnstone `c9efade0` and Knot `ef69aef` (receipts file): a change in a Graphshell toolkit crate
   reaches Turnstone by repinning **1** repository, Turnstone. Its lock holds graphshell.git once
   (`branch = "main"`, 47 packages), and every family row in its graph that names Graphshell
@@ -2832,8 +2832,8 @@ revision and what crosses at frame rate.
   `dr_c_receipts.py` deleted (`4b0acb7f1`); the four frame-receipt scripts went from Turnstone to
   Graphshell's `host/scripts` (Turnstone `b4961fdb`, Graphshell `21c9d70b`, D126). Mere's patch
   table holds no row for a moved crate; its line-ceiling file keeps 18 exceptions, none naming a
-  missing file, while its `[[exclude]] support/patches/` and `.prekignore`'s `/support/patches/`
-  still name the directory D119 deleted. Licences followed their content (D126 to D128): Graphshell's
+  missing file; its `[[exclude]] support/patches/` and `.prekignore`'s `/support/patches/`, which
+  named the directory D119 deleted, are dropped (2026-11-12). Licences followed their content (D126 to D128): Graphshell's
   `LICENSES.md` with four rows (`558cfa70`) and its part of the 2026-08-27 derivatives paragraph
   (`e1dbf762`), the rows gone from Mere (`2ddf02455`, `f5dd9c170`), tucket's sentence in Murm's
   notices (`f5759dbc`). The custody fixture's `combined/` moved to Graphshell (Mere `bb16a78b0`,

@@ -1,10 +1,6 @@
 # mere/design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md (H2); all physical source lines count.
 ceiling = 600
 
-[[exclude]]
-path = "support/patches/"
-reason = "Imported upstream crates with local integration patches; retain upstream source layout."
-
 [[exception]]
 path = "crates/graph/graph-kernel/src/graph/apply.rs"
 reason = "Apply. Existing source-size debt; a responsibility split must preserve GraphDelta, GraphDeltaResult and existing module visibility."
