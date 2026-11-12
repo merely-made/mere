@@ -2004,6 +2004,24 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D112, engine-split D119 · plans engine-split P3 · summary In the uxtree documents only present-tense paths are repointed; Graphshell's resolvable citations are fixed now and the rest marked historical; Mere drops its probes convention; scripts that served departed crates follow their nearest user or are deleted.
 
+- **D126. The headed pass's forks, and licences follow content (Mark, 2026-11-11):** The headed
+  pass (`Code/testing/engine-split/slice6_u6_headed.md`) built Turnstone `2672b635`, the app's web
+  root and Pelt `--locked` and ran them through their self-drive scenarios; a pre-split build
+  made the same day (Turnstone `ea971f17`, Mere `325b0083b`) shows the same frames, the web app
+  pixel-identical. Three rulings. The resident starting and the native viewer connecting over the
+  door has a macOS/Linux driver only: "Run it on the Fedora machine (Recommended)". The four
+  frame-receipt scripts went to Turnstone with the app but drive Cambium, now Graphshell's:
+  "Move them to Graphshell (Recommended)", which amends D120's placement of them. Five defects
+  that reproduce identically before the split (session saving fails on Windows with "Access is
+  denied", which is also Turnstone's 48 failing lib tests; the Roster pane runs off the window
+  edge; two stale web scenarios; Pelt's `reader` receipt; stale README screenshots): "Record as
+  findings, fix later (Recommended)". Separately, on the note that Graphshell has no
+  `LICENSES.md` while the rows for third-party content that moved there are still in Mere's:
+  "License for sure"; each row follows its content to the repo that now holds it, text verbatim.
+  Outcome: refines D120; applies D113, D119.
+
+  Links: area The stack · draws on engine-split D113, engine-split D119, engine-split D120 · plans engine-split P3 · summary The door surface is checked on Fedora; the frame-receipt scripts move to Graphshell; five pre-split defects are recorded as findings; licence rows follow their content to the repo that holds it.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

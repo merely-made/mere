@@ -1447,6 +1447,14 @@ summary = "In the uxtree documents only present-tense paths are repointed; Graph
 draws_on = ["engine-split D112", "engine-split D119"]
 plans = ["engine-split"]
 
+[decisions."engine-split D126"]
+title = "The headed pass's forks, and licences follow content (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The door surface is checked on Fedora; the frame-receipt scripts move to Graphshell; five pre-split defects are recorded as findings; licence rows follow their content to the repo that holds it."
+draws_on = ["engine-split D113", "engine-split D119", "engine-split D120"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
