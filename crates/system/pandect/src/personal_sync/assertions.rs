@@ -305,10 +305,7 @@ pub(super) fn retract_legacy(
                 edge.held_assertions()
                     .filter(|s| {
                         s.provenance_iri.as_deref() == Some(asserter)
-                            && kernel::graph::edge_payload::selector_matches_kind(
-                                selector,
-                                s.relation_kind(),
-                            )
+                            && mere::model::selector_matches_kind(selector, s.relation_kind())
                     })
                     .map(|s| s.statement_id.clone())
             })
