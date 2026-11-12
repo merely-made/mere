@@ -2179,6 +2179,26 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D119, engine-split D124 · plans engine-split P3 · summary From 2026-11-12 a lock moves only by a scoped cargo update -p, never by editing its text; the eight locks moved by substitution stand.
 
+- **D132. Where the parked probes go (Mark, 2026-11-12):** The probes sort
+  (`Code/testing/engine-split/probes_sort.md`) read the 19 local probes parked in `Code/probes` under
+  D125. They were untracked throwaways, so deleting one destroys its only copy. Six have one home
+  by subject and move there as tracked files if they build (the first reader's reading of D119 and
+  D121, listed to Mark): `rdf-kernel-footprint` to Mere, `webrtc-ping` to Murm,
+  `netrender-face-ceiling` to Netrender, `nexus-lbvh` to Seiche, `document-script-p0` and
+  `wasmtime-async-p1` to Graphshell. Three held only a stale `Cargo.lock` whose source is in Mere's
+  history (`mesh-lexical-wasm`, `pack-distribution`, `wing-three-paths`) and are deleted. Four
+  rulings, put to Mark by the first reader. The six that no longer build, needing the folded `quint`
+  and a patch the split deleted (`cubecl-repulsion`, `resident-diffusion`, `resident-graph`,
+  `ground-resident`, `resident-tracer-lease`, `seed-crystal`): "Archive, then remove
+  (Recommended)", into `Code/archive/engine-split-probes-2026-11-12`. `image-store-check`: "Mere now,
+  moves with D47 (Recommended)". `nexus-rbd`: "Seiche (Recommended)". `webrtc-join`: "Turnstone
+  (Recommended)", without its built `pkg/`. The archive answer refines D119's "delete what does not
+  build" for work that was never tracked. Separately, D121's two probes were prepared in a scratch
+  clone that was deleted before they were pushed; they are redone from `325b0083b`. Outcome: refines
+  D119; applies D121, D125.
+
+  Links: area The stack · draws on engine-split D119, engine-split D121, engine-split D125 · plans engine-split P3 · summary The parked probes move to the repository of their subject if they build there; the six that no longer build are archived under Code/archive; stale lock-only directories are deleted.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

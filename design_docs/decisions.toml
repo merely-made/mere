@@ -1495,6 +1495,14 @@ summary = "From 2026-11-12 a lock moves only by a scoped cargo update -p, never 
 draws_on = ["engine-split D119", "engine-split D124"]
 plans = ["engine-split"]
 
+[decisions."engine-split D132"]
+title = "Where the parked probes go (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The parked probes move to the repository of their subject if they build there; the six that no longer build are archived under Code/archive; stale lock-only directories are deleted."
+draws_on = ["engine-split D119", "engine-split D121", "engine-split D125"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
