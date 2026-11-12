@@ -2039,6 +2039,21 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D125, engine-split D126 · plans engine-split P3 · summary The derivatives ruling is split into per-repo paragraphs that Mark reads first; the port-boundary check is split between Graphshell and Turnstone; two historical cross-repo scripts are deleted; the custody fixture generator moves to Graphshell if its hashes still match.
 
+- **D128. The derivatives text, the custody fixture and the door build (Mark, 2026-11-11):** Five
+  rulings. Graphshell's part of the 2026-08-27 derivatives ruling, drafted by striking words only
+  (36 removed, none added): "Yes, as drafted (Recommended)". Eidetic, whose ledger already
+  carries its own paraphrase for luggage: "Leave Eidetic as it is (Recommended)". tucket is in
+  Murm, which keeps a `THIRD_PARTY_NOTICES.md`: "An entry in Murm's THIRD_PARTY_NOTICES.md
+  (Recommended)", the ruling's sentence verbatim. The custody fixture's regenerated manifest and
+  lock hashes differ from what the S79 receipt pins, and its sources already differed in Mere:
+  "Move it, mark the receipt historical (Recommended)", which settles D127's condition. The door
+  check on Fedora built the split cleanly (`--locked`, the first Linux build) but the harness
+  starts the resident without a custodian, which the resident has refused since custody isolation
+  on 2026-10-26: "Test build with in-process custody (Recommended)", harness unchanged. Outcome:
+  applies D126, D127.
+
+  Links: area The stack · draws on engine-split D126, engine-split D127 · plans engine-split P3 · summary Graphshell takes the derivatives paragraph with only words struck; Eidetic is unchanged; tucket's sentence goes into Murm's notices file; the custody fixture moves and its receipt is marked historical; the door surface is checked with an in-process-custody test build.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

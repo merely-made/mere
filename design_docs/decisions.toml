@@ -1463,6 +1463,14 @@ summary = "The derivatives ruling is split into per-repo paragraphs that Mark re
 draws_on = ["engine-split D125", "engine-split D126"]
 plans = ["engine-split"]
 
+[decisions."engine-split D128"]
+title = "The derivatives text, the custody fixture and the door build (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Graphshell takes the derivatives paragraph with only words struck; Eidetic is unchanged; tucket's sentence goes into Murm's notices file; the custody fixture moves and its receipt is marked historical; the door surface is checked with an in-process-custody test build."
+draws_on = ["engine-split D126", "engine-split D127"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
