@@ -1,0 +1,154 @@
+{
+  "schema": "graphshell.graph-codicil/v3",
+  "scope": "saved-scene",
+  "exported_at_ms": 1700000000000,
+  "graph": {
+    "nodes": [
+      {
+        "node_id": "00000000-0000-0000-0000-000000000001",
+        "address": {
+          "Http": "https://1.test/"
+        },
+        "url": "https://1.test/",
+        "cached_host": null,
+        "title": "https://1.test/",
+        "tags": [],
+        "tag_presentation": {
+          "ordered_tags": [],
+          "icon_overrides": {}
+        },
+        "import_provenance": [],
+        "is_pinned": false,
+        "session_state": {
+          "scroll_x": null,
+          "scroll_y": null,
+          "form_draft": null,
+          "last_visited_ms": null
+        },
+        "mime_hint": null,
+        "classifications": [],
+        "frame_layout_hints": [],
+        "frame_split_offer_suppressed": false,
+        "properties": [],
+        "derivations": [],
+        "body": null,
+        "last_session_visited": 0,
+        "nested": null
+      },
+      {
+        "node_id": "00000000-0000-0000-0000-000000000002",
+        "address": {
+          "Http": "https://2.test/"
+        },
+        "url": "https://2.test/",
+        "cached_host": null,
+        "title": "https://2.test/",
+        "tags": [],
+        "tag_presentation": {
+          "ordered_tags": [],
+          "icon_overrides": {}
+        },
+        "import_provenance": [],
+        "is_pinned": false,
+        "session_state": {
+          "scroll_x": null,
+          "scroll_y": null,
+          "form_draft": null,
+          "last_visited_ms": null
+        },
+        "mime_hint": null,
+        "classifications": [],
+        "frame_layout_hints": [],
+        "frame_split_offer_suppressed": false,
+        "properties": [],
+        "derivations": [],
+        "body": null,
+        "last_session_visited": 0,
+        "nested": null
+      }
+    ],
+    "edges": [
+      {
+        "from_node_id": "00000000-0000-0000-0000-000000000001",
+        "to_node_id": "00000000-0000-0000-0000-000000000002",
+        "families": [
+          "Semantic"
+        ],
+        "semantic": null,
+        "traversal": null,
+        "containment": null,
+        "arrangement": null,
+        "imported": null,
+        "provenance": null,
+        "assertions": [
+          {
+            "statement_id": "01a1cf98cf7e-0a45409b54a19fc8-0000000000000002",
+            "predicate": "https://mere.computer/ns/rel#cites",
+            "recognized_sub_kind": "Cites",
+            "provenance_iri": "https://mere.computer/ns/agent#unknown-legacy"
+          }
+        ]
+      }
+    ],
+    "import_records": [],
+    "timestamp_secs": 1794484260,
+    "fields": [],
+    "couplings": [],
+    "navigation": {
+      "snapshot": {
+        "entries": [],
+        "visits": [],
+        "owners": []
+      }
+    },
+    "resources": [],
+    "resource_edges": [],
+    "shown_resources": [],
+    "assertion_schema": 1
+  },
+  "facets": {
+    "nodes": {}
+  },
+  "scene": {
+    "name": "Codicil scene",
+    "selected": [
+      "00000000-0000-0000-0000-000000000001"
+    ],
+    "physics_paused": false,
+    "dynamics": {
+      "version": 9,
+      "x": [
+        0.1,
+        2
+      ]
+    },
+    "camera_offset": [
+      3.0,
+      4.0
+    ],
+    "camera_zoom": 0.5,
+    "default_handler": "graphshell.inspect",
+    "cartography": {
+      "positions": [
+        [
+          "00000000-0000-0000-0000-000000000001",
+          [
+            1.5,
+            -2.25
+          ]
+        ]
+      ],
+      "sizes": [],
+      "size_by_degree": false,
+      "size_by_importance": false,
+      "importance_metric": "",
+      "sprites": [],
+      "sprite_hulls": [],
+      "materials": [],
+      "faces": [],
+      "seed": null,
+      "regions": [],
+      "mosaic": null
+    }
+  }
+}

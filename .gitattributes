@@ -82,3 +82,6 @@ support/doc-audit/d2/batch_115_canvas_host_ownership.md -text
 crates/system/pandect/tests/fixtures/*.json text eol=lf
 
 # Authored IconVG byte goldens.
+
+# Fixtures written by pre-P4 code: byte-exact, no line-ending conversion.
+crates/system/pandect/tests/fixtures/pre_p4_** -text

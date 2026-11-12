@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "session_id": "00000000-0000-0000-0000-000000005e55",
+  "root_graph_id": "00000000-0000-0000-0000-0000000000c0",
+  "sub_graph_refs": [],
+  "display_name": "Donor",
+  "persona_id": "00000000-0000-0000-0000-000000000001",
+  "created_at": {
+    "secs_since_epoch": 1794484260,
+    "nanos_since_epoch": 723419600
+  },
+  "updated_at": {
+    "secs_since_epoch": 1794484260,
+    "nanos_since_epoch": 723628600
+  },
+  "parent_session": null,
+  "consolidated_codicils": [],
+  "last_consolidated_at": null,
+  "storage_path": null,
+  "forked_at": null,
+  "trashed": null,
+  "source_codicil": null,
+  "codicil_read_only": false,
+  "picked_from": null,
+  "lineage": "fork",
+  "merged": null
+}

@@ -1,0 +1,192 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "node_id": "00000000-0000-0000-0000-000000000001",
+        "address": {
+          "Http": "https://1.test/"
+        },
+        "url": "https://1.test/",
+        "cached_host": null,
+        "title": "https://1.test/",
+        "tags": [],
+        "tag_presentation": {
+          "ordered_tags": [],
+          "icon_overrides": {}
+        },
+        "import_provenance": [],
+        "is_pinned": false,
+        "session_state": {
+          "scroll_x": null,
+          "scroll_y": null,
+          "form_draft": null,
+          "last_visited_ms": null
+        },
+        "mime_hint": null,
+        "classifications": [],
+        "frame_layout_hints": [],
+        "frame_split_offer_suppressed": false,
+        "properties": [],
+        "derivations": [],
+        "body": null,
+        "last_session_visited": 0,
+        "nested": null
+      },
+      {
+        "node_id": "00000000-0000-0000-0000-000000000002",
+        "address": {
+          "Http": "https://2.test/"
+        },
+        "url": "https://2.test/",
+        "cached_host": null,
+        "title": "https://2.test/",
+        "tags": [],
+        "tag_presentation": {
+          "ordered_tags": [],
+          "icon_overrides": {}
+        },
+        "import_provenance": [],
+        "is_pinned": false,
+        "session_state": {
+          "scroll_x": null,
+          "scroll_y": null,
+          "form_draft": null,
+          "last_visited_ms": null
+        },
+        "mime_hint": null,
+        "classifications": [],
+        "frame_layout_hints": [],
+        "frame_split_offer_suppressed": false,
+        "properties": [],
+        "derivations": [],
+        "body": null,
+        "last_session_visited": 0,
+        "nested": null
+      },
+      {
+        "node_id": "00000000-0000-0000-0000-000000000003",
+        "address": {
+          "Http": "https://3.test/"
+        },
+        "url": "https://3.test/",
+        "cached_host": null,
+        "title": "https://3.test/",
+        "tags": [],
+        "tag_presentation": {
+          "ordered_tags": [],
+          "icon_overrides": {}
+        },
+        "import_provenance": [],
+        "is_pinned": false,
+        "session_state": {
+          "scroll_x": null,
+          "scroll_y": null,
+          "form_draft": null,
+          "last_visited_ms": null
+        },
+        "mime_hint": null,
+        "classifications": [],
+        "frame_layout_hints": [],
+        "frame_split_offer_suppressed": false,
+        "properties": [],
+        "derivations": [],
+        "body": null,
+        "last_session_visited": 0,
+        "nested": null
+      }
+    ],
+    "edges": [
+      {
+        "from_node_id": "00000000-0000-0000-0000-000000000001",
+        "to_node_id": "00000000-0000-0000-0000-000000000002",
+        "families": [
+          "Semantic"
+        ],
+        "semantic": null,
+        "traversal": null,
+        "containment": null,
+        "arrangement": null,
+        "imported": null,
+        "provenance": null,
+        "assertions": [
+          {
+            "statement_id": "01a1cf98cf71-0a45409b54a19fc8-0000000000000001",
+            "predicate": "https://mere.computer/ns/rel#cites",
+            "recognized_sub_kind": "Cites",
+            "provenance_iri": "https://mere.computer/ns/agent#unknown-legacy"
+          }
+        ]
+      }
+    ],
+    "import_records": [],
+    "timestamp_secs": 1794484260,
+    "fields": [],
+    "couplings": [],
+    "navigation": {
+      "snapshot": {
+        "entries": [],
+        "visits": [],
+        "owners": []
+      }
+    },
+    "resources": [],
+    "resource_edges": [],
+    "shown_resources": [],
+    "assertion_schema": 1
+  },
+  "facets": {
+    "nodes": {
+      "00000000-0000-0000-0000-0000000000c0": {
+        "arrangement.mosaic": {
+          "group_of": [
+            [
+              "00000000-0000-0000-0000-000000000003",
+              "g"
+            ]
+          ],
+          "group_order": [
+            "g"
+          ],
+          "member_order": [
+            "00000000-0000-0000-0000-000000000003",
+            "00000000-0000-0000-0000-000000000063",
+            "00000000-0000-0000-0000-000000000001"
+          ],
+          "scale": [
+            [
+              "00000000-0000-0000-0000-000000000003",
+              1.5
+            ]
+          ]
+        },
+        "arrangement.regions": [
+          {
+            "contour": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                10.0,
+                0.0
+              ],
+              [
+                10.0,
+                10.0
+              ]
+            ],
+            "label": "outside",
+            "members": [
+              "00000000-0000-0000-0000-000000000003",
+              "00000000-0000-0000-0000-000000000063"
+            ]
+          }
+        ],
+        "scene.importance_metric": "betweenness",
+        "scene.physics_damping": 6.25,
+        "scene.size_by_degree": true,
+        "scene.size_by_importance": false
+      }
+    }
+  }
+}
