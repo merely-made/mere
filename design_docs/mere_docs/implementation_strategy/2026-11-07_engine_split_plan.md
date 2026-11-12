@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D134 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D135 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -8,7 +8,7 @@ holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-fact
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
 P0's squishes have landed in part (D14, D26 to D28), and P4's stages in part (Findings, 2026-11-09); P4's
-done-conditions are read and its remaining owners ruled (D133, D134), and its work is under way. P5 to
+done-conditions are read and its remaining owners ruled (D133 to D135), and its work is under way. P5 to
 P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
@@ -2258,6 +2258,38 @@ revision and what crosses at frame rate.
   by scoped `cargo update -p` (D131). Outcome: applies P4; refines the P0 audit's candidates.
 
   Links: area The stack · draws on engine-split D79, engine-split D131 · plans engine-split P4 · summary Two of pandect's unruled sidecars are retired, settings go to the resident, web state to Turnstone, canvas facets to mere-cartography and incipit, policy to Dramatis; facet_store stays.
+
+- **D135. Where D134's moves land (Mark, 2026-11-12):** Carrying out D134, the move lane's map
+  (`Code/testing/engine-split/p4_lane_a.md`, at Mere `31bf7ab3b`, Graphshell `b957d819`) found five
+  places where the ruling could not be followed as worded. One went to Mark through the first
+  reader, because it contradicts D134. `arrangement_facets` to incipit's arrangement is infeasible:
+  incipit's arrangement is geometry-free by its own doc (`forme/arrangement.rs:95`), while
+  `arrangement_facets` stores positions, sizes, sprites, regions and mosaic over `NodeFacetStore`
+  and cartography's geometry types, and `mere-cartography` depends on incipit, so incipit cannot
+  name them. Ruling: "mere-cartography, with the canvas three (Recommended)"; all four canvas facet
+  modules land together in the canvas crate, with no new edge, and incipit's arrangement stays
+  geometry-free. The other four the first reader answered from existing rulings, listed to Mark.
+  First, pandect's `personal_sync` (`SaveScene`, `scenes`) and `product_codicil` embed the saved-scene
+  types, and pandect cannot name the canvas crate above it. So the sync events and the codicil
+  carry the scene opaquely, the pattern of D43, D44 and D79, with the wire bytes proved identical
+  over a fixture written before the change. The three saved-scene facet names stay public
+  constants in pandect, which reserves them, and `mere-cartography` imports them (Stack 6). Second,
+  "Turnstone's legacy adapter" was the option's label, not a module. Nothing in Turnstone bears
+  that name and `manifest_store` is the live store, so do not look for an adapter: `manifest_store`,
+  `web_facets` and `browser_node_state` go to Turnstone's `src/session/` and `denizen_facets` to
+  `src/denizen/` (Stack 1). Third, the generic fork copy is the existing namespace-blind
+  `copy_node_facets` over the container pair, replacing `copy_scene_facets`. A component fork now
+  carries regions, mosaic and saved-scene facets that name donor nodes it lacks, and a donor with
+  no scene facets no longer has defaults written; tests prove that a fork naming absent nodes
+  reopens, reads and projects without them appearing, that a facet-less donor's fork reads the same
+  defaults, and that a store written before the change reopens. Fourth, `notochord_policy_store`
+  goes to Dramatis's `sporran`, which holds `device_settings_store` and `PERSONAS_DIR` (Stack 1),
+  and its load and save take the persona's settings directory from the caller, so Dramatis gains
+  no pandect or Graphshell edge and never learns `PersonaId`. That follows the Constraints' "Nothing
+  lower names anything higher", cycle-breaks D6 and Stack 6, and a Graphshell host test loads a
+  policy file written by today's pandect through the new path. Outcome: refines D134.
+
+  Links: area The stack · draws on engine-split D43, engine-split D44, engine-split D79, engine-split D134 · plans engine-split P4 · summary All four canvas facet modules go to mere-cartography; pandect carries saved scenes opaquely; Turnstone takes its four in src/session and src/denizen; the fork copies container facets namespace-blind; the notochord store goes to sporran behind a directory API.
 
 ## Open questions
 

@@ -1519,6 +1519,14 @@ summary = "Two of pandect's unruled sidecars are retired, settings go to the res
 draws_on = ["engine-split D79", "engine-split D131"]
 plans = ["engine-split"]
 
+[decisions."engine-split D135"]
+title = "Where D134's moves land (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "All four canvas facet modules go to mere-cartography; pandect carries saved scenes opaquely; Turnstone takes its four in src/session and src/denizen; the fork copies container facets namespace-blind; the notochord store goes to sporran behind a directory API."
+draws_on = ["engine-split D43", "engine-split D44", "engine-split D79", "engine-split D134"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
