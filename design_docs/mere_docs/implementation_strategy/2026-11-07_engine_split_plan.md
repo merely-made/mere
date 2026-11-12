@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D135 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D136 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -8,7 +8,7 @@ holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-fact
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
 P0's squishes have landed in part (D14, D26 to D28), and P4's stages in part (Findings, 2026-11-09); P4's
-done-conditions are read and its remaining owners ruled (D133 to D135), and its work is under way. P5 to
+done-conditions are read and its remaining owners ruled (D133 to D136), and its work is under way. P5 to
 P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
@@ -2271,7 +2271,7 @@ revision and what crosses at frame rate.
   geometry-free. The other four the first reader answered from existing rulings, listed to Mark.
   First, pandect's `personal_sync` (`SaveScene`, `scenes`) and `product_codicil` embed the saved-scene
   types, and pandect cannot name the canvas crate above it. So the sync events and the codicil
-  carry the scene opaquely, the pattern of D43, D44 and D79, with the wire bytes proved identical
+  carry the scene opaquely (superseded by D136: the two wire types stay in pandect), the pattern of D43, D44 and D79, with the wire bytes proved identical
   over a fixture written before the change. The three saved-scene facet names stay public
   constants in pandect, which reserves them, and `mere-cartography` imports them (Stack 6). Second,
   "Turnstone's legacy adapter" was the option's label, not a module. Nothing in Turnstone bears
@@ -2290,6 +2290,33 @@ revision and what crosses at frame rate.
   policy file written by today's pandect through the new path. Outcome: refines D134.
 
   Links: area The stack · draws on engine-split D43, engine-split D44, engine-split D79, engine-split D134 · plans engine-split P4 · summary All four canvas facet modules go to mere-cartography; pandect carries saved scenes opaquely; Turnstone takes its four in src/session and src/denizen; the fork copies container facets namespace-blind; the notochord store goes to sporran behind a directory API.
+
+- **D136. The saved-scene wire types stay in pandect, and the old sha1 leaves (Mark, 2026-11-12):**
+  Two findings from carrying out D134 and D135, put to Mark by the first reader. First, D135's
+  reading that the sync events carry a scene opaquely was the first reader's, and it was wrong
+  to close it without Mark. The lane's fixtures, written by the code before the change, showed
+  that `serde_json::Value` cannot hold the old CBOR scene, because `selected: Vec<Uuid>` is
+  encoded as 16-byte byte strings. Re-encoding a product codicil also reorders its keys. Every
+  opaque form needs a byte-to-uuid heuristic and drops strict decoding at the sync boundary,
+  which the workspace data-formats rule (`Code/CLAUDE.md`, "Data formats": "CBOR at trust
+  boundaries, deterministic and strictly decoded where signed or hashed") cuts against. Ruling:
+  "The two wire types stay in pandect (Recommended)". `SavedSceneV2` and `CartographyGeometry`
+  are part of the sync grammar pandect owns (D69), so they stay there as its types, and
+  `mere-cartography` imports them. Decoding stays strict, the bytes are unchanged, and there is
+  one copy. The canvas logic in their files and the other modules still move. Second, in
+  Graphshell `host/` (at `b957d819`) a scoped `cargo update -p sporran` re-picked spareval's
+  `sha1` edge from 0.11.0 to 0.10.7, breaking the query-feature build (E0277). That happened
+  because two `sha1` versions were locked. The only holder of 0.10.7 is `str0m-rust-crypto` 0.6.0
+  under `str0m` 0.23.1 through `murm-webrtc` (`cargo tree --target all --all-features -i
+  sha1@0.10.7`). Who removes it: "I do it now (Recommended)"; the first reader bumps `str0m` in
+  Murm to 0.25, whose `str0m-rust-crypto` 0.7.0 is on `sha1` 0.11.0, and the scoped update reruns
+  after it. D131 stands, with one lesson for lane briefs. A scoped update can re-pick an edge only
+  where two versions of a crate are both locked, so a new third-party duplicate is worth removing
+  when it appears. A scoped update names every package of each family repository it moves, so
+  none is left split across two commits, as three of Eidetic's ten were. Outcome: refines D134,
+  D135; applies D69, D131.
+
+  Links: area The stack · draws on engine-split D69, engine-split D131, engine-split D134, engine-split D135 · plans engine-split P4 · summary SavedSceneV2 and CartographyGeometry stay in pandect as sync-grammar types with strict decoding; the old sha1 leaves by a str0m bump in Murm so scoped updates have nothing to re-pick.
 
 ## Open questions
 

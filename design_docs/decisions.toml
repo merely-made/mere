@@ -1527,6 +1527,14 @@ summary = "All four canvas facet modules go to mere-cartography; pandect carries
 draws_on = ["engine-split D43", "engine-split D44", "engine-split D79", "engine-split D134"]
 plans = ["engine-split"]
 
+[decisions."engine-split D136"]
+title = "The saved-scene wire types stay in pandect, and the old sha1 leaves (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "SavedSceneV2 and CartographyGeometry stay in pandect as sync-grammar types with strict decoding; the old sha1 leaves by a str0m bump in Murm so scoped updates have nothing to re-pick."
+draws_on = ["engine-split D69", "engine-split D131", "engine-split D134", "engine-split D135"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
