@@ -97,6 +97,10 @@ consumers whose direct edges changed. Heavy checks used the shared machine lock,
 execution limit. The retained timeout remains a failed overall gate, with its
 completed subcommands identified separately.
 
+Since the engine split (2026-11-11), the custody-projection fixture generator lives in
+`graphshell/host/support/fixtures/custody-projection/combined`; it no longer reproduces the
+hashes pinned here, which stand as the record of this run.
+
 ## Published receiving cohort
 
 | Repository / packages | Published commit | Receiving result |
