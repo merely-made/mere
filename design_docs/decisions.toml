@@ -1575,6 +1575,14 @@ summary = "P5 folds linked-data, the assertion model and the resource graph into
 draws_on = ["engine-split D4", "engine-split D59", "engine-split D65"]
 plans = ["engine-split"]
 
+[decisions."engine-split D142"]
+title = "The engine's stance on each linked-data standard (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Every linked-data standard in Mere's field has a ruled stance; P6 grows by framing, RDFa extraction, Update, granted federation, SHACL-SPARQL and its rules, and verify-only credentials."
+draws_on = ["engine-split D65", "engine-split D141"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

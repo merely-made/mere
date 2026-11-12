@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D141 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D142 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -717,6 +717,12 @@ shape violation, reopen the same revision with the same results.
   identity and proof verification have their own rows and gates; the lessons brief's D24 to
   D29 and D17 to D23 each name the module that carries them.
 - Needs: P5; the declared-lens plan for the pack format.
+- Scope, 2026-11-12 (D142): the standards ruled "engine" for P6 in the
+  [standards stance](../technical_architecture/2026-11-12_standards_stance.md) land here, each
+  behind its own ledger rows: JSON-LD Framing, RDFa and HTML extraction, SPARQL Update,
+  federation and remote-store reads under a per-endpoint grant, SHACL-SPARQL, SHACL SPARQL rules
+  lowered into pack rules, VC Data Integrity verification, VC-JOSE-COSE and SD-JWT if a maintained
+  library covers them, and did:webvh once lessons D19 is met.
 
 ### P7. The experience vocabulary as the first external pack
 
@@ -2487,6 +2493,30 @@ revision and what crosses at frame rate.
   Outcome: refines P5; applies D59, D4, D65.
 
   Links: area The stack · draws on engine-split D4, engine-split D59, engine-split D65 · plans engine-split P5 · summary P5 folds linked-data, the assertion model and the resource graph into a new mere crate inside Mere, with mere-kernel re-exporting until P8; frame cost is the engine's headless share and the budget stays with P8.
+
+- **D142. The engine's stance on each linked-data standard (Mark, 2026-11-12):** Asked whether later
+  phases cover additional standards, the plan placed the core (the RDF model and main syntaxes,
+  SPARQL query, RDFS and OWL RL, SHACL, RDFC-1.0, WebID and DID) and named nothing else. A draft gave
+  every standard in Mere's field a stance (engine, pack, host or out), a phase and a reason
+  (`Code/testing/engine-split/standards_stance_draft.md`), and argued it should be ruled before P5's
+  stage layout. Put to Mark as one round by the first reader. Ruling: "Accept with those four changes
+  (Recommended)". First, SHACL SPARQL rules (`sh:SPARQLRule`) are admitted as an input format that
+  lowers into pack rules, so one rule mechanism remains; SHACL functions and triple rules stay out
+  unless they lower as cheaply. Second, ShEx is out unless the SHACL library P6 adopts brings it free
+  (Stack 3), decided when that library is chosen. Third, federated query and the client side of the
+  SPARQL and Graph Store protocols are acquisition, with a per-endpoint grant refused by default,
+  because a federated query sends bindings from a person's graph to the endpoint. Fourth, two rows
+  were missing and are added with a proposed stance, listed to Mark. did:webvh is engine resolve and
+  verify, following the lessons brief's D5, D17 and D18 and gated by its D19 ("Wait for 1.0").
+  VC-JOSE-COSE and SD-JWT are verify only if a maintained library covers them at P6's library
+  choice, and out otherwise, by the security rule. Everything else stands as drafted: vocabularies
+  are packs, serving protocols are host, N3, the heavier OWL profiles, RIF, SWRL, CBOR-LD, HDT, TPF
+  and the tabular mappings are out, RDF/XML is parse-only, and proof verification is verify-only on
+  maintained crypto, with issuing in custody. The ruled table is
+  `mere_docs/technical_architecture/2026-11-12_standards_stance.md`. P5's seam is untouched; P6's
+  scope and the ledger's rows grow. Outcome: refines P6; applies D65, D141.
+
+  Links: area The stack · draws on engine-split D65, engine-split D141 · plans engine-split P5, engine-split P6 · summary Every linked-data standard in Mere's field has a ruled stance; P6 grows by framing, RDFa extraction, Update, granted federation, SHACL-SPARQL and its rules, and verify-only credentials.
 
 ## Open questions
 
