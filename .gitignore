@@ -12,12 +12,6 @@ Cargo.lock
 **/.cargo/local/
 **/.cargo/config.local.toml
 
-# Probes are throwaway experiments in a separate workspace. Ignore probe content
-# so it never clutters git status or lands in a `git add -A` (the multi-GB
-# p2panda / willow clones live here). Already-committed probes stay tracked;
-# `git add -f` to keep a new one, `git rm --cached` to drop one.
-/crates/probes/
-
 # Backup / swap files
 /support/family-promotion/lock-before/
 /support/family-promotion/consumer-refresh-preservation.json

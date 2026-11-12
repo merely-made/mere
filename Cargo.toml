@@ -10,9 +10,6 @@ members = [
     "crates/system/pandect",
     "crates/domain/personal-facts",
 ]
-exclude = [
-    "crates/probes",
-]
 
 [workspace.package]
 rust-version = "1.97.1"
