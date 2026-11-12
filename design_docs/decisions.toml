@@ -1471,6 +1471,14 @@ summary = "Graphshell takes the derivatives paragraph with only words struck; Ei
 draws_on = ["engine-split D126", "engine-split D127"]
 plans = ["engine-split"]
 
+[decisions."engine-split D129"]
+title = "The coop harness is repaired inside U6 (Mark, 2026-11-11)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The coop harness is brought up to custody isolation, admission by consent and the two-repository layout inside U6, forks first, and the split closes only when the door surface passes headed."
+draws_on = ["engine-split D113", "engine-split D128"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

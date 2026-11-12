@@ -2054,6 +2054,20 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D126, engine-split D127 · plans engine-split P3 · summary Graphshell takes the derivatives paragraph with only words struck; Eidetic is unchanged; tucket's sentence goes into Murm's notices file; the custody fixture moves and its receipt is marked historical; the door surface is checked with an in-process-custody test build.
 
+- **D129. The coop harness is repaired inside U6 (Mark, 2026-11-11):** The second Fedora run
+  (`Code/testing/engine-split/slice6_u6_door_fedora.md`) started the in-process-custody resident
+  on Linux after the split (sockets listening, status ready, unlocked), then the harness's seeding
+  step was refused at the door: "graphshell is not an application this device admits". Since
+  admission by consent (2026-11-01) a fresh profile admits no application until the owner
+  consents, and the harness cannot answer. `support/graphshell-coop` predates custody isolation
+  (2026-10-26), admission by consent and the split's two-repository layout. Offered recording the
+  door surface as blocked and closing, repairing the harness inside U6, or pre-seeding consent as
+  a second test-only shortcut: "Repair the harness now, inside U6", over the recommended
+  record-and-close. The repair is assessed first and its design forks come to Mark before code;
+  the split stays open until the door surface passes. Outcome: refines D113, D128.
+
+  Links: area The stack · draws on engine-split D113, engine-split D128 · plans engine-split P3 · summary The coop harness is brought up to custody isolation, admission by consent and the two-repository layout inside U6, forks first, and the split closes only when the door surface passes headed.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
