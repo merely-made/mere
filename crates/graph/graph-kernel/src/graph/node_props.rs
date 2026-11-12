@@ -14,7 +14,7 @@
 //! `node_projected_position`, `node_committed_position`,
 //! `projected_centroid`). Browser-runtime setters (session scroll,
 //! form draft, viewer override, compat mode, lifecycle) left with the
-//! `BrowserNodeState` sidecar (boundary pass slice C, 2026-07-09).
+//! Turnstone's `BrowserNodeState` sidecar (boundary pass slice C, 2026-07-09).
 //!
 //! Extracted from `graph/mod.rs` per the 2026-05-11 kernel
 //! decomposition pass. Lifecycle ops (`new`, `add_node`,

@@ -300,7 +300,7 @@ fn replacing_a_navigation_parents_history_keeps_the_branched_child() {
     Graph::from_snapshot(&graph.to_snapshot_at(0));
 }
 
-/// Scroll left the kernel Node for the host's BrowserNodeState sidecar
+/// Scroll left the kernel Node for Turnstone's BrowserNodeState sidecar
 /// (boundary pass slice C). What the kernel guarantees now: a legacy
 /// snapshot's `session_state` scroll/draft stay readable on the
 /// `PersistedNode` (the host's one-time migration source) and loading

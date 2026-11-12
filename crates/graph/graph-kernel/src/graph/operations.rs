@@ -163,7 +163,7 @@ impl Graph {
     //      `set_node_position` / `set_node_projected_position` (physics/view —
     //      positions are not graph truth), `set_current_session` (per-launch
     //      host wiring). Webview runtime state left the kernel entirely
-    //      (`BrowserNodeState` sidecar, boundary pass slice C).
+    //      (Turnstone's `BrowserNodeState` sidecar, boundary pass slice C).
     //   5. Test fixtures: the `fixtures` cargo feature re-exposes the raw
     //      structural mutators via `graph::fixtures::GraphFixtures` —
     //      dev-dependencies only, never a production enable. Navigation is not

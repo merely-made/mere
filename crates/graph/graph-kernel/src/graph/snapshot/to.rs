@@ -76,7 +76,7 @@ impl Graph {
                 legacy_favicon_rgba: None,
                 legacy_favicon_width: 0,
                 legacy_favicon_height: 0,
-                // Scroll / form draft left for the host's BrowserNodeState
+                // Scroll / form draft left for Turnstone's BrowserNodeState
                 // sidecar (boundary pass slice C); the snapshot now carries
                 // only the last-visited clock here. `session_state` itself
                 // stays for legacy readers and the one-time load migration.

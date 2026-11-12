@@ -2036,8 +2036,19 @@ pub fn picked_session_name(source: Option<&str>) -> String {
 /// donor's ids, including nodes outside the component, which the fork does not
 /// hold. Those ids are inert references; the host that opens the fork reads
 /// them against the fork's own nodes and may rewrite them. A donor container
-/// with no facets leaves the fork's with none, which reads as the defaults. The
-/// product-neutral half of Turnstone's tear-out; nested worlds and resident
+/// with no facets leaves the fork's with none, which reads as the defaults.
+///
+/// Audited 2026-11-12 (engine split D134): the facets any writer puts on a
+/// container id today are all canvas view state, none of which a fork must not
+/// inherit: `scene.size_by_degree`, `scene.size_by_importance`,
+/// `scene.importance_metric`, `scene.physics_damping` (Turnstone's older
+/// scenes), `graphshell.saved-scene/v4` (and the read-only `/v3`, `/v2`),
+/// `arrangement.regions` and `arrangement.mosaic`. No sharing or co-op
+/// enablement, sync or replication state, identity or denizen binding is keyed
+/// by a container; those ride per node, or beside the graph. A new container
+/// namespace that is not view state needs this carry revisited.
+///
+/// The product-neutral half of Turnstone's tear-out; nested worlds and resident
 /// admissions stay Turnstone's to carry. `None` when `seed` names no node;
 /// refused when the carried facets fail the handle rule. Native only, as the
 /// kernel's component copy is.

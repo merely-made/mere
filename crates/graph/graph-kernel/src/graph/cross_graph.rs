@@ -34,7 +34,7 @@ impl Graph {
     /// properties, address, visuals, viewer preferences) is cloned, while its
     /// **identity / runtime / session / arrangement** state is reset (fresh id,
     /// unpinned, no frame hints; browser-runtime state lives in the host's
-    /// `BrowserNodeState` sidecar and never travels with a copy). A
+    /// Turnstone's `BrowserNodeState` sidecar and never travels with a copy). A
     /// [`NodeDerivation`] records `(CopiedFrom, source.id, source_graph)` so the
     /// lineage survives and projects to a `wasDerivedFrom` statement.
     ///
