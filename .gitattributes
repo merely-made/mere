@@ -2,32 +2,8 @@
 # attempts a text diff on screenshots and the demo gif.
 assets/** binary
 
-# Graphshell receipts are deterministic proof artifacts. Keep their serialized
-# bytes stable across Windows and Unix checkouts.
-ports/graphshell/docs/receipts/*.html text eol=lf
-ports/graphshell/docs/receipts/*.json text eol=lf
-# Djinn compares the generated identity-card projection byte for byte.
-ports/graphshell/tests/fixtures/identity_cards.json text eol=lf
-ports/distillery/tests/fixtures/** text eol=lf
-# Tabard compares its Lagrange palette golden byte for byte (b7ed0bdc; row
-# followed the crate from ports/tabard, 2026-10-10).
-crates/system/tabard/tests/fixtures/** text eol=lf
-# Fixtures whose digests graphshell's web tests pin (site export, practice dataset).
-ports/graphshell/web/fixtures/** text eol=lf
-# OpenSSH key fixtures whose slot bytes a test compares to a pre-P4a baseline.
-ports/mere-resident/tests/fixtures/** text eol=lf
-# Snapshot JSON that castellan compares byte for byte (dramatis repo plan D32).
-
-# The Cambium component-catalog test compares the live render against these
-# captures byte for byte; autocrlf must not rewrite them on checkout (2026-09-03).
-crates/cambium/cambium/tests/fixtures/component_catalog_*.html text eol=lf
 tests/fixtures/luggage-comparison/** -text
-crates/cambium/cambium/examples/component_catalog.css text eol=lf
 
-# Preserve raw allocator diagnostic log bytes across checkout.
-ports/distillery/probe/receipts/2026-09-29_pre4_allocator_stop.log -text
-ports/distillery/probe/receipts/2026-09-30_pre4_allocator_control.log -text
-ports/distillery/probe/receipts/2026-09-30_pre4_allocator_completion_poll.log -text
 # Preserve the exact tested standalone dependency receipt across checkouts.
 design_docs/cambium_docs/testing/receipts/generated-names/graphshell-web-Cargo.lock.txt text eol=lf
 
@@ -37,20 +13,7 @@ design_docs/mere_docs/testing/receipts/2026-10-11_vello_releases/probe/src/main.
 # Exact fresh-device RGBA receipts must keep binary bytes across checkouts.
 design_docs/mere_docs/testing/receipts/2026-10-11_producer_gates/device-rehydration-qualified/*.rgba binary
 
-# Relationship/dynamics inspector receipts: stable raw logs and LF proof metadata.
-ports/graphshell/docs/receipts/relationship_dynamics_20261011/checks/*.log -text
-ports/graphshell/docs/receipts/relationship_dynamics_20261011/qualification.json text eol=lf
-ports/graphshell/docs/receipts/relationship_dynamics_20261011/harness/** text eol=lf
-
-# Node ladder proof logs and canonical text metadata across checkout platforms.
-# Keep Cargo diagnostic indentation verbatim in these evidence logs.
-ports/graphshell/docs/receipts/node_ladder_20261011/checks/*.log -text whitespace=-space-before-tab
-ports/graphshell/docs/receipts/node_ladder_20261011/qualification.json text eol=lf
-ports/graphshell/docs/receipts/node_ladder_20261011/harness/** text eol=lf
-
 # Djinn deployment scripts and immutable peer-qualification evidence.
-ports/mere-resident/install-linux.sh text eol=lf
-ports/mere-resident/install-ssh-server-windows.ps1 text eol=lf
 scripts/djinn-ssh-control.py text eol=lf
 design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.json text eol=lf
 design_docs/mere_docs/testing/receipts/djinn-ssh-peers/*.log -text whitespace=-space-before-tab
@@ -119,4 +82,3 @@ support/doc-audit/d2/batch_115_canvas_host_ownership.md -text
 crates/system/pandect/tests/fixtures/*.json text eol=lf
 
 # Authored IconVG byte goldens.
-crates/canvas/pictograph/tests/fixtures/symbols/*.iconvg binary

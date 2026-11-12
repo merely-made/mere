@@ -9,13 +9,6 @@ Cargo.lock
 !/Cargo.lock
 !/support/fixtures/armillary-consumer/Cargo.lock
 !/tests/fixtures/luggage-comparison/retained-source/support/luggage-comparison/Cargo.lock
-!/crates/script/app-host/guest/Cargo.lock
-!/crates/script/block-host/guest/Cargo.lock
-!/crates/script/authority-host/guest/Cargo.lock
-!/ports/moot/examples/capsule-library/guest/Cargo.lock
-# The browser viewer's standalone workspace: a host builds the plain viewer
-# with `--locked` from this lock (mer3ly site canvas plan, Ruling 157).
-!/ports/graphshell/web/Cargo.lock
 **/.cargo/local/
 **/.cargo/config.local.toml
 
@@ -103,14 +96,6 @@ __pycache__/
 # `**/.cargo/*` excludes the contents at every level without excluding the dirs.
 **/.cargo/*
 !/.cargo/config.toml.example
-# Portable committed configs (no redirects): every standalone wasm
-# workspace's cfg (burn plan 13.44, ruling 558).
-!/ports/graphshell/web/.cargo/config.toml
-!/ports/distillery/probe/.cargo/config.toml
-!/ports/distillery/probe/repros/burn_browser_embedding/.cargo/config.toml
-!/ports/distillery/probe/repros/cubek_browser_extrema/.cargo/config.toml
-!/ports/muniment-opfs-probe/.cargo/config.toml
-!/crates/cambium/examples/genet_web_smoke/.cargo/config.toml
 /target-*/
 
 # Isolated cargo homes created for dependency experiments — e.g.
@@ -121,15 +106,6 @@ __pycache__/
 # how this rule came to be written. Ignore the class rather than the one name.
 .cargo-*/
 
-# Local host receipts can contain machine addresses, key fingerprints, and
-# endpoint reachability details. Keep the raw resident-host rehearsal local.
-ports/graphshell/docs/2026-07-28_h4f_resident_device_host_receipt.md
-
-# The Circuit recipe's workspace graph is derived from `cargo metadata` by
-# `ports/distillery/tests/walk_fixtures.rs`, not authored. A committed copy
-# fell a generation behind every time a member was added (2026-09-03).
-ports/distillery/tests/fixtures/circuit/
-
 # Claude Code agent worktrees (machine-local)
 .claude/
 
@@ -138,7 +114,3 @@ ports/distillery/tests/fixtures/circuit/
 
 # Installed JavaScript tooling dependencies are reproducible local output.
 node_modules/
-
-# The mere:script WIT world lives in the Graphshell repository; document-host and
-# app-host materialise it here from graphshell-endpoint's build metadata.
-/crates/script/wit/
