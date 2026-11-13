@@ -82,10 +82,18 @@ name = "adapter_scale"
 required-features = ["query", "fixtures"]
 
 [[example]]
+name = "lens_dispatch"
+required-features = ["query", "fixtures"]
+
+[[example]]
 name = "join_scale"
 required-features = ["query"]
 
 [dev-dependencies]
+# The lens_dispatch probe loads the core pack and the workspace stand-in through
+# the real loader (declared-lens L3), which needs the authoring compiler and a key type.
+eidetic = { version = "0.0.3", default-features = false, features = ["pack-signing", "pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+identity.workspace = true
 # The examples' and the moved projection tests' SPARQL parity oracle.
 spareval = { version = "0.2.9", features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
 spargebra = { version = "0.4", features = ["sparql-12"] }
