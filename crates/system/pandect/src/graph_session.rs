@@ -53,7 +53,6 @@ use crate::graph_placement::{
     FrozenGraph, LegacyTranslationReceipt, PlacementProfile, SessionPlacement, source_digest,
 };
 use crate::manifest::{GraphSessionManifest, Lineage, MergedMark, TrashMark};
-#[cfg(not(target_arch = "wasm32"))]
 use crate::view_state::ViewState;
 
 /// Product-owned validation of a complete candidate before graph/history installation.

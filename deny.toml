@@ -110,10 +110,6 @@ crate = "hashbrown@0.15.5"
 reason = "petgraph 0.8.3 under portolan (eidetic, sibling); gone when petgraph moves to a current hashbrown"
 
 [[bans.skip]]
-crate = "hashbrown@0.16.1"
-reason = "quick_cache 0.6.24 under mere-lsm-tree and mere-fjall (eidetic, sibling); gone when quick_cache moves to a current hashbrown"
-
-[[bans.skip]]
 crate = "hax-lib@0.3.7"
 reason = "core-models 0.0.7 (libcrux, behind hpke-rs-rust-crypto 0.8.0, upstream); gone when libcrux aligns on hax-lib 0.4"
 
@@ -160,11 +156,3 @@ reason = "bindgen 0.72.1 via crabgrind 0.3.1 (upstream); gone when bindgen moves
 [[bans.skip]]
 crate = "syn@2.0.119"
 reason = "some sixty proc-macro crates (async-stream-impl, derive_more-impl, hax-lib-macros, irpc-derive and others, upstream) still on syn 2; gone as they move to syn 3"
-
-[[bans.skip]]
-crate = "thiserror@1.0.69"
-reason = "mere-proofs and stickleback (eidetic), mere-transport and murm-sync (murm), notochord and personae (dramatis), all siblings; gone when each moves to thiserror 2"
-
-[[bans.skip]]
-crate = "thiserror-impl@1.0.69"
-reason = "thiserror 1.0.69, held by the sibling repositories listed there; gone with thiserror 2"
