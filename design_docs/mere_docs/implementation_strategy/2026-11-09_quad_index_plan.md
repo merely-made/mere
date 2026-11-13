@@ -110,6 +110,23 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
   `for_graph`. The kernel captures a withdrawal as the pair's whole statement bucket
   (`capture_statement_bucket`), not as row changes, so the refresh has to re-project what an edit
   touched and diff it against the index.
+- Progress, 2026-11-12 (the fork answered): removal as a third input to `apply`, tombstoned in the
+  existing skip bitset until a rebuild compacts it, with `tombstones()` exposed and no threshold
+  inside chartulary; the flip path stays. Coordinator, relaying: "take (A)"; a projection change
+  "changes a history ruling and is not ours to make", and physical deletion "pays an insert's cost
+  for nothing a tombstone does not give". Eidetic `6cdc567` on `quads/incr`: random removals added to
+  the equality tests (breaking removal fails them), 126 chartulary tests; at 800k quads on a quiet run
+  0.30 ms per 8-row assert and 0.40 ms to remove 8 held rows and add 8 withdrawn ones. Its push to
+  `eidetic` main was refused by the session's permission check and waits on Mark.
+- Open before the Mere refresh is written (stopped 2026-11-12): one node's held quads re-project
+  alone (`node_dataset_quads` in `graph-kernel/src/rdf.rs`, which the full projection maps over every
+  node), and one bucket's withdrawn reifiers do too (`push_withdrawn_reifiers`). A pair's held quads
+  do not: they are re-projected only as part of the `from` node's quads. What has no answer yet is
+  the baseline to diff against. The index cannot name the rows a node contributed: reifier rows are
+  keyed by statement-id IRIs, and the reifier IRI of a retracted or removed statement survives only
+  inside a triple-term object. Identical rows from two sources (a surface node and a resource with
+  the same IRI) collapse into one row. The dataset receives deltas only from whoever holds the
+  graph's single recorder slot, and nothing ties them to the revision it was built at.
 
 ## Decisions
 
