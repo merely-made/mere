@@ -151,39 +151,33 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
         report.record("parser", manifest, "toRdf", &id, out);
 
         // Adapter layer: accept or reject through the offline-context entry point.
-        if opt["processingMode"] == "json-ld-1.0" {
-            report.record(
-                "adapter",
-                manifest,
-                "toRdf",
-                &id,
-                Outcome::Skip("processingMode json-ld-1.0: the adapter always runs 1.1"),
-            );
-            report.record(
-                "engine",
-                manifest,
-                "toRdf",
-                &id,
-                Outcome::Skip("processingMode json-ld-1.0: the engine always runs 1.1"),
-            );
-            continue;
-        }
-        let adapted =
-            mere::from_jsonld_with_contexts_and_base_iri(&bytes, cache.clone(), Some(&base));
-        let out = match (adapted, negative) {
-            (Err(err), true) if err.to_string().contains("refused remote @context") => {
-                Outcome::Skip("rejected only because a context lives outside the suite")
-            },
-            (Err(_), true) => Outcome::Pass,
-            (Ok(_), true) => Outcome::Fail("accepted".into()),
-            (Ok(_), false) => Outcome::Pass,
-            (Err(err), false) => Outcome::Fail(format!("rejected: {err}")),
+        let adapter_out = if opt["processingMode"] == "json-ld-1.0" {
+            Outcome::Skip("processingMode json-ld-1.0: the adapter always runs 1.1")
+        } else {
+            let adapted =
+                mere::from_jsonld_with_contexts_and_base_iri(&bytes, cache.clone(), Some(&base));
+            match (adapted, negative) {
+                (Err(err), true) if err.to_string().contains("refused remote @context") => {
+                    Outcome::Skip("rejected only because a context lives outside the suite")
+                },
+                (Err(_), true) => Outcome::Pass,
+                (Ok(_), true) => Outcome::Fail("accepted".into()),
+                (Ok(_), false) => Outcome::Pass,
+                (Err(err), false) => Outcome::Fail(format!("rejected: {err}")),
+            }
         };
-        report.record("adapter", manifest, "toRdf", &id, out);
+        report.record("adapter", manifest, "toRdf", &id, adapter_out);
 
         // Engine layer: `mere::parse_jsonld` through the offline cache, scored by dataset.
         {
-            let got = mere::parse_jsonld(&bytes, cache.clone(), Some(&base))
+            let options = mere::JsonLdOptions {
+                processing_mode: if opt["processingMode"] == "json-ld-1.0" {
+                    mere::ProcessingMode::JsonLd1_0
+                } else {
+                    mere::ProcessingMode::JsonLd1_1
+                },
+            };
+            let got = mere::parse_jsonld(&bytes, cache.clone(), Some(&base), options)
                 .map(|d| crate::rdf::dataset_of(&d));
             let out = if negative {
                 match &got {

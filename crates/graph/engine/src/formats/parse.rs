@@ -123,10 +123,41 @@ pub fn parse_rdfxml(bytes: &[u8], base_iri: Option<&str>) -> Result<IndexedDatas
     Ok(dataset(in_default_graph(triples)))
 }
 
-/// Parse **JSON-LD** 1.1 into a dataset (the `toRdf` algorithm), resolving
-/// relative IRIs against `base_iri`. A remote `@context` is served from
-/// `contexts` and never fetched; a URL absent from the cache is an error. The
-/// base is an expansion input, not a source-identity claim, as for
+/// The JSON-LD processing mode (JSON-LD 1.1 Processing Algorithms and API,
+/// `processingMode`): `json-ld-1.1` unless a document or caller asks for
+/// `json-ld-1.0`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum ProcessingMode {
+    /// `json-ld-1.0`: 1.1-only features (scoped contexts, `@nest`, `@included`,
+    /// `@json` and the rest) are not processed.
+    JsonLd1_0,
+    /// `json-ld-1.1`, the default.
+    #[default]
+    JsonLd1_1,
+}
+
+impl From<ProcessingMode> for oxjsonld::JsonLdProcessingMode {
+    fn from(mode: ProcessingMode) -> Self {
+        match mode {
+            ProcessingMode::JsonLd1_0 => Self::JsonLd1_0,
+            ProcessingMode::JsonLd1_1 => Self::JsonLd1_1,
+        }
+    }
+}
+
+/// What [`parse_jsonld`] takes besides the document, its contexts and base.
+/// The default is the 1.1 mode.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub struct JsonLdOptions {
+    /// The JSON-LD API's `processingMode` option.
+    pub processing_mode: ProcessingMode,
+}
+
+/// Parse **JSON-LD** into a dataset (the `toRdf` algorithm) in
+/// `options.processing_mode` (1.1 by default), resolving relative IRIs
+/// against `base_iri`. A remote `@context` is served from `contexts` and never
+/// fetched; a URL absent from the cache is an error. The base is an expansion
+/// input, not a source-identity claim, as for
 /// [`from_jsonld_with_contexts_and_base_iri`](crate::from_jsonld_with_contexts_and_base_iri).
 ///
 /// # Errors
@@ -137,8 +168,10 @@ pub fn parse_jsonld(
     bytes: &[u8],
     contexts: ContextCache,
     base_iri: Option<&str>,
+    options: JsonLdOptions,
 ) -> Result<IndexedDataset, IngestError> {
-    let mut parser = oxjsonld::JsonLdParser::new();
+    let mut parser =
+        oxjsonld::JsonLdParser::new().with_processing_mode(options.processing_mode.into());
     if let Some(base) = base_iri {
         parser = parser
             .with_base_iri(base)
@@ -153,7 +186,8 @@ pub fn parse_jsonld(
 }
 
 /// Parse `bytes` as `format`: the dispatch over the `parse_*` entry points.
-/// Text syntaxes must be UTF-8; `contexts` serves a JSON-LD remote `@context`.
+/// Text syntaxes must be UTF-8; `contexts` serves a JSON-LD remote `@context`,
+/// and JSON-LD runs in the default 1.1 mode (call [`parse_jsonld`] for 1.0).
 ///
 /// # Errors
 ///
@@ -172,7 +206,7 @@ pub fn parse(
         F::TriG => parse_trig(text()?, base_iri),
         F::NTriples => parse_ntriples(text()?, base_iri),
         F::NQuads => parse_nquads(text()?, base_iri),
-        F::JsonLd { .. } => parse_jsonld(bytes, contexts, base_iri),
+        F::JsonLd { .. } => parse_jsonld(bytes, contexts, base_iri, JsonLdOptions::default()),
         F::RdfXml => parse_rdfxml(bytes, base_iri),
         other => Err(IngestError::Parse(format!(
             "unsupported RDF format: {}",
@@ -229,10 +263,29 @@ mod tests {
             "http://c.example/ctx",
             br#"{"@context":{"name":"http://schema.org/name"}}"#.to_vec(),
         );
-        let ds = parse_jsonld(doc, cache, Some("http://x/")).unwrap();
+        let options = JsonLdOptions::default();
+        let ds = parse_jsonld(doc, cache, Some("http://x/"), options).unwrap();
         assert_eq!(rows(&ds), 1);
-        let err = parse_jsonld(doc, ContextCache::new(), Some("http://x/")).unwrap_err();
+        let err = parse_jsonld(doc, ContextCache::new(), Some("http://x/"), options).unwrap_err();
         assert!(err.to_string().contains("refused remote @context"));
+    }
+
+    #[test]
+    fn the_processing_mode_defaults_to_1_1_and_1_0_refuses_a_1_1_context() {
+        // `@version: 1.1` in a context is a processing mode conflict under json-ld-1.0.
+        let doc = br#"{"@context":{"@version":1.1,"name":"http://schema.org/name"},"@id":"http://a/","name":"n"}"#;
+        let parse = |mode| {
+            let options = JsonLdOptions {
+                processing_mode: mode,
+            };
+            parse_jsonld(doc, ContextCache::new(), None, options)
+        };
+        assert_eq!(rows(&parse(ProcessingMode::default()).unwrap()), 1);
+        assert_eq!(
+            JsonLdOptions::default().processing_mode,
+            ProcessingMode::JsonLd1_1
+        );
+        assert!(parse(ProcessingMode::JsonLd1_0).is_err());
     }
 
     #[test]
