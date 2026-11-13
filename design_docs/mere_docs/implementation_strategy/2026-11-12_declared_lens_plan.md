@@ -1,9 +1,9 @@
 # Declared-lens plan: packs, lenses and the engine's loader
 
 **Date**: 2026-11-12
-**Status**: plan, 2026-11-12, forks open. Nothing is built. Nine forks go to Mark as cards
-(Forks, "Mark's"); nine are argued for the first reader. The phases below start once the Mark
-forks they name are answered.
+**Status**: plan, 2026-11-12; L0 done the same day: Mark ruled M1 to M9, each on its
+recommendation (D1 to D9), and the first reader's R1 to R9 and the conflict readings stand as
+argued (D10). Nothing is built; L1 (the header in Eidetic) is next.
 **For**: the plan the [linked-data platform lessons brief](../research/2026-11-06_linked_data_platform_lessons_brief.md)
 owes. Its Open says of D2: "What remains is the stance doc rewrite ('closed lens' to 'declared
 lenses') and a declared-lens plan to carry the work. Neither is written yet." The
@@ -679,8 +679,45 @@ removes it.
 
 ## Decisions
 
-None yet. Answers to the forks are recorded here in answer order as `declared-lens D<n>`, in the
-words given, each with its outcome and a Links line.
+- **D1. A lens is a pack of kind `lens` (Mark, 2026-11-12):** M1. Ruling: "A pack of kind lens (Recommended)". A lens carries D10's header and goes through the same loader as every pack, so it gets identity, signing, pinning and loading with no record type of its own; the core pack is the user-agent lens. Outcome: new.
+
+  Links: area The stack · draws on linked-data-platform-lessons D2, linked-data-platform-lessons D10 · plans engine-split P6 · summary A declared lens is a pack of kind lens, with the shared header and loader.
+
+- **D2. Physics, theme and layout live in a host profile that pins a lens (Mark, 2026-11-12):** M2. Ruling: "Host profile pins a lens (Recommended)". The host profile is itself a pack; the engine never decodes it. This settles F18's "engine pack vs host presentation profile" and the plan's C1: physics is outside the lens whichever owner holds its presets. Outcome: new.
+
+  Links: area The stack · draws on linked-data-platform-lessons D2, linked-data-platform-lessons D10, engine-split D14 · plans engine-split P6 · summary A host-profile pack carries physics, theme and layout and pins a lens; the engine never reads it.
+
+- **D3. The release key is the one built-in signer; others are accepted per pack by install review (Mark, 2026-11-12):** M5. Ruling: "Release key + install review (Recommended)". The release key is held in custody (Dramatis) and its public key is built into the engine; any other signer is accepted per pack id through the host's install review, which pins the author key the way the authority guest's `Pin` does. This fills the gap between `pack.rs`'s "`Trusted` means *the signature verifies* — nothing more" and D20's "requires Trusted" (C5). Outcome: refines linked-data-platform-lessons D20.
+
+  Links: area The stack · draws on linked-data-platform-lessons D20 · plans engine-split P6 · summary Only the custody-held release key is trusted by default; any other pack signer is accepted per pack at install review.
+
+- **D4. Packs require each other by lower bound, and the resolved digests are recorded (Mark, 2026-11-12):** M6. Ruling: "Lower bounds + recorded digests (Recommended)". A pack's requirements are lower-bound SemVer; the exact digests a load resolved go into a selection record that scenes and the derived layer carry, the git-note pattern of D139 applied to data. This reconciles "stop pinning" with "select a pinned pack" (C4) and makes D10's `requires` typed, a pack requirement or a capability IRI (C3). Outcome: applies engine-split D139.
+
+  Links: area The stack · draws on engine-split D139, linked-data-platform-lessons D10, linked-data-platform-lessons D16 · plans engine-split P6 · summary Pack requirements are lower bounds; the digests a load resolved are recorded in a selection record.
+
+- **D5. A pack's canonical bytes are RFC 8949 §4.2.1 deterministic CBOR with text keys (Mark, 2026-11-12):** M3. Ruling: "§4.2.1, text keys (Recommended)". Core deterministic encoding, text keys, no tags, no floats in identity-bearing fields, a CDDL schema (RFC 8610), and strict decoding by re-encoding and comparing bytes. Metric: byte-identity round trips and strict-decode refusals. Outcome: refines linked-data-platform-lessons D20.
+
+  Links: area The stack · draws on linked-data-platform-lessons D20 · plans engine-split P6 · summary Packs are canonical RFC 8949 deterministic CBOR with text keys and a CDDL schema, decoded strictly.
+
+- **D6. Packs are signed with a detached COSE_Sign1 (Mark, 2026-11-12):** M4. Ruling: "COSE_Sign1 (Recommended)". RFC 9052 COSE_Sign1, detached, algorithm -19 (Ed25519, RFC 9864), `kid` a `did:key`, built on `coset` and the family's `ed25519-dalek` 3, carried in eidetic's trust envelope as a `cose-sign1:` binding; the cose-wg Sign1 examples are vendored under `Code/crates` as its vector suite. Outcome: refines linked-data-platform-lessons D20.
+
+  Links: area The stack · draws on linked-data-platform-lessons D20 · plans engine-split P6 · summary Pack signatures are detached COSE_Sign1 with Ed25519, judged against the cose-wg examples.
+
+- **D7. A rule's canonical form is its parsed form printed back (Mark, 2026-11-12):** M7. Ruling: "Re-serialized parsed form (Recommended)". The rule is parsed and printed with `spargebra`'s printer, and that UTF-8 text inside the CBOR is what the rule digest (lessons D25) covers. A printer change across `spargebra` versions moves digests and costs a derived-layer rebuild, which is accepted because that layer is always rebuildable. Outcome: applies linked-data-platform-lessons D25.
+
+  Links: area The stack · draws on linked-data-platform-lessons D25, engine-split D143 · plans engine-split P6 · summary Rule digests cover the rule as spargebra prints its parsed form.
+
+- **D8. A shapes graph's canonical form is RDFC-1.0 under a blank-node limit (Mark, 2026-11-12):** M9. Ruling: "RDFC-1.0 with a limit (Recommended)". Canonical N-Quads by RDFC-1.0 (`oxrdf`'s `rdfc-10`, engine-split D143 F-R7), under the loader's blank-node limit; RDF 1.2 triple terms are refused in shapes packs until RDFC supports them. Metric: the `rdf-canon` suite. Outcome: applies engine-split D143.
+
+  Links: area The stack · draws on engine-split D143 · plans engine-split P6 · summary Shapes-graph digests are RDFC-1.0 canonical N-Quads, with a blank-node limit and no triple terms yet.
+
+- **D9. The pack path may cost up to 5% of the headless frame share (Mark, 2026-11-12):** M8, a quantity. Ruling: "Within 5% (Recommended)", against 1.5% (P5's noise band) and 10%. L3's probe compares the enum path and the pack path in one run at 100k nodes; the core pack replaces the predicate enums only within that bound. Outcome: new.
+
+  Links: area The stack · draws on engine-split D141 · plans engine-split P6 · summary Pack-driven predicate lookup may cost at most 5% of the engine's headless frame share at 100k nodes.
+
+- **D10. The first reader's forks and the conflict readings (first reader, 2026-11-12, listed to Mark):** Decided as argued in Forks, "The first reader's": R1, the body types live in `eidetic::pack` beside the header, so Knot reads the core pack without the engine (which also settles C7); R2, the core pack's axis defaults; R3, the three v1 consumers convert in lockstep and v1 is deleted; R4, a pack id is an absolute IRI; R5, the loader's modules are `mere::profile::{pack, resolve, intern, lens, load}`; R6, terms, rules and shapes inline, wasm, scripts and assets by digest; R7, the pack tool starts as an example binary in eidetic with keys from custody; R8, diagnostics are a typed enum with a location; R9, RDFS and OWL 2 RL ship as first-party rules packs. The conflict readings stand as written in Conflicts: C2 (the workspace terms go to Graphshell's pack, not the core pack, since P7 is newer and more specific) and C6 (a pack's identity is its CBOR; engine-side caches are postcard behind `mere-framing`). Eidetic's chartulary split landed after the plan was read (Eidetic `33e0c9a`: `portolan`, `hodograph`, `quadstore`, `fieldbook`); the plan puts nothing in those crates, so the split does not move it. Outcome: refines linked-data-platform-lessons D10, D12, D20; applies engine-split D143.
+
+  Links: area The stack · draws on linked-data-platform-lessons D10, linked-data-platform-lessons D12, linked-data-platform-lessons D20, engine-split D143 · plans engine-split P6 · summary The pack body types live in eidetic::pack, the loader in mere::profile, RDFS and OWL RL ship as rules packs, and v1 is converted in lockstep and deleted.
 
 ## Findings
 
@@ -705,3 +742,4 @@ words given, each with its outcome and a Links line.
 ## Progress
 
 - 2026-11-12: plan written on branch `lens-plan`; forks open; nothing built.
+- 2026-11-12: L0 done. Mark ruled M1 to M9 in two card rounds and a third for the quantity, every one on its recommendation (D1 to D9); the first reader's forks and conflict readings recorded as D10. The lessons brief's Open and engine split P6's Needs line link here. Landed on Mere main.

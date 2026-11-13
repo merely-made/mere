@@ -448,6 +448,86 @@ area = "stack"
 summary = "Dramatis serves its roster and quarantine review as portable cards plus bounded action forms that hosts present as a pane, in process until the stdio carrier authenticates its peer; the window application is removed."
 draws_on = ["stack.3"]
 
+[decisions."declared-lens D1"]
+title = "A lens is a pack of kind `lens` (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "A declared lens is a pack of kind lens, with the shared header and loader."
+draws_on = ["linked-data-platform-lessons D2", "linked-data-platform-lessons D10"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D2"]
+title = "Physics, theme and layout live in a host profile that pins a lens (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "A host-profile pack carries physics, theme and layout and pins a lens; the engine never reads it."
+draws_on = ["engine-split D14", "linked-data-platform-lessons D2", "linked-data-platform-lessons D10"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D3"]
+title = "The release key is the one built-in signer; others are accepted per pack by install review (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Only the custody-held release key is trusted by default; any other pack signer is accepted per pack at install review."
+draws_on = ["linked-data-platform-lessons D20"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D4"]
+title = "Packs require each other by lower bound, and the resolved digests are recorded (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Pack requirements are lower bounds; the digests a load resolved are recorded in a selection record."
+draws_on = ["engine-split D139", "linked-data-platform-lessons D10", "linked-data-platform-lessons D16"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D5"]
+title = "A pack's canonical bytes are RFC 8949 §4.2.1 deterministic CBOR with text keys (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Packs are canonical RFC 8949 deterministic CBOR with text keys and a CDDL schema, decoded strictly."
+draws_on = ["linked-data-platform-lessons D20"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D6"]
+title = "Packs are signed with a detached COSE_Sign1 (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Pack signatures are detached COSE_Sign1 with Ed25519, judged against the cose-wg examples."
+draws_on = ["linked-data-platform-lessons D20"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D7"]
+title = "A rule's canonical form is its parsed form printed back (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Rule digests cover the rule as spargebra prints its parsed form."
+draws_on = ["engine-split D143", "linked-data-platform-lessons D25"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D8"]
+title = "A shapes graph's canonical form is RDFC-1.0 under a blank-node limit (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Shapes-graph digests are RDFC-1.0 canonical N-Quads, with a blank-node limit and no triple terms yet."
+draws_on = ["engine-split D143"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D9"]
+title = "The pack path may cost up to 5% of the headless frame share (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Pack-driven predicate lookup may cost at most 5% of the engine's headless frame share at 100k nodes."
+draws_on = ["engine-split D141"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D10"]
+title = "The first reader's forks and the conflict readings (first reader, 2026-11-12, listed to Mark)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The pack body types live in eidetic::pack, the loader in mere::profile, RDFS and OWL RL ship as rules packs, and v1 is converted in lockstep and deleted."
+draws_on = ["engine-split D143", "linked-data-platform-lessons D10", "linked-data-platform-lessons D12", "linked-data-platform-lessons D20"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"

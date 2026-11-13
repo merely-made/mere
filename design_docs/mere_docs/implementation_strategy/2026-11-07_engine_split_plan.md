@@ -752,7 +752,7 @@ shape violation, reopen the same revision with the same results.
 - Done when: the thin slice passes as a test; SHACL and RDFC-1.0 rows exist with results;
   identity and proof verification have their own rows and gates; the lessons brief's D24 to
   D29 and D17 to D23 each name the module that carries them.
-- Needs: P5; the declared-lens plan for the pack format.
+- Needs: P5; the [declared-lens plan](2026-11-12_declared_lens_plan.md) for the pack format (written and its forks ruled 2026-11-12; its L1 to L5 build what the pack loader and the thin slice's pack step need).
 - Scope, 2026-11-12 (D142): the standards ruled "engine" for P6 in the
   [standards stance](../technical_architecture/2026-11-12_standards_stance.md) land here, each
   behind its own ledger rows: JSON-LD Framing, RDFa and HTML extraction, SPARQL Update,

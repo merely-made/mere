@@ -319,7 +319,7 @@ choices still open on how we carry it are listed under Open.
 | Per-stage validators, sorted-graph hash | [graph semantics plan](../implementation_strategy/2026-10-28_graph_semantics_plan.md), resource strata |
 | Edit intent as marked pattern, RDF/POST PULL | the application experience plan's intent seam |
 | Plan-then-Execute assistant writes | dramatis custody |
-| Declared lenses (D2) | the stance doc rewrite and a plan, after the survey |
+| Declared lenses (D2) | the stance doc rewrite; the plan is the [declared-lens plan](../implementation_strategy/2026-11-12_declared_lens_plan.md), its forks ruled 2026-11-12 |
 | WebID ADOPT, maturity principle (D4); did:webvh (D5) | the standards survey; doctrine Stack 3 |
 | Axes closed, names open; classes in packs; generated ids (D6–D8) | doctrine Stack 3; the declared-lens plan after the survey |
 
