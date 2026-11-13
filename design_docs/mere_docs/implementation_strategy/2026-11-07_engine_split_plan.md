@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-13: D1 to D145 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-13: D1 to D147 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2642,6 +2642,14 @@ revision and what crosses at frame rate.
 - **D145. P8's "the engine" is the Mere workspace (Mark, 2026-11-13):** P8's first done-condition reads "neither product pins `mere.git` for anything but the engine". At Turnstone and Knot `origin/main` the remaining `mere.git` rows name `mere-kernel`, `pandect` and `catchment`, Mere workspace crates but not the `mere` engine crate, so the condition turned on whether "the engine" meant the crate or the workspace. Ruling: "i would say the mere workspace, like the genet workspace". So a product may take any crate of Mere's workspace from `mere.git`, as it takes Genet's crates from Genet's; what P8 removes is any pin of `mere.git` for something that has left for Graphshell, Inker or Seiche, or a reading pin of an old Mere revision for a moved crate. Outcome: refines P8's done-condition reading.
 
   Links: area The stack · draws on engine-split D4 · plans engine-split P8 · summary P8's "anything but the engine" means anything outside Mere's workspace: products may take Mere's workspace crates from mere.git, as they take Genet's from Genet.
+
+- **D146. P8 moves the kernel's surface half, after the contract (Mark, 2026-11-13):** P8 assessment F1 (`Code/testing/engine-split/p8_assessment.md`). D59 deferred `mere-kernel`'s split with "the split follows the engine-to-workspace contract"; D141 has the kernel's re-exports and `kernel::rdf` "leave with the kernel at P8"; declared-lens L7 leaves `predicate_declarations.rs` in the kernel "until P8 moves it"; P8's own text named none of it. Asked whether P8 includes the move: "Yes, after the contract (Recommended)", against "No, a later phase". So P8 writes the contract and passes its three probes first, then moves the kernel's surface half to Graphshell as its last step, and lens L7's removal of the workspace enums rides on that move. Outcome: refines P8's scope; applies D59, D141.
+
+  Links: area The stack · draws on engine-split D59, engine-split D141 · plans engine-split P8 · summary P8 ends by moving mere-kernel's surface half to Graphshell, after the engine-to-workspace contract and its probes.
+
+- **D147. P8's third probe tests content: an arrangement edit leaves every Resource-stratum quad unchanged (Mark, 2026-11-13):** P8 assessment F5. The probe "an arrangement edit leaving the revision alone" reads two ways: arrangement as view state (`set_view` writes at the current journal cursor without advancing it, `graph_session.rs:1875-1900`), or arrangement as graph edges (`FrameMember`, `TileGroup`, `SplitPair`, Surface stratum, exported as RDF, and P7's "a layout grouping exports as RDF"), which are journal edits and do move the cursor. Offered: "Resource quads unchanged (Recommended)", "Arrangement is view state", "Per-stratum revision". Ruling: "I'm ok with 1. Are you considering different strata different views with entities/resources/local content (another strata; locally saved content?) connected by edges? Eh. 1 is probably fine". So an arrangement edit may advance the cursor, and the probe compares a digest of the Resource-stratum quads before and after, which must be equal; one revision counter stays. His question about strata as views over entities, resources and locally saved content is not taken up here and is noted under Open questions' successors if it returns. Outcome: refines P8's done-condition reading.
+
+  Links: area The stack · draws on engine-split D44, engine-split D145 · plans engine-split P8, engine-split P7 · summary P8's arrangement probe checks that an arrangement edit leaves every Resource-stratum quad unchanged, not that the cursor stays put.
 
 ## Open questions
 

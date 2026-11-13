@@ -1719,6 +1719,22 @@ summary = "P8's \"anything but the engine\" means anything outside Mere's worksp
 draws_on = ["engine-split D4"]
 plans = ["engine-split"]
 
+[decisions."engine-split D146"]
+title = "P8 moves the kernel's surface half, after the contract (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P8 ends by moving mere-kernel's surface half to Graphshell, after the engine-to-workspace contract and its probes."
+draws_on = ["engine-split D59", "engine-split D141"]
+plans = ["engine-split"]
+
+[decisions."engine-split D147"]
+title = "P8's third probe tests content: an arrangement edit leaves every Resource-stratum quad unchanged (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P8's arrangement probe checks that an arrangement edit leaves every Resource-stratum quad unchanged, not that the cursor stays put."
+draws_on = ["engine-split D44", "engine-split D145"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
