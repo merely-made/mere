@@ -1,7 +1,7 @@
 # The quad index: implementation plan
 
 **Date**: 2026-11-09
-**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold; its Eidetic half built on a branch the same day, its Mere half built on a branch too, with one source per node and per resource, refreshing an edit in under 1 ms at 100k nodes. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
+**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold; its Eidetic half landed on `eidetic` main `1371574` (chartulary 0.3.1) and its Mere half on Mere main `f57371773`, with one source per node and per resource; **P4 is done, 2026-11-12** (D10): its done-conditions are checked under P4, with one edit at 100k nodes refreshing in 0.32 to 0.72 ms on the development machine and 1.4 to 1.7 ms on the quiet ThinkPad. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
 **Related**: the brief (the measurement in its §1, the shape in §3, the budget in §4); the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows); Eidetic's chartulary notes (`eidetic/design_docs/eidetic_docs/technical_architecture/2026-07-08_chartulary_g0.md` to `g2`); doctrine Stack 1, Stack 3, Stack 6, Stack 7.
 
 ## What the brief ruled, carried here
@@ -202,6 +202,35 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
   `ResourceGraph`. The random generator now both replaces and clears a shown resource (302 sets, 61
   clears over the run), and equality holds with no fallback on a clear. Tests: 618 `mere-kernel`
   tests; random sequences 637 incremental, 63 fallbacks; the four mutations still fail them.
+- Landed, 2026-11-12: Eidetic main `1371574` (Mark approved the push), Mere main `f57371773`. The
+  first reader reran the gates on a fresh resolve against Eidetic main: 621 `mere-kernel` lib tests
+  with `query,bundled-contexts`, `mere` with `query` 28 unit, 2 inspector and 2 conformance tests,
+  wasm32 with `query`, and one chartulary 0.3.1 in the graph.
+- Done-conditions, 2026-11-12 (the sentences above stand as written; each is mapped to its evidence):
+  - Eidetic, "a random sequence of asserts and withdrawals applied in place reads the same as
+    `QuadIndex::build` over the same final rows": met, with removals added (126 chartulary tests;
+    breaking the flip, removal or the held-first choice fails them). "One edit at 800k quads costs
+    under 1 ms": met, 0.30 ms per 8-row assert and 0.40 ms per Mere-shaped withdrawal on a quiet run.
+    "chartulary's version is bumped": 0.3.1, required as a lower bound.
+  - Mere, "after any edit sequence, the refreshed dataset answers every query in the existing test
+    corpus the same as a fresh `for_graph`": met through a stronger check. The random sequences
+    compare the refreshed dataset's quads with a fresh build's in both views after every step, and
+    two datasets holding the same quads in both views answer every query alike. 637 refreshed in
+    place and 63 fell back, and four deliberate breakages fail the comparison.
+  - Mere, "refresh under 1 ms per edit at 100k nodes": met on the development machine (0.47 ms after
+    an assert, 0.32 after a withdrawal, 0.092 for a title, 0.72 for a re-tag). On the quiet ThinkPad
+    it is 1.71, 1.44, 0.60 and 1.57 ms. Recorded as met with both machines, by Mark's ruling (D10).
+  - Mere, "the P5 baseline's refresh rows are rerun and recorded beside the old ones in the brief's
+    §1": met, "Quad index P4, incremental refresh" in the indexed dataset brief, on the same ThinkPad
+    as the P5 tables.
+  - Follow-ups, none blocking: a flat per-source record (dense source ids and offsets over one array,
+    estimated 27.2 to about 9.6 MB at 100k), queued after the engine split's first P6 lanes; the
+    batched merge from the prior-art survey (`Code/testing/engine-split/quad_index_prior_art.md`) if
+    slow hardware or ten times the rows need it; and detecting a missed edit by the journal cursor.
+    The kernel journal appends one entry per captured delta (`record_as`, with `live_cursor` as
+    `next_seq`). A refresh that takes its deltas from the journal by cursor range, and stores the
+    cursor it reached, therefore sees a gap with no change to what the kernel records. That holds
+    wherever a journal exists, as in a pandect session, but not for a bare kernel `Graph`.
 
 ## Decisions
 
@@ -250,3 +279,19 @@ D1 to D3 ruled 2026-11-09, one round, before the plan was written. D4 to D7 rule
   indexed-dataset D4; refines indexed-dataset D2.
 
   Links: area The stack · draws on indexed-dataset D2, indexed-dataset D4 · plans quad-index P3, quad-index P4 · summary A 243 ms rebuild per edit at 10k nodes opens incremental index maintenance, after the P5 fold, proved equal to a fresh rebuild.
+
+- **D10. P4's 1 ms condition is met with both machines recorded (Mark, 2026-11-12):** the condition
+  says "refresh under 1 ms per edit at 100k nodes" and names no machine. The Mere half measured
+  0.47 ms after an assert and 0.32 ms after a withdrawal on the development machine; the first
+  reader's rerun on the quiet ThinkPad, the P5 tables' reference (Ryzen 3 4450U), measured 1.71 ms
+  and 1.44 ms (a re-tag 1.57 ms, a title 0.60 ms), against a 2.65 s rebuild. The cost is the shift of
+  six ordinal arrays of about 3 MB each, which meets the slower machine's memory bandwidth (at 10k it
+  is 0.08 ms there). Put to Mark against holding P4 open for a batched-merge lane and against
+  rewriting the bound per machine. Ruling: "Met; record both machines (Recommended)". Asked in the
+  same round whether to accept that the per-source record slows the full rebuild, now only a fallback
+  (on the ThinkPad at 100k, index build 2.24 to 2.49 s, rebuild after an edit 2.48 to 2.65 s, a
+  rebuild then a two-hop join 2.56 to 2.92 s): "Accept, record it (Recommended)". The batched merge
+  from the prior-art survey stays the named fix if slow hardware or ten times the rows ever need it.
+  Outcome: applies quad-index D9; refines P4's done-condition reading.
+
+  Links: area The stack · draws on quad-index D9 · plans quad-index P4 · summary Incremental refresh at 100k nodes is met at 0.3 to 0.7 ms on the development machine and recorded at 1.4 to 1.7 ms on the ThinkPad; the 7 to 14% slower fallback rebuild is accepted.

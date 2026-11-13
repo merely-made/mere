@@ -144,6 +144,24 @@ The same five runs on the same quiet ThinkPad at Mere `50fec1537`, after the fol
 
 The fold costs nothing a person would see. Every row is within 1.5% of its pre-fold value, the index is the same size to the byte, and the edits and the currency check are unchanged. The one consistent shift is about 1% on the index build and the rebuild after an edit, both of which now walk the kernel's surfaces and the engine's resources through the `RdfSource` seam. That is at the edge of the spread and is not chased, because P4 of the quad index plan replaces the rebuild.
 
+### Quad index P4, incremental refresh, 2026-11-12
+
+The same five runs on the same quiet ThinkPad at Mere `f57371773` (chartulary 0.3.1, Eidetic `1371574`), after the quad index plan's P4: `IndexedDataset::refresh` re-projects only the sources an edit touched and applies the difference to the index; a rebuild stays as the fallback. `adapter_scale` gains the incremental rows, and the rebuild rows are now the fallback's cost. Load average 1.0 to 1.7 before each run; every row's five medians within 4%. Raw log: `Code/testing/engine-split/qip4_thinkpad_f57371773.log`. The development machine's numbers for the same rows are in the quad index plan's P4 progress lines (after an assert 0.47 ms at 100k).
+
+| measure | 10k, P5 post-fold `50fec1537` | 10k, P4 `f57371773` | 100k, P5 post-fold | 100k, P4 |
+|---|---|---|---|---|
+| index build | 206 ms | 223 ms | 2.27 s | 2.49 s |
+| per-source record (`refresh_bytes`) | none | 3.00 MB | none | 27.2 MB |
+| refresh after an assert | 216 ms (rebuild) | 0.078 ms | 2.50 s (rebuild) | 1.71 ms |
+| refresh after a withdrawal | 216 ms (rebuild) | 0.075 ms | 2.49 s (rebuild) | 1.44 ms |
+| refresh after a title edit | rebuild | 0.017 ms | rebuild | 0.60 ms |
+| refresh after a re-tag | rebuild | 0.23 ms | rebuild | 1.57 ms |
+| refresh after a URL edit (no rows moved) | rebuild | 0.008 ms | rebuild | 0.010 ms |
+| fallback rebuild after an assert | 216 ms | 234 ms | 2.50 s | 2.65 s |
+| frame after one edit with a rebuild, two-hop join | 223 ms | 254 ms | 2.57 s | 2.92 s |
+
+An edit that a person waits on now costs microseconds to under 2 ms instead of a quarter to two and a half seconds: about 1,500 times less at 100k on this machine. It grows faster than the node count (22 times for 10 times the nodes after an assert), because each insert shifts six ordinal arrays of about 3 MB, which runs into this machine's memory bandwidth. The faster development machine stays under 1 ms, and quad index D10 records both. The bookkeeping costs 27.2 MB beside the 38.4 MB index (+71%) and slows the fallback rebuild by 7 to 14%, both accepted in D10.
+
 ## 2. What the dataset is today
 
 The dataset is a derived projection, not a store. `dataset_quad_iter` in `crates/graph/linked-data/src/lib.rs` walks surface nodes (direct quads: the node IRI as subject, properties as literals, scoped statements into named graphs by `GraphScope`, then RDF 1.2 reifier metadata per statement: asserter, assertion time, withdrawal), resource nodes (resource metadata) and resource edges (held assertions and their metadata). Terms are built as `oxrdf` strings on every walk. Named graphs are assertion scopes; the reserved history graph (`ASSERTION_HISTORY_GRAPH_IRI`) carries withdrawn reifiers only in the explicit history projection.
