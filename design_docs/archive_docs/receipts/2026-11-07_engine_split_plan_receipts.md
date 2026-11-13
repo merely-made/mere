@@ -1401,3 +1401,8 @@ Cleromancy and Knot (`knot-editor`): Cleromancy and Knot none; Turnstone's `deny
 in a skip reason, a prose string, not a dependency. A sweep of every repo under `Code/repos` found the name
 only in Graphshell (the row just repointed, and its `deny.toml`), in mer3ly's `content/specs.toml` prose, and
 in Turnstone's `deny.toml`.
+
+After both pushes: Graphshell's `cargo check -p mere-view --features mere-view/query` from `host/` with a fresh
+resolve passes against Mere `f7ffaf16a` (one `mere` in the graph). `house cycles --family-dir
+C:/Users/mark_/Code/repos --remote` exits 0 (35 repositories, 1,315 manifest edges, no manifest cycle; the
+resolved-cycle lines are warnings, as before), and `house doc-audit` exits 0.
