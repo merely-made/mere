@@ -3480,7 +3480,7 @@ revision and what crosses at frame rate.
   layer's counts, with the same ten failing tests. Gates: `mere` lib 30 (31 with `query`); wasm32 with and
   without `query`; workspace check; `mere-kernel` 621; hooks. Receipts: "2026-11-12: P6 L1, the dataset
   reader and the JSON-LD processing mode".
-- 2026-11-13: P6 L2 landed, RDF Dataset Canonicalization RDFC-1.0 (D143 F-R7), Mere `<code>`, `<harness>` and `<docs>`.
+- 2026-11-13: P6 L2 landed, RDF Dataset Canonicalization RDFC-1.0 (D143 F-R7), Mere `54ccc5a99` (code) and `02a6d632a` (harness), the docs after them.
   `mere::canonicalize(&IndexedDataset, View, &CanonOptions)` and `canonicalize_quads(&[Quad], &CanonOptions)` return
   canonical N-Quads and the issued-identifier map (`Canonical`), take SHA-256 or SHA-384 and a work budget, refuse
   RDF 1.2 triple terms (`CanonError::TripleTerm`: RDFC-1.0 defines none), and need no `query`; wasm32 builds. The

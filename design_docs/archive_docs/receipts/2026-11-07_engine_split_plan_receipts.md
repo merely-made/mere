@@ -1494,7 +1494,7 @@ The engine and parser fail lists, from `W3C_VERBOSE=1`, are the same ten tests. 
 
 Gates: `cargo test -p mere` lib 30, `inspect_example` 3, `w3c_conformance` 1 (1 ignored); with `query` lib 31, `inspect_example` 3 (the query test replaces the refusal test), `w3c_conformance` 2; wasm32 `cargo check -p mere` with and without `query` (`RUSTFLAGS='--cfg getrandom_backend="wasm_js"'`); `cargo check --workspace --all-targets`; `cargo test -p mere-kernel --features query,bundled-contexts` 621 lib tests; commit hooks (clippy over `mere` and `mere-kernel`, dependency bans, line ceiling, decisions check) passed on both commits.
 
-## 2026-11-13: P6 L2, RDFC-1.0 (Mere `<code>`, `<harness>`, `<docs>`)
+## 2026-11-13: P6 L2, RDFC-1.0 (Mere `54ccc5a99`, `02a6d632a`, and the docs commit after them)
 
 D143 F-R7. Spec: W3C RDF Dataset Canonicalization (RDFC-1.0). Metric: the `rdf-canon` suite (`15619df2fda7`), 86 tests: 64 eval, 21 map, 1 negative.
 
