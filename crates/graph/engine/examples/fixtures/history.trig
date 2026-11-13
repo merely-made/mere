@@ -1,0 +1,51 @@
+<https://example.test/graph/notes> {
+	<https://example.test/alice> <https://mere.computer/ns/rel#cites> <https://example.test/bob> .
+	<urn:mere:statement:fx:one> <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <https://example.test/alice> <https://mere.computer/ns/rel#cites> <https://example.test/bob> )>> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "read the paper" ;
+		<http://www.w3.org/ns/prov#wasAttributedTo> <urn:author:ada> ;
+		<http://www.w3.org/ns/prov#generatedAtTime> "2023-11-14T22:13:20Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<https://mere.computer/ns/lastAssertedAt> "2023-11-14T22:13:20Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<http://www.w3.org/ns/prov#wasGeneratedBy> <urn:method:manual-review> ;
+		<https://mere.computer/ns/methodVersion> "1.0" .
+	<https://example.test/alice> <https://mere.computer/ns/rel#cites> <https://example.test/carol> .
+	<urn:mere:statement:fx:two> <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <https://example.test/alice> <https://mere.computer/ns/rel#cites> <https://example.test/carol> )>> ;
+		<http://www.w3.org/ns/prov#wasAttributedTo> <urn:author:ada> ;
+		<http://www.w3.org/ns/prov#generatedAtTime> "2023-11-14T22:15:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<https://mere.computer/ns/lastAssertedAt> "2023-11-14T22:15:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+}
+<https://example.test/graph/imports> {
+	<https://example.test/bob> <https://mere.computer/ns/rel#cites> <https://example.test/carol> .
+	<urn:mere:statement:fx:three> <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <https://example.test/bob> <https://mere.computer/ns/rel#cites> <https://example.test/carol> )>> ;
+		<http://www.w3.org/ns/prov#wasAttributedTo> <urn:author:grace> ;
+		<http://www.w3.org/ns/prov#generatedAtTime> "2023-11-14T22:16:40Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<https://mere.computer/ns/lastAssertedAt> "2023-11-14T22:16:40Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<http://www.w3.org/ns/prov#wasGeneratedBy> <urn:method:extractor> ;
+		<https://mere.computer/ns/methodVersion> "1.0" .
+}
+<https://mere.computer/ns/graph#history> {
+	<urn:mere:statement:fx:four> <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <https://example.test/carol> <https://mere.computer/ns/rel#cites> <https://example.test/alice> )>> ;
+		<https://mere.computer/ns/assertedGraphKind> "custom" ;
+		<https://mere.computer/ns/assertedGraphName> "https://example.test/graph/imports" ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "retracted after recheck" ;
+		<http://www.w3.org/ns/prov#wasAttributedTo> <urn:author:grace> ;
+		<http://www.w3.org/ns/prov#generatedAtTime> "2023-11-14T22:18:20Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<https://mere.computer/ns/lastAssertedAt> "2023-11-14T22:18:20Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+		<http://www.w3.org/ns/prov#wasGeneratedBy> <urn:method:extractor> ;
+		<https://mere.computer/ns/methodVersion> "1.0" ;
+		<http://www.w3.org/ns/prov#wasInvalidatedBy> <urn:mere:withdrawal-activity:v1:66783a666f7572> .
+	<urn:mere:withdrawal-activity:v1:66783a666f7572> a <http://www.w3.org/ns/prov#Activity> ;
+		<http://www.w3.org/ns/prov#wasAssociatedWith> <urn:author:grace> .
+	<urn:mere:statement:fx:four> <http://www.w3.org/ns/prov#invalidatedAtTime> "2023-11-14T22:20:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+}
+<https://mere.computer/ns/graph#vocabulary> {
+	<https://mere.computer/ns/rel#hyperlink> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://purl.org/spar/cito/linksTo> .
+	<https://mere.computer/ns/rel#cites> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://purl.org/spar/cito/cites> .
+	<https://mere.computer/ns/rel#quotes> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://purl.org/spar/cito/includesQuotationFrom> .
+	<https://mere.computer/ns/rel#summarizes> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://purl.org/spar/cito/cites> .
+	<https://mere.computer/ns/rel#elaborates> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://purl.org/spar/cito/extends> .
+	<https://mere.computer/ns/rel#supports> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://purl.org/spar/cito/supports> .
+	<https://mere.computer/ns/rel#contradicts> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://purl.org/spar/cito/disputes> .
+	<https://mere.computer/ns/rel#questions> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://purl.org/spar/cito/cites> .
+	<https://mere.computer/ns/rel#same-entity-as> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://www.w3.org/2002/07/owl#sameAs> .
+	<https://mere.computer/ns/rel#depends-on> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://purl.org/dc/terms/requires> .
+}

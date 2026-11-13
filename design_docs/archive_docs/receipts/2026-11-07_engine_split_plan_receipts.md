@@ -1406,3 +1406,50 @@ After both pushes: Graphshell's `cargo check -p mere-view --features mere-view/q
 resolve passes against Mere `f7ffaf16a` (one `mere` in the graph). `house cycles --family-dir
 C:/Users/mark_/Code/repos --remote` exits 0 (35 repositories, 1,315 manifest edges, no manifest cycle; the
 resolved-cycle lines are warnings, as before), and `house doc-audit` exits 0.
+
+## 2026-11-12: P5 L6a, the headless resource inspector
+
+`cargo run -p mere --example inspect --features query -- crates/graph/engine/examples/fixtures/history.trig
+--query 'SELECT ?s ?o WHERE { GRAPH ?g { ?s <https://mere.computer/ns/rel#cites> ?o } } ORDER BY ?s ?o'`:
+
+```
+dataset: 43 rows, 64 terms
+
+resources (2):
+  https://example.test/alice
+    https://mere.computer/ns/rel#cites https://example.test/bob [https://example.test/graph/notes]
+    https://mere.computer/ns/rel#cites https://example.test/carol [https://example.test/graph/notes]
+  https://example.test/bob
+    https://mere.computer/ns/rel#cites https://example.test/carol [https://example.test/graph/imports]
+
+asserters (2):
+  urn:author:ada: 2 held, 0 withdrawn
+  urn:author:grace: 1 held, 1 withdrawn
+
+assertions (4):
+  urn:author:ada  held  in https://example.test/graph/notes  urn:mere:statement:fx:one  reason: urn:method:manual-review v1.0; "read the paper"
+  urn:author:ada  held  in https://example.test/graph/notes  urn:mere:statement:fx:two  reason: (none)
+  urn:author:grace  held  in https://example.test/graph/imports  urn:mere:statement:fx:three  reason: urn:method:extractor v1.0
+  urn:author:grace  withdrawn  in https://mere.computer/ns/graph#history  urn:mere:statement:fx:four  reason: urn:method:extractor v1.0; "retracted after recheck"
+
+named graphs (4):
+  https://example.test/graph/imports: 7 quads
+  https://example.test/graph/notes: 13 quads
+  https://mere.computer/ns/graph#history: 13 quads
+  https://mere.computer/ns/graph#vocabulary: 10 quads
+
+reason keys (2):
+  urn:method:extractor: 2 assertions
+  urn:method:manual-review: 1 assertions
+
+query (3 rows): s | o
+  https://example.test/alice | https://example.test/bob
+  https://example.test/alice | https://example.test/carol
+  https://example.test/bob | https://example.test/carol
+```
+
+Fixture: `to_trig_with_history` output of a four-statement kernel graph, generated once by a throwaway test in
+`mere-kernel` (not committed) modelled on `explicit_history_roundtrips_lifecycle_basis_and_original_scope`.
+`cargo test -p mere --features query`: lib 19, `inspect_example` 2, `w3c_conformance` 2 passed (1 ignored);
+`cargo test -p mere` without `query`: lib 18 passed, the inspector test compiled out. wasm32 `cargo check -p
+mere` passes with and without `query`; `cargo check --workspace --all-targets` passes.

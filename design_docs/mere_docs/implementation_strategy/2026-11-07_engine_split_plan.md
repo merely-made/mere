@@ -3323,3 +3323,13 @@ revision and what crosses at frame rate.
   origin/main already (dirs 6 beside Mere's `catchment` on 7, D137: bump the holder). Gates and receipts:
   "2026-11-12: P5 L5, the re-export window closes". Not in L5: the ledger's `engine` layer still needs `query`
   (the harness is gated as a whole), content negotiation, a JSON-LD processing mode argument.
+- 2026-11-12: P5 L6a landed, the headless resource inspector (D141 F11). `crates/graph/engine/examples/inspect.rs`
+  (`inspect <file> [--base IRI] [--query SPARQL]`; `required-features = ["query"]`, because enumerating a dataset
+  is `IndexedDataset::read` plus `sparql_on`) parses `.ttl`, `.trig`, `.nq` and `.jsonld`/`.json` with the
+  `mere::parse_*` entry points and prints resources, held and withdrawn assertions per asserter (from the
+  reifier metadata; withdrawn means in the history graph or invalidated), named graphs with quad counts,
+  reason keys (the method IRI) and one query's rows. It names no `mere-kernel`. The fixture
+  `examples/fixtures/history.trig` is real `to_trig_with_history` output from a kernel graph (two asserters,
+  one withdrawal, two scopes, a method and notes). `tests/inspect_example.rs` includes the example by `#[path]`
+  and asserts the counts, so the engine gains no public API. Receipts: "2026-11-12: P5 L6a, the headless
+  resource inspector".

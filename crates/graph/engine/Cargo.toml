@@ -72,3 +72,8 @@ sparesults = { version = "0.3", features = ["sparql-12"] }
 
 [lints]
 workspace = true
+
+# The headless resource inspector reads the dataset through SPARQL (D141 F11).
+[[example]]
+name = "inspect"
+required-features = ["query"]
