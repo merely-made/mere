@@ -86,7 +86,7 @@ snapshot, so none is recorded (a fork in the lane report).
 | JSON-LD 1.1 | toRdf (JSON-LD to RDF) | `json-ld-api` `tests/toRdf-manifest.jsonld` (467 tests) | parser 439/449 (10 fail: 9 dataset mismatches, `tli12` rejects its base); 18 skipped (11 are 1.0-only, 4 `rdfDirection`, 1 `expandContext`, 1 expected output unreadable, 1 rejected only for an out-of-suite context). Adapter `from_jsonld_with_contexts_and_base_iri` accept or reject 441/442 (fails `tli12`); 25 skipped (those 18 less 1 plus 8 `processingMode` 1.0 tests). Engine `parse_jsonld` (2026-11-12, dataset isomorphism, base IRI, offline cache and `processingMode`; P6 L1 F-R2) 439/449, the same 10 fails as the parser layer; 18 skipped, the same as the parser layer's (before F-R2: 432/442 and 25, the 8 `processingMode` 1.0 tests skipped) |
 | JSON-LD 1.1 | Expand, compact, flatten, fromRdf, HTML, remote-doc | `json-ld-api` `tests/*-manifest.jsonld` | not run: no such API in the adapter or `oxjsonld` (386 + 246 + 58 + 54 + 50 + 18 tests) |
 | SHACL (Core, SPARQL) | none yet | `data-shapes` | not run: no engine stage yet (P6) |
-| RDFC-1.0 | none yet | `rdf-canon` | not run: no engine stage yet (P6) |
+| RDFC-1.0 | Canonical N-Quads, issued identifiers, poison refusal; SHA-256 and SHA-384; RDF 1.2 triple terms refused (RDFC-1.0 defines none) | `rdf-canon` `tests/manifest.ttl` (86 tests: 64 eval, 21 map, 1 negative) | engine `mere::canonicalize_quads` (2026-11-13, carried `mere-rdfc`) eval 64/64, map 21/21, negative 1/1; control (raw `oxrdf` 0.3.5 `rdfc-10`, no budget) eval 64/64, map 21/21, negative 0/1: it does not return on `test074c`. The engine refuses `test074c` after 4,000 Hash N-Degree Quads calls (0.4 s release, 2.2 s debug); the positive tests use at most 468 calls and 2,880 permutations. Why a carried copy: [comparison](#rdfc-10-the-carried-implementation) |
 
 ## The declared profile (engine layer, 2026-11-12)
 
@@ -105,7 +105,8 @@ is parse only; Turtle, TriG, N-Triples, N-Quads and JSON-LD are engine; SPARQL U
 | SPARQL 1.2 query evaluation | 64 / 1 / 0 | 64 / 1 / 0 | not scorable |
 | JSON-LD 1.1 toRdf | 439 / 10 / 18 | 439 / 10 / 18 | 441 / 1 / 25 (accept or reject) |
 | SPARQL 1.1 and 1.2 syntax, SPARQL Update | not scored | parser | none |
-| RDF 1.1 and 1.2 c14n, entailment; JSON-LD expand, compact, flatten, fromRdf, html, remote-doc; SHACL; RDFC-1.0 | not run | not run | not run |
+| RDFC-1.0 (`rdf-canon`; engine is `mere-rdfc`, parser column is raw `oxrdf`, the control) | 86 / 0 / 0 | 85 / 1 / 0 | none |
+| RDF 1.1 and 1.2 c14n, entailment; JSON-LD expand, compact, flatten, fromRdf, html, remote-doc; SHACL | not run | not run | not run |
 
 What changed against the adapter layer: the RDF 1.1 TriG syntax row went from 199/214 to 214/214 (the
 15 fails were relative IRIs the old `from_trig` could not resolve), and N-Triples, Turtle and RDF/XML, which
@@ -128,3 +129,25 @@ Reading the starting point: the parsers behind the adapter are strong on syntax;
 exposes less than the parsers do (no N-Triples, Turtle or RDF/XML entry point, no base IRI, no
 processing mode, no dataset output, no update, no evaluation beyond SELECT and ASK); no capability
 beyond the rows marked pass is claimed.
+
+## RDFC-1.0, the carried implementation
+
+Engine split P6 L2 (2026-11-13, D143 F-R7). `mere::canonicalize` and `canonicalize_quads` (module `formats::canon`) wrap
+the crate `mere-rdfc` (`crates/graph/rdfc`), which is `oxrdf` 0.3.5's `rdfc-10` carried, not depended on. The reason is in
+the comparison (`Code/testing/engine-split/rdfc_comparison.md`): `oxrdf`'s
+`rdfc-10` and the other maintained Rust implementation, zkp-ld `rdf-canon` 0.15.3, both pass the 85 eval and map tests, and each
+deviates from the spec elsewhere. `oxrdf` has no poison-dataset limit (`test074c`, a 10-node clique, does not return), builds all
+n! permutations before iterating, and collapses repeated mentions in Hash N-Degree Quads step 3; `rdf-canon` double counts a
+quad that names one blank node twice (4.4.3 step 2) and orders temporary identifiers as strings (`b10` before `b2`). Mark ruled
+(2026-11-12) that upstreams are not to be bothered with AI-generated fixes, and (2026-11-13) to take and improve the more
+spec-compliant of the two: `oxrdf`'s. Nothing was filed upstream.
+
+What `mere-rdfc` changes, each marked in its source header: every mention kept (4.8.3 step 3), a budget on Hash N-Degree Quads
+calls (default 4,000; the largest positive test uses 468) and on permutations (default 100,000; the largest uses 2,880),
+lazy permutations, an own table interner, triple terms refused with `CanonError::TripleTerm`, `sha2` 0.11. There is no
+blank-node-count limit: poison datasets are not told apart by it (the clique has 10 blank nodes, positive tests reach 19).
+The arbiter was a differential fuzz against `rdf-canon` with its two deviations fixed in a scratch copy: 16 modes of 20,000
+random datasets (default, named and blank-node graphs, literals, repeated mentions) and 48 cycle and chain shapes; the outputs
+agree except where an implementation is not invariant under relabelling its input (both are, in a few of 20,000, since RDFC-1.0
+leaves tie order open), and where both are invariant they agree on all 20,000.
+

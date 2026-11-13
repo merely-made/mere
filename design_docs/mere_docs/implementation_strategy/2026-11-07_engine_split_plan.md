@@ -3480,3 +3480,19 @@ revision and what crosses at frame rate.
   layer's counts, with the same ten failing tests. Gates: `mere` lib 30 (31 with `query`); wasm32 with and
   without `query`; workspace check; `mere-kernel` 621; hooks. Receipts: "2026-11-12: P6 L1, the dataset
   reader and the JSON-LD processing mode".
+- 2026-11-13: P6 L2 landed, RDF Dataset Canonicalization RDFC-1.0 (D143 F-R7), Mere `<code>`, `<harness>` and `<docs>`.
+  `mere::canonicalize(&IndexedDataset, View, &CanonOptions)` and `canonicalize_quads(&[Quad], &CanonOptions)` return
+  canonical N-Quads and the issued-identifier map (`Canonical`), take SHA-256 or SHA-384 and a work budget, refuse
+  RDF 1.2 triple terms (`CanonError::TripleTerm`: RDFC-1.0 defines none), and need no `query`; wasm32 builds. The
+  algorithm is the new crate `mere-rdfc` (`crates/graph/rdfc`), `oxrdf` 0.3.5's `rdfc-10` carried with its
+  provenance in the source header, because `oxrdf` has no poison-dataset limit (the suite's `test074c` does not
+  return), builds all n! permutations eagerly and collapses repeated mentions; the other maintained implementation,
+  zkp-ld `rdf-canon` 0.15.3, passes the same 85 eval and map tests with two other deviations (comparison in
+  `Code/testing/engine-split/rdfc_comparison.md`). Mark ruled both ways: no upstream reports for AI-generated fixes,
+  and take and improve the more spec-compliant of the two. The `rdf-canon` rows: engine eval 64/64, map 21/21,
+  negative 1/1; the control (raw `oxrdf`) 64/64, 21/21, 0/1. Budget: 4,000 Hash N-Degree Quads calls (the largest
+  positive test uses 468) and 100,000 permutations (largest 2,880); `test074c` is refused in 0.4 s release. A
+  blank-node-count limit was dropped: the clique has 10 blank nodes and positive tests reach 19. Declared-lens D8's
+  "blank-node limit" is therefore the work budget. Gates: `mere` tests with and without `query`; ledger run with and
+  without `query`, every other ROW line unchanged; wasm32 `cargo check` of `mere-rdfc`, and of `mere` apart from a `uuid` randomness error in the workspace's `uuid` line that this lane does not touch (receipts); workspace check;
+  `mere-kernel` 621; hooks. Receipts: "2026-11-13: P6 L2, RDFC-1.0".
