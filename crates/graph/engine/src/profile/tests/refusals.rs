@@ -304,3 +304,46 @@ fn unobserved_values_fall_back_and_are_kept() {
         .collect();
     assert_eq!(notes.len(), 2, "{notes:?}");
 }
+
+#[test]
+fn a_selected_lens_is_noted_and_its_body_not_applied() {
+    let with_a = Source::of(vec![
+        local(lens("root", &[("inner", "1.0.0")], &[])),
+        local(lens("inner", &[("a", "1.0.0")], &[])),
+        local(pack("a", "1.0.0", &[], &[("t", "surface")])),
+    ]);
+    let p = load_with(&select("root"), &with_a).unwrap();
+    let inner = "https://example.org/packs/inner".to_string();
+    assert!(
+        p.diagnostics.contains(&Diagnostic::NestedLensIgnored {
+            pack: inner.clone()
+        }),
+        "{:?}",
+        p.diagnostics
+    );
+    let ids: Vec<&str> = p.selection.pins.iter().map(|r| r.pin.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        [
+            crate::profile::core::CORE_PACK_ID,
+            inner.as_str(),
+            "https://example.org/packs/root"
+        ],
+        "the inner lens's selection is not resolved"
+    );
+    assert!(p.terms.entry("https://example.org/ns#t").is_none());
+    // The record is the one a source without `a` gives: the ignored select changed nothing.
+    let without_a = Source::of(with_a.offers[..2].to_vec());
+    assert_eq!(
+        load_with(&select("root"), &without_a).unwrap().selection,
+        p.selection
+    );
+    // Control: the root lens and the core pack draw no such note.
+    let plain = load_with(&workspace_lens(), &workspace_source()).unwrap();
+    assert!(
+        !plain
+            .diagnostics
+            .iter()
+            .any(|d| matches!(d, Diagnostic::NestedLensIgnored { .. }))
+    );
+}

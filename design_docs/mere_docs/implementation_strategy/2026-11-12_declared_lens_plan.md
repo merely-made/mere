@@ -732,6 +732,10 @@ removes it.
 
   Links: area The stack · draws on declared-lens D4, declared-lens D8, declared-lens D10, declared-lens D12 · plans engine-split P6 · summary The core pack leaves the workspace terms to a stand-in pack in L2's tests, compiles at build time behind eidetic's pack-authoring feature, and matches requirements as Cargo's caret does.
 
+- **D14. The loader's default limits are 4 MiB a pack, 64 packs and 100,000 terms (Mark, 2026-11-13):** a quantity the L2 lane set in `Limits::default()` and returned as a fork. Ruling: "Keep 4 MiB/64/100k (Recommended)", against 1 MiB, 32 packs and 20,000 terms, and against no default (every caller passes its limits). The scale: the core pack is 11 KB with 46 terms; L1's 1,000-term pack is 0.83 MB and now strict-decodes in about 96 ms because typed bodies are checked (22 ms in L1), so the default holds it five times over. Each limit stays a typed refusal (Stack 8). Outcome: new.
+
+  Links: area The stack · draws on declared-lens D13 · plans engine-split P6 · summary The pack loader refuses past 4 MiB a pack, 64 packs or 100,000 terms by default.
+
 ## Findings
 
 - 2026-11-12: read at Mere `origin/main` `48fbe3d8d`, Eidetic `1371574`, Graphshell `a377c352`,

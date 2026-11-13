@@ -13,7 +13,7 @@ use std::collections::BTreeSet;
 
 use eidetic::pack::{HeaderError, Pin, Refusal, SignerReview, TrustPolicy};
 
-use super::core::CORE_PACK;
+use super::core::{CORE_PACK, CORE_PACK_ID};
 use super::intern::{TermTable, intern};
 use super::lens::{LensChoices, ResolvedPin, SelectionRecord, choices};
 use super::pack::{declare_and_verify, decode};
@@ -102,6 +102,9 @@ pub enum Diagnostic {
     UnusedSettlement { term: String, pack: String },
     /// Something the pack carries that a later phase interprets.
     NotYetInterpreted { pack: String, what: String },
+    /// A selected pack is itself a lens; only the root lens's body governs,
+    /// so its select, settle and presentation choices are not applied.
+    NestedLensIgnored { pack: String },
 }
 
 /// The loaded semantic profile.
@@ -131,6 +134,10 @@ pub fn load<R: SignerReview>(
     let mut diagnostics = Vec::new();
     for chosen in &resolution.packs {
         declare_and_verify(&chosen.pack, source, &mut diagnostics)?;
+        let id = &chosen.pack.header.id;
+        if chosen.pack.lens.is_some() && *id != resolution.lens && *id != CORE_PACK_ID {
+            diagnostics.push(Diagnostic::NestedLensIgnored { pack: id.clone() });
+        }
     }
     let root = resolution
         .packs
