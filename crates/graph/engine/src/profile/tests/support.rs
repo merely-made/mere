@@ -19,6 +19,20 @@ use crate::profile::resolve::{Offered, PackRef, PackSource};
 pub(crate) const WORKSPACE: &str = include_str!("../fixtures/workspace.toml");
 pub(crate) const WORKSPACE_LENS: &str = include_str!("../fixtures/workspace_lens.toml");
 pub(crate) const WORKSPACE_ID: &str = "https://mere.computer/packs/test/workspace";
+
+/// Edits a fixture's text: line endings normalized first (a Windows checkout
+/// writes CRLF), and the edit must apply exactly once, so a fixture change
+/// cannot turn a refusal test into a silent pass or a misleading failure.
+pub(crate) fn edit(text: &str, old: &str, new: &str) -> String {
+    let text = text.replace("\r\n", "\n");
+    assert_eq!(
+        text.matches(old).count(),
+        1,
+        "fixture edit must match once: {old:?}"
+    );
+    text.replace(old, new)
+}
+
 /// Traversal's IRI, minted in the stand-in only (D13).
 pub(crate) const TRAVERSAL_IRI: &str = "https://mere.computer/ns/test/workspace#traversal";
 

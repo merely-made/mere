@@ -204,13 +204,18 @@ fn trust_across_the_boundary_needs_an_accepted_signer() {
 
 #[test]
 fn declare_and_verify_and_limits_refuse() {
-    let outside = compiled(&WORKSPACE.replace("provides = [\"rel:arrangement.\",", "provides = ["));
+    let outside = compiled(&edit(
+        WORKSPACE,
+        "provides = [\"rel:arrangement.\",",
+        "provides = [",
+    ));
     let src = Source::of(vec![local(outside), local(compiled(WORKSPACE_LENS))]);
     assert!(matches!(
         load_with(&workspace_lens(), &src),
         Err(LoadRefusal::Undeclared { .. })
     ));
-    let handled = compiled(&WORKSPACE.replace(
+    let handled = compiled(&edit(
+        WORKSPACE,
         "labels = { en = \"traversal\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
         "handler = \"ws:trail\"\nlabels = { en = \"traversal\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
     ));
@@ -254,10 +259,12 @@ fn declare_and_verify_and_limits_refuse() {
 
 #[test]
 fn unobserved_values_fall_back_and_are_kept() {
-    let text = WORKSPACE.replace(
-        "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"tile-group\" }",
-        "\"axis:durability\" = [\"durability:ephemeral\", \"durability:session\"] }\nlabels = { en = \"tile-group\" }",
-    ).replace(
+    let text = edit(
+        &edit(
+            WORKSPACE,
+            "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"tile-group\" }",
+            "\"axis:durability\" = [\"durability:ephemeral\", \"durability:session\"] }\nlabels = { en = \"tile-group\" }",
+        ),
         "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"split-pair\" }",
         "\"axis:durability\" = \"durability:ephemeral\", \"axis:bounce\" = \"ws:high\" }\nlabels = { en = \"split-pair\" }",
     );
