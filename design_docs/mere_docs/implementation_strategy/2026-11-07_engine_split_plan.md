@@ -8,11 +8,13 @@ holds five crates (`mere-kernel`, `catchment`, `pandect`, `mere-facts` and, from
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
 P0's squishes have landed in part (D14, D26 to D28). **P4 (Pandect on the authority boundary) is done,
-2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5 is in progress:** L2 (the `mere`
+2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5's conditions are met:** L2 (the `mere`
 crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph` in `mere`, the kernel
 composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
 layer) and L5 (the dataset and the formats without `query`; Graphshell repointed to `mere`; the `mere-rdf` shim
-deleted) landed 2026-11-12. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+deleted) and L6a (the headless inspector) landed 2026-11-12, and its four done-conditions are met, checked
+under P5 ("Done-conditions, 2026-11-12"); it closes when L6b (content negotiation and Link headers, D142's P5
+row) lands. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -708,6 +710,38 @@ change. Measure per Constraints before the resource/surface join becomes a crate
   performance baseline, so the baseline is taken at the commit before the fold; "frame cost" is
   the engine's share of a frame measured headlessly, and the frame budget stays with P8's contract.
 - The dataset behind the query stage is designed and ruled in the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09): the generic id-level index in chartulary, the `spareval` seam here, dense ids rebuilt per revision, six orderings, one index for live and history. Its §1 measured the borrowed adapter, which is what this phase replaces.
+- Done-conditions, 2026-11-12 (the sentences above stand as written, read through D141; each is mapped to its evidence):
+  - "the `mere` crate builds headless on native and wasm with no host, canvas or Pandect dependency":
+    met. `cargo tree -p mere -e normal`, with and without `query`, names no accesskit, graphshell,
+    pandect, catchment, canvas, cambium or kernel crate; its only family packages are chartulary and
+    muniment (L3, rechecked by the first reader at `34b2c111e`). `cargo check -p mere --target
+    wasm32-unknown-unknown` passes with and without `query` (L3 to L6a). The kernel depends on `mere`,
+    not the reverse.
+  - "the ledger's RDF, SPARQL and JSON-LD rows pass for the declared profile at the same or better rate
+    than P0 recorded": met. The declared profile is the ledger's engine layer (D141 F8, L4). Against P0's
+    adapter rows it is the same or better on every row: TriG syntax 199/214 becomes 214/214; Turtle,
+    N-Triples and RDF/XML, which P0 could not score, pass at the parser layer's rate; SPARQL query
+    evaluation matches P0's parser and indexed rows (230/244 and 64/65). JSON-LD toRdf is 432/10/25 on
+    dataset isomorphism, where P0's adapter row was 441/1/25 on accept or reject. The nine extra fails
+    are dataset mismatches that accept or reject cannot see; on P0's measure the engine accepts the
+    same 441 and rejects `tli12`, so it scores 441/1, the same. Every engine fail is a parser-layer
+    fail on the same test (the upstream control), so the engine adds none.
+  - "load, mutation, projection refresh and frame cost are measured against the P0 baseline and
+    recorded": met, with the baseline D141 substituted (P0 recorded none). Measured pre-fold at
+    `0f641d525` and `cf674aded` and post-fold at `50fec1537`, five runs each on the same quiet machine,
+    and recorded in the indexed dataset brief §1 ("P5 baseline, quiet rerun" and "P5 post-fold").
+    Every row is within 1.5% across the fold. The frame budget stays with P8 (D4, D141).
+  - "the example headless resource inspector runs": met. `cargo run -p mere --example inspect
+    --features query -- crates/graph/engine/examples/fixtures/history.trig` prints the resources,
+    two asserters (one with 2 held, one with 1 held and 1 withdrawn), four named
+    graphs and two reason keys (L6a, `6bc6b1d4a`; rerun by the first reader with the same output).
+  - The body's other sentences: the assertion rules came across whole (`EdgePayload` and its rules
+    moved into `mere::model`, and the kernel's write path is not loosened, L3); the old projection and
+    `GraphContribution` import live in `kernel::rdf`, which leaves with the kernel at P8 (L3, F5);
+    Oxigraph's crates stay upstream, with no fork (F10); the join was measured before the boundary
+    (L3's `join_scale`, no change beyond noise).
+  - Outside the done-conditions: D142 also placed content negotiation and Link headers in P5's
+    acquire stage. That is L6b, and P5 closes when it lands.
 
 ### P6. Interpretation and identity stages
 

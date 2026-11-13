@@ -123,6 +123,27 @@ The same five runs of `adapter_scale 10000 100000` on a quiet machine, twice: th
 
 What changes with quiet: withdrawal on the baseline grows 13 times for 10 times the nodes (the busy machine showed 40), still a scan; after the fix it is flat at 1.3 µs, below an assert. Every other row moves by less than its spread between the two commits, so the fix touched only withdrawal. The steady two-hop join at 100k is 46 ms, not 72: the busy machine had inflated it. The refresh after one edit is still a full rebuild, 213 ms at 10k and 2.5 s at 100k, which is what the quad index plan's P4 (incremental maintenance, its D9) answers. These are the pre-fold rows the P5 post-fold measurement is compared against.
 
+### P5 post-fold, 2026-11-12
+
+The same five runs on the same quiet ThinkPad at Mere `50fec1537`, after the fold: the model and resource graph in `mere`, the kernel composed over it, the `mere-rdf` shim deleted (engine split P5 L3 to L5). The instrument moved with its code to `crates/graph/graph-kernel/examples/adapter_scale.rs` (package `mere-kernel`, features `query,fixtures`) and measures the same things. Compared against `cf674aded`, the last pre-fold commit, so the withdraw fix is in both columns. Raw log: `Code/testing/engine-split/p5_thinkpad_50fec1537_postfold.log`.
+
+| measure | 10k, pre-fold `cf674aded` | 10k, post-fold `50fec1537` | 100k, pre-fold | 100k, post-fold |
+|---|---|---|---|---|
+| graph build | 161 ms | 163 ms | 1.71 s | 1.72 s |
+| index build | 204 ms | 206 ms | 2.24 s | 2.27 s |
+| `memory_bytes()` | 3.84 MB | 3.84 MB | 38.4 MB | 38.4 MB |
+| assert, per edit | 0.0042 ms | 0.0042 ms | 0.0050 ms | 0.0051 ms |
+| withdraw, per edit | 0.0013 ms | 0.0012 ms | 0.0013 ms | 0.0013 ms |
+| `is_current`, stale or fresh | under 0.001 ms | under 0.001 ms | under 0.001 ms | under 0.001 ms |
+| refresh after an assert (rebuild) | 213 ms | 216 ms | 2.48 s | 2.50 s |
+| refresh after a withdrawal (rebuild) | 214 ms | 216 ms | 2.50 s | 2.49 s |
+| frame, steady point lookup | 0.011 ms | 0.011 ms | 0.011 ms | 0.011 ms |
+| frame, steady two-hop join | 4.4 ms | 4.4 ms | 46 ms | 45 ms |
+| frame after one edit, point lookup | 222 ms | 224 ms | 2.65 s | 2.65 s |
+| frame after one edit, two-hop join | 221 ms | 223 ms | 2.56 s | 2.57 s |
+
+The fold costs nothing a person would see. Every row is within 1.5% of its pre-fold value, the index is the same size to the byte, and the edits and the currency check are unchanged. The one consistent shift is about 1% on the index build and the rebuild after an edit, both of which now walk the kernel's surfaces and the engine's resources through the `RdfSource` seam. That is at the edge of the spread and is not chased, because P4 of the quad index plan replaces the rebuild.
+
 ## 2. What the dataset is today
 
 The dataset is a derived projection, not a store. `dataset_quad_iter` in `crates/graph/linked-data/src/lib.rs` walks surface nodes (direct quads: the node IRI as subject, properties as literals, scoped statements into named graphs by `GraphScope`, then RDF 1.2 reifier metadata per statement: asserter, assertion time, withdrawal), resource nodes (resource metadata) and resource edges (held assertions and their metadata). Terms are built as `oxrdf` strings on every walk. Named graphs are assertion scopes; the reserved history graph (`ASSERTION_HISTORY_GRAPH_IRI`) carries withdrawn reifiers only in the explicit history projection.
