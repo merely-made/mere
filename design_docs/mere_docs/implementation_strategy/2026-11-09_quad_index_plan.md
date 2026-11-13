@@ -1,7 +1,7 @@
 # The quad index: implementation plan
 
 **Date**: 2026-11-09
-**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
+**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold; its Eidetic half built on a branch the same day, its Mere half waiting on a fork. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
 **Related**: the brief (the measurement in its §1, the shape in §3, the budget in §4); the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows); Eidetic's chartulary notes (`eidetic/design_docs/eidetic_docs/technical_architecture/2026-07-08_chartulary_g0.md` to `g2`); doctrine Stack 1, Stack 3, Stack 6, Stack 7.
 
 ## What the brief ruled, carried here
@@ -77,13 +77,39 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
   into the six orderings (a binary search and a shift). A withdrawal flips the row's held flag, which
   the live view already skips, so nothing is removed and history stays one index (indexed-dataset D5).
   `is_current` becomes "caught up to this revision". A full rebuild stays as the fallback and as the
-  oracle in tests.
-- Done when: after any sequence of asserts and withdrawals, the incrementally maintained index equals
-  a fresh `for_graph` (a property test over generated edit sequences); one edit at 100k nodes costs
-  under 1 ms through the index; the P5 baseline's refresh rows are rerun and recorded beside the old
-  ones.
-- Needs: the engine split's P5 fold landed (it moves the code this touches); the kernel's withdraw
-  scan fixed, since the kernel's per-edit cost is what a person then waits for.
+  oracle in tests. How the sorted insert is done was left to a measurement at 800k quads: direct
+  insert into each ordering if one edit (a statement's quad plus its reifier rows) costs under 1 ms,
+  otherwise a small sorted overlay merged into the base past a threshold.
+- Eidetic: `QuadIndex::apply(asserted, withdrawn)` in `chartulary::quads`, generic like the rest of
+  the module. Done when a property test shows a random sequence of asserts and withdrawals applied
+  in place reads the same as `QuadIndex::build` over the same final rows (every bound shape, both
+  views, `graph_names`, `contains_graph`); the existing tests pass; one edit at 800k quads costs
+  under 1 ms; chartulary's version is bumped (a lower bound, never `=x.y.z`).
+- Mere: `IndexedDataset` gains a refresh that applies the kernel's captured deltas since the index's
+  revision, and falls back to `for_graph` when deltas are unavailable or the store was replaced
+  wholesale. Done when, after any edit sequence, the refreshed dataset answers every query in the
+  existing test corpus the same as a fresh `for_graph`; `adapter_scale`'s `edit_scale` table shows
+  refresh under 1 ms per edit at 100k nodes; the P5 baseline's refresh rows are rerun and recorded
+  beside the old ones in the brief's §1.
+- Needs: the engine split's P5 fold (closed on Mere main, `2fa594c1f`) and the kernel's withdraw
+  scan fixed (`cf674aded`); both are in.
+- Progress, 2026-11-12 (Eidetic half): `QuadIndex::apply` on the `eidetic` branch `quads/incr`,
+  `9992ab7`, chartulary 0.3.1, not pushed. The base table is append-only after the first apply, so
+  SPOG becomes a sixth ordinal then (a built index keeps reading its sorted base directly). A read
+  picks each quad's least-rank visible row, so a withdrawal's flip moves no ordering. Measured at
+  800k quads, release, on a machine shared with other builds: direct insert of an 8-row statement
+  0.54 to 0.80 ms (median of 101, three runs), the withdrawal flip 0.003 ms, the first apply after
+  a build 7 to 20 ms. The overlay stalled 77 to 82 ms per merge and doubled a wide read (scratch
+  bench), so direct insert was taken. Vecs grow by a sixteenth: 38.4 MB built, 44.2 MB after edits
+  (doubling had given 83.2 MB). 125 chartulary tests pass, 3 new; breaking the flip or the
+  held-first choice fails the equality tests.
+- Open before the Mere half, as a fork: Mere's projection does not withdraw in place. A withdrawn
+  statement's quad and reifier rows leave their graph, and its reifiers reappear in the reserved
+  history graph (`dataset_quads_with_history`). A node edit (title, property, removal) also drops
+  quads outright. A held-flag flip alone therefore cannot make a refresh read the same as
+  `for_graph`. The kernel captures a withdrawal as the pair's whole statement bucket
+  (`capture_statement_bucket`), not as row changes, so the refresh has to re-project what an edit
+  touched and diff it against the index.
 
 ## Decisions
 
