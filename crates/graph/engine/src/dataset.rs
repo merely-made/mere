@@ -16,7 +16,7 @@ use crate::projection::{ProjectionSource, SourceQuads};
 use crate::{ProjectionKey, RdfSource};
 pub use chartulary::quads::View;
 use chartulary::quads::{Dictionary, Quad, QuadIndex, QuadMeta, TermId};
-use oxrdf::{GraphName, NamedNode, Term};
+use oxrdf::{GraphName, NamedNode, NamedOrBlankNode, Term};
 
 mod refresh;
 pub use refresh::Refresh;
@@ -187,6 +187,40 @@ impl IndexedDataset {
         self.key == Some(graph.projection_key())
     }
 
+    /// Every quad `view` admits, as `oxrdf` quads: the default graph's rows
+    /// and the named graphs', each once, in no promised order. The read needs
+    /// no SPARQL evaluator; `query`'s [`IndexedRead`](crate::query::IndexedRead)
+    /// reads the same rows by pattern.
+    ///
+    /// # Panics
+    ///
+    /// Never for a dataset built here: every row was interned from an
+    /// `oxrdf::Quad`, so its subject, predicate and graph are well-formed.
+    pub fn quads(&self, view: View) -> impl Iterator<Item = oxrdf::Quad> + '_ {
+        self.index
+            .pattern(None, None, None, None, view)
+            .map(|(quad, _)| {
+                let term = |id| self.terms.resolve(id).clone();
+                let graph_name = if quad.graph.is_default_graph() {
+                    GraphName::DefaultGraph
+                } else {
+                    match NamedOrBlankNode::try_from(term(quad.graph))
+                        .expect("graph names are IRIs or blank nodes")
+                    {
+                        NamedOrBlankNode::NamedNode(name) => GraphName::NamedNode(name),
+                        NamedOrBlankNode::BlankNode(name) => GraphName::BlankNode(name),
+                    }
+                };
+                oxrdf::Quad::new(
+                    NamedOrBlankNode::try_from(term(quad.subject))
+                        .expect("subjects are IRIs or blank nodes"),
+                    NamedNode::try_from(term(quad.predicate)).expect("predicates are IRIs"),
+                    term(quad.object),
+                    graph_name,
+                )
+            })
+    }
+
     /// Stored rows (distinct quad and held flag).
     pub fn len(&self) -> usize {
         self.index.len()
@@ -206,5 +240,52 @@ impl IndexedDataset {
     /// Bytes held by the quad index (the dictionary's terms are not counted).
     pub fn memory_bytes(&self) -> usize {
         self.index.memory_bytes()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use oxrdf::{BlankNode, Literal};
+
+    fn node(local: &str) -> NamedNode {
+        NamedNode::new(format!("http://e/{local}")).unwrap()
+    }
+
+    #[test]
+    fn quads_round_trip_every_graph_kind_and_honour_the_view() {
+        let p = node("p");
+        let default = oxrdf::Quad::new(
+            node("a"),
+            p.clone(),
+            Literal::from("x"),
+            GraphName::DefaultGraph,
+        );
+        let named = oxrdf::Quad::new(node("a"), p.clone(), node("b"), node("g"));
+        let blank = oxrdf::Quad::new(
+            BlankNode::new("n1").unwrap(),
+            p.clone(),
+            node("b"),
+            BlankNode::new("g2").unwrap(),
+        );
+        let gone = oxrdf::Quad::new(node("z"), p, node("b"), GraphName::DefaultGraph);
+        let ds = IndexedDataset::from_quads([
+            (default.clone(), true),
+            (named.clone(), true),
+            (blank.clone(), true),
+            (gone.clone(), false),
+        ]);
+
+        let live: std::collections::HashSet<_> = ds.quads(View::Live).collect();
+        assert_eq!(
+            live,
+            std::collections::HashSet::from([default.clone(), named.clone(), blank.clone()])
+        );
+        let history: std::collections::HashSet<_> = ds.quads(View::History).collect();
+        assert_eq!(
+            history,
+            std::collections::HashSet::from([default, named, blank, gone])
+        );
+        assert_eq!(ds.quads(View::History).count(), ds.len());
     }
 }

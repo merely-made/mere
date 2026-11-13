@@ -94,38 +94,13 @@ pub(crate) fn isomorphic(mut a: Dataset, mut b: Dataset) -> bool {
     a == b
 }
 
-/// The engine's dataset as an `oxrdf::Dataset`, read back through the query seam
-/// (live rows: the default graph, then the named graphs).
-#[cfg(feature = "query")]
-pub(crate) fn dataset_of(dataset: &mere::query::IndexedDataset) -> Dataset {
-    use oxrdf::{NamedNode, NamedOrBlankNode, Quad};
-    use spareval::QueryableDataset;
-    let read = dataset.read(mere::query::View::Live);
-    let mut out = Dataset::new();
-    for graph in [Some(None), None] {
-        for q in read.internal_quads_for_pattern(None, None, None, graph) {
-            let Ok(q) = q;
-            let term = |id| read.externalize_term(id).unwrap_or_else(|e| match e {});
-            let graph_name = match q.graph_name {
-                None => GraphName::DefaultGraph,
-                Some(id) => match NamedOrBlankNode::try_from(term(id)).expect("graph name") {
-                    NamedOrBlankNode::NamedNode(n) => GraphName::NamedNode(n),
-                    NamedOrBlankNode::BlankNode(b) => GraphName::BlankNode(b),
-                },
-            };
-            out.insert(&Quad::new(
-                NamedOrBlankNode::try_from(term(q.subject)).expect("subject"),
-                NamedNode::try_from(term(q.predicate)).expect("predicate"),
-                term(q.object),
-                graph_name,
-            ));
-        }
-    }
-    out
+/// The engine's dataset as an `oxrdf::Dataset`, read back through `IndexedDataset::quads` (live
+/// rows: the default graph, then the named graphs). No SPARQL evaluator is involved.
+pub(crate) fn dataset_of(dataset: &mere::dataset::IndexedDataset) -> Dataset {
+    dataset.quads(mere::dataset::View::Live).collect()
 }
 
 /// The engine's entry point for `fmt` (`mere::parse_*`), read back as a dataset.
-#[cfg(feature = "query")]
 pub(crate) fn engine_parse(fmt: Fmt, bytes: &[u8], base: &str) -> Result<Dataset, String> {
     let text = || std::str::from_utf8(bytes).map_err(|e| e.to_string());
     let base = Some(base);
@@ -141,7 +116,6 @@ pub(crate) fn engine_parse(fmt: Fmt, bytes: &[u8], base: &str) -> Result<Dataset
 }
 
 /// Score a syntax or evaluation test through the engine's entry point.
-#[cfg(feature = "query")]
 fn engine_outcome(
     root: &Path,
     fmt: Fmt,
@@ -182,11 +156,7 @@ fn engine_outcome(
 
 /// The layers a test is recorded on when it is skipped outright.
 pub(crate) fn layers() -> &'static [&'static str] {
-    if cfg!(feature = "query") {
-        &["parser", "adapter", "engine"]
-    } else {
-        &["parser", "adapter"]
-    }
+    &["parser", "adapter", "engine"]
 }
 
 /// The adapter's own entry point for `fmt`, accept or reject only. `None`: it has none.
@@ -324,7 +294,6 @@ pub(crate) fn run_rdf(root: &Path, entries: &[Entry], report: &mut Report) {
         report.record("adapter", &manifest, category, &id, out);
 
         // Engine layer: the dataset entry points (`mere::parse_*`) with the test's base IRI.
-        #[cfg(feature = "query")]
         report.record(
             "engine",
             &manifest,

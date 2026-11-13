@@ -4,25 +4,28 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The headless resource inspector (engine split P5, D141 F11).
+//! The headless resource inspector (engine split P5, D141 F11; P6 L1).
 //!
 //! `inspect <file> [--base IRI] [--query SPARQL]` parses a Turtle, TriG,
 //! N-Quads or JSON-LD file with the engine's own entry points and reads the
-//! returned dataset with SPARQL: resources, assertions per asserter (held and
-//! withdrawn, from the RDF 1.2 reifier metadata), named graphs with quad
-//! counts, reason keys, and optionally one query's rows. It depends on the
-//! engine alone. Run with `cargo run -p mere --example inspect --features
-//! query -- <file>`. The logic is `inspect()`; `tests/inspect_example.rs`
-//! includes this file and calls it.
+//! returned dataset through `IndexedDataset::quads`: resources, assertions per
+//! asserter (held and withdrawn, from the RDF 1.2 reifier metadata), named
+//! graphs with quad counts and reason keys. Those sections need no SPARQL;
+//! `--query` runs one query and needs the `query` feature. It depends on the
+//! engine alone. Run with `cargo run -p mere --example inspect -- <file>`. The
+//! logic is `inspect()`; `tests/inspect_example.rs` includes this file and
+//! calls it.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fmt::Write as _;
 
-use mere::model::CoverageNote;
-use mere::query::{IndexedDataset, QueryRows, View, sparql_on};
+use mere::dataset::{IndexedDataset, View};
+#[cfg(feature = "query")]
+use mere::query::QueryRows;
 use mere::{
     ASSERTION_HISTORY_GRAPH_IRI, ContextCache, MERE_METHOD_VERSION, WITHDRAWAL_ACTIVITY_PREFIX,
 };
+use oxrdf::{GraphName, Term};
 
 const PROV: &str = "http://www.w3.org/ns/prov#";
 const RDF_REIFIES: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies";
@@ -58,18 +61,51 @@ pub struct Report {
     pub graphs: BTreeMap<String, usize>,
     /// Reason key (the assertion method IRI) -> assertions citing it.
     pub reasons: BTreeMap<String, usize>,
+    #[cfg(feature = "query")]
     pub query: Option<QueryRows>,
 }
 
-fn select(ds: &IndexedDataset, q: &str) -> Result<QueryRows, String> {
-    sparql_on(ds, q, View::Live, CoverageNote::default())
+/// A term as the report shows it: the bare IRI or lexical value, `_:id` for a blank node.
+fn show(term: &Term) -> String {
+    match term {
+        Term::NamedNode(n) => n.as_str().to_string(),
+        Term::Literal(l) => l.value().to_string(),
+        Term::BlankNode(b) => format!("_:{}", b.as_str()),
+        Term::Triple(triple) => triple.to_string(),
+    }
 }
 
-fn cell(row: &[Option<String>], i: usize) -> Option<&str> {
-    row.get(i).and_then(|c| c.as_deref())
+/// One live quad with every position as report text; `None` is the default graph.
+struct Row {
+    graph: Option<String>,
+    subject: String,
+    predicate: String,
+    object: String,
+}
+
+/// What each node says, graph by graph: `(graph, subject)` -> `(predicate, object)` pairs.
+type Props = HashMap<(Option<String>, String), Vec<(String, String)>>;
+
+/// The first object of `subject`'s `predicate` in `graph`, by sorted text.
+fn first<'a>(
+    props: &'a Props,
+    graph: &Option<String>,
+    subject: &str,
+    predicate: &str,
+) -> Option<&'a str> {
+    props
+        .get(&(graph.clone(), subject.to_string()))?
+        .iter()
+        .filter(|(p, _)| p == predicate)
+        .map(|(_, o)| o.as_str())
+        .min()
 }
 
 /// Read the dataset into a [`Report`], running `query` last when given.
+///
+/// # Errors
+///
+/// A query error, or `query` given when the `query` feature is off.
 pub fn inspect(ds: &IndexedDataset, query: Option<&str>) -> Result<Report, String> {
     let mut report = Report {
         rows: ds.len(),
@@ -79,30 +115,39 @@ pub fn inspect(ds: &IndexedDataset, query: Option<&str>) -> Result<Report, Strin
         assertions: Vec::new(),
         graphs: BTreeMap::new(),
         reasons: BTreeMap::new(),
+        #[cfg(feature = "query")]
         query: None,
     };
 
-    // Reifiers: every `?r rdf:reifies ?t`, with its metadata, in any graph.
-    let body = format!(
-        "?r <{RDF_REIFIES}> ?t .
-         OPTIONAL {{ ?r <{PROV}wasAttributedTo> ?by }}
-         OPTIONAL {{ ?r <{PROV}wasGeneratedBy> ?method }}
-         OPTIONAL {{ ?r <{MERE_METHOD_VERSION}> ?version }}
-         OPTIONAL {{ ?r <{RDFS_LABEL}> ?note }}
-         OPTIONAL {{ ?r <{PROV}wasInvalidatedBy> ?gone }}"
-    );
-    let reifiers = select(
-        ds,
-        &format!(
-            "SELECT ?g ?r ?by ?method ?version ?note ?gone WHERE {{
-               {{ {body} }} UNION {{ GRAPH ?g {{ {body} }} }} }}"
-        ),
-    )?;
+    let quads: Vec<Row> = ds
+        .quads(View::Live)
+        .map(|q| Row {
+            graph: match q.graph_name {
+                GraphName::DefaultGraph => None,
+                GraphName::NamedNode(n) => Some(n.as_str().to_string()),
+                GraphName::BlankNode(b) => Some(format!("_:{}", b.as_str())),
+            },
+            subject: show(&Term::from(q.subject)),
+            predicate: q.predicate.as_str().to_string(),
+            object: show(&q.object),
+        })
+        .collect();
+    let mut props = Props::new();
+    for q in &quads {
+        props
+            .entry((q.graph.clone(), q.subject.clone()))
+            .or_default()
+            .push((q.predicate.clone(), q.object.clone()));
+    }
+
+    // Reifiers: every `?r rdf:reifies ?t`, with its metadata beside it, in any graph.
     let mut reifier_ids = BTreeSet::new();
-    for row in &reifiers.rows {
-        let (g, r) = (cell(row, 0), cell(row, 1).unwrap_or_default());
-        let withdrawn = g == Some(ASSERTION_HISTORY_GRAPH_IRI) || cell(row, 6).is_some();
-        let by = cell(row, 2).unwrap_or("(none)");
+    for q in quads.iter().filter(|q| q.predicate == RDF_REIFIES) {
+        let (g, r) = (&q.graph, q.subject.as_str());
+        let prop = |p: &str| first(&props, g, r, p);
+        let withdrawn = g.as_deref() == Some(ASSERTION_HISTORY_GRAPH_IRI)
+            || prop(&format!("{PROV}wasInvalidatedBy")).is_some();
+        let by = prop(&format!("{PROV}wasAttributedTo")).unwrap_or("(none)");
         let tally = report.asserters.entry(by.to_string()).or_default();
         if withdrawn {
             tally.withdrawn += 1;
@@ -110,14 +155,14 @@ pub fn inspect(ds: &IndexedDataset, query: Option<&str>) -> Result<Report, Strin
             tally.held += 1;
         }
         let mut reason = String::new();
-        if let Some(method) = cell(row, 3) {
+        if let Some(method) = prop(&format!("{PROV}wasGeneratedBy")) {
             *report.reasons.entry(method.to_string()).or_default() += 1;
             reason.push_str(method);
-            if let Some(version) = cell(row, 4) {
+            if let Some(version) = prop(MERE_METHOD_VERSION) {
                 let _ = write!(reason, " v{version}");
             }
         }
-        if let Some(note) = cell(row, 5) {
+        if let Some(note) = prop(RDFS_LABEL) {
             if !reason.is_empty() {
                 reason.push_str("; ");
             }
@@ -126,27 +171,21 @@ pub fn inspect(ds: &IndexedDataset, query: Option<&str>) -> Result<Report, Strin
         report.assertions.push(format!(
             "{by}  {}  in {}  {r}  reason: {}",
             if withdrawn { "withdrawn" } else { "held" },
-            g.unwrap_or("(default)"),
+            g.as_deref().unwrap_or("(default)"),
             if reason.is_empty() { "(none)" } else { &reason },
         ));
         reifier_ids.insert(r.to_string());
     }
+    report.assertions.sort();
 
     // Quads: resources and the per-graph counts.
-    let quads = select(
-        ds,
-        "SELECT ?g ?s ?p ?o WHERE {
-           { ?s ?p ?o } UNION { GRAPH ?g { ?s ?p ?o } } }",
-    )?;
-    for row in &quads.rows {
-        let g = cell(row, 0);
+    for q in &quads {
+        let g = q.graph.as_deref();
         *report
             .graphs
             .entry(g.unwrap_or("(default)").to_string())
             .or_default() += 1;
-        let (Some(s), Some(p), Some(o)) = (cell(row, 1), cell(row, 2), cell(row, 3)) else {
-            continue;
-        };
+        let (s, p, o) = (&q.subject, &q.predicate, &q.object);
         let machinery = reifier_ids.contains(s) || s.starts_with(WITHDRAWAL_ACTIVITY_PREFIX);
         let alignment = g == Some(mere::profile::vocab::GRAPH_VOCABULARY);
         if machinery || alignment || s.starts_with("_:") || p == RDF_REIFIES {
@@ -158,9 +197,22 @@ pub fn inspect(ds: &IndexedDataset, query: Option<&str>) -> Result<Report, Strin
             .or_default()
             .push(format!("{p} {o} [{}]", g.unwrap_or("(default)")));
     }
+    for lines in report.resources.values_mut() {
+        lines.sort();
+    }
 
     if let Some(q) = query {
-        report.query = Some(select(ds, q)?);
+        #[cfg(feature = "query")]
+        {
+            report.query = Some(mere::query::sparql_on(
+                ds,
+                q,
+                View::Live,
+                mere::model::CoverageNote::default(),
+            )?);
+        }
+        #[cfg(not(feature = "query"))]
+        return Err(format!("--query needs the `query` feature: {q}"));
     }
     Ok(report)
 }
@@ -191,6 +243,7 @@ impl std::fmt::Display for Report {
         for (key, n) in &self.reasons {
             writeln!(f, "  {key}: {n} assertions")?;
         }
+        #[cfg(feature = "query")]
         if let Some(q) = &self.query {
             writeln!(
                 f,

@@ -12,14 +12,16 @@
 //!   adapter's own feature set and options.
 //! - `adapter`: the crate's public entry points (`from_nquads`, `from_trig`,
 //!   `from_jsonld_with_contexts_and_base_iri`), where one exists for the format.
-//! - `engine` (the `query` feature): the dataset entry points `mere::parse_*` with the test's base
-//!   IRI, scored on syntax by accept or reject and on evaluation by isomorphism of the returned
-//!   dataset; SPARQL query evaluation runs over a dataset built from data files those entry
-//!   points read.
+//! - `engine`: the dataset entry points `mere::parse_*` with the test's base IRI, scored on syntax by
+//!   accept or reject and on evaluation by isomorphism of the returned dataset (read back through
+//!   `IndexedDataset::quads`, so RDF and JSON-LD rows need no `query`); SPARQL query evaluation (the
+//!   `query` feature) runs over a dataset built from data files those entry points read.
 //! - `indexed` (SPARQL query evaluation only): the case's data loaded through
 //!   `query::IndexedDataset::from_quads` and evaluated by the same `spareval`.
 //!
 //! Ignored by default and a clean skip when the suites are absent:
+//!
+//! With `--features query` the SPARQL suites and the evaluation controls run as well.
 //!
 //! ```text
 //! W3C_SUITES_DIR=<dir holding rdf-tests, json-ld-api, ...> \

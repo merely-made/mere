@@ -159,7 +159,6 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
                 &id,
                 Outcome::Skip("processingMode json-ld-1.0: the adapter always runs 1.1"),
             );
-            #[cfg(feature = "query")]
             report.record(
                 "engine",
                 manifest,
@@ -183,7 +182,6 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
         report.record("adapter", manifest, "toRdf", &id, out);
 
         // Engine layer: `mere::parse_jsonld` through the offline cache, scored by dataset.
-        #[cfg(feature = "query")]
         {
             let got = mere::parse_jsonld(&bytes, cache.clone(), Some(&base))
                 .map(|d| crate::rdf::dataset_of(&d));

@@ -235,6 +235,14 @@ mod tests {
         assert!(err.to_string().contains("refused remote @context"));
     }
 
+    #[test]
+    fn parsed_rows_are_held_and_read_back_without_the_evaluator() {
+        let ds = parse_turtle("<http://a/> <http://p/> <http://b/> .", None).unwrap();
+        let quads: Vec<_> = ds.quads(View::Live).collect();
+        assert_eq!(quads.len(), 1);
+        assert_eq!(quads[0].graph_name, oxrdf::GraphName::DefaultGraph);
+    }
+
     #[cfg(feature = "query")]
     #[test]
     fn rows_are_held_and_the_default_graph_reads_live() {
