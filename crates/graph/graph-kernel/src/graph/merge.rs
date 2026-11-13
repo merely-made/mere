@@ -124,7 +124,7 @@ mod tests {
 
     use serde_json::Value;
 
-    use chartulary::AcceptAll;
+    use portolan::AcceptAll;
 
     use super::*;
     use crate::graph::revert::NodeState;
@@ -166,7 +166,7 @@ mod tests {
         assert_eq!(live.node_count(), 0);
         assert!(live.resource_nodes().next().is_none());
         assert_eq!(incoming.node_count(), 1);
-        assert!(incoming.resource(chartulary::resource_id(iri)).is_some());
+        assert!(incoming.resource(portolan::resource_id(iri)).is_some());
     }
 
     type Codicil = (GraphSnapshot, NodeFacetStore);

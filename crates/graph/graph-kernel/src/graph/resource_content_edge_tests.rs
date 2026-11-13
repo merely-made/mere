@@ -44,7 +44,7 @@ fn record(iri: &str, properties: &[NodeProperty]) -> PersistedResourceRecord {
 }
 
 fn resource(iri: &str) -> Uuid {
-    chartulary::resource_id_from_canonical_iri(iri)
+    portolan::resource_id_from_canonical_iri(iri)
 }
 
 fn set_record(graph: &mut Graph, iri: &str, properties: &[NodeProperty]) {

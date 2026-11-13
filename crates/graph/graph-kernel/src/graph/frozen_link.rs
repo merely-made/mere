@@ -86,7 +86,7 @@ pub(super) fn validate_frozen_link_record(
     if link.stratum() == GraphStratum::Resource
         && [&link.first(), &link.second()].into_iter().any(|endpoint| {
             endpoint.address.as_ref().is_none_or(|address| {
-                chartulary::resource_id_from_canonical_iri(address) != endpoint.id
+                portolan::resource_id_from_canonical_iri(address) != endpoint.id
             })
         })
     {

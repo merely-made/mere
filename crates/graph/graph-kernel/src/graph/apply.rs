@@ -4,8 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use chartulary::stemma::TransitionKind;
 use euclid::default::Point2D;
+use hodograph::TransitionKind;
 use uuid::Uuid;
 
 use super::{
@@ -536,13 +536,13 @@ fn set_node_facet(
     };
     graph.admit_surface_facet(node_id, facet, &value)?;
     let visits = facet == super::node_facets::VISIT_HISTORY;
-    let facet = chartulary::FacetId::new(facet);
+    let facet = portolan::FacetId::new(facet);
     if graph.facets().get(&node_id, &facet) == Some(&value) {
         return Ok(false);
     }
     graph
         .facets
-        .set(node_id, facet, value, &chartulary::AcceptAll)
+        .set(node_id, facet, value, &portolan::AcceptAll)
         .expect("AcceptAll cannot reject a graph facet");
     graph.note_surface_literals(node_id);
     if visits {
@@ -557,7 +557,7 @@ fn remove_node_facet(graph: &mut Graph, key: NodeKey, facet: &str) -> bool {
     };
     let removed = graph
         .facets
-        .remove(&node_id, &chartulary::FacetId::new(facet))
+        .remove(&node_id, &portolan::FacetId::new(facet))
         .is_some();
     if removed && facet == super::node_facets::VISIT_HISTORY {
         graph.bump_visit_revision();

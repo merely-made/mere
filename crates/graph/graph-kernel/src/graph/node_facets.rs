@@ -27,7 +27,7 @@ pub const PROVENANCE_DERIVATIONS: &str = "provenance.derivations";
 pub const SEMANTIC_CLASSIFICATIONS: &str = "semantic.classifications";
 pub const SEMANTIC_PROPERTIES: &str = "semantic.properties";
 
-pub type NodeFacetStore = chartulary::FacetStore<Uuid>;
+pub type NodeFacetStore = portolan::FacetStore<Uuid>;
 
 /// The durable visit clocks formerly stored as two columns on `Node`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
@@ -94,9 +94,7 @@ impl Graph {
         facet: &'static str,
     ) -> Option<T> {
         let node = self.inner.node(key)?;
-        let value = self
-            .facets
-            .get(&node.id, &chartulary::FacetId::new(facet))?;
+        let value = self.facets.get(&node.id, &portolan::FacetId::new(facet))?;
         // Borrowing deserializer: `&Value` is itself a `Deserializer`, so the
         // stored subtree is read in place. `from_value` would deep-clone the
         // whole tree first, and these accessors sit on the per-frame paint path.
@@ -120,13 +118,13 @@ impl Graph {
         let Some(node_id) = self.inner.node(key).map(|node| node.id) else {
             return false;
         };
-        let facet_id = chartulary::FacetId::new(facet);
+        let facet_id = portolan::FacetId::new(facet);
         let value = serde_json::to_value(value).expect("kernel facet must serialize");
         if self.facets.get(&node_id, &facet_id) == Some(&value) {
             return false;
         }
         self.facets
-            .set(node_id, facet_id, value, &chartulary::AcceptAll)
+            .set(node_id, facet_id, value, &portolan::AcceptAll)
             .expect("AcceptAll cannot reject a kernel facet");
         self.note_surface_literals(node_id);
         if facet == VISIT_HISTORY {

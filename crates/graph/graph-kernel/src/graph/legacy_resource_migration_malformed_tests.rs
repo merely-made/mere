@@ -45,7 +45,7 @@ fn legacy_migration_refuses_a_malformed_facet_record_naming_the_node_and_facet()
     let baseline = baseline();
     let valid = facet(1, r#"{"kept":true}"#);
     let migrated = migrate_legacy_prefix(&baseline, std::slice::from_ref(&valid)).unwrap();
-    let id = chartulary::FacetId::new(FACET);
+    let id = portolan::FacetId::new(FACET);
     assert!(
         migrated
             .graph

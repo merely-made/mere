@@ -131,7 +131,7 @@ impl Graph {
         }
         let held: Vec<NodeProperty> = self
             .facets
-            .get(&node_id, &chartulary::FacetId::new(SEMANTIC_PROPERTIES))
+            .get(&node_id, &portolan::FacetId::new(SEMANTIC_PROPERTIES))
             .and_then(|value| serde::Deserialize::deserialize(value).ok())
             .unwrap_or_default();
         if let Some(holders) = self.handle_index.built.get_mut() {

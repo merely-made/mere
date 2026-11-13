@@ -11,12 +11,12 @@ impl Graph {
     pub fn new() -> Self {
         Self {
             runtime_input_keys: [GraphInputKey::new_source(); 4],
-            inner: chartulary::Graph::new(),
+            inner: portolan::Graph::new(),
             surface_node_lifetimes: HashMap::new(),
             resources: mere::model::ResourceGraph::new(),
             shown_resources: BTreeMap::new(),
             resource_surfaces: BTreeMap::new(),
-            facets: chartulary::FacetStore::new(),
+            facets: portolan::FacetStore::new(),
             url_to_nodes: HashMap::new(),
             import_records: Vec::new(),
             fields: BTreeMap::new(),
@@ -218,7 +218,7 @@ impl Graph {
         _position: Point2D<f32>,
     ) -> (NodeKey, bool) {
         let primary_address = address_from_url(&url);
-        let mut container = chartulary::Container::with_identity(id)
+        let mut container = portolan::Container::with_identity(id)
             .with_address_record(primary_address)
             .with_title(url.clone());
         container.media_type = detect_mime(&url, None);

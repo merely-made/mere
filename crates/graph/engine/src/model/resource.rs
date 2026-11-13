@@ -8,7 +8,7 @@
 //! `graph::resource` (engine split P5 L3).
 
 use super::{FrozenLink, FrozenSelection};
-use chartulary::{Address, Addressed, Identified};
+use portolan::{Address, Addressed, Identified};
 use uuid::Uuid;
 
 /// A tagging assertion points from the tagged resource to its concept resource.
@@ -20,7 +20,7 @@ pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
 /// attached through the kernel's recorded write path.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ResourceNode {
-    container: chartulary::Container<Uuid>,
+    container: portolan::Container<Uuid>,
     nested_selection: Option<FrozenSelection>,
     nested_link: Option<FrozenLink>,
 }
@@ -28,7 +28,7 @@ pub struct ResourceNode {
 impl ResourceNode {
     /// Identify a resource using the common canonicalizer and UUID namespace.
     pub fn new(iri: &str) -> Self {
-        let canonical = chartulary::canonical_url(iri);
+        let canonical = portolan::canonical_url(iri);
         Self::from_canonical_iri(&canonical)
     }
 
@@ -43,8 +43,8 @@ impl ResourceNode {
         Self {
             nested_selection: None,
             nested_link: None,
-            container: chartulary::Container::with_identity(
-                chartulary::resource_id_from_canonical_iri(canonical),
+            container: portolan::Container::with_identity(
+                portolan::resource_id_from_canonical_iri(canonical),
             )
             .with_address_record(Address::new(canonical)),
         }

@@ -60,7 +60,7 @@ fn composition_preserves_classification_variants_origins_and_literal_handles() {
     let right = b.to_snapshot();
     let (merged, _) = try_merge_snapshots(&left, &right).unwrap();
     assert_eq!(merged.nodes.len(), 2);
-    let resource = chartulary::resource_id("https://example.test/page");
+    let resource = portolan::resource_id("https://example.test/page");
     let materialized = Graph::try_from_recorded_snapshot(&merged).unwrap();
     let variants = materialized.resource_classification_variants(resource);
     assert_eq!(variants.len(), 2);

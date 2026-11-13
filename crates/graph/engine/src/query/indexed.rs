@@ -10,8 +10,8 @@ use std::cell::RefCell;
 use std::convert::Infallible;
 
 use crate::dataset::IndexedDataset;
-use chartulary::quads::{Dictionary, TermId, View};
 use oxrdf::Term;
+use quadstore::{Dictionary, TermId, View};
 use spareval::{InternalQuad, QueryableDataset};
 
 impl IndexedDataset {

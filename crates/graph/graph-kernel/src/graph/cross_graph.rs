@@ -164,10 +164,10 @@ impl Graph {
                 super::node_facets::SEMANTIC_CLASSIFICATIONS,
                 super::node_facets::SEMANTIC_PROPERTIES,
             ] {
-                let facet_id = chartulary::FacetId::new(facet);
+                let facet_id = portolan::FacetId::new(facet);
                 if let Some(value) = source.facets.get(&source_id, &facet_id) {
                     self.facets
-                        .set(new_id, facet_id, value.clone(), &chartulary::AcceptAll)
+                        .set(new_id, facet_id, value.clone(), &portolan::AcceptAll)
                         .expect("AcceptAll cannot reject copied content");
                 }
             }
@@ -232,9 +232,9 @@ impl Graph {
         }
         // Declarations the copied statements and properties need, to a fixpoint
         // (a declaration resource can itself carry declared properties).
-        let declarations = chartulary::FacetId::new(PREDICATE_DECLARATIONS_FACET);
+        let declarations = portolan::FacetId::new(PREDICATE_DECLARATIONS_FACET);
         let declared = |predicate: &str| {
-            let id = chartulary::resource_id_from_canonical_iri(predicate);
+            let id = portolan::resource_id_from_canonical_iri(predicate);
             source
                 .resource_facets()
                 .get(&id, &declarations)
@@ -257,7 +257,7 @@ impl Graph {
                     .map(|property| property.predicate),
             )
             .collect();
-        let properties = chartulary::FacetId::new(RESOURCE_PROPERTIES);
+        let properties = portolan::FacetId::new(RESOURCE_PROPERTIES);
         loop {
             let before = resources.len();
             for (from, to, payload) in source.resource_edges() {

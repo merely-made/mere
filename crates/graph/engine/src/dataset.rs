@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The held dataset (no SPARQL evaluator needed; `query` reads it through `spareval`): `oxrdf` terms interned into a dense-id dictionary
-//! and their quads in a `chartulary::quads::QuadIndex` (indexed dataset brief
+//! and their quads in a `quadstore::QuadIndex` (indexed dataset brief
 //! D1 to D5). Built once per revision and read until the kernel's change
 //! counters move, or brought forward by [`IndexedDataset::refresh`] (quad index
 //! plan P4); who holds it is the consumer's (quad index plan D3).
@@ -14,8 +14,8 @@ use std::collections::HashMap;
 
 use crate::projection::{ProjectionSource, SourceQuads};
 use crate::{ProjectionKey, RdfSource};
-pub use chartulary::quads::View;
-use chartulary::quads::{Dictionary, Quad, QuadIndex, QuadMeta, TermId};
+pub use quadstore::View;
+use quadstore::{Dictionary, Quad, QuadIndex, QuadMeta, TermId};
 use oxrdf::{GraphName, NamedNode, NamedOrBlankNode, Term};
 
 mod refresh;

@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use chartulary::stemma::{EntrySnapshot, OwnerSnapshot, StemmaSnapshot, VisitSnapshot};
+use hodograph::{EntrySnapshot, OwnerSnapshot, StemmaSnapshot, VisitSnapshot};
 use kernel::graph::history::NodeHistoryOwner;
 use kernel::persistence::{GraphSnapshot, PersistedEdge, PersistedNode, PersistedResourceRecord};
 pub(super) type Navigation = StemmaSnapshot<String, String, NodeHistoryOwner, ()>;

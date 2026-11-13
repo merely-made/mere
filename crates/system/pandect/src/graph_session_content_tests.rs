@@ -60,7 +60,7 @@ fn unknown_tags_require_original_mere_and_reopen_preserves_that_namespace() {
                 .resource_tag_labels(resource)
                 .contains("saved")
         );
-        let concept = chartulary::resource_id_from_canonical_iri(&tag_concept_iri(
+        let concept = portolan::resource_id_from_canonical_iri(&tag_concept_iri(
             &context.original_mere_iri,
             "saved",
         ));

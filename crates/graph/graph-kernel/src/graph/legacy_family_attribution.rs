@@ -14,7 +14,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use chartulary::Identified;
+use portolan::Identified;
 use uuid::Uuid;
 
 use super::{AttributedDelta, CapturedDelta, EdgeAssertion, Graph, RelationKind};

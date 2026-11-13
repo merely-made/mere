@@ -22,8 +22,8 @@
 //! offer out still receives and stores it. What bounds who can read a personal
 //! graph is the roster, not this filter.
 
-use chartulary::FacetId;
 use eidetic::Hash;
+use portolan::FacetId;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

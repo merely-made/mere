@@ -8,7 +8,7 @@
 //! This crate transforms candidates and validates complete graphs. Djinn owns
 //! files, grants, sessions, the journal and archives. References grant no access.
 
-use chartulary::FacetId;
+use portolan::FacetId;
 use dramatis::{
     birth::BirthFacts,
     resources::{ResourceRef, SubjectResourceAssociation},

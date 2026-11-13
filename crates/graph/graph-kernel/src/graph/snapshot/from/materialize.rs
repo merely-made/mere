@@ -181,7 +181,7 @@ impl Graph {
         }
 
         for record in &snapshot.resources {
-            let id = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+            let id = portolan::resource_id_from_canonical_iri(&record.canonical_iri);
             graph.set_resource_record(id, Some(record.clone()));
         }
         let mut resource_pairs: BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>> = BTreeMap::new();

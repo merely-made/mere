@@ -89,9 +89,9 @@ impl Address {
     }
 }
 
-impl chartulary::ContainerAddress for Address {
-    fn to_address(&self) -> chartulary::Address {
-        chartulary::Address::new(self.as_url_str())
+impl portolan::ContainerAddress for Address {
+    fn to_address(&self) -> portolan::Address {
+        portolan::Address::new(self.as_url_str())
     }
 }
 

@@ -400,9 +400,9 @@ mod tests {
             .facets
             .set(
                 surface_id,
-                chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                portolan::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
                 serde_json::to_value(vec![property.clone(), property]).unwrap(),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
         assert!(conflicting.materialize().is_err());
@@ -411,9 +411,9 @@ mod tests {
             .facets
             .set(
                 surface_id,
-                chartulary::FacetId::new("foreign.retained-note"),
+                portolan::FacetId::new("foreign.retained-note"),
                 serde_json::json!({"statement_id": "opaque\nshared handle"}),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
         assert_eq!(FrozenGraph::of(&retained.materialize().unwrap()), retained);
@@ -706,9 +706,9 @@ mod tests {
             .facets
             .set(
                 Uuid::from_u128(1),
-                chartulary::FacetId::new("receipt.control"),
+                portolan::FacetId::new("receipt.control"),
                 serde_json::json!({"changed":true}),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
         assert_ne!(changed_facets, receipt.legacy_final);

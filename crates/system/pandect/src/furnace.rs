@@ -377,13 +377,13 @@ mod tests {
                 .facets_mut()
                 .set(
                     id,
-                    chartulary::FacetId::new(kernel::graph::node_facets::VISIT_HISTORY),
+                    portolan::FacetId::new(kernel::graph::node_facets::VISIT_HISTORY),
                     serde_json::to_value(kernel::graph::VisitHistoryFacet {
                         last_visited_ms: None,
                         last_session_visited: session,
                     })
                     .unwrap(),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
         }

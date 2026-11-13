@@ -140,13 +140,13 @@ mod tests {
             .facets_mut()
             .set(
                 id,
-                chartulary::FacetId::new(VISIT_HISTORY),
+                portolan::FacetId::new(VISIT_HISTORY),
                 serde_json::to_value(VisitHistoryFacet {
                     last_visited_ms: None,
                     last_session_visited: session,
                 })
                 .unwrap(),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
     }
@@ -163,9 +163,9 @@ mod tests {
             .facets_mut()
             .set(
                 pinned_id,
-                chartulary::FacetId::new(ARRANGEMENT_PIN),
+                portolan::FacetId::new(ARRANGEMENT_PIN),
                 serde_json::json!(true),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
 

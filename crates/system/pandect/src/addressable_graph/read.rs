@@ -61,9 +61,9 @@ pub(super) async fn materialize<B: Backend>(
                     facets
                         .set(
                             id,
-                            chartulary::FacetId::new(name),
+                            portolan::FacetId::new(name),
                             value.clone(),
-                            &chartulary::AcceptAll,
+                            &portolan::AcceptAll,
                         )
                         .map_err(|e| fail(e.to_string()))?;
                 }

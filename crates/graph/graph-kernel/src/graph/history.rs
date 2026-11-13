@@ -7,7 +7,7 @@
 //! Navigation history: the browse trail, in one **shared** visit space for the
 //! whole graph.
 //!
-//! Every node is an `Owner` within a single `chartulary::stemma::Stemma`, keyed by
+//! Every node is an `Owner` within a single `hodograph::Stemma`, keyed by
 //! the node's UUID. A node's own browse history is its owner's path (within-node
 //! back/forward); a node minted by an "open in new node" gesture is **spawned**
 //! with its creator set to the origin node, so its first visit attaches under the
@@ -37,7 +37,7 @@
 //!
 //! Extracted from `graph/mod.rs` per the 2026-05-11 kernel-mod decomposition pass.
 
-use chartulary::stemma::{
+use hodograph::{
     EntryPrivacy as MemoryEntryPrivacy, Stemma as OwnerScopedMemory,
     StemmaSnapshot as GraphMemorySnapshot, TransitionKind as MemoryTransitionKind,
 };

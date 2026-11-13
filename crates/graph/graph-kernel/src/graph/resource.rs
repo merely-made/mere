@@ -33,7 +33,7 @@ impl Graph {
     }
 
     /// Resource metadata, separate from surface metadata.
-    pub fn resource_facets(&self) -> &chartulary::FacetStore<Uuid> {
+    pub fn resource_facets(&self) -> &portolan::FacetStore<Uuid> {
         self.resources.facets()
     }
 
@@ -102,7 +102,7 @@ impl Graph {
         {
             let stored = self.resources.facets().get(
                 &id,
-                &chartulary::FacetId::new(super::frozen_selection::FROZEN_SELECTION),
+                &portolan::FacetId::new(super::frozen_selection::FROZEN_SELECTION),
             );
             let incoming = record
                 .facets
@@ -128,7 +128,7 @@ impl Graph {
         {
             let stored = self.resources.facets().get(
                 &id,
-                &chartulary::FacetId::new(super::frozen_link::FROZEN_LINK),
+                &portolan::FacetId::new(super::frozen_link::FROZEN_LINK),
             );
             let incoming = record
                 .facets
@@ -157,7 +157,7 @@ impl Graph {
                 return false;
             };
             if facets
-                .insert(chartulary::FacetId::new(facet.facet), value)
+                .insert(portolan::FacetId::new(facet.facet), value)
                 .is_some()
             {
                 return false;
@@ -185,7 +185,7 @@ impl Graph {
         for (facet, value) in facets {
             self.resources
                 .facets_mut()
-                .set(id, facet, value, &chartulary::AcceptAll)
+                .set(id, facet, value, &portolan::AcceptAll)
                 .expect("permissive facet validator");
         }
         self.note_resource_literals(id);

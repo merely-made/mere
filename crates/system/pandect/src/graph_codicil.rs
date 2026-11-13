@@ -269,7 +269,7 @@ impl RedactionPolicy {
         let nodes = facets.iter().map(|(node, _)| *node).collect::<Vec<_>>();
         for node in nodes {
             for facet in private_runtime_facets {
-                facets.remove(&node, &chartulary::FacetId::new(facet));
+                facets.remove(&node, &portolan::FacetId::new(facet));
             }
         }
     }
@@ -828,7 +828,7 @@ fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> Result<GraphCodicil
                         canonical,
                         facet.clone(),
                         value.clone(),
-                        &chartulary::AcceptAll,
+                        &portolan::AcceptAll,
                     )
                     .expect("AcceptAll cannot reject a composed facet");
             }
@@ -1023,9 +1023,9 @@ mod tests {
             .facets_mut()
             .set(
                 node_id,
-                chartulary::FacetId::new(kernel::graph::node_facets::ARRANGEMENT_PIN),
+                portolan::FacetId::new(kernel::graph::node_facets::ARRANGEMENT_PIN),
                 serde_json::json!(pinned),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
     }
@@ -1223,27 +1223,27 @@ mod tests {
                 .facets_mut()
                 .set(
                     node_id,
-                    chartulary::FacetId::new("web.form_draft"),
+                    portolan::FacetId::new("web.form_draft"),
                     serde_json::json!("secret"),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
             graph
                 .facets_mut()
                 .set(
                     node_id,
-                    chartulary::FacetId::new("web.page_scale"),
+                    portolan::FacetId::new("web.page_scale"),
                     serde_json::json!(1.5),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
             graph
                 .facets_mut()
                 .set(
                     node_id,
-                    chartulary::FacetId::new("foreign.keep"),
+                    portolan::FacetId::new("foreign.keep"),
                     serde_json::json!({"portable": true}),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
 
@@ -1258,19 +1258,19 @@ mod tests {
             assert!(
                 opened
                     .facets()
-                    .get(&node_id, &chartulary::FacetId::new("web.form_draft"))
+                    .get(&node_id, &portolan::FacetId::new("web.form_draft"))
                     .is_none()
             );
             assert!(
                 opened
                     .facets()
-                    .get(&node_id, &chartulary::FacetId::new("web.page_scale"))
+                    .get(&node_id, &portolan::FacetId::new("web.page_scale"))
                     .is_none()
             );
             assert_eq!(
                 opened
                     .facets()
-                    .get(&node_id, &chartulary::FacetId::new("foreign.keep")),
+                    .get(&node_id, &portolan::FacetId::new("foreign.keep")),
                 Some(&serde_json::json!({"portable": true}))
             );
         });
@@ -1534,17 +1534,17 @@ mod tests {
                 facets
                     .set(
                         surface_id,
-                        chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                        portolan::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
                         serde_json::to_value(vec![carried.clone(), carried]).unwrap(),
-                        &chartulary::AcceptAll,
+                        &portolan::AcceptAll,
                     )
                     .unwrap();
                 facets
                     .set(
                         surface_id,
-                        chartulary::FacetId::new("extension.origin-note"),
+                        portolan::FacetId::new("extension.origin-note"),
                         serde_json::json!({"statement_id": "resource-literal-handle"}),
-                        &chartulary::AcceptAll,
+                        &portolan::AcceptAll,
                     )
                     .unwrap();
                 let codicil = GraphCodicil {
@@ -1607,7 +1607,7 @@ mod tests {
                     assert_eq!(
                         restored.facets().get(
                             &surface_id,
-                            &chartulary::FacetId::new("extension.origin-note")
+                            &portolan::FacetId::new("extension.origin-note")
                         ),
                         Some(&serde_json::json!({"statement_id": "resource-literal-handle"}))
                     );
@@ -1794,9 +1794,9 @@ mod tests {
                 .facets
                 .set(
                     surface_id,
-                    chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                    portolan::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
                     serde_json::to_value(vec![held]).unwrap(),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
             assert!(stolen.clone().into_graph().is_err());

@@ -26,7 +26,7 @@ use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::F
 use std::collections::{BTreeMap, HashMap, HashSet};
 use uuid::Uuid;
 
-pub use chartulary::stemma::TransitionKind as NodeHistoryTransitionKind;
+pub use hodograph::TransitionKind as NodeHistoryTransitionKind;
 /// The stable address of a node's out-of-line representation.
 pub use muniment::Hash as ContentHash;
 
@@ -219,12 +219,12 @@ pub use muniment::{LogId, Seq};
 
 // Field-system truth types (2026-05-31). Field/Coupling form a parallel field
 // layer beside the node/edge graph; Seiche's numen reads them and evaluates.
-pub use chartulary::coupling::{COUPLING_VOCAB, Coupling, CouplingResponse, NodeSelector};
-pub use chartulary::edge_path::{EdgePath, EdgePathRule};
-pub use chartulary::field::{
+pub use fieldbook::coupling::{COUPLING_VOCAB, Coupling, CouplingResponse, NodeSelector};
+pub use fieldbook::edge_path::{EdgePath, EdgePathRule};
+pub use fieldbook::field::{
     CouplingId, Field, FieldDefinition, FieldExtent, FieldId, FieldLifecycle,
 };
-pub use chartulary::field_ast::{Falloff, ScalarField, VectorField};
+pub use fieldbook::field_ast::{Falloff, ScalarField, VectorField};
 
 /// Traversal archive payload emitted when dissolving a node.
 #[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize)]
@@ -349,7 +349,7 @@ pub struct Graph {
     /// Runtime-only model input versions, preserved by clones and advanced at
     /// the existing structural/content/site/visit mutation boundaries.
     runtime_input_keys: [GraphInputKey; 4],
-    /// The substrate graph: a [`chartulary::Graph`] over mere's [`Node`] and
+    /// The substrate graph: a [`portolan::Graph`] over mere's [`Node`] and
     /// [`EdgePayload`] (the G5 re-base — mere's graph *is* a chartulary graph).
     /// It owns the petgraph topology and the stable id-to-key index (mere's old
     /// hand-rolled `id_to_node` is retired in its favor). `pub(crate)` to enforce
@@ -357,8 +357,8 @@ pub struct Graph {
     /// goes through a `Graph` method so it advances [`revision`](Self::revision);
     /// direct mutation from outside the kernel would bypass the bump and stale the
     /// structural caches. Reads reach petgraph algorithms through
-    /// [`chartulary::Graph::inner`]. (Graph signals.)
-    pub(crate) inner: chartulary::Graph<Node, EdgePayload>,
+    /// [`portolan::Graph::inner`]. (Graph signals.)
+    pub(crate) inner: portolan::Graph<Node, EdgePayload>,
     /// Runtime membership witnesses; cloned with candidates, never snapshotted.
     surface_node_lifetimes: HashMap<Uuid, SurfaceNodeLifetime>,
 
@@ -376,7 +376,7 @@ pub struct Graph {
     /// Atomic optional metadata keyed by stable node id. This is the single
     /// live authority persisted by the host as `facets.json`; snapshot columns
     /// are legacy import inputs only.
-    pub(crate) facets: chartulary::FacetStore<Uuid>,
+    pub(crate) facets: portolan::FacetStore<Uuid>,
 
     /// URL to node mapping for lookup (supports duplicate URLs).
     pub(crate) url_to_nodes: HashMap<String, Vec<NodeKey>>,

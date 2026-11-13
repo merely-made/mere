@@ -7,11 +7,11 @@
 use super::*;
 use crate::graph::{Graph, SurfaceNode};
 use crate::persistence::PersistedResourceFacet;
-use chartulary::{Address, Addressed, Identified};
+use portolan::{Address, Addressed, Identified};
 
 fn record(iri: &str, value_json: &str) -> PersistedResourceRecord {
     PersistedResourceRecord {
-        canonical_iri: chartulary::canonical_url(iri),
+        canonical_iri: portolan::canonical_url(iri),
         facets: vec![PersistedResourceFacet {
             facet: "test.content".into(),
             value_json: value_json.into(),
@@ -23,7 +23,7 @@ fn record(iri: &str, value_json: &str) -> PersistedResourceRecord {
 fn resource_record_validation_is_atomic_and_replacement_clears_old_facets() {
     let mut graph = Graph::new();
     let iri = "https://example.com/resource";
-    let id = chartulary::resource_id(iri);
+    let id = portolan::resource_id(iri);
     let original = record(iri, "{\"title\":\"original\"}");
     assert!(graph.set_resource_record(id, Some(original.clone())));
     assert_eq!(graph.resource_record(id), Some(original.clone()));
@@ -60,7 +60,7 @@ fn shown_resource_is_explicit_and_references_guard_inverse_creation() {
     );
     let surface = graph.get_node(first).unwrap().id;
     let alias = graph.get_node(second).unwrap().id;
-    let id = chartulary::resource_id("https://example.com/page");
+    let id = portolan::resource_id("https://example.com/page");
     assert!(graph.shown_resource_id(first).is_none());
     assert!(!graph.set_shown_resource(surface, Some(id)));
     assert!(graph.set_resource_record(id, Some(record("https://example.com/page", "null"))));
@@ -84,7 +84,7 @@ fn resource_pair_rejects_conflicting_handles_before_replacing_truth() {
     let ids: Vec<_> = ["https://a.test/", "https://b.test/", "https://c.test/"]
         .into_iter()
         .map(|iri| {
-            let id = chartulary::resource_id(iri);
+            let id = portolan::resource_id(iri);
             assert!(graph.set_resource_record(id, Some(record(iri, "null"))));
             id
         })
@@ -176,7 +176,7 @@ fn resource_identity_is_common_and_canonical_without_renumbering_surfaces() {
     let alias = "https://EXAMPLE.COM:443/page?utm_source=news&id=7#part";
     let resource = ResourceNode::new(alias);
     assert_eq!(resource.canonical_iri(), iri);
-    assert_eq!(resource.id(), chartulary::resource_id(iri));
+    assert_eq!(resource.id(), portolan::resource_id(iri));
     assert_eq!(*Identified::id(&resource), resource.id());
     assert_eq!(resource.primary_address(), Some(Address::new(iri)));
     assert_eq!(resource, ResourceNode::new(iri));
@@ -206,7 +206,7 @@ fn vocabulary_term_identity_preserves_fragments_query_and_case() {
     ] {
         let term = ResourceNode::for_term(iri);
         assert_eq!(term.canonical_iri(), iri);
-        assert_eq!(term.id(), chartulary::resource_id_from_canonical_iri(iri));
+        assert_eq!(term.id(), portolan::resource_id_from_canonical_iri(iri));
         assert_ne!(term.id(), cat.id());
     }
     assert_eq!(cat, ResourceNode::for_term(cat.canonical_iri()));
@@ -268,7 +268,7 @@ fn exact_term_records_and_resource_edge_endpoints_survive_checked_load() {
 
 #[test]
 fn chartulary_indexes_resources_by_the_shared_identity() {
-    let mut graph = chartulary::Graph::<ResourceNode, ()>::new();
+    let mut graph = portolan::Graph::<ResourceNode, ()>::new();
     let first = graph.insert(ResourceNode::new("https://example.com/page"));
     let alias = graph.insert(ResourceNode::new("https://EXAMPLE.COM/page#part"));
     assert_eq!(first, alias);
@@ -278,11 +278,11 @@ fn chartulary_indexes_resources_by_the_shared_identity() {
     assert_eq!(graph.node_count(), 2);
     let clone = graph.clone();
     assert_eq!(
-        clone.get(&chartulary::resource_id("https://example.com/page")),
+        clone.get(&portolan::resource_id("https://example.com/page")),
         graph.node(first)
     );
     assert_eq!(
-        clone.get(&chartulary::resource_id("https://example.com/other")),
+        clone.get(&portolan::resource_id("https://example.com/other")),
         graph.node(other)
     );
 }

@@ -3040,7 +3040,7 @@ mod tests {
             alice_projection
                 .graph
                 .facets()
-                .get(&A, &chartulary::FacetId::new("graphshell.test/v1"),),
+                .get(&A, &portolan::FacetId::new("graphshell.test/v1"),),
             Some(&serde_json::json!({"device": "bob"}))
         );
         assert_eq!(

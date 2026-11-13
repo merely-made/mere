@@ -177,9 +177,9 @@ pub(super) fn resource_snapshot_fixture() -> (GraphSnapshot, Uuid, Uuid, Uuid) {
         canonical_iri: "https://target.test/item?id=7".into(),
         facets: Vec::new(),
     };
-    let from = chartulary::resource_id_from_canonical_iri(&first.canonical_iri);
-    let to = chartulary::resource_id_from_canonical_iri(&second.canonical_iri);
-    assert_ne!(from, chartulary::resource_id(&first.canonical_iri));
+    let from = portolan::resource_id_from_canonical_iri(&first.canonical_iri);
+    let to = portolan::resource_id_from_canonical_iri(&second.canonical_iri);
+    assert_ne!(from, portolan::resource_id(&first.canonical_iri));
     assert!(graph.set_resource_record(from, Some(first)));
     assert!(graph.set_resource_record(to, Some(second)));
     let mut payload = complete_payload();
@@ -427,7 +427,7 @@ fn recorded_load_keeps_a_set_node_url_over_the_navigation_cursor() {
 #[test]
 fn checked_loads_refuse_a_navigation_index_that_names_no_row() {
     use crate::graph::apply::add_node;
-    use chartulary::stemma::{StemmaSnapshot, TransitionKind};
+    use hodograph::{StemmaSnapshot, TransitionKind};
     type Nav = StemmaSnapshot<String, String, NodeHistoryOwner, ()>;
     const BAD: usize = 999_999;
 

@@ -352,7 +352,7 @@ impl Graph {
     pub(crate) fn resource_content<T: DeserializeOwned>(&self, id: Uuid, facet: &str) -> Option<T> {
         let value = self
             .resource_facets()
-            .get(&id, &chartulary::FacetId::new(facet))?;
+            .get(&id, &portolan::FacetId::new(facet))?;
         T::deserialize(value).ok()
     }
 

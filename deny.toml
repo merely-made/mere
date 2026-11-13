@@ -91,7 +91,7 @@ reason = "the RustCrypto 0.10 generation, held by p2mere-encryption 0.10.0 (p2me
 
 [[bans.skip]]
 crate = "foldhash@0.1.5"
-reason = "hashbrown 0.15.5, held by petgraph 0.8.3 under chartulary (eidetic, sibling); gone when petgraph moves to a current hashbrown"
+reason = "hashbrown 0.15.5, held by petgraph 0.8.3 under portolan (eidetic, sibling); gone when petgraph moves to a current hashbrown"
 
 [[bans.skip]]
 crate = "getrandom@0.2.17"
@@ -107,7 +107,7 @@ reason = "dashmap 6.2.1 under mere-fjall and muniment (eidetic, sibling); gone w
 
 [[bans.skip]]
 crate = "hashbrown@0.15.5"
-reason = "petgraph 0.8.3 under chartulary (eidetic, sibling); gone when petgraph moves to a current hashbrown"
+reason = "petgraph 0.8.3 under portolan (eidetic, sibling); gone when petgraph moves to a current hashbrown"
 
 [[bans.skip]]
 crate = "hashbrown@0.16.1"

@@ -124,9 +124,9 @@ fn wholesale_facet_replacement_clears_the_index() {
     facets
         .set(
             node_id,
-            chartulary::FacetId::new(SEMANTIC_PROPERTIES),
+            portolan::FacetId::new(SEMANTIC_PROPERTIES),
             serde_json::to_value(vec![property("legacy", "1")]).unwrap(),
-            &chartulary::AcceptAll,
+            &portolan::AcceptAll,
         )
         .unwrap();
     graph.install_facets(facets).unwrap();

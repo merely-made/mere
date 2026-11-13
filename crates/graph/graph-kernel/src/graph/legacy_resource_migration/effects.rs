@@ -36,7 +36,7 @@ pub(super) fn effects_between(
                 let facet = super::super::node_facets::PRESENTATION_TAGS;
                 let id = parse_id(&node.node_id)?;
                 effects.push(
-                    match after_facets.get(&id, &chartulary::FacetId::new(facet)) {
+                    match after_facets.get(&id, &portolan::FacetId::new(facet)) {
                         Some(value) => CapturedDelta::ReplaySetNodeFacetById {
                             node_id: node.node_id.clone(),
                             facet: facet.into(),

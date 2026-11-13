@@ -18,7 +18,7 @@ use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use chartulary::stemma::TransitionKind;
+use hodograph::TransitionKind;
 use euclid::default::Point2D;
 use rkyv::{Archive, Deserialize, Serialize};
 use uuid::Uuid;
@@ -912,9 +912,9 @@ impl ReplayAttribution {
         self.1.repair_checkpoint(graph);
     }
 
-    fn repair_edges<N: chartulary::Identified>(
+    fn repair_edges<N: portolan::Identified>(
         &self,
-        graph: &mut chartulary::Graph<N, super::EdgePayload>,
+        graph: &mut portolan::Graph<N, super::EdgePayload>,
     ) -> bool {
         let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
         let keys: Vec<_> = graph.inner().edge_indices().collect();
@@ -1239,7 +1239,7 @@ mod tests {
         let [added, stamp, resource, shown, set, removed] = captured.as_slice() else {
             panic!("expected add, visit, resource, shown, one facet set and remove: {captured:?}");
         };
-        let resource_id = chartulary::resource_id("mere://facet-test").to_string();
+        let resource_id = portolan::resource_id("mere://facet-test").to_string();
         assert!(
             matches!(added, CapturedDelta::ReplayAddNodeWithIdIfMissing {
             id: node_id, .. } if node_id == &id.to_string())
@@ -1267,14 +1267,14 @@ mod tests {
         assert_eq!(
             set_projection
                 .facets()
-                .get(&id, &chartulary::FacetId::new("example.portable/v1"),),
+                .get(&id, &portolan::FacetId::new("example.portable/v1"),),
             Some(&value)
         );
         let removed_projection = replay_captured_deltas(captured.iter().cloned());
         assert!(
             removed_projection
                 .facets()
-                .get(&id, &chartulary::FacetId::new("example.portable/v1"),)
+                .get(&id, &portolan::FacetId::new("example.portable/v1"),)
                 .is_none()
         );
         assert_eq!(
@@ -2465,7 +2465,7 @@ mod tests {
         .map(|(surface, iri)| {
             (
                 Uuid::from_u128(surface).to_string(),
-                chartulary::resource_id(iri).to_string(),
+                portolan::resource_id(iri).to_string(),
             )
         });
         let actual_bindings = captured
@@ -2490,8 +2490,8 @@ mod tests {
         ]
         .map(|iri| {
             (
-                chartulary::resource_id(iri).to_string(),
-                chartulary::canonical_url(iri),
+                portolan::resource_id(iri).to_string(),
+                portolan::canonical_url(iri),
             )
         });
         let actual_records = captured.iter().enumerate().filter_map(|(index, delta)| match delta {
@@ -2505,7 +2505,7 @@ mod tests {
                     CapturedDelta::ReplayAddNodeWithIdIfMissing { url, .. }
                     | CapturedDelta::ReplayNavigateNodeById { url, .. }
                     | CapturedDelta::ReplaySetNodeUrlById { new_url: url, .. } => {
-                        chartulary::resource_id(url).to_string() == *resource_id
+                        portolan::resource_id(url).to_string() == *resource_id
                     },
                     _ => false,
                 }));
@@ -2766,9 +2766,9 @@ mod resource_capture_tests {
 
     fn record(iri: &str) -> CapturedDelta {
         CapturedDelta::ReplaySetResourceRecordById {
-            resource_id: chartulary::resource_id(iri).to_string(),
+            resource_id: portolan::resource_id(iri).to_string(),
             record: Some(PersistedResourceRecord {
-                canonical_iri: chartulary::canonical_url(iri),
+                canonical_iri: portolan::canonical_url(iri),
                 facets: vec![PersistedResourceFacet {
                     facet: "foreign.metadata".into(),
                     value_json: r#"{"nested":[null,{"future":"kept"}]}"#.into(),
@@ -2829,8 +2829,8 @@ mod resource_capture_tests {
             [46, 1, b'a', 0]
         );
         let iri = "https://resource.test/a";
-        let resource = chartulary::resource_id(iri);
-        let other = chartulary::resource_id("https://resource.test/b");
+        let resource = portolan::resource_id(iri);
+        let other = portolan::resource_id("https://resource.test/b");
         let variants = [
             record(iri),
             CapturedDelta::ReplaySetResourceEdgesByIds {
@@ -2857,8 +2857,8 @@ mod resource_capture_tests {
 
     #[test]
     fn resource_capture_replay_preserves_strata_exact_data_and_noops() {
-        let from = chartulary::resource_id("https://resource.test/a");
-        let to = chartulary::resource_id("https://resource.test/b");
+        let from = portolan::resource_id("https://resource.test/a");
+        let to = portolan::resource_id("https://resource.test/b");
         let mut graph = Graph::new();
         let source =
             graph.add_node_with_id(from, "https://surface.test/a".into(), Default::default());
@@ -2935,8 +2935,8 @@ mod resource_capture_tests {
 
     #[test]
     fn resource_capture_journal_preserves_mint_source_across_withdrawal() {
-        let from = chartulary::resource_id("https://resource.test/a");
-        let to = chartulary::resource_id("https://resource.test/b");
+        let from = portolan::resource_id("https://resource.test/a");
+        let to = portolan::resource_id("https://resource.test/b");
         let mut captured = edges(from, to);
         captured[0].retained_assertions_mut()[0].provenance_iri = None;
         let pair = |edges| CapturedDelta::ReplaySetResourceEdgesByIds {

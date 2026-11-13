@@ -37,7 +37,7 @@ pub struct SurfaceNode {
     /// content, media type, title, tags, and nested-graph bearing live here.
     ///
     /// `Deref` keeps the Container capability surface direct.
-    pub container: chartulary::Container<Uuid, Address>,
+    pub container: portolan::Container<Uuid, Address>,
 
     /// Content-addressed preview imagery, keyed by role. The node carries
     /// ~40-byte [`ImageRef`] handles; the pixels live in the durable blob
@@ -60,7 +60,7 @@ pub struct SurfaceNode {
 pub type Node = SurfaceNode;
 
 impl Deref for SurfaceNode {
-    type Target = chartulary::Container<Uuid, Address>;
+    type Target = portolan::Container<Uuid, Address>;
 
     fn deref(&self) -> &Self::Target {
         &self.container
@@ -124,7 +124,7 @@ impl SurfaceNode {
     #[cfg(not(target_arch = "wasm32"))]
     pub fn test_stub(url: &str) -> Self {
         Self {
-            container: chartulary::Container::with_identity(Uuid::new_v4())
+            container: portolan::Container::with_identity(Uuid::new_v4())
                 .with_address_record(address_from_url(url))
                 .with_title(url),
             images: BTreeMap::new(),

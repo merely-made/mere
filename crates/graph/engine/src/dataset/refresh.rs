@@ -13,7 +13,7 @@ use std::mem::size_of;
 use super::{Contribution, IndexedDataset, Row, meta, subject_term};
 use crate::projection::ProjectionSource;
 use crate::RdfSource;
-use chartulary::quads::{TermId, View};
+use quadstore::{TermId, View};
 use oxrdf::Term;
 
 /// What [`IndexedDataset::refresh`] did.

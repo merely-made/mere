@@ -11,8 +11,8 @@
 //! `2026-07-18_one_node_facets_layer_map.md`): optional, typed, schema-validated
 //! records keyed by node id, so a node carries content-specific metadata (and a
 //! modder defines new metadata) without changing the kernel `Node`. The store
-//! type and its validation seam live in [`chartulary::facet`]; this module is the
-//! mere-side **wiring**: it persists a [`FacetStore<Uuid>`](chartulary::FacetStore)
+//! type and its validation seam live in [`portolan::facet`]; this module is the
+//! mere-side **wiring**: it persists a [`FacetStore<Uuid>`](portolan::FacetStore)
 //! (mere's node id is a `Uuid`) beside the session graph, on the same sidecar
 //! pattern as Turnstone's `browser_node_state` and `denizen_bindings`.
 //!
@@ -31,7 +31,7 @@
 //! `arrangement.*`), replacing N hand-rolled documents. This wiring is the
 //! enabling rung; the migrations follow behind it, opportunistically.
 //!
-//! Validation (a [`FacetValidator`](chartulary::FacetValidator)) is a write-time
+//! Validation (a [`FacetValidator`](portolan::FacetValidator)) is a write-time
 //! host concern (mere backs it with eidetic schema codicils); persistence here is
 //! schema-agnostic. One JSON document, recoverable replacement, `Ok(None)` when absent —
 //! deleting it drops facets, never graph truth.
@@ -43,11 +43,11 @@ use std::path::{Path, PathBuf};
 use serde::de::DeserializeOwned;
 use uuid::Uuid;
 
-pub use chartulary::{AcceptAll, ExpiringFacet, FacetError, FacetId, FacetValidator, NodeFacets};
+pub use portolan::{AcceptAll, ExpiringFacet, FacetError, FacetId, FacetValidator, NodeFacets};
 
-/// The mere node-facet store: a [`chartulary::FacetStore`] keyed by the node's
+/// The mere node-facet store: a [`portolan::FacetStore`] keyed by the node's
 /// stable `Uuid`.
-pub type NodeFacetStore = chartulary::FacetStore<Uuid>;
+pub type NodeFacetStore = portolan::FacetStore<Uuid>;
 
 /// Filename of the sidecar document, sibling to `graph.json`.
 pub const NODE_FACETS_FILE: &str = "facets.json";
@@ -60,7 +60,7 @@ pub const NODE_FACETS_FILE: &str = "facets.json";
 /// revision so replay can use the journal prefix's revision rather than a
 /// process clock.
 pub fn read_expiring_facet<Id, T>(
-    store: &chartulary::FacetStore<Id>,
+    store: &portolan::FacetStore<Id>,
     node: &Id,
     facet: &FacetId,
     revision: u64,
@@ -123,7 +123,7 @@ pub fn load_node_facets(session_dir: &Path) -> io::Result<Option<NodeFacetStore>
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chartulary::{Author, Container, GraphLog, Relation};
+    use portolan::{Author, Container, GraphLog, Relation};
     use serde_json::json;
     use servitor::{
         Cap, CascadeBudget, CascadeOutcome, CommittedEntry, Grant, GrantTable, Mode, ScopePath,

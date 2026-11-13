@@ -18,7 +18,7 @@ use super::edge_taxonomy::{
     ArrangementSubKind, EdgeAssertion, EdgeFamily, RelationKind, RelationSelector, SemanticSubKind,
 };
 use crate::model::types::{AssertionWithdrawal, GraphScope};
-use chartulary::{Classified, Predicated, RelationClass};
+use portolan::{Classified, Predicated, RelationClass};
 use rkyv::{Archive, Deserialize, Serialize};
 use std::collections::BTreeSet;
 

@@ -1211,9 +1211,9 @@ fn a_facet_value_naming_an_id_is_carried_verbatim_through_a_pick_merge() {
 
 fn properties_record(iri: &str, facets: &[(&str, Value)]) -> CapturedDelta {
     CapturedDelta::ReplaySetResourceRecordById {
-        resource_id: chartulary::resource_id(iri).to_string(),
+        resource_id: portolan::resource_id(iri).to_string(),
         record: Some(PersistedResourceRecord {
-            canonical_iri: chartulary::canonical_url(iri),
+            canonical_iri: portolan::canonical_url(iri),
             facets: facets
                 .iter()
                 .map(|(facet, value)| PersistedResourceFacet {
@@ -1237,7 +1237,7 @@ fn property(handle: &str, value: &str) -> Value {
 fn resource_facets_merge_by_the_rules_compose_uses() {
     pollster::block_on(async {
         let iri = "https://resource.test/a";
-        let resource = chartulary::resource_id(iri);
+        let resource = portolan::resource_id(iri);
         let mere = MereSessions::new(MemoryBackend::new());
         let mut target = parent(&mere).await;
         target

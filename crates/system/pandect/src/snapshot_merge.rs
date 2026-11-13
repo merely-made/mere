@@ -274,7 +274,7 @@ pub(crate) fn merge_snapshots_with_remap(
 
     let mut resource_ids = HashSet::new();
     merged.resources.retain(|record| {
-        resource_ids.insert(chartulary::resource_id_from_canonical_iri(
+        resource_ids.insert(portolan::resource_id_from_canonical_iri(
             &record.canonical_iri,
         ))
     });
@@ -284,13 +284,13 @@ pub(crate) fn merge_snapshots_with_remap(
         .enumerate()
         .map(|(index, record)| {
             (
-                chartulary::resource_id_from_canonical_iri(&record.canonical_iri),
+                portolan::resource_id_from_canonical_iri(&record.canonical_iri),
                 index,
             )
         })
         .collect();
     for record in &b.resources {
-        let id = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+        let id = portolan::resource_id_from_canonical_iri(&record.canonical_iri);
         if let Some(&index) = resources.get(&id) {
             layer_resource_record(&mut merged.resources[index], record)
                 .map_err(|error| Error::new(error.0))?;
@@ -699,8 +699,8 @@ mod tests {
         );
         let source = "https://source.test/";
         let target = "https://target.test/";
-        let from = chartulary::resource_id_from_canonical_iri(source).to_string();
-        let to = chartulary::resource_id_from_canonical_iri(target).to_string();
+        let from = portolan::resource_id_from_canonical_iri(source).to_string();
+        let to = portolan::resource_id_from_canonical_iri(target).to_string();
         let mut a = snap(&[source, target]);
         let mut b = snap(&[source, target]);
         a.resources = vec![
@@ -907,8 +907,8 @@ mod tests {
     fn shared_resources_keep_surface_associations_metadata_and_distinct_handles() {
         let iri = "https://shared.test/page";
         let target = "https://target.test/item";
-        let from = chartulary::resource_id_from_canonical_iri(iri).to_string();
-        let to = chartulary::resource_id_from_canonical_iri(target).to_string();
+        let from = portolan::resource_id_from_canonical_iri(iri).to_string();
+        let to = portolan::resource_id_from_canonical_iri(target).to_string();
         let mut a = snap(&[iri]);
         let mut b = snap(&[iri]);
         a.resources = vec![
@@ -976,8 +976,8 @@ mod tests {
     fn identical_cross_input_assertion_overlap_is_idempotent_while_new_rows_survive() {
         let from_iri = "https://from.test/item";
         let to_iri = "https://to.test/item";
-        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
-        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
+        let from = portolan::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = portolan::resource_id_from_canonical_iri(to_iri).to_string();
         let mut a = snap(&[]);
         a.resources = vec![
             resource_record(from_iri, "test.owner", "\"from\""),
@@ -1077,9 +1077,9 @@ mod tests {
         let from_iri = "https://from.test/item";
         let to_iri = "https://to.test/item";
         let other_iri = "https://other.test/item";
-        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
-        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
-        let other = chartulary::resource_id_from_canonical_iri(other_iri).to_string();
+        let from = portolan::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = portolan::resource_id_from_canonical_iri(to_iri).to_string();
+        let other = portolan::resource_id_from_canonical_iri(other_iri).to_string();
         let mut valid = snap(&[]);
         valid.resources = vec![
             resource_record(from_iri, "test.owner", "\"from\""),
@@ -1181,8 +1181,8 @@ mod tests {
     fn a_shared_handle_cannot_pick_a_payload_during_composition() {
         let from_iri = "https://from.test/item";
         let to_iri = "https://to.test/item";
-        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
-        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
+        let from = portolan::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = portolan::resource_id_from_canonical_iri(to_iri).to_string();
         let mut a = snap(&[]);
         a.resources = vec![
             resource_record(from_iri, "test.a", "1"),
@@ -1256,8 +1256,8 @@ mod tests {
         let mut source = snap(&["https://surface.test/a", "https://surface.test/b"]);
         let from_iri = "https://resource.test/a";
         let to_iri = "https://resource.test/b";
-        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
-        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
+        let from = portolan::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = portolan::resource_id_from_canonical_iri(to_iri).to_string();
         source.resources = vec![
             resource_record(from_iri, "test.origin", "1"),
             resource_record(to_iri, "test.origin", "2"),

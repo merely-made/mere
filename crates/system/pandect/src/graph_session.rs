@@ -2476,7 +2476,7 @@ mod tests {
             session.apply(person(), vec![add(7)]).await.unwrap();
             let node = Uuid::from_u128(7);
             let key = session.graph().get_node_key_by_id(node).unwrap();
-            let facet = chartulary::FacetId::new("graphshell.saved-scene/v4");
+            let facet = portolan::FacetId::new("graphshell.saved-scene/v4");
             // Exact coordinates observed in the headed scene Save refusal.
             let coordinates = [21.345783233642578_f64, -26.827743530273438_f64];
             let value = serde_json::json!({ "cartography": { "positions": coordinates } });
@@ -3086,9 +3086,9 @@ mod tests {
             changed_facets
                 .set(
                     Uuid::from_u128(1),
-                    chartulary::FacetId::new("extension.checkpoint-note"),
+                    portolan::FacetId::new("extension.checkpoint-note"),
                     serde_json::json!({"foreign": "valid but not in retained history"}),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
             let changes = [
@@ -4024,9 +4024,9 @@ mod tests {
                         .facets_mut()
                         .set(
                             Uuid::from_u128(1),
-                            chartulary::FacetId::new("unlogged.truth"),
+                            portolan::FacetId::new("unlogged.truth"),
                             serde_json::json!(true),
-                            &chartulary::AcceptAll,
+                            &portolan::AcceptAll,
                         )
                         .unwrap();
                 }),
@@ -4447,9 +4447,9 @@ mod tests {
             stolen
                 .set(
                     surface,
-                    chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                    portolan::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
                     serde_json::to_value(vec![held]).unwrap(),
-                    &chartulary::AcceptAll,
+                    &portolan::AcceptAll,
                 )
                 .unwrap();
             // The files a faulty writer would leave: the checkpoint names the

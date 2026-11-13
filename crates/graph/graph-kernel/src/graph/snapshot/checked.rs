@@ -263,7 +263,7 @@ fn validate_resource_columns(
     let mut resources: BTreeMap<Uuid, (usize, &str, BTreeMap<&str, serde_json::Value>)> =
         BTreeMap::new();
     for (index, record) in snapshot.resources.iter().enumerate() {
-        let id = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+        let id = portolan::resource_id_from_canonical_iri(&record.canonical_iri);
         crate::graph::predicate_declarations::predicate_declarations_from_record(record).map_err(
             |error| ResourceSnapshotError::InvalidFacet {
                 resource_id: id,
@@ -418,7 +418,7 @@ fn validate_resource_columns(
     }
     let mut literal_owners = BTreeMap::new();
     for record in &snapshot.resources {
-        let resource = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+        let resource = portolan::resource_id_from_canonical_iri(&record.canonical_iri);
         for facet in &record.facets {
             if facet.facet != crate::graph::resource_content::RESOURCE_PROPERTIES {
                 continue;

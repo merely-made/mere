@@ -9,9 +9,9 @@ use crate::graph::SemanticStatement;
 
 fn record(iri: &str, facets: &[(&str, Value)]) -> CapturedDelta {
     CapturedDelta::ReplaySetResourceRecordById {
-        resource_id: chartulary::resource_id(iri).to_string(),
+        resource_id: portolan::resource_id(iri).to_string(),
         record: Some(PersistedResourceRecord {
-            canonical_iri: chartulary::canonical_url(iri),
+            canonical_iri: portolan::canonical_url(iri),
             facets: facets
                 .iter()
                 .map(|(facet, value)| PersistedResourceFacet {
@@ -64,7 +64,7 @@ fn apply(graph: &mut Graph, edits: &[CapturedDelta]) {
 #[test]
 fn resource_undo_keeps_later_facet_keys_and_reports_same_key_conflicts() {
     let iri = "https://resource.test/a";
-    let resource = chartulary::resource_id(iri);
+    let resource = portolan::resource_id(iri);
     let mut before = Graph::new();
     apply(
         &mut before,
@@ -110,8 +110,8 @@ fn resource_undo_keeps_later_facet_keys_and_reports_same_key_conflicts() {
 fn creation_fixture() -> (Graph, Graph, Vec<CapturedDelta>, Uuid, Uuid, Uuid, Uuid) {
     let surface_a = Uuid::from_u128(1);
     let surface_b = Uuid::from_u128(2);
-    let resource_a = chartulary::resource_id("https://resource.test/a");
-    let resource_b = chartulary::resource_id("https://resource.test/b");
+    let resource_a = portolan::resource_id("https://resource.test/a");
+    let resource_b = portolan::resource_id("https://resource.test/b");
     let mut before = Graph::new();
     before.add_node_with_id(
         surface_a,
@@ -194,7 +194,7 @@ fn resource_undo_creation_keeps_later_surface_and_pair_references() {
     let (before, after, change, surface_a, surface_b, resource_a, resource_b) = creation_fixture();
     for later_surface in [true, false] {
         let mut live = after.clone();
-        let resource_c = chartulary::resource_id("https://resource.test/c");
+        let resource_c = portolan::resource_id("https://resource.test/c");
         if later_surface {
             apply(&mut live, &[shown(surface_b, resource_a)]);
         } else {
@@ -236,8 +236,8 @@ fn resource_undo_creation_keeps_later_surface_and_pair_references() {
 
 #[test]
 fn surface_creation_undo_preserves_later_shown_binding() {
-    let resource_a = chartulary::resource_id("https://resource.test/a");
-    let resource_b = chartulary::resource_id("https://resource.test/b");
+    let resource_a = portolan::resource_id("https://resource.test/a");
+    let resource_b = portolan::resource_id("https://resource.test/b");
     let surface = Uuid::from_u128(99);
     let mut before = Graph::new();
     apply(

@@ -67,7 +67,9 @@ strum = { version = "0.28", features = ["derive"] }
 # traits (Identified / Addressed / Labeled), the first step of the graph re-base
 # onto chartulary. Git sibling; local checkout via the gitignored
 # `.cargo/config.toml` patch.
-chartulary.workspace = true
+fieldbook.workspace = true
+hodograph.workspace = true
+portolan.workspace = true
 # The captured-delta stream persists as a muniment journal, the edit spine over
 # the substrate (see graph/journal.rs). This is direct so the kernel can name it.
 muniment.workspace = true

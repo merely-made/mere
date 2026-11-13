@@ -7,7 +7,7 @@
 //! The resource graph: resources by canonical IRI, the assertion-bearing edges
 //! between them, and their facet store (engine split P5 L3).
 //!
-//! It is a [`chartulary::Graph`] of [`ResourceNode`]s and [`EdgePayload`]s (it
+//! It is a [`portolan::Graph`] of [`ResourceNode`]s and [`EdgePayload`]s (it
 //! dereferences to one) plus the facets that hold resource content. A host that
 //! journals its writes, such as `mere-kernel`, owns one privately and never
 //! hands out `&mut`, so its recorded write path stays the only way in.
@@ -36,8 +36,8 @@ fn fresh_version() -> u64 {
 /// Resources, the edges between them, and their facets.
 #[derive(Clone)]
 pub struct ResourceGraph {
-    graph: chartulary::Graph<ResourceNode, EdgePayload>,
-    facets: chartulary::FacetStore<Uuid>,
+    graph: portolan::Graph<ResourceNode, EdgePayload>,
+    facets: portolan::FacetStore<Uuid>,
     /// Advanced by every mutable access; not persisted.
     version: u64,
 }
@@ -59,7 +59,7 @@ impl Default for ResourceGraph {
 }
 
 impl Deref for ResourceGraph {
-    type Target = chartulary::Graph<ResourceNode, EdgePayload>;
+    type Target = portolan::Graph<ResourceNode, EdgePayload>;
 
     fn deref(&self) -> &Self::Target {
         &self.graph
@@ -76,8 +76,8 @@ impl DerefMut for ResourceGraph {
 impl ResourceGraph {
     pub fn new() -> Self {
         Self {
-            graph: chartulary::Graph::new(),
-            facets: chartulary::FacetStore::new(),
+            graph: portolan::Graph::new(),
+            facets: portolan::FacetStore::new(),
             version: fresh_version(),
         }
     }
@@ -88,11 +88,11 @@ impl ResourceGraph {
     }
 
     /// Resource metadata, separate from surface metadata.
-    pub fn facets(&self) -> &chartulary::FacetStore<Uuid> {
+    pub fn facets(&self) -> &portolan::FacetStore<Uuid> {
         &self.facets
     }
 
-    pub fn facets_mut(&mut self) -> &mut chartulary::FacetStore<Uuid> {
+    pub fn facets_mut(&mut self) -> &mut portolan::FacetStore<Uuid> {
         self.version = fresh_version();
         &mut self.facets
     }
@@ -145,7 +145,7 @@ impl ResourceGraph {
 
     /// One typed facet of a resource, when present and well formed.
     pub fn resource_content<T: DeserializeOwned>(&self, id: Uuid, facet: &str) -> Option<T> {
-        let value = self.facets.get(&id, &chartulary::FacetId::new(facet))?;
+        let value = self.facets.get(&id, &portolan::FacetId::new(facet))?;
         T::deserialize(value).ok()
     }
 

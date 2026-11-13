@@ -22,7 +22,7 @@ default = ["bundled-contexts"]
 # binary — `full()` then equals `minimal()`. See `assets/NOTICE` for licensing.
 bundled-contexts = []
 # SPARQL query over the graph via spareval's `QueryableDataset`, evaluated
-# over a dictionary-encoded quad index (chartulary::quads) built from the
+# over a dictionary-encoded quad index (quadstore) built from the
 # projected quads (no RocksDB, wasm-viable).
 # Off by default: the dataset and the format entry points need no evaluator; base stays slim, only consumers that want SPARQL
 # pull the evaluator. Tests retain a materialized spareval dataset as the
@@ -53,7 +53,8 @@ oxrdf = { version = "0.3", features = ["rdf-12"] }
 oxrdfxml = { version = "0.2", features = ["rdf-12"] }
 # The resource graph's substrate, and the id-level quad index the query
 # feature's held dataset wraps.
-chartulary.workspace = true
+portolan.workspace = true
+quadstore.workspace = true
 # Preserve query extensions previously enabled transitively by Oxigraph.
 spareval = { version = "0.2.9", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
 spargebra = { version = "0.4", optional = true, features = ["sparql-12"] }

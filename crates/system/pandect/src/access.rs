@@ -6,7 +6,6 @@
 
 //! Address-access facts projected into Mere's unknown-forward facet store.
 
-use chartulary::{FacetError, FacetId};
 use eidetic::{
     BlobSource, Hash, ManifestId, MereNativeFieldSpec, MereNativeSchemaBuilder, ModerationState,
     NoFetcher, PayloadSealer, PrivacyClass, ProvenanceOrigin, ProvenanceRecord, SchemaDefinition,
@@ -16,6 +15,7 @@ use eidetic::{
 use kernel::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
 use kernel::graph::{Graph, NodeKey};
 use muniment::Backend;
+use portolan::{FacetError, FacetId};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

@@ -78,7 +78,7 @@ fn ensure_binding_is_explicit_and_idempotent_with_missing_surface_control() {
         None,
         "raw legacy add stays surface-only"
     );
-    let resource = chartulary::resource_id("https://example.test/page");
+    let resource = portolan::resource_id("https://example.test/page");
     assert_eq!(graph.ensure_surface_resource(surface), Some(resource));
     assert!(graph.resource(resource).is_some());
     assert_eq!(graph.shown_resource_id(surface), Some(resource));
@@ -174,7 +174,7 @@ fn explicit_refresh_preserves_old_claims_and_ensure_retains_recorded_binding() {
         captured.lock().unwrap().is_empty(),
         "raw URL replay preserves recorded binding"
     );
-    let current = chartulary::resource_id("https://page.test/two");
+    let current = portolan::resource_id("https://page.test/two");
     assert_eq!(graph.refresh_surface_resource(surface), Some(current));
     assert_ne!(current, earlier);
     assert_eq!(graph.shown_resource_id(surface), Some(current));
@@ -209,7 +209,7 @@ fn live_navigation_and_history_switch_binding_without_moving_held_assertions() {
     let held = held_claim(&mut graph, earlier, target);
     navigate(&mut graph, surface, "https://page.test/one");
     navigate(&mut graph, surface, "https://page.test/two#part");
-    let current = chartulary::resource_id("https://page.test/two");
+    let current = portolan::resource_id("https://page.test/two");
     assert_eq!(graph.shown_resource_id(surface), Some(current));
     assert_eq!(apply::node_history_forward(&mut graph, surface), None);
     assert_eq!(
@@ -286,7 +286,7 @@ fn captured_live_lifecycle_replays_exact_resource_records_and_shown_associations
             CapturedDelta::ReplayAddNodeWithIdIfMissing { url, .. }
             | CapturedDelta::ReplayNavigateNodeById { url, .. }
             | CapturedDelta::ReplaySetNodeUrlById { new_url: url, .. } => {
-                chartulary::resource_id(url).to_string() == *resource_id
+                portolan::resource_id(url).to_string() == *resource_id
             },
             _ => false,
         }));
@@ -310,7 +310,7 @@ fn captured_live_lifecycle_replays_exact_resource_records_and_shown_associations
     );
     assert_eq!(
         replayed.shown_resource_id(replayed_surface),
-        Some(chartulary::resource_id("https://page.test/three"))
+        Some(portolan::resource_id("https://page.test/three"))
     );
 }
 
@@ -368,7 +368,7 @@ fn old_surface_only_captures_do_not_infer_resource_records_or_bindings() {
     navigate(&mut live, surface, "https://page.test/three");
     assert_eq!(
         live.shown_resource_id(surface),
-        Some(chartulary::resource_id("https://page.test/three"))
+        Some(portolan::resource_id("https://page.test/three"))
     );
     assert_eq!(live.resource_nodes().count(), 2);
 }

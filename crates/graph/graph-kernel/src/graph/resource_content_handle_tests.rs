@@ -27,7 +27,7 @@ fn set_record(graph: &mut Graph, iri: &str, properties: &[NodeProperty]) {
     apply_graph_delta(
         graph,
         GraphDelta::ReplaySetResourceRecordById {
-            resource_id: chartulary::resource_id_from_canonical_iri(iri),
+            resource_id: portolan::resource_id_from_canonical_iri(iri),
             record: Some(record(iri, properties)),
         },
     );
@@ -125,7 +125,7 @@ fn checked_replay_reports_a_refused_literal_handle_instead_of_dropping_it() {
     set_record(&mut graph, "urn:owner", &[held.clone()]);
     let before = serde_json::to_value(graph.to_snapshot()).unwrap();
     let colliding = CapturedDelta::ReplaySetResourceRecordById {
-        resource_id: chartulary::resource_id_from_canonical_iri("urn:other").to_string(),
+        resource_id: portolan::resource_id_from_canonical_iri("urn:other").to_string(),
         record: Some(record("urn:other", &[held])),
     };
     let refused = super::replay_captured_deltas_onto_checked(&mut graph, [colliding.clone()])
@@ -170,9 +170,9 @@ fn installing_facets_that_steal_a_resource_handle_is_refused_and_leaves_the_stor
         facets
             .set(
                 surface,
-                chartulary::FacetId::new(SEMANTIC_PROPERTIES),
+                portolan::FacetId::new(SEMANTIC_PROPERTIES),
                 serde_json::to_value(vec![property.clone()]).unwrap(),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
         facets

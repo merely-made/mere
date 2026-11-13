@@ -137,7 +137,7 @@ pub fn layer_resource_record(
             FacetMerge::Conflict => {
                 return Err(RuleError(format!(
                     "resource {} has conflicting facet {:?}; precise variant merge is required",
-                    chartulary::resource_id_from_canonical_iri(&target.canonical_iri),
+                    portolan::resource_id_from_canonical_iri(&target.canonical_iri),
                     facet.facet
                 )));
             },

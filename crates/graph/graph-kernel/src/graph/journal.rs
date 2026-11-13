@@ -22,7 +22,7 @@
 //! express, and muniment supplies the ordered, forkable, persistable log beneath
 //! it. Checkpointing reuses mere's existing `GraphSnapshot`: load a snapshot, then
 //! [`replay_from`](GraphJournal::replay_from) the journal tail past its sequence,
-//! mirroring `chartulary::GraphLog::load_checkpointed`.
+//! mirroring `portolan::GraphLog::load_checkpointed`.
 //!
 //! WASM-clean: muniment is the substrate's portable persistence primitive (the
 //! same ones the browser persists through), so this module compiles to

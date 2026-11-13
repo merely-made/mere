@@ -75,9 +75,9 @@ fn source(count: usize) -> (Graph, Vec<Uuid>, Vec<Uuid>) {
             .facets_mut()
             .set(
                 id,
-                chartulary::FacetId::new("reader.highlight"),
+                portolan::FacetId::new("reader.highlight"),
                 json!({"value":i}),
-                &chartulary::AcceptAll,
+                &portolan::AcceptAll,
             )
             .unwrap();
         surfaces.push(id);
