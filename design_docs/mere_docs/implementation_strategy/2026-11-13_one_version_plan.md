@@ -57,7 +57,10 @@ A skip that remains names the step that will remove it. It is a stopgap, never a
   patches and has no greater addition being considered" (Mark). A fork that grows past patches is
   a crate of our own and comes back to Mark. `mere-rdfc` is already that case and stays in Mere.
 - The fork's `main` is the upstream release tag plus our patch commits, each commit one change.
-  Consumers reach it through `[patch.crates-io]` rows that `house` writes; nobody hand-writes them.
+  A crate a family repository depends on directly names the fork by git in its own manifest, which
+  reaches every consumer with no extra row. A transitive holder is reached through
+  `[patch.crates-io]` rows that `house` writes in every root workspace from one list; nobody
+  hand-writes them.
 - When upstream's own main has already moved, the fork is upstream's main with no patch, and it
   retires at the next upstream release. Retiring a fork is part of its done-condition.
 - Cryptography-domain crates (Mark: "Version ports with vectors"): a patch may only move
@@ -89,7 +92,10 @@ Done when: every remaining skip names a crypto crate without vectors, with the r
 Genet's 62 unversioned skips, which become versioned skips with reasons or go.
 Done when: every `deny.toml` in the family has no skip, or only the P3 crypto exceptions.
 
-**P5. Close.** Mere's carried patches under `support/patches` move to forks or are argued to stay.
+**P5. Close.** Any carried patch left in a family repository moves to a fork or is argued to stay.
+Mere carries none today (`support/patches` is empty at 198e1e967): D143's rudof patch was never
+built, so engine-split P6's SHACL lane builds it as a `mark-ik` fork named directly by git, listed
+to Mark before its repository is created; `mere-rdfc` is Mere's own crate (D144).
 Done when: D144's stopgap wording can be removed from each `deny.toml` header.
 
 ## Decisions
@@ -121,3 +127,6 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
 ## Progress
 
 - 2026-11-13: plan written; classification in `skips_by_holder.md`; D144 recorded (6839c3138).
+- 2026-11-13: first reader's review: direct dependencies name a fork by git, `[patch]` rows only
+  for transitive holders; P5 corrected, since Mere carries no patch today and the rudof patch is
+  built as a fork by P6's SHACL lane. Landed on Mere main.
