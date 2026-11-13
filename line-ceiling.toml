@@ -56,11 +56,3 @@ reason = "Live graph. Existing source-size debt; a responsibility split must pre
 [[exception]]
 path = "scripts/mere_doc_audit.py"
 reason = "Mere doc audit. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "tests/fixtures/luggage-comparison/retained-source/crates/system/luggage/src/install.rs"
-reason = "Uncompiled historical source input bound by the 2026-10-12 comparison receipt hash; splitting or reformatting it would invalidate the retained provenance. Live source keeps its own size checks."
-
-[[exception]]
-path = "tests/fixtures/luggage-comparison/retained-source/crates/system/luggage/src/updater.rs"
-reason = "Uncompiled historical source input bound by the 2026-10-12 comparison receipt hash; splitting or reformatting it would invalidate the retained provenance. Live source keeps its own size checks."

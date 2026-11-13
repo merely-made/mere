@@ -2,7 +2,6 @@
 # attempts a text diff on screenshots and the demo gif.
 assets/** binary
 
-tests/fixtures/luggage-comparison/** -text
 
 # Preserve the exact tested standalone dependency receipt across checkouts.
 design_docs/cambium_docs/testing/receipts/generated-names/graphshell-web-Cargo.lock.txt text eol=lf
