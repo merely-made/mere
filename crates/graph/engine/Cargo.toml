@@ -66,6 +66,10 @@ time = { version = "0.3", features = ["formatting", "parsing"] }
 # oxrdf's random blank-node support reaches getrandom 0.3. Browser builds also
 # pass `--cfg getrandom_backend="wasm_js"`, following Mere's existing web lanes.
 getrandom = { version = "0.3", features = ["wasm_js"] }
+# The workspace uuid row asks for v4, which on wasm32 needs a randomness
+# source; chartulary used to supply it, and fieldbook does now, but the engine
+# reaches neither.
+uuid = { workspace = true, features = ["js"] }
 # Every prepared SPARQL query initializes NOW and its planning timer, even
 # without an explicit NOW expression. Use the evaluator's browser clock.
 oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
