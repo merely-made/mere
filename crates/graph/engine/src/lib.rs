@@ -76,6 +76,10 @@ pub use acquire::ingest::{
     from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
     from_quads_envelope, is_bundled_context, referenced_context_urls,
 };
+pub use formats::canon::{
+    CanonError, CanonHash, CanonOptions, Canonical, DEFAULT_MAX_HNDQ_CALLS, DEFAULT_MAX_PERMUTATIONS,
+    canonicalize, canonicalize_quads,
+};
 pub use formats::parse::{
     JsonLdOptions, ProcessingMode, parse_jsonld, parse_nquads, parse_ntriples, parse_rdfxml,
     parse_trig, parse_turtle,

@@ -1,0 +1,31 @@
+[package]
+name = "mere-rdfc"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97.1"
+# oxrdf's licence and author, because the algorithm is carried from oxrdf (see src/lib.rs).
+license = "MIT OR Apache-2.0"
+authors = ["Tpt <thomas@pellissier-tanon.fr>", "Mark AB (markik)"]
+repository = "https://github.com/merely-made/mere"
+description = "RDF Dataset Canonicalization (RDFC-1.0), carried from oxrdf 0.3.5 with a poison-dataset budget, lazy permutations and every mention kept."
+publish = true
+keywords = ["rdf", "rdfc", "canonicalization", "linked-data"]
+categories = ["data-structures"]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# The terms and their Display (canonical N-Quads lines); `rdf-12` so the term enum is the
+# one every other crate in the graph sees. Triple terms are refused, not canonicalized.
+oxrdf = { version = "0.3", features = ["rdf-12"] }
+# The hash functions RDFC-1.0 names; the same range oxrdf's own `rdfc-10` took.
+sha2 = "0.11"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# oxrdf's random blank node ids reach getrandom 0.3; browser builds also pass
+# `--cfg getrandom_backend="wasm_js"`, as `mere` does.
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
+[lints]
+workspace = true

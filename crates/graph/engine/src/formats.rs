@@ -9,6 +9,10 @@
 /// JSON-LD export and the classic-reification bridge.
 pub mod jsonld;
 
+/// RDF Dataset Canonicalization (RDFC-1.0) over `oxrdf`'s `rdfc-10`: canonical N-Quads, the
+/// issued-identifier map, a hash choice and a blank-node limit.
+pub mod canon;
+
 /// Turtle-family file I/O (N-Quads / TriG) for the RDF projection, via `oxttl`.
 pub mod serialize;
 

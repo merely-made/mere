@@ -6,6 +6,7 @@ resolver = "2"
 members = [
     "crates/graph/graph-kernel",
     "crates/graph/engine",
+    "crates/graph/rdfc",
     "crates/system/catchment",
     "crates/system/pandect",
     "crates/domain/personal-facts",

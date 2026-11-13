@@ -49,6 +49,8 @@ oxjsonld = "0.2"
 oxrdfio = { version = "0.2", default-features = false, features = ["rdf-12"] }
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
+# RDFC-1.0 (formats::canon, D143 F-R7): oxrdf's `rdfc-10` carried with a poison budget.
+mere-rdfc = { version = "0.1.0", path = "../rdfc" }
 # RDF/XML parse only (D142), for the dataset entry points (always on).
 oxrdfxml = { version = "0.2", features = ["rdf-12"] }
 # The resource graph's substrate, and the id-level quad index the query
@@ -71,6 +73,8 @@ oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
 getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optional = true }
 
 [dev-dependencies]
+# The raw-oxrdf control layer of the rdf-canon rows (tests/w3c_conformance/rdfc.rs).
+oxrdf = { version = "0.3", features = ["rdf-12", "rdfc-10"] }
 postcard = { version = "1", features = ["alloc"] }
 # The W3C conformance harness (tests/w3c_conformance): SPARQL result files.
 sparesults = { version = "0.3", features = ["sparql-12"] }
