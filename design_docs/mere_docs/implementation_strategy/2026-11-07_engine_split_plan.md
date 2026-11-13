@@ -3500,3 +3500,21 @@ revision and what crosses at frame rate.
   "blank-node limit" is therefore the work budget. Gates: `mere` tests with and without `query`; ledger run with and
   without `query`, every other ROW line unchanged; wasm32 `cargo check` of `mere-rdfc`, and of `mere` apart from a `uuid` randomness error that the first reader traced to Eidetic's chartulary split (its wasm `js` row moved to `fieldbook`, which the engine does not reach) and fixed on main at `8bb31e96b` (the engine names `uuid` `js` for wasm32; `cargo check -p mere` for wasm32 passes with and without `query`); workspace check;
   `mere-kernel` 621; hooks. Receipts: "2026-11-13: P6 L2, RDFC-1.0".
+- 2026-11-13: P6's differential-dataflow probe (D143's order, before SHACL and the derived layer),
+  in a scratch crate, no repo changed; evidence and rerunnable source in
+  `Code/testing/engine-split/dd_probe.md` and `dd_probe/`. Verdict: differential-dataflow 0.26 with
+  timely 0.32 carries the derived layer native and on wasm32-unknown-unknown with no fork. The shim
+  is timely's public API: one `Worker` built with `idle_spin(Duration::ZERO)` and stepped with
+  `step()`, the same code path on both targets (`execute_directly` traps on `Instant::now()`). Spec:
+  RDF 1.1 Semantics §9.2 rdfs2, 3, 5, 7, 9, 11 and OWL 2 RL prp-trp, prp-inv1, prp-inv2 in one
+  `iterate`. Metric: a naive fixpoint oracle after every epoch, 30,616 checks native and 6,176 on
+  wasm (Node 24, zero imports), 0 mismatches; 1,030 withdrawals left a fact standing on a second
+  support; two deliberately broken programs fail as they should. Cost at 100k base triples (492,136
+  derived): an instance edit 0.6 to 1.6 ms against a 0.4 to 1.9 s rebuild, the heaviest schema edit
+  184 to 247 ms, about 165 bytes a closure triple held (94 MiB native, 79 MiB wasm), on a shared
+  machine. wasm size 1.89 MB after `wasm-opt -Oz` (476 KB gzipped). One added duplicate,
+  `foldhash` 0.2 beside 0.1.5 through petgraph 0.8.3 (its latest), for D144's removal plan. Carried
+  to the derived-layer lane: deltas come from the asserted index's refresh diff (a variant that
+  hands it out), a `Refresh::Rebuilt` mints a new dictionary, literal-subject derivations (rdfs3,
+  prp-inv) are filtered where the output lands, and per-graph or union entailment and the remaining
+  RDFS rules are its forks.
