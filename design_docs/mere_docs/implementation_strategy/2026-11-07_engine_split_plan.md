@@ -10,7 +10,8 @@ the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the 
 P0's squishes have landed in part (D14, D26 to D28). **P4 (Pandect on the authority boundary) is done,
 2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5 is in progress:** L2 (the `mere`
 crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph` in `mere`, the kernel
-composed over it) landed 2026-11-12. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
+layer) landed 2026-11-12. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -3284,3 +3285,23 @@ revision and what crosses at frame rate.
   `surface_ids_showing_resource` 1.78 / 1.84 and 40.6 / 34.7, `for_graph` 129 / 139 and 1416 / 1414,
   edit then `is_current` then rebuild 132 / 134 and 1350 / 1352: no change beyond noise. Receipts:
   "2026-11-12: P5 L3, the model seam".
+- 2026-11-12: P5 L4 landed, the format entry points and the ledger's engine layer (D141 F8, F9; the surface
+  projection and `apply_contribution` had moved to `kernel::rdf` in L3, F5). Entry points (`65f27a4a4`), in
+  `mere::formats::parse` and at the crate root behind the `query` feature: `parse_turtle`, `parse_ntriples`,
+  `parse_nquads`, `parse_trig` and `parse_rdfxml(bytes)`, each `(text, base_iri: Option<&str>)`, and
+  `parse_jsonld(bytes, ContextCache, base_iri: Option<&str>)`; all return `Result<IndexedDataset, IngestError>`
+  through `IndexedDataset::from_quads`, with nothing skolemized or dropped. N-Triples and N-Quads take the base
+  and ignore it. RDF/XML is parse only (D142), so `oxrdfxml` is now an optional dependency of `query`. The
+  existing `from_*` functions are unchanged (no caller outside Mere names the entry points: Graphshell,
+  Turnstone, Cleromancy and Knot grep clean at origin/main), and the JSON-LD cache loader is now one shared
+  function. Harness (`d3ed0ece8`): the `engine` layer scores them, and SPARQL query evaluation runs over a
+  dataset built from data files read by them. Ledger: the 49 parser, adapter and indexed `ROW` lines are
+  unchanged and 21 engine lines are added; RDF 1.1 TriG syntax is 214/214 at the engine layer (199/214 at the
+  adapter), N-Triples, Turtle and RDF/XML are scored for the first time (syntax and evaluation), the engine
+  matches the parser layer on every row except JSON-LD toRdf (432 pass against 439, the 8 `processingMode` 1.0
+  tests skipped), and every engine fail is also a parser-layer fail on the same test. Not in L4: content
+  negotiation and Link headers (acquire), SPARQL syntax and update at the engine layer, a JSON-LD processing
+  mode argument. Gates: `mere` 14 tests (19 with `query`), `mere-kernel` 616 with `query` and
+  `bundled-contexts`, `mere` checks on wasm32 with and without `query`, the workspace checks with
+  `--all-targets`, Graphshell's `mere-view` `query` build passes against the branch by `--config` patch, the
+  hooks and `house doc-audit` pass. Receipts: "2026-11-12: P5 L4, format entry points and the engine layer".

@@ -1319,3 +1319,52 @@ and the same check without the patch (resolving Mere main `cc780c8d`) fails with
 (`SessionViewIntent.focus`, `SessionGraphV1.attention`, `DecoderDevice::ndarray`; `core`'s
 `authority_corpus` test missing `mere_resident`, `eidetic`, `ostiary`, `uuid`); `core`'s library,
 binaries and examples pass with the patch.
+
+## 2026-11-12: P5 L4, format entry points and the engine layer (Mere `65f27a4a4` entry points, `d3ed0ece8` harness)
+
+Ledger: `W3C_SUITES_DIR=C:/Users/mark_/Code/crates cargo test -p mere --features query --test
+w3c_conformance -- --include-ignored --nocapture`, 3 passed in 24 s (suites `rdf-tests` `202a74e`,
+`json-ld-api` `5551473`; the same as the ledger's starting point). 70 `ROW` lines: the 49 parser, adapter and
+indexed lines equal L3's (compared with the counts recorded in the ledger and the P5 assessment: rdf12 syntax
+parser 181/1/0 and adapter 69/0/113, eval 85/2/0; rdf11 syntax 579/0/0 and 286/15/278, eval 412/2/0; SPARQL
+1.1 query-eval parser and indexed 230/14/3; SPARQL 1.2 64/1/0 and syntax 200/3/0; toRdf parser 439/10/18 and
+adapter 441/1/25), plus 21 `engine` lines:
+
+| ROW | pass | fail | skip |
+|---|---|---|---|
+| rdf12 syntax engine | 181 | 1 | 0 |
+| rdf12 eval engine | 85 | 2 | 0 |
+| rdf12 c14n engine | 0 | 0 | 82 |
+| rdf12 entailment engine | 0 | 0 | 29 |
+| rdf11 syntax engine | 579 | 0 | 0 |
+| rdf11 eval engine | 412 | 2 | 0 |
+| rdf11 entailment engine | 0 | 0 | 48 |
+| sparql11-query query-eval engine | 230 | 14 | 3 |
+| sparql11-query syntax engine | 0 | 0 | 106 |
+| sparql11-update syntax engine | 0 | 0 | 63 |
+| sparql11-update update-eval engine | 0 | 0 | 94 |
+| sparql12 query-eval engine | 64 | 1 | 0 |
+| sparql12 syntax engine | 0 | 0 | 203 |
+| sparql12 update-eval engine | 0 | 0 | 3 |
+| jsonld11 toRdf engine | 432 | 10 | 25 |
+| jsonld11 compact, expand, flatten, fromRdf, html, remote-doc engine | 0 | 0 | 246, 386, 58, 54, 50, 18 |
+
+Leaves that moved from the adapter layer: rdf11 TriG syntax 199/15/0 (adapter) to 214/0/0 (engine), TriG
+evaluation 143/143, Turtle 168/168 and 145/145, N-Triples 70/70, RDF/XML syntax 40/40 and evaluation 124/126;
+rdf12 N-Triples 33/34, Turtle 77/77 and 32/32, TriG 26/26 evaluation, RDF/XML 2/2 and 27/29. The verbose fail
+lists of the parser and engine layers were diffed by test id: the engine's 30 fails are a subset of the
+parser's 33 (the other 3 are SPARQL 1.2 syntax tests the engine layer does not score), so no case passes at
+the parser layer and fails at the engine layer.
+
+Tests: `cargo test -p mere` 14 lib tests (as L3), 19 with `--features query` (five new, in
+`formats::parse`); harness 2 passed and 1 ignored with `query`, 1 and 1 without; `cargo test -p mere-kernel
+--features query,bundled-contexts` lib 616 (as L3), `wire_fixtures` 5 + 1 ignored, `assertion_lifecycle_reopen`
+1 + 1, `frozen_link_reopen` 1 + 1. `cargo check -p mere --target wasm32-unknown-unknown` passes with and
+without `--features query`; `cargo check --workspace --all-targets` passes (1m20s); the pre-commit hooks pass
+(clippy including `--all-targets` with `mere/query`), and `house doc-audit` and `house hooks --check` exit 0.
+
+Downstream: Graphshell at origin/main `e919ae77`, a throwaway worktree (removed after), `cargo check -j 4
+--config <patch file> -p mere-view --features mere-view/query` from `host/`, the patch file pointing `mere`,
+`mere-kernel` and `mere-rdf` at the branch: passed in 1m08s, with no unused-patch warning for those three.
+Callers of the entry points outside Mere: none (Graphshell, Turnstone, Cleromancy and Knot, `git grep` at
+origin/main; Turnstone's one hit is a doc comment naming `from_jsonld`).
