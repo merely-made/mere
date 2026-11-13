@@ -291,10 +291,9 @@ including the core pack's release key and where it lives, is fork M5 (Conflicts,
   beside `mere` (D143), so a malformed shapes pack is refused with a report rather than
   half-applied. Validation of data is the SHACL rows' job (SHACL 1.2 core 162 and sparql 98; SHACL
   1.0 as a second row).
-- **Bound work** (Stack 8). The loader carries limits on pack bytes, term count, rule count and
-  RDFC blank nodes. `oxrdf`'s RDFC documents exponential worst-case cost and has no limit (P6
-  assessment §3.3), and the two `rdf-canon` poison cases (`test074c` and its sibling) are the
-  negative controls. Each limit is a typed refusal, never a hang.
+- **Bound work** (Stack 8). The loader carries limits on pack bytes, term count and rule count, and
+  RDFC-1.0 runs on `mere-rdfc` with its budgets on Hash N-Degree Quads calls and permutations (D11;
+  a blank-node count cannot refuse the poison clique). `test074c` is the negative control. Each limit is a typed refusal, never a hang.
 
 ### 3.7 Migrating from `mere.pack/v1`
 

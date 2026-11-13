@@ -3494,5 +3494,5 @@ revision and what crosses at frame rate.
   positive test uses 468) and 100,000 permutations (largest 2,880); `test074c` is refused in 0.4 s release. A
   blank-node-count limit was dropped: the clique has 10 blank nodes and positive tests reach 19. Declared-lens D8's
   "blank-node limit" is therefore the work budget. Gates: `mere` tests with and without `query`; ledger run with and
-  without `query`, every other ROW line unchanged; wasm32 `cargo check` of `mere-rdfc`, and of `mere` apart from a `uuid` randomness error in the workspace's `uuid` line that this lane does not touch (receipts); workspace check;
+  without `query`, every other ROW line unchanged; wasm32 `cargo check` of `mere-rdfc`, and of `mere` apart from a `uuid` randomness error that the first reader traced to Eidetic's chartulary split (its wasm `js` row moved to `fieldbook`, which the engine does not reach) and fixed on main at `8bb31e96b` (the engine names `uuid` `js` for wasm32; `cargo check -p mere` for wasm32 passes with and without `query`); workspace check;
   `mere-kernel` 621; hooks. Receipts: "2026-11-13: P6 L2, RDFC-1.0".
