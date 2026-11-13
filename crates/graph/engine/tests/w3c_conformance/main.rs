@@ -36,6 +36,7 @@ mod controls;
 mod jsonld;
 mod manifest;
 mod rdf;
+mod rdfc;
 mod report;
 #[cfg(feature = "query")]
 mod sparql;
@@ -138,6 +139,17 @@ fn w3c_conformance() {
             .map(|(_, c)| c.pass)
             .sum::<usize>();
         report.print("jsonld11");
+    }
+    // RDFC-1.0: the rdf-canon suite, whose manifest sits under `tests/`.
+    let canon = dir.join("rdf-canon");
+    if canon.is_dir() {
+        let mut entries = Vec::new();
+        walk(&canon.join("tests/manifest.ttl"), &mut entries)
+            .unwrap_or_else(|e| panic!("rdf-canon: {e}"));
+        println!("SUITE\trdfc10\t{} entries", entries.len());
+        let mut report = Report::default();
+        rdfc::run_rdfc(&canon, &entries, &mut report).unwrap_or_else(|e| panic!("rdf-canon: {e}"));
+        report.print("rdfc10");
     }
     // The instrument found and passed tests: a zero here is a broken walker, not a verdict.
     assert!(
