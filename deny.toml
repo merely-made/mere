@@ -95,11 +95,11 @@ reason = "hashbrown 0.15.5, held by petgraph 0.8.3 under chartulary (eidetic, si
 
 [[bans.skip]]
 crate = "getrandom@0.2.17"
-reason = "mere-rdf's wasm `query` build (getrandom02 with js), rand_core 0.6.4 (p2mere-core's rand 0.8) and ring 0.17.14 (iroh, upstream); gone when p2mere-core moves to rand 0.10 and ring leaves the graph"
+reason = "mere's wasm `query` build (getrandom02 with js), rand_core 0.6.4 (p2mere-core's rand 0.8) and ring 0.17.14 (iroh, upstream); gone when p2mere-core moves to rand 0.10 and ring leaves the graph"
 
 [[bans.skip]]
 crate = "getrandom@0.3.4"
-reason = "mere-rdf and pandect (wasm_js backend), rand_core 0.9.5 (oxrdf/spargebra, oxigraph upstream), personae and sporran (dramatis, sibling); gone when the oxigraph crates move to rand 0.10 and the wasm lanes to getrandom 0.4"
+reason = "mere and pandect (wasm_js backend), rand_core 0.9.5 (oxrdf/spargebra, oxigraph upstream), personae and sporran (dramatis, sibling); gone when the oxigraph crates move to rand 0.10 and the wasm lanes to getrandom 0.4"
 
 [[bans.skip]]
 crate = "hashbrown@0.14.5"

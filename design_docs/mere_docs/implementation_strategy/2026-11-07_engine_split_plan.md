@@ -4,14 +4,15 @@
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
-holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-facts`) that name nothing from
+holds five crates (`mere-kernel`, `catchment`, `pandect`, `mere-facts` and, from P5 L2, `mere`; `mere-rdf` retired at P5 L5) that name nothing from
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
 P0's squishes have landed in part (D14, D26 to D28). **P4 (Pandect on the authority boundary) is done,
 2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5 is in progress:** L2 (the `mere`
 crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph` in `mere`, the kernel
 composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
-layer) landed 2026-11-12. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+layer) and L5 (the dataset and the formats without `query`; Graphshell repointed to `mere`; the `mere-rdf` shim
+deleted) landed 2026-11-12. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -3305,3 +3306,20 @@ revision and what crosses at frame rate.
   `bundled-contexts`, `mere` checks on wasm32 with and without `query`, the workspace checks with
   `--all-targets`, Graphshell's `mere-view` `query` build passes against the branch by `--config` patch, the
   hooks and `house doc-audit` pass. Receipts: "2026-11-12: P5 L4, format entry points and the engine layer".
+- 2026-11-12: P5 L5 landed, the re-export window closes (D141 F6). Step 1, ungating (first reader, 2026-11-12,
+  listed to Mark; Mere `2b45c839a`): `IndexedDataset` and `View` moved to `mere::dataset`, and
+  `mere::formats::parse::*` with the root `parse_*` re-exports no longer need `query`; `oxrdfxml` is a normal
+  dependency (no `formats` feature: the parsers are always on, so a feature would only add a switch nobody
+  turns off). `IndexedRead`, its `read()` constructor and the `spareval` impl stay under `query`, and
+  `mere::query::{IndexedDataset, IndexedRead, View}` still resolve; `cargo tree -p mere -e normal` names no
+  `spareval`, `spargebra` or `oxsdatatypes`. The window, in D141's order: Mere's `mere` was already additive
+  with `mere-rdf` a `pub use` shim; Graphshell's one row (`host/Cargo.toml`, key `linked-data`, used by
+  `mere-view`) now names package `mere` (`a377c352`, key kept so no `use linked_data::` line changed;
+  `mere-view` used only `query::{IndexedDataset, sparql_resource_members, sparql_resource_members_on}`, all in
+  `mere`, and nothing from the kernel half); then Mere deleted `crates/graph/linked-data` and its workspace
+  row and moved the clippy hook to `-p mere -p mere-kernel`. Turnstone, Cleromancy and Knot name the shim in no
+  dependency row (Turnstone's `deny.toml` skip reason names it as prose; the other two grep clean).
+  Graphshell's commit also moves `pelt-desktop` to `dirs` 7, because its dependency-bans hook failed on
+  origin/main already (dirs 6 beside Mere's `catchment` on 7, D137: bump the holder). Gates and receipts:
+  "2026-11-12: P5 L5, the re-export window closes". Not in L5: the ledger's `engine` layer still needs `query`
+  (the harness is gated as a whole), content negotiation, a JSON-LD processing mode argument.

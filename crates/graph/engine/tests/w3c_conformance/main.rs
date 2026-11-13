@@ -23,7 +23,7 @@
 //!
 //! ```text
 //! W3C_SUITES_DIR=<dir holding rdf-tests, json-ld-api, ...> \
-//!   cargo test -p mere-rdf --features query --test w3c_conformance -- --ignored --nocapture
+//!   cargo test -p mere --features query --test w3c_conformance -- --ignored --nocapture
 //! ```
 //!
 //! Failures do not fail the test; they are the ledger's record. `W3C_VERBOSE=1` lists each
@@ -49,7 +49,7 @@ fn suites_dir() -> Option<PathBuf> {
         let dir = PathBuf::from(dir);
         return dir.join("rdf-tests").is_dir().then_some(dir);
     }
-    // `repos/mere/crates/graph/linked-data` -> `Code/crates`.
+    // `repos/mere/crates/graph/engine` -> `Code/crates`.
     let guess = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../../../crates");
     guess.join("rdf-tests").is_dir().then_some(guess)
 }
