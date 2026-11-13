@@ -77,6 +77,10 @@ pub use formats::serialize::{
     from_nquads, from_nquads_envelope, from_trig, from_trig_envelope, to_nquads,
     to_nquads_with_history, to_trig, to_trig_with_history,
 };
+#[cfg(feature = "query")]
+pub use formats::parse::{
+    parse_jsonld, parse_nquads, parse_ntriples, parse_rdfxml, parse_trig, parse_turtle,
+};
 pub use profile::vocab::{Alignment, alignment, vocabulary_alignment_quads};
 
 /// `schema:name` — the curated mapping target for a node's title.

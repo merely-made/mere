@@ -345,19 +345,37 @@ pub fn from_jsonld_envelope_with_contexts_and_base_iri(
     };
     let quads = parser
         .for_slice(bytes)
-        .with_load_document_callback(move |url, _options| {
-            contexts
-                .get(url)
-                .map(|document| JsonLdRemoteDocument {
-                    document: document.to_vec(),
-                    document_url: url.to_string(),
-                })
-                .ok_or_else(|| -> Box<dyn std::error::Error + Send + Sync> {
-                    format!("refused remote @context (not in the bundled cache): {url}").into()
-                })
-        });
+        .with_load_document_callback(offline_loader(contexts));
     collect_contribution(quads, &namespace)
 }
+
+/// The document loader that serves `@context` documents from `contexts` and
+/// refuses everything else, so no parse makes a request.
+#[allow(clippy::type_complexity)]
+pub(crate) fn offline_loader(
+    contexts: ContextCache,
+) -> impl Fn(
+    &str,
+    &oxjsonld::JsonLdLoadDocumentOptions,
+) -> Result<JsonLdRemoteDocument, Box<dyn std::error::Error + Send + Sync>>
++ Send
++ Sync
++ std::panic::UnwindSafe
++ std::panic::RefUnwindSafe
++ 'static {
+    move |url, _options| {
+        contexts
+            .get(url)
+            .map(|document| JsonLdRemoteDocument {
+                document: document.to_vec(),
+                document_url: url.to_string(),
+            })
+            .ok_or_else(|| -> Box<dyn std::error::Error + Send + Sync> {
+                format!("refused remote @context (not in the bundled cache): {url}").into()
+            })
+    }
+}
+
 /// Scan a JSON-LD document for the remote `@context` URLs it references — the
 /// string entries of any `@context`, top-level or nested, including inside
 /// `@graph`. A host fetches these (minus the ones the bundled packs already

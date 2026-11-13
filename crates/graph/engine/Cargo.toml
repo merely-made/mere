@@ -28,7 +28,7 @@ bundled-contexts = []
 # pull the evaluator. Tests retain a materialized spareval dataset as the
 # parity oracle for the indexed dataset.
 # Preserve directional JSON-LD terms previously enabled through Oxigraph.
-query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
+query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "dep:oxrdfxml", "oxjsonld/rdf-12"]
 
 [dependencies]
 serde.workspace = true
@@ -45,6 +45,8 @@ web-time = "1"
 oxjsonld = "0.2"
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
+# RDF/XML parse only (D142), for the dataset entry points of the `query` feature.
+oxrdfxml = { version = "0.2", features = ["rdf-12"], optional = true }
 # The resource graph's substrate, and the id-level quad index the query
 # feature's held dataset wraps.
 chartulary.workspace = true

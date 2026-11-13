@@ -11,3 +11,8 @@ pub mod jsonld;
 
 /// Turtle-family file I/O (N-Quads / TriG) for the RDF projection, via `oxttl`.
 pub mod serialize;
+
+/// Entry points that take a base IRI and return an `IndexedDataset` (the `query`
+/// feature): Turtle, N-Triples, N-Quads, TriG, RDF/XML (parse only) and JSON-LD.
+#[cfg(feature = "query")]
+pub mod parse;
