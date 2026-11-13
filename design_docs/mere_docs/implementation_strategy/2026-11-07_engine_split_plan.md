@@ -8,13 +8,12 @@ holds five crates (`mere-kernel`, `catchment`, `pandect`, `mere-facts` and, from
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
 P0's squishes have landed in part (D14, D26 to D28). **P4 (Pandect on the authority boundary) is done,
-2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5's conditions are met:** L2 (the `mere`
+2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5 (the engine crate) is done, 2026-11-12:** L2 (the `mere`
 crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph` in `mere`, the kernel
 composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
 layer) and L5 (the dataset and the formats without `query`; Graphshell repointed to `mere`; the `mere-rdf` shim
-deleted) and L6a (the headless inspector) landed 2026-11-12, and its four done-conditions are met, checked
-under P5 ("Done-conditions, 2026-11-12"); it closes when L6b (content negotiation and Link headers, D142's P5
-row) lands. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+deleted), L6a (the headless inspector) and L6b (content negotiation and Link headers, D142's P5 row) landed
+2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -741,7 +740,7 @@ change. Measure per Constraints before the resource/surface join becomes a crate
     Oxigraph's crates stay upstream, with no fork (F10); the join was measured before the boundary
     (L3's `join_scale`, no change beyond noise).
   - Outside the done-conditions: D142 also placed content negotiation and Link headers in P5's
-    acquire stage. That is L6b, and P5 closes when it lands.
+    acquire stage. L6b built them (Mere `0211a831d`), and P5 closed with it.
 
 ### P6. Interpretation and identity stages
 
@@ -3367,3 +3366,21 @@ revision and what crosses at frame rate.
   one withdrawal, two scopes, a method and notes). `tests/inspect_example.rs` includes the example by `#[path]`
   and asserts the counts, so the engine gains no public API. Receipts: "2026-11-12: P5 L6a, the headless
   resource inspector".
+- 2026-11-12: P5 L6b landed, content negotiation and Link headers in the acquire stage (D142's P5 row),
+  Mere `0211a831d`. `mere::acquire::negotiate` holds an Accept policy as data (`AcceptPolicy`, narrowable
+  to a host's formats), `parse_content_type` and `parse_response` (bytes and a Content-Type to an
+  `IndexedDataset`), and `negotiate::link` parses RFC 8288 Link headers and discovers RDF alternates,
+  `describedby` and JSON-LD context links, resolved against the response URL with `oxiri`. No network code:
+  the fetch stays with the host. The format type is `oxrdfio::RdfFormat`, re-exported as
+  `mere::formats::RdfFormat` (first reader, 2026-11-12, listed to Mark: P5's body keeps Oxigraph's
+  components upstream, so the engine keeps no format enum or media-type table of its own), with the
+  format-to-parser dispatch in `mere::formats::parse::parse`, which the inspector now also uses. The
+  media-type mapping refuses `application/json`, `text/plain`, `application/xml` and N3, which oxrdfio maps
+  leniently, because an unknown type is an error, not a guess. The Link parser is our own, about 200 lines
+  tested on RFC 8288's examples; no crate in the tree fits. Gates: `mere` lib tests 27, and 28 with
+  `query`; wasm32 with and without `query`; no HTTP client in `cargo tree -p mere`; workspace check; hooks
+  and `house doc-audit`. Receipts: "2026-11-12: P5 L6b, content negotiation and Link headers".
+- 2026-11-12: P5 done. The four done-conditions are checked under P5, and D142's P5 row is built.
+  Carried forward: the conformance harness still needs `query` as a whole; JSON-LD has no 1.0
+  processing mode (its 8 tests are skipped at the engine layer); the quad index plan's P4 (incremental
+  maintenance) is unblocked by the fold.
