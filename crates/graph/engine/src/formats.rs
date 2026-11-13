@@ -15,3 +15,7 @@ pub mod serialize;
 /// Entry points that take a base IRI and return an `IndexedDataset` (no `query`
 /// feature needed): Turtle, N-Triples, N-Quads, TriG, RDF/XML (parse only) and JSON-LD.
 pub mod parse;
+
+/// The RDF format enum (media types, extensions), from `oxrdfio`. The engine
+/// parses every variant but N3.
+pub use oxrdfio::RdfFormat;

@@ -152,6 +152,35 @@ pub fn parse_jsonld(
     Ok(dataset(quads))
 }
 
+/// Parse `bytes` as `format`: the dispatch over the `parse_*` entry points.
+/// Text syntaxes must be UTF-8; `contexts` serves a JSON-LD remote `@context`.
+///
+/// # Errors
+///
+/// [`IngestError::Parse`] for a format the engine does not parse (N3), invalid
+/// UTF-8, or a parser failure.
+pub fn parse(
+    format: oxrdfio::RdfFormat,
+    bytes: &[u8],
+    base_iri: Option<&str>,
+    contexts: ContextCache,
+) -> Result<IndexedDataset, IngestError> {
+    use oxrdfio::RdfFormat as F;
+    let text = || std::str::from_utf8(bytes).map_err(parse_error);
+    match format {
+        F::Turtle => parse_turtle(text()?, base_iri),
+        F::TriG => parse_trig(text()?, base_iri),
+        F::NTriples => parse_ntriples(text()?, base_iri),
+        F::NQuads => parse_nquads(text()?, base_iri),
+        F::JsonLd { .. } => parse_jsonld(bytes, contexts, base_iri),
+        F::RdfXml => parse_rdfxml(bytes, base_iri),
+        other => Err(IngestError::Parse(format!(
+            "unsupported RDF format: {}",
+            other.iri()
+        ))),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -40,9 +40,13 @@ rkyv = { version = "0.8", features = ["std"] }
 strum = { version = "0.28", features = ["derive"] }
 petgraph = { version = "0.8.3", features = ["serde-1"] }
 url = "2.5"
+# Link-header targets resolve against the response URL (already in the tree through oxrdf).
+oxiri = "0.2"
 # SystemTime::now() through Date.now() in wasm32 browser hosts.
 web-time = "1"
 oxjsonld = "0.2"
+# The shared RDF format enum (media types, extensions); the parsers stay upstream.
+oxrdfio = { version = "0.2", default-features = false, features = ["rdf-12"] }
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
 # RDF/XML parse only (D142), for the dataset entry points (always on).

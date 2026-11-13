@@ -28,20 +28,12 @@ const PROV: &str = "http://www.w3.org/ns/prov#";
 const RDF_REIFIES: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies";
 const RDFS_LABEL: &str = "http://www.w3.org/2000/01/rdf-schema#label";
 
-/// Parse `text` by the file extension (`ttl`, `trig`, `nq`, `jsonld`/`json`).
+/// Parse `text` by the file extension (`RdfFormat::from_extension`).
 pub fn parse(ext: &str, text: &str, base: Option<&str>) -> Result<IndexedDataset, String> {
-    match ext {
-        "ttl" => mere::parse_turtle(text, base),
-        "trig" => mere::parse_trig(text, base),
-        "nq" => mere::parse_nquads(text, base),
-        "jsonld" | "json" => mere::parse_jsonld(text.as_bytes(), ContextCache::full(), base),
-        other => {
-            return Err(format!(
-                "unknown extension .{other}: use ttl, trig, nq, jsonld"
-            ));
-        },
-    }
-    .map_err(|e| e.to_string())
+    let format = mere::formats::RdfFormat::from_extension(ext)
+        .ok_or_else(|| format!("unknown extension .{ext}: use ttl, trig, nq, nt, jsonld, rdf"))?;
+    mere::formats::parse::parse(format, text.as_bytes(), base, ContextCache::full())
+        .map_err(|e| e.to_string())
 }
 
 /// Held and withdrawn assertion counts for one asserter.

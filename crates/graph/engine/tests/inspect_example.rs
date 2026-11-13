@@ -74,5 +74,5 @@ fn a_query_runs_and_a_plain_turtle_file_has_no_asserters() {
     let report = run(&plain, None).unwrap();
     assert!(report.asserters.is_empty());
     assert_eq!(report.resources.len(), 1);
-    assert!(parse("txt", "", None).is_err());
+    assert!(parse("xyz", "", None).is_err());
 }

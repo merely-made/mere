@@ -1453,3 +1453,16 @@ Fixture: `to_trig_with_history` output of a four-statement kernel graph, generat
 `cargo test -p mere --features query`: lib 19, `inspect_example` 2, `w3c_conformance` 2 passed (1 ignored);
 `cargo test -p mere` without `query`: lib 18 passed, the inspector test compiled out. wasm32 `cargo check -p
 mere` passes with and without `query`; `cargo check --workspace --all-targets` passes.
+
+## 2026-11-12: P5 L6b, content negotiation and Link headers
+
+D142 row "Access: content negotiation and Link headers". Pure functions in `mere::acquire::negotiate`; no network, no HTTP client.
+
+- `formats::RdfFormat` is `oxrdfio`'s enum (new normal dependency, `0.2`, `default-features = false`, `rdf-12`; resolved 0.2.7), re-exported; it covers Turtle, TriG, N-Triples, N-Quads, JSON-LD, RDF/XML and N3. `formats::parse::parse(format, bytes, base_iri, contexts)` dispatches to the `parse_*` entry points; N3 is an error.
+- `negotiate`: `PARSED_FORMATS`, `AcceptPolicy` (formats and q-values as data; default Turtle and JSON-LD 1, TriG and N-Quads 0.9, N-Triples 0.8, RDF/XML 0.5; `narrowed_to`, `header_value`), `format_for_media_type`, `parse_content_type`, `parse_response`. `oxrdfio::from_media_type` is lenient (`application/json`, `text/plain`, `application/xml` map to JSON-LD, N-Triples, RDF/XML), so `format_for_media_type` refuses those three and N3: a dereferencer does not guess, and a bare `application/json` body needs a Link context. A non-UTF-8 charset is an unsupported type.
+- `negotiate::link`: hand-written RFC 8288 parser (`parse_links`, `Link`) and `discover` (alternate with an RDF type, describedby, the JSON-LD context relation), targets resolved with `oxiri` against the response URL.
+- Link parser: nothing in the tree fits, and the one widely used crate checked (`parse_link_header`, regex-based, keyed by `rel`) would add dependencies and lose repeated or multi-valued relations.
+  The RFC 8288 section 3.5 examples are the tests.
+- The inspector example picks its format with `RdfFormat::from_extension` and the dispatch; its test's unknown-extension case moved from `txt` (an oxrdfio alias for N-Triples) to `xyz`.
+
+Gates: `cargo test -p mere` lib 27 passed; `--features query` lib 28, `inspect_example` 2, `w3c_conformance` 2 passed (1 ignored). Tests: Accept output, Content-Type dispatch for every format with parameters, the RFC examples, and Turtle body plus JSON-LD Link alternate end to end. wasm32 `cargo check -p mere` (with `--cfg getrandom_backend="wasm_js"`) passes with and without `query`; `cargo tree -p mere -e normal` shows no reqwest, ureq or hyper; `cargo check --workspace --all-targets` passes.

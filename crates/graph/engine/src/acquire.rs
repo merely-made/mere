@@ -10,3 +10,8 @@
 
 /// JSON-LD ingest: `application/ld+json` → a graph contribution.
 pub mod ingest;
+
+/// Content negotiation and Link-header discovery: the Accept policy, the
+/// media-type dispatch to the parsers, and RFC 8288 links. Pure functions; the
+/// host does the fetch.
+pub mod negotiate;
