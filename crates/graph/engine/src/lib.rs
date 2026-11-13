@@ -55,6 +55,9 @@ pub use projection::{ProjectionKey, RdfSource};
 /// Acquire stage: JSON-LD ingest and the offline `@context` loader.
 pub mod acquire;
 
+/// The held dataset: dictionary-encoded quad index, `View`, and `IndexedRead`.
+pub mod dataset;
+
 /// Formats stage: Turtle-family and JSON-LD parsers and serializers.
 pub mod formats;
 
@@ -73,13 +76,12 @@ pub use acquire::ingest::{
     from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
     from_quads_envelope, is_bundled_context, referenced_context_urls,
 };
+pub use formats::parse::{
+    parse_jsonld, parse_nquads, parse_ntriples, parse_rdfxml, parse_trig, parse_turtle,
+};
 pub use formats::serialize::{
     from_nquads, from_nquads_envelope, from_trig, from_trig_envelope, to_nquads,
     to_nquads_with_history, to_trig, to_trig_with_history,
-};
-#[cfg(feature = "query")]
-pub use formats::parse::{
-    parse_jsonld, parse_nquads, parse_ntriples, parse_rdfxml, parse_trig, parse_turtle,
 };
 pub use profile::vocab::{Alignment, alignment, vocabulary_alignment_quads};
 

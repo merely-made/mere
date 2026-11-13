@@ -24,11 +24,11 @@ bundled-contexts = []
 # SPARQL query over the graph via spareval's `QueryableDataset`, evaluated
 # over a dictionary-encoded quad index (chartulary::quads) built from the
 # projected quads (no RocksDB, wasm-viable).
-# Off by default: base linked-data stays slim, only consumers that want SPARQL
+# Off by default: the dataset and the format entry points need no evaluator; base stays slim, only consumers that want SPARQL
 # pull the evaluator. Tests retain a materialized spareval dataset as the
 # parity oracle for the indexed dataset.
 # Preserve directional JSON-LD terms previously enabled through Oxigraph.
-query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "dep:oxrdfxml", "oxjsonld/rdf-12"]
+query = ["dep:spareval", "dep:spargebra", "dep:oxsdatatypes", "dep:getrandom02", "oxjsonld/rdf-12"]
 
 [dependencies]
 serde.workspace = true
@@ -45,8 +45,8 @@ web-time = "1"
 oxjsonld = "0.2"
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
-# RDF/XML parse only (D142), for the dataset entry points of the `query` feature.
-oxrdfxml = { version = "0.2", features = ["rdf-12"], optional = true }
+# RDF/XML parse only (D142), for the dataset entry points (always on).
+oxrdfxml = { version = "0.2", features = ["rdf-12"] }
 # The resource graph's substrate, and the id-level quad index the query
 # feature's held dataset wraps.
 chartulary.workspace = true
@@ -67,8 +67,7 @@ getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optio
 
 [dev-dependencies]
 postcard = { version = "1", features = ["alloc"] }
-# The W3C conformance harness (tests/w3c_conformance): RDF/XML parsing and SPARQL result files.
-oxrdfxml = { version = "0.2", features = ["rdf-12"] }
+# The W3C conformance harness (tests/w3c_conformance): SPARQL result files.
 sparesults = { version = "0.3", features = ["sparql-12"] }
 
 [lints]

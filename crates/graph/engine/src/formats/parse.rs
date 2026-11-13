@@ -18,13 +18,13 @@
 //! take the argument for a uniform signature and ignore it. RDF/XML is parse
 //! only (standards stance D142): the engine does not serialize it.
 //!
-//! Gated on the `query` feature because [`IndexedDataset`] is.
+//! Available without the `query` feature: the dataset needs no evaluator.
 
 use oxrdf::{GraphName, Quad};
 use oxttl::{NQuadsParser, NTriplesParser, TriGParser, TurtleParser};
 
 use crate::acquire::ingest::{ContextCache, IngestError, offline_loader};
-use crate::query::IndexedDataset;
+use crate::dataset::IndexedDataset;
 
 fn parse_error(error: impl std::fmt::Display) -> IngestError {
     IngestError::Parse(error.to_string())
@@ -155,7 +155,7 @@ pub fn parse_jsonld(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::query::View;
+    use crate::dataset::View;
 
     fn rows(dataset: &IndexedDataset) -> usize {
         dataset.len()
@@ -206,6 +206,7 @@ mod tests {
         assert!(err.to_string().contains("refused remote @context"));
     }
 
+    #[cfg(feature = "query")]
     #[test]
     fn rows_are_held_and_the_default_graph_reads_live() {
         let ds = parse_turtle("<http://a/> <http://p/> <http://b/> .", None).unwrap();

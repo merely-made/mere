@@ -22,8 +22,10 @@ use spargebra::SparqlParser;
 #[path = "query/indexed.rs"]
 mod indexed;
 
-pub use chartulary::quads::View;
-pub use indexed::{IndexedDataset, IndexedRead};
+// The dataset lives in `crate::dataset` (no evaluator needed); these keep the
+// old `mere::query::` paths.
+pub use crate::dataset::{IndexedDataset, View};
+pub use indexed::IndexedRead;
 
 /// The rows of a SPARQL `SELECT` (or the boolean of an `ASK`).
 #[derive(Clone, Debug, PartialEq, Eq)]
