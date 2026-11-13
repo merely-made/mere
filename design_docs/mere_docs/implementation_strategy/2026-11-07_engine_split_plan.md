@@ -13,7 +13,7 @@ crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph`
 composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
 layer) and L5 (the dataset and the formats without `query`; Graphshell repointed to `mere`; the `mere-rdf` shim
 deleted), L6a (the headless inspector) and L6b (content negotiation and Link headers, D142's P5 row) landed
-2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). **P6 is under way:** RDFC-1.0 (`mere-rdfc`, with its rows), the differential-dataflow probe and the declared-lens plan's L1 (the pack header, `eidetic` `c96bea1`) and L2 (the pack loader and core pack, Mere `47a2b976a`, `eidetic` `41ec454`) have landed; SHACL, the derived layer, lens L3 to L5, the thin slice and identity and proofs remain. P7 needs P6's loader, which L2 supplies, but no enum leaves before lens L3's probe. P8 needs only P1 to P5 and has not started; nor have the consolidations C, and `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
