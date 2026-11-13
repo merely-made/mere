@@ -3465,3 +3465,18 @@ revision and what crosses at frame rate.
   Carried forward: the conformance harness still needs `query` as a whole; JSON-LD has no 1.0
   processing mode (its 8 tests are skipped at the engine layer); the quad index plan's P4 (incremental
   maintenance) is unblocked by the fold.
+- 2026-11-12: P6 L1 landed, the dataset reader and the JSON-LD processing mode (D143 F-R1 and F-R2), Mere
+  `18178e5a0` and `1dcd5b49d`. `IndexedDataset::quads(View)` returns the rows a view admits as `oxrdf` quads, in
+  `dataset.rs`, with no `spareval`. The conformance harness's RDF and JSON-LD rows at every layer, engine
+  included, and the inspector's reifier, graph and resource sections now read through it, so neither needs
+  `query`; the SPARQL rows, the evaluation controls and `inspect --query` stay behind it (the example's
+  `required-features` is gone). With `query` every `ROW` line is identical to before F-R1; without it the RDF and
+  JSON-LD rows equal the `query` run's; `cargo tree -p mere -e normal` still names no `spareval` or `spargebra`.
+  `parse_jsonld(bytes, contexts, base_iri, JsonLdOptions)` takes a `processing_mode` (`ProcessingMode`,
+  `JsonLd1_1` by default, `JsonLd1_0`), passed to `oxjsonld`; Graphshell, Turnstone, Cleromancy and Knot call
+  nothing in it at `origin/main`, so the signature changed in place. `formats::parse::parse` and
+  `negotiate::parse_response` run JSON-LD in the default 1.1 mode (a mode argument does not fit a
+  format-dispatching entry point). The engine toRdf row went from 432 / 10 / 25 to 439 / 10 / 18, the parser
+  layer's counts, with the same ten failing tests. Gates: `mere` lib 30 (31 with `query`); wasm32 with and
+  without `query`; workspace check; `mere-kernel` 621; hooks. Receipts: "2026-11-12: P6 L1, the dataset
+  reader and the JSON-LD processing mode".

@@ -1466,3 +1466,30 @@ D142 row "Access: content negotiation and Link headers". Pure functions in `mere
 - The inspector example picks its format with `RdfFormat::from_extension` and the dispatch; its test's unknown-extension case moved from `txt` (an oxrdfio alias for N-Triples) to `xyz`.
 
 Gates: `cargo test -p mere` lib 27 passed; `--features query` lib 28, `inspect_example` 2, `w3c_conformance` 2 passed (1 ignored). Tests: Accept output, Content-Type dispatch for every format with parameters, the RFC examples, and Turtle body plus JSON-LD Link alternate end to end. wasm32 `cargo check -p mere` (with `--cfg getrandom_backend="wasm_js"`) passes with and without `query`; `cargo tree -p mere -e normal` shows no reqwest, ureq or hyper; `cargo check --workspace --all-targets` passes.
+
+## 2026-11-12: P6 L1, the dataset reader and the JSON-LD processing mode (Mere `18178e5a0`, `1dcd5b49d`)
+
+D143 F-R1 and F-R2. Spec and metric per item, as Mark asked (2026-11-12).
+
+F-R1, `IndexedDataset::quads(View) -> impl Iterator<Item = oxrdf::Quad>` (`dataset.rs`; a full-scan `QuadIndex::pattern`, no `spareval`).
+Ungated by it: the harness's RDF and JSON-LD engine layer (`dataset_of` reads through `quads(View::Live)`; `layers()` always lists `engine`) and the inspector (reifier, graph and resource sections read the live quads into a per-graph property map; `--query` is `cfg(feature = "query")` and an error without it; `required-features` dropped).
+Metrics:
+- Harness builds and runs its RDF and JSON-LD rows without `query`: yes, `cargo test -p mere --test w3c_conformance -- --ignored --nocapture`, 1.8 s.
+- With `query`, every ROW line identical to before: `diff` of the baseline run (origin/main, stashed) against the F-R1 run shows only the timing line.
+- Without `query` the RDF and JSON-LD ROW lines equal the `query` run's: `diff` empty.
+- `cargo tree -p mere -e normal`: 0 lines naming `spareval` or `spargebra`.
+- New tests: `dataset::tests::quads_round_trip_every_graph_kind_and_honour_the_view` (default, named, blank graph, a withdrawn row in both views), `parsed_rows_are_held_and_read_back_without_the_evaluator`, and the inspector's `a_query_without_the_feature_is_refused` (the inspector test file now compiles without `query`).
+
+F-R2, `parse_jsonld(bytes, contexts, base_iri, options: JsonLdOptions)`, `JsonLdOptions { processing_mode: ProcessingMode }`, `ProcessingMode::{JsonLd1_0, JsonLd1_1}` (default 1.1), re-exported at the crate root. Spec: JSON-LD 1.1 Processing Algorithms and API, `processingMode`. `oxjsonld` 0.2.7 `with_processing_mode`.
+Callers outside Mere: none (`git grep` for `parse_jsonld`, `parse_response`, `parse::parse` at `origin/main` of Graphshell `a377c352`, Turnstone `0a4636ae`, Cleromancy `2867b94`, Knot `090237c`, Dramatis, Eidetic, Genet, Isocosm: no hits; Turnstone's `pub use parse::parse` is its own module; a `mere::` grep finds each consumer's files, so the search reads). `formats::parse::parse` and `negotiate::parse_response` pass `JsonLdOptions::default()`.
+Metric, the JSON-LD toRdf rows (`pass / fail / skip`):
+
+| Layer | Before | After |
+|---|---|---|
+| parser (control) | 439 / 10 / 18 | 439 / 10 / 18 |
+| engine | 432 / 10 / 25 | 439 / 10 / 18 |
+| adapter | 441 / 1 / 25 | 441 / 1 / 25 (still 1.1 only) |
+
+The engine and parser fail lists, from `W3C_VERBOSE=1`, are the same ten tests. Every other ROW line is unchanged. New test: `the_processing_mode_defaults_to_1_1_and_1_0_refuses_a_1_1_context`.
+
+Gates: `cargo test -p mere` lib 30, `inspect_example` 3, `w3c_conformance` 1 (1 ignored); with `query` lib 31, `inspect_example` 3 (the query test replaces the refusal test), `w3c_conformance` 2; wasm32 `cargo check -p mere` with and without `query` (`RUSTFLAGS='--cfg getrandom_backend="wasm_js"'`); `cargo check --workspace --all-targets`; `cargo test -p mere-kernel --features query,bundled-contexts` 621 lib tests; commit hooks (clippy over `mere` and `mere-kernel`, dependency bans, line ceiling, decisions check) passed on both commits.

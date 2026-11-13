@@ -12,18 +12,19 @@ the [receipts](../../archive_docs/receipts/2026-11-07_engine_split_plan_receipts
 - **Harness**: `crates/graph/engine/tests/w3c_conformance/` (`main.rs` plus five modules) (package `mere`, lib
   `mere`; moved from `crates/graph/linked-data` by engine split P5 L2, 2026-11-12). Ignored by default; skips cleanly if the suites are absent. Command:
   `W3C_SUITES_DIR=<Code/crates> cargo test -p mere --features query --test w3c_conformance -- --ignored --nocapture`
-  (`W3C_VERBOSE=1` lists failing tests).
+  (`W3C_VERBOSE=1` lists failing tests). Without `--features query` the same command runs the RDF and JSON-LD
+  rows at every layer, engine included, and skips the SPARQL rows and the evaluation controls (P6 L1, 2026-11-12).
 - **Layers.** `parser` runs the parsers the adapter wraps (`oxttl`, `oxrdfxml`, `oxjsonld`, `spargebra`, `spareval`, `sparesults`)
   with the adapter's features and options, and scores what the suite specifies: accept or reject
   for syntax tests, isomorphism of the produced dataset against the expected one for evaluation
   and toRdf tests. `adapter` runs the crate's own public entry points (`from_nquads`, `from_trig`,
   `from_jsonld_with_contexts_and_base_iri`) and can score accept or reject only: they return a
   graph contribution, not an RDF dataset, and take no base IRI or processing mode.
-- **The `engine` layer** (from 2026-11-12, engine split P5 L4, F8 and F9; needs the `query` feature) runs the
+- **The `engine` layer** (from 2026-11-12, engine split P5 L4, F8 and F9; RDF and JSON-LD rows need no `query` since P6 L1, SPARQL rows do) runs the
   engine's dataset entry points, `mere::parse_turtle`, `parse_ntriples`, `parse_nquads`, `parse_trig`,
   `parse_rdfxml` and `parse_jsonld`, each with the test's base IRI (JSON-LD through the offline
-  `ContextCache` of the suite's contexts), and reads the returned `IndexedDataset` back through the query
-  seam. Syntax tests score accept or reject; evaluation and toRdf tests score isomorphism of that dataset
+  `ContextCache` of the suite's contexts), and reads the returned `IndexedDataset` back through
+  `IndexedDataset::quads(View::Live)` (P6 L1; before it, through the query seam, with identical rows). Syntax tests score accept or reject; evaluation and toRdf tests score isomorphism of that dataset
   against the expected one. SPARQL query evaluation loads every data file (manifest data, graph data and
   FROM graphs) through those entry points, merges the quads into one `IndexedDataset` and evaluates with
   `spareval` over it, scored as the parser layer is. SPARQL syntax and update are not scored here: the
@@ -82,7 +83,7 @@ snapshot, so none is recorded (a fork in the lane report).
 | SPARQL 1.2 | Syntax | `rdf-tests` `sparql/sparql12` | parser 200/203 (accepts `nested-aggregate-functions`, `tripleterm-subject-03`, `tripleterm-subject-06`, which the suite says to reject); engine: not scored |
 | SPARQL 1.2 | Query evaluation | `rdf-tests` `sparql/sparql12` | parser 64/65; the fail (`select-variable-reuse`) is engine: `spargebra` with `sparql-12` rejects reuse of a variable bound earlier in the same SELECT (control parses the query directly); adapter: not scorable; indexed (2026-11-10, `IndexedDataset::from_quads`) 64/65, the same fail; engine (2026-11-12) 64/65, the same fail |
 | SPARQL 1.2 | Update evaluation | `rdf-tests` `sparql/sparql12` | not run: no update stage (3 tests; D65) |
-| JSON-LD 1.1 | toRdf (JSON-LD to RDF) | `json-ld-api` `tests/toRdf-manifest.jsonld` (467 tests) | parser 439/449 (10 fail: 9 dataset mismatches, `tli12` rejects its base); 18 skipped (11 are 1.0-only, 4 `rdfDirection`, 1 `expandContext`, 1 expected output unreadable, 1 rejected only for an out-of-suite context). Adapter `from_jsonld_with_contexts_and_base_iri` accept or reject 441/442 (fails `tli12`); 25 skipped (those 18 less 1 plus 8 `processingMode` 1.0 tests). Engine `parse_jsonld` (2026-11-12, dataset isomorphism, base IRI and offline cache) 432/442, the same 10 fails as the parser layer; 25 skipped, the same as the adapter's |
+| JSON-LD 1.1 | toRdf (JSON-LD to RDF) | `json-ld-api` `tests/toRdf-manifest.jsonld` (467 tests) | parser 439/449 (10 fail: 9 dataset mismatches, `tli12` rejects its base); 18 skipped (11 are 1.0-only, 4 `rdfDirection`, 1 `expandContext`, 1 expected output unreadable, 1 rejected only for an out-of-suite context). Adapter `from_jsonld_with_contexts_and_base_iri` accept or reject 441/442 (fails `tli12`); 25 skipped (those 18 less 1 plus 8 `processingMode` 1.0 tests). Engine `parse_jsonld` (2026-11-12, dataset isomorphism, base IRI, offline cache and `processingMode`; P6 L1 F-R2) 439/449, the same 10 fails as the parser layer; 18 skipped, the same as the parser layer's (before F-R2: 432/442 and 25, the 8 `processingMode` 1.0 tests skipped) |
 | JSON-LD 1.1 | Expand, compact, flatten, fromRdf, HTML, remote-doc | `json-ld-api` `tests/*-manifest.jsonld` | not run: no such API in the adapter or `oxjsonld` (386 + 246 + 58 + 54 + 50 + 18 tests) |
 | SHACL (Core, SPARQL) | none yet | `data-shapes` | not run: no engine stage yet (P6) |
 | RDFC-1.0 | none yet | `rdf-canon` | not run: no engine stage yet (P6) |
@@ -102,7 +103,7 @@ is parse only; Turtle, TriG, N-Triples, N-Quads and JSON-LD are engine; SPARQL U
 | RDF 1.1 evaluation | 412 / 2 / 0 | 412 / 2 / 0 | not scorable |
 | SPARQL 1.1 query evaluation | 230 / 14 / 3 | 230 / 14 / 3 | not scorable |
 | SPARQL 1.2 query evaluation | 64 / 1 / 0 | 64 / 1 / 0 | not scorable |
-| JSON-LD 1.1 toRdf | 432 / 10 / 25 | 439 / 10 / 18 | 441 / 1 / 25 (accept or reject) |
+| JSON-LD 1.1 toRdf | 439 / 10 / 18 | 439 / 10 / 18 | 441 / 1 / 25 (accept or reject) |
 | SPARQL 1.1 and 1.2 syntax, SPARQL Update | not scored | parser | none |
 | RDF 1.1 and 1.2 c14n, entailment; JSON-LD expand, compact, flatten, fromRdf, html, remote-doc; SHACL; RDFC-1.0 | not run | not run | not run |
 
@@ -112,8 +113,12 @@ had no entry point, are now scored on both syntax and evaluation. The engine's f
 fails: the two RDF/XML canonical-literal evaluation fails per suite (`xml-canon-test001`, `-002`,
 `rdf12-xml-an-13`, `-14`), `ntriples-version-1`, the 14 and 1 SPARQL evaluation fails listed in their rows, and
 the JSON-LD toRdf fails (nine dataset mismatches and `tli12`). No engine fail lacks a parser-layer fail on the
-same test. JSON-LD's engine pass count is below the parser layer's by the 8 `processingMode` 1.0 tests the
-parser layer runs under 1.0 and the engine, always 1.1, skips (as the adapter does), less 1.
+same test. JSON-LD's engine row first read 432 / 10 / 25, below the parser layer's by the 8 `processingMode`
+1.0 tests the engine skipped (the adapter still does); P6 L1 F-R2 (2026-11-12, `parse_jsonld` takes a
+`JsonLdOptions` with a `ProcessingMode`, default 1.1) scores them: the engine row is 439 / 10 / 18, the
+parser layer's counts, and the two fail lists are the same ten tests. The RDF and JSON-LD rows above are the
+same with and without the `query` feature (P6 L1 F-R1: the harness reads the dataset through
+`IndexedDataset::quads`); the SPARQL rows need `query`.
 
 The unconfirmed fails (no control built) are the ones listed under the scoring rule above; this lane built
 none. The parser layer's pass on a case is what separates an engine-code fault from an upstream one, and no
