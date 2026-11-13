@@ -1587,7 +1587,7 @@ plans = ["engine-split"]
 title = "P6's reading, libraries and order (Mark and the first reader, 2026-11-12)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
-summary = "P6 is read as four conditions with D142's extras outside its close; SHACL is rudof beside the engine on a carried patch, proofs a thin verifier of our own over maintained crypto, derived facts a second dataset in union, pack rules SPARQL 1.2 RL."
+summary = "P6 is read as four conditions with D142's extras outside its close; SHACL is rudof beside the engine on a carried patch, proofs a thin verifier of our own over maintained crypto, derived facts a derived-fact placement measured first, pack rules SPARQL 1.2 RL."
 draws_on = ["engine-split D59", "engine-split D141", "engine-split D142"]
 plans = ["engine-split"]
 

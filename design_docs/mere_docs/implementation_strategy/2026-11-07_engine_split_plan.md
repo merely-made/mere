@@ -767,8 +767,7 @@ shape violation, reopen the same revision with the same results.
   is the journal cursor, passed in by the caller, so the slice runs through the kernel's reopen (or a
   recorded quad stream carrying a cursor), and the engine mints no revision id (D141 F13). SHACL is
   rudof in a crate beside `mere`, over a carried patch; proofs are verified by a thin verifier of
-  our own over maintained crypto; derived facts live in a second dataset read in union with the
-  asserted one. Order: the dataset reader without `query` and JSON-LD processing mode; RDFC-1.0;
+  our own over maintained crypto; where derived facts live is measured before it is built (F-M4). Order: the dataset reader without `query` and JSON-LD processing mode; RDFC-1.0;
   a differential-dataflow wasm probe; SHACL; the derived layer; the pack loader (after the
   declared-lens plan, written as a doc lane beside the first stages); the thin slice; identity and
   proofs; D142's extras.
@@ -2613,11 +2612,17 @@ revision and what crosses at frame rate.
   (F-R7); did:key through `insigne` (F-R8); `sh:SPARQLRule` lowered in `mere::interpret::derive`
   (F-R9); the SHACL report as an `sh:ValidationReport` dataset plus a typed summary (F-R10). The
   declared-lens plan is written as a doc lane beside the stages that need no pack, and its own forks
-  go to Mark (F-M1). Derived facts live in a second `IndexedDataset` keyed by (rule digest, cursor),
-  read through a union adapter for `spareval` and SHACL, so quad-index D5 stays for asserted data
-  (F-M4); the adapter yields a fact that is both asserted and derived once (quad-index D6), and the
-  lane that builds it measures two-hop and full-scan cost against one dataset at 100k nodes, and
-  over 2x brings a third `View` in chartulary back as a fork with the numbers. P6 closes without
+  go to Mark (F-M1). Where derived facts live is measured before either design is built (F-M4,
+  amended the same day after the reviewer's quad-index prior-art survey,
+  `Code/testing/engine-split/quad_index_prior_art.md`: GraphDB, RDFox and Blazegraph store a fact
+  once with an explicit or inferred flag, and Jena keeps two graphs and reads their union). The
+  derived-layer lane benches both at 100k nodes, two-hop and full scan, with a fact that is both
+  asserted and derived yielded once (quad-index D6): a second `IndexedDataset` keyed by (rule digest,
+  cursor) read through a union adapter for `spareval` and SHACL, which keeps quad-index D5 for
+  asserted data and needs no Eidetic change; and one index with a derived marker, which needs a third
+  `View` or a meta bit in chartulary so exports and asserted-only reads can leave derived rows out.
+  If the one-index design wins, it goes to Mark as a fork, since it touches quad-index D5 and
+  lessons D25. P6 closes without
   did:webvh, whose row reads "waiting on D19" (F-M6). The pack-rule language is SPARQL 1.2 RL, per
   lessons D26 ("labeled as a draft"); `sh:SPARQLRule` and the SHACL 1.2 inference rules lower into
   it, so D142's one rule mechanism holds; its rows are `sparql12-rl` (pack rules, scored against the
@@ -2628,7 +2633,7 @@ revision and what crosses at frame rate.
   `ed25519-dalek` 2 through `ssh-key`, so the family is not uniformly on 3. Outcome: refines P6,
   D142; applies D26, D59, D141.
 
-  Links: area The stack · draws on engine-split D141, engine-split D142, engine-split D59 · plans engine-split P6 · summary P6 is read as four conditions with D142's extras outside its close; SHACL is rudof beside the engine on a carried patch, proofs a thin verifier of our own over maintained crypto, derived facts a second dataset in union, pack rules SPARQL 1.2 RL.
+  Links: area The stack · draws on engine-split D141, engine-split D142, engine-split D59 · plans engine-split P6 · summary P6 is read as four conditions with D142's extras outside its close; SHACL is rudof beside the engine on a carried patch, proofs a thin verifier of our own over maintained crypto, derived facts a derived-fact placement measured first, pack rules SPARQL 1.2 RL.
 
 ## Open questions
 
