@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use oxrdf::{Dataset, Quad};
 
 use crate::manifest::rel;
-use crate::rdf::{Fmt, isomorphic, parse_rdf};
+use crate::rdf::{Fmt, isomorphic, layers, parse_rdf};
 use crate::report::{Outcome, Report};
 
 pub(crate) const JLD_BASE: &str = "https://w3c.github.io/json-ld-api/";
@@ -87,7 +87,7 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
         };
         let manifest = "tests/toRdf-manifest.jsonld";
         if let Some(reason) = skip {
-            for layer in ["parser", "adapter"] {
+            for layer in layers() {
                 report.record(layer, manifest, "toRdf", &id, Outcome::Skip(reason));
             }
             continue;
@@ -159,6 +159,14 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
                 &id,
                 Outcome::Skip("processingMode json-ld-1.0: the adapter always runs 1.1"),
             );
+            #[cfg(feature = "query")]
+            report.record(
+                "engine",
+                manifest,
+                "toRdf",
+                &id,
+                Outcome::Skip("processingMode json-ld-1.0: the engine always runs 1.1"),
+            );
             continue;
         }
         let adapted =
@@ -173,6 +181,41 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
             (Err(err), false) => Outcome::Fail(format!("rejected: {err}")),
         };
         report.record("adapter", manifest, "toRdf", &id, out);
+
+        // Engine layer: `mere::parse_jsonld` through the offline cache, scored by dataset.
+        #[cfg(feature = "query")]
+        {
+            let got = mere::parse_jsonld(&bytes, cache.clone(), Some(&base))
+                .map(|d| crate::rdf::dataset_of(&d));
+            let out = if negative {
+                match &got {
+                    Err(err) if err.to_string().contains("refused remote @context") => {
+                        Outcome::Skip("rejected only because a context lives outside the suite")
+                    },
+                    Err(_) => Outcome::Pass,
+                    Ok(_) => Outcome::Fail("accepted".into()),
+                }
+            } else {
+                match (&got, syntax_only) {
+                    (Err(err), _) => Outcome::Fail(format!("rejected: {err}")),
+                    (Ok(_), true) => Outcome::Pass,
+                    (Ok(got), false) => {
+                        let want = t["expect"].as_str().and_then(|p| {
+                            let b = std::fs::read(tests.join(p)).ok()?;
+                            parse_rdf(Fmt::NQuads, &b, "").ok()
+                        });
+                        match want {
+                            Some(want) if isomorphic(got.clone(), want.clone()) => Outcome::Pass,
+                            Some(_) => {
+                                Outcome::Fail("not isomorphic to the expected dataset".into())
+                            },
+                            None => Outcome::Skip("expected N-Quads unreadable"),
+                        }
+                    },
+                }
+            };
+            report.record("engine", manifest, "toRdf", &id, out);
+        }
     }
 
     // The other API algorithms: the adapter exposes no entry point for any of them.
@@ -188,7 +231,7 @@ pub(crate) fn run_jsonld(suite: &Path, report: &mut Report) -> Result<(), String
         let manifest = format!("tests/{name}-manifest.jsonld");
         for t in doc["sequence"].as_array().ok_or("no sequence")? {
             let id = t["@id"].as_str().unwrap_or("?");
-            for layer in ["parser", "adapter"] {
+            for layer in layers() {
                 report.record(
                     layer,
                     &manifest,

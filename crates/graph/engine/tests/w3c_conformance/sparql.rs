@@ -26,6 +26,7 @@ pub(crate) fn run_sparql(root: &Path, entries: &[Entry], report: &mut Report) {
         let syntax = (kind.starts_with("Positive") || kind.starts_with("Negative"))
             && kind.contains("Syntax");
         let mut indexed_out = None;
+        let mut engine_out = None;
         let (category, parser_out) = if syntax {
             let out = match e.action.as_ref().map(std::fs::read) {
                 Some(Ok(bytes)) => {
@@ -48,8 +49,9 @@ pub(crate) fn run_sparql(root: &Path, entries: &[Entry], report: &mut Report) {
             };
             ("syntax", out)
         } else if kind == "QueryEvaluationTest" {
-            let (parser_out, out) = query_eval(root, e);
+            let (parser_out, out, engine) = query_eval(root, e);
             indexed_out = Some(out);
+            engine_out = Some(engine);
             ("query-eval", parser_out)
         } else if kind == "UpdateEvaluationTest" {
             (
@@ -72,6 +74,15 @@ pub(crate) fn run_sparql(root: &Path, entries: &[Entry], report: &mut Report) {
             &id,
             indexed_out.unwrap_or(Outcome::Skip(
                 "the indexed layer evaluates queries; syntax and update are the parser layer's",
+            )),
+        );
+        report.record(
+            "engine",
+            &manifest,
+            category,
+            &id,
+            engine_out.unwrap_or(Outcome::Skip(
+                "the engine layer evaluates queries over its dataset entry points; syntax and update are the parser layer's",
             )),
         );
         report.record(
@@ -99,10 +110,32 @@ fn fmt_of_path(p: &Path) -> Option<Fmt> {
 /// Load a data file; a named graph's triples go into the graph named by the file's address.
 #[cfg(feature = "query")]
 fn load(root: &Path, path: &Path, named: bool) -> Result<oxrdf::Dataset, String> {
+    load_with(root, path, named, parse_rdf)
+}
+
+/// Load a data file through the engine's dataset entry points.
+#[cfg(feature = "query")]
+fn load_engine(root: &Path, path: &Path, named: bool) -> Result<oxrdf::Dataset, String> {
+    load_with(root, path, named, crate::rdf::engine_parse)
+}
+
+#[cfg(feature = "query")]
+type Parse = fn(Fmt, &[u8], &str) -> Result<oxrdf::Dataset, String>;
+
+#[cfg(feature = "query")]
+type Loader = fn(&Path, &Path, bool) -> Result<oxrdf::Dataset, String>;
+
+#[cfg(feature = "query")]
+fn load_with(
+    root: &Path,
+    path: &Path,
+    named: bool,
+    parse: Parse,
+) -> Result<oxrdf::Dataset, String> {
     let fmt = fmt_of_path(path).ok_or("unrecognised data format")?;
     let bytes = std::fs::read(path).map_err(|e| e.to_string())?;
     let base = test_base(root, path);
-    let ds = parse_rdf(fmt, &bytes, &base)?;
+    let ds = parse(fmt, &bytes, &base)?;
     if !named {
         return Ok(ds);
     }
@@ -221,23 +254,29 @@ fn from_iris(text: &str, base: &str) -> Vec<oxrdf::NamedNode> {
         .collect()
 }
 
-/// Score one evaluation test on both layers: `spareval` over the loaded `oxrdf::Dataset`
-/// (parser) and over the same quads loaded through `IndexedDataset::from_quads` (indexed).
+/// Score one evaluation test on three layers: `spareval` over the loaded `oxrdf::Dataset`
+/// (parser), over the same quads loaded through `IndexedDataset::from_quads` (indexed), and
+/// over a dataset built from files read by `mere::parse_*` (engine).
 #[cfg(feature = "query")]
-fn query_eval(root: &Path, e: &Entry) -> (Outcome, Outcome) {
+fn query_eval(root: &Path, e: &Entry) -> (Outcome, Outcome, Outcome) {
     use mere::query::{IndexedDataset, View};
-    match query_case(root, e) {
+    let held = |data: &oxrdf::Dataset| {
+        IndexedDataset::from_quads(data.iter().map(|quad| (quad.into_owned(), true)))
+    };
+    let (parser, indexed) = match query_case(root, e, load) {
         Err(out) => (out.clone(), out),
-        Ok((data, text, q, res)) => {
-            let parser = evaluate(root, &q, &res, &text, &data);
-            let indexed =
-                IndexedDataset::from_quads(data.iter().map(|quad| (quad.into_owned(), true)));
-            (
-                parser,
-                evaluate(root, &q, &res, &text, indexed.read(View::Live)),
-            )
-        },
-    }
+        Ok((data, text, q, res)) => (
+            evaluate(root, &q, &res, &text, &data),
+            evaluate(root, &q, &res, &text, held(&data).read(View::Live)),
+        ),
+    };
+    // The engine layer: every data file goes through the dataset entry points, and the
+    // merged quads are evaluated over the dataset the engine builds from them.
+    let engine = match query_case(root, e, load_engine) {
+        Err(out) => out,
+        Ok((data, text, q, res)) => evaluate(root, &q, &res, &text, held(&data).read(View::Live)),
+    };
+    (parser, indexed, engine)
 }
 
 /// A case's data (manifest data, graph data and FROM graphs), query text, query and result paths.
@@ -250,7 +289,7 @@ type Case = (
 );
 
 #[cfg(feature = "query")]
-fn query_case(root: &Path, e: &Entry) -> Result<Case, Outcome> {
+fn query_case(root: &Path, e: &Entry, load: Loader) -> Result<Case, Outcome> {
     let (Some(q), Some(res)) = (
         e.parts.get("query").and_then(|v| v.first()),
         e.result.as_ref(),

@@ -4,14 +4,18 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! W3C conformance harness for the `linked-data` adapter (engine split plan, P0).
+//! W3C conformance harness for the `mere` engine (engine split plan, P0; engine layer P5 L4).
 //!
-//! Reads the vendored suites' manifests and runs two layers per test:
+//! Reads the vendored suites' manifests and runs these layers per test:
 //!
 //! - `parser`: the parsers the adapter wraps (`oxttl`, `oxjsonld`, `spargebra`), built with the
 //!   adapter's own feature set and options.
 //! - `adapter`: the crate's public entry points (`from_nquads`, `from_trig`,
 //!   `from_jsonld_with_contexts_and_base_iri`), where one exists for the format.
+//! - `engine` (the `query` feature): the dataset entry points `mere::parse_*` with the test's base
+//!   IRI, scored on syntax by accept or reject and on evaluation by isomorphism of the returned
+//!   dataset; SPARQL query evaluation runs over a dataset built from data files those entry
+//!   points read.
 //! - `indexed` (SPARQL query evaluation only): the case's data loaded through
 //!   `query::IndexedDataset::from_quads` and evaluated by the same `spareval`.
 //!
