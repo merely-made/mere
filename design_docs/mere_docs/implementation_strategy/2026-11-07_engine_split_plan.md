@@ -8,8 +8,9 @@ holds five crates (`mere-kernel`, `mere-rdf`, `catchment`, `pandect`, `mere-fact
 graphshell.git; its done-conditions are checked one by one under P3 ("Done-conditions, 2026-11-12"), with
 the evidence in `Code/testing/engine-split/slice6_p3_doneconditions.md` and the U6 reports beside it.
 P0's squishes have landed in part (D14, D26 to D28). **P4 (Pandect on the authority boundary) is done,
-2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). P5 to
-P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
+2026-11-12:** its four done-conditions are checked under P4 ("Done-conditions, 2026-11-12"). **P5 is in progress:** L2 (the `mere`
+crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph` in `mere`, the kernel
+composed over it) landed 2026-11-12. P6 to P8 and the consolidations C have not started; `wavicle` has not folded. The engine-to-workspace contract
 is deferred by D4; open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
@@ -3237,3 +3238,49 @@ revision and what crosses at frame rate.
   TriG adapter syntax 199/214); `mere` checks on wasm32 with and without `query`; Graphshell's
   `mere-view` query build passes against the branch by `--config` patch. The clippy hook now names
   both packages.
+- 2026-11-12: P5 L3 landed, the model seam (D141 F1 (a), F5). Fixtures first (`b36e9abf8`), written by the
+  kernel before the move: `graph-kernel/tests/fixtures/wire/` holds the journal's `AttributedDelta`
+  stream as JSON, postcard and rkyv (all three resource variants and seven surface ones), the
+  authority-guest candidate `mere.graph-snapshot-and-facets/json`, and the rkyv snapshot archive;
+  `tests/wire_fixtures.rs` decodes each and re-encodes it byte-identical, through the types and through
+  a restored `Graph`. Then the move (`d2a6398c1`, with `0578ddadf` for pandect's `personal-sync`):
+  `mere::model` holds the assertion model (`EdgePayload` and its rules, the edge taxonomy and data, the
+  persisted edge types, `GraphScope`, the assertion basis, method and withdrawal, the statement-id
+  minter, `Author`), `ResourceNode` with its frozen selection and link types, coverage notes, the
+  predicate strata, resource content records, `PersistedResourceRecord` and `ResourceGraph` (the
+  resource chartulary graph plus its facet store). `mere` no longer depends on `mere-kernel`; the
+  kernel's `Graph` keeps a private `ResourceGraph` and every write still goes through a recorded `Graph`
+  method. The surface walk and `apply_contribution`/`apply_import` are `kernel::rdf`; format writers,
+  `IndexedDataset` and SPARQL are generic over `mere::RdfSource`, which `ResourceGraph` and the kernel's
+  `Graph` implement (surfaces first, then the resource projection, as before). Re-exported at old paths,
+  because Graphshell, Turnstone, Cleromancy or Knot name them: `kernel::graph::{ArrangementSubKind,
+  Author, AuthorKind, USER_AUTHOR, ContainmentSubKind, CoverageLayer, CoverageLimit, CoverageNote,
+  EdgeAssertion, EdgeFamily, EdgePayload, FrozenLink, FrozenLinkSource, FrozenSourceRevision,
+  GraphStratum, ImportedSubKind, NavigationTrigger, ProvenanceSubKind, RelationKind, RelationSelector,
+  ResourceNode, SemanticStatement, SemanticStatementSpec, SemanticSubKind, predicate_iri,
+  sub_kind_from_iri}`, `kernel::graph::edge_data::{Traversal, UNKNOWN_LEGACY_ASSERTER_IRI}`,
+  `kernel::graph::edge_taxonomy::NavigationTrigger`, `kernel::graph::resource::{ResourceNode,
+  TAGGED_WITH_IRI}`, `kernel::graph::resource_tags::{TagConcept, tag_concept_iri}`,
+  `kernel::persistence::{PersistedEdge, PersistedEdgeFamily, PersistedResourceFacet,
+  PersistedResourceRecord, PersistedSemanticEdgeData, PersistedSemanticStatement,
+  PersistedSemanticSubKind, PersistedTraversalEdgeData}`, `kernel::persistence_edge::{PersistedEdge,
+  PersistedSemanticStatement}` and `kernel::types::{AssertionBasis, AssertionMethod,
+  AssertionWithdrawal, GraphScope, NodeProperty}`; pandect names the rest through `mere`. The `mere-rdf`
+  shim resolves every path it had (`node_quads` and `apply_*` through `kernel::rdf`). Tests: the same
+  630 names (`mere` 93 + kernel 537 before; `mere` 14 + kernel 616 after, kernel with `query` and
+  `bundled-contexts`): 90 engine tests that build a kernel graph moved to `kernel::rdf`, 11 kernel model
+  tests to `mere::model`; `adapter_scale` and the new `join_scale` are kernel examples. Gates: the wire
+  fixtures byte-identical; `cargo tree -p mere -e normal` names no accesskit, graphshell, pandect,
+  catchment, canvas, cambium or kernel crate (family packages: chartulary, muniment); `mere` checks on
+  wasm32 with and without `query`; the workspace checks with `--all-targets --all-features`; the ledger's
+  49 rows are identical to L2's; Graphshell `host/` (workspace, all targets, and `mere-view` with
+  `query`), Turnstone (default features), Cleromancy's `authority-guest` and `core` library and binaries,
+  and Knot check against the branch by `--config` patch. Cleromancy's root crate and `core`'s
+  `authority_corpus` test fail with the same errors against Mere main without the patch (Graphshell and
+  Seiche drift, and core's missing test dependencies, Finding at Cleromancy `2374bb5`), so are unchanged;
+  the hooks pass, and the clippy hook now also lints `mere-kernel` with `query` and
+  `bundled-contexts`. The join, timed by `join_scale` before and after (medians of seven, ms, second
+  run of each): `shown_resource_id` then the resource 0.91 / 1.01 at 10k and 32.2 / 34.9 at 100k,
+  `surface_ids_showing_resource` 1.78 / 1.84 and 40.6 / 34.7, `for_graph` 129 / 139 and 1416 / 1414,
+  edit then `is_current` then rebuild 132 / 134 and 1350 / 1352: no change beyond noise. Receipts:
+  "2026-11-12: P5 L3, the model seam".

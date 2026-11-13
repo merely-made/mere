@@ -1267,3 +1267,55 @@ What an edit is: `assert_semantic_statement` of a statement with a predicate no 
 | 100000 | full scan | 3141.47 (2338.57..4776.53) | 63.07 (59.7..74.94) | 345.69 (313.89..421.97) |
 
 The 100k withdraw (5.0 ms, against 0.12 ms at 10k) is a kernel cost found by this run and not investigated here. The index build column is the first build after the graph; the warm rebuilds in the edit table are the refresh figures.
+
+## 2026-11-12: P5 L3, the model seam (Mere `b36e9abf8` fixtures, `d2a6398c1` move)
+
+Instrument: `crates/graph/graph-kernel/examples/join_scale.rs` (added with the move; the same source
+ran from `crates/graph/engine/examples/` at the pre-move commit `b36e9abf8`). Each surface shows its own
+resource and the resources form a `cites` ring. Release, debug info off, Windows 11, Ryzen 9 7940HS.
+Each cell is the median of seven reps in one run, in milliseconds. Runs alternated: before 1, after 1,
+before 2 (a throwaway worktree at `b36e9abf8`, deleted after), after 2. Before 1 ran while the machine
+was busier; read run 2 against run 2.
+
+| scale | phase | before run 1 | before run 2 | after run 1 | after run 2 |
+|---|---|---|---|---|---|
+| 10,000 | shown_resource_id+resource | 1.208 | 0.914 | 1.101 | 1.008 |
+| 10,000 | surface_ids_showing_resource | 2.638 | 1.783 | 2.115 | 1.840 |
+| 10,000 | resource_edges held | 0.058 | 0.036 | 0.047 | 0.038 |
+| 10,000 | dataset_quads | 226.514 | 180.644 | 169.736 | 183.562 |
+| 10,000 | for_graph | 162.209 | 129.190 | 129.573 | 139.013 |
+| 10,000 | edit+is_current+rebuild | 159.716 | 132.022 | 121.927 | 133.713 |
+| 100,000 | shown_resource_id+resource | 41.842 | 32.206 | 35.239 | 34.895 |
+| 100,000 | surface_ids_showing_resource | 46.012 | 40.614 | 35.855 | 34.734 |
+| 100,000 | resource_edges held | 2.813 | 2.715 | 2.118 | 2.037 |
+| 100,000 | dataset_quads | 2966.216 | 2397.216 | 2267.295 | 2257.717 |
+| 100,000 | for_graph | 1754.568 | 1415.989 | 1259.590 | 1413.587 |
+| 100,000 | edit+is_current+rebuild | 1763.557 | 1350.096 | 1325.361 | 1352.418 |
+
+Build (one pass each): `add_node` with resource binding 78.6 / 54.9 / 56.9 / 66.4 ms at 10k and
+852.0 / 706.9 / 712.4 / 730.4 ms at 100k; resource asserts 32.8 / 29.5 / 36.0 / 36.4 ms and
+489.9 / 404.6 / 374.2 / 404.2 ms (before 1, before 2, after 1, after 2). Counts agreed in every cell
+(10k: 10,000 joins, 50,000 quads; 100k: 100,000 and 500,000).
+
+Tests, by name: before, `mere` lib 93 and `mere-kernel` lib 537 (630); after, `mere` lib 14 and
+`mere-kernel` lib 616 (630, `--features query,bundled-contexts`), the same 630 names. 90 engine tests
+that build a kernel `Graph` moved to `kernel::rdf`'s test modules; 11 kernel model tests (edge data,
+persisted statements and properties, minting, predicate strata) moved to `mere::model`. Integration
+targets unchanged: `wire_fixtures` 5 + 1 ignored writer, `assertion_lifecycle_reopen` 1 + 1,
+`frozen_link_reopen` 1 + 1, `w3c_conformance` 2 + 1, `mere-rdf` 1.
+
+Ledger: `W3C_SUITES_DIR=C:/Users/mark_/Code/crates cargo test -p mere --features query --test
+w3c_conformance -- --ignored --nocapture`, 44 s; all 49 `ROW` lines identical to L2's run.
+
+Downstream, each from a throwaway worktree at origin/main (Graphshell `e919ae77`, Turnstone `0a4636ae`,
+Cleromancy `30d3340`, Knot `090237c`), with `--config` naming a patch file that points `mere`,
+`mere-kernel`, `mere-rdf`, `pandect`, `catchment` and `mere-facts` at the branch; every build showed the
+patched packages from `C:/t/p5l3`. Graphshell `cargo check --manifest-path host/Cargo.toml --workspace
+--all-targets`: first failed on pandect's `personal-sync` path (fixed in `0578ddadf`), then passed in
+3m50s; `-p mere-view --features mere-view/query` passed. Turnstone `cargo check --workspace --all-targets`
+(default features, CEF) passed in 9m07s. Knot `cargo check --workspace --all-targets` passed in 4m14s.
+Cleromancy: `authority-guest` (its own workspace) passed; the root crate and `core --all-targets` fail,
+and the same check without the patch (resolving Mere main `cc780c8d`) fails with the identical error set
+(`SessionViewIntent.focus`, `SessionGraphV1.attention`, `DecoderDevice::ndarray`; `core`'s
+`authority_corpus` test missing `mere_resident`, `eidetic`, `ostiary`, `uuid`); `core`'s library,
+binaries and examples pass with the patch.

@@ -18,7 +18,7 @@
 - **Family rows and locks.** Mere consumes `chartulary` from `eidetic.git` on `branch = "main"`; after P1 lands, Mere's lock moves by `cargo update -p chartulary` and nothing else is pinned or hand-edited.
 - **Ceilings and hooks.** 600 physical lines per file in both repositories (Stack 7); Eidetic's hooks are line-ceiling and `cargo clippy --locked --all-targets`; Mere's add the responsa check and `cargo deny --locked check bans`. Never `--no-verify`. Plain commit messages, no attribution lines.
 - **Lanes stop at forks.** A choice with more than one defensible answer comes back as a card with evidence before code commits to it. A lane verifies in its own worktree, one cargo build at a time, at most three tasks.
-- **Measured, not asserted.** The instrument is `crates/graph/linked-data/examples/adapter_scale.rs`; its table is appended to the brief's §1, not restated elsewhere.
+- **Measured, not asserted.** The instrument is `crates/graph/graph-kernel/examples/adapter_scale.rs` (moved by engine split P5 L2 and L3); its table is appended to the brief's §1, not restated elsewhere.
 
 ## P1. `chartulary::quads` in Eidetic
 
