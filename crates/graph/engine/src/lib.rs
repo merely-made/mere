@@ -50,7 +50,7 @@ pub mod model;
 pub mod projection;
 
 pub use model::ResourceGraph;
-pub use projection::{ProjectionKey, RdfSource};
+pub use projection::{ProjectionKey, ProjectionSource, RdfSource, SourceQuads};
 
 /// Acquire stage: JSON-LD ingest and the offline `@context` loader.
 pub mod acquire;

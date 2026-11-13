@@ -15,9 +15,12 @@
 //! read a kernel graph as before. This module leaves with the kernel at P8.
 
 use mere::model::ClassificationScheme;
-use mere::projection::{push_withdrawn_reifiers, resource_quads, resource_withdrawn_reifier_quads};
+use mere::projection::{
+    push_withdrawn_reifiers, resource_dependents, resource_quads, resource_source_quads,
+    resource_sources, resource_withdrawn_reifier_quads,
+};
 use mere::{
-    ProjectionKey, RDF_TYPE, RdfSource, SCHEMA_KEYWORDS, SCHEMA_NAME, graph_name_for_scope,
+    ProjectionKey, ProjectionSource, RDF_TYPE, RdfSource, SourceQuads, SCHEMA_KEYWORDS, SCHEMA_NAME, graph_name_for_scope,
     property_literal, push_quad, push_semantic_statement_metadata_quads,
     push_statement_metadata_quads,
 };
@@ -30,6 +33,8 @@ use crate::types::GraphScope;
 
 #[cfg(not(target_arch = "wasm32"))]
 mod apply;
+mod refresh;
+pub use refresh::touched_sources;
 #[cfg(not(target_arch = "wasm32"))]
 pub use apply::{
     ApplyOutcome, apply_contribution, apply_contribution_with_identity, apply_import,
@@ -326,6 +331,61 @@ impl RdfSource for Graph {
         ])
     }
 
+    fn sources(&self) -> Option<Vec<ProjectionSource>> {
+        let nodes = self.nodes().map(|(_, node)| ProjectionSource::Node(node.id));
+        Some(nodes.chain(resource_sources(&self.resources)).collect())
+    }
+
+    /// A node's quads are what [`RdfSource::held_quads`] walks for it, plus
+    /// the withdrawn reifiers of its outgoing buckets; a resource's come from
+    /// the engine's resource projection.
+    fn source_quads(&self, source: ProjectionSource) -> Option<SourceQuads> {
+        let id = match source {
+            ProjectionSource::Node(id) => id,
+            ProjectionSource::Resource(id) => return resource_source_quads(&self.resources, id),
+            ProjectionSource::Resources => return None,
+        };
+        let key = self.get_node_key_by_id(id)?;
+        let node = self.get_node(key)?;
+        let subject = node_id(node);
+        let mut withdrawn = Vec::new();
+        if let Ok(from) = NamedNode::new(subject.as_str()) {
+            for (_, _, to, payload) in self.surface_outgoing_relation_buckets(key) {
+                let target = self.get_node(to).map(node_id);
+                if let Some(Ok(target)) = target.map(NamedNode::new) {
+                    push_withdrawn_reifiers(&mut withdrawn, &from, &target, payload);
+                }
+            }
+        }
+        Some(SourceQuads {
+            subject: Some(subject),
+            held: node_dataset_quads(self, key, node),
+            withdrawn,
+        })
+    }
+
+    /// A node's in-neighbours, whose edges and reifiers name its IRI; for a
+    /// resource, the resources with edges into it.
+    fn dependents(&self, source: ProjectionSource) -> Vec<ProjectionSource> {
+        let id = match source {
+            ProjectionSource::Node(id) => id,
+            ProjectionSource::Resource(id) => return resource_dependents(&self.resources, id),
+            ProjectionSource::Resources => return Vec::new(),
+        };
+        let Some(key) = self.get_node_key_by_id(id) else {
+            return Vec::new();
+        };
+        let mut sources: Vec<ProjectionSource> = self
+            .surface_incoming_relation_buckets(key)
+            .filter(|(_, from, _, _)| *from != key)
+            .filter_map(|(_, from, _, _)| self.get_node(from))
+            .map(|node| ProjectionSource::Node(node.id))
+            .collect();
+        sources.sort_unstable();
+        sources.dedup();
+        sources
+    }
+
     fn resource_graph(&self) -> &mere::ResourceGraph {
         &self.resources
     }
@@ -354,6 +414,9 @@ mod query_history_projection_tests;
 #[cfg(all(test, feature = "query"))]
 #[path = "rdf/tests/query/indexed.rs"]
 mod query_indexed_tests;
+#[cfg(all(test, feature = "query"))]
+#[path = "rdf/tests/query/refresh.rs"]
+mod query_refresh_tests;
 #[cfg(all(test, feature = "query"))]
 #[path = "rdf/tests/query/resource_member.rs"]
 mod query_resource_member_tests;

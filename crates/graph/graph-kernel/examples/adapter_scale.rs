@@ -23,15 +23,22 @@
 //! per-edit assert and withdraw on the built graph, the refresh after one edit
 //! (`is_current`, then rebuild of the held index), and the engine's share of a
 //! frame measured headlessly. Each row is the median, min and max over its reps
-//! within the run; the recorded figure is the median of several runs.
+//! within the run; the recorded figure is the median of several runs. The
+//! `refresh_incremental_after_*` rows time `IndexedDataset::refresh` from the
+//! edit's captured deltas (quad index plan P4), and `refresh_bytes` is what
+//! its per-source record adds beside `index_bytes`.
 
 use kernel::graph::fixtures::GraphFixtures;
-use kernel::graph::{Graph, NodeKey, SemanticStatementSpec};
+use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+use kernel::graph::{CapturedDelta, Graph, NodeKey, SemanticStatementSpec};
+use kernel::rdf::touched_sources;
 use kernel::types::NodeProperty;
+use mere::dataset::Refresh;
 use mere::query::{IndexedDataset, View, sparql, sparql_on};
 use spareval::{QueryEvaluator, QueryResults};
 use spargebra::SparqlParser;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 const NEXT: &str = "https://example.test/vocab#next";
@@ -124,7 +131,7 @@ fn main() {
     let mut over_budget = vec![false; QUERIES.len()];
 
     println!(
-        "scale\tquads\tgraph_build_ms\tindex_build_ms\tindex_bytes\tmaterialize_ms\tquery\tsparql_call_ms\tindexed_ms\tmaterialized_ms\trows"
+        "scale\tquads\tgraph_build_ms\tindex_build_ms\tindex_bytes\trefresh_bytes\tmaterialize_ms\tquery\tsparql_call_ms\tindexed_ms\tmaterialized_ms\trows"
     );
     for n in scales {
         let t = Instant::now();
@@ -141,10 +148,11 @@ fn main() {
         let mut indexed = IndexedDataset::for_graph(&graph);
         let index_ms = t.elapsed();
         let prefix = format!(
-            "{n}\t{quad_count}\t{}\t{}\t{}\t{}",
+            "{n}\t{quad_count}\t{}\t{}\t{}\t{}\t{}",
             ms(build_ms),
             ms(index_ms),
             indexed.memory_bytes(),
+            indexed.refresh_bytes(),
             ms(materialize_ms)
         );
 
@@ -280,6 +288,71 @@ fn edit_scale(n: usize, graph: &mut Graph, keys: &[NodeKey], indexed: &mut Index
         median_row(n, &format!("is_current_fresh_after_{kind}"), fresh);
         median_row(n, &format!("refresh_total_after_{kind}"), total);
     }
+
+    // Refresh from the captured deltas instead of rebuilding.
+    let sink: Arc<Mutex<Vec<CapturedDelta>>> = Arc::default();
+    let into = sink.clone();
+    graph.set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
+        into.lock().unwrap().push(delta.clone());
+    })));
+    let refresh = |indexed: &mut IndexedDataset, graph: &Graph| {
+        let deltas = std::mem::take(&mut *sink.lock().unwrap());
+        let touched = touched_sources(&deltas).expect("statement edits refresh in place");
+        let outcome = indexed.refresh(graph, &touched);
+        assert_eq!(outcome, Refresh::Incremental, "an edit refreshes in place");
+    };
+    *indexed = IndexedDataset::for_graph(graph);
+    sink.lock().unwrap().clear();
+    for kind in ["assert", "withdraw"] {
+        let mut samples = vec![];
+        for _ in 0..edits {
+            let id = edit_assert(graph, keys, "incrementalEdit");
+            if kind == "withdraw" {
+                refresh(indexed, graph);
+                assert!(graph.withdraw_semantic_assertion(&id, None, None));
+            }
+            let t = Instant::now();
+            refresh(indexed, graph);
+            samples.push(t.elapsed());
+        }
+        median_row(n, &format!("refresh_incremental_after_{kind}"), samples);
+    }
+    // Node edits through the captured path: a title, a re-tag (a tag's label is
+    // its identity, so changing it means another concept), and a URL, whose
+    // IRI change brings the node's dependents.
+    for kind in ["title", "retag", "url"] {
+        let mut samples = vec![];
+        for k in 0..edits {
+            let key = keys[(k * 131) % keys.len()];
+            match kind {
+                "title" => {
+                    let title = format!("title {k}");
+                    apply_graph_delta(graph, GraphDelta::SetNodeTitle { key, title });
+                },
+                "retag" => {
+                    let tag = format!("tag {k}");
+                    apply_graph_delta(graph, GraphDelta::InsertNodeTag { key, tag });
+                    refresh(indexed, graph);
+                    let (tag, new) = (format!("tag {k}"), format!("tag {k} renamed"));
+                    apply_graph_delta(graph, GraphDelta::RemoveNodeTag { key, tag });
+                    apply_graph_delta(graph, GraphDelta::InsertNodeTag { key, tag: new });
+                },
+                _ => {
+                    let new_url = format!("https://moved.test/{k}");
+                    apply_graph_delta(graph, GraphDelta::SetNodeUrl { key, new_url });
+                },
+            }
+            let t = Instant::now();
+            refresh(indexed, graph);
+            samples.push(t.elapsed());
+        }
+        median_row(n, &format!("refresh_incremental_after_{kind}"), samples);
+    }
+    indexed
+        .verify_against_fresh(graph)
+        .expect("the refreshed dataset equals a fresh build");
+    graph.set_recorder(None);
+    println!("{n}\trefresh_bytes_after_edits\t{}\t\t\t", indexed.refresh_bytes());
 
     // A frame's engine share, headless. Steady: is_current (true) plus one
     // held query. Edit: is_current (false), rebuild, one held query, after one

@@ -1,7 +1,7 @@
 # The quad index: implementation plan
 
 **Date**: 2026-11-09
-**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold; its Eidetic half built on a branch the same day, its Mere half waiting on a fork. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
+**Status**: plan, 2026-11-09; D1 to D3 ruled the same day, D4 to D7 (the P1 lane's forks) on 2026-11-10; P1 landed on `eidetic` main `60f3d60` the same day (Mark: "Land and start P2"); D8 ruled and P2 landed on Mere main 2026-11-10 (Mark: "Land after the lock repair"); P3 open, its refresh and 100k rows measured 2026-11-12; P4 (incremental maintenance) opened 2026-11-12 by D9, after the engine split's P5 fold; its Eidetic half built on a branch the same day, its Mere half built on a branch too, with one source per node and per resource, refreshing an edit in under 1 ms at 100k nodes. Carries out the [indexed dataset brief](../technical_architecture/2026-11-09_indexed_dataset_brief.md) (D1 to D5, 2026-11-09) under the [engine split plan](2026-11-07_engine_split_plan.md)'s P5. Three phases, in order: the generic index in Eidetic, the engine seam in Mere, then measurement and refinement. Mark: "ok, orchestrate/do the implementation plan for the index" (2026-11-09).
 **Related**: the brief (the measurement in its §1, the shape in §3, the budget in §4); the [conformance ledger](../testing/2026-11-09_conformance_ledger.md) (SPARQL rows); Eidetic's chartulary notes (`eidetic/design_docs/eidetic_docs/technical_architecture/2026-07-08_chartulary_g0.md` to `g2`); doctrine Stack 1, Stack 3, Stack 6, Stack 7.
 
 ## What the brief ruled, carried here
@@ -127,6 +127,81 @@ In `crates/graph/linked-data/src/query/`, behind the existing `query` feature. `
   inside a triple-term object. Identical rows from two sources (a surface node and a resource with
   the same IRI) collapse into one row. The dataset receives deltas only from whoever holds the
   graph's single recorder slot, and nothing ties them to the revision it was built at.
+- Progress, 2026-11-12 (those answered; coordinator, relaying): the baseline is "(i). The dataset
+  keeps what each source (node or resource) contributed, with a count for rows emitted by more than
+  one source"; deltas: "the holder passes them in. The dataset does not get a recorder slot and the
+  kernel is not changed"; in-neighbours: "re-project them for a node removal or a node IRI change. If
+  that turns out not to be mechanical, make those two edit kinds fall back"; and "make
+  `node_dataset_quads` reachable for this with the narrowest visibility that works". Built on Mere
+  `quads/incr`, unpushed. `RdfSource` gains `sources`, `source_quads` and `dependents`, all
+  defaulting to "does not split". The kernel's `Graph` splits into one source per node
+  (`node_dataset_quads` as it was, private, plus `push_withdrawn_reifiers` on its outgoing buckets)
+  and one source for the whole resource projection, since a resource's quads read other resources.
+  `IndexedDataset::for_graph` indexes by source and keeps each source's rows and a count for shared
+  rows. `refresh(graph, touched)` re-projects the touched sources, plus the resource source whenever
+  `ResourceGraph::version()` moved, and their in-neighbours when a node's IRI changed. It diffs, and
+  removes a row from the index only when its count reaches zero. `kernel::rdf::touched_sources`
+  derives the sources from captured deltas. Incremental: every node edit, relation edits (both
+  ends), resource edits, and URL and navigation changes (in-neighbours re-projected). Fall back to
+  `for_graph`: node removal (the graph no longer holds the edges that named it) and import records.
+  Field and coupling edits touch nothing. Gap detection by the counters is not possible: over 400
+  random edits the advance of `revision` plus `content_revision` matched the delta count for some edit
+  kinds but not all (12 edits moved two counters for one delta), so the contract is in `refresh`'s doc
+  comment and `verify_against_fresh` is the test check. Tests: random edit sequences, 12 seeds × 60
+  batches, each refresh equal to a fresh `for_graph` in full quad sets for both views (620
+  incremental, 75 fallbacks), with four corpus-shaped queries compared every 15 batches; indexing by
+  source equals the whole walk; a row two sources emit; an IRI change through a containment edge; a
+  missed source caught. Dropping removal, the shared counts or the in-neighbour step each fails them.
+  618 `mere-kernel` tests pass. Measured with `adapter_scale 10000 100000`, release, quiet machine:
+  the per-source record adds 2.30 MB beside the index's 3.84 MB at 10k nodes and 21.6 MB beside
+  38.4 MB at 100k. Incremental refresh per edit is 142 ms after an assert and 144 ms after a
+  withdrawal at 10k (rebuild 210 ms), and 1.47 s and 1.48 s at 100k (rebuild 2.27 s), so the 1 ms
+  target is missed. Where the time goes (10k, probed): re-projecting the resource source, 81k rows
+  (the statements and node properties live in the resource graph), costs 103 ms; interning it 43 ms;
+  the diff 0.1 ms; `apply` 0.07 ms. Index build by source: 196 ms at 10k and 2.07 s at 100k.
+  chartulary's requirement is now 0.3.1, served locally by an uncommitted patch to the Eidetic
+  worktree until Eidetic's `6cdc567` and `1371574` reach main.
+- Progress, 2026-11-12 (resources split; coordinator, relaying: "A third off a rebuild does not
+  meet D4's purpose, so go on: split the resource projection into one source per resource"): each
+  resource is its own source, `resource_source_quads`, built from the per-resource
+  `resource_metadata::quads`, the per-edge `resource_edge_quads` over its outgoing edges, and
+  `push_withdrawn_reifiers`. The whole-graph walk is unchanged for the serializers, and the "by
+  source equals the whole walk" test still passes. The earlier reason for one resource source was
+  wrong: a resource's quads read only its own facets. A tag concept's label lives on the concept
+  itself, and is its identity (`tag_concept_iri` of owner and label; `define_tag_concept` refuses a
+  new label). So no resource reads another, and `dependents` for a resource names its in-edges only
+  for a canonical IRI change. `touched_sources` names resources from the deltas: a record edit its
+  resource, a resource-edge edit both ends, showing a resource the surface and the resource. No
+  delta kind lacked the ids. `ProjectionSource::Resources` (every resource) remains for anything
+  unattributed, and is assumed when the resource graph's version moves with no resource named. That
+  happened 0 times in 645 random-test refreshes. Still falling back to `for_graph`: node removal and
+  import records. Tests rerun: equality in both views over the random sequences (621 incremental, 75
+  fallbacks); attributing resource-edge deltas to one end only fails them, as do dropping removal,
+  shared counts or dependents. `adapter_scale 10000 100000`, release, quiet machine, refresh per
+  edit (median of 51): after an assert 0.057 ms at 10k and 0.47 ms at 100k; after a withdrawal 0.060
+  and 0.32 ms; a title edit 0.014 and 0.092 ms; a re-tag (drop one tag, add another, the nearest edit
+  to a label change) 0.17 and 0.72 ms; rebuilds 185 ms and 2.07 s. A URL edit measured 0.007 ms
+  (it moved no rows in this instrument; the IRI-change path is proven by its test, not timed). The
+  first refresh after a build reaches 6.2 ms at 100k (the index's first `apply` grows its vectors).
+  The per-source record is 3.00 MB beside the 3.84 MB index at 10k and 27.2 MB beside 38.4 MB at 100k
+  (+71%). Index build: 166 ms and 1.81 s. The 1 ms target is met at 100k for an assert, a
+  withdrawal and a title edit.
+- Progress, 2026-11-12 (landing review, three items): (1) `touched_sources` matches all 50
+  `CapturedDelta` variants by name with no wildcard arm, so a new edit kind fails to compile until it
+  is mapped. `refresh`'s doc comment now gives that as the reason to derive `touched` only through
+  it, or to rebuild: the unchecked case is a caller building the list by hand. (2) Per-source
+  ordinals instead of rows: checked first that an ordinal is stable under removals and asserts. Rows
+  are appended and removed ones stay tombstoned. A withdrawal's flip and its withdrawn-twin drop are
+  the two places it would not hold, and Mere never withdraws through `apply`. Built with a
+  chartulary `ordinal_of` and `row`. The record fell from 3.00 to 1.72 MB at 10k (−43%) and from 27.2
+  to 14.4 MB at 100k (−47%). Refresh at 100k stayed under 1 ms (0.57 ms assert, 0.41 ms withdraw,
+  0.094 ms title, 0.74 ms re-tag). That is short of the "half or more" the review set, so it was
+  reverted, and the 71% stands. The reason is the per-source map itself: about 11 MB of the 14.4 at
+  100k is the hash map of 200k sources and the shared counts, not the rows. (3) The resource
+  projection reads nothing from showing: `shown_resources` lives in the kernel graph, not the
+  `ResourceGraph`. The random generator now both replaces and clears a shown resource (302 sets, 61
+  clears over the run), and equality holds with no fallback on a clear. Tests: 618 `mere-kernel`
+  tests; random sequences 637 incremental, 63 fallbacks; the four mutations still fail them.
 
 ## Decisions
 

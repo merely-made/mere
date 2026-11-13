@@ -13,6 +13,8 @@
 //! of the projection the kernel had before the split.
 
 use oxrdf::{GraphName, NamedNode, Quad};
+use petgraph::Direction;
+use petgraph::visit::EdgeRef;
 use uuid::Uuid;
 
 pub use crate::resource_metadata::{SKOS_CONCEPT, SKOS_PREF_LABEL};
@@ -34,6 +36,82 @@ impl ProjectionKey {
     }
 }
 
+/// One part of a projection that re-projects alone, so a held index can
+/// refresh what an edit touched (quad index plan P4).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum ProjectionSource {
+    /// A surface node: its own quads, its outgoing statements with their
+    /// reifiers, and their withdrawn reifiers.
+    Node(Uuid),
+    /// A resource: its own metadata, its outgoing edges' held assertions with
+    /// their reifiers, and their withdrawn reifiers.
+    Resource(Uuid),
+    /// Every resource at once: named in a touched list when an edit cannot be
+    /// attributed to particular resources; a refresh expands it.
+    Resources,
+}
+
+/// One resource's quads, or `None` when it is not in the graph. The same rows
+/// the whole-graph walk ([`resource_quads`], [`resource_withdrawn_reifier_quads`])
+/// emits for it, from the same per-resource and per-edge functions.
+pub fn resource_source_quads(resources: &ResourceGraph, id: Uuid) -> Option<SourceQuads> {
+    let key = resources.key_of(&id)?;
+    let resource = resources.node(key)?;
+    let mut held = crate::resource_metadata::quads(resources, resource);
+    let mut withdrawn = Vec::new();
+    let subject = NamedNode::new(resource.canonical_iri()).ok();
+    for edge in resources.inner().edges_directed(key, Direction::Outgoing) {
+        let Some(to) = resources.node(edge.target()) else {
+            continue;
+        };
+        held.extend(resource_edge_quads(resource, to, edge.weight()));
+        if let (Some(subject), Ok(target)) = (&subject, NamedNode::new(to.canonical_iri())) {
+            push_withdrawn_reifiers(&mut withdrawn, subject, &target, edge.weight());
+        }
+    }
+    Some(SourceQuads {
+        subject: Some(resource.canonical_iri().to_string()),
+        held,
+        withdrawn,
+    })
+}
+
+/// Every resource as a source.
+pub fn resource_sources(resources: &ResourceGraph) -> impl Iterator<Item = ProjectionSource> + '_ {
+    resources
+        .resource_nodes()
+        .map(|resource| ProjectionSource::Resource(resource.id()))
+}
+
+/// The resources whose edges name `id`'s IRI.
+pub fn resource_dependents(resources: &ResourceGraph, id: Uuid) -> Vec<ProjectionSource> {
+    let Some(key) = resources.key_of(&id) else {
+        return Vec::new();
+    };
+    let mut sources: Vec<ProjectionSource> = resources
+        .inner()
+        .edges_directed(key, Direction::Incoming)
+        .filter(|edge| edge.source() != key)
+        .filter_map(|edge| resources.node(edge.source()))
+        .map(|resource| ProjectionSource::Resource(resource.id()))
+        .collect();
+    sources.sort_unstable();
+    sources.dedup();
+    sources
+}
+
+/// One source's quads.
+#[derive(Clone, Debug, Default)]
+pub struct SourceQuads {
+    /// The IRI the source's quads name it by, which other sources' quads
+    /// also carry; a change means those must be re-projected too.
+    pub subject: Option<String>,
+    /// Held quads; may repeat a quad.
+    pub held: Vec<Quad>,
+    /// Withdrawn reifiers in [`ASSERTION_HISTORY_GRAPH_IRI`]; may repeat.
+    pub withdrawn: Vec<Quad>,
+}
+
 /// A graph the engine projects to RDF.
 pub trait RdfSource {
     /// Every held quad of the projection, in a stable order; may repeat a quad.
@@ -50,6 +128,24 @@ pub trait RdfSource {
 
     /// Changes whenever the projection may change.
     fn projection_key(&self) -> ProjectionKey;
+
+    /// The sources whose quads together are the projection, when each
+    /// re-projects alone; `None` when the projection does not split.
+    fn sources(&self) -> Option<Vec<ProjectionSource>> {
+        None
+    }
+
+    /// One source's quads, or `None` when the source no longer exists or the
+    /// projection does not split.
+    fn source_quads(&self, _source: ProjectionSource) -> Option<SourceQuads> {
+        None
+    }
+
+    /// The other sources whose quads carry `source`'s subject IRI, which a
+    /// change of that IRI also changes.
+    fn dependents(&self, _source: ProjectionSource) -> Vec<ProjectionSource> {
+        Vec::new()
+    }
 
     /// The resources beneath the projection.
     fn resource_graph(&self) -> &ResourceGraph;
@@ -167,6 +263,24 @@ impl RdfSource for ResourceGraph {
 
     fn projection_key(&self) -> ProjectionKey {
         ProjectionKey::new([self.version(), 0, 0, 0, 0, 0, 0, 0])
+    }
+
+    fn sources(&self) -> Option<Vec<ProjectionSource>> {
+        Some(resource_sources(self).collect())
+    }
+
+    fn source_quads(&self, source: ProjectionSource) -> Option<SourceQuads> {
+        match source {
+            ProjectionSource::Resource(id) => resource_source_quads(self, id),
+            ProjectionSource::Node(_) | ProjectionSource::Resources => None,
+        }
+    }
+
+    fn dependents(&self, source: ProjectionSource) -> Vec<ProjectionSource> {
+        match source {
+            ProjectionSource::Resource(id) => resource_dependents(self, id),
+            ProjectionSource::Node(_) | ProjectionSource::Resources => Vec::new(),
+        }
     }
 
     fn resource_graph(&self) -> &ResourceGraph {

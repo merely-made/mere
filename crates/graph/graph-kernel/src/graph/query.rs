@@ -170,6 +170,19 @@ impl Graph {
             .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
     }
 
+    /// Every Surface bucket into `to`, tombstone-only ones included, for the
+    /// RDF projection's dependents of a node's IRI. Cost is proportional to
+    /// the node's in-degree.
+    pub(crate) fn surface_incoming_relation_buckets(
+        &self,
+        to: NodeKey,
+    ) -> impl Iterator<Item = (EdgeKey, NodeKey, NodeKey, &EdgePayload)> + '_ {
+        self.inner
+            .inner()
+            .edges_directed(to, Direction::Incoming)
+            .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
+    }
+
     /// Surface relations followed by content relations lifted to every pair of
     /// surfaces showing their endpoints. The handle retains its owning store;
     /// projection does not copy resource assertions into the surface graph.
