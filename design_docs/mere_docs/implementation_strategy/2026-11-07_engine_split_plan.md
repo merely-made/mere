@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-12: D1 to D142 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-12: D1 to D143 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -759,6 +759,19 @@ shape violation, reopen the same revision with the same results.
   federation and remote-store reads under a per-endpoint grant, SHACL-SPARQL, SHACL SPARQL rules
   lowered into pack rules, VC Data Integrity verification, VC-JOSE-COSE and SD-JWT if a maintained
   library covers them, and did:webvh once lessons D19 is met.
+- Reading, 2026-11-12 (D143): the four done-conditions are read as the slice, SHACL and RDFC-1.0
+  rows, Data Integrity verification and DID resolution with rows, and the lessons modules named.
+  D142's other engine rows (framing, RDFa extraction, Update, granted federation, VC-JOSE-COSE,
+  SD-JWT) land as P6 lanes behind their rows but do not hold P6's close, and neither does did:webvh,
+  which waits on lessons D19. The thin slice is not an engine-only test: "reopen the same revision"
+  is the journal cursor, passed in by the caller, so the slice runs through the kernel's reopen (or a
+  recorded quad stream carrying a cursor), and the engine mints no revision id (D141 F13). SHACL is
+  rudof in a crate beside `mere`, over a carried patch; proofs are verified by a thin verifier of
+  our own over maintained crypto; derived facts live in a second dataset read in union with the
+  asserted one. Order: the dataset reader without `query` and JSON-LD processing mode; RDFC-1.0;
+  a differential-dataflow wasm probe; SHACL; the derived layer; the pack loader (after the
+  declared-lens plan, written as a doc lane beside the first stages); the thin slice; identity and
+  proofs; D142's extras.
 
 ### P7. The experience vocabulary as the first external pack
 
@@ -2553,6 +2566,69 @@ revision and what crosses at frame rate.
   scope and the ledger's rows grow. Outcome: refines P6; applies D65, D141.
 
   Links: area The stack · draws on engine-split D65, engine-split D141 · plans engine-split P5, engine-split P6 · summary Every linked-data standard in Mere's field has a ruled stance; P6 grows by framing, RDFa extraction, Update, granted federation, SHACL-SPARQL and its rules, and verify-only credentials.
+
+- **D143. P6's reading, libraries and order (Mark and the first reader, 2026-11-12):** The P6
+  assessment (`Code/testing/engine-split/p6_assessment.md`, read-only at Mere `2fa594c1f`, by the
+  reviewer session) found none of P6's four done-conditions met; the declared-lens plan unwritten and
+  Eidetic holding only the participant `mere.pack/v1` (signed `serde_json`), not lessons D10's shared
+  header; `IndexedDataset` unable to list its quads without `query` (why the harness needs it); and
+  `parse_jsonld` with no 1.0 mode though `oxjsonld` has one. It found five conflicts: derived facts
+  against the one-index rulings (C1), the pack-rule language unnamed (C2), "reopen the same revision"
+  against D141 F13 (C3), the candidate SHACL and DID libraries carrying HTTP clients against P5 L6b's
+  no-HTTP gate (C4), and did:webvh in P6's scope against D19 (C5). The probes
+  (`Code/testing/engine-split/p6_probes.md`) measured the library forks before the round.
+  Mark's rulings, put to him as cards by the reviewer:
+  SHACL (F-M2). First round: "could we fork/tailor?". Put back with the measured size, about 190
+  lines across about 20 files of rudof's 49,000 in the three crates used, and its wasm build already
+  compiling without the store and HTTP stack. Ruling: "Carry a tailored patch now". So rudof's
+  `shacl` sits in a crate beside `mere` and validates over the engine's dataset through rudof's
+  traits (`Rdf`, `NeighsRDF`, `ShaclProcessor`; a stub over `Vec<oxrdf::Quad>` compiled and
+  validated in the probe), with a patch carried under `support/patches` that turns rudof's
+  wasm-only switch into a feature, so native builds also drop oxigraph, tokio, reqwest and rustls.
+  The accepted cost is reapplying the patch on each rudof release taken. rudof brings `oxiri` 0.3
+  beside Mere's 0.2; the lane bumps the holder or lists the duplicate (D137). ShEx comes on the same
+  code but needs rudof's `QueryRDF` (SPARQL strings); by D142 it gets its own rows only if that is
+  small, decided by the lane that sees it.
+  Credentials (F-M3). First round: "again, can we fork/tailor?". Put back with the 2026-10-04
+  security rule against forking crypto libraries, and four options. Ruling: "Our own thin
+  verifier". No credential library: verification code of our own that follows the Data Integrity
+  spec's algorithms over maintained crates only (`oxrdf`'s `rdfc-10` for canonicalization, the
+  family's `ed25519-dalek` 3 and `p256` 0.14 for signatures, `sha2` 0.11), with no cryptographic
+  math of ours. This refines the security rule for this case: spec-following protocol code over
+  maintained crypto is in, and forks of crypto libraries stay out. The risk named to Mark is that
+  the verification logic is ours to get right (proof purpose, multikey decoding, binding a key to
+  its controller), and the W3C vectors mostly cover the happy path, so the lane writes negative tests
+  of its own from the spec's verification steps. VC-JOSE-COSE and SD-JWT follow under the same
+  ruling as later lanes, each behind its rows, outside P6's close; this replaces D142's "out
+  otherwise" for them (listed to Mark).
+  Suites (F-M5): "All six now". The OWL 2 conformance cases, the cryptosuite vectors (eddsa,
+  ecdsa), the didwebvh vectors, `json-ld-framing`, the RDFa suite and the ShEx suite are vendored
+  under `Code/crates` the way `wpt` is.
+  Decided by the first reader and the reviewer under Mark's "you're allowed to think about it and
+  argue", listed to him. The ten reviewer forks of the assessment's §6 stand as argued: the dataset
+  lists its quads without `query` (F-R1); `parse_jsonld` takes a processing mode, 1.1 by default
+  (F-R2); the cursor reading of C3 (F-R3); SHACL 1.2 core and sparql as the SHACL row, SHACL 1.0 as a
+  second (F-R4); did:web mapped to its URL by the engine and fetched by the host, with no resolver
+  library (F-R5); D142's extras do not hold P6's close (F-R6); RDFC-1.0 through `oxrdf`'s `rdfc-10`
+  (F-R7); did:key through `insigne` (F-R8); `sh:SPARQLRule` lowered in `mere::interpret::derive`
+  (F-R9); the SHACL report as an `sh:ValidationReport` dataset plus a typed summary (F-R10). The
+  declared-lens plan is written as a doc lane beside the stages that need no pack, and its own forks
+  go to Mark (F-M1). Derived facts live in a second `IndexedDataset` keyed by (rule digest, cursor),
+  read through a union adapter for `spareval` and SHACL, so quad-index D5 stays for asserted data
+  (F-M4); the adapter yields a fact that is both asserted and derived once (quad-index D6), and the
+  lane that builds it measures two-hop and full-scan cost against one dataset at 100k nodes, and
+  over 2x brings a third `View` in chartulary back as a fork with the numbers. P6 closes without
+  did:webvh, whose row reads "waiting on D19" (F-M6). The pack-rule language is SPARQL 1.2 RL, per
+  lessons D26 ("labeled as a draft"); `sh:SPARQLRule` and the SHACL 1.2 inference rules lower into
+  it, so D142's one rule mechanism holds; its rows are `sparql12-rl` (pack rules, scored against the
+  draft dated in the row) and `shacl12-inference-rules` (SHACL rules) (C2). Probe facts carried:
+  differential-dataflow 0.26 with timely 0.32 runs a join on wasm32 single-threaded only through a
+  hand-built `Worker` stepped with `step()` (`execute_directly` traps on `Instant::now()`); `oxrdf`
+  0.3.5's `rdfc-10` runs, not yet against `rdf-canon`; Dramatis' castellan already holds
+  `ed25519-dalek` 2 through `ssh-key`, so the family is not uniformly on 3. Outcome: refines P6,
+  D142; applies D26, D59, D141.
+
+  Links: area The stack · draws on engine-split D141, engine-split D142, engine-split D59 · plans engine-split P6 · summary P6 is read as four conditions with D142's extras outside its close; SHACL is rudof beside the engine on a carried patch, proofs a thin verifier of our own over maintained crypto, derived facts a second dataset in union, pack rules SPARQL 1.2 RL.
 
 ## Open questions
 

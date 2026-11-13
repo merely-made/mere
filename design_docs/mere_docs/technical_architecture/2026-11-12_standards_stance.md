@@ -1,6 +1,6 @@
 # Linked-data standards: the engine's stance per standard
 
-**Status:** ruled, 2026-11-12, engine split D142 (Mark: "Accept with those four changes (Recommended)").
+**Status:** ruled, 2026-11-12, engine split D142 (Mark: "Accept with those four changes (Recommended)"); the SHACL, ShEx, credential and pack-rule rows refined by D143 the same day.
 The draft and its round are in `Code/testing/engine-split/standards_stance_draft.md`. Each row takes
 one of four stances:
 
@@ -38,14 +38,14 @@ P5's seam.
 | Reasoning | OWL 2 RL | engine | P6 | Rule-based; it fits the derived layer. |
 | Reasoning | OWL 2 EL, QL and DL | out | — | These need full reasoners, and no pack we foresee needs them. |
 | Reasoning | RIF, SWRL | out | — | Pack rules are the one rule mechanism. |
-| Validation | SHACL Core | engine | P6 | — |
+| Validation | SHACL Core | engine | P6 | rudof's `shacl` in a crate beside `mere`, on a carried patch (D143). Rows: SHACL 1.2 core and sparql, SHACL 1.0 as a second row. |
 | Validation | SHACL-SPARQL (constraints) | engine | P6 | Cheap, since SPARQL is present, and real shapes use it. |
-| Validation | SHACL Advanced Features, SPARQL rules (`sh:SPARQLRule`) | engine, as an input format that lowers into pack rules | P6 | A SPARQL rule is a CONSTRUCT the engine already runs. One rule mechanism remains, and a pack may be authored in the standard. |
+| Validation | SHACL Advanced Features, SPARQL rules (`sh:SPARQLRule`), SHACL 1.2 inference rules | engine, as input formats that lower into pack rules | P6 | Pack rules are SPARQL 1.2 RL (lessons D26, a draft; D143). One rule mechanism remains. Rows: `sparql12-rl` and `shacl12-inference-rules`. |
 | Validation | SHACL Advanced Features, functions and triple rules | out unless they lower into pack rules as cheaply | — | Overlaps pack rules. |
-| Validation | ShEx | out unless the SHACL library P6 adopts brings it free | P6 (decided when the library is chosen) | Stack 3 admits community reports "where we have a use and they are cheap". If the library implements both, ShEx gets its own ledger rows. |
+| Validation | ShEx | engine if small, on the SHACL library's code | P6 | rudof brings ShEx (D143), but it needs rudof's `QueryRDF` (SPARQL strings); it gets rows only if that is small, decided by the lane. |
 | Proofs | RDF Dataset Canonicalization (RDFC-1.0) | engine | P6 | — |
-| Proofs | VC Data Model 2.0, Data Integrity (eddsa-rdfc-2022, ecdsa-rdfc-2019), JCS | engine, verify only | P6 | The standard shape behind P6's proof verification, on maintained crypto. Issuing belongs to custody. |
-| Proofs | VC secured with JOSE or COSE (VC-JOSE-COSE), SD-JWT | engine, verify only, if a maintained library covers it at P6's library choice; otherwise out | P6 | The second securing family credentials arrive in. Same verify-only rule as Data Integrity. Without a maintained library, the security rule says out, not ours. |
+| Proofs | VC Data Model 2.0, Data Integrity (eddsa-rdfc-2022, ecdsa-rdfc-2019), JCS | engine, verify only | P6 | A thin verifier of our own following the spec's algorithms over maintained crypto, with no crypto math of ours (D143). Issuing belongs to custody. |
+| Proofs | VC secured with JOSE or COSE (VC-JOSE-COSE), SD-JWT | engine, verify only, later lanes | after P6's close | Under D143's thin-verifier ruling, over maintained JOSE and COSE crates, each behind its rows. |
 | Identity | WebID, DID Core, DID resolution (did:key, did:web) | engine | P6 | Already in P6, against custody. |
 | Identity | did:webvh | engine (resolve and verify), gated by lessons D19 | P6, once `didwebvh-rs` reaches 1.0 or a second maintainer | ADOPT as an anchor beside did:plc (lessons D5). Our resolver refuses rollbacks, and witnesses and watchers are optional and raise the trust grade (D17). Minting, portable on save, is custody's (D18). |
 | Access | Content negotiation and Link headers | engine (acquire) | P5 | Dereferencing needs an Accept policy and Link-header discovery. |
