@@ -1711,6 +1711,14 @@ summary = "One version of every crate, the latest: skips are stopgaps, family ho
 draws_on = ["engine-split D137", "engine-split D139", "engine-split D143"]
 plans = ["engine-split"]
 
+[decisions."engine-split D145"]
+title = "P8's \"the engine\" is the Mere workspace (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P8's \"anything but the engine\" means anything outside Mere's workspace: products may take Mere's workspace crates from mere.git, as they take Genet's from Genet."
+draws_on = ["engine-split D4"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
