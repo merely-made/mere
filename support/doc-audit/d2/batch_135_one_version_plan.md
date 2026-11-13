@@ -9,12 +9,12 @@ Written 2026-11-13 against Mere `origin/main` `198e1e967`, the day the document 
 ## mere_docs/implementation_strategy/2026-11-13_one_version_plan.md
 
 - disposition: current
-- status line: accurate: yes
-- claims checked: 6 — holds: 4, stale: 1 (corrected before landing), unverifiable: 1
+- status line: "2026-11-13: plan. P1 has started outside Mere" — accurate: yes
+- claims checked: 6 — holds: 4, stale: 1, unverifiable: 1
 
 ### Stale claims
 
-- P5 said Mere carries patches under `support/patches` (rudof, burn, cubecl). `support/patches` is empty at `198e1e967`; corrected in the landing review commit.
+- Corrected before landing: P5 said Mere carries patches under `support/patches` (rudof, burn, cubecl). `support/patches` is empty at `198e1e967`; corrected in the landing review commit.
 
 ### Contradictions
 
