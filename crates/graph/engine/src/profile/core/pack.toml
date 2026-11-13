@@ -1,0 +1,364 @@
+# The core pack (declared-lens D13, lessons D13): the user-agent pack every
+# load resolves first. build.rs compiles it to canonical CBOR and emits the
+# engine's id constants (D8). It carries no workspace terms (Traversal,
+# Arrangement): those are Graphshell's pack (P7, C2).
+
+id = "pack:core"
+version = "0.1.0"
+kind = ["vocabulary", "lens"]
+licence = "MPL-2.0"
+credit = ["Mark Alan Boykin"]
+provides = ["rel:", "family:"]
+
+[prefixes]
+pack = "https://mere.computer/packs/"
+rel = "https://mere.computer/ns/rel#"
+family = "https://mere.computer/ns/family#"
+axis = "https://mere.computer/ns/axis#"
+stratum = "https://mere.computer/ns/stratum#"
+durability = "https://mere.computer/ns/durability#"
+retract = "https://mere.computer/ns/retractability#"
+project = "https://mere.computer/ns/projectability#"
+force = "https://mere.computer/ns/force#"
+symmetry = "https://mere.computer/ns/symmetry#"
+present = "https://mere.computer/ns/presentation#"
+derive = "https://mere.computer/ns/derivation#"
+
+# R2: an axis a row does not name, or names only with unobserved values.
+[vocabulary.defaults]
+"axis:stratum" = "stratum:resource"
+"axis:durability" = "durability:retained-until-compaction"
+"axis:retractability" = "retract:asserter"
+"axis:projectability" = "project:projectable"
+"axis:force" = "force:none"
+"axis:symmetry" = "symmetry:directed"
+"axis:presentation" = "present:generic"
+"axis:derivation" = "derive:not-derived"
+
+# The lens half: the core pack selects nothing beyond itself.
+[lens]
+
+# Families.
+
+[[vocabulary.terms]]
+iri = "family:semantic"
+kind = "family"
+labels = { en = "semantic" }
+
+[[vocabulary.terms]]
+iri = "family:containment"
+kind = "family"
+labels = { en = "containment" }
+
+[[vocabulary.terms]]
+iri = "family:imported"
+kind = "family"
+labels = { en = "imported" }
+
+[[vocabulary.terms]]
+iri = "family:provenance"
+kind = "family"
+labels = { en = "provenance" }
+
+# Semantic (edge_data.rs predicate_iri).
+
+[[vocabulary.terms]]
+iri = "rel:hyperlink"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "hyperlink" }
+
+[[vocabulary.terms]]
+iri = "rel:user-grouped"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "user-grouped" }
+
+[[vocabulary.terms]]
+iri = "rel:agent-derived"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "agent-derived" }
+
+[[vocabulary.terms]]
+iri = "rel:cites"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "cites" }
+
+[[vocabulary.terms]]
+iri = "rel:quotes"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "quotes" }
+
+[[vocabulary.terms]]
+iri = "rel:summarizes"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "summarizes" }
+
+[[vocabulary.terms]]
+iri = "rel:elaborates"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "elaborates" }
+
+[[vocabulary.terms]]
+iri = "rel:example-of"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "example-of" }
+
+[[vocabulary.terms]]
+iri = "rel:supports"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "supports" }
+
+[[vocabulary.terms]]
+iri = "rel:contradicts"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "contradicts" }
+
+[[vocabulary.terms]]
+iri = "rel:questions"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "questions" }
+
+[[vocabulary.terms]]
+iri = "rel:same-entity-as"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "same-entity-as" }
+
+[[vocabulary.terms]]
+iri = "rel:duplicate-of"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "duplicate-of" }
+
+[[vocabulary.terms]]
+iri = "rel:canonical-mirror-of"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "canonical-mirror-of" }
+
+[[vocabulary.terms]]
+iri = "rel:depends-on"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "depends-on" }
+
+[[vocabulary.terms]]
+iri = "rel:blocks"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "blocks" }
+
+[[vocabulary.terms]]
+iri = "rel:next-step"
+kind = "predicate"
+family = "family:semantic"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "next-step" }
+
+# Tags (resource.rs TAGGED_WITH_IRI).
+
+[[vocabulary.terms]]
+iri = "rel:taggedWith"
+kind = "predicate"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "tagged with" }
+
+# Containment (relation_kind.rs predicate_iri).
+
+[[vocabulary.terms]]
+iri = "rel:containment.url-path"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "url-path" }
+
+[[vocabulary.terms]]
+iri = "rel:containment.domain"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "domain" }
+
+[[vocabulary.terms]]
+iri = "rel:containment.filesystem"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "filesystem" }
+
+[[vocabulary.terms]]
+iri = "rel:containment.user-folder"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "user-folder" }
+
+[[vocabulary.terms]]
+iri = "rel:containment.clip-source"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "clip-source" }
+
+[[vocabulary.terms]]
+iri = "rel:containment.notebook-section"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "notebook-section" }
+
+[[vocabulary.terms]]
+iri = "rel:containment.collection-member"
+kind = "predicate"
+family = "family:containment"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "collection-member" }
+
+# Imported (relation_kind.rs predicate_iri).
+
+[[vocabulary.terms]]
+iri = "rel:imported.bookmark-folder"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "bookmark-folder" }
+
+[[vocabulary.terms]]
+iri = "rel:imported.history-import"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "history-import" }
+
+[[vocabulary.terms]]
+iri = "rel:imported.session-import"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "session-import" }
+
+[[vocabulary.terms]]
+iri = "rel:imported.rss-membership"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "rss-membership" }
+
+[[vocabulary.terms]]
+iri = "rel:imported.filesystem-import"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "filesystem-import" }
+
+[[vocabulary.terms]]
+iri = "rel:imported.archive-membership"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "archive-membership" }
+
+[[vocabulary.terms]]
+iri = "rel:imported.shared-collection"
+kind = "predicate"
+family = "family:imported"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "shared-collection" }
+
+# Provenance (relation_kind.rs predicate_iri).
+
+[[vocabulary.terms]]
+iri = "rel:provenance.clipped-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "clipped-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.excerpted-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "excerpted-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.summarized-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "summarized-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.translated-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "translated-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.rewritten-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "rewritten-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.generated-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "generated-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.extracted-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "extracted-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.imported-from-source"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:resource" }
+labels = { en = "imported-from-source" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.copied-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "copied-from" }
+
+[[vocabulary.terms]]
+iri = "rel:provenance.merged-from"
+kind = "predicate"
+family = "family:provenance"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "merged-from" }

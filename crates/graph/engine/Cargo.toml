@@ -57,6 +57,11 @@ oxrdfxml = { version = "0.2", features = ["rdf-12"] }
 # feature's held dataset wraps.
 portolan.workspace = true
 quadstore.workspace = true
+# The `mere.pack/2` header, codec, envelope and body types (declared-lens L1,
+# L2, R1); the substrate only, not the browsing product.
+eidetic = { version = "0.0.3", default-features = false, features = ["pack-signing"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+# Requirement matching (declared-lens D13); already in the tree through eidetic.
+semver = "1"
 # Preserve query extensions previously enabled transitively by Oxigraph.
 spareval = { version = "0.2.9", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
 spargebra = { version = "0.4", optional = true, features = ["sparql-12"] }
@@ -76,12 +81,25 @@ oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
 # The evaluator's rand 0.8 has its own entropy backend, distinct from oxrdf.
 getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optional = true }
 
+[build-dependencies]
+# build.rs compiles the core pack's authored TOML (declared-lens D13), so the
+# TOML parser stays out of the run-time graph.
+eidetic = { version = "0.0.3", default-features = false, features = ["pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+
 [dev-dependencies]
+# The profile tests author their fixture packs and sign them.
+eidetic = { version = "0.0.3", default-features = false, features = ["pack-signing", "pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+identity.workspace = true
+proptest = { version = "1.11", default-features = false, features = ["std"] }
 # The raw-oxrdf control layer of the rdf-canon rows (tests/w3c_conformance/rdfc.rs).
 oxrdf = { version = "0.3", features = ["rdf-12", "rdfc-10"] }
 postcard = { version = "1", features = ["alloc"] }
 # The W3C conformance harness (tests/w3c_conformance): SPARQL result files.
 sparesults = { version = "0.3", features = ["sparql-12"] }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+# The core pack's wasm32 load (tests/profile_wasm.rs), run under node.
+wasm-bindgen-test = "0.3.79"
 
 [lints]
 workspace = true

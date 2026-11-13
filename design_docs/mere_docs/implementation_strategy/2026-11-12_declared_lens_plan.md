@@ -3,7 +3,7 @@
 **Date**: 2026-11-12
 **Status**: plan, 2026-11-12; L0 done the same day: Mark ruled M1 to M9, each on its
 recommendation (D1 to D9), and the first reader's R1 to R9 and the conflict readings stand as
-argued (D10). L1 (the header and envelope) landed on `eidetic` main `c96bea1` the same day; D11 and D12 followed. L2 is next.
+argued (D10). L1 (the header and envelope) landed on `eidetic` main `c96bea1` the same day; D11 and D12 followed. L2 is built on branches `lens/l2` in both repositories (2026-11-13, D13), awaiting review; L3 is next after it lands.
 **For**: the plan the [linked-data platform lessons brief](../research/2026-11-06_linked_data_platform_lessons_brief.md)
 owes. Its Open says of D2: "What remains is the stance doc rewrite ('closed lens' to 'declared
 lenses') and a declared-lens plan to carry the work. Neither is written yet." The
@@ -752,8 +752,20 @@ removes it.
 - The chartulary split names (`portolan`, `hodograph`, `quadstore`, `fieldbook`) appear nowhere at
   Eidetic or Mere `origin/main`, so the mapping of pieces to them is unverified.
 
+- 2026-11-13 (L2): the `cddl` crate's validator (0.10.7) refuses a named rule in map-key position:
+  `{ * iri => [+ iri] }` fails where `{ * tstr => [+ iri] }` passes over the same bytes, so the
+  schema writes those keys `tstr` and the decoder checks them as IRIs (`mere-pack-2.cddl`).
+- 2026-11-13 (L2): checking typed bodies costs about four times the L1 decode: the 1,000-term
+  fixture (830,469 bytes) strict-decodes in 95 to 98 ms release against L1's 22.4 ms, most of it
+  in the per-row IRI checks and the set-order check. The core pack (46 terms, 11,129 bytes) loads
+  in under 2 ms. Recorded in the receipts; not a hot path (L3 measures dispatch, not load).
+- 2026-11-13 (L2): a fresh resolve of Mere with the `eidetic` row adds 32 crates to
+  `cargo tree -p mere -e normal` on native and on wasm32 and no HTTP client; `toml` reaches only
+  build.rs and the tests (D13).
+
 ## Progress
 
 - 2026-11-12: plan written on branch `lens-plan`; forks open; nothing built.
 - 2026-11-12: L0 done. Mark ruled M1 to M9 in two card rounds and a third for the quantity, every one on its recommendation (D1 to D9); the first reader's forks and conflict readings recorded as D10. The lessons brief's Open and engine split P6's Needs line link here. Landed on Mere main.
 - 2026-11-12: L1 landed on `eidetic` main `c96bea1`, "Pack header mere.pack/2 and its COSE_Sign1 envelope". `PackHeader` with its CDDL (`crates/eidetic-core/src/pack/mere-pack-2.cddl`), the strict canonical codec, multihash digests (BLAKE3, SHA-256), detached COSE_Sign1 sign and verify behind `pack-signing`, the verdict, and `TrustPolicy::admit` for D3; `mere.pack/1` unchanged. The cose-wg Examples are vendored at `Code/crates/cose-examples` (`53c9d63`); four Ed25519 Sign1 examples verify and `eddsa-sig-01` re-signs byte for byte. Costs and test counts are in the receipt file. Four muniment `redb_backend::upgrade_tests` fail on Windows with "Access is denied" identically at untouched `origin/main`, outside this work. D11 (RDFC's poison limit) and D12 (the header's open format details) recorded.
+- 2026-11-13: L2 built on branches `lens/l2`, not landed: `eidetic` `41ec454`, "Pack bodies for mere.pack/2" (typed vocabulary and lens bodies, their CDDL, and the authored compiler behind `pack-authoring`); Mere: `mere::profile::{pack, resolve, intern, lens, load}`, the core pack in `profile/core/pack.toml` compiled by build.rs with its id constants, a test-only workspace stand-in and fixture lens (D13), the pack-format ledger row, and the placement test run against the pack as well. Mere builds against the Eidetic branch through an uncommitted `--config` patch, so the Eidetic commit lands first. Evidence in the receipt file, "L2, bodies, loader and core pack".

@@ -1,0 +1,12 @@
+# The fixture lens that loads the workspace stand-in over the core pack.
+
+id = "pack:test/workspace-lens"
+version = "0.1.0"
+kind = ["lens"]
+licence = "MPL-2.0"
+
+[prefixes]
+pack = "https://mere.computer/packs/"
+
+[lens]
+select = [{ pack = "pack:test/workspace", version = "0.1.0" }]

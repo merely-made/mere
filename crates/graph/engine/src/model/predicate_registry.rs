@@ -104,8 +104,12 @@ mod tests {
     use crate::model::predicate_iri;
     use strum::IntoEnumIterator;
 
+    /// Asserted twice: by the built-in table, and by the loaded pack (the core
+    /// pack with the workspace stand-in, declared-lens L2 and D13).
     #[test]
     fn all_recognized_kinds_match_the_settled_placement_table() {
+        use crate::profile::tests::support::{pack_stratum, workspace_profile};
+        let profile = workspace_profile();
         let surfaces = [
             RelationKind::Semantic(SemanticSubKind::UserGrouped),
             RelationKind::Provenance(ProvenanceSubKind::CopiedFrom),
@@ -139,16 +143,24 @@ mod tests {
                 GraphStratum::Resource
             };
             assert_eq!(built_in_relation_stratum(kind), expected, "{kind:?}");
+            assert_eq!(
+                pack_stratum(&profile, kind),
+                expected,
+                "{kind:?} from the pack"
+            );
         }
         assert_eq!((resource_count, surface_count), (32, 12));
-        assert_eq!(
-            built_in_relation_stratum(RelationKind::Traversal),
-            GraphStratum::Surface
-        );
-        assert_eq!(
-            built_in_relation_stratum(RelationKind::OpenPredicate),
-            GraphStratum::Resource
-        );
+        for (kind, expected) in [
+            (RelationKind::Traversal, GraphStratum::Surface),
+            (RelationKind::OpenPredicate, GraphStratum::Resource),
+        ] {
+            assert_eq!(built_in_relation_stratum(kind), expected, "{kind:?}");
+            assert_eq!(
+                pack_stratum(&profile, kind),
+                expected,
+                "{kind:?} from the pack"
+            );
+        }
     }
 
     #[test]

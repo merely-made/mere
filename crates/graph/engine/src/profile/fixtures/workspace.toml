@@ -1,0 +1,57 @@
+# A test-only stand-in for Graphshell's experience pack (P7; declared-lens
+# D13): the workspace terms the core pack leaves out. Traversal has no
+# predicate IRI in the engine, so it is minted here, and only here.
+
+id = "pack:test/workspace"
+version = "0.1.0"
+kind = ["vocabulary"]
+licence = "MPL-2.0"
+provides = ["rel:arrangement.", "family:traversal", "family:arrangement", "ws:"]
+requires = [{ pack = "pack:core", version = "0.1.0" }]
+
+[prefixes]
+pack = "https://mere.computer/packs/"
+rel = "https://mere.computer/ns/rel#"
+family = "https://mere.computer/ns/family#"
+ws = "https://mere.computer/ns/test/workspace#"
+axis = "https://mere.computer/ns/axis#"
+stratum = "https://mere.computer/ns/stratum#"
+durability = "https://mere.computer/ns/durability#"
+
+[[vocabulary.terms]]
+iri = "family:traversal"
+kind = "family"
+labels = { en = "traversal" }
+
+[[vocabulary.terms]]
+iri = "family:arrangement"
+kind = "family"
+labels = { en = "arrangement" }
+
+[[vocabulary.terms]]
+iri = "ws:traversal"
+kind = "predicate"
+family = "family:traversal"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "traversal" }
+
+[[vocabulary.terms]]
+iri = "rel:arrangement.frame-member"
+kind = "predicate"
+family = "family:arrangement"
+axes = { "axis:stratum" = "stratum:surface" }
+labels = { en = "frame-member" }
+
+[[vocabulary.terms]]
+iri = "rel:arrangement.tile-group"
+kind = "predicate"
+family = "family:arrangement"
+axes = { "axis:stratum" = "stratum:surface", "axis:durability" = "durability:session" }
+labels = { en = "tile-group" }
+
+[[vocabulary.terms]]
+iri = "rel:arrangement.split-pair"
+kind = "predicate"
+family = "family:arrangement"
+axes = { "axis:stratum" = "stratum:surface", "axis:durability" = "durability:session" }
+labels = { en = "split-pair" }
