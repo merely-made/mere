@@ -101,7 +101,27 @@ Engine share of a frame, headless (the edit itself is the host's action and is n
 | after one edit: `is_current`, rebuild, point lookup | 258 ms | 2.67 s |
 | after one edit: `is_current`, rebuild, two-hop join | 262 ms | 2.87 s |
 
-No pass or fail threshold is set (the frame budget stays with P8). What the numbers say: an unchanged frame costs the query and nothing else, because `is_current` is a counter compare; a frame after an edit costs one full rebuild, which at 10k is about 15 times a 60 Hz frame and at 100k about 160 times; and the rebuild is the whole refresh cost, since the edit and the check are microseconds. Withdrawal is the one kernel cost that scales badly (0.12 ms at 10k, 5.0 ms at 100k: 40 times for 10 times the nodes), found here and not chased (the engine is unchanged in this lane). The two-hop join at 100k, 72 ms steady, is over a frame by itself.
+No pass or fail threshold is set (the frame budget stays with P8). What the numbers say: an unchanged frame costs the query and nothing else, because `is_current` is a counter compare; a frame after an edit costs one full rebuild, which at 10k is about 15 times a 60 Hz frame and at 100k about 160 times; and the rebuild is the whole refresh cost, since the edit and the check are microseconds. Withdrawal is the one kernel cost that scales badly (0.12 ms at 10k, 5.0 ms at 100k: 40 times for 10 times the nodes), found here and not chased in this lane; the quiet rerun below has the fix. The two-hop join at 100k, 72 ms steady, is over a frame by itself (46 ms on the quiet machine, still over).
+
+### P5 baseline, quiet rerun, 2026-11-12
+
+The same five runs of `adapter_scale 10000 100000` on a quiet machine, twice: the baseline commit, Mere `0f641d525`, and the withdraw fix, `cf674aded` (withdraw finds a statement's owners through the handle index instead of scanning every edge). Host: ThinkPad L14 Gen 1, Fedora, AMD Ryzen 3 PRO 4450U (8 threads), rustc 1.100.0, release, debug info off, nothing else running (load average 1.0 to 1.5 before each run, the instrument's own thread). Each figure is the median of five run medians; most rows' five medians are within 4% of each other; the widest are the steady scans and joins (up to 16%) and the rows under 0.1 ms, where the log's two-decimal rounding dominates. This is the slower CPU, so read it beside itself, not against the Windows table. Raw logs: `Code/testing/engine-split/p5_thinkpad_0f641d525.log` and `p5_thinkpad_cf674aded.log`.
+
+| measure | 10k, `0f641d525` | 10k, `cf674aded` | 100k, `0f641d525` | 100k, `cf674aded` |
+|---|---|---|---|---|
+| graph build | 160 ms | 161 ms | 1.72 s | 1.71 s |
+| index build | 202 ms | 204 ms | 2.23 s | 2.24 s |
+| assert, per edit | 0.0043 ms | 0.0042 ms | 0.0050 ms | 0.0050 ms |
+| withdraw, per edit | 0.36 ms | 0.0013 ms | 4.59 ms | 0.0013 ms |
+| `is_current`, stale or fresh | under 0.001 ms | under 0.001 ms | under 0.001 ms | under 0.001 ms |
+| refresh after an assert (rebuild) | 213 ms | 213 ms | 2.47 s | 2.48 s |
+| refresh after a withdrawal (rebuild) | 213 ms | 214 ms | 2.48 s | 2.50 s |
+| frame, steady point lookup | 0.011 ms | 0.011 ms | 0.011 ms | 0.011 ms |
+| frame, steady two-hop join | 4.5 ms | 4.4 ms | 46 ms | 46 ms |
+| frame after one edit, point lookup | 221 ms | 222 ms | 2.63 s | 2.65 s |
+| frame after one edit, two-hop join | 221 ms | 221 ms | 2.55 s | 2.56 s |
+
+What changes with quiet: withdrawal on the baseline grows 13 times for 10 times the nodes (the busy machine showed 40), still a scan; after the fix it is flat at 1.3 µs, below an assert. Every other row moves by less than its spread between the two commits, so the fix touched only withdrawal. The steady two-hop join at 100k is 46 ms, not 72: the busy machine had inflated it. The refresh after one edit is still a full rebuild, 213 ms at 10k and 2.5 s at 100k, which is what the quad index plan's P4 (incremental maintenance, its D9) answers. These are the pre-fold rows the P5 post-fold measurement is compared against.
 
 ## 2. What the dataset is today
 
