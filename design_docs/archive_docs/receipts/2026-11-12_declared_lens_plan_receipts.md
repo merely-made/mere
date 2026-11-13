@@ -1,0 +1,13 @@
+# Declared-lens plan: receipts
+
+Receipts for the [declared-lens plan](../../mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md).
+
+## 2026-11-12: L1, the header and envelope
+
+`eidetic` main `c96bea1` (fast-forward from `33e0c9a`), reported by the L1 lane and reviewed by the first reader.
+
+- Vectors: cose-wg Examples at `53c9d634333bb4f529d78f5980fffa2667ee2c12`, vendored at `Code/crates/cose-examples`. `eddsa-sig-01` is held as a known answer: coset's Sig_structure equals the example's ToBeSign bytes, the signature verifies, and re-signing reproduces it byte for byte. A walk over the suite verified four Ed25519 Sign1 examples (`eddsa-sig-01`, `countersign/signed1-01`, `-02`, `countersign1/signed1-01`, main signature). `eddsa-sig-02` (Ed448) is counted unsupported. The examples use alg -8; the pack profile (alg -19) refuses them, asserted in tests.
+- Envelope negatives, about 35 checks in 9 tests: tampered payload (every header field, a swapped part digest, one bit, other bytes); wrong key; `kid` not a did:key, of another key family, or unprotected; alg -8, ES256, missing or unprotected; a label in both buckets; `crit`; content type wrong or missing; the cose-wg failure kinds on Ed25519 (wrong tag, untagged, changed or short signature, alg changed after signing, protected label added or removed); attached payload; bad base64; non-deterministic or trailing COSE bytes; one bad signature among two good.
+- Codec refusals: 13 on a hand-written document (unsorted keys; indefinite map, array and text; a tag; a bignum tag; non-shortest integer and length; a float; a duplicate key; an unknown key; null; trailing bytes), 8 more on a real header, about 13 field refusals. Byte-identity round trips; 24 set orderings give one encoding; BLAKE3 and SHA-256 known answers (SHA-256 cross-checked in Python); CDDL validation of three documents with three negative controls. Disabling the re-encode comparison, the duplicate-label check or the alg check fails five tests.
+- Costs, a 1,000-term header (822,459 bytes), release, median of 31: encode 11.5 ms; strict decode 22.4 ms; decode plus BLAKE3 pin 24.0 ms; SHA-256 0.53 ms; sign 4.3 ms; verify 2.6 ms.
+- Gates: 25 pack tests (2 ignored ones run explicitly); `cargo test --workspace` 994 passed, 4 failed (muniment `redb_backend::upgrade_tests`, "Access is denied (os error 5)", identical at untouched `origin/main`), 6 ignored; wasm32 `cargo check -p eidetic --no-default-features --features pack-signing`; `cargo deny check bans` with no new skips; `house hooks --check`; Mere `cargo check -p mere-kernel --features query` against the branch, with one `oxiri` in its graph.

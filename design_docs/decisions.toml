@@ -528,6 +528,22 @@ summary = "The pack body types live in eidetic::pack, the loader in mere::profil
 draws_on = ["engine-split D143", "linked-data-platform-lessons D10", "linked-data-platform-lessons D12", "linked-data-platform-lessons D20"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D11"]
+title = "RDFC-1.0's poison limit is a carried patch on the more compliant implementation, with nothing sent upstream (Mark, 2026-11-12)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "RDFC-1.0 runs on whichever of oxrdf's and rdf-canon's implementations is more spec compliant, carried and improved by us with the spec's call budget; nothing goes upstream."
+draws_on = ["declared-lens D8", "engine-split D143"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D12"]
+title = "The header's format details left open by the plan (first reader, 2026-11-12, listed to Mark)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The mere.pack/2 header fixes credit order, contribution kinds, plain-data bodies, a host-profile kind and sorted sets, with kid and alg protected and untagged or crit envelopes refused."
+draws_on = ["declared-lens D2", "declared-lens D4", "declared-lens D5", "declared-lens D6"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
