@@ -15,9 +15,9 @@ impl Graph {
             surface_node_lifetimes: HashMap::new(),
             resources: mere::model::ResourceGraph::new(),
             shown_resources: BTreeMap::new().into(),
-            resource_surfaces: BTreeMap::new(),
+            resource_surfaces: Default::default(),
             facets: portolan::FacetStore::new(),
-            url_to_nodes: HashMap::new(),
+            url_to_nodes: Default::default(),
             import_records: Vec::new().into(),
             fields: BTreeMap::new(),
             couplings: BTreeMap::new(),
@@ -228,7 +228,7 @@ impl Graph {
         });
         if inserted {
             self.set_node_last_visited_at_ms(key, Self::epoch_ms());
-            self.url_to_nodes.entry(url.into()).or_default().push(key);
+            self.add_url_mapping(&url, key);
             self.bump_revision();
             self.bump_content_revision();
         }
@@ -309,10 +309,7 @@ impl Graph {
         }
         let url_changed = old_url != new_url;
         self.remove_url_mapping(&old_url, key);
-        self.url_to_nodes
-            .entry(new_url.into())
-            .or_default()
-            .push(key);
+        self.add_url_mapping(&new_url, key);
         if site_group_changed {
             self.bump_url_grouping_revision();
         }

@@ -375,7 +375,7 @@ pub struct Graph {
     /// `shown_resources` inverted: the surfaces showing each resource. Kept
     /// in step by `set_shown_resource` and node removal, its only writers.
     pub(crate) resource_surfaces:
-        BTreeMap<Uuid, mere::model::Shared<std::collections::BTreeSet<Uuid>>>,
+        rpds::RedBlackTreeMapSync<Uuid, mere::model::Shared<std::collections::BTreeSet<Uuid>>>,
 
     /// Atomic optional metadata keyed by stable node id. This is the single
     /// live authority persisted by the host as `facets.json`; snapshot columns
@@ -383,7 +383,8 @@ pub struct Graph {
     pub(crate) facets: portolan::FacetStore<Uuid>,
 
     /// URL to node mapping for lookup (supports duplicate URLs).
-    pub(crate) url_to_nodes: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<NodeKey>>>,
+    pub(crate) url_to_nodes:
+        rpds::HashTrieMapSync<std::sync::Arc<str>, mere::model::Shared<Vec<NodeKey>>>,
 
     /// Durable imported relation truth; node provenance is derived from this.
     pub(crate) import_records: mere::model::Shared<Vec<ImportRecord>>,

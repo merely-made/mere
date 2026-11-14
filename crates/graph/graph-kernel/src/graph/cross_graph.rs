@@ -93,7 +93,7 @@ impl Graph {
         self.set_node_facet(key, PROVENANCE_DERIVATIONS, &vec![derivation]);
         self.set_node_last_visited_at_ms(key, Self::epoch_ms());
 
-        self.url_to_nodes.entry(url.into()).or_default().push(key);
+        self.add_url_mapping(&url, key);
         self.bump_revision();
         self.bump_content_revision();
         key

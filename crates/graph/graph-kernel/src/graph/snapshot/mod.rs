@@ -43,12 +43,29 @@ mod handle_tests;
 mod tests;
 
 impl Graph {
+    /// Map `url` to `key` in the URL index.
+    pub(crate) fn add_url_mapping(&mut self, url: &str, key: NodeKey) {
+        if !self.url_to_nodes.contains_key(url) {
+            let keys = mere::model::Shared::new(vec![key]);
+            self.url_to_nodes.insert_mut(url.into(), keys);
+        } else if let Some(keys) = self.url_to_nodes.get_mut(url) {
+            keys.push(key);
+        }
+    }
+
     pub(crate) fn remove_url_mapping(&mut self, url: &str, key: NodeKey) {
-        if let Some(keys) = self.url_to_nodes.get_mut(url) {
-            keys.retain(|candidate| *candidate != key);
-            if keys.is_empty() {
-                self.url_to_nodes.remove(url);
-            }
+        // Reads first: a persistent map copies its path on any write.
+        let Some(keys) = self.url_to_nodes.get(url) else {
+            return;
+        };
+        if !keys.contains(&key) {
+            return;
+        }
+        let rest: Vec<NodeKey> = keys.iter().copied().filter(|k| *k != key).collect();
+        if rest.is_empty() {
+            self.url_to_nodes.remove_mut(url);
+        } else {
+            self.url_to_nodes.insert_mut(url.into(), rest.into());
         }
     }
 }

@@ -38,27 +38,29 @@ pub(crate) struct HandleIndex {
 
 #[derive(Clone, Default)]
 struct Holders {
-    relations: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<RelationKey>>>,
-    resource_literals: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<Uuid>>>,
+    relations: Holding<RelationKey>,
+    resource_literals: Holding<Uuid>,
     /// Retained Surface literals, by Surface node id.
-    surface_literals: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<Uuid>>>,
+    surface_literals: Holding<Uuid>,
 }
 
-fn add<T: PartialEq + Clone>(
-    map: &mut HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<T>>>,
-    id: &str,
-    holder: T,
-) {
-    if let Some(holders) = map.get_mut(id) {
-        if !holders.contains(&holder) {
-            holders.push(holder);
-        }
-        return;
+/// Holders by statement id, in a persistent map: a clone shares it whole.
+type Holding<T> = rpds::HashTrieMapSync<std::sync::Arc<str>, mere::model::Shared<Vec<T>>>;
+
+fn add<T: PartialEq + Clone>(map: &mut Holding<T>, id: &str, holder: T) {
+    match map.get(id) {
+        // Already held: leave the map shared.
+        Some(holders) if holders.contains(&holder) => {},
+        Some(_) => {
+            if let Some(holders) = map.get_mut(id) {
+                holders.push(holder);
+            }
+        },
+        None => map.insert_mut(
+            std::sync::Arc::from(id),
+            mere::model::Shared::new(vec![holder]),
+        ),
     }
-    map.insert(
-        std::sync::Arc::from(id),
-        mere::model::Shared::new(vec![holder]),
-    );
 }
 
 /// Iteration order of [`Graph::find_semantic_statement`]'s scan: every Surface

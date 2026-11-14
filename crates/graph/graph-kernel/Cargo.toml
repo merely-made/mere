@@ -73,6 +73,9 @@ portolan.workspace = true
 # The captured-delta stream persists as a muniment journal, the edit spine over
 # the substrate (see graph/journal.rs). This is direct so the kernel can name it.
 muniment.workspace = true
+# Persistent maps for the handle, URL and Resource-to-Surface indexes, so a
+# graph clone shares them whole (engine split D167).
+rpds = "1.2.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 uuid = { version = "1", features = ["serde", "v4"] }

@@ -209,10 +209,12 @@ impl Graph {
             return false;
         }
         let previous = if let Some(resource) = resource {
-            self.resource_surfaces
-                .entry(resource)
-                .or_default()
-                .insert(surface);
+            if !self.resource_surfaces.contains_key(&resource) {
+                let surfaces = std::collections::BTreeSet::from([surface]);
+                self.resource_surfaces.insert_mut(resource, surfaces.into());
+            } else if let Some(surfaces) = self.resource_surfaces.get_mut(&resource) {
+                surfaces.insert(surface);
+            }
             self.appearance_admission_revision = self.appearance_admission_revision.wrapping_add(1);
             self.shown_resources.insert(surface, resource)
         } else {
@@ -226,11 +228,17 @@ impl Graph {
     }
 
     pub(crate) fn unlink_shown_surface(&mut self, resource: Uuid, surface: Uuid) {
-        if let Some(surfaces) = self.resource_surfaces.get_mut(&resource) {
+        // Reads first: a persistent map copies its path on any write.
+        let Some(surfaces) = self.resource_surfaces.get(&resource) else {
+            return;
+        };
+        if !surfaces.contains(&surface) {
+            return;
+        }
+        if surfaces.len() == 1 {
+            self.resource_surfaces.remove_mut(&resource);
+        } else if let Some(surfaces) = self.resource_surfaces.get_mut(&resource) {
             surfaces.remove(&surface);
-            if surfaces.is_empty() {
-                self.resource_surfaces.remove(&resource);
-            }
         }
     }
 
