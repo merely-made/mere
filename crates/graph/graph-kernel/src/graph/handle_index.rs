@@ -147,6 +147,12 @@ impl Graph {
             return;
         }
         let held = self.resource_properties(id);
+        self.note_resource_literals_held(id, held);
+    }
+
+    /// [`note_resource_literals`](Self::note_resource_literals) with the
+    /// properties the resource now holds already in hand.
+    pub(crate) fn note_resource_literals_held(&mut self, id: Uuid, held: Vec<NodeProperty>) {
         if let Some(holders) = self.handle_index.built.get_mut() {
             for property in held {
                 add(&mut holders.resource_literals, &property.statement_id, id);

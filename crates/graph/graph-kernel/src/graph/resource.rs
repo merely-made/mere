@@ -207,20 +207,47 @@ impl Graph {
         true
     }
 
-    /// Replace a resource's facets with `facets`.
+    /// Replace a resource's facets with `facets`: drop the ones it no longer
+    /// holds and write the rest in place. Taking the node out and putting it
+    /// back would rebalance the persistent store twice per record (engine split
+    /// D168); the store ends the same either way.
     fn write_resource_facets(
         &mut self,
         id: Uuid,
         facets: std::collections::BTreeMap<portolan::FacetId, serde_json::Value>,
     ) {
-        self.resources.facets_mut().remove_node(&id);
+        let dropped: Vec<portolan::FacetId> = self
+            .resources
+            .facets()
+            .facets_of(&id)
+            .into_iter()
+            .flat_map(|held| held.iter().map(|(facet, _)| facet))
+            .filter(|facet| !facets.contains_key(*facet))
+            .cloned()
+            .collect();
+        let store = self.resources.facets_mut();
+        if facets.is_empty() {
+            // An emptied resource holds no facet node at all, as before.
+            store.remove_node(&id);
+        }
+        for facet in &dropped {
+            store.remove(&id, facet);
+        }
+        let properties = self.handle_index_built().then(|| {
+            facets
+                .get(&portolan::FacetId::new(super::resource_content::RESOURCE_PROPERTIES))
+                .and_then(|value| serde::Deserialize::deserialize(value).ok())
+                .unwrap_or_default()
+        });
+        let store = self.resources.facets_mut();
         for (facet, value) in facets {
-            self.resources
-                .facets_mut()
+            store
                 .set(id, facet, value, &portolan::AcceptAll)
                 .expect("permissive facet validator");
         }
-        self.note_resource_literals(id);
+        if let Some(properties) = properties {
+            self.note_resource_literals_held(id, properties);
+        }
     }
 
     /// Write facets [`set_resource_record_deferring`]
