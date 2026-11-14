@@ -194,7 +194,7 @@ impl Graph {
         if incoming.iter().all(|property| held.contains(property)) {
             return Ok(());
         }
-        self.validate_handles_after(Some(PendingWrite::Literals(write)))
+        self.admit_write(PendingWrite::Literals(write))
     }
 
     pub(crate) fn admit_record_literals(

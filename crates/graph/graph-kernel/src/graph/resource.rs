@@ -273,24 +273,10 @@ impl Graph {
                 return false;
             }
         }
-        for edge in self.resources.inner().edge_references() {
-            if edge.source() == source && edge.target() == target {
-                continue;
-            }
-            if edge
-                .weight()
-                .assertions()
-                .iter()
-                .any(|statement| statements.contains_key(&statement.statement_id))
-            {
-                return false;
-            }
-        }
-        if self.inner.inner().edge_weights().any(|edge| {
-            edge.assertions()
-                .iter()
-                .any(|statement| statements.contains_key(&statement.statement_id))
-        }) {
+        if statements
+            .keys()
+            .any(|id| self.handle_held_off_resource_pair(id, source, target))
+        {
             return false;
         }
         let payloads: Vec<_> = edges

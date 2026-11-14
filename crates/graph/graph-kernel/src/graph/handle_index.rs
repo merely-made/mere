@@ -12,15 +12,19 @@
 //! [`Graph::get_edge_mut`], [`Graph::get_relation_mut`], the connect helpers
 //! here, and the facet writers. Writes that replace a store wholesale clear the
 //! index, and the next read rebuilds it.
+//!
+//! Admission reads it too: a write is checked against the holders of its own
+//! handles, so replaying a journal costs each entry its handles, not the graph.
 
 use super::node_facets::SEMANTIC_PROPERTIES;
+use super::resource_content::{LiteralWrite, PendingWrite};
 use super::{
     EdgeKey, EdgePayload, Graph, NodeKey, RelationKey, ResourceEdgeKey, SemanticStatement,
 };
 use crate::types::NodeProperty;
 use petgraph::stable_graph::EdgeIndex;
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::OnceLock;
 use uuid::Uuid;
 
@@ -244,9 +248,61 @@ impl Graph {
                 return false;
             }
         }
-        !holders
-            .surface_literals
-            .get(id)
+        !self.surface_literal_holds(id)
+    }
+
+    /// Whether a live relation that `keep` accepts holds `statement_id`.
+    fn relation_holds(&self, statement_id: &str, keep: impl Fn(RelationKey) -> bool) -> bool {
+        let indexed = self.handle_holders().relations.get(statement_id);
+        indexed
+            .into_iter()
+            .flatten()
+            .chain(&self.handle_index.dirty)
+            .any(|key| {
+                keep(*key)
+                    && self.get_relation(*key).is_some_and(|payload| {
+                        payload
+                            .assertions()
+                            .iter()
+                            .any(|statement| statement.statement_id == statement_id)
+                    })
+            })
+    }
+
+    /// Whether any relation but the Resource edges from `source` to `target`
+    /// holds `statement_id`.
+    pub(super) fn handle_held_off_resource_pair(
+        &self,
+        statement_id: &str,
+        source: NodeKey,
+        target: NodeKey,
+    ) -> bool {
+        self.relation_holds(statement_id, |key| match key {
+            RelationKey::Surface(_) => true,
+            RelationKey::Resource(key) => {
+                self.resources.inner().edge_endpoints(key.raw()) != Some((source, target))
+            },
+        })
+    }
+
+    /// Whether a Resource other than `except` holds `statement_id` as a literal.
+    fn resource_literal_holds(&self, statement_id: &str, except: Option<Uuid>) -> bool {
+        let holders = self.handle_holders().resource_literals.get(statement_id);
+        holders
+            .into_iter()
+            .flatten()
+            .filter(|holder| Some(**holder) != except && self.resource(**holder).is_some())
+            .any(|holder| {
+                self.resource_properties(*holder)
+                    .iter()
+                    .any(|held| held.statement_id == statement_id)
+            })
+    }
+
+    /// Whether a retained Surface literal holds `statement_id`.
+    fn surface_literal_holds(&self, statement_id: &str) -> bool {
+        let holders = self.handle_holders().surface_literals.get(statement_id);
+        holders
             .into_iter()
             .flatten()
             .filter_map(|node_id| self.get_node_key_by_id(*node_id))
@@ -254,7 +310,72 @@ impl Graph {
                 self.legacy_node_properties(key)
                     .into_iter()
                     .flatten()
-                    .any(|held| held.statement_id == *id)
+                    .any(|held| held.statement_id == statement_id)
             })
+    }
+
+    /// Whether storing `write` puts one of its handles where the handle rule
+    /// refuses it, read through the index: a handle the write claims twice or
+    /// that another holder keeps. On a graph that passes the rule this agrees
+    /// with [`Self::validate_handles_after`], which walks every holder; only
+    /// the write's own handles can newly collide.
+    pub(super) fn write_collides(&self, write: PendingWrite<'_>) -> bool {
+        match write {
+            PendingWrite::Literals(LiteralWrite::Resource(owner, incoming)) => {
+                let mut claimed = HashMap::<&str, &NodeProperty>::new();
+                incoming.iter().any(|property| {
+                    let id = property.statement_id.as_str();
+                    claimed
+                        .insert(id, property)
+                        .is_some_and(|first| first != property)
+                        || self.relation_holds(id, |_| true)
+                        || self.resource_literal_holds(id, Some(owner))
+                        || self.surface_literal_holds(id)
+                })
+            },
+            // Surface literals answer only to Resource holders.
+            PendingWrite::Literals(LiteralWrite::Surface(_, incoming)) => {
+                incoming.iter().any(|property| {
+                    let id = property.statement_id.as_str();
+                    self.relation_holds(id, |key| matches!(key, RelationKey::Resource(_)))
+                        || self.resource_literal_holds(id, None)
+                })
+            },
+            PendingWrite::ResourceEdges(from, to, rows) => {
+                let Some((source, target)) =
+                    self.resources.key_of(&from).zip(self.resources.key_of(&to))
+                else {
+                    return true;
+                };
+                let mut claimed = HashSet::new();
+                rows.iter().any(|id| {
+                    !claimed.insert(id.as_str())
+                        || self.handle_held_off_resource_pair(id, source, target)
+                        || self.resource_literal_holds(id, None)
+                        || self.surface_literal_holds(id)
+                })
+            },
+            // Held Surface-only duplicates keep their historical grammar, so
+            // Surface literals are not holders here.
+            PendingWrite::SurfaceEdges(from, to, rows) => {
+                let Some(pair) = self
+                    .get_node_key_by_id(from)
+                    .zip(self.get_node_key_by_id(to))
+                else {
+                    return true;
+                };
+                let mut claimed = HashSet::new();
+                rows.iter().any(|id| {
+                    !claimed.insert(id.as_str())
+                        || self.relation_holds(id, |key| match key {
+                            RelationKey::Resource(_) => true,
+                            RelationKey::Surface(key) => {
+                                self.inner.inner().edge_endpoints(key) != Some(pair)
+                            },
+                        })
+                        || self.resource_literal_holds(id, None)
+                })
+            },
+        }
     }
 }

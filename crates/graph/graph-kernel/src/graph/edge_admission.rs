@@ -38,6 +38,17 @@ impl Graph {
         self.validate_active_resource_assertion_handles()
     }
 
+    /// Whether storing `write` leaves the graph passing checked open. The
+    /// handle index answers; the whole-graph rule runs only to name the handle
+    /// a colliding write claims, and while a migration stages, when the graph
+    /// may already hold a collision the write does not touch.
+    pub(super) fn admit_write(&self, write: PendingWrite<'_>) -> Result<(), ContentError> {
+        if self.staged_edges.0 || self.write_collides(write) {
+            return self.validate_handles_after(Some(write));
+        }
+        Ok(())
+    }
+
     /// Whether storing `edges` as every Resource edge from `from` to `to` leaves
     /// the graph passing checked open. A set the write refuses anyway stores nothing.
     pub(crate) fn admit_resource_edges(
@@ -65,7 +76,7 @@ impl Graph {
         if !claims_new_handle(&held, &rows) {
             return Ok(());
         }
-        self.validate_handles_after(Some(PendingWrite::ResourceEdges(from, to, &rows)))
+        self.admit_write(PendingWrite::ResourceEdges(from, to, &rows))
     }
 
     /// The same for the Surface edges between two nodes, by node id.
@@ -94,7 +105,7 @@ impl Graph {
         if !claims_new_handle(&held, &rows) {
             return Ok(());
         }
-        self.validate_handles_after(Some(PendingWrite::SurfaceEdges(from, to, &rows)))
+        self.admit_write(PendingWrite::SurfaceEdges(from, to, &rows))
     }
 }
 

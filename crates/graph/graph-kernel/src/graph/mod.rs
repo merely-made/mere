@@ -116,6 +116,8 @@ pub mod node_facets;
 pub mod node_props;
 pub mod predicate_declarations;
 mod relation_read;
+#[cfg(test)]
+mod replay_admission_tests;
 pub mod resource;
 pub mod resource_classifications;
 pub mod resource_content;
