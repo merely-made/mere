@@ -1405,7 +1405,8 @@ impl<B: Backend> GraphSession<B> {
 
     /// Apply edits as one change under `author`, journal what they did, and
     /// store it before returning. A change that alters nothing records
-    /// nothing.
+    /// nothing; one with an edit admission refuses commits nothing, and the
+    /// error names that edit (engine-split D163).
     pub async fn apply_deltas(
         &mut self,
         author: Author,
@@ -1524,11 +1525,7 @@ impl<B: Backend> GraphSession<B> {
         deltas: Vec<GraphDelta>,
     ) -> Result<Applied, SessionError> {
         self.ensure_writable()?;
-        let (_, applied) = self.edit_as(author, kind, |graph| {
-            for delta in deltas {
-                let _ = apply_graph_delta(graph, delta);
-            }
-        })?;
+        let (_, applied) = self.try_edit_as(author, kind, |graph| apply_all(graph, deltas))?;
         self.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(applied)
     }

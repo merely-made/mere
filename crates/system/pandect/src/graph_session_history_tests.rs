@@ -416,3 +416,6 @@ async fn stored_bytes(store: &MemoryBackend) -> Vec<(String, Vec<u8>)> {
     }
     bytes
 }
+
+#[path = "graph_session_refusal_tests.rs"]
+mod refusal;

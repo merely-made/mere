@@ -186,7 +186,8 @@ impl<B: LegacyTransactionBackend> GraphSession<B> {
 
 impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     /// Apply one complete, validated change against a session.
-    /// Storage failure or a competing append leaves graph and history unchanged.
+    /// Storage failure, a competing append or an edit admission refuses
+    /// (engine-split D163) leaves graph and history unchanged.
     /// Append-only log lengths and their last retained entries are rechecked in
     /// the write transaction. This is not a journal corruption/tampering audit.
     pub async fn transact_deltas(
@@ -197,11 +198,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     ) -> Result<Applied, SessionError> {
         self.transact_change(at, false, move |candidate| {
             candidate
-                .edit_as(author, ChangeKind::Edit, |graph| {
-                    for delta in deltas {
-                        apply_graph_delta(graph, delta);
-                    }
-                })
+                .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))
                 .map(|(_, applied)| applied)
         })
         .await
@@ -220,11 +217,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     ) -> Result<(Applied, String), SessionError> {
         self.transact_change(at, true, move |candidate| {
             candidate
-                .edit_as(author, ChangeKind::Edit, |graph| {
-                    for delta in deltas {
-                        apply_graph_delta(graph, delta);
-                    }
-                })
+                .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))
                 .map(|(_, applied)| applied)
         })
         .await
