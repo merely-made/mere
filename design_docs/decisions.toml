@@ -1799,6 +1799,14 @@ summary = "A revision crosses devices named by a chained v2 journal digest, so a
 draws_on = ["engine-split D148"]
 plans = ["engine-split"]
 
+[decisions."engine-split D155"]
+title = "Oxigraph is forked as `mark-ik/oxigraph` on its 0.5 line, with upstream's newer oxiri, rand and quick-xml and its RDF/XML literal fix (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Oxigraph is forked on its 0.5 line at the branch tip with newer oxiri, rand and quick-xml plus the RDF/XML literal fix, and the rudof fork is created now."
+draws_on = ["engine-split D144", "engine-split D150", "engine-split D152"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
