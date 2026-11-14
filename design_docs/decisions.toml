@@ -1759,6 +1759,30 @@ summary = "The engine sends the host a scene snapshot as a keyframe and touched-
 draws_on = ["engine-split D148"]
 plans = ["engine-split"]
 
+[decisions."engine-split D150"]
+title = "The rudof fork is one `mark-ik/rudof`, taking every upstream release (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "rudof's SHACL is forked whole as mark-ik/rudof and rebased on every upstream release."
+draws_on = ["engine-split D142", "engine-split D143", "engine-split D144"]
+plans = ["engine-split"]
+
+[decisions."engine-split D151"]
+title = "The rudof fork grows to close SHACL-SPARQL (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The rudof fork takes new code to close the SHACL-SPARQL tests rudof skips, scored against data-shapes."
+draws_on = ["engine-split D143", "engine-split D144", "engine-split D150"]
+plans = ["engine-split"]
+
+[decisions."engine-split D152"]
+title = "rudof moves to oxiri 0.2 now, and a lane sizes an Oxigraph 0.5-line fork (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "rudof takes oxiri 0.2 for now; a lane sizes a fork of Oxigraph's 0.5 line with upstream's newer oxiri, rand and quick-xml; owning the RDF core is an open question."
+draws_on = ["engine-split D144", "engine-split D150"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
