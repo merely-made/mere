@@ -1863,6 +1863,22 @@ summary = "The Oxigraph fork carries the six SPARQL fixes as three small commits
 draws_on = ["engine-split D160"]
 plans = ["engine-split"]
 
+[decisions."engine-split D163"]
+title = "One replay point at the stored checkpoint, an owned `PinnedView`, and whole refusal for the import-shaped paths (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "graph_at starts from one replay point at the stored checkpoint, pins are owned PinnedViews, and the import-shaped paths refuse whole."
+draws_on = ["engine-split D161"]
+plans = ["engine-split"]
+
+[decisions."engine-split D164"]
+title = "The 100 ms edit is reached by structural sharing with a pointer-diff check (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Session edits reach 100 ms at 100k through per-entry structural sharing and a pointer-diff check comparing changed entries as bytes."
+draws_on = ["engine-split D157", "engine-split D161"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
