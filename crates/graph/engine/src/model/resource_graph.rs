@@ -127,20 +127,25 @@ impl ResourceGraph {
     /// A resource's identity and facets in their persisted form.
     pub fn resource_record(&self, id: Uuid) -> Option<PersistedResourceRecord> {
         let resource = self.resource(id)?;
-        let facets = self
-            .facets
-            .facets_of(&id)
+        Some(record_of(resource, self.facets.facets_of(&id)))
+    }
+
+    /// Every resource's record, in the order [`resource_nodes`](Self::resource_nodes)
+    /// yields them, as [`resource_record`](Self::resource_record) writes each.
+    pub fn resource_records(&self) -> Vec<PersistedResourceRecord> {
+        self.resources_with_facets()
             .into_iter()
-            .flat_map(|facets| facets.iter())
-            .map(|(facet, value)| PersistedResourceFacet {
-                facet: facet.as_str().to_string(),
-                value_json: serde_json::to_string(value).expect("JSON value serializes"),
-            })
-            .collect();
-        Some(PersistedResourceRecord {
-            canonical_iri: resource.canonical_iri().to_string(),
-            facets,
-        })
+            .map(|(resource, facets)| record_of(resource, facets))
+            .collect()
+    }
+
+    /// Every resource with its facets, in [`resource_nodes`](Self::resource_nodes)
+    /// order, read by [`facets_in_order`] rather than a lookup per resource.
+    pub fn resources_with_facets(&self) -> Vec<(&ResourceNode, Option<&portolan::NodeFacets>)> {
+        let resources: Vec<&ResourceNode> = self.resource_nodes().collect();
+        let ids: Vec<Uuid> = resources.iter().map(|resource| resource.id()).collect();
+        let facets = facets_in_order(&self.facets, &ids);
+        resources.into_iter().zip(facets).collect()
     }
 
     /// One typed facet of a resource, when present and well formed.
@@ -177,5 +182,52 @@ impl ResourceGraph {
                     .map(|concept| concept.label)
             })
             .collect()
+    }
+}
+
+/// `store`'s facets for each of `ids`, in the order given: one walk of the store
+/// in id order beside the ids sorted (engine split D168). A lookup in the
+/// persistent store walks down a binary tree, and ids come in no order, so a
+/// pass over every resource or node reads them this way, not one by one.
+pub fn facets_in_order<'a>(
+    store: &'a portolan::FacetStore<Uuid>,
+    ids: &[Uuid],
+) -> Vec<Option<&'a portolan::NodeFacets>> {
+    let mut order: Vec<(Uuid, usize)> = ids.iter().copied().zip(0..).collect();
+    order.sort_unstable();
+    let mut found = vec![None; ids.len()];
+    let mut held = store.iter().peekable();
+    for (id, at) in order {
+        while held.next_if(|(key, _)| **key < id).is_some() {}
+        found[at] = held.peek().filter(|(key, _)| **key == id).map(|(_, f)| *f);
+    }
+    found
+}
+
+/// The literal properties `facets` hold, as
+/// [`resource_properties`](ResourceGraph::resource_properties) reads them.
+pub fn properties_in(facets: Option<&portolan::NodeFacets>) -> Vec<NodeProperty> {
+    facets
+        .and_then(|facets| facets.get(&portolan::FacetId::new(RESOURCE_PROPERTIES)))
+        .and_then(|value| <Vec<NodeProperty> as serde::Deserialize>::deserialize(value).ok())
+        .unwrap_or_default()
+}
+
+/// A resource and its facets as their persisted record.
+fn record_of(
+    resource: &ResourceNode,
+    facets: Option<&portolan::NodeFacets>,
+) -> PersistedResourceRecord {
+    let facets = facets
+        .into_iter()
+        .flat_map(|facets| facets.iter())
+        .map(|(facet, value)| PersistedResourceFacet {
+            facet: facet.as_str().to_string(),
+            value_json: serde_json::to_string(value).expect("JSON value serializes"),
+        })
+        .collect();
+    PersistedResourceRecord {
+        canonical_iri: resource.canonical_iri().to_string(),
+        facets,
     }
 }

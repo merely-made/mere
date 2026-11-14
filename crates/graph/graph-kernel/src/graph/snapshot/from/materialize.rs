@@ -180,10 +180,18 @@ impl Graph {
             }
         }
 
+        // Facets are written in id order after the loop (engine split D168);
+        // a repeated id writes what is pending first, as one by one would.
+        let mut pending = Vec::new();
+        let mut seen = std::collections::HashSet::new();
         for record in &snapshot.resources {
             let id = portolan::resource_id_from_canonical_iri(&record.canonical_iri);
-            graph.set_resource_record(id, Some(record.clone()));
+            if !seen.insert(id) {
+                graph.apply_resource_facets(std::mem::take(&mut pending));
+            }
+            graph.set_resource_record_deferring(id, Some(record.clone()), Some(&mut pending));
         }
+        graph.apply_resource_facets(pending);
         let mut resource_pairs: BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>> = BTreeMap::new();
         for edge in &snapshot.resource_edges {
             let (Ok(from), Ok(to)) = (

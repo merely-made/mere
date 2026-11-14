@@ -6,7 +6,7 @@
 
 //! Typed, recorded content on shared resources. Unknown facets remain untouched.
 
-use super::{CapturedDelta, Graph, NodeKey, ResourceNode};
+use super::{CapturedDelta, Graph, NodeKey};
 use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use crate::types::{ClassificationScheme, ClassificationStatus, NodeClassification, NodeProperty};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
@@ -278,13 +278,20 @@ impl Graph {
             Some(LiteralWrite::Resource(id, _)) if self.resource(id).is_none() => Some(id),
             _ => None,
         };
-        for id in self.resource_nodes().map(ResourceNode::id).chain(unheld) {
-            let held;
+        let held: Vec<(Uuid, Option<&portolan::NodeFacets>)> = self
+            .resources
+            .resources_with_facets()
+            .into_iter()
+            .map(|(resource, facets)| (resource.id(), facets))
+            .chain(unheld.map(|id| (id, None)))
+            .collect();
+        for (id, facets) in held {
+            let read;
             let properties = match literals {
                 Some(LiteralWrite::Resource(owner, properties)) if owner == id => properties,
                 _ => {
-                    held = self.resource_properties(id);
-                    &held
+                    read = mere::model::resource_graph::properties_in(facets);
+                    &read
                 },
             };
             for property in properties {

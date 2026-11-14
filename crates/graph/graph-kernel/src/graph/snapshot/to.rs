@@ -71,11 +71,7 @@ impl Graph {
 
         let couplings = self.couplings().map(persisted_coupling).collect();
 
-        let resources = self
-            .resources
-            .nodes()
-            .filter_map(|(_, resource)| self.resource_record(resource.id()))
-            .collect();
+        let resources = self.resources.resource_records();
         let resource_pairs = self
             .resources
             .inner()

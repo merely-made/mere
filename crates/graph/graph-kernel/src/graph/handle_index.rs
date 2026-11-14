@@ -92,8 +92,9 @@ impl Graph {
                     holders.note_relation(RelationKey::Resource(key), payload);
                 }
             }
-            for resource in self.resource_nodes() {
-                for held in self.resource_properties(resource.id()) {
+            use mere::model::resource_graph::{facets_in_order, properties_in};
+            for (resource, facets) in self.resources.resources_with_facets() {
+                for held in properties_in(facets) {
                     add(
                         &mut holders.resource_literals,
                         &held.statement_id,
@@ -101,13 +102,25 @@ impl Graph {
                     );
                 }
             }
-            for (key, node) in self.nodes() {
-                for held in self.legacy_node_properties(key).unwrap_or_default() {
-                    add(&mut holders.surface_literals, &held.statement_id, node.id);
+            // Surface literals, read in one walk of the facets in id order.
+            let nodes: Vec<Uuid> = self.nodes().map(|(_, node)| node.id).collect();
+            let semantic = portolan::FacetId::new(SEMANTIC_PROPERTIES);
+            for (id, facets) in nodes.iter().zip(facets_in_order(&self.facets, &nodes)) {
+                let held: Vec<NodeProperty> = facets
+                    .and_then(|facets| facets.get(&semantic))
+                    .and_then(|value| serde::Deserialize::deserialize(value).ok())
+                    .unwrap_or_default();
+                for held in held {
+                    add(&mut holders.surface_literals, &held.statement_id, *id);
                 }
             }
             holders
         })
+    }
+
+    /// Whether the index has been built (a write must then note itself).
+    pub(crate) fn handle_index_built(&self) -> bool {
+        self.handle_index.built.get().is_some()
     }
 
     /// Forget the index; the next read rebuilds it from the stores.
