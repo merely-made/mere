@@ -771,6 +771,9 @@ mod history;
 use history::{HeldPoint, apply_all};
 #[path = "graph_session_operation.rs"]
 mod operation;
+#[path = "graph_session_pin.rs"]
+mod pin;
+pub use pin::PinnedView;
 #[path = "graph_session_transaction.rs"]
 mod transaction;
 pub use operation::OperationReceipt;

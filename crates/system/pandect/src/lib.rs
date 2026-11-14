@@ -149,8 +149,9 @@ pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, DroppedChoice,
     GraphAdmissionValidator, GraphSession, GraphValidator, Kept, MereSessions, MergeChoice,
-    MergeConflict, MergeMatch, Pending, PendingMerge, Reverted, SESSIONS_PREFIX, SessionError,
-    ViewEntry, ViewKey, branched_session_name, forked_session_name, picked_session_name,
+    MergeConflict, MergeMatch, Pending, PendingMerge, PinnedView, Reverted, SESSIONS_PREFIX,
+    SessionError, ViewEntry, ViewKey, branched_session_name, forked_session_name,
+    picked_session_name,
 };
 pub use identity::StartupUnlockMode;
 // The ids and author the session schema names, so a host can name them
