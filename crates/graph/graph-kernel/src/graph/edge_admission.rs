@@ -38,12 +38,13 @@ impl Graph {
         self.validate_active_resource_assertion_handles()
     }
 
-    /// Whether storing `write` leaves the graph passing checked open. The
-    /// handle index answers; the whole-graph rule runs only to name the handle
-    /// a colliding write claims, and while a migration stages, when the graph
-    /// may already hold a collision the write does not touch.
+    /// Whether storing `write` leaves the graph passing checked open, judged by
+    /// the write's own handles through the handle index; the whole-graph rule
+    /// runs only to name the handle a colliding write claims. A collision the
+    /// write does not touch, as a staged migration may hold, is left to
+    /// [`Self::settle_staged_edges`] or checked open.
     pub(super) fn admit_write(&self, write: PendingWrite<'_>) -> Result<(), ContentError> {
-        if self.staged_edges.0 || self.write_collides(write) {
+        if self.write_collides(write) {
             return self.validate_handles_after(Some(write));
         }
         Ok(())

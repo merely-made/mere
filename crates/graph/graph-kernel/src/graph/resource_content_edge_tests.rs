@@ -363,6 +363,60 @@ fn legacy_migration_stages_edge_admission_and_refuses_a_result_that_would_not_re
     assert!(!error.0.contains("replacement was refused"), "{error}");
 }
 
+/// A literal write during staging is judged by its own handles, so a staged
+/// collision elsewhere does not refuse it; settling still refuses the collision.
+#[test]
+fn literal_writes_while_staged_use_the_index_and_settling_still_refuses() {
+    let c = resource("urn:edge:c");
+    let with_unrelated = |drop_literal| {
+        let mut journal = legacy_journal(false);
+        journal.record_as(
+            Author::user(),
+            CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: c.to_string(),
+                record: Some(record("urn:edge:c", &[literal("unrelated")])),
+            },
+        );
+        if drop_literal {
+            journal.record_as(
+                Author::user(),
+                CapturedDelta::ReplaySetResourceRecordById {
+                    resource_id: resource("urn:edge:b").to_string(),
+                    record: Some(record("urn:edge:b", &[])),
+                },
+            );
+        }
+        journal
+    };
+
+    // The unrelated literal is admitted beside the staged collision, and the
+    // collision resolving later lets the migration finish with it held.
+    let migrated = migrate_legacy_prefix(&Graph::new(), with_unrelated(true).entries())
+        .expect("an unrelated literal is admitted while a collision is staged");
+    let held = migrated.graph.resource_properties(c);
+    assert_eq!(held.len(), 1);
+    assert_eq!(held[0].statement_id, "unrelated");
+    assert!(reopens(&migrated.graph));
+
+    // A collision still standing at the end is refused when the migration settles.
+    let error = migrate_legacy_prefix(&Graph::new(), with_unrelated(false).entries())
+        .err()
+        .expect("the staged collision is refused at settle");
+    assert!(error.0.contains("staged-handle"), "{error}");
+    assert!(!error.0.contains("replacement was refused"), "{error}");
+
+    // The control: a literal claiming the staged handle itself is refused.
+    let mut stealing = legacy_journal(true);
+    stealing.record_as(
+        Author::user(),
+        CapturedDelta::ReplaySetResourceRecordById {
+            resource_id: c.to_string(),
+            record: Some(record("urn:edge:c", &[literal("staged-handle")])),
+        },
+    );
+    assert!(migrate_legacy_prefix(&Graph::new(), stealing.entries()).is_err());
+}
+
 /// Legacy journals repeat rows; the migration reads them as written.
 #[test]
 fn legacy_migration_reads_its_source_through_the_staged_state_repeated_rows_included() {
