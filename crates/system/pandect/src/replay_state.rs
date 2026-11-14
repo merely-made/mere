@@ -15,8 +15,12 @@
 //! `preserve_order` in Mere's graph), so equal states write equal bytes. The
 //! one place `Value` equality is looser than bytes is a zero's sign, which
 //! [`UnsignedZero`] writes away.
+//!
+//! The session edit compares only what two graphs do not share
+//! ([`replay_equal`], engine split D164): the same bytes, entry by entry.
 
 use kernel::graph::Graph;
+use kernel::graph::snapshot::unshared::Unshared;
 use serde::Serialize;
 use serde_json::ser::{CompactFormatter, Formatter};
 use std::io;
@@ -48,6 +52,37 @@ pub(crate) fn state_bytes(value: &impl Serialize) -> Result<Vec<u8>, serde_json:
 /// never reads the clock (reservoir plan ruling 47), and the facet store.
 pub(crate) fn replay_bytes(graph: &Graph) -> Result<Vec<u8>, serde_json::Error> {
     state_bytes(&(graph.to_snapshot_at(0), graph.facets()))
+}
+
+/// How [`replay_equal`] reached its answer.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Decided {
+    /// From the entries the graphs do not share, this many pairs compared.
+    Entries(usize),
+    /// The pointer walk named a difference it can prove.
+    Walk,
+    /// The walk could not vouch; the whole states were compared.
+    Whole,
+}
+
+/// Whether `a` and `b` have equal replay states, as [`replay_bytes`] would
+/// find them (engine split D164). Two graphs cloned from one another share
+/// every entry neither wrote since, so only the unshared entries are written
+/// and compared, each as the bytes [`state_bytes`] gives it; where the walk
+/// cannot vouch, the whole states are compared as before.
+pub(crate) fn replay_equal(a: &Graph, b: &Graph) -> Result<(bool, Decided), serde_json::Error> {
+    match a.unshared_state(b) {
+        Unshared::Entries(pairs) => {
+            for (x, y) in &pairs {
+                if state_bytes(x)? != state_bytes(y)? {
+                    return Ok((false, Decided::Walk));
+                }
+            }
+            Ok((true, Decided::Entries(pairs.len())))
+        },
+        Unshared::Differ(_) => Ok((false, Decided::Walk)),
+        Unshared::Whole(_) => Ok((replay_bytes(a)? == replay_bytes(b)?, Decided::Whole)),
+    }
 }
 
 #[cfg(test)]

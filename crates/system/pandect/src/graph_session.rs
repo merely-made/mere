@@ -672,9 +672,24 @@ fn provenance(manifest: &GraphSessionManifest) -> Option<Provenance> {
 
 /// What the replay check compares: the whole snapshot and facets, visit
 /// stamps included, under one fixed date so the check never reads the clock
-/// (reservoir plan ruling 47).
+/// (reservoir plan ruling 47). The edit compares through [`replay_matches`].
+#[cfg(test)]
 fn replay_state(graph: &Graph) -> Result<Vec<u8>, SessionError> {
     crate::replay_state::replay_bytes(graph)
+        .map_err(|e| SessionError::NotReplayable(e.to_string()))
+}
+
+/// Whether the replayed clone and the candidate have equal replay states.
+/// Both are clones of the live graph, so only the entries either wrote are
+/// compared, as bytes (engine split D164).
+fn replay_matches(replay: &Graph, candidate: &Graph) -> Result<bool, SessionError> {
+    #[cfg(test)]
+    if std::env::var_os("PANDECT_REPLAY_CHECK_OFF").is_some() {
+        // The control for the escape tests: with no check they must fail.
+        return Ok(true);
+    }
+    crate::replay_state::replay_equal(replay, candidate)
+        .map(|(equal, _)| equal)
         .map_err(|e| SessionError::NotReplayable(e.to_string()))
 }
 
@@ -1490,7 +1505,7 @@ impl<B: Backend> GraphSession<B> {
             &author,
             recorded.iter().cloned(),
         );
-        if replay_state(&replay)? != replay_state(&candidate)? {
+        if !replay_matches(&replay, &candidate)? {
             return Err(SessionError::NotReplayable(
                 "candidate changed graph truth outside the journaled mutation path".into(),
             ));
