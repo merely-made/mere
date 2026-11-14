@@ -23,6 +23,11 @@ pub(super) struct Pinned {
 /// dataset over it built on the first [`dataset`](Self::dataset) call. The
 /// holder owns it and decides how many to keep; the session keeps no
 /// reference, so dropping it frees both.
+///
+/// Dropping is the holder's cost, paid on the dropping thread: freeing an
+/// indexed pin took about 0.4 s at 100k nodes and about 36 ms at 10k on the
+/// reference laptop (engine-split D166). A host that cannot wait drops it on a
+/// worker.
 pub struct PinnedView {
     session: SessionId,
     cursor: Seq,
