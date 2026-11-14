@@ -3610,3 +3610,17 @@ revision and what crosses at frame rate.
   hands it out), a `Refresh::Rebuilt` mints a new dictionary, literal-subject derivations (rdfs3,
   prp-inv) are filtered where the output lands, and per-graph or union entailment and the remaining
   RDFS rules are its forks.
+- 2026-11-14: D165 carried out by the stickleback session. `house patches` (Eidetic `33ae568`, hook fix
+  `15278ea`, house 0.0.10) carries Mere's root `[patch.crates-io]` rows whose git URL is under
+  `https://github.com/mark-ik/`, so not Mere's own `eidetic` and `muniment` rows, keeps those whose crate is in the
+  consumer's graph, and writes a delimited block; `house patches --check` in each consumer's hooks compares it
+  against Mere's origin/main table. Landed on origin/main (first reader checked): Graphshell `a0469fc1` (10 rows,
+  `host/Cargo.toml`), Knot `7d90e43` (5), Turnstone `5f742733` (10 each in the root and `ports/graphshell/web`),
+  Cleromancy `80e4a63` (5 each in the root and `authority-guest`), Isocosm `d6c02104` (5 each in the root,
+  `cosmograph-host` and `shared/wing-integration`); Woodshed follows. Measured against the fork at `ba9a2ae3` and
+  Mere `166016cbf`: one `oxiri` (0.3.1) everywhere; `quick-xml` 0.37.5 gone; no Oxigraph crate holds rand 0.9;
+  Graphshell's `mere-view --features query` on wasm32 passes; Turnstone's `graphshell-web` passes getrandom and stops
+  at the unrelated `cubecl-runtime` 0.12.0-pre.2 import; Cleromancy's `authority-guest` (wasm32-wasip2) passes. Skips
+  deleted: `quick-xml@0.37.5` in all five, rand, rand_chacha and rand_core 0.9 in Knot and Isocosm; one added in Knot,
+  `quick-xml@0.41.0` through wayland-scanner at its latest. A change to Mere's mark-ik rows fails those consumers'
+  next commit until `house patches` is rerun in each.
