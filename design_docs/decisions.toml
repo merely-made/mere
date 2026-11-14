@@ -1895,6 +1895,14 @@ summary = "The operation path and transact_live refuse whole, merge-in reports w
 draws_on = ["engine-split D161", "engine-split D163"]
 plans = ["engine-split"]
 
+[decisions."engine-split D167"]
+title = "Persistent maps (rpds) close the last 35 ms, the five whole-shared or plain stores are ratified, and publication is assessed next (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Persistent maps close the edit's last 35 ms, five stores stay whole-shared or plain, and quadratic publication is assessed next."
+draws_on = ["engine-split D144", "engine-split D161", "engine-split D164"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
