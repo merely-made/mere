@@ -1847,6 +1847,22 @@ summary = "The Oxigraph fork ignores six SPARQL tests its parser fails while a p
 draws_on = ["engine-split D159"]
 plans = ["engine-split"]
 
+[decisions."engine-split D161"]
+title = "P8's views: a live index refreshed per edit and pinned views rebuilt from the nearest checkpoint; a refresh fits half a frame; an edit at 100k targets 100 ms; a refused import refuses its whole change (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A live index refreshed per edit, pinned views rebuilt from the nearest checkpoint, an 8 ms refresh budget, a 100 ms edit target at 100k, and a refused import refuses its change."
+draws_on = ["engine-split D148", "engine-split D149", "engine-split D153", "engine-split D157"]
+plans = ["engine-split"]
+
+[decisions."engine-split D162"]
+title = "The Oxigraph fork carries the six SPARQL fixes, one commit per upstream fix, escapes through the testsuite flag (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Oxigraph fork carries the six SPARQL fixes as three small commits and its testsuite runs with no family ignores."
+draws_on = ["engine-split D160"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
