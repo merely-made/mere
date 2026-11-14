@@ -768,7 +768,7 @@ pub struct GraphSession<B> {
 
 #[path = "graph_session_history.rs"]
 mod history;
-use history::HeldPoint;
+use history::{HeldPoint, apply_all};
 #[path = "graph_session_operation.rs"]
 mod operation;
 #[path = "graph_session_transaction.rs"]
@@ -1431,11 +1431,7 @@ impl<B: Backend> GraphSession<B> {
             })
             .collect::<Result<Vec<_>, _>>()?;
         Ok(self
-            .edit_as(author, ChangeKind::Edit, |graph| {
-                for delta in deltas {
-                    let _ = apply_graph_delta(graph, delta);
-                }
-            })?
+            .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))?
             .1)
     }
 
@@ -1461,13 +1457,24 @@ impl<B: Backend> GraphSession<B> {
         kind: ChangeKind,
         edit: impl FnOnce(&mut Graph) -> R,
     ) -> Result<(R, Applied), SessionError> {
+        self.try_edit_as(author, kind, |graph| Ok(edit(graph)))
+    }
+
+    /// [`edit_as`](Self::edit_as) whose edit can refuse: an `Err` from it
+    /// leaves the graph, journal and changes as they were.
+    fn try_edit_as<R>(
+        &mut self,
+        author: Author,
+        kind: ChangeKind,
+        edit: impl FnOnce(&mut Graph) -> Result<R, SessionError>,
+    ) -> Result<(R, Applied), SessionError> {
         self.ensure_writable()?;
         let observation = self.graph.semantic_observation_revision();
         let mut candidate = self.graph.clone();
         let captured = Arc::default();
         record_into(&mut candidate, &captured);
         let result =
-            kernel::graph::with_isolated_capture(|| candidate.write_as(author.clone(), edit));
+            kernel::graph::with_isolated_capture(|| candidate.write_as(author.clone(), edit))?;
         self.validate(&candidate)?;
         let recorded = std::mem::take(&mut *captured.lock().expect("candidate recorder buffer"));
         let mut replay = self.graph.clone();

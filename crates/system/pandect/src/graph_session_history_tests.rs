@@ -4,9 +4,10 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Engine-split D161: `graph_at` starts from the held checkpoint.
+//! Engine-split D161: `graph_at` starts from the held checkpoint, and a
+//! session-level import with a refused edit commits nothing.
 use super::*;
-use kernel::graph::{EdgeAssertion, SemanticSubKind};
+use kernel::graph::{EdgeAssertion, SemanticStatementSpec, SemanticSubKind};
 use muniment::MemoryBackend;
 
 fn person() -> Author {
@@ -323,4 +324,95 @@ fn a_held_checkpoint_whose_digest_does_not_verify_is_skipped() {
         assert_eq!(start(&session, live), at);
         assert_eq!(whole(&session.graph_at(live).unwrap()), expected);
     });
+}
+
+/// The live graph `a -> b` with one Resource statement, and its handle.
+fn related() -> (Graph, String) {
+    let mut graph = kernel::graph::replay_captured_deltas([add(1), add(2)]);
+    let key = |graph: &Graph, id| graph.get_node_key_by_id(Uuid::from_u128(id)).unwrap();
+    let (from, to) = (key(&graph, 1), key(&graph, 2));
+    let spec = SemanticStatementSpec {
+        predicate: "https://import.test/vocab#next".into(),
+        ..Default::default()
+    };
+    let (relation, _) = graph.assert_semantic_statement(from, to, spec).unwrap();
+    let handle = graph.get_relation(relation).unwrap().assertions()[0]
+        .statement_id
+        .clone();
+    (graph, handle)
+}
+
+/// An import of three edits whose middle one puts `handle` on a Surface
+/// relation 1 -> 2.
+fn import(graph: &Graph, handle: &str) -> Vec<CapturedDelta> {
+    let mut row = graph.to_snapshot().resource_edges[0].clone();
+    for statement in row.assertions.as_mut().unwrap() {
+        statement.statement_id = handle.into();
+    }
+    vec![
+        add(7),
+        CapturedDelta::ReplaySetEdgesByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            edges: vec![row],
+        },
+        retitle(7, "Imported"),
+    ]
+}
+
+#[test]
+fn an_import_with_a_refused_edit_commits_nothing_and_names_the_handle() {
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let (graph, handle) = related();
+        let mut session = mere.begin(person(), Some(graph));
+        session.flush(SystemTime::now()).await.unwrap();
+        let before = (
+            whole(session.graph()),
+            session.journal.live_cursor(),
+            session.changes().len(),
+            session.revision(),
+        );
+        let stored = stored_bytes(&store).await;
+
+        let Err(refused) = session.apply_now(person(), import(session.graph(), &handle)) else {
+            panic!("an import taking a held handle is refused");
+        };
+        assert!(refused.to_string().contains(&handle), "{refused}");
+        assert!(refused.to_string().contains("edit 1"), "{refused}");
+        assert_eq!(
+            (
+                whole(session.graph()),
+                session.journal.live_cursor(),
+                session.changes().len(),
+                session.revision(),
+            ),
+            before,
+            "nothing of the change is applied or recorded"
+        );
+        assert!(!session.has_unstored());
+        session.flush(SystemTime::now()).await.unwrap();
+        assert_eq!(stored_bytes(&store).await, stored, "nothing is stored");
+
+        // Control: the same import with a fresh handle commits whole.
+        let applied = session
+            .apply_now(person(), import(session.graph(), "fresh-import"))
+            .unwrap();
+        assert!(applied.end > applied.first);
+        let graph = session.graph();
+        let imported = graph.get_node_key_by_id(Uuid::from_u128(7)).unwrap();
+        assert_eq!(graph.get_node(imported).unwrap().title, "Imported");
+        assert!(graph.find_semantic_statement("fresh-import").is_some());
+    });
+}
+
+async fn stored_bytes(store: &MemoryBackend) -> Vec<(String, Vec<u8>)> {
+    let mut keys = store.list("").await.unwrap();
+    keys.sort();
+    let mut bytes = Vec::new();
+    for key in keys {
+        bytes.push((key.clone(), store.get(&key).await.unwrap().unwrap()));
+    }
+    bytes
 }

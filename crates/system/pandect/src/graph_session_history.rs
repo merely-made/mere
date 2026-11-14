@@ -4,9 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! History reads (engine-split D161): `graph_at` starts from the stored
-//! checkpoint's replay point.
+//! History reads and whole-change imports (engine-split D161): `graph_at`
+//! starts from the stored checkpoint's replay point, and an imported change
+//! with a refused edit commits nothing.
 use super::*;
+use kernel::graph::apply::GraphDeltaResult;
 
 /// The replay point at the stored checkpoint, with the v2 digest of the
 /// journal prefix it was replayed from.
@@ -14,6 +16,20 @@ use super::*;
 pub(super) struct HeldPoint {
     pub(super) point: ReplayPoint,
     pub(super) digest: Option<String>,
+}
+
+/// Apply `deltas` in order as one change, refusing it at the first edit
+/// admission refuses: the error names that edit and its reason, the handle
+/// for a collision, and the change commits nothing.
+pub(super) fn apply_all(graph: &mut Graph, deltas: Vec<GraphDelta>) -> Result<(), SessionError> {
+    for (position, delta) in deltas.into_iter().enumerate() {
+        if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta) {
+            return Err(SessionError::Validation(format!(
+                "edit {position} refused: {reason}"
+            )));
+        }
+    }
+    Ok(())
 }
 
 impl<B: Backend> GraphSession<B> {
