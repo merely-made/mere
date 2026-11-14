@@ -1815,6 +1815,30 @@ summary = "Journal replay is linear through the handle index; the session edit's
 draws_on = ["engine-split D153"]
 plans = ["engine-split"]
 
+[decisions."engine-split D157"]
+title = "The session edit's check compares serialized bytes; a colliding merge is refused by admission, proved by a test (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The session edit's replay check compares serialized bytes, and a colliding merge is left to admission with a test."
+draws_on = ["engine-split D156"]
+plans = ["engine-split"]
+
+[decisions."engine-split D158"]
+title = "The v2 chained digest is in muniment, and the chain is held in memory, rebuilt at open (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Muniment's v2 chained digest lands and pandect holds the chain in memory, rebuilt at open."
+draws_on = ["engine-split D154"]
+plans = ["engine-split"]
+
+[decisions."engine-split D159"]
+title = "Consumers take the Oxigraph fork through the same patch rows as Mere, and the fork takes upstream's rdf-tests bump (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Consumers take the Oxigraph fork through Mere's ten patch rows, and the fork takes upstream's rdf-tests bump."
+draws_on = ["engine-split D155"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
