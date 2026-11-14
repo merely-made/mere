@@ -1868,3 +1868,6 @@ fn operation_storage_refusal_and_lost_ack_reconcile() {
         assert_eq!(reopened.graph().node_count(), 4);
     });
 }
+
+#[path = "graph_session_merge_refused_tests.rs"]
+mod refused;

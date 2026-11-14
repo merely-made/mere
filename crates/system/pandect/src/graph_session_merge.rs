@@ -39,6 +39,7 @@ use kernel::graph::{
     Part, ProvenanceSubKind, part_edits, part_node, part_of, part_value, recreate_node_edits,
     replay_captured_deltas_onto,
 };
+use kernel::graph::apply::GraphDeltaResult;
 use kernel::persistence::PersistedResourceFacet;
 use kernel::types::NodeDerivation;
 use serde_json::Value;
@@ -207,6 +208,27 @@ impl PendingMerge {
         }
         (carried, dropped)
     }
+}
+
+/// What a merge-in wrote, and the edits admission refused (engine-split D169).
+#[derive(Clone, Debug, PartialEq)]
+pub struct Merged {
+    pub applied: Applied,
+    /// The edits left out while the rest applied, in order.
+    pub refused: Vec<Refused>,
+}
+
+/// An edit a merge-in could not apply because admission refused it.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Refused {
+    /// Its position among the edits the merge wrote: the plan's clean edits,
+    /// then each choice's, then the derivation records.
+    pub position: usize,
+    /// The part it writes; `None` for an edit with no part, such as a
+    /// derivation record.
+    pub part: Option<Part>,
+    /// Why admission refused it, naming the handle for a collision.
+    pub reason: String,
 }
 
 /// A choice made on an earlier plan that a new plan of the same merge could
@@ -622,7 +644,8 @@ impl<B: Backend + Clone> MereSessions<B> {
     /// node records a `MergedFrom` derivation naming the source node (M4).
     /// Both sessions are stored in one batch. Refused if either session
     /// changed since the plan, a conflict has no choice, or a choice does not
-    /// fit its conflict.
+    /// fit its conflict. An edit admission refuses is left out and reported
+    /// in [`Merged::refused`] while the rest applies (engine-split D169).
     pub async fn apply_merge(
         &self,
         target: &mut GraphSession<B>,
@@ -630,7 +653,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         pending: PendingMerge,
         choices: &BTreeMap<Part, MergeChoice>,
         author: Author,
-    ) -> Result<Applied, SessionError> {
+    ) -> Result<Merged, SessionError> {
         if target.id() != pending.target || source.id() != pending.source {
             return Err(SessionError::NotMergeable(
                 "the plan names other sessions".into(),
@@ -784,9 +807,16 @@ impl<B: Backend + Clone> MereSessions<B> {
             from: source.id(),
             through: pending.through,
         };
+        let mut refused = Vec::new();
         let (_, applied) = target.edit_as(author.clone(), kind, |graph| {
-            for delta in deltas {
-                let _ = apply_graph_delta(graph, delta);
+            for (position, (edit, delta)) in edits.iter().zip(deltas).enumerate() {
+                if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta) {
+                    refused.push(Refused {
+                        position,
+                        part: part_of(edit),
+                        reason: reason.to_string(),
+                    });
+                }
             }
         })?;
         let at = wall_clock_now();
@@ -814,7 +844,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         self.backend.apply(&ops).await?;
         target.stored(ours);
         source.stored(theirs);
-        Ok(applied)
+        Ok(Merged { applied, refused })
     }
 }
 

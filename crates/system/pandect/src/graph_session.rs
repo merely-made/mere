@@ -781,7 +781,9 @@ pub use operation::OperationReceipt;
 
 #[path = "graph_session_merge.rs"]
 mod merge;
-pub use merge::{DroppedChoice, MergeChoice, MergeConflict, MergeMatch, PendingMerge};
+pub use merge::{
+    DroppedChoice, MergeChoice, MergeConflict, MergeMatch, Merged, PendingMerge, Refused,
+};
 pub use transaction::CommitExtra;
 
 impl<B: Backend> GraphSession<B> {
