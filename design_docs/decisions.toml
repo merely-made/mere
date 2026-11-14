@@ -1807,6 +1807,14 @@ summary = "Oxigraph is forked on its 0.5 line at the branch tip with newer oxiri
 draws_on = ["engine-split D144", "engine-split D150", "engine-split D152"]
 plans = ["engine-split"]
 
+[decisions."engine-split D156"]
+title = "Replay admission reads the handle index; the session edit's check compares typed values (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Journal replay is linear through the handle index; the session edit's check compares typed values, migration uses the index, and merges get a whole-graph check."
+draws_on = ["engine-split D153"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
