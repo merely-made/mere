@@ -1783,6 +1783,22 @@ summary = "rudof takes oxiri 0.2 for now; a lane sizes a fork of Oxigraph's 0.5 
 draws_on = ["engine-split D144", "engine-split D150"]
 plans = ["engine-split"]
 
+[decisions."engine-split D153"]
+title = "P8 fixes journal replay before ruling what a pinned view holds or the frame budget (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Journal replay is quadratic, so P8 fixes it before ruling what a pinned view holds or the frame budget."
+draws_on = ["engine-split D148", "engine-split D149"]
+plans = ["engine-split"]
+
+[decisions."engine-split D154"]
+title = "The journal digest that crosses devices is a v2 chain (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A revision crosses devices named by a chained v2 journal digest, so any cursor's name is a lookup."
+draws_on = ["engine-split D148"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
