@@ -1523,3 +1523,35 @@ The `rdf-canon` rows (`pass / fail / skip`):
 Existing ROW lines: with and without `query`, the run with `rdf-canon` hidden and the run with it differ only by the `rdfc10` lines. The expected files of the suite are CRLF in this checkout (`core.autocrlf`; the git index is LF), and the harness normalizes them.
 
 Gates: `cargo test -p mere` lib 34 (35 with `query`), `inspect_example` 3, `w3c_conformance` 1; `cargo test -p mere-rdfc` 5; ledger run with and without `query`, each ROW line equal to a run of the same binary with `rdf-canon` hidden, apart from the new `rdfc10` rows (the RDF and JSON-LD rows equal across `query`); `cargo check --workspace --all-targets`; `cargo test -p mere-kernel --features query,bundled-contexts` 621 lib tests; `cargo tree -d` shows `sha2` 0.10.9 and 0.11.1 and `digest` 0.10.7 and 0.11.3, the 0.10 pair held by `p2mere-encryption` under the existing `deny.toml` skips, 0.11 by `mere-rdfc` and the family, no new skip. wasm32 `cargo check` of `mere` (with and without `query`) and of `mere-rdfc` with `RUSTFLAGS='--cfg getrandom_backend="wasm_js"'`: `mere-rdfc` needed the same `getrandom` 0.3 `wasm_js` target dependency `mere` carries (added); `mere` stops in `uuid` 1.29.2 (the workspace `uuid` has `v4` and no randomness source for wasm32, which this lane does not touch; not checked against `origin/main`) and checks clean, with and without `query`, with a temporary `js` feature on that workspace line, which was not kept.
+
+## 2026-11-14: conformance ledger rerun on main with the Oxigraph fork (Mere `0d7e587ca`, fork `d3ba9ecc`)
+
+Mere main (D155, D159) takes the Oxigraph crates from `mark-ik/oxigraph` branch `mark-ik/0.5` through `[patch.crates-io]`; the fork carries the three SPARQL fixes of D162. Fork commit measured: `d3ba9ecc8e8ac687d553b587f9759440fdc3dbbc` ("UPSTREAM.md: the three re-expressed SPARQL fixes"). Raw output: `Code/testing/engine-split/ledger_rerun/` (`cargo_tree.txt`, `with_query.txt`, `no_query.txt`).
+
+Fork in the graph: `cargo tree -p mere --features query -i spargebra` gives `spargebra v0.4.8 (https://github.com/mark-ik/oxigraph?branch=mark-ik%2F0.5#d3ba9ecc)`, and `spareval` 0.2.9 beside it from the same source; `-i oxrdfxml` gives `oxrdfxml v0.2.5 (...#d3ba9ecc)`, with `oxrdfio` 0.2.7 from the same source. Fresh resolve, no lock tracked.
+
+Suites (`Code/crates`, untouched, equal to the ledger's revisions): `rdf-tests` `202a74eb81f4`, `json-ld-api` `55514738d854`, `data-shapes` `9c102cbb5309`, `rdf-canon` `15619df2fda7`.
+
+Commands (worktree `C:/t/mere-ledger`, `CARGO_PROFILE_DEV_DEBUG=0`, `-j 4`, `CARGO_TARGET_DIR=C:/t/cargo-build/mere-ledger`, `W3C_VERBOSE=1`):
+- `W3C_SUITES_DIR=C:/Users/mark_/Code/crates cargo test -p mere --features query --test w3c_conformance -- --ignored --nocapture` (ok, 56 s)
+- the same without `--features query` (ok, 14 s; its RDF, JSON-LD and `rdfc10` rows equal the `query` run's)
+
+Engine rows, `pass / fail / skip`, before (ledger, 2026-11-12) to after:
+
+| Row | Before | After |
+|---|---|---|
+| RDF 1.2 evaluation (Turtle 32, TriG 26, RDF/XML 29) | 85 / 2 / 0 | 87 / 0 / 0 |
+| RDF 1.1 evaluation (Turtle 145, TriG 143, RDF/XML 126) | 412 / 2 / 0 | 414 / 0 / 0 |
+| SPARQL 1.2 query evaluation | 64 / 1 / 0 | 65 / 0 / 0 |
+| JSON-LD 1.1 toRdf | 439 / 10 / 18 | 443 / 6 / 18 |
+
+These four match the measured list the lane was given; no row moved backwards. Unmoved, equal to the ledger: RDF 1.2 syntax 181 / 1 / 0 (`ntriples-version-1`), RDF 1.1 syntax 579 / 0 / 0, SPARQL 1.1 query evaluation 230 / 14 / 3 (engine, indexed and parser alike), RDFC-1.0 eval 64 / 0 / 0, map 21 / 0 / 0, negative 1 / 0 / 0 (control 0 / 1 / 0, `test074c`), SPARQL 1.2 syntax parser 200 / 3 / 0, adapter rows unchanged (RDF 1.1 TriG syntax 286 / 15 / 278 across the suite, JSON-LD toRdf 441 / 1 / 25).
+
+Failing test names, before to after:
+- RDF/XML evaluation: `xml-canon-test001`, `xml-canon-test002`, `rdf12-xml-an-13`, `rdf12-xml-an-14` to none (each of the three layers).
+- SPARQL 1.2 query evaluation: `select-variable-reuse` to none (parser, indexed, engine).
+- JSON-LD toRdf, engine and parser: `t0122`, `t0123`, `tc013`, `tdi02`, `tdi04`, `tdi05`, `tdi06`, `te062`, `te091`, `tli12` to `tc013`, `tdi02`, `tdi04`, `tdi05`, `tdi06`, `tli12`. (The before list is the pre-landing parser fail list in `Code/testing/engine-split/sparql_port/mere_baseline.log`; the ledger's engine row carried the same ten tests.)
+- SPARQL 1.1 query evaluation, unchanged, 14: `agg-groupconcat-04`, `-06`, `graph-from-named-1`, `-2`, `-3`, `values-construct-group-by`, `bnode01`, `graph-minus`, `zero_or_more_set_start`, `zero_or_more_set_end`, `zero_or_one_set_start`, `zero_or_one_set_end`, `subquery15`, `subquery16`.
+- Others unchanged: `ntriples-version-1`; parser-only SPARQL 1.2 syntax `nested-aggregate-functions`, `tripleterm-subject-03`, `-06`.
+
+Ledger edits: the two RDF/XML rows, the SPARQL 1.2 query evaluation row, the JSON-LD toRdf row and the declared-profile table, each dated 2026-11-14 with the Mere and fork commits; the rest of the ledger is unchanged. Not run in this pass: the `engine_controls` printout beside the old RDF/XML controls (the fails it explained no longer occur).
