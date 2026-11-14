@@ -864,6 +864,7 @@ where
 }
 
 /// Attribution outlives a handle's removal so an undo keeps its original source.
+#[derive(Clone)]
 pub(crate) struct ReplayAttribution(
     BTreeMap<String, String>,
     super::legacy_family_attribution::LegacyFamilyAttribution,

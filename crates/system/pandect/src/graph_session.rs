@@ -37,8 +37,8 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{
-    AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, Seq, Touched,
-    revert_change,
+    AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, ReplayPoint, Seq,
+    Touched, revert_change,
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
@@ -744,6 +744,10 @@ pub struct GraphSession<B> {
     /// next [`checkpoint_if_behind`](Self::checkpoint_if_behind) rewrites it
     /// as v2 even when the journal has not moved.
     checkpoint_v1: bool,
+    /// Where a baseline replay stands at the stored checkpoint, which
+    /// [`graph_at`](Self::graph_at) starts from (engine-split D161). A cache:
+    /// shared with a detached candidate, and none for a legacy translation.
+    replay_point: Option<Arc<HeldPoint>>,
     checkpoint_interval: u64,
     revision: u64,
     /// Whether the manifest and baseline are in the store yet.
@@ -762,6 +766,9 @@ pub struct GraphSession<B> {
     observing: bool,
 }
 
+#[path = "graph_session_history.rs"]
+mod history;
+use history::HeldPoint;
 #[path = "graph_session_operation.rs"]
 mod operation;
 #[path = "graph_session_transaction.rs"]
@@ -823,6 +830,7 @@ impl<B: Backend> GraphSession<B> {
             changes_saved: Seq(0),
             checkpointed: Seq(0),
             checkpoint_v1: false,
+            replay_point: None,
             checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
             revision: 1,
             head_stored: false,
@@ -987,7 +995,9 @@ impl<B: Backend> GraphSession<B> {
                 Seq(0),
             ),
         };
-        if let Some(receipt) = &translation {
+        // The prefix replay that recovers attribution reaches the checkpoint's
+        // replay point, which the session keeps for `graph_at`.
+        let replay_point = if let Some(receipt) = &translation {
             let translated = receipt
                 .journal(journal.entries(), live)
                 .expect("receipt validated against journal");
@@ -995,17 +1005,32 @@ impl<B: Backend> GraphSession<B> {
                 .baseline
                 .materialize()
                 .map_err(SessionError::Corrupt)?;
-            translated.replay_from_with_baseline(
-                receipt.effect_cursor(checkpointed),
-                &mut graph,
-                &baseline,
-            )
+            translated
+                .replay_from_with_baseline(
+                    receipt.effect_cursor(checkpointed),
+                    &mut graph,
+                    &baseline,
+                )
+                .map(|()| None)
         } else {
-            journal.replay_from_with_baseline(checkpointed, &mut graph, &baseline)
+            journal
+                .replay_point_from(&baseline, checkpointed)
+                .and_then(|point| {
+                    let point = point.expect("an opened checkpoint lies within its journal");
+                    journal.replay_from_point(&point, &mut graph)?;
+                    Ok((checkpointed > Seq(0)).then_some(point))
+                })
         }
         .map_err(|error| {
             SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
         })?;
+        let replay_point = match replay_point {
+            Some(point) => Some(Arc::new(HeldPoint {
+                digest: journal_digest(&digests, &journal, point.cursor())?,
+                point,
+            })),
+            None => None,
+        };
         graph
             .validate_active_resource_assertion_handles()
             .map_err(|error| {
@@ -1049,6 +1074,7 @@ impl<B: Backend> GraphSession<B> {
             saved: live,
             checkpointed,
             checkpoint_v1,
+            replay_point,
             checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
             revision: 1,
             head_stored: true,
@@ -1659,6 +1685,7 @@ impl<B: Backend> GraphSession<B> {
         if let Some(cursor) = pending.checkpoint {
             self.checkpointed = self.checkpointed.max(cursor);
             self.checkpoint_v1 = false;
+            self.hold_replay_point(self.checkpointed);
         }
         if let Some(at) = pending.updated_at {
             self.manifest.updated_at = at;
@@ -1886,18 +1913,22 @@ impl<B: Backend> GraphSession<B> {
 
     /// The graph as it stood at journal cursor `cursor`: the baseline with the
     /// first `cursor` entries replayed. `None` past the live cursor or when
-    /// replay produces conflicting active Resource handles.
+    /// replay produces conflicting active Resource handles. It starts from the
+    /// stored checkpoint's replay point when that lies at or before `cursor`
+    /// and its digest still names the journal there, and from the baseline
+    /// otherwise, with the same result (engine-split D161).
     pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
         let mut graph = match &self.translation {
             Some(receipt) => receipt
                 .graph_at(self.journal.entries(), cursor)
                 .ok()
                 .flatten(),
-            None => self
-                .journal
-                .snapshot_at_from(&self.baseline, cursor)
-                .ok()
-                .flatten(),
+            None => match self.replay_point_for(cursor) {
+                Some(point) => self.journal.snapshot_at_from_point(point, cursor),
+                None => self.journal.snapshot_at_from(&self.baseline, cursor),
+            }
+            .ok()
+            .flatten(),
         }?;
         graph.validate_active_resource_assertion_handles().ok()?;
         graph.set_known_coverage(self.graph.known_coverage().clone());

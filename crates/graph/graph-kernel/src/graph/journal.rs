@@ -140,3 +140,6 @@ mod tests;
 
 #[path = "journal/operations.rs"]
 mod operations;
+#[path = "journal/replay_point.rs"]
+mod replay_point;
+pub use replay_point::ReplayPoint;

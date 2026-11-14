@@ -194,7 +194,8 @@ pub use capture::{
     replay_captured_deltas_onto_checked, set_captured_delta_hook, with_isolated_capture,
 };
 pub use journal::{
-    AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
+    AttributedDelta, Author, AuthorKind, GraphJournal, ReplayPoint, USER_AUTHOR,
+    journal_capture_hook,
 };
 pub use merge::import_edits;
 pub use revert::{

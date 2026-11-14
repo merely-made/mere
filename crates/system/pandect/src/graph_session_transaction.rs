@@ -404,7 +404,14 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         let mut extra = extra(generation.as_deref());
         ops.append(&mut extra.ops);
         extra.ops = ops;
-        candidate.commit(pending, extra).await?;
+        // The candidate shares this session's replay point: handing it over
+        // lets the candidate's checkpoint move it without a copy, and a
+        // refused commit takes it back.
+        self.replay_point = None;
+        if let Err(error) = candidate.commit(pending, extra).await {
+            self.replay_point = candidate.replay_point.take();
+            return Err(error);
+        }
         *self = candidate;
         Ok(generation)
     }
@@ -442,6 +449,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             changes_saved: self.changes_saved,
             checkpointed: self.checkpointed,
             checkpoint_v1: self.checkpoint_v1,
+            replay_point: self.replay_point.clone(),
             checkpoint_interval: self.checkpoint_interval,
             revision: self.revision,
             head_stored: self.head_stored,
