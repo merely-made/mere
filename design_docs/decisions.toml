@@ -560,6 +560,14 @@ summary = "The pack loader refuses past 4 MiB a pack, 64 packs or 100,000 terms 
 draws_on = ["declared-lens D13"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D15"]
+title = "D9's denominator is the steady two-hop frame, and the migration builds a flat dense table (Mark and the first reader, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "L3 passes: the pack path costs at most 0.10% of the steady two-hop frame at 100k, and the migration reads a flat dense-id table."
+draws_on = ["declared-lens D9", "declared-lens D13"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
@@ -1733,6 +1741,22 @@ source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_
 area = "The stack"
 summary = "P8's arrangement probe checks that an arrangement edit leaves every Resource-stratum quad unchanged, not that the cursor stays put."
 draws_on = ["engine-split D44", "engine-split D145"]
+plans = ["engine-split"]
+
+[decisions."engine-split D148"]
+title = "A revision is named by session and journal cursor locally, and by the journal-prefix digest wherever it crosses (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Revisions are session plus journal cursor locally and the running journal-prefix digest across replicas; the engine mints no revision id."
+draws_on = ["engine-split D141", "engine-split D143"]
+plans = ["engine-split"]
+
+[decisions."engine-split D149"]
+title = "Engine to host at frame rate: a snapshot keyframe, then deltas (Mark, 2026-11-13)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The engine sends the host a scene snapshot as a keyframe and touched-source deltas between keyframes."
+draws_on = ["engine-split D148"]
 plans = ["engine-split"]
 
 [decisions."house-style D1"]
