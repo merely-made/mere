@@ -330,3 +330,62 @@ fn a_journal_replays_to_the_live_graph_and_stops_at_a_colliding_entry() {
     assert_eq!(refused.position, journal.live_cursor().index() - 1);
     assert!(refused.to_string().contains("later"), "{refused}");
 }
+
+/// Merge (D156, F3): a codicil import's edits pass the same admission, so an
+/// import whose relation takes a held handle is refused at that edit and the
+/// edit stores nothing, while a fresh handle imports.
+#[test]
+fn an_import_taking_a_held_handle_is_refused_at_its_edit() {
+    let Live {
+        graph: live,
+        nodes: [na, nb, ..],
+        relation,
+        ..
+    } = live();
+    let incoming = |handle: &str| {
+        let mut incoming = Graph::new();
+        for (id, name) in [(na, "a"), (nb, "b")] {
+            incoming.add_node_with_id(id, format!("https://replay.test/{name}"), Point2D::zero());
+        }
+        let edges = vec![row(na, nb, handle)];
+        let result = apply_graph_delta(
+            &mut incoming,
+            GraphDelta::ReplaySetEdgesByIds {
+                from_id: na,
+                to_id: nb,
+                edges,
+            },
+        );
+        assert!(matches!(result, GraphDeltaResult::Applied));
+        incoming
+    };
+    let import = |handle: &str| {
+        let edits = super::merge::import_edits(&live, &incoming(handle));
+        let at = edits
+            .iter()
+            .position(|edit| matches!(edit, CapturedDelta::ReplaySetEdgesByIds { .. }))
+            .expect("the import writes the relation");
+        (edits, at)
+    };
+
+    let (edits, at) = import(&relation);
+    let mut before = live.clone();
+    replay_captured_deltas_onto_checked(&mut before, edits[..at].iter().cloned()).unwrap();
+    let mut merged = live.clone();
+    let Err(refused) = replay_captured_deltas_onto_checked(&mut merged, edits) else {
+        panic!("an import taking a held handle is refused");
+    };
+    assert_eq!(refused.position, at);
+    assert!(refused.to_string().contains(&relation), "{refused}");
+    assert_eq!(
+        state(&merged),
+        state(&before),
+        "the refused edit stores nothing"
+    );
+
+    // The control: the same import with a fresh handle is admitted whole.
+    let (edits, _) = import("fresh-import");
+    let mut merged = live.clone();
+    replay_captured_deltas_onto_checked(&mut merged, edits).unwrap();
+    assert!(merged.find_semantic_statement("fresh-import").is_some());
+}
