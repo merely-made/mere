@@ -430,11 +430,18 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             graph,
             pending,
             journal: self.journal.clone(),
+            digests: Mutex::new(
+                self.digests
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .clone(),
+            ),
             changes: self.changes.clone(),
             views: self.views.clone(),
             saved: self.saved,
             changes_saved: self.changes_saved,
             checkpointed: self.checkpointed,
+            checkpoint_v1: self.checkpoint_v1,
             checkpoint_interval: self.checkpoint_interval,
             revision: self.revision,
             head_stored: self.head_stored,

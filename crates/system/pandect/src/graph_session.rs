@@ -29,7 +29,7 @@
 //! own streams beside the journal, never merged into it (Alembic decision #5).
 
 use std::collections::BTreeMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, PoisonError};
 use std::time::SystemTime;
 
 use catchment::{GraphId, SessionId};
@@ -42,6 +42,7 @@ use kernel::graph::{
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
+use muniment::journal::DigestChain;
 use muniment::{Backend, Hash, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
@@ -323,6 +324,11 @@ struct Checkpoint {
     /// ties the checkpoint to the journal it was written beside.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     journal_digest: Option<String>,
+    /// Which muniment journal digest `journal_digest` is: `None` is v1
+    /// (`prefix_digest`), as every checkpoint before engine-split D154 wrote
+    /// it; 2 is the chained v2 every checkpoint writes now.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    journal_digest_version: Option<u8>,
     /// The muniment hash (hex) of the stored bytes of `graph.json` and
     /// `facets.json` as this checkpoint wrote them: what ties the checkpoint to
     /// the files it summarizes with. Open reads a checkpoint only if it names
@@ -333,12 +339,42 @@ struct Checkpoint {
     contents_digest: Option<String>,
 }
 
-/// The digest a checkpoint at `cursor` stores for `journal`.
-fn journal_digest(journal: &GraphJournal, cursor: Seq) -> Result<Option<String>, SessionError> {
-    Ok(journal
-        .log()
-        .prefix_digest(cursor.index())?
-        .map(|digest| digest.to_hex()))
+/// The version of the journal digest a checkpoint writes.
+const JOURNAL_DIGEST_VERSION: u8 = 2;
+
+/// The v2 digest a checkpoint at `cursor` stores for `journal`: a lookup in
+/// the session's chain, once the chain has taken the entries since it last
+/// looked.
+fn journal_digest(
+    digests: &Mutex<DigestChain>,
+    journal: &GraphJournal,
+    cursor: Seq,
+) -> Result<Option<String>, SessionError> {
+    let mut chain = digests.lock().unwrap_or_else(PoisonError::into_inner);
+    chain.catch_up(journal.log())?;
+    Ok(chain.at(cursor.index()).map(|digest| digest.to_hex()))
+}
+
+/// Whether `checkpoint` names `journal`'s first `cursor` entries, by the
+/// digest version it was written with: a v1 record is checked by recomputing
+/// v1, and an unknown version names nothing.
+fn names_journal(
+    checkpoint: &Checkpoint,
+    digests: &Mutex<DigestChain>,
+    journal: &GraphJournal,
+) -> Result<bool, SessionError> {
+    let Some(stored) = &checkpoint.journal_digest else {
+        return Ok(false);
+    };
+    let digest = match checkpoint.journal_digest_version {
+        None => journal
+            .log()
+            .prefix_digest(checkpoint.cursor.index())?
+            .map(|digest| digest.to_hex()),
+        Some(JOURNAL_DIGEST_VERSION) => journal_digest(digests, journal, checkpoint.cursor)?,
+        Some(_) => None,
+    };
+    Ok(digest.as_ref() == Some(stored))
 }
 
 /// The hash a checkpoint stores for the bytes of its graph and facets files.
@@ -356,6 +392,7 @@ fn contents_digest(graph: &[u8], facets: &[u8]) -> String {
 fn checkpoint_ops(
     keys: &Keys,
     graph: &Graph,
+    digests: &Mutex<DigestChain>,
     journal: &GraphJournal,
     cursor: Seq,
     translated_receipt_digest: Option<String>,
@@ -365,7 +402,8 @@ fn checkpoint_ops(
     let record = Checkpoint {
         cursor,
         translated_receipt_digest,
-        journal_digest: journal_digest(journal, cursor)?,
+        journal_digest: journal_digest(digests, journal, cursor)?,
+        journal_digest_version: Some(JOURNAL_DIGEST_VERSION),
         contents_digest: Some(contents_digest(&graph_bytes, &facets_bytes)),
     };
     Ok([
@@ -692,12 +730,20 @@ pub struct GraphSession<B> {
     retained_source: Option<RetainedSource>,
     graph: Graph,
     journal: GraphJournal,
+    /// Every journal prefix's v2 digest (engine-split D154), built at open and
+    /// caught up whenever a checkpoint names a prefix, so naming one is a
+    /// lookup. Behind a lock so a batch built through `&self` can catch it up.
+    digests: Mutex<DigestChain>,
     pending: Arc<Mutex<Vec<CapturedDelta>>>,
     changes: Journal<Change>,
     views: BTreeMap<ViewKey, View>,
     saved: Seq,
     changes_saved: Seq,
     checkpointed: Seq,
+    /// Whether the stored checkpoint was read with a v1 journal digest: the
+    /// next [`checkpoint_if_behind`](Self::checkpoint_if_behind) rewrites it
+    /// as v2 even when the journal has not moved.
+    checkpoint_v1: bool,
     checkpoint_interval: u64,
     revision: u64,
     /// Whether the manifest and baseline are in the store yet.
@@ -769,12 +815,14 @@ impl<B: Backend> GraphSession<B> {
             retained_source: None,
             graph,
             journal,
+            digests: Mutex::default(),
             pending,
             changes,
             views: BTreeMap::new(),
             saved: Seq(0),
             changes_saved: Seq(0),
             checkpointed: Seq(0),
+            checkpoint_v1: false,
             checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
             revision: 1,
             head_stored: false,
@@ -868,13 +916,13 @@ impl<B: Backend> GraphSession<B> {
         // names. Any other is a cache the journal outranks: it is replayed past,
         // and the next checkpoint names what it was written with. A session with
         // a retained translation compares its checkpoint with that translation
-        // below instead, and refuses a difference.
+        // below instead, and refuses a difference. A v1 digest is checked as
+        // v1; the session's chain gives v2 from here on (engine-split D154).
+        let digests = Mutex::new(DigestChain::of(journal.log())?);
         let checkpoint = match checkpoint {
             Some(checkpoint)
                 if checkpoint.cursor <= live
-                    && checkpoint.journal_digest.is_some()
-                    && journal_digest(&journal, checkpoint.cursor)?
-                        == checkpoint.journal_digest
+                    && names_journal(&checkpoint, &digests, &journal)?
                     && (translation.is_some()
                         || stored_contents_match(&slots, &keys, &checkpoint).await?) =>
             {
@@ -882,6 +930,9 @@ impl<B: Backend> GraphSession<B> {
             },
             _ => None,
         };
+        let checkpoint_v1 = checkpoint
+            .as_ref()
+            .is_some_and(|checkpoint| checkpoint.journal_digest_version.is_none());
         let (mut graph, checkpointed) = match checkpoint {
             Some(checkpoint)
                 if checkpoint.cursor <= live
@@ -990,12 +1041,14 @@ impl<B: Backend> GraphSession<B> {
             retained_source: Some(retained_source),
             graph,
             journal,
+            digests,
             pending: Arc::default(),
             changes_saved: changes.next_seq(),
             changes,
             views: BTreeMap::new(),
             saved: live,
             checkpointed,
+            checkpoint_v1,
             checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
             revision: 1,
             head_stored: true,
@@ -1161,6 +1214,7 @@ impl<B: Backend> GraphSession<B> {
         ops.extend(checkpoint_ops(
             &self.keys,
             &graph,
+            &self.digests,
             &self.journal,
             live,
             Some(receipt.translation_digest.clone()),
@@ -1173,6 +1227,7 @@ impl<B: Backend> GraphSession<B> {
         self.placement = Some(placement);
         self.translation = Some(receipt);
         self.checkpointed = live;
+        self.checkpoint_v1 = false;
         self.revision += 1;
         Ok(())
     }
@@ -1544,6 +1599,7 @@ impl<B: Backend> GraphSession<B> {
             ops.extend(checkpoint_ops(
                 &self.keys,
                 &self.graph,
+                &self.digests,
                 &self.journal,
                 journal,
                 self.translation
@@ -1602,6 +1658,7 @@ impl<B: Backend> GraphSession<B> {
         self.changes_saved = self.changes_saved.max(pending.changes);
         if let Some(cursor) = pending.checkpoint {
             self.checkpointed = self.checkpointed.max(cursor);
+            self.checkpoint_v1 = false;
         }
         if let Some(at) = pending.updated_at {
             self.manifest.updated_at = at;
@@ -1817,10 +1874,11 @@ impl<B: Backend> GraphSession<B> {
         self.store(wall_clock_now(), Vec::new(), true).await
     }
 
-    /// Checkpoint if the journal has moved since the last one: what the
-    /// resident calls when the last application detaches.
+    /// Checkpoint if the journal has moved since the last one, or if the
+    /// stored one names its journal by a v1 digest: what the resident calls
+    /// when the last application detaches.
     pub async fn checkpoint_if_behind(&mut self) -> Result<(), SessionError> {
-        if self.checkpointed < self.journal.live_cursor() {
+        if self.checkpointed < self.journal.live_cursor() || self.checkpoint_v1 {
             self.checkpoint().await?;
         }
         Ok(())
@@ -2875,6 +2933,7 @@ mod tests {
                         cursor: session.journal().live_cursor(),
                         translated_receipt_digest: None,
                         journal_digest: None,
+                        journal_digest_version: None,
                         contents_digest: None,
                     },
                 )
@@ -4269,7 +4328,13 @@ mod tests {
                     &Checkpoint {
                         cursor: Seq(0),
                         translated_receipt_digest: None,
-                        journal_digest: journal_digest(&GraphJournal::default(), Seq(0)).unwrap(),
+                        journal_digest: journal_digest(
+                            &Mutex::default(),
+                            &GraphJournal::default(),
+                            Seq(0),
+                        )
+                        .unwrap(),
+                        journal_digest_version: Some(JOURNAL_DIGEST_VERSION),
                         contents_digest: Some(contents_digest(graph, b"")),
                     },
                 )
@@ -4459,7 +4524,13 @@ mod tests {
                 let record = Checkpoint {
                     cursor: Seq(0),
                     translated_receipt_digest: None,
-                    journal_digest: journal_digest(&GraphJournal::default(), Seq(0)).unwrap(),
+                    journal_digest: journal_digest(
+                        &Mutex::default(),
+                        &GraphJournal::default(),
+                        Seq(0),
+                    )
+                    .unwrap(),
+                    journal_digest_version: Some(JOURNAL_DIGEST_VERSION),
                     contents_digest: Some(contents_digest(&graph_bytes, &facet_bytes)),
                 };
                 [

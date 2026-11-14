@@ -78,16 +78,111 @@ fn a_checkpoint_names_the_journal_prefix_and_the_files_it_reflects_and_opens_bes
         let digest = opened
             .journal()
             .log()
-            .prefix_digest(cursor.index())
+            .chain_digest(cursor.index())
             .unwrap()
             .unwrap();
         assert_eq!(record["journal_digest"], digest.to_hex());
+        assert_eq!(record["journal_digest_version"], 2);
         let contents = contents_digest(
             &stored(&backend, id, GRAPH).await,
             &stored(&backend, id, NODE_FACETS_FILE).await,
         );
         assert_eq!(record["contents_digest"], contents);
         assert_eq!(title_of(&opened), "alpha");
+    });
+}
+
+/// Point `id`'s checkpoint at `from`'s graph and facets files, naming the
+/// journal by `digest` under `version`; `None` writes no version, as every
+/// checkpoint before engine-split D154 did.
+async fn marked(
+    backend: &MemoryBackend,
+    id: SessionId,
+    from: SessionId,
+    digest: &str,
+    version: Option<u8>,
+) {
+    let graph = stored(backend, from, GRAPH).await;
+    let facets = stored(backend, from, NODE_FACETS_FILE).await;
+    let mut record: serde_json::Value =
+        serde_json::from_slice(&stored(backend, id, CHECKPOINT).await).unwrap();
+    let fields = record.as_object_mut().unwrap();
+    fields.insert("journal_digest".into(), digest.into());
+    fields.insert(
+        "contents_digest".into(),
+        contents_digest(&graph, &facets).into(),
+    );
+    match version {
+        Some(version) => fields.insert("journal_digest_version".into(), version.into()),
+        None => fields.remove("journal_digest_version"),
+    };
+    put(backend, id, GRAPH, graph).await;
+    put(backend, id, NODE_FACETS_FILE, facets).await;
+    put(
+        backend,
+        id,
+        CHECKPOINT,
+        serde_json::to_vec(&record).unwrap(),
+    )
+    .await;
+}
+
+/// The v1 and v2 digests (hex) of `id`'s journal at its live cursor.
+async fn digests_of(sessions: &MereSessions<MemoryBackend>, id: SessionId) -> (String, String) {
+    let opened = sessions.open(id).await.unwrap();
+    let log = opened.journal().log();
+    let cursor = opened.journal().live_cursor().index();
+    (
+        log.prefix_digest(cursor).unwrap().unwrap().to_hex(),
+        log.chain_digest(cursor).unwrap().unwrap().to_hex(),
+    )
+}
+
+#[test]
+fn a_v1_era_checkpoint_is_read_by_its_v1_digest_and_rewritten_as_v2() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let sessions = MereSessions::new(backend.clone());
+        let id = checkpointed(&sessions, "alpha").await;
+        // Its files come from another session, so reading them shows as "beta".
+        let other = checkpointed(&sessions, "beta").await;
+        let (v1, v2) = digests_of(&sessions, id).await;
+        assert_ne!(v1, v2);
+        marked(&backend, id, other, &v1, None).await;
+
+        let mut opened = sessions.open(id).await.unwrap();
+        assert_eq!(title_of(&opened), "beta", "the v1 checkpoint was read");
+        assert_eq!(opened.journal().live_cursor(), opened.checkpointed);
+        opened.checkpoint_if_behind().await.unwrap();
+        let record: serde_json::Value =
+            serde_json::from_slice(&stored(&backend, id, CHECKPOINT).await).unwrap();
+        assert_eq!(record["journal_digest"], v2.as_str(), "rewritten as v2");
+        assert_eq!(record["journal_digest_version"], 2);
+
+        let reopened = sessions.open(id).await.unwrap();
+        assert_eq!(title_of(&reopened), "beta", "the v2 checkpoint is read");
+        assert!(!reopened.checkpoint_v1, "nothing left to rewrite");
+    });
+}
+
+#[test]
+fn a_checkpoint_whose_digest_is_not_of_its_version_is_replayed_past() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let sessions = MereSessions::new(backend.clone());
+        let id = checkpointed(&sessions, "alpha").await;
+        let other = checkpointed(&sessions, "beta").await;
+        let (v1, v2) = digests_of(&sessions, id).await;
+        // Positive control: each digest under its own version is read.
+        for (digest, version) in [(&v1, None), (&v2, Some(2))] {
+            marked(&backend, id, other, digest, version).await;
+            assert_eq!(title_of(&sessions.open(id).await.unwrap()), "beta");
+        }
+        for (digest, version) in [(&v1, Some(2)), (&v2, None), (&v2, Some(3))] {
+            marked(&backend, id, other, digest, version).await;
+            let opened = sessions.open(id).await.unwrap();
+            assert_eq!(title_of(&opened), "alpha", "{version:?} replayed past");
+        }
     });
 }
 
