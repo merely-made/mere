@@ -1839,6 +1839,14 @@ summary = "Consumers take the Oxigraph fork through Mere's ten patch rows, and t
 draws_on = ["engine-split D155"]
 plans = ["engine-split"]
 
+[decisions."engine-split D160"]
+title = "The fork ignores the six SPARQL tests the newer rdf-tests adds while their port is sized, and both forks carry an `UPSTREAM.md` (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Oxigraph fork ignores six SPARQL tests its parser fails while a port is sized, and both forks carry an UPSTREAM.md."
+draws_on = ["engine-split D159"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
