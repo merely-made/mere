@@ -4,22 +4,25 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Pinned views (engine-split D163): a session's graph at a journal cursor
-//! with its query index, owned by the holder and released on drop. The live
-//! view is the host's index refreshed per edit; a pin is rebuilt from
-//! `graph_at`, which starts from the stored checkpoint's replay point.
+//! Pinned views (engine-split D163, D166): a session's graph at a journal
+//! cursor with its query index, owned by the holder and released on drop. The
+//! live view is the host's index refreshed per edit; a pin is rebuilt from
+//! `graph_at`, which starts from the stored checkpoint's replay point, and
+//! indexes on its first read.
 use super::*;
 use mere::dataset::IndexedDataset;
+use std::sync::OnceLock;
 
-/// What a pin holds: the graph at its cursor and the index built over it.
+/// What a pin holds: the graph at its cursor and, once read, its index.
 pub(super) struct Pinned {
     graph: Graph,
-    dataset: IndexedDataset,
+    dataset: OnceLock<IndexedDataset>,
 }
 
 /// A session's graph as it stood at a journal cursor, with the indexed
-/// dataset built over it. The holder owns it and decides how many to keep;
-/// the session keeps no reference, so dropping it frees both.
+/// dataset over it built on the first [`dataset`](Self::dataset) call. The
+/// holder owns it and decides how many to keep; the session keeps no
+/// reference, so dropping it frees both.
 pub struct PinnedView {
     session: SessionId,
     cursor: Seq,
@@ -46,13 +49,22 @@ impl PinnedView {
         &self.pinned.graph
     }
 
+    /// The indexed dataset over [`graph`](Self::graph), built on the first
+    /// call (1.7 s at 100k nodes) and held from then on.
     pub fn dataset(&self) -> &IndexedDataset {
-        &self.pinned.dataset
+        self.pinned
+            .dataset
+            .get_or_init(|| IndexedDataset::for_graph(&self.pinned.graph))
     }
 
     #[cfg(test)]
     pub(super) fn downgrade(&self) -> std::sync::Weak<Pinned> {
         Arc::downgrade(&self.pinned)
+    }
+
+    #[cfg(test)]
+    pub(super) fn is_indexed(&self) -> bool {
+        self.pinned.dataset.get().is_some()
     }
 }
 
@@ -62,16 +74,16 @@ impl std::fmt::Debug for PinnedView {
             .field("session", &self.session.as_uuid())
             .field("cursor", &self.cursor.0)
             .field("digest", &self.digest)
-            .field("rows", &self.pinned.dataset.len())
+            .field("rows", &self.pinned.dataset.get().map(IndexedDataset::len))
             .finish()
     }
 }
 
 impl<B: Backend> GraphSession<B> {
-    /// Pin the graph at journal cursor `cursor` with its indexed dataset:
-    /// [`graph_at`](Self::graph_at), then `IndexedDataset::for_graph`, both
-    /// built now. [`SessionError::CursorOutOfRange`] past the live cursor or
-    /// where `graph_at` has no graph.
+    /// Pin the graph at journal cursor `cursor`: [`graph_at`](Self::graph_at)
+    /// now, its `IndexedDataset` on the view's first
+    /// [`dataset`](PinnedView::dataset) read. [`SessionError::CursorOutOfRange`]
+    /// past the live cursor or where `graph_at` has no graph.
     pub fn pin(&self, cursor: Seq) -> Result<PinnedView, SessionError> {
         let out_of_range = || SessionError::CursorOutOfRange {
             cursor,
@@ -83,12 +95,14 @@ impl<B: Backend> GraphSession<B> {
         let digest =
             journal_digest(&self.digests, &self.journal, cursor)?.ok_or_else(out_of_range)?;
         let graph = self.graph_at(cursor).ok_or_else(out_of_range)?;
-        let dataset = IndexedDataset::for_graph(&graph);
         Ok(PinnedView {
             session: self.id(),
             cursor,
             digest,
-            pinned: Arc::new(Pinned { graph, dataset }),
+            pinned: Arc::new(Pinned {
+                graph,
+                dataset: OnceLock::new(),
+            }),
         })
     }
 }

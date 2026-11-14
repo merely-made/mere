@@ -221,3 +221,23 @@ fn pins_either_side_of_the_checkpoint_equal_the_baseline_replay() {
         );
     });
 }
+
+#[test]
+fn a_pin_indexes_on_its_first_read() {
+    pollster::block_on(async {
+        let mut session = chained().await;
+        let at = session.journal.live_cursor();
+        let expected = rows(&IndexedDataset::for_graph(&session.graph_at(at).unwrap()));
+        let pin = session.pin(at).unwrap();
+        assert!(!pin.is_indexed(), "no index until dataset()");
+        relate(&mut session, 3, 4, "later");
+        assert!(state(pin.graph()) != state(session.graph()));
+        assert!(!pin.is_indexed(), "reading the graph builds no index");
+
+        let first = rows(pin.dataset());
+        assert!(pin.is_indexed(), "control: dataset() builds it");
+        assert_eq!(first, expected, "the cursor's quads, though live moved");
+        assert_eq!(rows(pin.dataset()), first, "the same quads after");
+        assert!(std::ptr::eq(pin.dataset(), pin.dataset()), "built once");
+    });
+}
