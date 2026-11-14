@@ -137,6 +137,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     /// Atomically associate an immutable request and result with a published edit.
     /// Owners validate policy and verify that the deltas produce their intended
     /// effect. Identical requests return the original result, never a new edit.
+    /// An edit admission refuses refuses the whole operation (engine-split D163).
     pub async fn transact_operation_published(
         &mut self,
         operation: [u8; 32],
@@ -216,12 +217,11 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         };
         let committed = self
             .transact_change_with(at, true, record, move |candidate| {
-                let (checked, applied) = candidate.edit_as(author, ChangeKind::Edit, |graph| {
-                    for delta in deltas {
-                        apply_graph_delta(graph, delta);
-                    }
-                    validate(graph)
-                })?;
+                let (checked, applied) =
+                    candidate.try_edit_as(author, ChangeKind::Edit, |graph| {
+                        apply_all(graph, deltas)?;
+                        Ok(validate(graph))
+                    })?;
                 checked.map_err(SessionError::Validation)?;
                 Ok(applied)
             })

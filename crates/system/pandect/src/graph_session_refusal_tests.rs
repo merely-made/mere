@@ -182,3 +182,70 @@ fn revert_still_reverts_what_it_can() {
     });
 }
 
+/// The operation path is import-shaped: an operation whose middle edit takes
+/// a held handle is refused whole, with no receipt; the control commits whole
+/// with its receipt.
+#[test]
+fn transact_operation_published_refuses_an_operation_whole() {
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let (graph, handle) = related();
+        let mut session = mere.begin_recorded(person(), Some(graph));
+        session.flush(SystemTime::now()).await.unwrap();
+        let before = held(&session);
+        let stored = stored_bytes(&store).await;
+        let operation = [7; 32];
+
+        let edits = write(import(session.graph(), &handle));
+        let refused = session
+            .transact_operation_published(
+                operation,
+                b"request".to_vec(),
+                b"result".to_vec(),
+                person(),
+                edits,
+                SystemTime::now(),
+            )
+            .await
+            .unwrap_err();
+        assert!(matches!(refused, SessionError::Validation(_)));
+        let message = refused.to_string();
+        assert!(message.contains(&handle), "{message}");
+        assert!(message.contains("edit 1"), "{message}");
+        assert_eq!(held(&session), before, "nothing is applied");
+        assert_eq!(stored_bytes(&store).await, stored, "nothing is stored");
+        assert!(
+            session
+                .operation_receipt(operation)
+                .await
+                .unwrap()
+                .is_none()
+        );
+
+        // Control: the same operation with a fresh handle commits whole.
+        let edits = write(import(session.graph(), "fresh-import"));
+        let receipt = session
+            .transact_operation_published(
+                operation,
+                b"request".to_vec(),
+                b"result".to_vec(),
+                person(),
+                edits,
+                SystemTime::now(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(session.revision(), before.3 + 1);
+        assert!(
+            session
+                .graph()
+                .find_semantic_statement("fresh-import")
+                .is_some()
+        );
+        assert_eq!(
+            session.operation_receipt(operation).await.unwrap(),
+            Some(receipt)
+        );
+    });
+}
