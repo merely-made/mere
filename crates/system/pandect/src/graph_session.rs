@@ -673,8 +673,8 @@ fn provenance(manifest: &GraphSessionManifest) -> Option<Provenance> {
 /// What the replay check compares: the whole snapshot and facets, visit
 /// stamps included, under one fixed date so the check never reads the clock
 /// (reservoir plan ruling 47).
-fn replay_state(graph: &Graph) -> Result<serde_json::Value, SessionError> {
-    serde_json::to_value((graph.to_snapshot_at(0), graph.facets()))
+fn replay_state(graph: &Graph) -> Result<Vec<u8>, SessionError> {
+    crate::replay_state::replay_bytes(graph)
         .map_err(|e| SessionError::NotReplayable(e.to_string()))
 }
 
