@@ -38,14 +38,6 @@ crate = "foldhash@0.1.5"
 reason = "hashbrown 0.15.5, held by petgraph 0.8.3 under portolan (eidetic, sibling); gone when petgraph moves to a current hashbrown"
 
 [[bans.skip]]
-crate = "getrandom@0.2.17"
-reason = "mere's wasm `query` build (getrandom02 with js), rand_core 0.6.4 (p2mere-core's rand 0.8) and ring 0.17.14 (iroh, upstream); gone when p2mere-core moves to rand 0.10 and ring leaves the graph"
-
-[[bans.skip]]
-crate = "getrandom@0.3.4"
-reason = "mere and pandect (wasm_js backend), rand_core 0.9.5 (oxrdf/spargebra, oxigraph upstream), personae and sporran (dramatis, sibling); gone when the oxigraph crates move to rand 0.10 and the wasm lanes to getrandom 0.4"
-
-[[bans.skip]]
 crate = "hashbrown@0.14.5"
 reason = "dashmap 6.2.1 under mere-fjall and muniment (eidetic, sibling); gone when dashmap moves to a current hashbrown"
 
@@ -64,22 +56,6 @@ reason = "hax-lib 0.3.7, held by core-models 0.0.7 (libcrux, upstream); gone wit
 [[bans.skip]]
 crate = "hax-lib-macros-types@0.3.7"
 reason = "hax-lib-macros 0.3.7, held by core-models 0.0.7 (libcrux, upstream); gone with hax-lib 0.4"
-
-[[bans.skip]]
-crate = "r-efi@5.3.0"
-reason = "getrandom 0.3.4; gone with getrandom 0.3"
-
-[[bans.skip]]
-crate = "rand@0.9.5"
-reason = "oxrdf, spareval, spargebra and sparopt (oxigraph, upstream); gone when they move to rand 0.10"
-
-[[bans.skip]]
-crate = "rand_chacha@0.9.0"
-reason = "rand 0.9.5 (oxigraph, upstream) and p2mere-encryption 0.10.0 (p2mere, sibling); gone with rand 0.9"
-
-[[bans.skip]]
-crate = "rand_core@0.9.5"
-reason = "rand 0.9.5 (oxigraph, upstream) and rand_chacha 0.9.0; gone with rand 0.9"
 
 [[bans.skip]]
 crate = "shlex@1.3.0"

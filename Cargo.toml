@@ -126,6 +126,18 @@ undocumented_unsafe_blocks = "warn"
 too_many_lines = "warn"
 
 [patch.crates-io]
+# Oxigraph's 0.5 line with oxiri 0.3, rand 0.10, quick-xml 0.42 and the
+# RDF/XML literal fix (engine-split D155): one fork repository, mark-ik/oxigraph.
+oxjsonld = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+oxrdf = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+oxrdfio = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+oxrdfxml = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+oxsdatatypes = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+oxttl = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+sparesults = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+spareval = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+spargebra = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
+sparopt = { git = "https://github.com/mark-ik/oxigraph", branch = "mark-ik/0.5" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 # gaz (dramatis) takes muniment from crates.io so dramatis never pins mere;
 # this swaps in mere's own, so the graph holds one muniment and castellan's

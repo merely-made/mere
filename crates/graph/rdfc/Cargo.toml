@@ -23,9 +23,9 @@ oxrdf = { version = "0.3", features = ["rdf-12"] }
 sha2 = "0.11"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-# oxrdf's random blank node ids reach getrandom 0.3; browser builds also pass
-# `--cfg getrandom_backend="wasm_js"`, as `mere` does.
-getrandom = { version = "0.3", features = ["wasm_js"] }
+# oxrdf's random blank node ids reach getrandom 0.4 through rand 0.10
+# (mark-ik/oxigraph); `wasm_js` gives it the browser backend, as in `mere`.
+getrandom = { version = "0.4", features = ["wasm_js"] }
 
 [lints]
 workspace = true

@@ -49,11 +49,12 @@ impl Link {
     /// The target resolved against `base`; `None` if either is not an IRI.
     #[must_use]
     pub fn resolve(&self, base: &str) -> Option<String> {
-        oxiri::Iri::parse(base)
-            .ok()?
-            .resolve(&self.target)
-            .ok()
-            .map(oxiri::Iri::into_inner)
+        let base = oxiri::Iri::parse(base).ok()?;
+        let target = oxiri::IriRef::parse(self.target.as_str()).ok()?;
+        if target.is_absolute() {
+            return Some(target.into_inner().to_owned());
+        }
+        base.resolve(&target).ok().map(oxiri::Iri::into_inner)
     }
 }
 
