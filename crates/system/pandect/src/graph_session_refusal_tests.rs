@@ -249,3 +249,92 @@ fn transact_operation_published_refuses_an_operation_whole() {
         );
     });
 }
+
+/// `transact_live` refuses a change whole (engine-split D166): commands whose
+/// middle edit gives a Surface a literal holding a held handle are refused,
+/// naming the edit and the handle; the same commands with a fresh handle
+/// commit whole.
+#[test]
+fn transact_live_refuses_a_change_whole() {
+    use crate::addressable_graph::GraphAddress;
+    use crate::live_graph::{LiveCheck, LiveCommand, LiveEditError, ObservedCommand};
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let (graph, handle) = related();
+        let mut session = mere.begin_recorded(person(), Some(graph));
+        session.flush(SystemTime::now()).await.unwrap();
+        let (one, nine) = (Uuid::from_u128(1), Uuid::from_u128(9));
+        let digest = session
+            .prepare_resident_publication()
+            .unwrap()
+            .record_digest(GraphAddress::Surface(one))
+            .unwrap()
+            .to_owned();
+        let observed = vec![LiveCheck::RecordUnchanged {
+            address: GraphAddress::Surface(one),
+            digest,
+        }];
+        let commands = |statement: &str| {
+            let mut property = kernel::types::NodeProperty::new(
+                "https://live.test/vocab#note".to_string(),
+                "held".to_string(),
+            );
+            property.statement_id = statement.into();
+            vec![
+                ObservedCommand {
+                    command: LiveCommand::SetPinned {
+                        surface: one,
+                        pinned: true,
+                    },
+                    checks: observed.clone(),
+                },
+                ObservedCommand {
+                    command: LiveCommand::SetFacet {
+                        surface: one,
+                        facet: kernel::graph::node_facets::SEMANTIC_PROPERTIES.into(),
+                        value: serde_json::to_value([property]).unwrap(),
+                    },
+                    checks: observed.clone(),
+                },
+                ObservedCommand {
+                    command: LiveCommand::CreateAddress {
+                        id: nine,
+                        address: "https://live.test/nine".into(),
+                        title: "Nine".into(),
+                    },
+                    checks: vec![LiveCheck::Absent(GraphAddress::Surface(nine))],
+                },
+            ]
+        };
+        let before = held(&session);
+        let stored = stored_bytes(&store).await;
+
+        let refused = session
+            .transact_live(person(), commands(&handle), SystemTime::now())
+            .await
+            .unwrap_err();
+        assert!(
+            matches!(refused, LiveEditError::Session(SessionError::Validation(_))),
+            "{refused:?}"
+        );
+        let message = refused.to_string();
+        assert!(message.contains(&handle), "{message}");
+        assert!(message.contains("edit 1"), "{message}");
+        assert_eq!(held(&session), before, "nothing is applied");
+        assert_eq!(stored_bytes(&store).await, stored, "nothing is stored");
+
+        // Control: the same commands with a fresh handle commit whole.
+        let (live, _) = session
+            .transact_live(person(), commands("fresh-live"), SystemTime::now())
+            .await
+            .unwrap();
+        assert!(live.applied.end > live.applied.first);
+        assert_eq!(live.created, vec![nine]);
+        let graph = session.graph();
+        let key = graph.get_node_key_by_id(one).unwrap();
+        assert_eq!(graph.node_is_pinned(key), Some(true));
+        assert!(graph.get_node_key_by_id(nine).is_some());
+        assert_ne!(stored_bytes(&store).await, stored, "stored");
+    });
+}

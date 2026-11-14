@@ -768,6 +768,7 @@ pub struct GraphSession<B> {
 
 #[path = "graph_session_history.rs"]
 mod history;
+pub(crate) use history::apply_one;
 use history::{HeldPoint, apply_all};
 #[path = "graph_session_operation.rs"]
 mod operation;

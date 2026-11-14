@@ -227,8 +227,9 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     /// Preflight observed stable-ID commands against this complete writer, then
     /// apply their live deltas and the resulting addressable publication in one
     /// atomic write. Every refusal comes before anything is written: a stale
-    /// observation, a missing target, an unqualified session or a storage
-    /// refusal leaves graph, history, capture and storage as they were. Returns
+    /// observation, a missing target, an unqualified session, an edit
+    /// admission refuses (engine-split D166) or a storage refusal leaves
+    /// graph, history, capture and storage as they were. Returns
     /// the published generation with the application.
     pub async fn transact_live(
         &mut self,
@@ -246,7 +247,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         let (applied, generation) = self
             .transact_change(at, true, move |candidate| {
                 candidate
-                    .edit_as(author.clone(), ChangeKind::Edit, |graph| {
+                    .try_edit_as(author.clone(), ChangeKind::Edit, |graph| {
                         program.apply(graph, &author)
                     })
                     .map(|(_, applied)| applied)

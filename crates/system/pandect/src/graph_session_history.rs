@@ -23,13 +23,24 @@ pub(super) struct HeldPoint {
 /// for a collision, and the change commits nothing.
 pub(super) fn apply_all(graph: &mut Graph, deltas: Vec<GraphDelta>) -> Result<(), SessionError> {
     for (position, delta) in deltas.into_iter().enumerate() {
-        if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta) {
-            return Err(SessionError::Validation(format!(
-                "edit {position} refused: {reason}"
-            )));
-        }
+        apply_one(graph, position, delta)?;
     }
     Ok(())
+}
+
+/// Apply the edit at `position` in a change, refusing the change if
+/// admission refuses the edit, with the error [`apply_all`] gives.
+pub(crate) fn apply_one(
+    graph: &mut Graph,
+    position: usize,
+    delta: GraphDelta,
+) -> Result<(), SessionError> {
+    match apply_graph_delta(graph, delta) {
+        GraphDeltaResult::Refused(reason) => Err(SessionError::Validation(format!(
+            "edit {position} refused: {reason}"
+        ))),
+        _ => Ok(()),
+    }
 }
 
 impl<B: Backend> GraphSession<B> {

@@ -6,14 +6,12 @@
 
 //! Observed live edits against a complete session writer. No resident keys or
 //! captured replay records cross this boundary.
+use crate::graph_session::apply_one;
 use crate::{
     Applied, SessionError,
     addressable_graph::{GraphAddress, PreparedGraphPublication},
 };
-use kernel::graph::{
-    Author, EdgeAssertion, Graph, GraphStratum, RelationKind,
-    apply::{GraphDelta, apply_graph_delta},
-};
+use kernel::graph::{Author, EdgeAssertion, Graph, GraphStratum, RelationKind, apply::GraphDelta};
 use mere::model::built_in_relation_stratum;
 use std::collections::BTreeSet;
 use uuid::Uuid;
@@ -108,7 +106,8 @@ pub struct LiveApplied {
 }
 
 // Private stable-ID program. It is constructed only after all input checks;
-// execution is infallible and resolves keys inside each complete candidate.
+// execution resolves keys inside each complete candidate and refuses the whole
+// change at an edit admission refuses.
 pub(crate) struct Program {
     operations: Vec<Operation>,
     pub(crate) created: Vec<Uuid>,
@@ -125,7 +124,12 @@ enum Operation {
     Relation(Uuid, Uuid, EdgeAssertion),
 }
 impl Operation {
-    fn apply(&self, graph: &mut Graph, author: &Author) {
+    fn apply(
+        &self,
+        graph: &mut Graph,
+        author: &Author,
+        position: usize,
+    ) -> Result<(), SessionError> {
         let key = |id| {
             graph
                 .get_node_key_by_id(id)
@@ -169,14 +173,17 @@ impl Operation {
                 asserter_iri: author.asserter_iri(),
             },
         };
-        let _ = apply_graph_delta(graph, delta);
+        apply_one(graph, position, delta)
     }
 }
 impl Program {
-    pub(crate) fn apply(&self, graph: &mut Graph, author: &Author) {
-        for operation in &self.operations {
-            operation.apply(graph, author);
+    /// Apply every operation in order, refusing the whole change at the first
+    /// edit admission refuses (engine-split D166).
+    pub(crate) fn apply(&self, graph: &mut Graph, author: &Author) -> Result<(), SessionError> {
+        for (position, operation) in self.operations.iter().enumerate() {
+            operation.apply(graph, author, position)?;
         }
+        Ok(())
     }
 }
 fn exists(graph: &Graph, address: GraphAddress) -> bool {
@@ -358,7 +365,9 @@ pub(crate) fn preflight(
                     next.push(Operation::Relation(from, to, assertion));
                 },
             }
-            for operation in &next { operation.apply(scratch, author); }
+            for (offset, operation) in next.iter().enumerate() {
+                operation.apply(scratch, author, program.operations.len() + offset)?;
+            }
             program.operations.extend(next);
         }
         Ok(program)
