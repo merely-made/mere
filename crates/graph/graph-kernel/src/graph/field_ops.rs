@@ -20,7 +20,7 @@ impl Graph {
 
     /// Add or replace a field by its id.
     pub(crate) fn add_field(&mut self, field: Field) {
-        self.fields.insert(field.id.as_uuid(), field);
+        self.fields.insert(field.id.as_uuid(), field.into());
     }
 
     /// Retire a field: mark it `Retired` (keeping its definition for history /
@@ -56,19 +56,20 @@ impl Graph {
 
     /// The field with this id, if any.
     pub fn field(&self, id: FieldId) -> Option<&Field> {
-        self.fields.get(&id.as_uuid())
+        self.fields.get(&id.as_uuid()).map(|field| &**field)
     }
 
     /// All fields, in id order.
     pub fn fields(&self) -> impl Iterator<Item = &Field> {
-        self.fields.values()
+        self.fields.values().map(|field| &**field)
     }
 
     // ── Couplings ─────────────────────────────────────────────────────────────
 
     /// Add or replace a coupling by its id.
     pub(crate) fn add_coupling(&mut self, coupling: Coupling) {
-        self.couplings.insert(coupling.id.as_uuid(), coupling);
+        self.couplings
+            .insert(coupling.id.as_uuid(), coupling.into());
     }
 
     /// Remove a coupling. Returns whether it existed. (Couplings have no
@@ -79,12 +80,12 @@ impl Graph {
 
     /// All couplings, in id order.
     pub fn couplings(&self) -> impl Iterator<Item = &Coupling> {
-        self.couplings.values()
+        self.couplings.values().map(|coupling| &**coupling)
     }
 
     /// Couplings whose target is the given field.
     pub fn couplings_for_field(&self, field: FieldId) -> impl Iterator<Item = &Coupling> + '_ {
-        self.couplings.values().filter(move |c| c.field == field)
+        self.couplings().filter(move |c| c.field == field)
     }
 
     /// The `strength` of the first coupling targeting `field`, if any (a field

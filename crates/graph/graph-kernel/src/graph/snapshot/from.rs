@@ -93,7 +93,7 @@ impl Graph {
         let existing = self.find_edge_key(from, to);
         let mut payload = existing
             .and_then(|key| self.inner.edge(key))
-            .cloned()
+            .map(|e| (**e).clone())
             .unwrap_or_else(EdgePayload::new);
         let structural_changes = restore_persisted_payload(&mut payload, pedge);
         if pedge.semantic.is_some() || pedge.traversal.is_some() || !payload.is_empty() {

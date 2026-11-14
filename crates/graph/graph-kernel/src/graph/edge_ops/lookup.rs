@@ -10,12 +10,12 @@ impl Graph {
     /// Get a mutable edge payload by key, noted as written for the handle index.
     pub(crate) fn get_edge_mut(&mut self, key: EdgeKey) -> Option<&mut EdgePayload> {
         self.note_relation_handles(RelationKey::Surface(key));
-        self.inner.edge_mut(key)
+        self.inner.edge_mut(key).map(|v| &mut **v)
     }
 
     /// Get an edge payload by key.
     pub fn get_edge(&self, key: EdgeKey) -> Option<&EdgePayload> {
-        self.inner.edge(key)
+        self.inner.edge(key).map(|v| &**v)
     }
 
     /// Find the first directed edge key between two nodes.
@@ -41,6 +41,6 @@ impl Graph {
         let backward = inner.edges_connecting(b, a).filter(move |_| a != b);
         forward
             .chain(backward)
-            .map(|edge| (edge.id(), edge.weight()))
+            .map(|edge| (edge.id(), &**edge.weight()))
     }
 }

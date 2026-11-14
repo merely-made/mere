@@ -43,7 +43,7 @@ impl Graph {
         if let Some(key) = self.inner.key_of(&id) {
             return (key, false);
         }
-        let key = self.inner.insert(node);
+        let key = self.inner.insert(node.into());
         self.surface_node_lifetimes
             .insert(id, SurfaceNodeLifetime::fresh());
         (key, true)

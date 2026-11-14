@@ -29,7 +29,7 @@ impl Graph {
             .inner
             .inner()
             .edge_references()
-            .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
+            .map(|edge| (RelationKey::Surface(edge.id()), &**edge.weight()))
             .chain(
                 self.resource_relations()
                     .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload)),

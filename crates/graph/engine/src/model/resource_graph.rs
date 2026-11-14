@@ -36,7 +36,7 @@ fn fresh_version() -> u64 {
 /// Resources, the edges between them, and their facets.
 #[derive(Clone)]
 pub struct ResourceGraph {
-    graph: portolan::Graph<ResourceNode, EdgePayload>,
+    graph: portolan::Graph<super::Shared<ResourceNode>, super::Shared<EdgePayload>>,
     facets: portolan::FacetStore<Uuid>,
     /// Advanced by every mutable access; not persisted.
     version: u64,
@@ -59,7 +59,7 @@ impl Default for ResourceGraph {
 }
 
 impl Deref for ResourceGraph {
-    type Target = portolan::Graph<ResourceNode, EdgePayload>;
+    type Target = portolan::Graph<super::Shared<ResourceNode>, super::Shared<EdgePayload>>;
 
     fn deref(&self) -> &Self::Target {
         &self.graph
@@ -99,12 +99,12 @@ impl ResourceGraph {
 
     /// Read a resource by its stable identity.
     pub fn resource(&self, id: Uuid) -> Option<&ResourceNode> {
-        self.graph.get(&id)
+        self.graph.get(&id).map(|r| &**r)
     }
 
     /// The resources currently held.
     pub fn resource_nodes(&self) -> impl Iterator<Item = &ResourceNode> {
-        self.graph.nodes().map(|(_, resource)| resource)
+        self.graph.nodes().map(|(_, resource)| &**resource)
     }
 
     /// Resource edges with their resource endpoints.
@@ -113,13 +113,13 @@ impl ResourceGraph {
     ) -> impl Iterator<Item = (&ResourceNode, &ResourceNode, &EdgePayload)> {
         self.graph.inner().edge_references().map(|edge| {
             (
-                self.graph
+                &**self.graph
                     .node(edge.source())
                     .expect("resource endpoint exists"),
-                self.graph
+                &**self.graph
                     .node(edge.target())
                     .expect("resource endpoint exists"),
-                edge.weight(),
+                &**edge.weight(),
             )
         })
     }

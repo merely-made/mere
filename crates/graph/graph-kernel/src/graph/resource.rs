@@ -180,7 +180,7 @@ impl Graph {
         {
             return false;
         }
-        self.resources.insert(resource);
+        self.resources.insert(resource.into());
         self.resources.facets_mut().remove_node(&id);
         for (facet, value) in facets {
             self.resources
@@ -294,7 +294,7 @@ impl Graph {
             .resources
             .inner()
             .edges_connecting(source, target)
-            .map(|edge| edge.weight())
+            .map(|edge| &**edge.weight())
             .collect();
         if current.len() == payloads.len()
             && current.iter().zip(&payloads).all(|(old, new)| *old == new)

@@ -38,17 +38,27 @@ pub(crate) struct HandleIndex {
 
 #[derive(Clone, Default)]
 struct Holders {
-    relations: HashMap<String, Vec<RelationKey>>,
-    resource_literals: HashMap<String, Vec<Uuid>>,
+    relations: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<RelationKey>>>,
+    resource_literals: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<Uuid>>>,
     /// Retained Surface literals, by Surface node id.
-    surface_literals: HashMap<String, Vec<Uuid>>,
+    surface_literals: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<Uuid>>>,
 }
 
-fn add<T: PartialEq>(map: &mut HashMap<String, Vec<T>>, id: &str, holder: T) {
-    let holders = map.entry(id.to_owned()).or_default();
-    if !holders.contains(&holder) {
-        holders.push(holder);
+fn add<T: PartialEq + Clone>(
+    map: &mut HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<T>>>,
+    id: &str,
+    holder: T,
+) {
+    if let Some(holders) = map.get_mut(id) {
+        if !holders.contains(&holder) {
+            holders.push(holder);
+        }
+        return;
     }
+    map.insert(
+        std::sync::Arc::from(id),
+        mere::model::Shared::new(vec![holder]),
+    );
 }
 
 /// Iteration order of [`Graph::find_semantic_statement`]'s scan: every Surface
@@ -155,7 +165,7 @@ impl Graph {
         to: NodeKey,
         payload: EdgePayload,
     ) -> EdgeKey {
-        let key = self.inner.connect(from, to, payload);
+        let key = self.inner.connect(from, to, payload.into());
         self.note_relation_handles(RelationKey::Surface(key));
         key
     }
@@ -166,7 +176,7 @@ impl Graph {
         to: NodeKey,
         payload: EdgePayload,
     ) -> EdgeIndex {
-        let key = self.resources.connect(from, to, payload);
+        let key = self.resources.connect(from, to, payload.into());
         self.note_relation_handles(RelationKey::Resource(ResourceEdgeKey::from_raw(key)));
         key
     }
@@ -174,7 +184,7 @@ impl Graph {
     /// Mutable Resource relation payload, noted as written.
     pub(crate) fn resource_edge_mut(&mut self, key: EdgeIndex) -> Option<&mut EdgePayload> {
         self.note_relation_handles(RelationKey::Resource(ResourceEdgeKey::from_raw(key)));
-        self.resources.edge_mut(key)
+        self.resources.edge_mut(key).map(|e| &mut **e)
     }
 
     /// Every relation that retains `statement_id`, in scan order (Surface
@@ -238,7 +248,12 @@ impl Graph {
             return false;
         }
         let holders = self.handle_holders();
-        for holder in holders.resource_literals.get(id).into_iter().flatten() {
+        for holder in holders
+            .resource_literals
+            .get(id.as_str())
+            .into_iter()
+            .flatten()
+        {
             if self.resource(*holder).is_none() {
                 continue;
             }

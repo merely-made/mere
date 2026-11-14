@@ -140,7 +140,7 @@ fn owners_by_scan(graph: &Graph, id: &str) -> Vec<RelationKey> {
         .inner
         .inner()
         .edge_references()
-        .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
+        .map(|edge| (RelationKey::Surface(edge.id()), &**edge.weight()))
         .chain(
             graph
                 .resource_relations()

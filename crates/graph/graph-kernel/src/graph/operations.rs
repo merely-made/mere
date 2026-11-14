@@ -14,14 +14,14 @@ impl Graph {
             inner: portolan::Graph::new(),
             surface_node_lifetimes: HashMap::new(),
             resources: mere::model::ResourceGraph::new(),
-            shown_resources: BTreeMap::new(),
+            shown_resources: BTreeMap::new().into(),
             resource_surfaces: BTreeMap::new(),
             facets: portolan::FacetStore::new(),
             url_to_nodes: HashMap::new(),
-            import_records: Vec::new(),
+            import_records: Vec::new().into(),
             fields: BTreeMap::new(),
             couplings: BTreeMap::new(),
-            nav: SharedNavigationMemory::empty(),
+            nav: SharedNavigationMemory::empty().into(),
             revision: 0,
             url_grouping_revision: 0,
             content_revision: 0,
@@ -228,7 +228,7 @@ impl Graph {
         });
         if inserted {
             self.set_node_last_visited_at_ms(key, Self::epoch_ms());
-            self.url_to_nodes.entry(url).or_default().push(key);
+            self.url_to_nodes.entry(url.into()).or_default().push(key);
             self.bump_revision();
             self.bump_content_revision();
         }
@@ -256,13 +256,20 @@ impl Graph {
             }
             self.remove_facets_for_node(node_id);
             let removed_id = node_id.to_string();
-            for record in &mut self.import_records {
-                record
-                    .memberships
-                    .retain(|membership| membership.node_id != removed_id);
+            // A write copies the shared records, so write only when it changes them.
+            let changes = |record: &ImportRecord| {
+                record.memberships.is_empty()
+                    || record.memberships.iter().any(|m| m.node_id == removed_id)
+            };
+            if self.import_records.iter().any(changes) {
+                let records = &mut *self.import_records;
+                for record in records.iter_mut() {
+                    record
+                        .memberships
+                        .retain(|membership| membership.node_id != removed_id);
+                }
+                records.retain(|record| !record.memberships.is_empty());
             }
-            self.import_records
-                .retain(|record| !record.memberships.is_empty());
             self.bump_revision();
             self.bump_content_revision();
             true
@@ -302,7 +309,10 @@ impl Graph {
         }
         let url_changed = old_url != new_url;
         self.remove_url_mapping(&old_url, key);
-        self.url_to_nodes.entry(new_url).or_default().push(key);
+        self.url_to_nodes
+            .entry(new_url.into())
+            .or_default()
+            .push(key);
         if site_group_changed {
             self.bump_url_grouping_revision();
         }

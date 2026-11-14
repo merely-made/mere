@@ -70,12 +70,12 @@ mod projected_relation_tests;
 impl Graph {
     /// Get a node by key
     pub fn get_node(&self, key: NodeKey) -> Option<&Node> {
-        self.inner.node(key)
+        self.inner.node(key).map(|v| &**v)
     }
 
     /// Get a mutable node by key.
     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
-        self.inner.node_mut(key)
+        self.inner.node_mut(key).map(|v| &mut **v)
     }
 
     /// Find a node whose AddressClaims include the given address (any
@@ -110,7 +110,10 @@ impl Graph {
 
     /// Get all node keys currently mapped to a URL.
     pub fn get_nodes_by_url(&self, url: &str) -> Vec<NodeKey> {
-        self.url_to_nodes.get(url).cloned().unwrap_or_default()
+        self.url_to_nodes
+            .get(url)
+            .map(|keys| keys.to_vec())
+            .unwrap_or_default()
     }
 
     /// Get a node by UUID.
@@ -126,7 +129,7 @@ impl Graph {
 
     /// Iterate over all nodes as (key, node) pairs
     pub fn nodes(&self) -> impl Iterator<Item = (NodeKey, &Node)> {
-        self.inner.nodes()
+        self.inner.nodes().map(|(k, n)| (k, &**n))
     }
 
     /// Iterate over all stored relations, one row per recognized
@@ -141,7 +144,7 @@ impl Graph {
         self.inner
             .inner()
             .edge_references()
-            .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
+            .flat_map(|edge| relation_rows(edge.source(), edge.target(), &**edge.weight()))
     }
 
     /// Retained Surface buckets without expanding statements or lifting
@@ -154,7 +157,7 @@ impl Graph {
         self.inner
             .inner()
             .edge_references()
-            .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
+            .map(|edge| (edge.id(), edge.source(), edge.target(), &**edge.weight()))
     }
 
     /// Held Surface buckets outgoing from `from`, including every parallel
@@ -167,7 +170,7 @@ impl Graph {
         self.inner
             .inner()
             .edges_directed(from, Direction::Outgoing)
-            .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
+            .map(|edge| (edge.id(), edge.source(), edge.target(), &**edge.weight()))
     }
 
     /// Every Surface bucket into `to`, tombstone-only ones included, for the
@@ -180,7 +183,7 @@ impl Graph {
         self.inner
             .inner()
             .edges_directed(to, Direction::Incoming)
-            .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
+            .map(|edge| (edge.id(), edge.source(), edge.target(), &**edge.weight()))
     }
 
     /// Surface relations followed by content relations lifted to every pair of
@@ -189,7 +192,7 @@ impl Graph {
     pub fn projected_relations(&self) -> impl Iterator<Item = (RelationKey, RelationView)> + '_ {
         let surfaces = self.inner.inner().edge_references().flat_map(|edge| {
             let key = RelationKey::Surface(edge.id());
-            relation_rows(edge.source(), edge.target(), edge.weight())
+            relation_rows(edge.source(), edge.target(), &**edge.weight())
                 .into_iter()
                 .map(move |row| (key, row))
         });
@@ -264,7 +267,7 @@ impl Graph {
         self.inner
             .inner()
             .edges_directed(key, Direction::Outgoing)
-            .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
+            .flat_map(|edge| relation_rows(edge.source(), edge.target(), &**edge.weight()))
     }
 
     /// Relations whose `to` endpoint is `key`, expanded with exactly the
@@ -275,7 +278,7 @@ impl Graph {
         self.inner
             .inner()
             .edges_directed(key, Direction::Incoming)
-            .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
+            .flat_map(|edge| relation_rows(edge.source(), edge.target(), &**edge.weight()))
     }
 
     pub fn semantic_edges(&self) -> impl Iterator<Item = SemanticEdgeView> + '_ {

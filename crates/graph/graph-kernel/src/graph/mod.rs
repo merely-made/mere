@@ -361,7 +361,7 @@ pub struct Graph {
     /// direct mutation from outside the kernel would bypass the bump and stale the
     /// structural caches. Reads reach petgraph algorithms through
     /// [`portolan::Graph::inner`]. (Graph signals.)
-    pub(crate) inner: portolan::Graph<Node, EdgePayload>,
+    pub(crate) inner: portolan::Graph<mere::model::Shared<Node>, mere::model::Shared<EdgePayload>>,
     /// Runtime membership witnesses; cloned with candidates, never snapshotted.
     surface_node_lifetimes: HashMap<Uuid, SurfaceNodeLifetime>,
 
@@ -371,10 +371,11 @@ pub struct Graph {
     /// write goes through a recorded `Graph` method, as for `inner`.
     pub(crate) resources: mere::model::ResourceGraph,
     /// Explicit surface UUID to resource UUID associations.
-    pub(crate) shown_resources: BTreeMap<Uuid, Uuid>,
+    pub(crate) shown_resources: mere::model::Shared<BTreeMap<Uuid, Uuid>>,
     /// `shown_resources` inverted: the surfaces showing each resource. Kept
     /// in step by `set_shown_resource` and node removal, its only writers.
-    pub(crate) resource_surfaces: BTreeMap<Uuid, std::collections::BTreeSet<Uuid>>,
+    pub(crate) resource_surfaces:
+        BTreeMap<Uuid, mere::model::Shared<std::collections::BTreeSet<Uuid>>>,
 
     /// Atomic optional metadata keyed by stable node id. This is the single
     /// live authority persisted by the host as `facets.json`; snapshot columns
@@ -382,10 +383,10 @@ pub struct Graph {
     pub(crate) facets: portolan::FacetStore<Uuid>,
 
     /// URL to node mapping for lookup (supports duplicate URLs).
-    pub(crate) url_to_nodes: HashMap<String, Vec<NodeKey>>,
+    pub(crate) url_to_nodes: HashMap<std::sync::Arc<str>, mere::model::Shared<Vec<NodeKey>>>,
 
     /// Durable imported relation truth; node provenance is derived from this.
-    pub(crate) import_records: Vec<ImportRecord>,
+    pub(crate) import_records: mere::model::Shared<Vec<ImportRecord>>,
 
     /// Field-layer truth (field-system step 3, Phase 1): a parallel keyed store
     /// beside the node/edge petgraph. A coupling targets a *selector* over nodes,
@@ -395,13 +396,13 @@ pub struct Graph {
     /// Ordered by id (the inner UUID, which orders as its canonical string
     /// does; `FieldId` and `CouplingId` carry no `Ord`), so every read and
     /// every snapshot sees one order.
-    pub(crate) fields: BTreeMap<Uuid, Field>,
-    pub(crate) couplings: BTreeMap<Uuid, Coupling>,
+    pub(crate) fields: BTreeMap<Uuid, mere::model::Shared<Field>>,
+    pub(crate) couplings: BTreeMap<Uuid, mere::model::Shared<Coupling>>,
 
     /// The graph's whole navigation history: one shared visit space, one owner
     /// per node (the (b) anchor design). In-place navigation extends a node's own
     /// path; a branch node is spawned anchored under its origin's current visit.
-    pub(crate) nav: SharedNavigationMemory,
+    pub(crate) nav: mere::model::Shared<SharedNavigationMemory>,
 
     /// A monotonic **structural revision**, bumped by [`bump_revision`](Self::bump_revision)
     /// whenever the node/edge structure or a pair's relation set changes (add/remove node, add/

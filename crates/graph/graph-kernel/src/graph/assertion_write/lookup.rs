@@ -27,7 +27,7 @@ impl Graph {
             .inner
             .inner()
             .edges_connecting(from, to)
-            .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
+            .map(|edge| (RelationKey::Surface(edge.id()), &**edge.weight()))
             .chain(
                 resource_pair
                     .into_iter()
@@ -68,7 +68,7 @@ impl Graph {
             .resources
             .inner()
             .edges_connecting(source, target)
-            .map(|edge| (ResourceEdgeKey::from_raw(edge.id()), edge.weight()))
+            .map(|edge| (ResourceEdgeKey::from_raw(edge.id()), &**edge.weight()))
             .collect();
         edges.sort_by_key(|(key, _)| key.raw());
         edges
@@ -85,7 +85,7 @@ impl Graph {
             self.resource_surfaces
                 .get(&resource)
                 .into_iter()
-                .flatten()
+                .flat_map(|surfaces| surfaces.iter())
                 .filter_map(|surface| self.inner.key_of(surface))
                 .collect()
         };
@@ -98,7 +98,7 @@ impl Graph {
                     .iter()
                     .flat_map(move |target| graph.edges_connecting(*source, *target))
             })
-            .map(|edge| (edge.id(), edge.weight()))
+            .map(|edge| (edge.id(), &**edge.weight()))
             .collect();
         edges.sort_by_key(|(key, _)| *key);
         edges.dedup_by_key(|(key, _)| *key);

@@ -55,7 +55,7 @@ pub(super) fn copy_resource_row(graph: &mut Graph, from: Uuid, to: Uuid) {
         graph.resources.key_of(&from).unwrap(),
         graph.resources.key_of(&to).unwrap(),
     );
-    graph.resources.connect(from, to, row);
+    graph.resources.connect(from, to, (row).into());
 }
 
 fn source() -> FrozenLinkSource {

@@ -30,7 +30,7 @@ impl Graph {
 
     /// Read a resource edge without accepting a surface edge index.
     pub fn get_resource_edge(&self, key: ResourceEdgeKey) -> Option<&EdgePayload> {
-        self.resources.edge(key.raw())
+        self.resources.edge(key.raw()).map(|e| &**e)
     }
 
     /// Find the first directed resource edge between resource identities.
@@ -59,7 +59,7 @@ impl Graph {
                     .node(edge.target())
                     .expect("resource endpoint exists")
                     .id(),
-                edge.weight(),
+                &**edge.weight(),
             )
         })
     }
@@ -85,7 +85,7 @@ impl Graph {
             self.inner
                 .inner()
                 .edges_connecting(from, to)
-                .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
+                .map(|edge| (RelationKey::Surface(edge.id()), &**edge.weight()))
         });
         let resource = resource_pair.into_iter().flat_map(move |(from, to)| {
             self.resources
@@ -94,7 +94,7 @@ impl Graph {
                 .map(|edge| {
                     (
                         RelationKey::Resource(ResourceEdgeKey::from_raw(edge.id())),
-                        edge.weight(),
+                        &**edge.weight(),
                     )
                 })
         });
@@ -147,7 +147,7 @@ impl Graph {
                         Direction::Outgoing => edge.target(),
                         Direction::Incoming => edge.source(),
                     };
-                    (neighbor, RelationKey::Surface(edge.id()), edge.weight())
+                    (neighbor, RelationKey::Surface(edge.id()), &**edge.weight())
                 })
         });
         let lifted = resource_key
@@ -174,7 +174,7 @@ impl Graph {
                                 (
                                     surface,
                                     RelationKey::Resource(ResourceEdgeKey::from_raw(edge.id())),
-                                    edge.weight(),
+                                    &**edge.weight(),
                                 )
                             })
                     })

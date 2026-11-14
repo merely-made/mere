@@ -77,7 +77,7 @@ fn freezes_surface_pair_buckets_as_independent_immutable_resource_facets() {
         timestamp_ms: 456,
         trigger: NavigationTrigger::Programmatic,
     });
-    graph.inner.connect(first, second, parallel);
+    graph.inner.connect(first, second, (parallel).into());
     let source = available_source();
     let source_revision = source.clone();
 
@@ -394,7 +394,7 @@ fn frozen_link_refuses_identical_parallel_surface_copies_with_the_shared_reason(
         .get_edge(graph.find_edge_key(first, second).unwrap())
         .unwrap()
         .clone();
-    graph.inner.connect(first, second, row);
+    graph.inner.connect(first, second, (row).into());
     let before = graph.to_snapshot().resources;
     let error = freeze(&mut graph, 202).unwrap_err();
     assert!(error.contains("one handle means one row"), "{error}");

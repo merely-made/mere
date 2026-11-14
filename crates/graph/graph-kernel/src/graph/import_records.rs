@@ -104,7 +104,7 @@ impl Graph {
             return false;
         };
         let mut changed = false;
-        for record in &mut self.import_records {
+        for record in self.import_records.iter_mut() {
             if record.record_id != record_id {
                 continue;
             }
@@ -126,10 +126,10 @@ impl Graph {
 
     pub(crate) fn set_import_records(&mut self, mut import_records: Vec<ImportRecord>) -> bool {
         normalize_import_records(&mut import_records);
-        if self.import_records == import_records {
+        if *self.import_records == import_records {
             return false;
         }
-        self.import_records = import_records;
+        self.import_records = import_records.into();
         self.sync_node_import_provenance_from_records();
         true
     }

@@ -23,7 +23,7 @@ fn fixture(asserter: Option<&str>) -> (Graph, NodeKey, NodeKey, EdgeKey) {
         withdrawn: None,
         basis: Default::default(),
     });
-    let edge = graph.inner.connect(from, to, payload);
+    let edge = graph.inner.connect(from, to, (payload).into());
     (graph, from, to, edge)
 }
 

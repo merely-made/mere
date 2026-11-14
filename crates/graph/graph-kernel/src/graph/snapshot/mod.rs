@@ -28,6 +28,7 @@ use crate::persistence::GraphSnapshot;
 mod checked;
 pub mod from;
 pub mod to;
+pub mod unshared;
 
 pub use checked::ResourceSnapshotError;
 

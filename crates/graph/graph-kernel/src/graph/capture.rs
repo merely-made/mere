@@ -915,7 +915,7 @@ impl ReplayAttribution {
 
     fn repair_edges<N: portolan::Identified>(
         &self,
-        graph: &mut portolan::Graph<N, super::EdgePayload>,
+        graph: &mut portolan::Graph<N, mere::model::Shared<super::EdgePayload>>,
     ) -> bool {
         let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
         let keys: Vec<_> = graph.inner().edge_indices().collect();

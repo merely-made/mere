@@ -28,6 +28,8 @@ pub mod predicate_registry;
 pub mod resource;
 pub mod resource_content;
 pub mod resource_graph;
+pub mod shared;
+pub use shared::Shared;
 pub mod resource_record;
 pub mod types;
 

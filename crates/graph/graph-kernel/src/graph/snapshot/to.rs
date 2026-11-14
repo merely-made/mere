@@ -52,62 +52,7 @@ impl Graph {
     /// snapshots of one graph at one date are equal whenever they are taken
     /// (reservoir plan ruling 47).
     pub fn to_snapshot_at(&self, timestamp_secs: u64) -> GraphSnapshot {
-        let nodes = self
-            .nodes()
-            .map(|(_, node)| PersistedNode {
-                node_id: node.id.to_string(),
-                // Legacy wire field only. Hostnames are derived from the
-                // Container's primary address and are never stored anew.
-                cached_host: None,
-                title: node.title.clone(),
-                tags: {
-                    let mut tags = node.tags.iter().cloned().collect::<Vec<_>>();
-                    tags.sort();
-                    tags
-                },
-                tag_presentation: Default::default(),
-                import_provenance: Vec::new(),
-                is_pinned: false,
-                images: node.images.clone(),
-                // Never written: a saved snapshot carries references only.
-                legacy_thumbnail_png: None,
-                legacy_thumbnail_width: 0,
-                legacy_thumbnail_height: 0,
-                legacy_favicon_rgba: None,
-                legacy_favicon_width: 0,
-                legacy_favicon_height: 0,
-                // Scroll / form draft left for Turnstone's BrowserNodeState
-                // sidecar (boundary pass slice C); the snapshot now carries
-                // only the last-visited clock here. `session_state` itself
-                // stays for legacy readers and the one-time load migration.
-                session_state: Some(PersistedNodeSessionState {
-                    scroll_x: None,
-                    scroll_y: None,
-                    form_draft: None,
-                    last_visited_ms: None,
-                }),
-                address: match node.primary_address() {
-                    Address::Http(s) => PersistedAddress::Http(s.clone()),
-                    Address::File(s) => PersistedAddress::File(s.clone()),
-                    Address::Data(s) => PersistedAddress::Data(s.clone()),
-                    Address::Clip(s) => PersistedAddress::Clip(s.clone()),
-                    Address::Directory(s) => PersistedAddress::Directory(s.clone()),
-                    Address::Custom(s) => PersistedAddress::Custom(s.clone()),
-                },
-                // Written for backward compat: pre-Stage C.2 readers use this field.
-                url: node.primary_address().as_url_str().to_string(),
-                classifications: Vec::new(),
-                mime_hint: node.media_type.clone(),
-                frame_layout_hints: Vec::new(),
-                frame_split_offer_suppressed: false,
-                properties: Vec::new(),
-                derivations: Vec::new(),
-                body: node.body.clone(),
-                last_session_visited: 0,
-                nested: node.nested.as_ref().map(|log| log.as_str().to_string()),
-                content_hash: node.content.map(|hash| hash.to_hex()),
-            })
-            .collect();
+        let nodes = self.nodes().map(|(_, node)| persisted_node(node)).collect();
 
         // Edge slots are reused, so storage order is history; the snapshot is
         // in the order of each edge's JSON bytes, so comparisons need no sort of
@@ -122,67 +67,9 @@ impl Graph {
             serde_json::to_vec(edge).expect("persisted surface edge encodes")
         });
 
-        let fields = self
-            .fields()
-            .map(|f| PersistedField {
-                id: f.id.as_uuid().to_string(),
-                name: f.name.clone(),
-                // The recursive AST rides as a JSON blob (see persistence_fields).
-                definition_json: serde_json::to_string(&f.definition).unwrap_or_default(),
-                extent: match &f.extent {
-                    FieldExtent::Global => PersistedFieldExtent::Global,
-                    FieldExtent::Region {
-                        min_x,
-                        min_y,
-                        max_x,
-                        max_y,
-                    } => PersistedFieldExtent::Region {
-                        min_x: *min_x,
-                        min_y: *min_y,
-                        max_x: *max_x,
-                        max_y: *max_y,
-                    },
-                    FieldExtent::AttachedToNode(id) => {
-                        PersistedFieldExtent::AttachedToNode(id.to_string())
-                    },
-                    FieldExtent::Polygon { points } => PersistedFieldExtent::Polygon {
-                        points: points.clone(),
-                    },
-                },
-                lifecycle: match f.lifecycle {
-                    FieldLifecycle::Active => PersistedFieldLifecycle::Active,
-                    FieldLifecycle::Retired => PersistedFieldLifecycle::Retired,
-                },
-            })
-            .collect();
+        let fields = self.fields().map(persisted_field).collect();
 
-        let couplings = self
-            .couplings()
-            .map(|c| PersistedCoupling {
-                id: c.id.as_uuid().to_string(),
-                field_id: c.field.as_uuid().to_string(),
-                selector: match &c.selector {
-                    NodeSelector::All => PersistedNodeSelector::All,
-                    NodeSelector::Tagged(t) => PersistedNodeSelector::Tagged(t.clone()),
-                    NodeSelector::Kind(k) => PersistedNodeSelector::Kind(k.clone()),
-                    NodeSelector::NotTagged(t) => PersistedNodeSelector::NotTagged(t.clone()),
-                },
-                response: match &c.response {
-                    CouplingResponse::AttractToMin => PersistedCouplingResponse::AttractToMin,
-                    CouplingResponse::RepelFromMax => PersistedCouplingResponse::RepelFromMax,
-                    CouplingResponse::AlignVelocity => PersistedCouplingResponse::AlignVelocity,
-                    CouplingResponse::FlowAdvect => PersistedCouplingResponse::FlowAdvect,
-                    CouplingResponse::DampenInside { factor } => {
-                        PersistedCouplingResponse::DampenInside { factor: *factor }
-                    },
-                    CouplingResponse::ContainmentWall => PersistedCouplingResponse::ContainmentWall,
-                    CouplingResponse::Open { predicate } => PersistedCouplingResponse::Open {
-                        predicate: predicate.clone(),
-                    },
-                },
-                strength: c.strength,
-            })
-            .collect();
+        let couplings = self.couplings().map(persisted_coupling).collect();
 
         let resources = self
             .resources
@@ -216,15 +103,132 @@ impl Graph {
             assertion_schema: 1,
             nodes,
             edges,
-            import_records: self.import_records.clone(),
+            import_records: self.import_records.to_vec(),
             timestamp_secs,
             fields,
             couplings,
-            navigation: self.nav.clone(),
+            navigation: (*self.nav).clone(),
             resources,
             resource_edges,
             shown_resources,
         }
+    }
+}
+
+/// One Surface node as the snapshot writes it.
+pub(crate) fn persisted_node(node: &Node) -> PersistedNode {
+    PersistedNode {
+        node_id: node.id.to_string(),
+        // Legacy wire field only. Hostnames are derived from the
+        // Container's primary address and are never stored anew.
+        cached_host: None,
+        title: node.title.clone(),
+        tags: {
+            let mut tags = node.tags.iter().cloned().collect::<Vec<_>>();
+            tags.sort();
+            tags
+        },
+        tag_presentation: Default::default(),
+        import_provenance: Vec::new(),
+        is_pinned: false,
+        images: node.images.clone(),
+        // Never written: a saved snapshot carries references only.
+        legacy_thumbnail_png: None,
+        legacy_thumbnail_width: 0,
+        legacy_thumbnail_height: 0,
+        legacy_favicon_rgba: None,
+        legacy_favicon_width: 0,
+        legacy_favicon_height: 0,
+        // Scroll / form draft left for Turnstone's BrowserNodeState
+        // sidecar (boundary pass slice C); the snapshot now carries
+        // only the last-visited clock here. `session_state` itself
+        // stays for legacy readers and the one-time load migration.
+        session_state: Some(PersistedNodeSessionState {
+            scroll_x: None,
+            scroll_y: None,
+            form_draft: None,
+            last_visited_ms: None,
+        }),
+        address: match node.primary_address() {
+            Address::Http(s) => PersistedAddress::Http(s.clone()),
+            Address::File(s) => PersistedAddress::File(s.clone()),
+            Address::Data(s) => PersistedAddress::Data(s.clone()),
+            Address::Clip(s) => PersistedAddress::Clip(s.clone()),
+            Address::Directory(s) => PersistedAddress::Directory(s.clone()),
+            Address::Custom(s) => PersistedAddress::Custom(s.clone()),
+        },
+        // Written for backward compat: pre-Stage C.2 readers use this field.
+        url: node.primary_address().as_url_str().to_string(),
+        classifications: Vec::new(),
+        mime_hint: node.media_type.clone(),
+        frame_layout_hints: Vec::new(),
+        frame_split_offer_suppressed: false,
+        properties: Vec::new(),
+        derivations: Vec::new(),
+        body: node.body.clone(),
+        last_session_visited: 0,
+        nested: node.nested.as_ref().map(|log| log.as_str().to_string()),
+        content_hash: node.content.map(|hash| hash.to_hex()),
+    }
+}
+
+/// One field as the snapshot writes it.
+pub(crate) fn persisted_field(f: &Field) -> PersistedField {
+    PersistedField {
+        id: f.id.as_uuid().to_string(),
+        name: f.name.clone(),
+        // The recursive AST rides as a JSON blob (see persistence_fields).
+        definition_json: serde_json::to_string(&f.definition).unwrap_or_default(),
+        extent: match &f.extent {
+            FieldExtent::Global => PersistedFieldExtent::Global,
+            FieldExtent::Region {
+                min_x,
+                min_y,
+                max_x,
+                max_y,
+            } => PersistedFieldExtent::Region {
+                min_x: *min_x,
+                min_y: *min_y,
+                max_x: *max_x,
+                max_y: *max_y,
+            },
+            FieldExtent::AttachedToNode(id) => PersistedFieldExtent::AttachedToNode(id.to_string()),
+            FieldExtent::Polygon { points } => PersistedFieldExtent::Polygon {
+                points: points.clone(),
+            },
+        },
+        lifecycle: match f.lifecycle {
+            FieldLifecycle::Active => PersistedFieldLifecycle::Active,
+            FieldLifecycle::Retired => PersistedFieldLifecycle::Retired,
+        },
+    }
+}
+
+/// One coupling as the snapshot writes it.
+pub(crate) fn persisted_coupling(c: &Coupling) -> PersistedCoupling {
+    PersistedCoupling {
+        id: c.id.as_uuid().to_string(),
+        field_id: c.field.as_uuid().to_string(),
+        selector: match &c.selector {
+            NodeSelector::All => PersistedNodeSelector::All,
+            NodeSelector::Tagged(t) => PersistedNodeSelector::Tagged(t.clone()),
+            NodeSelector::Kind(k) => PersistedNodeSelector::Kind(k.clone()),
+            NodeSelector::NotTagged(t) => PersistedNodeSelector::NotTagged(t.clone()),
+        },
+        response: match &c.response {
+            CouplingResponse::AttractToMin => PersistedCouplingResponse::AttractToMin,
+            CouplingResponse::RepelFromMax => PersistedCouplingResponse::RepelFromMax,
+            CouplingResponse::AlignVelocity => PersistedCouplingResponse::AlignVelocity,
+            CouplingResponse::FlowAdvect => PersistedCouplingResponse::FlowAdvect,
+            CouplingResponse::DampenInside { factor } => {
+                PersistedCouplingResponse::DampenInside { factor: *factor }
+            },
+            CouplingResponse::ContainmentWall => PersistedCouplingResponse::ContainmentWall,
+            CouplingResponse::Open { predicate } => PersistedCouplingResponse::Open {
+                predicate: predicate.clone(),
+            },
+        },
+        strength: c.strength,
     }
 }
 

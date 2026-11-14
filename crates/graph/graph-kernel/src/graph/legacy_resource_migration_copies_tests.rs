@@ -87,7 +87,7 @@ fn connect_resources(graph: &mut Graph, from: Uuid, to: Uuid, payloads: &[EdgePa
         graph.resources.key_of(&to).unwrap(),
     );
     for payload in payloads {
-        graph.resources.connect(from, to, payload.clone());
+        graph.resources.connect(from, to, (payload.clone()).into());
     }
 }
 
@@ -129,8 +129,8 @@ fn assert_reopens_and_replays(
 fn legacy_migration_dedupes_identical_copies_of_a_surface_placed_claim_and_says_so() {
     let (mut baseline, a, b) = surfaces();
     let grouped = claim(&["grouped"], predicate_iri(SemanticSubKind::UserGrouped));
-    baseline.inner.connect(a, b, grouped.clone());
-    baseline.inner.connect(a, b, grouped);
+    baseline.inner.connect(a, b, (grouped.clone()).into());
+    baseline.inner.connect(a, b, (grouped).into());
     assert!(
         Graph::try_from_snapshot(&baseline.to_snapshot()).is_err(),
         "the baseline holds a repeated handle"
@@ -235,8 +235,8 @@ fn legacy_migration_refuses_a_repeated_handle_on_rows_that_differ() {
         for (second, why) in [(relabeled(own.clone()), "statement"), (wider(own), "row")] {
             let refused = if surface {
                 let (mut baseline, a, b) = surfaces();
-                baseline.inner.connect(a, b, own.clone());
-                baseline.inner.connect(a, b, second);
+                baseline.inner.connect(a, b, (own.clone()).into());
+                baseline.inner.connect(a, b, (second).into());
                 migrate_legacy_prefix(&baseline, &[])
             } else {
                 let (mut baseline, from, to) = resources();

@@ -28,13 +28,13 @@ fn fixture() -> (Graph, Uuid, Uuid, Vec<EdgePayload>) {
     second.push_persisted_semantic_statement(payload.assertions.statements[1].clone());
     second.assertions.statements[0].statement_id = "different-handle".into();
     let key = graph.resources.key_of(&from).unwrap();
-    graph.resources.connect(key, key, payload.clone());
-    graph.resources.connect(key, key, second.clone());
+    graph.resources.connect(key, key, (payload.clone()).into());
+    graph.resources.connect(key, key, (second.clone()).into());
     let raw = graph
         .resources
         .inner()
         .edges_connecting(key, key)
-        .map(|edge| edge.weight().clone())
+        .map(|edge| (**edge.weight()).clone())
         .collect();
     (graph, from, other, raw)
 }
@@ -143,7 +143,7 @@ fn persisted_bytes_can_be_larger_than_raw_bytes() {
     let expected = vec![super::persisted_edge_for_ids(other, other, &payload)];
     let persisted_bytes = serde_json::to_vec(&expected).unwrap().len();
     assert!(persisted_bytes > raw_bytes);
-    graph.resources.connect(key, key, payload);
+    graph.resources.connect(key, key, (payload).into());
     assert_eq!(
         graph.persisted_resource_edges_between_bounded(other, other, 1, persisted_bytes),
         Ok(expected)
@@ -162,7 +162,7 @@ fn bounded_pair_refuses_missing_endpoints_and_ignores_other_large_bucket() {
     huge.push_persisted_semantic_statement(raw[0].assertions.statements[0].clone());
     huge.assertions.statements[0].label = Some("x".repeat(1_000_000));
     let source = graph.resources.key_of(&from).unwrap();
-    graph.resources.connect(source, key, huge);
+    graph.resources.connect(source, key, (huge).into());
     let expected = live_edges(from, &raw);
     let bytes = serde_json::to_vec(&raw)
         .unwrap()

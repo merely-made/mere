@@ -30,7 +30,7 @@ impl Graph {
         let mut graph = Graph::new();
         // Restore the shared navigation history (one visit space, owner per node)
         // before the node loop, so each node's restored current page reads from it.
-        graph.nav = snapshot.navigation.clone();
+        graph.nav = snapshot.navigation.clone().into();
 
         // Checked load has already refused an unparseable or repeated Surface id.
         for pnode in &snapshot.nodes {
@@ -302,7 +302,8 @@ impl Graph {
             )
         } else {
             snapshot.import_records.clone()
-        };
+        }
+        .into();
         normalize_import_records(&mut graph.import_records);
         graph.sync_node_import_provenance_from_records();
 
