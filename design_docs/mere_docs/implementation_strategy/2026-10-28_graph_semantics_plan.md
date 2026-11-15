@@ -195,7 +195,7 @@ unscheduled; neither a partial UI nor a partial reader is advertised as one.
   writer: operation dependency declarations are complete, journal and materialisation update
   incrementally, history reconstruction is bounded, and unsupported or global operations refuse.
 - Needs: C-E, for protected-reader adoption; Mark's memory choice (below) for the bounded writer.
-- Rulings: -
+- Rulings: engine-split D173 (2026-11-15): single-owner backends (Directory, Memory, redb as they are) collect now, each publication deleting in its own batch what the previous head named and the new head does not, with one sweep at the first open for older garbage and no grace for readers; the protected readers above stay the precondition for shared backends such as IndexedDB.
 - From: `archive_docs/2026-10-28/2026-10-09_graph_semantics_followons_plan.md:53-56,69-71,145-174,191-218`;
   `archive_docs/2026-10-28/2026-10-09_resident_host_implementation_plan.md:87-88,907`
 
