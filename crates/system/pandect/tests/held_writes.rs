@@ -80,7 +80,8 @@ fn prefix(graph_id: Uuid) -> String {
 }
 
 /// The keys a publication of `after` must write over one of `before`: each
-/// record whose digest moved, the new catalog and the head.
+/// record whose digest moved, each catalog chunk `before` lacks (catalog
+/// version 3, engine split D177), the new catalog and the head.
 fn expected_writes(graph_id: Uuid, before: &Graph, after: &Graph) -> BTreeSet<String> {
     let store = AddressableGraphStore::new(MemoryBackend::new(), graph_id);
     let (old, new) = (
@@ -108,6 +109,15 @@ fn expected_writes(graph_id: Uuid, before: &Graph, after: &Graph) -> BTreeSet<St
             keys.insert(format!("{}nodes/{layer}/{id}/{digest}", prefix(graph_id)));
         }
     }
+    let chunks = |p: &pandect::addressable_graph::PreparedGraphPublication| -> BTreeSet<String> {
+        (p.ops().iter())
+            .filter_map(|op| match op {
+                WriteOp::Put { key, .. } if key.contains("/chunks/") => Some(key.clone()),
+                _ => None,
+            })
+            .collect()
+    };
+    keys.extend(chunks(&new).difference(&chunks(&old)).cloned());
     keys
 }
 
@@ -167,9 +177,10 @@ fn write_recorded_graph_leaves_out_what_the_head_holds() {
         let store = AddressableGraphStore::new(backend.clone(), graph_id);
         let source = graph(8);
         let first = store.write_recorded_graph(&source).await.unwrap();
-        // The first publication writes everything: 16 records, catalog, head.
+        // The first publication writes everything: 16 records, the one row
+        // chunk, catalog, head.
         let everything = expected_writes(graph_id, &Graph::new(), &source);
-        assert_eq!(everything.len(), 18);
+        assert_eq!(everything.len(), 19);
         assert_eq!(
             backend.last_puts(&prefix(graph_id)),
             first_collecting(graph_id, everything)
@@ -184,10 +195,11 @@ fn write_recorded_graph_leaves_out_what_the_head_holds() {
         );
         reads_back(&backend, graph_id, &source, &first).await;
 
-        // One Surface changed: its record, the catalog and the head.
+        // One Surface changed: its record, its row chunk, the catalog and the
+        // head.
         let changed = retitled(&source, 3);
         let expected = expected_writes(graph_id, &source, &changed);
-        assert_eq!(expected.len(), 3, "{expected:?}");
+        assert_eq!(expected.len(), 4, "{expected:?}");
         let second = store.write_recorded_graph(&changed).await.unwrap();
         assert_ne!(second, first);
         assert_eq!(backend.last_puts(&prefix(graph_id)), expected);
@@ -259,7 +271,7 @@ fn a_published_commit_leaves_out_what_the_head_holds() {
             .await
             .unwrap();
         let expected = expected_writes(graph_id, &before, session.graph());
-        assert_eq!(expected.len(), 3, "{expected:?}");
+        assert_eq!(expected.len(), 4, "{expected:?}");
         assert_eq!(backend.last_puts(&prefix(graph_id)), expected);
         reads_back(&backend, graph_id, session.graph(), &second).await;
         // A cold reopen of the session reads the same publication.

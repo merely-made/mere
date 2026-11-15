@@ -209,6 +209,7 @@ impl<B: Backend> AddressableGraphStore<B> {
                 owners: vec![],
             },
             index: Default::default(),
+            trees: Default::default(),
         };
         catalog.globals.nodes.clear();
         catalog.globals.edges.clear();
@@ -290,7 +291,12 @@ impl<B: Backend> AddressableGraphStore<B> {
             &mut catalog.navigation,
             &mut ops,
         )?;
-        let bytes = encode(&catalog)?;
+        // Versions 1 and 2 store the catalog whole; tests still write them.
+        let bytes = if version >= 3 {
+            super::tree::store_catalog(self, &mut catalog, &mut ops)?
+        } else {
+            encode(&catalog)?
+        };
         let generation = hash(&bytes);
         ops.push(WriteOp::Put {
             key: self.key(&format!("catalog/{generation}")),
@@ -339,3 +345,6 @@ mod edge_tests;
 #[cfg(test)]
 #[path = "write_tests.rs"]
 mod tests;
+#[cfg(test)]
+#[path = "tree_tests.rs"]
+mod tree_tests;

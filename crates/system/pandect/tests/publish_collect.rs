@@ -351,7 +351,8 @@ fn a_shared_store_collects_nothing() {
         assert!(held.contains(&format!("{}catalog/{first}", prefix(graph_id))));
         assert!(held.is_superset(&publication_keys(graph_id, session.graph())));
         assert!(!held.contains(&swept(graph_id)));
-        assert_eq!(held.len(), original.len() + 4, "{held:#?}");
+        // Two later publications, each a record, a row chunk and a catalog.
+        assert_eq!(held.len(), original.len() + 6, "{held:#?}");
 
         // The store path alone, declared shared, keeps the old catalog too.
         let store = AddressableGraphStore::new(shared, graph_id);

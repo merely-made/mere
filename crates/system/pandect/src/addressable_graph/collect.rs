@@ -15,43 +15,123 @@ use std::sync::{Arc, Mutex};
 /// The record the one sweep leaves under the graph's prefix.
 const SWEPT: &str = "swept";
 
+/// How a publication's writers spell a row's record key under `prefix`.
+fn row_key(prefix: &str, row: &IndexRow) -> String {
+    let layer = match row.address {
+        GraphAddress::Surface(_) => "surface",
+        GraphAddress::Resource(_) => "resource",
+    };
+    let id = row.address.id();
+    format!("{prefix}nodes/{layer}/{id}/{}", row.hash)
+}
+fn navigation_key(prefix: &str, kind: &str, digest: &str) -> String {
+    format!("{prefix}navigation/{kind}/{digest}")
+}
+fn pending_key(prefix: &str, (id, digest): &(Uuid, String)) -> String {
+    format!("{prefix}pending/{id}/{digest}")
+}
+/// The keys each of `catalog`'s lists names, in list order, as its trees
+/// hold them: rows, navigation entries, visits and owners, pending owners.
+fn list_keys(prefix: &str, catalog: &Catalog) -> [Vec<String>; 5] {
+    let nav = &catalog.navigation;
+    let spelled = |kind: &str, digests: &[String]| {
+        (digests.iter())
+            .map(|digest| navigation_key(prefix, kind, digest))
+            .collect()
+    };
+    [
+        catalog
+            .entries
+            .iter()
+            .map(|row| row_key(prefix, row))
+            .collect(),
+        spelled("entry", &nav.entries),
+        spelled("visit", &nav.visits),
+        spelled("owner", &nav.owners),
+        (catalog.pending.owners.iter())
+            .map(|owner| pending_key(prefix, owner))
+            .collect(),
+    ]
+}
+
 /// The keys a publication names under `prefix`, spelled as its writers spell
-/// them: records, navigation rows, pending owners and the catalog itself.
-fn named_keys(prefix: &str, generation: &str, catalog: &Catalog) -> HashSet<String> {
-    let mut keys = HashSet::new();
+/// them: records, navigation rows, pending owners, the catalog itself and,
+/// from version 3, the chunks of its trees.
+pub(super) fn named_keys(prefix: &str, generation: &str, catalog: &Catalog) -> HashSet<String> {
+    let mut keys: HashSet<String> = list_keys(prefix, catalog).into_iter().flatten().collect();
     keys.insert(format!("{prefix}catalog/{generation}"));
-    for row in &catalog.entries {
-        let layer = match row.address {
-            GraphAddress::Surface(_) => "surface",
-            GraphAddress::Resource(_) => "resource",
-        };
-        let id = row.address.id();
-        keys.insert(format!("{prefix}nodes/{layer}/{id}/{}", row.hash));
-    }
-    for (kind, digests) in [
-        ("entry", &catalog.navigation.entries),
-        ("visit", &catalog.navigation.visits),
-        ("owner", &catalog.navigation.owners),
-    ] {
-        for digest in digests {
-            keys.insert(format!("{prefix}navigation/{kind}/{digest}"));
-        }
-    }
-    for (id, digest) in &catalog.pending.owners {
-        keys.insert(format!("{prefix}pending/{id}/{digest}"));
-    }
+    keys.extend((catalog.trees.digests()).map(|digest| format!("{prefix}chunks/{digest}")));
     keys
 }
 
-/// What the head names, read in a transaction. `None` with no head, or one
-/// whose catalog cannot be read: then nothing is held and nothing collected.
-fn named_by_head(reader: &dyn TransactionReader, prefix: &str) -> Option<HashSet<String>> {
+/// What the head names, read in a transaction. A version 3 head's chunks are
+/// read only where the new catalog (`new`) lacks them (D177, "Only changed
+/// chunks"): a chunk both name holds the same items, so the keys under it
+/// come from `new`. `None` with no head, or one whose catalog cannot be
+/// read: then nothing is held and nothing collected.
+fn named_by_head(
+    reader: &dyn TransactionReader,
+    prefix: &str,
+    new: &Catalog,
+) -> Option<HashSet<String>> {
     let generation: String = decode(&reader.get(&format!("{prefix}head")).ok()??).ok()?;
     let bytes = reader
         .get(&format!("{prefix}catalog/{generation}"))
         .ok()??;
-    let catalog = parse_catalog(&bytes, &generation).ok()?;
-    Some(named_keys(prefix, &generation, &catalog))
+    let root = match parse_catalog(&bytes, &generation).ok()? {
+        Stored::Whole(old) => return Some(named_keys(prefix, &generation, &old)),
+        Stored::Root(root) => root,
+    };
+    let mut held = HashSet::from([format!("{prefix}catalog/{generation}")]);
+    let chunk = |digest: &str| format!("{prefix}chunks/{digest}");
+    let [rows, entries, visits, owners, pending] = list_keys(prefix, new);
+    let (trees, nav) = (&new.trees, &root.navigation);
+    let navigation =
+        |kind: &'static str| move |digest: &String| navigation_key(prefix, kind, digest);
+    tree::held(
+        reader,
+        &chunk,
+        &root.rows,
+        (&trees.rows, &rows),
+        |row| row_key(prefix, row),
+        &mut held,
+    )?;
+    tree::held(
+        reader,
+        &chunk,
+        &nav.entries,
+        (&trees.entries, &entries),
+        navigation("entry"),
+        &mut held,
+    )?;
+    tree::held(
+        reader,
+        &chunk,
+        &nav.visits,
+        (&trees.visits, &visits),
+        navigation("visit"),
+        &mut held,
+    )?;
+    tree::held(
+        reader,
+        &chunk,
+        &nav.owners,
+        (&trees.owners, &owners),
+        |(digest, _): &(String, kernel::graph::history::NodeHistoryOwner)| {
+            navigation_key(prefix, "owner", digest)
+        },
+        &mut held,
+    )?;
+    let pending_of = |owner: &(Uuid, String)| pending_key(prefix, owner);
+    tree::held(
+        reader,
+        &chunk,
+        &root.pending.owners,
+        (&trees.pending, &pending),
+        pending_of,
+        &mut held,
+    )?;
+    Some(held)
 }
 
 /// A prepared publication's writes, decided against the head inside the
@@ -59,6 +139,9 @@ fn named_by_head(reader: &dyn TransactionReader, prefix: &str) -> Option<HashSet
 pub(crate) struct StagedPublication {
     ops: Vec<WriteOp>,
     prefix: String,
+    /// The new catalog, whose trees spare the decision reading the head's
+    /// unchanged chunks.
+    catalog: Catalog,
     /// What the new catalog names, when the store collects.
     collect: Option<HashSet<String>>,
 }
@@ -69,7 +152,7 @@ impl StagedPublication {
     /// read of the head. The first collecting publication on a store also
     /// sweeps what earlier publications left (see [`sweep`]).
     pub(crate) fn decide(mut self, reader: &dyn TransactionReader) -> Vec<WriteOp> {
-        let held = named_by_head(reader, &self.prefix);
+        let held = named_by_head(reader, &self.prefix, &self.catalog);
         let swept = (self.collect.as_ref()).and_then(|named| sweep(reader, &self.prefix, named));
         if swept.is_some() {
             // The sweep's deletes already cover what the head supersedes.
@@ -109,6 +192,7 @@ impl<B: Backend> AddressableGraphStore<B> {
         StagedPublication {
             ops,
             prefix,
+            catalog,
             collect,
         }
     }
@@ -148,7 +232,7 @@ impl<B: crate::graph_session::LegacyTransactionBackend> AddressableGraphStore<B>
 /// The key families a publication writes under the graph's prefix. The sweep
 /// touches nothing else there: `head`, `policy` and a host's own keys beside
 /// them (Graphshell's `host-settings`) stay.
-const FAMILIES: &[&str] = &["nodes/", "catalog/", "navigation/", "pending/"];
+const FAMILIES: &[&str] = &["nodes/", "catalog/", "chunks/", "navigation/", "pending/"];
 
 /// The one sweep (D173, "One sweep at open, once"), run by the first
 /// collecting publication on a store inside its transaction: a delete for

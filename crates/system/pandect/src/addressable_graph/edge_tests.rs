@@ -146,7 +146,7 @@ fn readers_rebuild_the_writers_columns_from_version_2_records() {
         let backend = MemoryBackend::new();
         publish(&backend, &graph, VERSION).await;
         let (_, catalog, _) = store(&backend).catalog().await.unwrap();
-        assert_eq!(catalog.version, 2);
+        assert_eq!(catalog.version, VERSION);
         // Version 2 records carry no index: none decodes in version 1's shape
         // unless it has no edges.
         for row in &catalog.entries {
@@ -244,7 +244,7 @@ fn version_1_stores_read_the_same_and_the_next_publication_rewrites_them() {
             .collect();
         assert_eq!(held, want);
         let (head, new, _) = store(&backend).catalog().await.unwrap();
-        assert_eq!((head.as_str(), new.version), (generation.as_str(), 2));
+        assert_eq!((head.as_str(), new.version), (generation.as_str(), VERSION));
         let edged = old
             .entries
             .iter()

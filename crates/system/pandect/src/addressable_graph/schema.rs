@@ -4,6 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use super::tree::{TreeRef, Trees};
 use super::*;
 use hodograph::{EntrySnapshot, OwnerSnapshot, StemmaSnapshot, VisitSnapshot};
 use kernel::graph::history::NodeHistoryOwner;
@@ -20,6 +21,8 @@ pub(super) struct IndexRow {
     pub pinned: bool,
     pub declaration: bool,
 }
+/// A catalog in memory, and versions 1 and 2's stored form. From version 3
+/// the lists are stored as trees a [`Root`] names (engine split D177).
 #[derive(Clone, Serialize, Deserialize)]
 pub(super) struct Catalog {
     pub version: u8,
@@ -32,6 +35,33 @@ pub(super) struct Catalog {
     /// first lookup for a prepared one. Not stored.
     #[serde(skip)]
     pub index: std::sync::OnceLock<RowIndex>,
+    /// The trees the lists are stored as (version 3). Not stored.
+    #[serde(skip)]
+    pub trees: Trees,
+}
+/// A version 3 catalog as stored: its lists as trees, the rest whole. Its
+/// digest is the generation, and it names every row through the trees.
+#[derive(Serialize, Deserialize)]
+pub(super) struct Root {
+    pub version: u8,
+    pub globals: GraphSnapshot,
+    pub rows: TreeRef,
+    pub navigation: NavigationRoot,
+    pub orphan_facets: NodeFacetStore,
+    pub pending: PendingRoot,
+}
+#[derive(Serialize, Deserialize)]
+pub(super) struct NavigationRoot {
+    pub entries: TreeRef,
+    pub visits: TreeRef,
+    /// Each owner's digest with its identity.
+    pub owners: TreeRef,
+    pub digest: String,
+}
+#[derive(Serialize, Deserialize)]
+pub(super) struct PendingRoot {
+    pub retention: kernel::graph::PendingLinkRetention,
+    pub owners: TreeRef,
 }
 /// Each row's position by address, and the Surfaces showing each Resource in
 /// row order (engine split D177: `row` was a scan, so a full reader's
@@ -68,8 +98,10 @@ pub(super) struct NavigationIndex {
     pub digest: String,
 }
 /// The catalog version this binary writes. Version 2 records list their
-/// edges without version 1's snapshot index (engine split D175).
-pub(super) const VERSION: u8 = 2;
+/// edges without version 1's snapshot index (engine split D175); version 3
+/// stores the catalog's lists as content-defined trees (D177) and its records
+/// as version 2 does.
+pub(super) const VERSION: u8 = 3;
 /// A stored node. Each edge with both endpoints in the stratum is listed by
 /// both endpoints' records, in snapshot order; the reader merges the two copies
 /// by pair and restores the snapshot's order from content (D175).
@@ -132,7 +164,7 @@ impl From<StoredNodeV1> for StoredNode {
 pub(super) fn fail(message: impl Into<String>) -> StoreError {
     StoreError::Codec(message.into())
 }
-pub(super) fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>, StoreError> {
+pub(super) fn encode<T: Serialize + ?Sized>(value: &T) -> Result<Vec<u8>, StoreError> {
     serde_json::to_vec(value).map_err(|e| fail(e.to_string()))
 }
 pub(super) fn decode<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T, StoreError> {
@@ -150,13 +182,30 @@ pub(super) fn checked<T: serde::de::DeserializeOwned>(
     }
     decode(bytes)
 }
-/// The catalog stored at `generation`, checked: its digest, a version this
-/// binary reads (1 or 2) and one row per address.
-pub(super) fn parse_catalog(bytes: &[u8], generation: &str) -> Result<Catalog, StoreError> {
-    let catalog: Catalog = checked(bytes, generation)?;
-    if !(1..=VERSION).contains(&catalog.version) {
-        return Err(fail("unsupported addressable graph version"));
+/// A stored catalog: whole (versions 1 and 2) or a root naming trees (3).
+pub(super) enum Stored {
+    Whole(Box<Catalog>),
+    Root(Box<Root>),
+}
+/// The catalog stored at `generation`, checked against it, decoded as its
+/// version wrote it. A whole one is [finished](finish); a root's trees are
+/// still to read.
+pub(super) fn parse_catalog(bytes: &[u8], generation: &str) -> Result<Stored, StoreError> {
+    #[derive(Deserialize)]
+    struct Version {
+        version: u8,
     }
+    if hash(bytes) != generation {
+        return Err(fail("addressable record checksum mismatch"));
+    }
+    match decode::<Version>(bytes)?.version {
+        1 | 2 => finish(decode(bytes)?).map(|catalog| Stored::Whole(Box::new(catalog))),
+        3 => Ok(Stored::Root(Box::new(decode(bytes)?))),
+        _ => Err(fail("unsupported addressable graph version")),
+    }
+}
+/// `catalog` with its row index built: one row per address.
+pub(super) fn finish(catalog: Catalog) -> Result<Catalog, StoreError> {
     let index = RowIndex::of(&catalog.entries);
     if index.at.len() != catalog.entries.len() {
         return Err(fail("duplicate catalog address"));
@@ -186,6 +235,9 @@ impl<B: Backend> AddressableGraphStore<B> {
         };
         self.key(&format!("nodes/{layer}/{}/{digest}", address.id()))
     }
+    pub(super) fn chunk_key(&self, digest: &str) -> String {
+        self.key(&format!("chunks/{digest}"))
+    }
     pub(super) async fn required(&self, key: &str) -> Result<Vec<u8>, StoreError> {
         self.backend
             .get(key)
@@ -197,8 +249,12 @@ impl<B: Backend> AddressableGraphStore<B> {
         let bytes = self
             .required(&self.key(&format!("catalog/{generation}")))
             .await?;
-        let catalog = parse_catalog(&bytes, &generation)?;
-        Ok((generation, catalog, bytes.len()))
+        let mut size = bytes.len();
+        let catalog = match parse_catalog(&bytes, &generation)? {
+            Stored::Whole(catalog) => *catalog,
+            Stored::Root(root) => tree::load_catalog(self, *root, &mut size).await?,
+        };
+        Ok((generation, catalog, size))
     }
     /// The record `row` names, decoded as its catalog's `version` wrote it.
     pub(super) async fn node(&self, row: &IndexRow, version: u8) -> Result<StoredNode, StoreError> {

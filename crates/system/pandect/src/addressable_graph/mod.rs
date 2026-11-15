@@ -22,12 +22,22 @@
 //! which carried the positions, still load with them ignored; the next
 //! publication rewrites them, and collection deletes the old ones.
 //!
+//! The catalog's lists (its rows, navigation's entries, visits and owners,
+//! and the pending owners) are stored as content-defined trees of chunks
+//! under `chunks/<digest>`, as deep as a list needs, named by a root whose
+//! digest is the generation (catalog version 3, engine split D177). A chunk
+//! ends where an item's key says it does, so a graph gives the same root
+//! however it was reached, and a publication puts only the chunks on the
+//! paths from its changed items to the tops. Versions 1 and 2, which stored
+//! the catalog whole, still read; the next publication rewrites them.
+//!
 //! Collection (engine split D173) keeps it. On a
 //! [single-owner](muniment::Backend::single_owner)
 //! store a publication reads the head once inside its own transaction, and
 //! from that one read leaves out the puts the head names and deletes every
 //! key the head names that the new catalog does not: superseded records,
-//! navigation rows and pending owners, and the old catalog. The first such
+//! navigation rows and pending owners, the old catalog and its replaced
+//! chunks. It reads only the head's chunks the new catalog lacks. The first such
 //! publication on a store also sweeps, in the same transaction, every record,
 //! navigation row, pending owner and catalog the new catalog does not name
 //! (garbage written before collection), and writes the `swept` record that
@@ -103,6 +113,7 @@ mod pending;
 mod read;
 mod residency;
 mod schema;
+mod tree;
 mod write;
 use kernel::graph::NodeFacetStore;
 use schema::*;

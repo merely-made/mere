@@ -150,9 +150,14 @@ fn row_index_answers_as_the_scans_did() {
         }
         assert_eq!(showing, 12);
 
-        let key = store.key(&format!("catalog/{generation}"));
-        assert_eq!(backend.get(&key).await.unwrap().unwrap().len(), size);
-        assert_eq!(encode(&catalog).unwrap().len(), size);
+        // The catalog's bytes are its root's and its chunks'.
+        let mut stored = vec![store.key(&format!("catalog/{generation}"))];
+        stored.extend(catalog.trees.digests().map(|d| store.chunk_key(d)));
+        let mut read = 0;
+        for key in stored {
+            read += backend.get(&key).await.unwrap().unwrap().len();
+        }
+        assert_eq!(read, size);
         let view = AddressableGraphStore::new(backend.clone(), id)
             .open(ResidencyRoots::default())
             .await
@@ -161,6 +166,7 @@ fn row_index_answers_as_the_scans_did() {
 
         // Control: a repeated address is refused.
         let mut twice = catalog.clone();
+        twice.version = 2;
         twice.entries.push(catalog.entries[0].clone());
         let bytes = encode(&twice).unwrap();
         let refused = parse_catalog(&bytes, &hash(&bytes)).err().unwrap();
