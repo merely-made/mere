@@ -5,6 +5,16 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Addressable recorded graph materializations over the existing Muniment backend.
+//!
+//! A publication is content-addressed records, navigation rows and pending
+//! owners, a catalog naming them by digest, and a `head` naming the catalog.
+//! Readers open only the head and what its catalog names. A publication
+//! leaves out every write whose key the current head's catalog already names
+//! (engine split D171), so it relies on one rule: **nothing deletes or
+//! rewrites a record the head names.** A collector of superseded records must
+//! keep everything the head reaches, and anything a reader may still hold
+//! open, and must run under the writer's exclusion; files edited by hand
+//! break the rule.
 use kernel::graph::Graph;
 use muniment::{Backend, StoreError};
 use serde::{Deserialize, Serialize};

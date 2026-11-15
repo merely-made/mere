@@ -386,12 +386,14 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         }
         let pending = candidate.pending(at)?;
         let mut ops = Vec::new();
-        // The publication describes the candidate's graph and joins its write.
-        // Preparation refuses before anything is written or installed.
+        // The publication describes the candidate's graph and joins its write,
+        // less what the current head already holds. Preparation refuses before
+        // anything is written or installed.
         let generation = if publish {
             let publication = candidate.prepare_resident_publication()?;
-            ops.extend_from_slice(publication.ops());
-            Some(publication.generation().to_owned())
+            let (writes, generation) = candidate.resident_store().unheld_writes(publication).await;
+            ops.extend(writes);
+            Some(generation)
         } else {
             None
         };
