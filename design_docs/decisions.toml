@@ -1935,6 +1935,14 @@ summary = "Publication's two quadratics are fixed, held writes are skipped, pref
 draws_on = ["engine-split D164", "engine-split D167"]
 plans = ["engine-split"]
 
+[decisions."engine-split D172"]
+title = "`to_snapshot_at` walks the sorted Resource facets beside the ordered Resources (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "to_snapshot_at walks sorted Resource facets beside the ordered Resources to meet D168's bound."
+draws_on = ["engine-split D168", "engine-split D170"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
