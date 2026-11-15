@@ -3688,3 +3688,10 @@ revision and what crosses at frame rate.
   controls failing as they should; about 45 ms for the decision at 10k and a 3.6 s one-time sweep on the ThinkPad. Before it could
   land, Eidetic `046f014` (eidetic-core 0.0.4) left fresh Mere resolves with two eidetic crates through Dramatis's exact `0.0.3`
   row; on Mark's word Dramatis `0c4d62a` took the lower bound `>=0.0.3, <0.1`. Evidence in `Code/testing/engine-split/collect/`.
+- 2026-11-15: D175 and D176's edge-index removal landed: Mere `07b4d15cc` (records list their edges without the snapshot
+  index, catalog version 2, version-1 records decoding by their catalog's version, the reader merging copies by pair and restoring
+  the snapshot's order) and `b205fdcf4` (an edge only one resident endpoint lists is refused). pandect 297 and mere-kernel 634 pass
+  on the committed tree with a fresh resolve, each new test failing with its code broken on purpose. At 10k an insert or undo writes
+  2 records (5,809 to 9,578 before) and about 4.05 MB a publication, nearly all the catalog; a fresh reader matched the writer after
+  20 of 20 publications. Evidence in `Code/testing/engine-split/edgeless/`. The catalog rewritten per publication is the next
+  amplification, not yet assessed.
