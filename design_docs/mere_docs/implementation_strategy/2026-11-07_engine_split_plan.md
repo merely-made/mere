@@ -3676,3 +3676,11 @@ revision and what crosses at frame rate.
   reported from Graphshell and fixed forward in `e7cca2d71`. mere-kernel 634, pandect 288 and mere 57 pass with `--all-features` on a
   fresh resolve, the equivalence test 12/12, both escape tests refusing and failing with the check off. Edits at 100k 29 to 85 ms
   (about 2,030 on main), `to_snapshot_at` about +11% as D174 allows. Evidence in `Code/testing/engine-split/edit_sharing/`.
+- 2026-11-15: D173 and D175's collection landed: Eidetic `63741b5` (`Backend::single_owner`, false unless a backend says
+  so; true for Directory, redb and Memory, forwarded through `Box` and `&`), then Mere `d9d618b85` (a publication decides its skip
+  and deletes from one head read inside its own transaction, on both write paths, only where the backend has one owner) and
+  `944175d0e` (the first collecting publication sweeps the publication's own key families once and records `swept`;
+  Graphshell's `host-settings` survives). pandect 292 and mere-kernel 634 pass on a fresh resolve, the collection tests' negative
+  controls failing as they should; about 45 ms for the decision at 10k and a 3.6 s one-time sweep on the ThinkPad. Before it could
+  land, Eidetic `046f014` (eidetic-core 0.0.4) left fresh Mere resolves with two eidetic crates through Dramatis's exact `0.0.3`
+  row; on Mark's word Dramatis `0c4d62a` took the lower bound `>=0.0.3, <0.1`. Evidence in `Code/testing/engine-split/collect/`.
