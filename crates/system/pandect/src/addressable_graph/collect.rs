@@ -4,12 +4,16 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Deleting what a publication supersedes, in its own transaction (engine
-//! split D173). The rules are in the [module docs](super).
+//! Deleting what a publication supersedes, in its own transaction, and the
+//! one sweep the first collecting publication runs (engine split D173,
+//! D175). The rules are in the [module docs](super).
 use super::*;
 use muniment::{TransactionReader, WriteOp};
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
+
+/// The record the one sweep leaves under the graph's prefix.
+const SWEPT: &str = "swept";
 
 /// The keys a publication names under `prefix`, spelled as its writers spell
 /// them: records, navigation rows, pending owners and the catalog itself.
@@ -62,12 +66,21 @@ impl StagedPublication {
     /// The writes to commit against `reader`'s snapshot: every put less those
     /// the head names (D171), then, when collecting, a delete for each key the
     /// head names that the new catalog does not (D173). Both come from one
-    /// read of the head.
-    pub(crate) fn decide(self, reader: &dyn TransactionReader) -> Vec<WriteOp> {
-        match named_by_head(reader, &self.prefix) {
-            Some(held) => self.against(&held),
-            None => self.ops,
+    /// read of the head. The first collecting publication on a store also
+    /// sweeps what earlier publications left (see [`sweep`]).
+    pub(crate) fn decide(mut self, reader: &dyn TransactionReader) -> Vec<WriteOp> {
+        let held = named_by_head(reader, &self.prefix);
+        let swept = (self.collect.as_ref()).and_then(|named| sweep(reader, &self.prefix, named));
+        if swept.is_some() {
+            // The sweep's deletes already cover what the head supersedes.
+            self.collect = None;
         }
+        let mut ops = match &held {
+            Some(held) => self.against(held),
+            None => self.ops,
+        };
+        ops.extend(swept.into_iter().flatten());
+        ops
     }
     fn against(self, held: &HashSet<String>) -> Vec<WriteOp> {
         let mut ops = self.ops;
@@ -130,4 +143,43 @@ impl<B: crate::graph_session::LegacyTransactionBackend> AddressableGraphStore<B>
         };
         self.backend.apply(&staged.against(&held)).await
     }
+}
+
+/// The key families a publication writes under the graph's prefix. The sweep
+/// touches nothing else there: `head`, `policy` and a host's own keys beside
+/// them (Graphshell's `host-settings`) stay.
+const FAMILIES: &[&str] = &["nodes/", "catalog/", "navigation/", "pending/"];
+
+/// The one sweep (D173, "One sweep at open, once"), run by the first
+/// collecting publication on a store inside its transaction: a delete for
+/// every key in the publication's [families](FAMILIES) the new catalog
+/// (`named`) does not name, and the `swept` record that stops it running
+/// again. After this transaction the new head is what readers open, so what
+/// it does not name there is garbage, whatever the old head was. `None` once
+/// swept, or when the store cannot be read here (tried again next time).
+fn sweep(
+    reader: &dyn TransactionReader,
+    prefix: &str,
+    named: &HashSet<String>,
+) -> Option<Vec<WriteOp>> {
+    let swept = format!("{prefix}{SWEPT}");
+    if reader.get(&swept).ok()?.is_some() {
+        return None;
+    }
+    let mut garbage = Vec::new();
+    for family in FAMILIES.iter() {
+        let mut keys = reader.list(&format!("{prefix}{family}")).ok()?;
+        keys.retain(|key| !named.contains(key));
+        garbage.append(&mut keys);
+    }
+    garbage.sort();
+    let mut ops: Vec<WriteOp> = garbage
+        .into_iter()
+        .map(|key| WriteOp::Delete { key })
+        .collect();
+    ops.push(WriteOp::Put {
+        key: swept,
+        value: encode(&1u8).ok()?,
+    });
+    Some(ops)
 }

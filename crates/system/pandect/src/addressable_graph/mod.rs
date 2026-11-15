@@ -18,13 +18,18 @@
 //! store a publication reads the head once inside its own transaction, and
 //! from that one read leaves out the puts the head names and deletes every
 //! key the head names that the new catalog does not: superseded records,
-//! navigation rows and pending owners, and the old catalog. It deletes at
-//! once, with no grace for readers: a reader opens only the current head,
-//! and one that loses a race fails closed and retries. A store whose backend
-//! does not declare a single owner (IndexedDB, which other tabs open, or a
-//! wrapper that does not forward the answer) collects nothing until
-//! protected readers exist (graph semantics Phase F); neither does a backend
-//! without transactions.
+//! navigation rows and pending owners, and the old catalog. The first such
+//! publication on a store also sweeps, in the same transaction, every record,
+//! navigation row, pending owner and catalog the new catalog does not name
+//! (garbage written before collection), and writes the `swept` record that
+//! stops it running again. Nothing else under the graph's prefix is touched:
+//! `head`, `policy` and a host's own keys (Graphshell's `host-settings`).
+//! Both delete at once, with no grace for readers: a reader opens only the
+//! current head, and one that loses a race fails closed and retries. A store
+//! whose backend does not declare a single owner (IndexedDB, which other tabs
+//! open, or a wrapper that does not forward the answer) collects nothing
+//! until protected readers exist (graph semantics Phase F); neither does a
+//! backend without transactions.
 use kernel::graph::Graph;
 use muniment::{Backend, StoreError};
 use serde::{Deserialize, Serialize};

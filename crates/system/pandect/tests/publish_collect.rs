@@ -6,14 +6,16 @@
 
 //! A publication deletes, in its own transaction, what the head it supersedes
 //! named and the new head does not, on both publishing paths, so a
-//! single-owner store holds exactly what the head names; a shared store
-//! collects nothing (engine split D173).
+//! single-owner store holds exactly what the head names; the first such
+//! publication sweeps what earlier ones left, once, and leaves a host's keys;
+//! a shared store collects
+//! nothing (engine split D173).
 #![cfg(not(target_arch = "wasm32"))]
 
 use kernel::graph::Graph;
 use kernel::graph::apply::GraphDelta;
 use muniment::{Backend, MemoryBackend, StoreError, TransactFn, WriteOp};
-use pandect::addressable_graph::{AddressableGraphStore, ResidencyRoots};
+use pandect::addressable_graph::{AddressableGraphStore, ResidencyPolicy, ResidencyRoots};
 use pandect::{Author, CapturedDelta, GraphSession, MereSessions};
 use std::collections::BTreeSet;
 use std::time::SystemTime;
@@ -173,14 +175,26 @@ async fn checkpoint<B: Backend + Clone + Sync>(
     session.publish_resident_checkpoint().await.unwrap()
 }
 
+/// What a collected store holds: a publication's keys and the `swept`
+/// record its first collecting publication left.
+fn collected(graph_id: Uuid, graph: &Graph) -> BTreeSet<String> {
+    let mut keys = publication_keys(graph_id, graph);
+    keys.insert(swept(graph_id));
+    keys
+}
+
+fn swept(graph_id: Uuid) -> String {
+    format!("{}swept", prefix(graph_id))
+}
+
 /// After each publication the reader opens it and the store holds exactly
-/// what the head names.
+/// what the head names, and the `swept` record.
 async fn exact(backend: &MemoryBackend, session: &GraphSession<MemoryBackend>, generation: &str) {
     let graph_id = published_graph(backend).await;
     reads_back(backend, graph_id, session.graph(), generation).await;
     assert_eq!(
         stored(backend, graph_id).await,
-        publication_keys(graph_id, session.graph())
+        collected(graph_id, session.graph())
     );
 }
 
@@ -336,6 +350,7 @@ fn a_shared_store_collects_nothing() {
         assert!(held.is_superset(&original));
         assert!(held.contains(&format!("{}catalog/{first}", prefix(graph_id))));
         assert!(held.is_superset(&publication_keys(graph_id, session.graph())));
+        assert!(!held.contains(&swept(graph_id)));
         assert_eq!(held.len(), original.len() + 4, "{held:#?}");
 
         // The store path alone, declared shared, keeps the old catalog too.
@@ -344,5 +359,72 @@ fn a_shared_store_collects_nothing() {
         let after = stored(&backend, graph_id).await;
         assert!(after.is_superset(&held));
         reads_back(&backend, graph_id, &Graph::new(), &fourth).await;
+    });
+}
+
+#[test]
+fn garbage_from_before_collection_is_swept_once() {
+    pollster::block_on(async {
+        // A store published without collection, as every store was before:
+        // the same map behind a wrapper that reads as shared.
+        let uncollected = Shared::default();
+        let backend = uncollected.0.clone();
+        let mut session = MereSessions::new(uncollected).begin_recorded(author(), None);
+        session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+        commit(&mut session, adds(1..=6)).await;
+        let deltas = title(&session, 2, "changed");
+        commit(&mut session, deltas).await;
+        let deltas = navigate(3, 10);
+        checkpoint(&mut session, deltas).await;
+        let deltas = remove(&session, 6);
+        commit(&mut session, deltas).await;
+        let graph_id = published_graph(&backend).await;
+        let before = stored(&backend, graph_id).await;
+        let named = publication_keys(graph_id, session.graph());
+        let garbage = before.difference(&named).count();
+        assert!(garbage >= 6, "{garbage} garbage keys");
+
+        // A host's own keys beside the publication: Graphshell keeps its
+        // resident settings at `host-settings` next to `policy`.
+        let host = format!("{}host-settings", prefix(graph_id));
+        backend.put(&host, b"{}").await.unwrap();
+        AddressableGraphStore::new(backend.clone(), graph_id)
+            .set_policy(ResidencyPolicy::Full)
+            .await
+            .unwrap();
+        let before = stored(&backend, graph_id).await;
+        let kept = [host, format!("{}policy", prefix(graph_id))];
+
+        // The owner reopens it single-owner: its first publication sweeps, in
+        // its own transaction, every record, navigation row, pending owner and
+        // catalog the new head does not name, and nothing else.
+        let sessions = MereSessions::new(backend.clone());
+        let mut owner = sessions.open(session.id()).await.unwrap();
+        assert_eq!(
+            stored(&backend, graph_id).await,
+            before,
+            "open alone sweeps nothing"
+        );
+        let deltas = title(&owner, 4, "changed");
+        let generation = commit(&mut owner, deltas).await;
+        reads_back(&backend, graph_id, owner.graph(), &generation).await;
+        let mut expected = collected(graph_id, owner.graph());
+        expected.extend(kept.iter().cloned());
+        assert_eq!(stored(&backend, graph_id).await, expected);
+
+        // Once: a key written outside a publication after the sweep stays.
+        let stray = format!(
+            "{}nodes/surface/{}/stray",
+            prefix(graph_id),
+            Uuid::from_u128(4)
+        );
+        backend.put(&stray, b"stray").await.unwrap();
+        let deltas = navigate(5, 20);
+        let generation = checkpoint(&mut owner, deltas).await;
+        reads_back(&backend, graph_id, owner.graph(), &generation).await;
+        let mut expected = collected(graph_id, owner.graph());
+        expected.extend(kept);
+        expected.insert(stray);
+        assert_eq!(stored(&backend, graph_id).await, expected);
     });
 }

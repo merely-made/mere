@@ -111,6 +111,13 @@ fn expected_writes(graph_id: Uuid, before: &Graph, after: &Graph) -> BTreeSet<St
     keys
 }
 
+/// The puts of a store's first collecting publication: `writes` and the
+/// record of its one sweep (engine split D173).
+fn first_collecting(graph_id: Uuid, mut writes: BTreeSet<String>) -> BTreeSet<String> {
+    writes.insert(format!("{}swept", prefix(graph_id)));
+    writes
+}
+
 /// A full reader opens the head at `generation` and sees `graph`.
 async fn reads_back(backend: &Counting, graph_id: Uuid, graph: &Graph, generation: &str) {
     let view = AddressableGraphStore::new(backend.clone(), graph_id)
@@ -163,7 +170,10 @@ fn write_recorded_graph_leaves_out_what_the_head_holds() {
         // The first publication writes everything: 16 records, catalog, head.
         let everything = expected_writes(graph_id, &Graph::new(), &source);
         assert_eq!(everything.len(), 18);
-        assert_eq!(backend.last_puts(&prefix(graph_id)), everything);
+        assert_eq!(
+            backend.last_puts(&prefix(graph_id)),
+            first_collecting(graph_id, everything)
+        );
         reads_back(&backend, graph_id, &source, &first).await;
 
         // The same graph again: only the head.
@@ -229,7 +239,7 @@ fn a_published_commit_leaves_out_what_the_head_holds() {
         let graph_id = published_graph(&backend).await;
         assert_eq!(
             backend.last_puts(&prefix(graph_id)),
-            expected_writes(graph_id, &empty, session.graph())
+            first_collecting(graph_id, expected_writes(graph_id, &empty, session.graph()))
         );
         reads_back(&backend, graph_id, session.graph(), &first).await;
 

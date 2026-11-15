@@ -1078,6 +1078,11 @@ fn preparation_matches_publication_and_refuses_limited_views_before_writes() {
         assert_eq!(prepared.generation(), generation);
         backend.apply(prepared.ops()).await.unwrap();
         let mut keys = published.list("").await.unwrap();
+        // The first collecting publication also records its one sweep
+        // (engine split D173); the rest is the prepared publication.
+        let swept = format!("graphs/{graph_id}/resident/v1/swept");
+        assert_eq!(published.get(&swept).await.unwrap(), Some(b"1".to_vec()));
+        keys.retain(|key| *key != swept);
         keys.sort();
         let mut prepared_keys = backend.list("").await.unwrap();
         prepared_keys.sort();
