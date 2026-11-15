@@ -8,9 +8,9 @@ use super::*;
 use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote};
 use kernel::persistence::{PersistedEdge, PersistedShownResource};
 use std::collections::btree_map::Entry;
-/// Resident edges by `(from, to)` pair, each pair's edges as its records list
-/// them.
-type Pairs = BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>>;
+/// Resident edges by `(from, to)` pair: the pair's edges as its records list
+/// them, and the endpoints whose records listed them.
+type Pairs = BTreeMap<(Uuid, Uuid), (Vec<PersistedEdge>, BTreeSet<Uuid>)>;
 pub(super) async fn materialize<B: Backend>(
     store: &AddressableGraphStore<B>,
     catalog: &Catalog,
@@ -80,7 +80,7 @@ pub(super) async fn materialize<B: Backend>(
                         resource_id: resource.to_string(),
                     });
                 }
-                admit(edges, &addresses, true, &mut surface_edges)?;
+                admit(id, edges, &addresses, true, &mut surface_edges)?;
             },
             (GraphAddress::Resource(id), StoredNode::Resource { record, edges }) => {
                 if kernel::graph::ResourceNode::for_term(&record.canonical_iri).id() != id {
@@ -88,20 +88,24 @@ pub(super) async fn materialize<B: Backend>(
                 }
                 footprint.resources += 1;
                 snapshot.resources.push(record.clone());
-                admit(edges, &addresses, false, &mut resource_edges)?;
+                admit(id, edges, &addresses, false, &mut resource_edges)?;
             },
             _ => return Err(fail("address stratum mismatch")),
         }
     }
+    listed_by_both(&surface_edges)?;
+    listed_by_both(&resource_edges)?;
     // `to_snapshot_at`'s order, rebuilt from content (engine split D175):
     // Surface edges by their JSON bytes, Resource edges by `(from, to)` pair,
     // each pair's edges as listed.
-    let mut keyed = (surface_edges.into_values().flatten())
+    let mut keyed = (surface_edges.into_values().flat_map(|(edges, _)| edges))
         .map(|edge| Ok((encode(&edge)?, edge)))
         .collect::<Result<Vec<_>, StoreError>>()?;
     keyed.sort_by(|a, b| a.0.cmp(&b.0));
     snapshot.edges = keyed.into_iter().map(|(_, edge)| edge).collect();
-    snapshot.resource_edges = resource_edges.into_values().flatten().collect();
+    snapshot.resource_edges = (resource_edges.into_values())
+        .flat_map(|(edges, _)| edges)
+        .collect();
     let (navigation, bytes) = navigation::load(
         store,
         &catalog.navigation,
@@ -118,9 +122,10 @@ pub(super) async fn materialize<B: Backend>(
     }
     Ok((snapshot, facets, coverage, footprint))
 }
-/// A record's resident edges, merged by pair with the other endpoint's copy,
-/// which must list the same edges in the same order.
+/// `owner`'s record's resident edges, merged by pair with the other
+/// endpoint's copy, which must list the same edges in the same order.
 fn admit(
+    owner: Uuid,
     edges: &[PersistedEdge],
     addresses: &BTreeSet<GraphAddress>,
     surface: bool,
@@ -133,7 +138,7 @@ fn admit(
             GraphAddress::Resource(id)
         }
     };
-    let mut mine = Pairs::new();
+    let mut mine: BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>> = BTreeMap::new();
     for edge in edges {
         let a = Uuid::parse_str(&edge.from_node_id).map_err(|e| fail(e.to_string()))?;
         let b = Uuid::parse_str(&edge.to_node_id).map_err(|e| fail(e.to_string()))?;
@@ -143,13 +148,28 @@ fn admit(
     }
     for (pair, list) in mine {
         match out.entry(pair) {
-            Entry::Occupied(copy) if *copy.get() != list => {
+            Entry::Occupied(copy) if copy.get().0 != list => {
                 return Err(fail("inconsistent incident relation copies"));
             },
-            Entry::Occupied(_) => {},
-            Entry::Vacant(slot) => {
-                slot.insert(list);
+            Entry::Occupied(mut copy) => {
+                copy.get_mut().1.insert(owner);
             },
+            Entry::Vacant(slot) => {
+                slot.insert((list, BTreeSet::from([owner])));
+            },
+        }
+    }
+    Ok(())
+}
+/// Every resident pair was listed by both its endpoints' records (engine
+/// split D176): an edge one record lists and the other omits is a store that
+/// disagrees with itself, refused as disagreeing copies are.
+fn listed_by_both(pairs: &Pairs) -> Result<(), StoreError> {
+    for ((a, b), (_, by)) in pairs {
+        if *by != BTreeSet::from([*a, *b]) {
+            return Err(fail(
+                "inconsistent incident relation copies: listed by one endpoint",
+            ));
         }
     }
     Ok(())

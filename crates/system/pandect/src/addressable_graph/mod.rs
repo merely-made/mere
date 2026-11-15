@@ -16,8 +16,9 @@
 //! A record lists its node's edges in snapshot order without their positions
 //! in the snapshot's edge columns (catalog version 2, engine split D175), so
 //! an edit rewrites only the records whose own content or edges changed. A
-//! reader merges each edge's two copies by pair, refuses copies that disagree,
-//! and rebuilds `to_snapshot_at`'s order from content. Version 1 records,
+//! reader merges each edge's two copies by pair, refuses copies that disagree
+//! or an edge between resident items that only one of their records lists
+//! (D176), and rebuilds `to_snapshot_at`'s order from content. Version 1 records,
 //! which carried the positions, still load with them ignored; the next
 //! publication rewrites them, and collection deletes the old ones.
 //!

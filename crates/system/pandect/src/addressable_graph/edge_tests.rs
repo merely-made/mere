@@ -419,3 +419,74 @@ fn copies_of_an_edge_that_disagree_are_refused() {
         assert_eq!(refused(&view, &view.records).await, "admitted");
     });
 }
+
+#[test]
+fn an_edge_one_resident_endpoint_omits_is_refused() {
+    pollster::block_on(async {
+        let (graph, pair) = fixture();
+        let backend = MemoryBackend::new();
+        publish(&backend, &graph, VERSION).await;
+        let view = store(&backend)
+            .open(ResidencyRoots::default())
+            .await
+            .unwrap();
+        // Surface 3's record omits one of its edges to another Surface.
+        let mut omitted = view.records.clone();
+        let Some(StoredNode::Surface { edges, .. }) =
+            omitted.get_mut(&GraphAddress::Surface(Uuid::from_u128(3)))
+        else {
+            panic!("Surface 3 is resident");
+        };
+        let at = (edges.iter())
+            .position(|e| e.from_node_id != e.to_node_id)
+            .unwrap();
+        edges.remove(at);
+        let answer = refused(&view, &omitted).await;
+        assert!(answer.contains("listed by one endpoint"), "{answer}");
+        // The pair's start omits both of the pair's edges.
+        let mut omitted = view.records.clone();
+        let Some(StoredNode::Resource { edges, .. }) =
+            omitted.get_mut(&GraphAddress::Resource(pair.0))
+        else {
+            panic!("the pair's start is a resident Resource");
+        };
+        edges.retain(|e| e.to_node_id != pair.1.to_string());
+        let answer = refused(&view, &omitted).await;
+        assert!(answer.contains("listed by one endpoint"), "{answer}");
+        assert_eq!(refused(&view, &view.records).await, "admitted");
+
+        // A one-hop view: resident records list edges to items that are not
+        // resident, which only one endpoint can list. Accepted.
+        store(&backend)
+            .set_policy(ResidencyPolicy::Neighborhood { hops: 1 })
+            .await
+            .unwrap();
+        let roots = ResidencyRoots {
+            projection_surfaces: BTreeSet::from([Uuid::from_u128(4)]),
+            ..Default::default()
+        };
+        let partial = store(&backend).open(roots).await.unwrap();
+        let resident: BTreeSet<_> = partial.records.keys().copied().collect();
+        let outward = (partial.records.iter())
+            .flat_map(|(address, record)| record.edges().iter().map(move |e| (address, e)))
+            .filter(|(address, e)| {
+                let stratum = |id: &String| {
+                    let id = Uuid::parse_str(id).unwrap();
+                    match address {
+                        GraphAddress::Surface(_) => GraphAddress::Surface(id),
+                        GraphAddress::Resource(_) => GraphAddress::Resource(id),
+                    }
+                };
+                !resident.contains(&stratum(&e.from_node_id))
+                    || !resident.contains(&stratum(&e.to_node_id))
+            })
+            .count();
+        assert!(outward > 0, "the view has edges leaving it");
+        let catalog = partial.catalog.as_ref().unwrap();
+        let read = read::materialize(&partial.store, catalog, &partial.records, false)
+            .await
+            .unwrap()
+            .0;
+        same_columns(&read, &expected(&graph, &resident));
+    });
+}
