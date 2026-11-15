@@ -23,8 +23,8 @@ use serde::de::DeserializeOwned;
 use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 
-/// Items per chunk on average, at every level (D177's starting target).
-pub(super) const CHUNK_TARGET: u64 = 128;
+/// Items per chunk on average, at every level (engine-split D178).
+pub(super) const CHUNK_TARGET: u64 = 64;
 /// The most levels a 64-bit key hash can close at, at a target of 2.
 const MAX_DEPTH: u8 = 64;
 
