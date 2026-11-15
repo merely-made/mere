@@ -1967,6 +1967,14 @@ summary = "Records drop the edge index, old records are rewritten on publish, th
 draws_on = ["engine-split D171", "engine-split D173"]
 plans = ["engine-split"]
 
+[decisions."engine-split D176"]
+title = "Records decode by their catalog's version, a one-sided edge between resident nodes is refused, and downgrades are not supported (Mark, 2026-11-15)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Records decode by catalog version, one-sided edges between resident nodes are refused, and downgrades over version 2 are unsupported."
+draws_on = ["engine-split D173", "engine-split D175"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
