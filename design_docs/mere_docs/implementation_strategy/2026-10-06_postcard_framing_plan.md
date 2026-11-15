@@ -74,6 +74,10 @@ already takes. The claim is a real publish after H1, on Mark's word.
   if any, and whether old bytes exist anywhere (on disk, in a peer's log, in
   a fixture).
 - **Corpora and test-only encodings are listed and excluded.**
+- **Stored JSON that F3 would put on postcard is listed as an outlier** (engine-split D175, 2026-11-15): pandect's addressable
+  graph store (`addressable_graph/schema.rs`, serde_json, catalog-versioned, no per-record header) is the first. Its facets are
+  `serde_json::Value` and `PersistedEdge` skips empty fields, so moving it needs typed values first; a later lane measures what
+  postcard would save before anything moves. Portability rides on the RDF exports (N-Quads, JSON-LD), not the at-rest codec.
 
 **Done when:** the table is in this plan's Findings, with each row's source
 line cited.
