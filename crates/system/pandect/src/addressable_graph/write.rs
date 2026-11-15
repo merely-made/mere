@@ -6,7 +6,108 @@
 
 use super::*;
 use kernel::graph::{CoverageLayer, ResourceNode};
+use kernel::persistence::{GraphSnapshot, PersistedEdge, PersistedShownResource};
 use muniment::WriteOp;
+use std::collections::HashMap;
+
+/// Each node's edges and shown binding, found through maps built once per
+/// prepare instead of a scan of every edge and binding per node (engine split
+/// D171: the Resource edge scan was 97% of a 100k publication).
+struct NodeLinks<'a> {
+    snapshot: &'a GraphSnapshot,
+    lookup: Lookup<'a>,
+}
+enum Lookup<'a> {
+    Maps {
+        edges: HashMap<&'a str, Vec<usize>>,
+        resource_edges: HashMap<&'a str, Vec<usize>>,
+        shown: HashMap<&'a str, &'a PersistedShownResource>,
+    },
+    /// The scans the maps replaced, kept so a test can pin that both write
+    /// the same bytes.
+    #[cfg(test)]
+    Scan,
+}
+/// The links of `snapshot`, its maps built once.
+fn indexed_links(snapshot: &GraphSnapshot) -> NodeLinks<'_> {
+    let mut shown = HashMap::new();
+    for binding in &snapshot.shown_resources {
+        // The first binding wins, as the scan's `find` did.
+        shown.entry(binding.surface_id.as_str()).or_insert(binding);
+    }
+    let lookup = Lookup::Maps {
+        edges: by_endpoint(&snapshot.edges),
+        resource_edges: by_endpoint(&snapshot.resource_edges),
+        shown,
+    };
+    NodeLinks { snapshot, lookup }
+}
+#[cfg(test)]
+fn scanned_links(snapshot: &GraphSnapshot) -> NodeLinks<'_> {
+    NodeLinks {
+        snapshot,
+        lookup: Lookup::Scan,
+    }
+}
+impl<'a> NodeLinks<'a> {
+    fn surface_edges(&self, id: &str) -> Vec<(usize, PersistedEdge)> {
+        match &self.lookup {
+            Lookup::Maps { edges, .. } => listed(&self.snapshot.edges, edges, id),
+            #[cfg(test)]
+            Lookup::Scan => scanned(&self.snapshot.edges, id),
+        }
+    }
+    fn resource_edges(&self, id: &str) -> Vec<(usize, PersistedEdge)> {
+        match &self.lookup {
+            Lookup::Maps { resource_edges, .. } => {
+                listed(&self.snapshot.resource_edges, resource_edges, id)
+            },
+            #[cfg(test)]
+            Lookup::Scan => scanned(&self.snapshot.resource_edges, id),
+        }
+    }
+    fn shown(&self, id: &str) -> Option<&'a PersistedShownResource> {
+        match &self.lookup {
+            Lookup::Maps { shown, .. } => shown.get(id).copied(),
+            #[cfg(test)]
+            Lookup::Scan => self
+                .snapshot
+                .shown_resources
+                .iter()
+                .find(|b| b.surface_id == id),
+        }
+    }
+}
+/// Edge positions by endpoint, each list in edge order; a self-loop once.
+fn by_endpoint(edges: &[PersistedEdge]) -> HashMap<&str, Vec<usize>> {
+    let mut map: HashMap<&str, Vec<usize>> = HashMap::new();
+    for (i, edge) in edges.iter().enumerate() {
+        map.entry(edge.from_node_id.as_str()).or_default().push(i);
+        if edge.to_node_id != edge.from_node_id {
+            map.entry(edge.to_node_id.as_str()).or_default().push(i);
+        }
+    }
+    map
+}
+fn listed(
+    edges: &[PersistedEdge],
+    index: &HashMap<&str, Vec<usize>>,
+    id: &str,
+) -> Vec<(usize, PersistedEdge)> {
+    index
+        .get(id)
+        .map(|at| at.iter().map(|&i| (i, edges[i].clone())).collect())
+        .unwrap_or_default()
+}
+#[cfg(test)]
+fn scanned(edges: &[PersistedEdge], id: &str) -> Vec<(usize, PersistedEdge)> {
+    edges
+        .iter()
+        .enumerate()
+        .filter(|(_, e)| e.from_node_id == id || e.to_node_id == id)
+        .map(|(i, e)| (i, e.clone()))
+        .collect()
+}
 /// A complete publication prepared without touching storage. The caller owns
 /// when, and in which batch, its writes are applied.
 pub struct PreparedGraphPublication {
@@ -43,6 +144,13 @@ impl<B: Backend> AddressableGraphStore<B> {
     pub fn prepare_recorded_graph(
         &self,
         graph: &Graph,
+    ) -> Result<PreparedGraphPublication, StoreError> {
+        self.prepare_with(graph, indexed_links)
+    }
+    fn prepare_with(
+        &self,
+        graph: &Graph,
+        links: for<'a> fn(&'a GraphSnapshot) -> NodeLinks<'a>,
     ) -> Result<PreparedGraphPublication, StoreError> {
         if graph
             .known_coverage()
@@ -83,6 +191,7 @@ impl<B: Backend> AddressableGraphStore<B> {
         catalog.globals.resource_edges.clear();
         catalog.globals.shown_resources.clear();
         catalog.globals.navigation = Default::default();
+        let links = links(&snapshot);
         let mut ops = vec![];
         for node in &snapshot.nodes {
             let id = Uuid::parse_str(&node.node_id).map_err(|e| fail(e.to_string()))?;
@@ -96,20 +205,12 @@ impl<B: Backend> AddressableGraphStore<B> {
                         .collect()
                 })
                 .unwrap_or_default();
-            let edges = snapshot
-                .edges
-                .iter()
-                .enumerate()
-                .filter(|(_, e)| e.from_node_id == node.node_id || e.to_node_id == node.node_id)
-                .map(|(i, e)| (i, e.clone()))
-                .collect();
+            let edges = links.surface_edges(&node.node_id);
             let row = IndexRow {
                 address: GraphAddress::Surface(id),
                 hash: String::new(),
-                shown: snapshot
-                    .shown_resources
-                    .iter()
-                    .find(|b| b.surface_id == node.node_id)
+                shown: links
+                    .shown(&node.node_id)
                     .map(|b| Uuid::parse_str(&b.resource_id))
                     .transpose()
                     .map_err(|e| fail(e.to_string()))?,
@@ -132,13 +233,7 @@ impl<B: Backend> AddressableGraphStore<B> {
         }
         for record in &snapshot.resources {
             let id = ResourceNode::for_term(&record.canonical_iri).id();
-            let edges = snapshot
-                .resource_edges
-                .iter()
-                .enumerate()
-                .filter(|(_, e)| e.from_node_id == id.to_string() || e.to_node_id == id.to_string())
-                .map(|(i, e)| (i, e.clone()))
-                .collect();
+            let edges = links.resource_edges(&id.to_string());
             let declaration = record.facets.iter().any(|f| {
                 f.facet == kernel::graph::predicate_declarations::PREDICATE_DECLARATIONS_FACET
             });
@@ -203,3 +298,6 @@ impl<B: Backend> AddressableGraphStore<B> {
         Ok(())
     }
 }
+#[cfg(test)]
+#[path = "write_tests.rs"]
+mod tests;
