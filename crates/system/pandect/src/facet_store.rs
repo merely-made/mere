@@ -66,7 +66,7 @@ pub fn read_expiring_facet<Id, T>(
     revision: u64,
 ) -> Option<T>
 where
-    Id: Ord + Clone,
+    Id: Ord + std::hash::Hash + Clone,
     T: DeserializeOwned,
 {
     let stored = store.get(node, facet)?.clone();
