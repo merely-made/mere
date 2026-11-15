@@ -208,6 +208,7 @@ impl<B: Backend> AddressableGraphStore<B> {
                 retention: graph.pending_link_state().retention,
                 owners: vec![],
             },
+            index: Default::default(),
         };
         catalog.globals.nodes.clear();
         catalog.globals.edges.clear();

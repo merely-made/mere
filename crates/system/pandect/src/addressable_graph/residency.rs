@@ -38,7 +38,7 @@ impl<B: Backend> ResidentGraph<B> {
         policy: ResidencyPolicy,
         persist: bool,
     ) -> Result<(), StoreError> {
-        let (generation, catalog, _) = self.store.catalog().await?;
+        let (generation, catalog, catalog_bytes) = self.store.catalog().await?;
         let records = self.select(&catalog, &roots, &demands, policy).await?;
         let identical = generation == self.generation
             && records.keys().eq(self.records.keys())
@@ -65,6 +65,7 @@ impl<B: Backend> ResidentGraph<B> {
             )
             .await?;
             footprint.pending_bytes = bytes;
+            footprint.catalog_bytes = catalog_bytes;
             let digest = hash(&encode(&(&snapshot, &facets))?);
             Some((snapshot, facets, coverage, footprint, pending, digest))
         };
@@ -175,7 +176,7 @@ impl<B: Backend> ResidentGraph<B> {
             }
             walked.insert(address, distance);
             if let GraphAddress::Resource(id) = address {
-                for alias in catalog.entries.iter().filter(|e| e.shown == Some(id)) {
+                for alias in catalog.showing(id) {
                     queue.push_back((alias.address, distance, true));
                 }
             }

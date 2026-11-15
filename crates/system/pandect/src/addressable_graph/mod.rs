@@ -226,7 +226,7 @@ impl<B: Backend> ResidentGraph<B> {
         } else if self
             .catalog
             .as_ref()
-            .is_some_and(|c| c.entries.iter().any(|e| e.address == address))
+            .is_some_and(|c| c.row(address).is_some())
         {
             ResidencyStatus::NotLoaded
         } else {

@@ -110,3 +110,60 @@ fn indexed_links_publish_the_bytes_the_scans_did() {
             .generation
     );
 }
+
+/// The catalog's row index answers as the scans it replaced (engine split
+/// D177), refuses a duplicate address as the scan's check did, and a reader's
+/// footprint counts the catalog's stored bytes.
+#[test]
+fn row_index_answers_as_the_scans_did() {
+    pollster::block_on(async {
+        let graph = linked(12);
+        let backend = MemoryBackend::new();
+        let id = Uuid::from_u128(0xd177);
+        let store = AddressableGraphStore::new(backend.clone(), id);
+        let generation = store.write_recorded_graph(&graph).await.unwrap();
+        let (_, catalog, size) = store.catalog().await.unwrap();
+        let prepared = store.prepare_recorded_graph(&graph).unwrap();
+        let mut showing = 0;
+        for row in &catalog.entries {
+            let scanned = catalog.entries.iter().find(|e| e.address == row.address);
+            assert_eq!(
+                catalog.row(row.address).unwrap().hash,
+                scanned.unwrap().hash
+            );
+            assert_eq!(prepared.record_digest(row.address), Some(row.hash.as_str()));
+            let other = match row.address {
+                GraphAddress::Surface(id) => GraphAddress::Resource(id),
+                GraphAddress::Resource(id) => GraphAddress::Surface(id),
+            };
+            assert!(catalog.row(other).is_none());
+            let mine: Vec<_> = catalog
+                .showing(row.address.id())
+                .map(|r| r.address)
+                .collect();
+            let scanned: Vec<_> = (catalog.entries.iter())
+                .filter(|e| e.shown == Some(row.address.id()))
+                .map(|e| e.address)
+                .collect();
+            assert_eq!(mine, scanned);
+            showing += mine.len();
+        }
+        assert_eq!(showing, 12);
+
+        let key = store.key(&format!("catalog/{generation}"));
+        assert_eq!(backend.get(&key).await.unwrap().unwrap().len(), size);
+        assert_eq!(encode(&catalog).unwrap().len(), size);
+        let view = AddressableGraphStore::new(backend.clone(), id)
+            .open(ResidencyRoots::default())
+            .await
+            .unwrap();
+        assert_eq!(view.footprint().catalog_bytes, size);
+
+        // Control: a repeated address is refused.
+        let mut twice = catalog.clone();
+        twice.entries.push(catalog.entries[0].clone());
+        let bytes = encode(&twice).unwrap();
+        let refused = parse_catalog(&bytes, &hash(&bytes)).err().unwrap();
+        assert!(refused.to_string().contains("duplicate catalog address"));
+    });
+}

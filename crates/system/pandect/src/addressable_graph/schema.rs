@@ -28,6 +28,31 @@ pub(super) struct Catalog {
     pub navigation: NavigationIndex,
     pub orphan_facets: NodeFacetStore,
     pub pending: PendingIndex,
+    /// Built once per catalog: by `parse_catalog` for a stored one, on the
+    /// first lookup for a prepared one. Not stored.
+    #[serde(skip)]
+    pub index: std::sync::OnceLock<RowIndex>,
+}
+/// Each row's position by address, and the Surfaces showing each Resource in
+/// row order (engine split D177: `row` was a scan, so a full reader's
+/// selection was quadratic, 23.6 s of a 32.8 s open at 100k).
+#[derive(Clone, Default)]
+pub(super) struct RowIndex {
+    at: BTreeMap<GraphAddress, usize>,
+    showing: BTreeMap<Uuid, Vec<usize>>,
+}
+impl RowIndex {
+    fn of(entries: &[IndexRow]) -> Self {
+        let mut index = Self::default();
+        for (i, row) in entries.iter().enumerate() {
+            // The first row wins, as the scan's `find` did.
+            index.at.entry(row.address).or_insert(i);
+            if let Some(resource) = row.shown {
+                index.showing.entry(resource).or_default().push(i);
+            }
+        }
+        index
+    }
 }
 #[derive(Clone, Serialize, Deserialize)]
 pub(super) struct PendingIndex {
@@ -132,15 +157,25 @@ pub(super) fn parse_catalog(bytes: &[u8], generation: &str) -> Result<Catalog, S
     if !(1..=VERSION).contains(&catalog.version) {
         return Err(fail("unsupported addressable graph version"));
     }
-    let unique: BTreeSet<_> = catalog.entries.iter().map(|e| e.address).collect();
-    if unique.len() != catalog.entries.len() {
+    let index = RowIndex::of(&catalog.entries);
+    if index.at.len() != catalog.entries.len() {
         return Err(fail("duplicate catalog address"));
     }
+    let _ = catalog.index.set(index);
     Ok(catalog)
 }
 impl Catalog {
+    fn index(&self) -> &RowIndex {
+        self.index.get_or_init(|| RowIndex::of(&self.entries))
+    }
     pub fn row(&self, address: GraphAddress) -> Option<&IndexRow> {
-        self.entries.iter().find(|e| e.address == address)
+        let at = *self.index().at.get(&address)?;
+        Some(&self.entries[at])
+    }
+    /// The rows of the Surfaces showing `resource`, in row order.
+    pub fn showing(&self, resource: Uuid) -> impl Iterator<Item = &IndexRow> {
+        let rows = self.index().showing.get(&resource);
+        rows.into_iter().flatten().map(|&i| &self.entries[i])
     }
 }
 impl<B: Backend> AddressableGraphStore<B> {

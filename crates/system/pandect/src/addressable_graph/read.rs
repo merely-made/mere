@@ -30,10 +30,7 @@ pub(super) async fn materialize<B: Backend>(
     let mut facets = catalog.orphan_facets.clone();
     let mut surface_edges = Pairs::new();
     let mut resource_edges = Pairs::new();
-    let mut footprint = ResidentFootprint {
-        catalog_bytes: encode(catalog)?.len(),
-        ..Default::default()
-    };
+    let mut footprint = ResidentFootprint::default();
     let mut limit = CoverageLimit::new(
         CoverageLayer::Residency,
         "stored graph items are not resident",
