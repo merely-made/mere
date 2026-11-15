@@ -6,7 +6,11 @@
 
 use super::*;
 use kernel::graph::{CoverageLayer, CoverageLimit, CoverageNote};
-use kernel::persistence::PersistedShownResource;
+use kernel::persistence::{PersistedEdge, PersistedShownResource};
+use std::collections::btree_map::Entry;
+/// Resident edges by `(from, to)` pair, each pair's edges as its records list
+/// them.
+type Pairs = BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>>;
 pub(super) async fn materialize<B: Backend>(
     store: &AddressableGraphStore<B>,
     catalog: &Catalog,
@@ -24,8 +28,8 @@ pub(super) async fn materialize<B: Backend>(
     let addresses: BTreeSet<_> = records.keys().copied().collect();
     let mut snapshot = catalog.globals.clone();
     let mut facets = catalog.orphan_facets.clone();
-    let mut surface_edges = BTreeMap::new();
-    let mut resource_edges = BTreeMap::new();
+    let mut surface_edges = Pairs::new();
+    let mut resource_edges = Pairs::new();
     let mut footprint = ResidentFootprint {
         catalog_bytes: encode(catalog)?.len(),
         ..Default::default()
@@ -89,8 +93,15 @@ pub(super) async fn materialize<B: Backend>(
             _ => return Err(fail("address stratum mismatch")),
         }
     }
-    snapshot.edges = surface_edges.into_values().collect();
-    snapshot.resource_edges = resource_edges.into_values().collect();
+    // `to_snapshot_at`'s order, rebuilt from content (engine split D175):
+    // Surface edges by their JSON bytes, Resource edges by `(from, to)` pair,
+    // each pair's edges as listed.
+    let mut keyed = (surface_edges.into_values().flatten())
+        .map(|edge| Ok((encode(&edge)?, edge)))
+        .collect::<Result<Vec<_>, StoreError>>()?;
+    keyed.sort_by(|a, b| a.0.cmp(&b.0));
+    snapshot.edges = keyed.into_iter().map(|(_, edge)| edge).collect();
+    snapshot.resource_edges = resource_edges.into_values().flatten().collect();
     let (navigation, bytes) = navigation::load(
         store,
         &catalog.navigation,
@@ -107,27 +118,38 @@ pub(super) async fn materialize<B: Backend>(
     }
     Ok((snapshot, facets, coverage, footprint))
 }
+/// A record's resident edges, merged by pair with the other endpoint's copy,
+/// which must list the same edges in the same order.
 fn admit(
-    edges: &[(usize, kernel::persistence::PersistedEdge)],
+    edges: &[PersistedEdge],
     addresses: &BTreeSet<GraphAddress>,
     surface: bool,
-    out: &mut BTreeMap<usize, kernel::persistence::PersistedEdge>,
+    out: &mut Pairs,
 ) -> Result<(), StoreError> {
-    for (index, edge) in edges {
+    let address = |id| {
+        if surface {
+            GraphAddress::Surface(id)
+        } else {
+            GraphAddress::Resource(id)
+        }
+    };
+    let mut mine = Pairs::new();
+    for edge in edges {
         let a = Uuid::parse_str(&edge.from_node_id).map_err(|e| fail(e.to_string()))?;
         let b = Uuid::parse_str(&edge.to_node_id).map_err(|e| fail(e.to_string()))?;
-        let address = |id| {
-            if surface {
-                GraphAddress::Surface(id)
-            } else {
-                GraphAddress::Resource(id)
-            }
-        };
         if addresses.contains(&address(a)) && addresses.contains(&address(b)) {
-            if out.get(index).is_some_and(|previous| previous != edge) {
+            mine.entry((a, b)).or_default().push(edge.clone());
+        }
+    }
+    for (pair, list) in mine {
+        match out.entry(pair) {
+            Entry::Occupied(copy) if *copy.get() != list => {
                 return Err(fail("inconsistent incident relation copies"));
-            }
-            out.insert(*index, edge.clone());
+            },
+            Entry::Occupied(_) => {},
+            Entry::Vacant(slot) => {
+                slot.insert(list);
+            },
         }
     }
     Ok(())

@@ -150,7 +150,7 @@ impl<B: Backend> ResidentGraph<B> {
                 {
                     old.clone()
                 } else {
-                    self.store.node(row).await?
+                    self.store.node(row, catalog.version).await?
                 };
                 selected.insert(address, record);
             }
@@ -186,7 +186,7 @@ impl<B: Backend> ResidentGraph<B> {
             if distance >= max {
                 continue;
             }
-            for (_, edge) in selected[&address].edges() {
+            for edge in selected[&address].edges() {
                 for id in [&edge.from_node_id, &edge.to_node_id] {
                     let id = Uuid::parse_str(id).map_err(|e| fail(e.to_string()))?;
                     let neighbor = match address {

@@ -42,8 +42,37 @@ pub(super) struct NavigationIndex {
     pub identities: Vec<NodeHistoryOwner>,
     pub digest: String,
 }
+/// The catalog version this binary writes. Version 2 records list their
+/// edges without version 1's snapshot index (engine split D175).
+pub(super) const VERSION: u8 = 2;
+/// A stored node. Each edge with both endpoints in the stratum is listed by
+/// both endpoints' records, in snapshot order; the reader merges the two copies
+/// by pair and restores the snapshot's order from content (D175).
 #[derive(Clone, Serialize, Deserialize)]
 pub(super) enum StoredNode {
+    Surface {
+        node: PersistedNode,
+        facets: Vec<(String, serde_json::Value)>,
+        edges: Vec<PersistedEdge>,
+    },
+    Resource {
+        record: PersistedResourceRecord,
+        edges: Vec<PersistedEdge>,
+    },
+}
+impl StoredNode {
+    pub fn edges(&self) -> &[PersistedEdge] {
+        match self {
+            Self::Surface { edges, .. } | Self::Resource { edges, .. } => edges,
+        }
+    }
+}
+/// A version 1 record: each edge with its position in the snapshot's edge
+/// column. It still loads, the position ignored; the next publication
+/// rewrites it.
+#[derive(Deserialize)]
+#[cfg_attr(test, derive(Serialize))]
+pub(super) enum StoredNodeV1 {
     Surface {
         node: PersistedNode,
         facets: Vec<(String, serde_json::Value)>,
@@ -54,10 +83,24 @@ pub(super) enum StoredNode {
         edges: Vec<(usize, PersistedEdge)>,
     },
 }
-impl StoredNode {
-    pub fn edges(&self) -> &[(usize, PersistedEdge)] {
-        match self {
-            Self::Surface { edges, .. } | Self::Resource { edges, .. } => edges,
+impl From<StoredNodeV1> for StoredNode {
+    fn from(node: StoredNodeV1) -> Self {
+        let plain =
+            |edges: Vec<(usize, PersistedEdge)>| edges.into_iter().map(|(_, e)| e).collect();
+        match node {
+            StoredNodeV1::Surface {
+                node,
+                facets,
+                edges,
+            } => Self::Surface {
+                node,
+                facets,
+                edges: plain(edges),
+            },
+            StoredNodeV1::Resource { record, edges } => Self::Resource {
+                record,
+                edges: plain(edges),
+            },
         }
     }
 }
@@ -82,11 +125,11 @@ pub(super) fn checked<T: serde::de::DeserializeOwned>(
     }
     decode(bytes)
 }
-/// The catalog stored at `generation`, checked: its digest, its version and
-/// one row per address.
+/// The catalog stored at `generation`, checked: its digest, a version this
+/// binary reads (1 or 2) and one row per address.
 pub(super) fn parse_catalog(bytes: &[u8], generation: &str) -> Result<Catalog, StoreError> {
     let catalog: Catalog = checked(bytes, generation)?;
-    if catalog.version != 1 {
+    if !(1..=VERSION).contains(&catalog.version) {
         return Err(fail("unsupported addressable graph version"));
     }
     let unique: BTreeSet<_> = catalog.entries.iter().map(|e| e.address).collect();
@@ -122,10 +165,14 @@ impl<B: Backend> AddressableGraphStore<B> {
         let catalog = parse_catalog(&bytes, &generation)?;
         Ok((generation, catalog, bytes.len()))
     }
-    pub(super) async fn node(&self, row: &IndexRow) -> Result<StoredNode, StoreError> {
+    /// The record `row` names, decoded as its catalog's `version` wrote it.
+    pub(super) async fn node(&self, row: &IndexRow, version: u8) -> Result<StoredNode, StoreError> {
         let bytes = self
             .required(&self.record_key(row.address, &row.hash))
             .await?;
-        checked(&bytes, &row.hash)
+        match version {
+            1 => checked::<StoredNodeV1>(&bytes, &row.hash).map(StoredNode::from),
+            _ => checked(&bytes, &row.hash),
+        }
     }
 }

@@ -173,12 +173,15 @@ impl<B: Backend> AddressableGraphStore<B> {
         &self,
         graph: &Graph,
     ) -> Result<PreparedGraphPublication, StoreError> {
-        self.prepare_with(graph, indexed_links)
+        self.prepare_with(graph, indexed_links, VERSION)
     }
+    /// `version` is [`VERSION`] outside tests; tests also write version 1
+    /// stores, to read them back.
     fn prepare_with(
         &self,
         graph: &Graph,
         links: for<'a> fn(&'a GraphSnapshot) -> NodeLinks<'a>,
+        version: u8,
     ) -> Result<PreparedGraphPublication, StoreError> {
         refuse_residency_limited(graph)?;
         #[cfg(test)]
@@ -190,7 +193,7 @@ impl<B: Backend> AddressableGraphStore<B> {
             .install_facets(graph.facets().clone())
             .map_err(|e| fail(e.to_string()))?;
         let mut catalog = Catalog {
-            version: 1,
+            version,
             globals: snapshot.clone(),
             entries: vec![],
             navigation: NavigationIndex {
@@ -245,7 +248,7 @@ impl<B: Backend> AddressableGraphStore<B> {
                 &mut catalog,
                 &mut ops,
                 row,
-                StoredNode::Surface {
+                StoredNodeV1::Surface {
                     node: node.clone(),
                     facets,
                     edges,
@@ -268,7 +271,7 @@ impl<B: Backend> AddressableGraphStore<B> {
                     pinned: false,
                     declaration,
                 },
-                StoredNode::Resource {
+                StoredNodeV1::Resource {
                     record: record.clone(),
                     edges,
                 },
@@ -302,14 +305,24 @@ impl<B: Backend> AddressableGraphStore<B> {
             catalog,
         })
     }
+    /// Store `node`, built with each edge's snapshot position, which version 2
+    /// drops (engine split D175): a record changes only when its own content
+    /// or its edges do, not when an edge elsewhere moves the column.
     fn append_node(
         &self,
         catalog: &mut Catalog,
         ops: &mut Vec<WriteOp>,
         mut row: IndexRow,
-        node: StoredNode,
+        node: StoredNodeV1,
     ) -> Result<(), StoreError> {
-        let bytes = encode(&node)?;
+        #[cfg(test)]
+        let bytes = if catalog.version == 1 {
+            encode(&node)?
+        } else {
+            encode(&StoredNode::from(node))?
+        };
+        #[cfg(not(test))]
+        let bytes = encode(&StoredNode::from(node))?;
         row.hash = hash(&bytes);
         ops.push(WriteOp::Put {
             key: self.record_key(row.address, &row.hash),
@@ -319,6 +332,9 @@ impl<B: Backend> AddressableGraphStore<B> {
         Ok(())
     }
 }
+#[cfg(test)]
+#[path = "edge_tests.rs"]
+mod edge_tests;
 #[cfg(test)]
 #[path = "write_tests.rs"]
 mod tests;

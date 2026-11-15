@@ -13,6 +13,14 @@
 //! (engine split D171), so it relies on one rule: **nothing deletes or
 //! rewrites a record the head names.** Files edited by hand break the rule.
 //!
+//! A record lists its node's edges in snapshot order without their positions
+//! in the snapshot's edge columns (catalog version 2, engine split D175), so
+//! an edit rewrites only the records whose own content or edges changed. A
+//! reader merges each edge's two copies by pair, refuses copies that disagree,
+//! and rebuilds `to_snapshot_at`'s order from content. Version 1 records,
+//! which carried the positions, still load with them ignored; the next
+//! publication rewrites them, and collection deletes the old ones.
+//!
 //! Collection (engine split D173) keeps it. On a
 //! [single-owner](muniment::Backend::single_owner)
 //! store a publication reads the head once inside its own transaction, and

@@ -14,7 +14,7 @@ use muniment::MemoryBackend;
 
 /// Surfaces in a chain with edges back to the first and a self relation,
 /// Resources in a chain with a self relation, every Surface showing one.
-fn linked(count: u128) -> Graph {
+pub(super) fn linked(count: u128) -> Graph {
     let mut graph = Graph::new();
     let keys: Vec<_> = (1..=count)
         .map(|i| {
@@ -81,7 +81,7 @@ fn indexed_links_publish_the_bytes_the_scans_did() {
         "{counts:?}"
     );
     let store = AddressableGraphStore::new(MemoryBackend::new(), Uuid::from_u128(0xd171));
-    let scanned = store.prepare_with(&graph, scanned_links).unwrap();
+    let scanned = store.prepare_with(&graph, scanned_links, VERSION).unwrap();
     let indexed = store.prepare_recorded_graph(&graph).unwrap();
     assert_eq!(indexed.generation, scanned.generation);
     assert!(indexed.ops == scanned.ops, "byte-identical writes");
@@ -105,7 +105,7 @@ fn indexed_links_publish_the_bytes_the_scans_did() {
     assert_eq!(
         moved.generation,
         store
-            .prepare_with(&changed, scanned_links)
+            .prepare_with(&changed, scanned_links, VERSION)
             .unwrap()
             .generation
     );
