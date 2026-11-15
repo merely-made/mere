@@ -108,7 +108,7 @@ fn roots(id: Uuid) -> ResidencyRoots {
     }
 }
 
-async fn neighborhood_controls<B: Backend + Clone>(backend: B) {
+async fn neighborhood_controls<B: ProbeBackend + Clone>(backend: B) {
     let (source, surfaces, resources) = source(64);
     let expected = source.to_snapshot_at(0);
     let facets = source.facets().clone();
@@ -222,7 +222,7 @@ fn memory_neighborhood_demand_full_and_no_partial_overwrite() {
     pollster::block_on(neighborhood_controls(MemoryBackend::new()));
 }
 
-async fn session_controls<B: Backend + Clone>(backend: B) {
+async fn session_controls<B: ProbeBackend + Clone>(backend: B) {
     use pandect::graph_session::MereSessions;
     let sessions = MereSessions::new(backend.clone());
     let (graph, surfaces, resources) = source(32);
@@ -310,7 +310,7 @@ async fn indexeddb_real_store_controls() {
     assert_eq!(view.graph().nodes().count(), 64);
 }
 
-async fn identity_and_refusal_controls<B: Backend + Clone>(backend: B) {
+async fn identity_and_refusal_controls<B: ProbeBackend + Clone>(backend: B) {
     let (mut graph, surfaces, resources) = source(24);
     let overlap = resources[5];
     apply::add_node(
@@ -760,7 +760,7 @@ fn live_allocation_scoped_partial_vs_full() {
     });
 }
 
-async fn p3_context_and_cache_controls<B: Backend + Clone>(backend: B) {
+async fn p3_context_and_cache_controls<B: ProbeBackend + Clone>(backend: B) {
     use kernel::graph::{
         CoverageLimit, CoverageNote, PendingLink, PendingLinkRetention, ResourceNode,
     };
@@ -976,7 +976,7 @@ fn retained_pending_and_host_context() {
     pollster::block_on(p3_context_and_cache_controls(MemoryBackend::new()));
 }
 
-async fn unloaded_only_cache_controls<B: Backend + Clone>(backend: B) {
+async fn unloaded_only_cache_controls<B: ProbeBackend + Clone>(backend: B) {
     let (mut graph, surfaces, _) = source(8);
     let id = Uuid::from_u128(706);
     let store = AddressableGraphStore::new(backend.clone(), id);

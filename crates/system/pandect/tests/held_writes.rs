@@ -60,6 +60,9 @@ impl Backend for Counting {
         self.batches.lock().unwrap().push(ops.to_vec());
         self.inner.apply(ops).await
     }
+    fn single_owner(&self) -> bool {
+        self.inner.single_owner()
+    }
     async fn transact(&self, f: TransactFn) -> Result<(), StoreError> {
         let batches = self.batches.clone();
         self.inner

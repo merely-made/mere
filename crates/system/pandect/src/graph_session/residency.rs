@@ -24,12 +24,9 @@ impl<B: Backend + Clone> GraphSession<B> {
         &self,
     ) -> Result<crate::addressable_graph::PreparedGraphPublication, SessionError> {
         self.check_resident_publishable()?;
-        AddressableGraphStore::new(
-            self.slots.backend().clone(),
-            *self.manifest.root_graph_id.as_uuid(),
-        )
-        .prepare_recorded_graph(&self.graph)
-        .map_err(SessionError::Store)
+        self.resident_store()
+            .prepare_recorded_graph(&self.graph)
+            .map_err(SessionError::Store)
     }
     /// The refusals of
     /// [`prepare_resident_publication`](Self::prepare_resident_publication),
@@ -43,6 +40,8 @@ impl<B: Backend + Clone> GraphSession<B> {
         }
         crate::addressable_graph::refuse_residency_limited(&self.graph).map_err(SessionError::Store)
     }
+}
+impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     pub async fn publish_resident_checkpoint(&mut self) -> Result<String, SessionError> {
         if self.placement.is_none() {
             return Err(SessionError::Validation(
@@ -63,13 +62,10 @@ impl<B: Backend + Clone> GraphSession<B> {
             ));
         }
         self.checkpoint().await?;
-        AddressableGraphStore::new(
-            self.slots.backend().clone(),
-            *self.manifest.root_graph_id.as_uuid(),
-        )
-        .write_recorded_graph(&self.graph)
-        .await
-        .map_err(SessionError::Store)
+        self.resident_store()
+            .write_recorded_graph(&self.graph)
+            .await
+            .map_err(SessionError::Store)
     }
 }
 impl<B: Backend + Clone> MereSessions<B> {

@@ -82,6 +82,19 @@ pub(super) fn checked<T: serde::de::DeserializeOwned>(
     }
     decode(bytes)
 }
+/// The catalog stored at `generation`, checked: its digest, its version and
+/// one row per address.
+pub(super) fn parse_catalog(bytes: &[u8], generation: &str) -> Result<Catalog, StoreError> {
+    let catalog: Catalog = checked(bytes, generation)?;
+    if catalog.version != 1 {
+        return Err(fail("unsupported addressable graph version"));
+    }
+    let unique: BTreeSet<_> = catalog.entries.iter().map(|e| e.address).collect();
+    if unique.len() != catalog.entries.len() {
+        return Err(fail("duplicate catalog address"));
+    }
+    Ok(catalog)
+}
 impl Catalog {
     pub fn row(&self, address: GraphAddress) -> Option<&IndexRow> {
         self.entries.iter().find(|e| e.address == address)
@@ -106,14 +119,7 @@ impl<B: Backend> AddressableGraphStore<B> {
         let bytes = self
             .required(&self.key(&format!("catalog/{generation}")))
             .await?;
-        let catalog: Catalog = checked(&bytes, &generation)?;
-        if catalog.version != 1 {
-            return Err(fail("unsupported addressable graph version"));
-        }
-        let unique: BTreeSet<_> = catalog.entries.iter().map(|e| e.address).collect();
-        if unique.len() != catalog.entries.len() {
-            return Err(fail("duplicate catalog address"));
-        }
+        let catalog = parse_catalog(&bytes, &generation)?;
         Ok((generation, catalog, bytes.len()))
     }
     pub(super) async fn node(&self, row: &IndexRow) -> Result<StoredNode, StoreError> {

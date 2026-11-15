@@ -385,21 +385,34 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             ));
         }
         let pending = candidate.pending(at)?;
-        let mut ops = Vec::new();
-        // The publication describes the candidate's graph and joins its write,
-        // less what the current head already holds. Preparation refuses before
-        // anything is written or installed.
-        let generation = if publish {
+        // The publication describes the candidate's graph and joins its write.
+        // Preparation refuses before anything is written or installed.
+        let staged = if publish {
             let publication = candidate.prepare_resident_publication()?;
-            let (writes, generation) = candidate.resident_store().unheld_writes(publication).await;
-            ops.extend(writes);
-            Some(generation)
+            let generation = publication.generation().to_owned();
+            Some((generation, candidate.resident_store().stage(publication)))
         } else {
             None
         };
+        let generation = staged.as_ref().map(|(generation, _)| generation.clone());
         let mut extra = extra(generation.as_deref());
-        ops.append(&mut extra.ops);
-        extra.ops = ops;
+        if let Some((_, publication)) = staged {
+            // Decided inside the commit's transaction, from one read of the
+            // head: the puts it holds are left out and, on a single-owner
+            // store, what it names and the candidate's does not is deleted
+            // (engine split D171, D173). The publication's writes keep their
+            // place ahead of the caller's.
+            let ops = std::mem::take(&mut extra.ops);
+            let decide = extra.decide.take();
+            extra.decide = Some(Box::new(move |reader: &dyn muniment::TransactionReader| {
+                let mut writes = publication.decide(reader);
+                writes.extend(ops);
+                if let Some(decide) = decide {
+                    writes.extend(decide(reader)?);
+                }
+                Ok(writes)
+            }));
+        }
         // The candidate shares this session's replay point: handing it over
         // lets the candidate's checkpoint move it without a copy, and a
         // refused commit takes it back.

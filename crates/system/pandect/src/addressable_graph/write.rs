@@ -8,7 +8,7 @@ use super::*;
 use kernel::graph::{CoverageLayer, ResourceNode};
 use kernel::persistence::{GraphSnapshot, PersistedEdge, PersistedShownResource};
 use muniment::WriteOp;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 /// Each node's edges and shown binding, found through maps built once per
 /// prepare instead of a scan of every edge and binding per node (engine split
@@ -135,6 +135,9 @@ pub struct PreparedGraphPublication {
     catalog: Catalog,
 }
 impl PreparedGraphPublication {
+    pub(super) fn into_parts(self) -> (Vec<WriteOp>, String, Catalog) {
+        (self.ops, self.generation, self.catalog)
+    }
     pub fn ops(&self) -> &[WriteOp] {
         &self.ops
     }
@@ -150,56 +153,20 @@ impl PreparedGraphPublication {
         self.catalog.row(GraphAddress::Surface(surface))?.shown
     }
 }
-impl<B: Backend> AddressableGraphStore<B> {
-    /// Publish immutable records and catalog, then their head pointer, leaving
-    /// out what the current head already holds. Existing resident readers
-    /// retain their prior generation until an explicit refresh.
+impl<B: crate::graph_session::LegacyTransactionBackend> AddressableGraphStore<B> {
+    /// Publish immutable records and catalog, then their head pointer, in one
+    /// transaction that leaves out what the current head already holds and,
+    /// on a single-owner store, deletes what the new head supersedes (see the
+    /// [module docs](super)). Existing resident readers retain their prior
+    /// generation in memory until an explicit refresh.
     pub async fn write_recorded_graph(&self, graph: &Graph) -> Result<String, StoreError> {
         let prepared = self.prepare_recorded_graph(graph)?;
-        let (ops, generation) = self.unheld_writes(prepared).await;
-        self.backend.apply(&ops).await?;
+        let generation = prepared.generation.clone();
+        self.commit_staged(self.stage(prepared)).await?;
         Ok(generation)
     }
-    /// The writes of `prepared` less every put whose key the current head's
-    /// catalog already names, and its generation. Those keys are content
-    /// addressed, so the head naming one means the store holds its bytes: the
-    /// rule in the [module docs](super) that nothing deletes or rewrites a
-    /// record the head names is what makes leaving it out safe. With no head,
-    /// or one that cannot be read, nothing is held and every write stays.
-    pub(crate) async fn unheld_writes(
-        &self,
-        prepared: PreparedGraphPublication,
-    ) -> (Vec<WriteOp>, String) {
-        let held = self.held_keys().await;
-        let mut ops = prepared.ops;
-        ops.retain(|op| !matches!(op, WriteOp::Put { key, .. } if held.contains(key)));
-        (ops, prepared.generation)
-    }
-    /// The content-addressed keys the current head's catalog names: its
-    /// records, navigation rows, pending owners and the catalog itself.
-    async fn held_keys(&self) -> HashSet<String> {
-        let mut held = HashSet::new();
-        let Ok((generation, catalog, _)) = self.catalog().await else {
-            return held;
-        };
-        held.insert(self.key(&format!("catalog/{generation}")));
-        for row in &catalog.entries {
-            held.insert(self.record_key(row.address, &row.hash));
-        }
-        for (kind, digests) in [
-            ("entry", &catalog.navigation.entries),
-            ("visit", &catalog.navigation.visits),
-            ("owner", &catalog.navigation.owners),
-        ] {
-            for digest in digests {
-                held.insert(self.key(&format!("navigation/{kind}/{digest}")));
-            }
-        }
-        for (id, digest) in &catalog.pending.owners {
-            held.insert(self.key(&format!("pending/{id}/{digest}")));
-        }
-        held
-    }
+}
+impl<B: Backend> AddressableGraphStore<B> {
     /// Encode a complete publication without writing. Refuses a residency-limited
     /// view, which cannot become complete truth.
     pub fn prepare_recorded_graph(

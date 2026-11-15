@@ -11,10 +11,20 @@
 //! Readers open only the head and what its catalog names. A publication
 //! leaves out every write whose key the current head's catalog already names
 //! (engine split D171), so it relies on one rule: **nothing deletes or
-//! rewrites a record the head names.** A collector of superseded records must
-//! keep everything the head reaches, and anything a reader may still hold
-//! open, and must run under the writer's exclusion; files edited by hand
-//! break the rule.
+//! rewrites a record the head names.** Files edited by hand break the rule.
+//!
+//! Collection (engine split D173) keeps it. On a
+//! [single-owner](muniment::Backend::single_owner)
+//! store a publication reads the head once inside its own transaction, and
+//! from that one read leaves out the puts the head names and deletes every
+//! key the head names that the new catalog does not: superseded records,
+//! navigation rows and pending owners, and the old catalog. It deletes at
+//! once, with no grace for readers: a reader opens only the current head,
+//! and one that loses a race fails closed and retries. A store whose backend
+//! does not declare a single owner (IndexedDB, which other tabs open, or a
+//! wrapper that does not forward the answer) collects nothing until
+//! protected readers exist (graph semantics Phase F); neither does a backend
+//! without transactions.
 use kernel::graph::Graph;
 use muniment::{Backend, StoreError};
 use serde::{Deserialize, Serialize};
@@ -73,6 +83,7 @@ impl ResidentFootprint {
     }
 }
 
+mod collect;
 mod navigation;
 mod pending;
 mod read;
