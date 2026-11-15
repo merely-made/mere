@@ -3699,3 +3699,8 @@ revision and what crosses at frame rate.
   2 records (5,809 to 9,578 before) and about 4.05 MB a publication, nearly all the catalog; a fresh reader matched the writer after
   20 of 20 publications. Evidence in `Code/testing/engine-split/edgeless/`. The catalog rewritten per publication is the next
   amplification, not yet assessed.
+- 2026-11-15: D177's row lookup landed: Mere `aff7e7649`, the catalog's rows found through an index built once per catalog
+  (positions by address, the Surfaces showing each Resource), the footprint taken from the bytes `catalog()` read; no format
+  change. pandect 298 and mere-kernel 634 pass on the committed tree, the new test's controls failing. A full open in memory went
+  from 59.9 s (median, noisy; the assessment's 32.8 s) to 9.2 s at 100k and 958 to 756 ms at 10k. Evidence in
+  `Code/testing/engine-split/catalog_v3/`.
