@@ -140,11 +140,11 @@ impl ResourceGraph {
     }
 
     /// Every resource with its facets, in [`resource_nodes`](Self::resource_nodes)
-    /// order, read by [`facets_in_order`] rather than a lookup per resource.
+    /// order.
     pub fn resources_with_facets(&self) -> Vec<(&ResourceNode, Option<&portolan::NodeFacets>)> {
         let resources: Vec<&ResourceNode> = self.resource_nodes().collect();
         let ids: Vec<Uuid> = resources.iter().map(|resource| resource.id()).collect();
-        let facets = facets_in_order(&self.facets, &ids);
+        let facets = facets_of_each(&self.facets, &ids);
         resources.into_iter().zip(facets).collect()
     }
 
@@ -185,23 +185,13 @@ impl ResourceGraph {
     }
 }
 
-/// `store`'s facets for each of `ids`, in the order given: one walk of the store
-/// in id order beside the ids sorted (engine split D168). A lookup in the
-/// persistent store walks down a binary tree, and ids come in no order, so a
-/// pass over every resource or node reads them this way, not one by one.
-pub fn facets_in_order<'a>(
+/// `store`'s facets for each of `ids`, in the order given: a lookup each in
+/// the store's hash trie (engine split D170).
+pub fn facets_of_each<'a>(
     store: &'a portolan::FacetStore<Uuid>,
     ids: &[Uuid],
 ) -> Vec<Option<&'a portolan::NodeFacets>> {
-    let mut order: Vec<(Uuid, usize)> = ids.iter().copied().zip(0..).collect();
-    order.sort_unstable();
-    let mut found = vec![None; ids.len()];
-    let mut held = store.iter().peekable();
-    for (id, at) in order {
-        while held.next_if(|(key, _)| **key < id).is_some() {}
-        found[at] = held.peek().filter(|(key, _)| **key == id).map(|(_, f)| *f);
-    }
-    found
+    ids.iter().map(|id| store.facets_of(id)).collect()
 }
 
 /// The literal properties `facets` hold, as

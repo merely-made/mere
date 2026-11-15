@@ -14,11 +14,6 @@ use uuid::Uuid;
 pub use super::resource_pair_bounds::ResourceEdgesBoundError;
 pub use mere::model::resource::{ResourceNode, TAGGED_WITH_IRI};
 
-/// A record's facets whose writing a load put off (see
-/// [`Graph::apply_resource_facets`]).
-pub(crate) type PendingResourceFacets =
-    Vec<(Uuid, std::collections::BTreeMap<portolan::FacetId, serde_json::Value>)>;
-
 impl Graph {
     /// Read a resource by its stable identity.
     pub fn resource(&self, id: Uuid) -> Option<&ResourceNode> {
@@ -65,19 +60,6 @@ impl Graph {
         &mut self,
         id: Uuid,
         record: Option<PersistedResourceRecord>,
-    ) -> bool {
-        self.set_resource_record_deferring(id, record, None)
-    }
-
-    /// [`set_resource_record`](Self::set_resource_record), leaving a written
-    /// record's facets in `defer`, for [`apply_resource_facets`]
-    /// (Self::apply_resource_facets) to write in id order. Only a load that
-    /// holds no index yet defers; otherwise this writes them at once.
-    pub(crate) fn set_resource_record_deferring(
-        &mut self,
-        id: Uuid,
-        record: Option<PersistedResourceRecord>,
-        defer: Option<&mut PendingResourceFacets>,
     ) -> bool {
         let Some(record) = record else {
             let Some(key) = self.resources.key_of(&id) else {
@@ -199,10 +181,7 @@ impl Graph {
             return false;
         }
         self.resources.insert(resource.into());
-        match defer.filter(|_| !self.handle_index_built()) {
-            Some(pending) => pending.push((id, facets)),
-            None => self.write_resource_facets(id, facets),
-        }
+        self.write_resource_facets(id, facets);
         self.bump_revision();
         true
     }
@@ -247,17 +226,6 @@ impl Graph {
         }
         if let Some(properties) = properties {
             self.note_resource_literals_held(id, properties);
-        }
-    }
-
-    /// Write facets [`set_resource_record_deferring`]
-    /// (Self::set_resource_record_deferring) left, in id order: a persistent
-    /// map filled along one path, not at a random place per resource (engine
-    /// split D168). Ends as writing each when its record was set would.
-    pub(crate) fn apply_resource_facets(&mut self, mut pending: PendingResourceFacets) {
-        pending.sort_by_key(|(id, _)| *id);
-        for (id, facets) in pending {
-            self.write_resource_facets(id, facets);
         }
     }
 

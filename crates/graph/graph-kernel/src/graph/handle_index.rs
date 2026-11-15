@@ -92,7 +92,7 @@ impl Graph {
                     holders.note_relation(RelationKey::Resource(key), payload);
                 }
             }
-            use mere::model::resource_graph::{facets_in_order, properties_in};
+            use mere::model::resource_graph::{facets_of_each, properties_in};
             for (resource, facets) in self.resources.resources_with_facets() {
                 for held in properties_in(facets) {
                     add(
@@ -102,10 +102,9 @@ impl Graph {
                     );
                 }
             }
-            // Surface literals, read in one walk of the facets in id order.
             let nodes: Vec<Uuid> = self.nodes().map(|(_, node)| node.id).collect();
             let semantic = portolan::FacetId::new(SEMANTIC_PROPERTIES);
-            for (id, facets) in nodes.iter().zip(facets_in_order(&self.facets, &nodes)) {
+            for (id, facets) in nodes.iter().zip(facets_of_each(&self.facets, &nodes)) {
                 let held: Vec<NodeProperty> = facets
                     .and_then(|facets| facets.get(&semantic))
                     .and_then(|value| serde::Deserialize::deserialize(value).ok())
@@ -142,16 +141,7 @@ impl Graph {
         self.handle_index = index;
     }
 
-    pub(crate) fn note_resource_literals(&mut self, id: Uuid) {
-        if self.handle_index.built.get().is_none() {
-            return;
-        }
-        let held = self.resource_properties(id);
-        self.note_resource_literals_held(id, held);
-    }
-
-    /// [`note_resource_literals`](Self::note_resource_literals) with the
-    /// properties the resource now holds already in hand.
+    /// Note the literal properties a resource now holds, given in hand.
     pub(crate) fn note_resource_literals_held(&mut self, id: Uuid, held: Vec<NodeProperty>) {
         if let Some(holders) = self.handle_index.built.get_mut() {
             for property in held {
