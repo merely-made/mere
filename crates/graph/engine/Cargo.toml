@@ -59,7 +59,7 @@ portolan.workspace = true
 quadstore.workspace = true
 # The `mere.pack/2` header, codec, envelope and body types (declared-lens L1,
 # L2, R1); the substrate only, not the browsing product.
-eidetic = { version = "0.0.3", default-features = false, features = ["pack-signing"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+eidetic = { version = ">=0.0.3, <0.1", default-features = false, features = ["pack-signing"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 # Requirement matching (declared-lens D13); already in the tree through eidetic.
 semver = "1"
 # Preserve query extensions previously enabled transitively by Oxigraph.
@@ -82,11 +82,11 @@ oxsdatatypes = { version = "0.2", features = ["js"], optional = true }
 [build-dependencies]
 # build.rs compiles the core pack's authored TOML (declared-lens D13), so the
 # TOML parser stays out of the run-time graph.
-eidetic = { version = "0.0.3", default-features = false, features = ["pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+eidetic = { version = ">=0.0.3, <0.1", default-features = false, features = ["pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 
 [dev-dependencies]
 # The profile tests author their fixture packs and sign them.
-eidetic = { version = "0.0.3", default-features = false, features = ["pack-signing", "pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
+eidetic = { version = ">=0.0.3, <0.1", default-features = false, features = ["pack-signing", "pack-authoring"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 identity.workspace = true
 proptest = { version = "1.11", default-features = false, features = ["std"] }
 # The raw-oxrdf control layer of the rdf-canon rows (tests/w3c_conformance/rdfc.rs).
