@@ -23,17 +23,25 @@ impl<B: Backend + Clone> GraphSession<B> {
     pub(crate) fn prepare_resident_publication(
         &self,
     ) -> Result<crate::addressable_graph::PreparedGraphPublication, SessionError> {
-        if self.placement.is_none() {
-            return Err(SessionError::Validation(
-                "addressable publication requires qualified recorded placement".into(),
-            ));
-        }
+        self.check_resident_publishable()?;
         AddressableGraphStore::new(
             self.slots.backend().clone(),
             *self.manifest.root_graph_id.as_uuid(),
         )
         .prepare_recorded_graph(&self.graph)
         .map_err(SessionError::Store)
+    }
+    /// The refusals of
+    /// [`prepare_resident_publication`](Self::prepare_resident_publication),
+    /// an unqualified writer and a residency-limited graph, without preparing
+    /// the publication (engine split D171).
+    pub(crate) fn check_resident_publishable(&self) -> Result<(), SessionError> {
+        if self.placement.is_none() {
+            return Err(SessionError::Validation(
+                "addressable publication requires qualified recorded placement".into(),
+            ));
+        }
+        crate::addressable_graph::refuse_residency_limited(&self.graph).map_err(SessionError::Store)
     }
     pub async fn publish_resident_checkpoint(&mut self) -> Result<String, SessionError> {
         if self.placement.is_none() {

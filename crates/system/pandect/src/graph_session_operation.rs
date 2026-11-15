@@ -28,10 +28,11 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
                 "Save pending session changes before observing a revision".into(),
             ));
         }
-        // Keep the publication's completeness/placement preflight. Snapshot
-        // reconstruction synthesizes visit times; replace them with the exact
-        // authoritative facet sidecar before hashing.
-        self.prepare_resident_publication()?;
+        // Keep the publication's completeness/placement refusals, without
+        // preparing a publication only to drop it. Snapshot reconstruction
+        // synthesizes visit times; replace them with the exact authoritative
+        // facet sidecar before hashing.
+        self.check_resident_publishable()?;
         let mut normalized = Graph::try_from_recorded_snapshot(&self.graph.to_snapshot_at(0))
             .map_err(|error| SessionError::Validation(error.to_string()))?;
         normalized
@@ -102,7 +103,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             ));
         }
         // Refuse unqualified or residency-limited writers before any reload.
-        self.prepare_resident_publication()?;
+        self.check_resident_publishable()?;
         let Some(receipt) = self.operation_receipt(operation).await? else {
             return Ok(None);
         };

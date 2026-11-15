@@ -82,7 +82,10 @@ mod write;
 use kernel::graph::NodeFacetStore;
 use schema::*;
 use std::collections::BTreeMap;
+#[cfg(test)]
+pub(crate) use write::PREPARES;
 pub use write::PreparedGraphPublication;
+pub(crate) use write::refuse_residency_limited;
 
 pub struct AddressableGraphStore<B> {
     backend: B,

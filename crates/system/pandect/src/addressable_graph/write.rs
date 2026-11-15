@@ -108,6 +108,25 @@ fn scanned(edges: &[PersistedEdge], id: &str) -> Vec<(usize, PersistedEdge)> {
         .map(|(i, e)| (i, e.clone()))
         .collect()
 }
+/// Refuse a residency-limited view, which cannot become complete truth.
+pub(crate) fn refuse_residency_limited(graph: &Graph) -> Result<(), StoreError> {
+    if graph
+        .known_coverage()
+        .limits
+        .iter()
+        .any(|l| l.layer == CoverageLayer::Residency)
+    {
+        return Err(fail(
+            "cannot publish a residency-limited view as complete truth",
+        ));
+    }
+    Ok(())
+}
+#[cfg(test)]
+thread_local! {
+    /// Publications prepared on this thread, for tests that count them.
+    pub(crate) static PREPARES: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
 /// A complete publication prepared without touching storage. The caller owns
 /// when, and in which batch, its writes are applied.
 pub struct PreparedGraphPublication {
@@ -194,16 +213,9 @@ impl<B: Backend> AddressableGraphStore<B> {
         graph: &Graph,
         links: for<'a> fn(&'a GraphSnapshot) -> NodeLinks<'a>,
     ) -> Result<PreparedGraphPublication, StoreError> {
-        if graph
-            .known_coverage()
-            .limits
-            .iter()
-            .any(|l| l.layer == CoverageLayer::Residency)
-        {
-            return Err(fail(
-                "cannot publish a residency-limited view as complete truth",
-            ));
-        }
+        refuse_residency_limited(graph)?;
+        #[cfg(test)]
+        PREPARES.with(|count| count.set(count.get() + 1));
         let snapshot = graph.to_snapshot_at(0);
         let mut loaded =
             Graph::try_from_recorded_snapshot(&snapshot).map_err(|e| fail(e.to_string()))?;

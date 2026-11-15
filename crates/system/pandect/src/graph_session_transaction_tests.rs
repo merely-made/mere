@@ -176,3 +176,61 @@ fn a_candidate_commits_extra_writes_and_refuses_a_key_that_changed() {
         assert!(holds(&mere.open(id).await.unwrap(), 1));
     });
 }
+
+/// Engine split D171: the publication preflights make their refusals without
+/// preparing a publication only to drop it.
+#[test]
+fn publication_preflights_refuse_without_preparing() {
+    let prepares = || crate::addressable_graph::PREPARES.with(std::cell::Cell::get);
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let made = mere.mint(person(), Some("Preflight".into())).await.unwrap();
+        let mut session = mere.open(made.session_id).await.unwrap();
+        session.apply(person(), vec![add(1), add(2)]).await.unwrap();
+        let before = prepares();
+        let revision = session.operation_revision().unwrap();
+        assert_eq!(prepares() - before, 1, "only the revision's own prepare");
+        // The full preflight it replaced prepared once more, for the same revision.
+        let before = prepares();
+        session.prepare_resident_publication().unwrap();
+        assert_eq!(session.operation_revision().unwrap(), revision);
+        assert_eq!(prepares() - before, 2);
+        // Reconcile without a receipt stops after its check, preparing nothing.
+        let before = prepares();
+        assert!(
+            session
+                .reconcile_operation([7; 32])
+                .await
+                .unwrap()
+                .is_none()
+        );
+        assert_eq!(prepares(), before);
+
+        // A residency-limited writer is still refused, before any prepare.
+        session
+            .graph
+            .set_known_coverage(kernel::graph::CoverageNote {
+                limits: vec![kernel::graph::CoverageLimit::new(
+                    kernel::graph::CoverageLayer::Residency,
+                    "a neighborhood",
+                )],
+            });
+        let limited = |result: Result<_, SessionError>| matches!(result, Err(SessionError::Store(e)) if e.to_string().contains("residency-limited"));
+        assert!(limited(session.operation_revision().map(|_| ())));
+        assert!(limited(
+            session.reconcile_operation([7; 32]).await.map(|_| ())
+        ));
+        // So is an unqualified one.
+        let mut legacy = mere.begin(person(), Some(Graph::new()));
+        legacy
+            .flush(std::time::SystemTime::UNIX_EPOCH)
+            .await
+            .unwrap();
+        let unqualified = |result: Result<_, SessionError>| matches!(result, Err(SessionError::Validation(m)) if m.contains("qualified recorded"));
+        assert!(unqualified(legacy.operation_revision().map(|_| ())));
+        assert!(unqualified(
+            legacy.reconcile_operation([7; 32]).await.map(|_| ())
+        ));
+        assert_eq!(prepares(), before);
+    });
+}
