@@ -3654,3 +3654,11 @@ revision and what crosses at frame rate.
   its first `dataset()` read, its drop cost documented as the holder's; `apply_merge` returns `Merged { applied, refused }`. pandect 276,
   mere-kernel 634 and mere 57 pass with `--all-features`, with negative controls for each refusal and the lazy index; evidence in
   `Code/testing/engine-split/p8_pins/`. Main had moved only in docs since the branch point.
+- 2026-11-15: D171's fixes landed: Eidetic `b8ad36e` (a directory batch finds a nested key by sorted range), then Mere
+  `f5a0d08f1` (a publication's edges and shown bindings through maps built once), `a76d943a2` (writes the head holds left out on
+  `write_recorded_graph` and `commit_candidate_with`, the rule that nothing deletes a record the head names in `addressable_graph`'s
+  docs) and `982f38123` (preflights refuse without preparing). muniment 186, pandect 244 plus integration and mere-kernel 634 pass,
+  each new test failing with its code broken on purpose; pandect re-run against Eidetic `b8ad36e` before landing. On the ThinkPad:
+  in-memory publication 470 ms at 10k and 5.9 to 6.3 s at 100k (1,702 s on main), a first directory publication at 10k 31 to 32 s
+  (211 s), a republish 1 write of 20,002, one facet changed 3; 15 to 25% above the prototype, with GNOME's indexer busy and D170 now
+  under it, not separated. Evidence in `Code/testing/engine-split/publish_fix/`.
