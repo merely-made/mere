@@ -1919,6 +1919,14 @@ summary = "Merge-in returns Merged with each refused edit's position, optional p
 draws_on = ["engine-split D166"]
 plans = ["engine-split"]
 
+[decisions."engine-split D170"]
+title = "portolan's `FacetStore` moves to rpds's hash trie to close the cursor before the checkpoint (Mark, 2026-11-14)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "FacetStore moves to rpds's hash trie so replay from the baseline meets D168's bound."
+draws_on = ["engine-split D168"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

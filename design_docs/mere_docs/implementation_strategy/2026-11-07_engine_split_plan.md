@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-14: D1 to D169 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-14: D1 to D170 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2739,6 +2739,10 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D166 · plans engine-split P8 · summary Merge-in returns Merged with each refused edit's position, optional part and reason text.
 
+- **D170. portolan's `FacetStore` moves to rpds's hash trie to close the cursor before the checkpoint (Mark, 2026-11-14):** D168's lane (`Code/testing/engine-split/edit_sharing/`) walked facets in order beside the Resources and built maps in bulk on load (Mere `a4756eb4c`, `379ba9ff3`; Eidetic `230eb8c`). Against a fresh origin/main run in the same ThinkPad session at 100k: `to_snapshot_at` +4.3%, save -1.3%, checkpoint +1.0%, reopen +7.9%, `graph_at` and pin at or after the checkpoint 46 to 48% and 3.5 to 4.3% faster, edits 29 to 52 ms, refresh 1.4 to 1.7 ms; but at a cursor before the checkpoint `graph_at` +20.7% and pin +13.5%, replaying about 300k entries one write at a time, each walking `FacetStore`'s rpds red-black tree (a benchmark at 100k: random get 54 ms against 15 ms for std `BTreeMap` and rpds's hash trie). At 10k the snapshot paths are also 6 to 18% over, outside the bound's scale. "FacetStore on the hash trie (Recommended)": the same crate, serde bytes, Debug and equality unchanged and pinned by the vector, `FacetStore<Id>` gaining an `Id: Hash` bound (Mere's Uuid, Knot's `String`, portolan's spine id), an ordered walk becoming collect-and-sort; against a whole-node write API (estimated 40 to 60 ms, likely short) and accepting the cursor before the checkpoint over the bound. Outcome: refines D168.
+
+  Links: area The stack · draws on engine-split D168 · plans engine-split P8 · summary FacetStore moves to rpds's hash trie so replay from the baseline meets D168's bound.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -3632,3 +3636,9 @@ revision and what crosses at frame rate.
   deleted: `quick-xml@0.37.5` in all five, rand, rand_chacha and rand_core 0.9 in Knot and Isocosm; one added in Knot,
   `quick-xml@0.41.0` through wayland-scanner at its latest. A change to Mere's mark-ik rows fails those consumers'
   next commit until `house patches` is rerun in each.
+- 2026-11-14: P8's pins and refusals landed on Mere main (D163, D166, D169), `1fb2f3c3f` to `c1b60c912`, the lane's
+  instrument commits left out: `apply_deltas`, `transact_deltas`, `transact_deltas_published`, `transact_operation_published` and
+  `transact_live` refuse a change with a refused edit whole; `GraphSession::pin` returns an owned `PinnedView` whose index is built on
+  its first `dataset()` read, its drop cost documented as the holder's; `apply_merge` returns `Merged { applied, refused }`. pandect 276,
+  mere-kernel 634 and mere 57 pass with `--all-features`, with negative controls for each refusal and the lazy index; evidence in
+  `Code/testing/engine-split/p8_pins/`. Main had moved only in docs since the branch point.
