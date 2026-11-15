@@ -1959,6 +1959,14 @@ summary = "The sharing work lands with to_snapshot_at about 11% over main at 100
 draws_on = ["engine-split D168", "engine-split D170", "engine-split D172"]
 plans = ["engine-split"]
 
+[decisions."engine-split D175"]
+title = "Records drop the edge index and readers rebuild by pair; old records are read and rewritten; the store stays JSON for now; a backend declares a single owner; the one sweep runs in the first collecting publication (Mark, 2026-11-15)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Records drop the edge index, old records are rewritten on publish, the store stays JSON for now, backends declare a single owner, and the sweep runs in the first publication."
+draws_on = ["engine-split D171", "engine-split D173"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-15: D1 to D174 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-15: D1 to D175 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2759,6 +2759,10 @@ revision and what crosses at frame rate.
 
   Links: area The stack · draws on engine-split D168, engine-split D170, engine-split D172 · plans engine-split P8 · summary The sharing work lands with to_snapshot_at about 11% over main at 100k as an exception, D172's walk dropped.
 
+- **D175. Records drop the edge index and readers rebuild by pair; old records are read and rewritten; the store stays JSON for now; a backend declares a single owner; the one sweep runs in the first collecting publication (Mark, 2026-11-15):** D173's edge-index lane (`Code/testing/engine-split/edgeidx_assess/assessment.md`, Mere `d46cc77ff`, DROPPABLE) found the snapshot index read only by `read.rs` `admit`, to merge an edge's two copies, check them and restore order, while `to_snapshot_at` already orders edges by content (Surface edges by their JSON bytes, Resource edges by pair, kernel `snapshot/to.rs:112-123`, `:192-205`). At 10k an insert or undo writes 5,809 to 9,578 records with the index and 2 without (15.3 against 4.05 MB, 36.6 against 2.0 s into a directory); over 20 publications at 1k and 10k a reader rebuilt the edge lists and graph byte for byte, two controls failing. "Drop it; rebuild by pair (Recommended)"; against a per-pair ordinal and leaving it. "Read both, rewrite on next publish (Recommended)": catalog version 2, version 1 read with the index ignored, D173 collecting the one-time rewrite (10,000 of 20,012 records at 10k); against refusing version 1 and a per-record framing header. On the codec Mark asked: "Consider which is more standards compliant and consider do we need postcard for data portability? why is it like that is the real question". First reader found no ruling: the store (2026-10-09, `bf34faf8b`) came three days after F3 and is JSON most likely because the kernel's stored types are (facets `serde_json::Value`, edges skipping empty fields, neither decodable by postcard); the standard for graph data is RDF, which Mere already exports (N-Quads, `formats/serialize.rs:36`; JSON-LD, `formats/jsonld.rs:177`), so portability rides on the exports and postcard, positional and schema-bound, is the less portable. "JSON now; measure postcard later (Recommended)": the store joins the postcard framing plan's inventory as an outlier, a later lane measuring what postcard would save; against an F3 exception for good, postcard in this bump and RDF at rest. "After D173's collection lands (Recommended)" for when. D173's lane (`Code/testing/engine-split/collect/`, branch `publish-collect`) moved the head read into the commit transaction and returned two forks: "Backend::single_owner, default false (Recommended)", a defaulted method on muniment's `Backend`, true for Directory, Memory and redb and forwarded through `Box` and `&`, landed in Eidetic first; against its pandect `Ownership` setting (single-owner natively, shared on wasm32) and the same defaulting shared. "In the first publication (Recommended)": the first collecting publication sweeps only the publication's own key families (`nodes/`, `catalog/`, `navigation/`, `pending/`; Graphshell's `host-settings` survives) and records `swept`, a one-time stall on the owner's first edit (about 3.6 s on the ThinkPad at 50k garbage files); against `MereSessions::open`, which would require `Sync` of Graphshell's and Turnstone's hosts, and an explicit owner call. Outcome: refines D173 and data-formats F3.
+
+  Links: area The stack · draws on engine-split D171, engine-split D173 · plans engine-split P8 · summary Records drop the edge index, old records are rewritten on publish, the store stays JSON for now, backends declare a single owner, and the sweep runs in the first publication.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -3666,3 +3670,9 @@ revision and what crosses at frame rate.
   in-memory publication 470 ms at 10k and 5.9 to 6.3 s at 100k (1,702 s on main), a first directory publication at 10k 31 to 32 s
   (211 s), a republish 1 write of 20,002, one facet changed 3; 15 to 25% above the prototype, with GNOME's indexer busy and D170 now
   under it, not separated. Evidence in `Code/testing/engine-split/publish_fix/`.
+- 2026-11-15: the sharing work landed (D164, D167, D168, D170, D174): Eidetic `102c1cd` (portolan's `FacetStore` per node behind
+  `Arc` in an rpds hash trie, its bytes pinned by a fixed vector), then Mere `0e3642ef5` to `2fba763e7`, the instrument commits and
+  D172's walk left out. Landing Eidetic first broke a fresh resolve of Mere main (pandect's `read_expiring_facet` lacked `Id: Hash`),
+  reported from Graphshell and fixed forward in `e7cca2d71`. mere-kernel 634, pandect 288 and mere 57 pass with `--all-features` on a
+  fresh resolve, the equivalence test 12/12, both escape tests refusing and failing with the check off. Edits at 100k 29 to 85 ms
+  (about 2,030 on main), `to_snapshot_at` about +11% as D174 allows. Evidence in `Code/testing/engine-split/edit_sharing/`.
