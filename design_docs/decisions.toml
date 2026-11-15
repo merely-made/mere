@@ -1975,6 +1975,14 @@ summary = "Records decode by catalog version, one-sided edges between resident n
 draws_on = ["engine-split D173", "engine-split D175"]
 plans = ["engine-split"]
 
+[decisions."engine-split D177"]
+title = "The reader's row lookup is indexed now, and the catalog is stored as a content-defined tree as deep as it needs, catalog version 3 (Mark, 2026-11-15)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The reader's row lookup is indexed now and the catalog becomes a content-defined tree as deep as it needs, version 3."
+draws_on = ["engine-split D171", "engine-split D173", "engine-split D175", "engine-split D176"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
