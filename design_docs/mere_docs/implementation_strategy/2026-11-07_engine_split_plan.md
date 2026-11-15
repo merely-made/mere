@@ -3708,8 +3708,8 @@ revision and what crosses at frame rate.
   change. pandect 298 and mere-kernel 634 pass on the committed tree, the new test's controls failing. A full open in memory went
   from 59.9 s (median, noisy; the assessment's 32.8 s) to 9.2 s at 100k and 958 to 756 ms at 10k. Evidence in
   `Code/testing/engine-split/catalog_v3/`.
-- 2026-11-15: D177 and D178's catalog version 3 landed: Mere `6c3648297`'s successor on main (the five catalog lists as
+- 2026-11-15: D177 and D178's catalog version 3 landed: Mere `f0b1b2a22` (the five catalog lists as
   content-defined trees under `chunks/<digest>`, the root's digest still the generation, collection reading only the head's changed
-  chunks, versions 1 and 2 read and rewritten on the next publication) and the 64-item target, ending at `7133c5fdf`. pandect 303
+  chunks, versions 1 and 2 read and rewritten on the next publication) and `7133c5fdf` (the 64-item target). pandect 303
   and mere-kernel 634 pass at 64 on a fresh resolve. Every generation shifts once at the upgrade. Evidence in
   `Code/testing/engine-split/catalog_v3/`.
