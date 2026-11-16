@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-15: D1 to D178 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-16: D1 to D178 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -13,8 +13,7 @@ crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph`
 composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
 layer) and L5 (the dataset and the formats without `query`; Graphshell repointed to `mere`; the `mere-rdf` shim
 deleted), L6a (the headless inspector) and L6b (content negotiation and Link headers, D142's P5 row) landed
-2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). **P6 is under way:** RDFC-1.0 (`mere-rdfc`, with its rows), the differential-dataflow probe and the declared-lens plan's L1 (the pack header, `eidetic` `c96bea1`) and L2 (the pack loader and core pack, Mere `47a2b976a`, `eidetic` `41ec454`) have landed; SHACL, the derived layer, lens L3 to L5, the thin slice and identity and proofs remain. P7 needs P6's loader, which L2 supplies, but no enum leaves before lens L3's probe. P8 needs only P1 to P5 and has not started; nor have the consolidations C, and `wavicle` has not folded. The engine-to-workspace contract
-is deferred by D4; open forks are in Open questions.
+2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). **P6 is under way:** RDFC-1.0 (`mere-rdfc`, with its rows), the differential-dataflow probe and the declared-lens plan's L1 (the pack header, `eidetic` `c96bea1`) and L2 (the pack loader and core pack, Mere `47a2b976a`, `eidetic` `41ec454`) have landed; lens L3's hot-path probe passed (declared-lens D15); SHACL, the derived layer, lens L4 and L5, the thin slice and identity and proofs remain. P7 has the loader and the probe it waited on; Graphshell's real pack and the trail and arrangement round-trip remain. **P8 is under way:** its first done-condition holds under D145 (checked 2026-11-16: Turnstone `d2a2c676` and Knot `9147ace` take only Mere's workspace crates, `mere-kernel`, `pandect` and `catchment`, from mere.git on `main`); the contract's first rulings are D148 (a revision is session and journal cursor locally, the journal-prefix digest across) and D149 (a snapshot keyframe, then deltas); its groundwork has landed: pinned views and whole refusal (D163, D166, D169), edits at 100k by structural sharing (D164 to D174), publication's fixes and collection (D171, D173, D175, D176) and catalog version 3 (D177, D178). The contract document, its three probes (the third checking every Resource-stratum quad, D147) and the kernel's surface half moving to Graphshell (D146) remain. The consolidations C have not started, P0's squishes are in part, and `wavicle` has not folded. Open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
 linked-data graph, in the posture Genet takes toward the web platform: dereference, parse,
@@ -806,8 +805,14 @@ revision and what crosses at frame rate.
 - Done when: neither product pins `mere.git` for anything but the engine; the contract is a
   dated design document with its own rulings; the three probes from the second layout (a
   headless assertion edit and reopen, a host view bound to that revision, an arrangement edit
-  leaving the revision alone) pass as tests.
+  leaving every Resource-stratum quad unchanged, D147) pass as tests; then the kernel's surface half
+  moves to Graphshell (D146).
 - Needs: P1 to P5.
+- Readings and rulings, 2026-11-13 to 2026-11-15: "the engine" is Mere's workspace, so products may take its crates
+  from mere.git (D145), which Turnstone and Knot already do; the contract's revision is session and journal cursor
+  locally and the journal-prefix digest wherever it crosses (D148), and the engine sends a host a snapshot keyframe
+  then touched-source deltas (D149); the groundwork for pinned views, edits at 100k and publication landed under
+  D161 to D178 (Progress). What remains: the contract document, the three probes, then the kernel's surface half.
 
 ## Decisions
 
