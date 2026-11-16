@@ -1991,6 +1991,22 @@ summary = "The catalog's content-defined tree lands at 64 items a chunk."
 draws_on = ["engine-split D177"]
 plans = ["engine-split"]
 
+[decisions."engine-split D179"]
+title = "P0's crate lines close with `settings-wit` kept apart; a host binds a view by holding a `PinnedView`; P8 settles the keyframe schema, missed-delta recovery and the Resource digest's encoding; the arrangement probe tests the Surface edit only (Mark, 2026-11-16)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P0's lines close with settings-wit kept apart; hosts bind views by holding a PinnedView; P8 settles the keyframe schema, recovery and digest encoding."
+draws_on = ["engine-split D27", "engine-split D52", "engine-split D147", "engine-split D149", "engine-split D163", "engine-split D166"]
+plans = ["engine-split"]
+
+[decisions."engine-split D180"]
+title = "SHACL is `mere-shacl` over a public indexed pattern read, the caller naming the graph, returning the report dataset with a typed summary (Mark, 2026-11-16)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "SHACL is mere-shacl over a public indexed pattern read, the caller naming the graph, returning the report dataset and a typed summary."
+draws_on = ["engine-split D143", "engine-split D144", "engine-split D150", "engine-split D151"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
