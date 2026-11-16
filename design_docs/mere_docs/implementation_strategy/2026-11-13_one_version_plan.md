@@ -110,6 +110,18 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
   Links: applies one-version D2.
 - **one-version D4** (reader, listed to Mark). Dropping a holder is tried before forking it.
   Links: applies engine-split D144.
+- **one-version D5** (Mark, 2026-11-16). Mere's `hashbrown` 0.15.5, held only by `petgraph 0.8.3` (for `mere`,
+  `mere-kernel` and Eidetic's `portolan`), whose master is 0.9.0 on `hashbrown` 0.17 without the `serde-1` feature
+  all three use: "Measure upstream master first (Recommended)", the no-patch default when upstream main has moved,
+  with a 0.8 port the alternative if the migration is too wide; against porting the 0.8 line and waiting. Mark
+  added: "My preference, of course, remains the newest versions." Evidence:
+  `Code/testing/engine-split/one_version_mere/report.md`. Links: applies engine-split D144 · governs P3.
+- **one-version D6** (Mark, 2026-11-16). Mere's `syn` 2 holders, all third-party proc macros with no release on `syn`
+  3 (`async-stream-impl`, `curve25519-dalek-derive`, `enumn`, `munge_macro`, `strum_macros`, `zerocopy-derive`,
+  `zeroize_derive`, and `enum_dispatch` and `postcard-derive` outside the main trees): "Keep it, queue forks in P3
+  (Recommended)", each holder's step named, the two crypto holders under D1; against forking the non-crypto holders
+  now and waiting. `peg-runtime`'s two entries are one package (proc-macro and normal contexts), not a duplicate.
+  Links: applies one-version D1, engine-split D144 · governs P3, P4.
 
 ## Open questions
 
@@ -130,3 +142,6 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
 - 2026-11-13: first reader's review: direct dependencies name a fork by git, `[patch]` rows only
   for transitive holders; P5 corrected, since Mere carries no patch today and the rudof patch is
   built as a fork by P6's SHACL lane. Landed on Mere main.
+- 2026-11-16: Mere's own duplicates measured at `43322122a` (two fresh resolves, identical package IDs):
+  `hashbrown` 0.15/0.17 and `syn` 2/3 are splits, `peg-runtime` is not; no class A update clears either (D5, D6).
+  Also seen outside the main trees: `hashbrown` 0.14.5 under `dashmap`.
