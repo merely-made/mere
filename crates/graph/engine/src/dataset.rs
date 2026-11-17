@@ -14,9 +14,9 @@ use std::collections::HashMap;
 
 use crate::projection::{ProjectionSource, SourceQuads};
 use crate::{ProjectionKey, RdfSource};
+use oxrdf::{GraphName, NamedNode, NamedOrBlankNode, Term};
 pub use quadstore::View;
 use quadstore::{Dictionary, Quad, QuadIndex, QuadMeta, TermId};
-use oxrdf::{GraphName, NamedNode, NamedOrBlankNode, Term};
 
 mod refresh;
 pub use refresh::Refresh;
@@ -199,26 +199,61 @@ impl IndexedDataset {
     pub fn quads(&self, view: View) -> impl Iterator<Item = oxrdf::Quad> + '_ {
         self.index
             .pattern(None, None, None, None, view)
-            .map(|(quad, _)| {
-                let term = |id| self.terms.resolve(id).clone();
-                let graph_name = if quad.graph.is_default_graph() {
-                    GraphName::DefaultGraph
-                } else {
-                    match NamedOrBlankNode::try_from(term(quad.graph))
-                        .expect("graph names are IRIs or blank nodes")
-                    {
-                        NamedOrBlankNode::NamedNode(name) => GraphName::NamedNode(name),
-                        NamedOrBlankNode::BlankNode(name) => GraphName::BlankNode(name),
-                    }
-                };
-                oxrdf::Quad::new(
-                    NamedOrBlankNode::try_from(term(quad.subject))
-                        .expect("subjects are IRIs or blank nodes"),
-                    NamedNode::try_from(term(quad.predicate)).expect("predicates are IRIs"),
-                    term(quad.object),
-                    graph_name,
-                )
+            .map(|(quad, _)| self.externalize_quad(quad))
+    }
+
+    /// Read quads matching the supplied terms through the index. `None` is a
+    /// wildcard; `Some(GraphName::DefaultGraph)` selects the default graph.
+    /// Terms absent from the dictionary match nothing. Results have no promised order.
+    pub fn quads_matching(
+        &self,
+        view: View,
+        subject: Option<&NamedOrBlankNode>,
+        predicate: Option<&NamedNode>,
+        object: Option<&Term>,
+        graph: Option<&GraphName>,
+    ) -> impl Iterator<Item = oxrdf::Quad> + '_ {
+        let s = subject.map(|v| self.terms.lookup(&Term::from(v.clone())));
+        let p = predicate.map(|v| self.terms.lookup(&Term::from(v.clone())));
+        let o = object.map(|v| self.terms.lookup(v));
+        let g = graph.map(|v| match v {
+            GraphName::DefaultGraph => Some(None),
+            GraphName::NamedNode(v) => self.terms.lookup(&Term::from(v.clone())).map(Some),
+            GraphName::BlankNode(v) => self.terms.lookup(&Term::from(v.clone())).map(Some),
+        });
+        let missing = s.is_some_and(|v| v.is_none())
+            || p.is_some_and(|v| v.is_none())
+            || o.is_some_and(|v| v.is_none())
+            || g.is_some_and(|v| v.is_none());
+        let rows = (!missing)
+            .then(|| {
+                self.index
+                    .pattern(s.flatten(), p.flatten(), o.flatten(), g.flatten(), view)
             })
+            .into_iter()
+            .flatten();
+        rows.map(|(quad, _)| self.externalize_quad(quad))
+    }
+
+    fn externalize_quad(&self, quad: &Quad) -> oxrdf::Quad {
+        let term = |id| self.terms.resolve(id).clone();
+        let graph_name = if quad.graph.is_default_graph() {
+            GraphName::DefaultGraph
+        } else {
+            match NamedOrBlankNode::try_from(term(quad.graph))
+                .expect("graph names are IRIs or blank nodes")
+            {
+                NamedOrBlankNode::NamedNode(name) => GraphName::NamedNode(name),
+                NamedOrBlankNode::BlankNode(name) => GraphName::BlankNode(name),
+            }
+        };
+        oxrdf::Quad::new(
+            NamedOrBlankNode::try_from(term(quad.subject))
+                .expect("subjects are IRIs or blank nodes"),
+            NamedNode::try_from(term(quad.predicate)).expect("predicates are IRIs"),
+            term(quad.object),
+            graph_name,
+        )
     }
 
     /// Stored rows (distinct quad and held flag).
@@ -287,5 +322,82 @@ mod tests {
             std::collections::HashSet::from([default, named, blank, gone])
         );
         assert_eq!(ds.quads(View::History).count(), ds.len());
+    }
+    #[test]
+    fn indexed_patterns_equal_filtered_quads() {
+        use std::collections::HashSet;
+        let s = NamedOrBlankNode::from(node("a"));
+        let p = node("p");
+        let o = Term::from(node("b"));
+        let g = GraphName::from(node("g"));
+        let ds = IndexedDataset::from_quads([
+            (
+                oxrdf::Quad::new(s.clone(), p.clone(), o.clone(), g.clone()),
+                true,
+            ),
+            (
+                oxrdf::Quad::new(s.clone(), p.clone(), o.clone(), GraphName::DefaultGraph),
+                false,
+            ),
+            (
+                oxrdf::Quad::new(node("other"), p.clone(), o.clone(), g.clone()),
+                true,
+            ),
+            (
+                oxrdf::Quad::new(s.clone(), node("other-p"), o.clone(), g.clone()),
+                true,
+            ),
+        ]);
+        for view in [View::Live, View::History] {
+            for mask in 0..16 {
+                let subject = (mask & 1 != 0).then_some(&s);
+                let predicate = (mask & 2 != 0).then_some(&p);
+                let object = (mask & 4 != 0).then_some(&o);
+                let graph = (mask & 8 != 0).then_some(&g);
+                let expected: HashSet<_> = ds
+                    .quads(view)
+                    .filter(|q| {
+                        subject.is_none_or(|v| &q.subject == v)
+                            && predicate.is_none_or(|v| &q.predicate == v)
+                            && object.is_none_or(|v| &q.object == v)
+                            && graph.is_none_or(|v| &q.graph_name == v)
+                    })
+                    .collect();
+                let actual: HashSet<_> = ds
+                    .quads_matching(view, subject, predicate, object, graph)
+                    .collect();
+                assert_eq!(actual, expected, "pattern {mask}");
+            }
+            let missing = NamedOrBlankNode::from(node("missing"));
+            assert_eq!(
+                ds.quads_matching(view, Some(&missing), None, None, None)
+                    .count(),
+                0
+            );
+            let missing_p = node("missing");
+            let missing_o = Term::from(node("missing"));
+            let missing_g = GraphName::from(node("missing"));
+            assert_eq!(
+                ds.quads_matching(view, None, Some(&missing_p), None, None)
+                    .count(),
+                0
+            );
+            assert_eq!(
+                ds.quads_matching(view, None, None, Some(&missing_o), None)
+                    .count(),
+                0
+            );
+            assert_eq!(
+                ds.quads_matching(view, None, None, None, Some(&missing_g))
+                    .count(),
+                0
+            );
+            let default = GraphName::DefaultGraph;
+            assert_eq!(
+                ds.quads_matching(view, None, None, None, Some(&default))
+                    .count(),
+                ds.quads(view).filter(|q| q.graph_name == default).count()
+            );
+        }
     }
 }
