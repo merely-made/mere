@@ -1,7 +1,8 @@
 # One-version plan: every crate at one version, the latest, across the family
 
-**Status:** 2026-11-13: plan. P1 has started outside Mere (base64 0.23 and rcgen 0.14 in Graphshell,
-Armillary, Gemot and Errand). No fork exists yet; the fork list goes to Mark before any is created.
+**Status:** 2026-11-17: in progress. P1 has started outside Mere (base64 0.23 and rcgen 0.14 in Graphshell,
+Armillary, Gemot and Errand). Mere's unused AccessKit adapter is removed in a review candidate under
+Graphshell's uxtree-spine D8, retaining `SurfaceId`. No fork exists yet; the fork list goes to Mark before any is created.
 
 **For:** carrying out engine-split D144. Mark, 2026-11-13, asked "Why skips?" about the
 `[[bans.skip]]` rows added for duplicates held by third-party crates at their latest release, then
@@ -135,6 +136,18 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
 - The oxigraph duplicates (rand 0.9 under oxrdf 0.3.5, quick-xml 0.37 under oxrdfxml 0.2.5) entered
   every consumer with P6 L1 and were skipped in Mere, Isocosm, Woodshed, Turnstone and Knot.
 - rcgen was not stuck: 0.14.10 takes pem 4, which takes base64 0.23.
+- 2026-11-17: a fresh Mere resolution identifies `enumn` 0.1.14's only holder as
+  `accesskit` 0.25.2, held only by `mere-kernel`, on native and wasm. The kernel's
+  `accessibility::descriptor_for`, `AccessibilityDescriptor`, `apply` and three tests are the
+  entire adapter; no production caller exists. Graphshell's `ux-events` still re-exports
+  `accessibility::SurfaceId`. Graphshell's `design_docs/graphshell_docs/implementation_strategy/2026-11-11_uxtree_spine_plan.md`,
+  D8 and P8, authorize the independent Mere deletion while preserving that type.
+  This holder takes step 1 (drop unused support), rather than the fork queued by D6.
+- 2026-11-17: after that deletion, native and wasm workspace trees with all features contain
+  neither `accesskit` nor `enumn`. Normal dependency trees retain five direct `syn` 2 holders
+  on native (`curve25519-dalek-derive`, `munge_macro`, `strum_macros`, `zerocopy-derive`,
+  `zeroize_derive`) and four on wasm (all except `curve25519-dalek-derive`); the split remains.
+  `SurfaceId`'s definition, derives, variant order and public module path are unchanged.
 
 ## Progress
 
@@ -145,3 +158,8 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
 - 2026-11-16: Mere's own duplicates measured at `43322122a` (two fresh resolves, identical package IDs):
   `hashbrown` 0.15/0.17 and `syn` 2/3 are splits, `peg-runtime` is not; no class A update clears either (D5, D6).
   Also seen outside the main trees: `hashbrown` 0.14.5 under `dashmap`.
+- 2026-11-17: review candidate removes the unused kernel accessibility descriptor adapter and
+  Mere's AccessKit dependency. Native workspace tests and Graphshell's `ux-events` tests pass;
+  default workspace libraries and `ux-events` compile for wasm. Broader wasm gates have
+  separate fixture and optional personal-sync blockers; details and raw-output locations are
+  in the [receipt](../../archive_docs/receipts/2026-11-13_one_version_plan_receipts.md).
