@@ -265,6 +265,12 @@ the focused address is a separate action through the existing browser route.
    common link inspector with the selected edge and its individual evidence
    rows. Those rows keep their direction even when one stroke represents a
    pair. Expose source, acquisition kind and any coverage limits.
+   Genet `206d67a33e3` adds the occurrence record and passes the selected
+   anchor orders through the Livery and scripted clip selectors. The native
+   neighborhood can match Livery's source response against its admission and
+   inspect the exact hyperlink order with Graphshell's observation reader.
+   Moving extraction off the paint path and applying the same evidence reader
+   in the browser companion remain follow-up work.
 3. **Adopt the post-split read and retain path.** Use the
    [P8 link-cloud contract](2026-11-07_engine_split_plan.md#link-cloud-consumer)
    for resource neighborhood and evidence reads. A Resource is the addressed
