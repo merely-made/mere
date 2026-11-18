@@ -124,6 +124,25 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
   now and waiting. `peg-runtime`'s two entries are one package (proc-macro and normal contexts), not a duplicate.
   Links: applies one-version D1, engine-split D144 · governs P3, P4.
 
+- **one-version D7** (Mark, 2026-11-18). Of the `syn` 2 holders our own crates bring in, after the first reader confirmed each
+  chain to the crate that turns it on: `rkyv` (`munge_macro`) is derive-only in `mere`, `mere-kernel` and Eidetic's `hodograph`,
+  with no production archive read or write in any repository and F3 ruling out a third binary format; `personae` turns on
+  `zeroize_derive` for 8 derives; `strum` enumerates and decodes relation kinds. "Drop rkyv only": `rkyv` leaves all three crates
+  (also taking `rkyv_derive`, `bytecheck_derive` and `ptr_meta_derive` off `syn` 3); `zeroize_derive` and `strum` stay. Against
+  dropping `rkyv` and `zeroize_derive`, and all three. Revises D6. Links: applies engine-split D144, data-formats F3.
+- **one-version D8** (Mark, 2026-11-18). `petgraph`: the three consumers request `serde-1`, which master (0.9) lacks, and
+  `portolan` stores `StableGraph`'s serde form; Mark: "They're in mere! We own it!" and, of staying on 0.8.3, "This also seems
+  daffy". "Own the format, take master (Recommended)": `portolan` writes its own versioned graph records (old bytes still read),
+  `serde-1` is dropped, and all three crates take petgraph master by git, clearing `hashbrown` 0.15 on native and wasm. Against
+  owning the format and waiting for 0.9, and dropping petgraph. Revises D5. Links: applies engine-split D144.
+- **one-version D9** (Mark, 2026-11-18). `curve25519-dalek-derive` (x86_64 only, absent under the `serial` or `fiat` backend) and
+  `zerocopy-derive` (through `half` under `ciborium` for CBOR and COSE, and `ppv-lite86` under `rand_chacha` for HPKE): "Measure
+  both": sign, verify and x25519 timed with the SIMD backend against serial, and a CBOR and COSE stack without `half` and HPKE
+  without `rand_chacha` assessed, before either moves. Against measuring Dalek and keeping zerocopy, and keeping both.
+  Links: applies one-version D1 · governs P3.
+- **Priority** (Mark, 2026-11-18): "Size these moves, sure, but they aren't the immediate priority; finishing cutover work is."
+  D7 to D9 are sized and queued behind engine-split P8.
+
 ## Open questions
 
 - ssh-key 0.6.7 takes part in 29 skips and its 0.7 line is still a release candidate. Fork 0.6.7
@@ -163,3 +182,5 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
   default workspace libraries and `ux-events` compile for wasm. Broader wasm gates have
   separate fixture and optional personal-sync blockers; details and raw-output locations are
   in the [receipt](../../archive_docs/receipts/2026-11-13_one_version_plan_receipts.md).
+- 2026-11-18: `async-stream-impl` left Mere's graph with P2mere 0.11.1 (`async-stream` behind the store's `sqlite` feature);
+  `enumn` left with the AccessKit adapter's removal (`13a084dde`). D7 to D9 rule the rest, queued behind the cutover.

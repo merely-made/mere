@@ -2007,6 +2007,30 @@ summary = "SHACL is mere-shacl over a public indexed pattern read, the caller na
 draws_on = ["engine-split D143", "engine-split D144", "engine-split D150", "engine-split D151"]
 plans = ["engine-split"]
 
+[decisions."engine-split D181"]
+title = "P8's transport: a versioned CBOR envelope around the projection snapshot, resume else a fresh keyframe, and an RDFC-1.0 digest for Resource content (Mark, 2026-11-18)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "P8's keyframe is a CBOR envelope around the snapshot, recovery resumes or sends a keyframe, and Resource content hashes RDFC-1.0 N-Quads."
+draws_on = ["engine-split D149", "engine-split D158", "engine-split D179"]
+plans = ["engine-split"]
+
+[decisions."engine-split D182"]
+title = "A trail round-trips through a workspace-owned RDF event representation (Mark, 2026-11-18)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A trail round-trips through a workspace-owned RDF event representation with an explicit Surface identity mapping."
+draws_on = ["engine-split D44"]
+plans = ["engine-split"]
+
+[decisions."engine-split D183"]
+title = "A SHACL call names both its view and its graph (Mark, 2026-11-18)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Every SHACL call names its Live or History view and its graph explicitly."
+draws_on = ["engine-split D180"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-16: D1 to D180 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-18: D1 to D183 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2829,6 +2829,18 @@ checks alongside the standards ledger and P8 cutover probes.
 
   Links: area The stack · draws on engine-split D143, engine-split D144, engine-split D150, engine-split D151 · plans engine-split P6 · summary SHACL is mere-shacl over a public indexed pattern read, the caller naming the graph, returning the report dataset and a typed summary.
 
+- **D181. P8's transport: a versioned CBOR envelope around the projection snapshot, resume else a fresh keyframe, and an RDFC-1.0 digest for Resource content (Mark, 2026-11-18):** D179 asked that P8 settle them; the binding lane (`Code/testing/engine-split/p8_binding/transport_forks.md`, Mere `9b96cd693`, Graphshell `8885bb499`) read chirograph's versioned `ProjectionSnapshot`, `ProjectionDiff` and resume responses, whose projection session is not the engine's session, and scenotime's epochs and diffs. "CBOR envelope around snapshot (Recommended)": the keyframe is a versioned CBOR envelope carrying the engine session, cursor and full v2 digest with the projection epoch and revision, around the existing snapshot, postcard staying inside the stack (F3); against a new engine and scene schema and a serialized Rust snapshot. "Resume, else fresh keyframe (Recommended)": a host resumes from its acknowledged engine identity and epoch, a contiguous retained suffix replays when it verifies and otherwise a fresh keyframe is sent, every base and target checked before applying, the retention bound a number for Mark; against always a keyframe and retaining every delta. "RDFC-1.0 canonical N-Quads (Recommended)": the Resource digest is versioned and domain-separated over the Resource dataset canonicalized by `mere-rdfc`, with an algorithm id and work limits, distinct from D158's journal digest, measured before use on the edit path; against Mere's own sorted encoding and reusing the journal digest. Outcome: refines D149 and D179.
+
+  Links: area The stack · draws on engine-split D149, engine-split D158, engine-split D179 · plans engine-split P8 · summary P8's keyframe is a CBOR envelope around the snapshot, recovery resumes or sends a keyframe, and Resource content hashes RDFC-1.0 N-Quads.
+
+- **D182. A trail round-trips through a workspace-owned RDF event representation (Mark, 2026-11-18):** P7's probe (`Code/testing/engine-split/p7_workspace_pack/report.md`, Mere `b1ff67792`, evidence only, committed without hooks) exported a trail and a frame membership and re-imported them: the frame membership's five quads survived, the link click and its timestamp did not, and fresh import derived node ids from the URL IRIs. "RDF event representation (Recommended)": the workspace pack defines a traversal event's identity, endpoints, trigger and timestamp in RDF with an explicit Surface identity mapping, and import reconstructs the typed payload; event identity, multiplicity, graph scope and provenance return as forks before it is built; against RDF with a versioned workspace sidecar and a lossy export. Outcome: refines P7.
+
+  Links: area The stack · draws on engine-split D44 · plans engine-split P7 · summary A trail round-trips through a workspace-owned RDF event representation with an explicit Surface identity mapping.
+
+- **D183. A SHACL call names both its view and its graph (Mark, 2026-11-18):** the pattern-read lane (`Code/testing/engine-split/p6_shacl_build/indexed-receipt.md`) stopped because D180's View is Live or History in code, and inside either the default graph, one named graph or the union can be validated. "View and graph, both explicit (Recommended)": every validation call names Live or History and a graph selector, with no implicit default; against the union or the default graph by default. Outcome: refines D180.
+
+  Links: area The stack · draws on engine-split D180 · plans engine-split P6 · summary Every SHACL call names its Live or History view and its graph explicitly.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -3767,3 +3779,12 @@ checks alongside the standards ledger and P8 cutover probes.
   chunks, versions 1 and 2 read and rewritten on the next publication) and `7133c5fdf` (the 64-item target). pandect 303
   and mere-kernel 634 pass at 64 on a fresh resolve. Every generation shifts once at the upgrade. Evidence in
   `Code/testing/engine-split/catalog_v3/`.
+- 2026-11-18: landed on Mere main `08f9af8c0`: P8's first probe (`5be5c4efd`, a pinned assertion edit reopened through a fresh
+  backend matching session, cursor, v2 digest and every live and history row; its control fails), the contract draft (`f4f392b4d`,
+  `50df14eea`, `5d8263b8b`, now `technical_architecture/2026-11-16_engine_workspace_contract.md`) and P6's indexed pattern read
+  (`08f9af8c0`, all sixteen binding shapes against filtered quads, its control fails). `mere`, `pandect` and `mere-kernel` pass 993
+  with `--all-features` on a fresh resolve and `mere` with `query` checks on wasm (`Code/testing/engine-split/land_1118/`). The
+  consolidation's wavicle fold landed on Woodshed main `6873c0e7` (a merge keeping Wavicle's history; 377 tests in `wavicle`,
+  `hocket-project` and `woodshed-core`); Wavicle's own repository is not yet archived. P8's probes 2 and 3 wait on the host binding's
+  shape, P6's wrapper on D183. Mark, 2026-11-18, on the one-version moves: "Size these moves, sure, but they aren't the immediate
+  priority; finishing cutover work is."
