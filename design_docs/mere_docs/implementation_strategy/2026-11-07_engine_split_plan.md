@@ -814,6 +814,47 @@ revision and what crosses at frame rate.
   then touched-source deltas (D149); the groundwork for pinned views, edits at 100k and publication landed under
   D161 to D178 (Progress). What remains: the contract document, the three probes, then the kernel's surface half.
 
+#### Link-cloud consumer
+
+[B2's native Turnstone slice](2026-11-04_application_experience_plan.md#native-turnstone)
+uses P5's existing parser and a temporary host projection. It can be used and
+refined during the split. The following are receiving requirements for adopting
+the shared contract after cutover. P8's revision rules and three probes still
+govern the cutover.
+
+| Engine seam | What the host needs |
+|---|---|
+| Interpret a bounded source | Accept the acquisition descriptor (effective IRI, resolution base, capture identity and acquisition kind) and Fleece's structured blocks with their evidence references. Reuse P5's format parsers and `ContextCache`. Return directed statements with resource IDs or IRIs and their block references. Report per-block diagnostics and coverage for limits, unknown contexts and unsupported inputs. The host can supply a loader under its existing policy for a separate authorized read. |
+| Read a neighborhood | Given a Resource ID or exact IRI, a revision and an admitted source scope, return a bounded first hop in both directions with stable resource and evidence handles, predicates, provenance kind, counts and a limit or continuation indication. Use indexed resource and dataset reads. The host derives the drawn pair and fetches individual evidence rows on demand. |
+| Inspect one link | Read the evidence for the selected assertions at the same revision and scope. Return separate directed rows with their attributed source, immutable capture/edition reference and occurrence or structured-block locator. A local observation, traversal and a derived claim stay distinguishable. The host resolves a locator against an admitted capture when showing or opening the source. |
+| Retain or forget one source | Use existing assertion and journal operations so retries are idempotent. Admit observations and evidence references with the source as a unit. Withdrawal or removal affects that source's support and preserves independent support from other sources. Replay and reopen recover the same evidence references and assertion identities. |
+
+The host owns the `PinnedView` and supplies the scope of admitted sources.
+Inspect and navigate from the same session and journal cursor, with the
+journal-prefix digest for a cross-process view under D148. Apply D149's
+keyframe and touched-source deltas when the view needs to cross a process
+boundary. Tag transient observations with their capture identity and admission
+generation. They can supplement a pinned read in memory until the source changes
+and need no journal write to appear in the canvas.
+
+The engine takes structured evidence and supplies resource reads. Genet Fleece
+owns canonical text and extraction from the DOM. The host supplies directed
+anchor observations with occurrence references. Graphshell owns the Surface
+projection, geometry and shared inspector. Turnstone owns document selection,
+network and retention policy, and the Open address action. Use the P5 resource
+model and P8 transport contract so the product can drop its local RDF quad
+walk and provisional resource IDs. The observed-link slice needs P5 and the
+applicable P8 read interface. P6 inference, validation and identity can enrich
+later views. P7 traversal and arrangement come from the host's pack.
+
+This consumer is ready when native B2 can use the same engine result through
+both a direct call and a pinned host projection. Replacing a live capture drops
+its obsolete transient rows. A revoked scope refuses a stale inspection. A
+link with two supporting sources remains visible after one is withdrawn and
+disappears from the live view when the last is withdrawn. A retained capture
+reopens offline with its exact occurrence. These are consumer acceptance
+checks alongside the standards ledger and P8 cutover probes.
+
 ## Decisions
 
 - **D1. The split (Mark, 2026-11-07):** "I agree with the overall split", and "me personally,

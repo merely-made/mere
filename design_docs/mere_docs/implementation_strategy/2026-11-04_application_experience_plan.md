@@ -7,6 +7,10 @@ N2's local Woodshed fixture passed on macOS desktop and in Chrome. Android and
 iOS remain open in the four-host gate. Live peer access, offline reopen and the
 full browser release profile also remain open. See [Progress and evidence](#progress-and-evidence)
 for the scope of each run.
+
+On 2026-11-18, the [native B2 slice](#native-turnstone) reached a local
+Turnstone implementation with automated coverage of passage traversal.
+
 **Design:** [portable application experience brief](../../2026-11-04_portable_application_experience_brief.md).
 **First delivery:** a useful browser extension with no resident installed:
 copy a source link, relate consented browsing, Fleece the current page, inspect
@@ -40,7 +44,7 @@ capture ledger or extension framework under the Turnstone name.
 | Graph-kernel resource/access identity and the [link model](2026-10-28_link_model_plan.md) | Canonical resources, attributed assertions, link inspection, arrangements and promoted relations | Present occurrence context and copy/open actions; do not serialize derived pair links as new authority |
 | Extension `background.js`, `capture-model.js`, `extension-profile.js`; Graphshell `capture.rs` | Consent, bounded capture queue, source scope, commit-before-ack and encounter-ledger admission | Browser lifecycle qualification, document-scoped page acquisition and a production local profile |
 | Muniment IndexedDB and Graphshell's existing product/viewer split | Local graph, encounter persistence, persistence-state reporting and shared renderer | Production mount without fixture seed; concurrent panel/workspace admission |
-| Genet Fleece and Mere `fleece` | Extraction, canonical text/selectors, capture evidence, selected portable clips | Per-hyperlink occurrence context and browser-acquisition adapter |
+| Genet Fleece, Inker document sessions and the existing capture/retention path | Extraction, canonical text/selectors, source evidence and selected clips | Per-hyperlink occurrence context and browser-acquisition adapter |
 | `page-load`, `genet-host-api`, native `mere-fetch` and Errand | Request/outcome vocabulary, typed prompts, Stop/supersession, protocol fetch and parsing | Bounded gateway wire profile and asynchronous browser transport realization |
 | Stickleback drops and the [release-log plan](2026-11-03_release_log_plan.md), R2/R4/R6 | Content identity, verified payloads, protected drops, release/reader authority and portable addresses | Product adapters for preparing, copying, opening and retaining selected owned content |
 | Djinn/AppConnection, capability door and projection offers | Native/remote provider admission, leases, viewer authority and cancellation | Optional companion realization of the same actions, not a replacement local browser store |
@@ -130,6 +134,8 @@ flowchart LR
 ```
 
 The first reference/capture/link-cloud increment is independently useful.
+Native B2 follows the existing Turnstone acquisition path. The shared Fleece
+occurrence record feeds both hosts, and the engine read contract follows P8.
 S2 consumes release-log R2/R4/R6 as they qualify; it does not reimplement
 them. R1's fork publication, off-iroh carriage, anonymous overlays, generic
 applets and browser-engine parity do not block S1/B1/B2. N1 may proceed earlier
@@ -221,8 +227,65 @@ events; private/excluded browsing stays out of the retained/exportable set.
 
 ### B2. Fleece a page into an inspectable link cloud
 
-**Needs:** S1 and B1. **Owners:** Genet's Fleece extractor, Mere's Fleece
-adapters, Graphshell graph/presentation and the extension acquisition adapter.
+The extension delivery needs S1 and B1. Native Turnstone starts from its
+existing document sessions and source admissions and can proceed independently.
+Genet Fleece extracts evidence, Mere interprets linked data and Graphshell
+provides the common graph and inspector. Each host owns acquisition and consent.
+
+#### Native Turnstone
+
+Use the native reader and canvas already in Turnstone. Open **Panes →
+Document connections… → Explore resource neighborhood** from the current
+document. Browse a one-hop neighborhood from that document or, with a
+passage selected, start with the links in that passage. Clicking a resource
+recenters the neighborhood and reveals its incoming and outgoing observations
+within the available sources. Clicking a link inspects its evidence. Opening
+the focused address is a separate action through the existing browser route.
+
+1. **Use the existing first slice.** Turnstone's local implementation at
+   `2784b73d` uses the Cambium graph swatch, the active graph's settled HTML
+   source admissions and Inker's `DocumentSession::clip`. It uses Fleece for
+   title, anchors and embedded JSON-LD blocks and Mere's offline JSON-LD parser
+   for named-resource relations. Its temporary projection records the source
+   address, capture hash and anchor or block context. It bounds source count,
+   capture size, relations and displayed evidence and reports partial coverage.
+   The native build check and passage-to-resource regression passed. Headed
+   keyboard and pointer behavior remain to be checked. This cut is session-only
+   and has an inline evidence panel.
+2. **Share the occurrence and inspector path.** Extend the
+   [Fleece preservation contract](https://github.com/merely-made/genet/blob/main/design_docs/2026-09-05_fleece_preservation_contract_plan.md)
+   with one ordered record per hyperlink containing the raw href, rel, anchor
+   text and its canonical text range or an explicit unanchored status.
+   Include source-relative text quote and position selectors wherever a range
+   resolves. Reuse the supplied effective address and document base. Bind
+   passage links to the clip's observed representation and selected occurrence
+   keys. Page-level JSON-LD keeps its own block evidence. Move extraction off
+   the paint path, cache by capture, base and extraction profile, and drop
+   results from superseded or revoked admissions. Have the native canvas open the
+   common link inspector with the selected edge and its individual evidence
+   rows. Those rows keep their direction even when one stroke represents a
+   pair. Expose source, acquisition kind and any coverage limits.
+3. **Adopt the post-split read and retain path.** Use the
+   [P8 link-cloud contract](2026-11-07_engine_split_plan.md#link-cloud-consumer)
+   for resource neighborhood and evidence reads. A Resource is the addressed
+   thing. A capture is a particular representation with an acquisition record.
+   An occurrence picks out part of that capture. The host's content node and
+   layout remain Surface state. Offer session-only discovery by default and
+   separate choices to keep a reference or keep the evidence and its source
+   representation. Show what each choice stores and which supports offline
+   evidence. Reuse the existing capture, retention and source-owned removal
+   paths. Clearing a session source removes its temporary observations.
+
+The native slice is ready when a document with repeated links and an embedded
+statement can be explored by pointer and keyboard, without leaving the reader
+until an explicit open. Selecting a passage reveals its links alone, and
+moving to a neighbor finds evidence from other available sources. Inspection
+can distinguish repeated occurrences and shows whether evidence is an anchor
+or a JSON-LD block. Test a changed or forgotten source while extraction is
+pending and verify the result cannot reappear. Offline reopen is a later gate
+for explicitly retained evidence.
+
+#### Browser companion
 
 Start with a user-invoked current-document acquisition using the browser's
 `activeTab`/scripting model. Ongoing DOM observation is an additional
@@ -235,13 +298,10 @@ is the browser's authenticated current page. Respect the existing capture
 policy and exclude credential/form-control values from the default acquisition;
 permission to observe visits is not consent to capture every page input.
 
-Extend the shared Fleece extraction result to associate each hyperlink
-occurrence with preserved text/selector context. `html_links()` is useful for
-a frontier but discards duplicates; `extract_links()` retains anchor text but
-does not yet expose full surrounding occurrence context. Add that missing
-capability once in the extractor and consume it in native and browser paths.
-Use existing capture evidence, Web Annotation selectors and retention adapters;
-do not implement a separate JavaScript text normalizer or quote resolver.
+Consume the same Fleece occurrence record as the native path. The existing
+`extract_links()` keeps repeated anchors and their text. The new occurrence
+record supplies the surrounding text and selectors, through the shared
+normalizer and quote resolver.
 
 Project assertions into the existing graph. Hover and keyboard focus expose
 the selected occurrence, source and evidence; several contexts remain
