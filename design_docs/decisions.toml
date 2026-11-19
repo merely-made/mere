@@ -2031,6 +2031,30 @@ summary = "Every SHACL call names its Live or History view and its graph explici
 draws_on = ["engine-split D180"]
 plans = ["engine-split"]
 
+[decisions."engine-split D184"]
+title = "The shared milestone validates kept sources only (Mark, 2026-11-19)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The shared milestone validates kept sources only; a session-only page shows its claims and offers no validation."
+draws_on = ["engine-split D180", "engine-split D183"]
+plans = ["engine-split"]
+
+[decisions."engine-split D185"]
+title = "The shared milestone's first pass calls Mere directly; the pinned projection is its second (Mark, 2026-11-19)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The shared milestone passes first by a direct call to Mere and second through a pinned host projection."
+draws_on = ["engine-split D148", "engine-split D149", "engine-split D179"]
+plans = ["engine-split"]
+
+[decisions."engine-split D186"]
+title = "The first pass takes the caller's shapes graph; a pack supplies it second (Mark, 2026-11-19)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The shared milestone's shapes come from the caller's fixture first and from a pack once declared-lens L4 lands."
+draws_on = ["declared-lens D13", "engine-split D180"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -291,6 +291,11 @@ or a JSON-LD block. Test a changed or forgotten source while extraction is
 pending and verify the result cannot reappear. Offline reopen is a later gate
 for explicitly retained evidence.
 
+The [shared milestone](2026-11-07_engine_split_plan.md#shared-milestone-a-pages-claims-to-a-shacl-finding)
+(2026-11-19) takes this slice's kept-source path on to a SHACL finding and back
+to the claim. Offline reopen of that one kept source is the milestone's
+condition; this slice's own gate stays as written.
+
 #### Browser companion
 
 Start with a user-invoked current-document acquisition using the browser's
