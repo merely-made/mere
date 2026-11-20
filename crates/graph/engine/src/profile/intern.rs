@@ -184,7 +184,7 @@ impl TermTable {
 /// Intern the vocabularies of `packs` (in resolved order, core first) under
 /// the root lens's settlements.
 pub(crate) fn intern(
-    packs: &[DecodedPack],
+    packs: &[&DecodedPack],
     lens: &LensBody,
     limits: &Limits,
     diagnostics: &mut Vec<Diagnostic>,

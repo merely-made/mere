@@ -11,13 +11,17 @@
 
 use std::collections::BTreeSet;
 
-use eidetic::pack::{HeaderError, Pin, Refusal, SignerReview, TrustPolicy};
+use eidetic::pack::{
+    Admission, BodyValue, HeaderError, Origin, PackKind, Pin, Refusal, SignerReview, TrustPolicy,
+    Verdict,
+};
+use eidetic::schema::TrustEnvelope;
 
 use super::core::{CORE_PACK, CORE_PACK_ID};
 use super::intern::{TermTable, intern};
 use super::lens::{LensChoices, ResolvedPin, SelectionRecord, choices};
-use super::pack::{declare_and_verify, decode};
-use super::resolve::{PackRef, PackSource, resolve};
+use super::pack::{decode, verify_declarations};
+use super::resolve::{AdmitOffer, Offered, PackRef, PackSource, resolve};
 
 /// Bounds on the work a load may do (Stack 8); each is a typed refusal.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -129,11 +133,117 @@ pub fn load<R: SignerReview>(
     policy: &TrustPolicy<R>,
     limits: &Limits,
 ) -> Result<Profile, LoadRefusal> {
+    load_inner(
+        lens,
+        source,
+        &|id, verdict, origin| policy.admit(id, verdict, origin),
+        limits,
+        false,
+    )
+    .map(|loaded| loaded.profile)
+}
+
+/// A shape body from a resolved pack. The pack's bytes, identity and origin
+/// have passed the standard loader. Interpret and validate this body before use.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ShapePackBody {
+    pub pin: Pin,
+    pub provides: Vec<String>,
+    pub body: BodyValue,
+}
+
+/// The resolved profile and shape bodies from that same resolution. A shape
+/// interpreter needs no second read from the caller's pack source.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ShapeSelection {
+    pub profile: Profile,
+    pub packs: Vec<ShapePackBody>,
+}
+
+/// Resolve a lens with its shape bodies for a SHACL interpreter.
+///
+/// # Errors
+///
+/// A load refusal naming the rule and where.
+pub fn load_shape_selection<R: SignerReview>(
+    lens: &PackRef,
+    source: &dyn PackSource,
+    policy: &TrustPolicy<R>,
+    limits: &Limits,
+) -> Result<ShapeSelection, LoadRefusal> {
+    load_inner(
+        lens,
+        source,
+        &|id, verdict, origin| policy.admit(id, verdict, origin),
+        limits,
+        true,
+    )
+}
+
+/// Resolve a user-selected, unsigned local pack with an exact lens pin.
+/// The caller supplies the bytes and the action that establishes local origin.
+/// The core and these bytes are the only packs on offer.
+///
+/// # Errors
+///
+/// A load refusal naming the rule and where.
+pub fn load_local_shape_selection(
+    bytes: &[u8],
+    limits: &Limits,
+) -> Result<ShapeSelection, LoadRefusal> {
+    let pack = decode("the local pack", bytes, limits)?;
+    let source = LocalPack {
+        id: &pack.pin.id,
+        bytes,
+    };
+    load_inner(
+        &PackRef::Pinned(pack.pin.clone()),
+        &source,
+        &|_, verdict, origin| match (verdict, origin) {
+            (Verdict::Unsigned, Origin::Local) => Ok(Admission::Local),
+            (Verdict::Broken(step), _) => Err(Refusal::Broken(*step)),
+            (Verdict::Trusted(signers), _) => Err(Refusal::UnacceptedSigner(signers.clone())),
+            (Verdict::Unsigned, _) => Err(Refusal::Unsigned),
+        },
+        limits,
+        true,
+    )
+}
+
+struct LocalPack<'a> {
+    id: &'a str,
+    bytes: &'a [u8],
+}
+
+impl PackSource for LocalPack<'_> {
+    fn offer(&self, id: &str) -> Vec<Offered> {
+        if id != self.id {
+            return Vec::new();
+        }
+        vec![Offered {
+            canonical: self.bytes.to_vec(),
+            envelope: TrustEnvelope::self_asserted(),
+            origin: Origin::Local,
+        }]
+    }
+
+    fn handler_known(&self, _: &str) -> bool {
+        false
+    }
+}
+
+fn load_inner(
+    lens: &PackRef,
+    source: &dyn PackSource,
+    admit_offer: &AdmitOffer<'_>,
+    limits: &Limits,
+    read_shapes: bool,
+) -> Result<ShapeSelection, LoadRefusal> {
     let core = decode("the core pack", CORE_PACK, limits)?;
-    let resolution = resolve(lens, core, source, policy, limits)?;
+    let resolution = resolve(lens, core, source, admit_offer, limits)?;
     let mut diagnostics = Vec::new();
     for chosen in &resolution.packs {
-        declare_and_verify(&chosen.pack, source, &mut diagnostics)?;
+        verify_declarations(&chosen.pack, source, &mut diagnostics, read_shapes)?;
         let id = &chosen.pack.header.id;
         if chosen.pack.lens.is_some() && *id != resolution.lens && *id != CORE_PACK_ID {
             diagnostics.push(Diagnostic::NestedLensIgnored { pack: id.clone() });
@@ -152,9 +262,9 @@ pub fn load<R: SignerReview>(
             });
         },
     };
-    let packs: Vec<_> = resolution.packs.iter().map(|c| c.pack.clone()).collect();
+    let packs: Vec<_> = resolution.packs.iter().map(|c| &c.pack).collect();
     let terms = intern(&packs, body, limits, &mut diagnostics)?;
-    let lens = choices(&resolution.lens, body, &mut diagnostics);
+    let lens = choices(&resolution.lens, body, &mut diagnostics, read_shapes);
     let selection = SelectionRecord {
         lens: lens_pin.clone(),
         pins: resolution
@@ -166,12 +276,32 @@ pub fn load<R: SignerReview>(
             })
             .collect(),
     };
-    Ok(Profile {
-        selection,
-        terms,
-        capabilities: resolution.capabilities,
-        lens,
-        diagnostics,
+    let shapes = if read_shapes {
+        resolution
+            .packs
+            .into_iter()
+            .filter_map(|chosen| {
+                let mut header = chosen.pack.header;
+                let body = header.body.remove(&PackKind::Shapes)?;
+                Some(ShapePackBody {
+                    pin: chosen.pack.pin,
+                    provides: header.provides,
+                    body,
+                })
+            })
+            .collect()
+    } else {
+        Vec::new()
+    };
+    Ok(ShapeSelection {
+        profile: Profile {
+            selection,
+            terms,
+            capabilities: resolution.capabilities,
+            lens,
+            diagnostics,
+        },
+        packs: shapes,
     })
 }
 

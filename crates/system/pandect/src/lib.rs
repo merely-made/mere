@@ -148,9 +148,9 @@ pub use facet_store::{
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, DroppedChoice,
-    GraphAdmissionValidator, GraphSession, GraphValidator, Kept, MereSessions, MergeChoice,
-    MergeConflict, MergeMatch, Merged, Pending, PendingMerge, PinnedView, Refused, Reverted,
-    SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey, branched_session_name,
+    GraphAdmissionValidator, GraphRevision, GraphSession, GraphValidator, Kept, MereSessions,
+    MergeChoice, MergeConflict, MergeMatch, Merged, Pending, PendingMerge, PinnedView, Refused,
+    Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey, branched_session_name,
     forked_session_name, picked_session_name,
 };
 pub use identity::StartupUnlockMode;

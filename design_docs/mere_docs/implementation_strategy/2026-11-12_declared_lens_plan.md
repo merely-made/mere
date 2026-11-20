@@ -3,7 +3,7 @@
 **Date**: 2026-11-12
 **Status**: plan, 2026-11-12; L0 done the same day: Mark ruled M1 to M9, each on its
 recommendation (D1 to D9), and the first reader's R1 to R9 and the conflict readings stand as
-argued (D10). L1 (the header and envelope) landed on `eidetic` main `c96bea1` the same day; D11 and D12 followed. L2 (the bodies, the loader and the core pack) landed on `eidetic` main `41ec454` and Mere main `47a2b976a` and `f23d3cb4d` on 2026-11-13 (D13, D14). L3 (the hot-path probe) is done the same day, within D9's bound by D15. L4 is next.
+argued (D10). L1 (the header and envelope) landed on `eidetic` main `c96bea1` the same day; D11 and D12 followed. L2 (the bodies, the loader and the core pack) landed on `eidetic` main `41ec454` and Mere main `47a2b976a` and `f23d3cb4d` on 2026-11-13 (D13, D14). L3 (the hot-path probe) is done the same day, within D9's bound by D15. L4's shapes loader supplies the second native [page-to-SHACL pass](2026-11-07_engine_split_plan.md#shared-milestone-a-pages-claims-to-a-shacl-finding). The rule sets and first-party rules packs remain open.
 **For**: the plan the [linked-data platform lessons brief](../research/2026-11-06_linked_data_platform_lessons_brief.md)
 owes. Its Open says of D2: "What remains is the stance doc rewrite ('closed lens' to 'declared
 lenses') and a declared-lens plan to carry the work. Neither is written yet." The
@@ -453,6 +453,21 @@ carries a probe with both controls before the enums go."
 ### L4. Rules and shapes in packs
 Rule sets parse, stratify and hand off by digest; shapes are canonicalized and checked by SHACL-SHACL;
 the first-party RDFS and OWL 2 RL rules packs are written.
+
+The shape-only loader uses the existing pack resolver and exposes the exact selection record and each
+active set's graph and declaring pin through `mere_shacl::load_shape_profile`. A `body.shapes` map
+keys each inline set by an absolute IRI under the pack's `provides` namespaces. Each value is the
+RDFC-1.0 SHA-256 canonical N-Quads text of one default graph. The root lens names the active set IRIs.
+The loader refuses an unresolved or multiply declared set, an RDF 1.2 triple term, a named graph,
+and an exhausted RDFC budget. It checks admitted sets using the frozen W3C SHACL 1.0 SHACL-SHACL
+fixture and returns the RDF report for a syntax violation. Shape imports and entailment directives
+are refused in this offline path.
+
+`mere_shacl::load_local_shape_pack` takes bare canonical bytes for a lens with its shapes, selected
+explicitly by the host's user. It resolves with the embedded core alone. The host can retain those
+bytes next to the selection record and active set IRI and compare the record after re-admission.
+The `shape_pack` example writes an admitted fixture pack from synthetic Turtle for the native pass.
+
 - Needs: L2; M7, M9; P6's RDFC, SHACL and derive lanes (P6 assessment §5, L2, L4 and L5).
 - Done when:
   - the `sparql12-rl` syntax, well-formedness and stratification groups (173, 8 and 14) score at

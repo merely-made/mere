@@ -1,0 +1,5 @@
+shacl-shacl.ttl is the frozen W3C SHACL 1.0 shapes-graph validator from
+https://github.com/w3c/data-shapes/blob/ce71ce35e0e24f0dda1dfb7d7d1de8adc8bbe4c1/data-shapes-test-suite/tests/core/complex/shacl-shacl-data-shapes.ttl
+Copyright © 2017 W3C® (MIT, ERCIM, Keio, Beihang).
+Distributed under the W3C Software and Document License (LICENSE-W3C).
+Whitespace outside Turtle literals was normalized.

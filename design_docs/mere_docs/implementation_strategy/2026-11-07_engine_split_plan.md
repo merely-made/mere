@@ -899,7 +899,7 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 |---|---|---|
 | Blocks to claims, with their page source | B2 native steps 1 to 3; the link-cloud table | Native fixture passed. The `json-ld-api` HTML manifest row (P6) remains open. |
 | Keep the source | B2 step 3; the existing capture and retention paths | Kept claims and their evidence reopened offline in the native fixture. |
-| Validate | `mere-shacl` (D180, D183), over kept sources only (D184) | Native fixture passed with a caller-supplied shapes graph (D186). Pack-supplied shapes remain open. |
+| Validate | `mere-shacl` (D180, D183), over kept sources only (D184) | Native fixture passed with a caller-supplied shapes graph (D186). The [declared-lens shapes loader](2026-11-12_declared_lens_plan.md#l4-rules-and-shapes-in-packs) supplies the pack for the second pass. |
 | From the finding back to the claim | the link-cloud "inspect one link" read | The native finding opened its exact captured JSON-LD block in a read-only source pane. |
 | The revision the person saw | P8's contract; Graphshell's engine binding plan | Direct validation reopened at cursor 1. The pinned host projection remains open (D185). |
 
@@ -921,10 +921,11 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   same finding and source block. Receipt `Code/testing/turnstone/receipts/l1-page-shacl/native-round-trip.txt`.
 - Done when, second pass: the same page and finding through a pinned host projection bound to the
   engine's revision. An edit to the live graph leaves the pinned view's finding unchanged, and an
-  action from the superseded view is refused. The same shapes load from a pack once the declared-lens
-  plan's L4 lands.
+  action from the superseded view is refused. The same shapes load from an admitted pack. Retaining
+  the canonical pack bytes and the selection record lets the host reproduce the pack selection offline.
 - A session-only page shows its claims and offers no validation (D184).
-- The second pass needs P8's host binding and declared-lens L4.
+- The second pass uses P8's host binding and the shapes portion of declared-lens L4. A host can
+  compare a pin's revision identity with the live session's identity without rebuilding either graph.
 - By repository: Mere has the SHACL call and the finding-to-evidence read. Genet has Fleece's blocks,
   which exist. Graphshell has the inspector's finding row and the binding. Turnstone has the page,
   the keep choice and the way back into the reader. Each repository's plan cites this section by path

@@ -14,7 +14,7 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use eidetic::pack::{
-    Admission, Origin, Pin, Requirement, Selection, SignerReview, TrustPolicy, verify_envelope,
+    Admission, Origin, Pin, Refusal, Requirement, Selection, Verdict, verify_envelope,
 };
 use eidetic::schema::TrustEnvelope;
 
@@ -77,26 +77,28 @@ pub(crate) struct Resolution {
     pub capabilities: BTreeSet<String>,
 }
 
-struct Resolver<'a, R> {
+pub(crate) type AdmitOffer<'a> = dyn Fn(&str, &Verdict, Origin) -> Result<Admission, Refusal> + 'a;
+
+struct Resolver<'a> {
     source: &'a dyn PackSource,
-    policy: &'a TrustPolicy<R>,
+    admit_offer: &'a AdmitOffer<'a>,
     limits: &'a Limits,
     chosen: BTreeMap<String, Chosen>,
     edges: BTreeMap<String, BTreeSet<String>>,
     capabilities: BTreeSet<String>,
 }
 
-pub(crate) fn resolve<R: SignerReview>(
+pub(crate) fn resolve(
     lens: &PackRef,
     core: DecodedPack,
     source: &dyn PackSource,
-    policy: &TrustPolicy<R>,
+    admit_offer: &AdmitOffer<'_>,
     limits: &Limits,
 ) -> Result<Resolution, LoadRefusal> {
     let core_id = core.header.id.clone();
     let mut r = Resolver {
         source,
-        policy,
+        admit_offer,
         limits,
         chosen: BTreeMap::new(),
         edges: BTreeMap::new(),
@@ -163,7 +165,7 @@ pub(crate) fn resolve<R: SignerReview>(
     })
 }
 
-impl<R: SignerReview> Resolver<'_, R> {
+impl Resolver<'_> {
     /// Resolve `id` at `bound` for `from`, choosing it on first sight.
     fn require(&mut self, from: &str, id: &str, bound: &str) -> Result<String, LoadRefusal> {
         if let Some(held) = self.chosen.get(id) {
@@ -206,12 +208,12 @@ impl<R: SignerReview> Resolver<'_, R> {
 
     /// Resolve exactly the document `pin` names.
     fn pinned(&mut self, pin: &Pin) -> Result<String, LoadRefusal> {
-        if self
-            .chosen
-            .get(&pin.id)
-            .is_some_and(|held| held.pack.pin == *pin)
-        {
-            return Ok(pin.id.clone());
+        if let Some(held) = self.chosen.get(&pin.id) {
+            return if held.pack.pin == *pin {
+                Ok(pin.id.clone())
+            } else {
+                Err(LoadRefusal::DigestMismatch { pin: pin.clone() })
+            };
         }
         let found = self
             .decoded(&pin.id)?
@@ -261,7 +263,7 @@ impl<R: SignerReview> Resolver<'_, R> {
         origin: Origin,
     ) -> Result<AdmittedAs, LoadRefusal> {
         let verdict = verify_envelope(&pack.canonical, envelope);
-        match self.policy.admit(&pack.header.id, &verdict, origin) {
+        match (self.admit_offer)(&pack.header.id, &verdict, origin) {
             Ok(Admission::Release) => Ok(AdmittedAs::Release),
             Ok(Admission::Reviewed(key)) => Ok(AdmittedAs::Reviewed {
                 signer: key.to_bytes().iter().map(|b| format!("{b:02x}")).collect(),

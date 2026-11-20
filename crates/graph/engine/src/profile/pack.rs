@@ -78,6 +78,15 @@ pub fn declare_and_verify(
     source: &dyn PackSource,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Result<(), LoadRefusal> {
+    verify_declarations(pack, source, diagnostics, false)
+}
+
+pub(crate) fn verify_declarations(
+    pack: &DecodedPack,
+    source: &dyn PackSource,
+    diagnostics: &mut Vec<Diagnostic>,
+    read_shapes: bool,
+) -> Result<(), LoadRefusal> {
     let id = &pack.header.id;
     for term in pack.vocabulary.iter().flat_map(|v| &v.terms) {
         if !pack
@@ -102,7 +111,9 @@ pub fn declare_and_verify(
         }
     }
     for kind in &pack.header.kind {
-        if !matches!(kind, PackKind::Vocabulary | PackKind::Lens) {
+        if !matches!(kind, PackKind::Vocabulary | PackKind::Lens)
+            && !(read_shapes && *kind == PackKind::Shapes)
+        {
             diagnostics.push(Diagnostic::NotYetInterpreted {
                 pack: id.clone(),
                 what: format!("the {kind:?} body"),

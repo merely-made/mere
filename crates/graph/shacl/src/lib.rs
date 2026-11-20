@@ -22,6 +22,11 @@ use shacl::validator::{ShaclConfig, ShaclValidationMode};
 
 mod read;
 use read::IndexedGraph;
+mod shape_pack;
+pub use shape_pack::{
+    PackedShape, ShapeLoadError, ShapeProfile, ShapeSetError, canonical_shape_nquads,
+    load_local_shape_pack, load_shape_profile,
+};
 
 /// Which graph in the caller's chosen dataset view is the SHACL data graph.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -101,6 +106,11 @@ pub fn validate(
     selector: GraphSelector,
     shapes: &Graph,
 ) -> Result<ValidationReport, ValidationError> {
+    let schema = compile_shapes(shapes)?;
+    validate_compiled(dataset, view, selector, &schema)
+}
+
+fn compile_shapes(shapes: &Graph) -> Result<IRSchema, ValidationError> {
     let mut shapes_store = OxigraphInMemory::empty();
     for triple in shapes {
         shapes_store
@@ -111,17 +121,25 @@ pub fn validate(
             )
             .map_err(validation_error)?;
     }
-    let schema: IRSchema = ShaclParser::new(shapes_store)
+    ShaclParser::new(shapes_store)
         .parse()
         .map_err(validation_error)?
         .try_into()
-        .map_err(validation_error)?;
+        .map_err(validation_error)
+}
+
+fn validate_compiled(
+    dataset: impl Into<Arc<IndexedDataset>>,
+    view: View,
+    selector: GraphSelector,
+    schema: &IRSchema,
+) -> Result<ValidationReport, ValidationError> {
     let config = ShaclConfig::new()
         .with_store_errors(true)
         .with_store_evidences(false);
     let mut validation = IndexedValidation(IndexedGraph::new(dataset.into(), view, selector));
     let report = validation
-        .validate(&schema, &ShaclValidationMode::Native, &config)
+        .validate(schema, &ShaclValidationMode::Native, &config)
         .map_err(validation_error)?;
 
     let mut rdf = OxigraphInMemory::empty();

@@ -64,9 +64,17 @@ pub struct LensChoices {
 }
 
 /// The choices of `body`, the lens `id`, noting what is not interpreted yet.
-pub(crate) fn choices(id: &str, body: &LensBody, diagnostics: &mut Vec<Diagnostic>) -> LensChoices {
-    for (what, sets) in [("rule sets", &body.rules), ("shape sets", &body.shapes)] {
-        if !sets.is_empty() {
+pub(crate) fn choices(
+    id: &str,
+    body: &LensBody,
+    diagnostics: &mut Vec<Diagnostic>,
+    read_shapes: bool,
+) -> LensChoices {
+    for (what, pending) in [
+        ("rule sets", !body.rules.is_empty()),
+        ("shape sets", !read_shapes && !body.shapes.is_empty()),
+    ] {
+        if pending {
             diagnostics.push(Diagnostic::NotYetInterpreted {
                 pack: id.to_string(),
                 what: what.to_string(),

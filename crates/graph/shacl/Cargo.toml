@@ -7,6 +7,7 @@ repository.workspace = true
 description = "SHACL validation over Mere's indexed RDF dataset"
 
 [dependencies]
+eidetic = { version = ">=0.0.3", default-features = false, features = ["pack-signing"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 mere = { version = "0.1.0", path = "../engine", default-features = false, features = ["query"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
 prefixmap.workspace = true
@@ -15,6 +16,9 @@ rudof_rdf.workspace = true
 shacl.workspace = true
 spareval = { version = "0.2.9", features = ["sparql-12"] }
 spargebra = { version = "0.4", features = ["sparql-12"] }
+
+[dev-dependencies]
+identity.workspace = true
 
 [lints]
 workspace = true

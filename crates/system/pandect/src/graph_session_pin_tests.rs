@@ -106,9 +106,13 @@ fn a_pin_reads_its_cursor_after_live_moves() {
         );
         let pin = session.pin(at).unwrap();
         assert_eq!((pin.session(), pin.cursor()), (session.id(), at));
+        let revision = session.live_revision().unwrap();
+        assert_eq!(pin.revision_identity(), revision);
 
         relate(&mut session, 3, 4, "later");
         session.apply(person(), vec![add(5)]).await.unwrap();
+        assert_ne!(session.live_revision().unwrap(), revision);
+        assert_eq!(pin.revision_identity(), revision);
         let live = rows(&IndexedDataset::for_graph(session.graph()));
         assert_ne!(live, then.1, "control: live moved");
         assert_ne!(state(session.graph()), then.0, "control: live moved");

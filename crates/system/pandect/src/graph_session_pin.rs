@@ -19,6 +19,15 @@ pub(super) struct Pinned {
     dataset: OnceLock<IndexedDataset>,
 }
 
+/// Identity of a journal revision without its graph or index.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GraphRevision {
+    pub session: SessionId,
+    pub cursor: Seq,
+    /// The v2 digest of the journal prefix at this cursor.
+    pub digest: String,
+}
+
 /// A session's graph as it stood at a journal cursor, with the indexed
 /// dataset over it built on the first [`dataset`](Self::dataset) call. The
 /// holder owns it and decides how many to keep; the session keeps no
@@ -48,6 +57,14 @@ impl PinnedView {
     /// checkpoint at `cursor` stores it.
     pub fn digest(&self) -> &str {
         &self.digest
+    }
+
+    pub fn revision_identity(&self) -> GraphRevision {
+        GraphRevision {
+            session: self.session,
+            cursor: self.cursor,
+            digest: self.digest.clone(),
+        }
     }
 
     pub fn graph(&self) -> &Graph {
@@ -85,11 +102,35 @@ impl std::fmt::Debug for PinnedView {
 }
 
 impl<B: Backend> GraphSession<B> {
+    /// Identify the live journal revision without copying the graph or index.
+    pub fn live_revision(&self) -> Result<GraphRevision, SessionError> {
+        self.revision_at(self.journal.live_cursor())
+    }
+
     /// Pin the graph at journal cursor `cursor`: [`graph_at`](Self::graph_at)
     /// now, its `IndexedDataset` on the view's first
     /// [`dataset`](PinnedView::dataset) read. [`SessionError::CursorOutOfRange`]
     /// past the live cursor or where `graph_at` has no graph.
     pub fn pin(&self, cursor: Seq) -> Result<PinnedView, SessionError> {
+        let revision = self.revision_at(cursor)?;
+        let graph = self
+            .graph_at(cursor)
+            .ok_or_else(|| SessionError::CursorOutOfRange {
+                cursor,
+                live: self.journal.live_cursor(),
+            })?;
+        Ok(PinnedView {
+            session: revision.session,
+            cursor: revision.cursor,
+            digest: revision.digest,
+            pinned: Arc::new(Pinned {
+                graph,
+                dataset: OnceLock::new(),
+            }),
+        })
+    }
+
+    fn revision_at(&self, cursor: Seq) -> Result<GraphRevision, SessionError> {
         let out_of_range = || SessionError::CursorOutOfRange {
             cursor,
             live: self.journal.live_cursor(),
@@ -99,15 +140,10 @@ impl<B: Backend> GraphSession<B> {
         }
         let digest =
             journal_digest(&self.digests, &self.journal, cursor)?.ok_or_else(out_of_range)?;
-        let graph = self.graph_at(cursor).ok_or_else(out_of_range)?;
-        Ok(PinnedView {
+        Ok(GraphRevision {
             session: self.id(),
             cursor,
             digest,
-            pinned: Arc::new(Pinned {
-                graph,
-                dataset: OnceLock::new(),
-            }),
         })
     }
 }
