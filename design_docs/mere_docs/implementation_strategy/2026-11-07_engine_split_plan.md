@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-20. D1 to D186 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-20. D1 to D189 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2946,6 +2946,18 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D180, declared-lens D13 · plans engine-split P6 · summary The shared milestone's shapes come from the caller's fixture first and from a pack once declared-lens L4 lands.
 
+- **D187. Graphshell's MereHost holds an optional pin (Mark, 2026-11-20):** D179 has the host own a `PinnedView`; Graphshell's `MereHost` owns the live `GraphSession` as the one writer and builds its scene from `self.graph()` (`mere_host.rs:695`, Graphshell `da3a7812`), and the landed SHACL slice (`pinned_shacl.rs`) holds a pin beside its report without touching the host. "MereHost holds an optional pin (Recommended)": `MereHost` keeps an optional `PinnedView`, a call shows it and builds scenes from the pin's graph, another drops it and follows live, the scene builder takes the graph it is given so both paths share it, and the live path is unchanged; against a separate read-only pinned host type and a `MereHost` constructor over a pin. Outcome: applies D179.
+
+  Links: area The stack · draws on engine-split D163, engine-split D179 · plans engine-split P8 · summary Graphshell's MereHost keeps an optional PinnedView and builds its scene from the pin when one is held, live otherwise.
+
+- **D188. A scene carries the engine revision beside its counter (Mark, 2026-11-20):** the host's `projection_revision` moves on journal edits and also on device-local attention (`mere_host_attention.rs:82`, D133), the resident generation and coupling, so the cursor alone would miss changes the scene shows; pandect's `GraphRevision` (session, cursor, v2 digest) already refuses stale SHACL evidence actions. "Engine revision beside counter (Recommended)": the snapshot carries the engine's `GraphRevision` next to its epoch and `u64` counter, the counter stays the view-scoped cache key for host-local changes, an intent is stale when either moved, and `projection_epoch` stays once per host open; against the counter becoming the journal cursor with host-local changes in a separate generation. Outcome: refines D148.
+
+  Links: area The stack · draws on engine-split D133, engine-split D148 · plans engine-split P8 · summary A scene names the engine's GraphRevision beside its own counter, and an intent is stale when either moved.
+
+- **D189. The engine revision rides in the snapshot first; the CBOR envelope comes with recovery (Mark, 2026-11-20):** `SceneSnapshot` is scenotime's wire type (`crates/scenotime/src/snapshot.rs:60`), read by Turnstone, chirograph and `graphshell-client`, and D181's envelope schema, vectors and retention bound are open. "Snapshot field now, envelope with E3 (Recommended)": an optional engine-revision field on `SceneSnapshot` that old readers ignore, the envelope, its vectors and the retention bound arriving with Graphshell's E3 (a missed delta recovered); against building the envelope before E1. Outcome: refines D181.
+
+  Links: area The stack · draws on engine-split D181 · plans engine-split P8 · summary The engine revision is an optional SceneSnapshot field first; the CBOR keyframe envelope lands with missed-delta recovery.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -3904,3 +3916,5 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   D183's selector, the JSON-LD HTML manifest row), P7 (a trail made in Turnstone) and P8 (the host side, now Graphshell's
   engine binding plan), and the shared milestone under P8 with D184 to D186. Two open questions were added (where the HTML
   manifest is scored, the finding-to-evidence read).
+- 2026-11-20: P8's host binding ruled (D187 to D189) from Graphshell `da3a7812`; Graphshell's engine binding plan E1 and E2 cite
+  them. E3 waits on the envelope and the retention bound, E4 on the Resource digest's measurement on the edit path.

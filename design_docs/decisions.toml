@@ -2055,6 +2055,30 @@ summary = "The shared milestone's shapes come from the caller's fixture first an
 draws_on = ["declared-lens D13", "engine-split D180"]
 plans = ["engine-split"]
 
+[decisions."engine-split D187"]
+title = "Graphshell's MereHost holds an optional pin (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Graphshell's MereHost keeps an optional PinnedView and builds its scene from the pin when one is held, live otherwise."
+draws_on = ["engine-split D163", "engine-split D179"]
+plans = ["engine-split"]
+
+[decisions."engine-split D188"]
+title = "A scene carries the engine revision beside its counter (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A scene names the engine's GraphRevision beside its own counter, and an intent is stale when either moved."
+draws_on = ["engine-split D133", "engine-split D148"]
+plans = ["engine-split"]
+
+[decisions."engine-split D189"]
+title = "The engine revision rides in the snapshot first; the CBOR envelope comes with recovery (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The engine revision is an optional SceneSnapshot field first; the CBOR keyframe envelope lands with missed-delta recovery."
+draws_on = ["engine-split D181"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
