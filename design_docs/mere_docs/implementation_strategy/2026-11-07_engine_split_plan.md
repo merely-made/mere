@@ -910,10 +910,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   against the test's own shapes graph reports one violation with its focus node and path. Choosing
   the finding opens the claim's evidence and its block in the captured source. The kept source reopens
   offline at the same journal cursor with the same report.
-- First pass passed on native Windows, 2026-11-19. Turnstone tree
-  `e94bbbd083c8571962b0d3d6a881f946c1461d98` called Mere directly with the fixture's synthetic custody
-  broker. The neighborhood showed both valid resources and separate malformed-block and
-  uncached-context diagnostics. Keeping the source enabled validation against the chosen Turtle
+- First pass passed on native Windows, 2026-11-19. [Turnstone `793216ee`](https://github.com/merely-made/turnstone/commit/793216eed334add953090a973617349381d663b9)
+  has the tested tree `e94bbbd083c8571962b0d3d6a881f946c1461d98`. It called Mere directly with the
+  fixture's synthetic custody broker. The neighborhood showed both valid resources and separate
+  malformed-block and uncached-context diagnostics. Keeping the source enabled validation against the chosen Turtle
   file. The one finding named the river record and its `score` property. **Open finding evidence**
   showed the exact hidden JSON-LD script at DOM position 21 in the read-only **Source block** pane.
 - After restarting Turnstone offline with the HTTP server stopped and the original Turtle file
