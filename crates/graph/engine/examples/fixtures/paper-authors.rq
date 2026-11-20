@@ -1,0 +1,15 @@
+PREFIX ex: <https://example.org/>
+PREFIX schema: <https://schema.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?author ?namedBy WHERE {
+    GRAPH ?edition {
+        ex:paper schema:author ?person .
+        ?credit rdf:reifies <<( ex:paper schema:author ?person )>> ;
+                prov:wasAttributedTo ?source .
+    }
+    ?person schema:name ?author .
+    ?source schema:name ?namedBy .
+}
+ORDER BY ?author ?namedBy

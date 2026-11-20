@@ -1,0 +1,23 @@
+@prefix ex: <https://example.org/> .
+@prefix schema: <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+ex:ada schema:name "Ada" .
+ex:grace schema:name "Grace" .
+ex:catalog schema:name "Library catalog" .
+ex:publisher schema:name "Publisher" .
+
+ex:catalogEdition {
+    ex:paper schema:author ex:ada .
+    ex:credit1 rdf:reifies <<( ex:paper schema:author ex:ada )>> ;
+        prov:wasAttributedTo ex:catalog .
+}
+
+ex:publisherEdition {
+    ex:paper schema:author ex:ada, ex:grace .
+    ex:credit2 rdf:reifies <<( ex:paper schema:author ex:ada )>> ;
+        prov:wasAttributedTo ex:publisher .
+    ex:credit3 rdf:reifies <<( ex:paper schema:author ex:grace )>> ;
+        prov:wasAttributedTo ex:publisher .
+}

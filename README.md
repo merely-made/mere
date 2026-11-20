@@ -1,154 +1,82 @@
 # Mere
 
-Mere is a platform for showing data in useful projections, reaching it
-peer-to-peer wherever it lives, and sharing it on the user's terms. Each data
-domain lives in a mere: a spatial graph of resources and the nodes they are met
-through, which hosts project into canvases, tiles, and panes. Mere is not a
-browser; [Turnstone](https://github.com/merely-made/turnstone) is the browser
-built on it.
+Mere is a Rust library for working with linked data. It keeps a graph of
+resources such as pages, papers, and people. A connection in that graph can
+express a claim as simple as “this paper cites that paper.” Mere can keep who
+made the claim, where it came from, and whether it was later withdrawn.
 
-<p align="center">
-  <img src="assets/screenshots/graphshell-grid.png" alt="Graphshell arranging a local Mere graph in a grid" width="900"><br>
-  <sub>Graphshell, Mere's reference host: a local graph arranged through the product's own search, relation, and scene controls.</sub>
-</p>
+Suppose a library catalog names Ada as the author of a paper, and a
+publisher credits both Ada and Grace. An application using Mere can keep
+both accounts, ask which sources credit Grace, and show the reader the
+evidence for each answer. It can read and write the graph in standard
+linked-data formats such as JSON-LD and Turtle. [Engine API](crates/graph/engine/src/lib.rs)
 
-## Status (2026-10-20)
+## Mere in the Turnstone browser
 
-Pre-release, under active development.
+In Turnstone, open a page and choose **Save source and keep** in the
+Inspector. Turnstone decides which edition of the page to save. Graphshell
+supplies Cambium, the shared interface toolkit that draws the Inspector’s
+button and delivers the click. When the saved page contains structured
+claims, Mere can record them with a link to the exact edition and the block
+that supplied them.
 
-- Cargo workspace of 78 explicit members. The `mere` facade exposes graph,
-  linked-data, canvas, workbench and query capabilities.
-- Graphshell remains the complete reference graph host; Djinn supplies the local
-  resident composition. Cambium and Conatus remain platform components here.
-- [Graphshell](https://github.com/merely-made/graphshell) is the protocol layer
-  below Mere: the host/guest contract and the host-role kit. Mere, the apps and
-  the other suppliers depend on it; it depends on nothing here.
-- [Eidetic](https://github.com/merely-made/eidetic),
-  [Armillary](https://github.com/merely-made/armillary),
-  [ESP](https://github.com/merely-made/esp),
-  [Gemot](https://github.com/merely-made/gemot) and
-  [Errand](https://github.com/merely-made/errand) are independently developed
-  suppliers. Errand continues Smolweb's protocol history and crate identities.
-  The workspace pins one immutable revision per promoted family.
-- Graph canvas, content lanes, session persistence, comms and semantic queries
-  have separate implementation and acceptance boundaries. Promotion does not
-  establish new browser, network, model or physical-device capabilities.
-- Working Rust toolchain: 1.99.1; shared declared minimum: 1.97.1.
+If the publisher later changes the author list at the same address, the
+earlier capture can still tell you what the page said when you saved it.
+To try the graphical interface, start with [Turnstone’s browser
+instructions](https://github.com/merely-made/turnstone#build-and-run).
+For the implementation, see the [Turnstone save scenario](https://github.com/merely-made/turnstone/blob/main/scenarios/r1_source_keep_seed.scn),
+[Graphshell toolkit](https://github.com/merely-made/graphshell), and
+[Mere’s saved page claims](https://github.com/merely-made/mere/blob/main/crates/system/pandect/src/graph_session/page_claims.rs).
 
-The [family promotion plan](design_docs/archive_docs/2026-10-28/2026-10-19_family_promotion_plan.md)
-records source ownership, independent test gates and consumer cutover status.
+## Who named each author?
 
-## Design vocabulary
-
-**The graph**: what a mere holds.
-- *Resource*: what a canonical URL identifies. Claims about it (what a page says, cites, or derives from, and its tags) attach to the resource, each kept with who asserted it.
-- *Surface*: what the user browses in. A surface shows one resource at a time; navigating changes which. Resources and surfaces are both nodes of the graph.
-- *Strata*: the resource stratum (what things are) under the surface stratum (how they were met: trail, layout, groupings).
-- *Aspect*: any way of dividing the graph: strata, planes (truth and curation), keeping, attention, socialization tiers, coverage.
-
-A graph becomes a picture through two grammars that share one binding.
-
-**Projection**: what is shown, and where.
-- *Projection grammar*: the reusable vocabulary and operations: selection, derivation, visual encoding, arrangements, backgrounds, interactions, and provenance.
-- *Scene recipe*: saved presentation choices: a source reading, visual encodings, an arrangement, and optional dynamics. Hosts can edit and reuse these definitions; execution supports a declared subset of the grammar.
-- *Domain binding*: the connection to a domain's disclosed facts and owner-provided operations. Today the saved binding identifies the authority, domain and resource. Action advertisement and permission checks use separate owner/host interfaces; saving a recipe grants no permission to change its source.
-
-So a timeline recipe isn't inherently a music feature or a writing feature. A domain supplies meaningful temporal facts; the recipe makes them legible. Likewise, a relationship layout can present lexical connections, musical relationships, or research references without treating those relationships as semantically identical.
-
-**Dynamics**: how things move.
-- *Dynamics grammar*: the reusable vocabulary of motion: terms (what acts on what, by which rule, carrying which state), what kind of motion each makes, and how they combine (weighted sums, groups, schedules).
-- *Dynamics recipe*: a particular composition of those terms, saved, edited, and reused like a scene recipe.
-- The same domain binding supplies both: a scene recipe names an arrangement and, optionally, a dynamics recipe.
-
-An arrangement defines intended positions; physics acts on them. Each item's position is *seeded* (motion starts there), *pinned* (it stays) or *anchored* (it returns after a push or a drag), by the recipe's default or per item, seeded unless chosen. Meaning can live in the dynamics too: a semantic grouping becomes a pull among related items rather than a slot to return to.
-
-Authored dynamics, role choices and intentional placements can be saved. Knot,
-for example, retains those choices and placement traces as immutable versions.
-Live simulation state and execution handles remain runtime-owned. Executing a
-saved dynamics specification requires host validation and a runtime binding.
-
-A workbench's own structure of frames, tiles, and splits is a *forme*, not an arrangement. A physics simulation's bodies, joints, fields, and emitters are a *world*, not a scene.
-
-The implemented scene pipeline (`graphshell/host/crates/cambium/scenes/README.md`) compiles supported
-recipes and disclosed facts into layout instructions and a projected scene;
-the host draws it and supplies interaction. A renderer's drawing, such as a
-Vello scene, is a different object from that projected scene or a physics world.
-Cambium's desktop host (`graphshell/design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20`)
-supports a shared GPU render core and a caller-owned event loop; using the
-standalone entry point does not establish one device across independent hosts.
-
-## Use
-
-Mere is consumed as a git dependency by
-[Turnstone](https://github.com/merely-made/turnstone) (the browser app) and
-other sibling repos. Runnable consumers in this repository live under `ports/`:
-graphshell (the reference graph host and web presenter), djinn (the local
-desktop resident), castellan (credential keeper), distillery (model works),
-gazette (the directory port), moot (community: murmurs, moots, and coop), pelt
-(the reference browser port over Genet's engine and Cambium's shell), signalman
-(commissioning and operating Retinue stations). Tabard is the shared theme
-authoring library under `graphshell/host/crates/system/tabard`, used by platform crates and ports.
-[Knot Editor](https://github.com/merely-made/knot-editor) is an independent
-repository, not a Mere port: it owns files-in-place authoring, document and
-vault authority, evidence, sync and publishing, and Djinn and Turnstone consume
-it from one immutable revision through the generic Mere and Genet contracts. See
-`knot-editor/design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`.
+The terminal inspector can answer the question from the catalog example above.
+The [sample graph](crates/graph/engine/examples/fixtures/paper-authors.trig)
+records each author credit and the organization that made it. From the
+repository root, run the inspector with the included [SPARQL query](crates/graph/engine/examples/fixtures/paper-authors.rq).
 
 ```sh
-cargo build
-cargo test
-cargo test -p mere-kernel    # single crate, by package name
-
+sample=crates/graph/engine/examples/fixtures
+cargo run -p mere --features query --example inspect -- \
+  "$sample/paper-authors.trig" --query "$(cat "$sample/paper-authors.rq")"
 ```
 
-`turnstone/ports/graphshell` has no default binary; pick one explicitly (see
-`turnstone/ports/graphshell/README.md`).
+The inspector prints a summary of the graph, followed by these rows.
 
-### Portable and local dependencies
-
-No `Cargo.lock` is tracked. What cargo resolved for a commit rides on it as a
-git note: `house resolved show <commit>` prints it and `--write` puts it back
-as `Cargo.lock`. A lock on disk is used when it is there; otherwise cargo
-resolves afresh. Run acceptance checks in a clean checkout with documented
-platform prerequisites; a local-path build is a separate receipt.
-
-For sibling development, copy `.cargo/config.toml.example` to
-`.cargo/config.local.toml` and adjust its paths for your checkout layout. Existing
-users run `python scripts/cargo_mode.py setup` once from the repository root:
-it preserves current locks and renames ignored automatic configs to opt-in local
-configs. It does not overwrite an existing local config or local lock.
-
-```sh
-python scripts/cargo_mode.py local check --workspace
-python scripts/cargo_mode.py local check --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown
+```text
+query (3 rows): author | namedBy
+  Ada | Library catalog
+  Ada | Publisher
+  Grace | Publisher
 ```
 
-The launcher selects `<workspace>/.cargo/local/Cargo.lock`
-even with `--manifest-path`. Commands run from the selected workspace root;
-other relative command arguments are interpreted there. Local commands load
-root and nested local configs;
-ordinary Cargo commands do not. Use the launcher for editor check commands too
-(an absolute script path works from a member directory). Editor metadata using
-bare Cargo sees the portable graph. Do not set a global lockfile redirect.
-Nested workspace portable locks and platform gates are tracked separately in
-the [lattice plan](design_docs/archive_docs/2026-10-28/2026-09-16_lattice_sync_pass_plan.md).
+Ada appears twice because two sources credit her. The query follows each
+credit to its recorded source, then looks up both names. To ask about your
+own paper, use its identifier in place of `ex:paper` and supply a graph with
+the same attribution and name fields. If a credit has no recorded source, this query returns
+no row for that credit.
 
-Integration uses a tested set of published revisions. Local sibling changes do
-not require immediate Git repins, and pin-only commits do not trigger reciprocal
-repins. Advance pins when accepting a tested integration or a required fix.
+## Across devices
+
+If a colleague sends you this graph, running the query on your copy gives
+the same answer. The publisher still gets credit for naming Grace even when
+your colleague’s laptop delivers the file. The terminal inspector reads a
+local file. For live graph sharing, Turnstone has a **Co-op** view where the
+owner can invite a contact and grant access to a particular graph. In a
+test on two Linux desktops, Turnstone used Djinn, the local background
+service on each device, and a direct iroh connection. The guest edited the
+shared graph and the owner’s copy retained the guest’s attribution. [Two-device sharing example](https://github.com/merely-made/turnstone/blob/main/design_docs/archive_docs/receipts/2026-10-28_graphshell_host_plan_receipts.md#2026-11-20-n2-native-co-op-on-t-pc-and-s-pc)
+
+## Development
+
+The [workspace manifest](Cargo.toml) lists the engine packages and dependencies.
+The [toolchain file](rust-toolchain.toml) selects Rust for the checkout.
+The repository records resolved dependency versions in Git notes. Use
+`house resolved show <commit>` to inspect a recorded resolution.
+For work across sibling checkouts, see the [local Cargo configuration
+example](.cargo/config.toml.example). The [commit hooks](.pre-commit-config.yaml)
+list the repository checks.
 
 ## License
 
-MPL-2.0 (see `LICENSE`).
-
----
-
-*This README was generated by AI and will be edited by the author upon
-release.*
-
-## Local checks
-
-Enable the commit checks with `prek install --allow-missing-config`; run
-`prek run --all-files` alongside the existing local gates. Check definitions
-live in `.pre-commit-config.yaml`, with source-size exclusions and exceptions
-in `line-ceiling.toml`. Shared house style and rollout: `mere/design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md`.
+[MPL-2.0](LICENSE)
