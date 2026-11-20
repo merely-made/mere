@@ -13,7 +13,7 @@ crate, additive) and L3 (the model seam: the assertion model and `ResourceGraph`
 composed over it) and L4 (format entry points that take a base IRI and return a dataset; the ledger's `engine`
 layer) and L5 (the dataset and the formats without `query`; Graphshell repointed to `mere`; the `mere-rdf` shim
 deleted), L6a (the headless inspector) and L6b (content negotiation and Link headers, D142's P5 row) landed
-2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). **P6 is under way:** RDFC-1.0 (`mere-rdfc`, with its rows), the differential-dataflow probe and the declared-lens plan's L1 (the pack header, `eidetic` `c96bea1`) and L2 (the pack loader and core pack, Mere `47a2b976a`, `eidetic` `41ec454`) have landed; lens L3's hot-path probe passed (declared-lens D15); The direct SHACL reader is implemented. Its conformance suites, the derived layer, lens L4 and L5, the thin slice and identity and proofs remain. P7 has the loader and the probe it waited on; Graphshell's real pack and the trail and arrangement round-trip remain. **P8 is under way:** its first done-condition holds under D145 (checked 2026-11-16: Turnstone `d2a2c676` and Knot `9147ace` take only Mere's workspace crates, `mere-kernel`, `pandect` and `catchment`, from mere.git on `main`); the contract's first rulings are D148 (a revision is session and journal cursor locally, the journal-prefix digest across) and D149 (a snapshot keyframe, then deltas); its groundwork has landed: pinned views and whole refusal (D163, D166, D169), edits at 100k by structural sharing (D164 to D174), publication's fixes and collection (D171, D173, D175, D176) and catalog version 3 (D177, D178). The contract document, its three probes (the third checking every Resource-stratum quad, D147) and the kernel's surface half moving to Graphshell (D146) remain. Of the consolidations C, `wavicle` folded into Woodshed on 2026-11-18 (Progress); its repository is not yet archived. A shared milestone across Turnstone, Mere and Graphshell (a page's claims to a SHACL finding, D184 to D186) is written under P8, with acceptance lines added to P6, P7 and P8 on 2026-11-19; the Mere reader and kept-source journal path are implemented. The combined native fixture and pinned host projection remain open. Open forks are in Open questions.
+2026-11-12, and its four done-conditions are checked under P5 ("Done-conditions, 2026-11-12"). **P6 is under way:** RDFC-1.0 (`mere-rdfc`, with its rows), the differential-dataflow probe and the declared-lens plan's L1 (the pack header, `eidetic` `c96bea1`) and L2 (the pack loader and core pack, Mere `47a2b976a`, `eidetic` `41ec454`) have landed; lens L3's hot-path probe passed (declared-lens D15); The direct SHACL reader is implemented. Its conformance suites, the derived layer, lens L4 and L5, the thin slice and identity and proofs remain. P7 has the loader and the probe it waited on; Graphshell's real pack and the trail and arrangement round-trip remain. **P8 is under way:** its first done-condition holds under D145 (checked 2026-11-16: Turnstone `d2a2c676` and Knot `9147ace` take only Mere's workspace crates, `mere-kernel`, `pandect` and `catchment`, from mere.git on `main`); the contract's first rulings are D148 (a revision is session and journal cursor locally, the journal-prefix digest across) and D149 (a snapshot keyframe, then deltas); its groundwork has landed: pinned views and whole refusal (D163, D166, D169), edits at 100k by structural sharing (D164 to D174), publication's fixes and collection (D171, D173, D175, D176) and catalog version 3 (D177, D178). The contract document, its three probes (the third checking every Resource-stratum quad, D147) and the kernel's surface half moving to Graphshell (D146) remain. Of the consolidations C, `wavicle` folded into Woodshed on 2026-11-18 (Progress); its repository is not yet archived. A shared milestone across Turnstone, Mere and Graphshell (a page's claims to a SHACL finding, D184 to D186) is written under P8, with acceptance lines added to P6, P7 and P8 on 2026-11-19; the Mere reader and kept-source journal path are implemented. The direct native fixture passed, including offline reopen at the same cursor. The pinned host projection and pack-supplied shapes remain open. Open forks are in Open questions.
 
 **For:** making Mere what its name and design record describe, the engine for a person's
 linked-data graph, in the posture Genet takes toward the web platform: dereference, parse,
@@ -895,27 +895,36 @@ Pandect journals one Resource record per kept capture. Its evidence retains bloc
 original RDF graph names. Validation indexes that capture's statements in one named graph and
 reads evidence from the same journal cursor. The capture's custody remains the caller's authority.
 
-| Step | Carried by | Missing today |
+| Step | Carried by | Status |
 |---|---|---|
-| Blocks to claims, with their page source | B2 native steps 1 to 3; the link-cloud table | the `json-ld-api` HTML manifest row (P6) |
-| Keep the source | B2 step 3; the existing capture and retention paths | offline reopen of kept evidence, which B2 leaves as a later gate |
-| Validate | `mere-shacl` (D180, D183), over kept sources only (D184) | run the native fixture with its caller-supplied shapes graph (D186) |
-| From the finding back to the claim | the link-cloud "inspect one link" read | a read from a validation result's focus node and path to the assertions and evidence rows it concerns (Open questions) |
-| The revision the person saw | P8's contract; Graphshell's engine binding plan | the host binding (D185 lets the first pass go without it) |
+| Blocks to claims, with their page source | B2 native steps 1 to 3; the link-cloud table | Native fixture passed. The `json-ld-api` HTML manifest row (P6) remains open. |
+| Keep the source | B2 step 3; the existing capture and retention paths | Kept claims and their evidence reopened offline in the native fixture. |
+| Validate | `mere-shacl` (D180, D183), over kept sources only (D184) | Native fixture passed with a caller-supplied shapes graph (D186). Pack-supplied shapes remain open. |
+| From the finding back to the claim | the link-cloud "inspect one link" read | The native finding opened its exact captured JSON-LD block in a read-only source pane. |
+| The revision the person saw | P8's contract; Graphshell's engine binding plan | Direct validation reopened at cursor 1. The pinned host projection remains open (D185). |
 
 - Done when, first pass (D185, D186): Turnstone, calling Mere directly, opens a fixture page with two
-  JSON-LD script blocks and relative IRIs, and the claims shown match the expected dataset. A
+  valid JSON-LD script blocks and relative IRIs, and the claims shown match the expected dataset. A
   malformed block and an unavailable remote context are each reported as a per-block diagnostic, and
   neither hides the other block's claims. The person keeps the source. Validating that source's graph
   against the test's own shapes graph reports one violation with its focus node and path. Choosing
-  the finding opens the claim's evidence row and its block in the page. The kept source reopens
+  the finding opens the claim's evidence and its block in the captured source. The kept source reopens
   offline at the same journal cursor with the same report.
+- First pass passed on native Windows, 2026-11-19. Turnstone tree
+  `e94bbbd083c8571962b0d3d6a881f946c1461d98` called Mere directly with the fixture's synthetic custody
+  broker. The neighborhood showed both valid resources and separate malformed-block and
+  uncached-context diagnostics. Keeping the source enabled validation against the chosen Turtle
+  file. The one finding named the river record and its `score` property. **Open finding evidence**
+  showed the exact hidden JSON-LD script at DOM position 21 in the read-only **Source block** pane.
+- After restarting Turnstone offline with the HTTP server stopped and the original Turtle file
+  unavailable, **Reopen validation for this capture** returned cursor `1`, both diagnostics, and the
+  same finding and source block. Receipt `Code/testing/turnstone/receipts/l1-page-shacl/native-round-trip.txt`.
 - Done when, second pass: the same page and finding through a pinned host projection bound to the
   engine's revision. An edit to the live graph leaves the pinned view's finding unchanged, and an
   action from the superseded view is refused. The same shapes load from a pack once the declared-lens
   plan's L4 lands.
 - A session-only page shows its claims and offers no validation (D184).
-- Needs: P6's SHACL crate; B2 step 3. For the second pass: P8's host binding and declared-lens L4.
+- The second pass needs P8's host binding and declared-lens L4.
 - By repository: Mere has the SHACL call and the finding-to-evidence read. Genet has Fleece's blocks,
   which exist. Graphshell has the inspector's finding row and the binding. Turnstone has the page,
   the keep choice and the way back into the reader. Each repository's plan cites this section by path
