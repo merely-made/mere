@@ -205,14 +205,14 @@ impl IndexedDataset {
     /// Read quads matching the supplied terms through the index. `None` is a
     /// wildcard; `Some(GraphName::DefaultGraph)` selects the default graph.
     /// Terms absent from the dictionary match nothing. Results have no promised order.
-    pub fn quads_matching(
-        &self,
+    pub fn quads_matching<'a>(
+        &'a self,
         view: View,
         subject: Option<&NamedOrBlankNode>,
         predicate: Option<&NamedNode>,
         object: Option<&Term>,
         graph: Option<&GraphName>,
-    ) -> impl Iterator<Item = oxrdf::Quad> + '_ {
+    ) -> impl Iterator<Item = oxrdf::Quad> + use<'a> {
         let s = subject.map(|v| self.terms.lookup(&Term::from(v.clone())));
         let p = predicate.map(|v| self.terms.lookup(&Term::from(v.clone())));
         let o = object.map(|v| self.terms.lookup(v));

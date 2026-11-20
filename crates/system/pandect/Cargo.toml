@@ -33,6 +33,7 @@ muniment.workspace = true
 kernel.workspace = true
 # The engine's model, for the names the kernel no longer re-exports (P5 L3).
 mere = { version = "0.1.0", path = "../../graph/engine", default-features = false }
+oxrdf = { version = "0.3", features = ["rdf-12"] }
 # The native fold record (mer3ly site plan, Rulings 153 and 163).
 identity.workspace = true
 sporran.workspace = true

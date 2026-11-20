@@ -82,6 +82,7 @@ pub trait LegacyTransactionBackend: Backend {}
 impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
 mod residency;
+mod page_claims;
 
 const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";

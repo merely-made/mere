@@ -1,0 +1,20 @@
+[package]
+name = "mere-shacl"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "SHACL validation over Mere's indexed RDF dataset"
+
+[dependencies]
+mere = { version = "0.1.0", path = "../engine", default-features = false, features = ["query"] }
+oxrdf = { version = "0.3", features = ["rdf-12"] }
+prefixmap.workspace = true
+rudof_iri.workspace = true
+rudof_rdf.workspace = true
+shacl.workspace = true
+spareval = { version = "0.2.9", features = ["sparql-12"] }
+spargebra = { version = "0.4", features = ["sparql-12"] }
+
+[lints]
+workspace = true

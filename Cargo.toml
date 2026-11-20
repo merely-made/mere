@@ -7,6 +7,7 @@ members = [
     "crates/graph/graph-kernel",
     "crates/graph/engine",
     "crates/graph/rdfc",
+    "crates/graph/shacl",
     "crates/system/catchment",
     "crates/system/pandect",
     "crates/domain/personal-facts",
@@ -28,6 +29,11 @@ authors = ["Mark AB (markik)"]
 # `~/.claude/.../memory/feedback_workspace_pins_drive_probes.md`: workspace
 # pins canonically, probes adapt; pick once with the user, don't churn.
 [workspace.dependencies]
+shacl = { git = "https://github.com/mark-ik/rudof", rev = "b9ff1550", default-features = false, features = ["sparql-constraints"] }
+rudof_rdf = { git = "https://github.com/mark-ik/rudof", rev = "b9ff1550", default-features = false }
+rudof_iri = { git = "https://github.com/mark-ik/rudof", rev = "b9ff1550", default-features = false }
+prefixmap = { git = "https://github.com/mark-ik/rudof", rev = "b9ff1550" }
+
 murm-sync = { version = ">=0.0.1", git = "https://github.com/merely-made/murm.git", branch = "main" }
 
 kernel = { package = "mere-kernel", version = "0.0.3", path = "crates/graph/graph-kernel" }

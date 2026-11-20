@@ -15,3 +15,6 @@ pub mod ingest;
 /// media-type dispatch to the parsers, and RFC 8288 links. Pure functions; the
 /// host does the fetch.
 pub mod negotiate;
+
+/// Interpret the JSON-LD blocks of a page while preserving their evidence locators.
+pub mod page_claims;
