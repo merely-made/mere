@@ -790,7 +790,9 @@ use history::{HeldPoint, apply_all};
 mod operation;
 #[path = "graph_session_pin.rs"]
 mod pin;
-pub use pin::{GraphRevision, PinnedView};
+pub use pin::{
+    GraphRevision, PinnedView, RESOURCE_DIGEST_ALGORITHM, RESOURCE_DIGEST_VERSION, ResourceDigest,
+};
 #[path = "graph_session_transaction.rs"]
 mod transaction;
 pub use operation::OperationReceipt;

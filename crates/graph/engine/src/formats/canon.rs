@@ -15,9 +15,13 @@
 //!
 //! RDFC-1.0 defines no RDF 1.2 triple terms, so a dataset carrying one is refused.
 //!
+//! [`sorted_nquads`] is the other canonical form here (engine-split D190): deduplicated, sorted
+//! RDF 1.2 N-Quads that keep triple terms and refuse blank nodes, the text the Resource digest
+//! hashes.
+//!
 //! Available without the `query` feature and on wasm32.
 
-use oxrdf::Quad;
+use oxrdf::{GraphName, NamedOrBlankNode, Quad, Term};
 
 use crate::dataset::{IndexedDataset, View};
 
@@ -47,6 +51,64 @@ pub fn canonicalize(
 /// [`CanonError`] for a triple term or an exhausted work budget.
 pub fn canonicalize_quads(quads: &[Quad], options: &CanonOptions) -> Result<Canonical, CanonError> {
     mere_rdfc::canonicalize(quads, options)
+}
+
+/// Why quads have no [`sorted_nquads`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SortedNQuadsError {
+    /// A quad holds a blank node, anywhere including inside a triple term; sorting alone cannot
+    /// label one canonically. `quad` is the first seen, as N-Quads.
+    BlankNode { quad: String },
+}
+
+impl std::fmt::Display for SortedNQuadsError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::BlankNode { quad } => write!(f, "a blank node has no sorted N-Quads: {quad}"),
+        }
+    }
+}
+
+impl std::error::Error for SortedNQuadsError {}
+
+/// The deduplicated, sorted RDF 1.2 N-Quads of `quads`, triple terms included (engine-split
+/// D190): one `\n`-ended line per distinct quad, in code point order, each term written by the
+/// same `oxrdf` `Display` RDFC-1.0's serialization uses. A blank-free set without triple terms
+/// gives the same bytes as [`canonicalize_quads`]'s `nquads`.
+///
+/// # Errors
+///
+/// [`SortedNQuadsError::BlankNode`] if any quad holds a blank node.
+pub fn sorted_nquads(quads: impl IntoIterator<Item = Quad>) -> Result<String, SortedNQuadsError> {
+    let mut lines = Vec::new();
+    for quad in quads {
+        if quad_has_blank(&quad) {
+            return Err(SortedNQuadsError::BlankNode {
+                quad: format!("{quad} ."),
+            });
+        }
+        lines.push(format!("{quad} .\n"));
+    }
+    lines.sort_unstable();
+    lines.dedup();
+    Ok(lines.concat())
+}
+
+fn quad_has_blank(quad: &Quad) -> bool {
+    matches!(quad.subject, NamedOrBlankNode::BlankNode(_))
+        || term_has_blank(&quad.object)
+        || matches!(quad.graph_name, GraphName::BlankNode(_))
+}
+
+fn term_has_blank(term: &Term) -> bool {
+    match term {
+        Term::BlankNode(_) => true,
+        Term::Triple(triple) => {
+            matches!(triple.subject, NamedOrBlankNode::BlankNode(_))
+                || term_has_blank(&triple.object)
+        },
+        Term::NamedNode(_) | Term::Literal(_) => false,
+    }
 }
 
 #[cfg(test)]
@@ -95,6 +157,163 @@ mod tests {
         assert_eq!(
             canonicalize_quads(&[quad], &CanonOptions::default()),
             Err(CanonError::TripleTerm)
+        );
+    }
+
+    fn iri(s: &str) -> NamedNode {
+        NamedNode::new_unchecked(s)
+    }
+
+    /// A blank-free dataset without triple terms: both graph kinds, escapes, language tags,
+    /// datatypes, non-ASCII, prefix-sharing IRIs and repeats.
+    fn plain_quads() -> Vec<Quad> {
+        use oxrdf::Literal;
+        let g = GraphName::NamedNode(iri("urn:g"));
+        let mut quads = vec![
+            Quad::new(
+                iri("urn:b"),
+                iri("urn:p"),
+                iri("urn:a"),
+                GraphName::DefaultGraph,
+            ),
+            Quad::new(iri("urn:a/b"), iri("urn:p"), iri("urn:é"), g.clone()),
+            Quad::new(
+                iri("urn:a"),
+                iri("urn:p"),
+                Literal::new_simple_literal("tab\tnl\nq\"bs\\ c\u{1}"),
+                g.clone(),
+            ),
+            Quad::new(
+                iri("urn:a"),
+                iri("urn:p"),
+                Literal::new_language_tagged_literal_unchecked("chat", "fr"),
+                GraphName::DefaultGraph,
+            ),
+            Quad::new(
+                iri("urn:a"),
+                iri("urn:p"),
+                Literal::new_typed_literal("7", iri("http://www.w3.org/2001/XMLSchema#integer")),
+                g.clone(),
+            ),
+            Quad::new(
+                iri("urn:a"),
+                iri("urn:p"),
+                Literal::new_typed_literal("s", iri("http://www.w3.org/2001/XMLSchema#string")),
+                g,
+            ),
+            Quad::new(
+                iri("urn:Z"),
+                iri("urn:p"),
+                Literal::new_simple_literal("日本"),
+                GraphName::DefaultGraph,
+            ),
+        ];
+        quads.push(quads[0].clone());
+        quads.push(quads[3].clone());
+        quads
+    }
+
+    /// D190: for a blank-free set without triple terms, sorted N-Quads is RDFC-1.0's output.
+    #[test]
+    fn sorted_nquads_equal_rdfc_on_a_blank_free_set() {
+        let quads = plain_quads();
+        let rdfc = canonicalize_quads(&quads, &CanonOptions::default())
+            .unwrap()
+            .nquads;
+        let sorted = sorted_nquads(quads.clone()).unwrap();
+        assert_eq!(sorted.lines().count(), 7, "the two repeats count once");
+        assert_eq!(sorted, rdfc);
+        let mut reversed = quads;
+        reversed.reverse();
+        assert_eq!(
+            sorted_nquads(reversed).unwrap(),
+            rdfc,
+            "input order does not matter"
+        );
+    }
+
+    /// Triple terms are kept, in their RDF 1.2 form, and the text does not depend on input order.
+    #[test]
+    fn sorted_nquads_keep_triple_terms() {
+        let (s, p, o) = (iri("urn:s"), iri("urn:p"), iri("urn:o"));
+        let reifies = iri("http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies");
+        let triple = Term::from(Triple::new(s.clone(), p.clone(), o.clone()));
+        let mut quads = plain_quads();
+        quads.push(Quad::new(
+            iri("urn:r"),
+            reifies.clone(),
+            triple.clone(),
+            GraphName::DefaultGraph,
+        ));
+        quads.push(Quad::new(s, p, o, GraphName::DefaultGraph));
+        let text = sorted_nquads(quads.clone()).unwrap();
+        assert!(text.contains(
+            "<urn:r> <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <urn:s> <urn:p> <urn:o> )>> .\n"
+        ));
+        let mut reversed = quads.clone();
+        reversed.reverse();
+        assert_eq!(sorted_nquads(reversed).unwrap(), text);
+        let without = sorted_nquads(
+            quads
+                .into_iter()
+                .filter(|q| !matches!(q.object, Term::Triple(_))),
+        );
+        assert_ne!(without.unwrap(), text, "the triple-term row is in the text");
+    }
+
+    /// D190: a blank node anywhere is refused, inside a triple term too.
+    #[test]
+    fn sorted_nquads_refuse_blank_nodes() {
+        use oxrdf::BlankNode;
+        let b = BlankNode::new_unchecked("b0");
+        let (s, p) = (iri("urn:s"), iri("urn:p"));
+        let nested = Triple::new(
+            s.clone(),
+            p.clone(),
+            Term::from(Triple::new(b.clone(), p.clone(), s.clone())),
+        );
+        let cases = [
+            Quad::new(b.clone(), p.clone(), s.clone(), GraphName::DefaultGraph),
+            Quad::new(s.clone(), p.clone(), b.clone(), GraphName::DefaultGraph),
+            Quad::new(
+                s.clone(),
+                p.clone(),
+                s.clone(),
+                GraphName::BlankNode(b.clone()),
+            ),
+            Quad::new(
+                s.clone(),
+                p.clone(),
+                Term::from(Triple::new(b.clone(), p.clone(), s.clone())),
+                GraphName::DefaultGraph,
+            ),
+            Quad::new(
+                s.clone(),
+                p.clone(),
+                Term::from(Triple::new(s.clone(), p.clone(), b)),
+                GraphName::DefaultGraph,
+            ),
+            Quad::new(
+                s.clone(),
+                p.clone(),
+                Term::from(nested),
+                GraphName::DefaultGraph,
+            ),
+        ];
+        for case in cases {
+            let mut quads = plain_quads();
+            quads.push(case.clone());
+            assert_eq!(
+                sorted_nquads(quads),
+                Err(SortedNQuadsError::BlankNode {
+                    quad: format!("{case} .")
+                }),
+                "{case}"
+            );
+        }
+        assert!(
+            sorted_nquads(plain_quads()).is_ok(),
+            "control: the blank-free rest passes"
         );
     }
 

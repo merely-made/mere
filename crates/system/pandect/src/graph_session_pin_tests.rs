@@ -245,3 +245,200 @@ fn a_pin_indexes_on_its_first_read() {
         assert!(std::ptr::eq(pin.dataset(), pin.dataset()), "built once");
     });
 }
+
+/// Every Resource-stratum quad's line, and every quad of the whole projection.
+fn resource_and_all(graph: &Graph) -> (BTreeSet<String>, BTreeSet<String>) {
+    let all = graph
+        .held_quads()
+        .chain(graph.withdrawn_reifier_quads())
+        .map(|quad| quad.to_string());
+    (
+        resource_quads(graph).map(|quad| quad.to_string()).collect(),
+        all.collect(),
+    )
+}
+
+#[test]
+fn the_resource_digest_keeps_reifier_rows_and_is_stable() {
+    pollster::block_on(async {
+        let session = chained().await;
+        let live = session.journal.live_cursor();
+        let pin = session.pin(live).unwrap();
+        let quads: Vec<oxrdf::Quad> = resource_quads(pin.graph()).collect();
+        let triple_terms = quads
+            .iter()
+            .filter(|quad| matches!(quad.object, oxrdf::Term::Triple(_)))
+            .count();
+        assert!(triple_terms > 0, "the stratum has reifier rows");
+
+        let digest = pin.resource_digest().unwrap().clone();
+        assert_eq!(digest.algorithm, RESOURCE_DIGEST_ALGORITHM);
+        assert_eq!(digest.version, RESOURCE_DIGEST_VERSION);
+        let text = sorted_nquads(quads.clone()).unwrap();
+        assert!(text.contains("<<( "), "triple terms in the text");
+        let expected = blake3::Hasher::new_derive_key(RESOURCE_DIGEST_DOMAIN)
+            .update(text.as_bytes())
+            .finalize()
+            .to_hex()
+            .to_string();
+        assert_eq!(digest.digest, expected, "the documented construction");
+        let without = sorted_nquads(
+            quads
+                .into_iter()
+                .filter(|quad| !matches!(quad.object, oxrdf::Term::Triple(_))),
+        )
+        .unwrap();
+        assert_ne!(
+            digest_nquads(RESOURCE_DIGEST_DOMAIN, &without),
+            digest.digest,
+            "the reifier rows are in the digest"
+        );
+
+        let again = session.pin(live).unwrap();
+        assert!(!std::ptr::eq(pin.graph(), again.graph()));
+        assert_eq!(
+            again.resource_digest().unwrap(),
+            &digest,
+            "recomputed alike"
+        );
+        let earlier = session.pin(Seq(live.0 - 1)).unwrap();
+        assert_ne!(
+            earlier.resource_digest().unwrap().digest,
+            digest.digest,
+            "control: the cursor before the last statement differs"
+        );
+    });
+}
+
+#[test]
+fn the_resource_stratum_without_reifier_rows_reads_as_rdfc() {
+    pollster::block_on(async {
+        let session = chained().await;
+        let pin = session.pin(session.journal.live_cursor()).unwrap();
+        let plain: Vec<oxrdf::Quad> = resource_quads(pin.graph())
+            .filter(|quad| !matches!(quad.object, oxrdf::Term::Triple(_)))
+            .collect();
+        assert!(!plain.is_empty());
+        let rdfc = mere::canonicalize_quads(&plain, &mere::CanonOptions::default())
+            .unwrap()
+            .nquads;
+        assert_eq!(sorted_nquads(plain).unwrap(), rdfc);
+    });
+}
+
+#[test]
+fn an_arrangement_edit_keeps_the_resource_digest_and_a_resource_edit_moves_it() {
+    use kernel::graph::apply::assert_relation;
+    use kernel::graph::{ArrangementSubKind, EdgeAssertion};
+    pollster::block_on(async {
+        let mut session = chained().await;
+        let before = session.pin(session.journal.live_cursor()).unwrap();
+        let cursor = before.cursor();
+        session
+            .edit_now(person(), |graph| {
+                let key = |id| graph.get_node_key_by_id(Uuid::from_u128(id)).unwrap();
+                let (frame, member) = (key(1), key(3));
+                let arrangement = EdgeAssertion::Arrangement {
+                    sub_kind: ArrangementSubKind::FrameMember,
+                };
+                assert!(assert_relation(graph, frame, member, arrangement).is_some());
+            })
+            .unwrap();
+        let arranged = session.pin(session.journal.live_cursor()).unwrap();
+        assert!(
+            arranged.cursor() > cursor,
+            "the arrangement is a journal edit"
+        );
+        let (resources, all) = resource_and_all(before.graph());
+        let (arranged_resources, arranged_all) = resource_and_all(arranged.graph());
+        assert_ne!(arranged_all, all, "control: the projection shows it");
+        assert_eq!(arranged_resources, resources);
+        assert_eq!(
+            arranged.resource_digest().unwrap(),
+            before.resource_digest().unwrap(),
+            "an arrangement edit leaves the Resource digest"
+        );
+
+        relate(&mut session, 3, 1, "answers");
+        let edited = session.pin(session.journal.live_cursor()).unwrap();
+        assert_ne!(
+            edited.resource_digest().unwrap(),
+            before.resource_digest().unwrap(),
+            "a Resource edit moves it"
+        );
+    });
+}
+
+#[test]
+fn a_pin_computes_its_resource_digest_once_on_first_ask() {
+    pollster::block_on(async {
+        let mut session = chained().await;
+        let pin = session.pin(session.journal.live_cursor()).unwrap();
+        assert_eq!(pin.resource_digests_computed(), 0, "pinning computes none");
+        relate(&mut session, 3, 4, "later");
+        session.apply(person(), vec![add(5)]).await.unwrap();
+        let _ = pin.dataset();
+        assert_eq!(
+            pin.resource_digests_computed(),
+            0,
+            "edits and the index compute none"
+        );
+
+        let first = pin.resource_digest().unwrap();
+        assert_eq!(
+            pin.resource_digests_computed(),
+            1,
+            "control: the ask computes it"
+        );
+        let second = pin.resource_digest().unwrap();
+        assert_eq!(pin.resource_digests_computed(), 1, "kept, not recomputed");
+        assert!(std::ptr::eq(first, second));
+
+        let other = session.pin(pin.cursor()).unwrap();
+        assert_eq!(other.resource_digests_computed(), 0, "each pin its own");
+        assert_eq!(other.resource_digest().unwrap(), first);
+        assert_eq!(other.resource_digests_computed(), 1);
+    });
+}
+
+#[test]
+fn the_resource_digest_is_domain_separated_and_versioned() {
+    let text =
+        "<urn:a> <urn:p> <<( <urn:s> <urn:p> <urn:o> )>> .\n<urn:a> <urn:p> <urn:b> <urn:g> .\n";
+    // Known answers from an independent BLAKE3 (Python `blake3` 1.0.9,
+    // `derive_key_context="mere resource digest v1"`).
+    assert_eq!(
+        digest_nquads(RESOURCE_DIGEST_DOMAIN, text),
+        "b9f03eefecee42a211cb413ae05b9db27b88185029a318973891181392c0cfce"
+    );
+    assert_eq!(
+        digest_nquads(RESOURCE_DIGEST_DOMAIN, ""),
+        "4ca1cb55f0bc7ce78d867413037ca62d8a1e4c40c2cc4488f48f050169253b39"
+    );
+    assert_ne!(
+        digest_nquads(RESOURCE_DIGEST_DOMAIN, text),
+        blake3::hash(text.as_bytes()).to_hex().to_string(),
+        "not a plain hash"
+    );
+    assert_eq!(
+        RESOURCE_DIGEST_DOMAIN,
+        format!("mere resource digest v{RESOURCE_DIGEST_VERSION}"),
+        "the domain names the version"
+    );
+    let v1 = digest_nquads(RESOURCE_DIGEST_DOMAIN, text);
+    assert_ne!(
+        v1,
+        digest_nquads("mere resource digest v2", text),
+        "a version bump"
+    );
+    assert_ne!(
+        v1,
+        digest_nquads("muniment journal prefix digest v2", text),
+        "another domain"
+    );
+    assert_eq!(
+        v1,
+        digest_nquads(RESOURCE_DIGEST_DOMAIN, text),
+        "control: same inputs agree"
+    );
+}

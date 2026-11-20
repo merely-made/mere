@@ -8,15 +8,81 @@
 //! cursor with its query index, owned by the holder and released on drop. The
 //! live view is the host's index refreshed per edit; a pin is rebuilt from
 //! `graph_at`, which starts from the stored checkpoint's replay point, and
-//! indexes on its first read.
+//! indexes on its first read. Its Resource digest (D190 to D192) is likewise
+//! computed on the first ask and kept.
 use super::*;
 use mere::dataset::IndexedDataset;
+use mere::formats::canon::{SortedNQuadsError, sorted_nquads};
+use mere::projection::RdfSource;
 use std::sync::OnceLock;
 
-/// What a pin holds: the graph at its cursor and, once read, its index.
+/// The Resource digest's algorithm: BLAKE3 in key-derivation mode over the
+/// sorted N-Quads of the Resource stratum (engine-split D190).
+pub const RESOURCE_DIGEST_ALGORITHM: &str = "mere-resource-sorted-nquads-blake3";
+/// The Resource digest's version; a change to its definition bumps it.
+pub const RESOURCE_DIGEST_VERSION: u32 = 1;
+/// The key-derivation context: domain separation, naming the version.
+const RESOURCE_DIGEST_DOMAIN: &str = "mere resource digest v1";
+
+/// What a pin holds: the graph at its cursor and, once read, its index and
+/// Resource digest.
 pub(super) struct Pinned {
     graph: Graph,
     dataset: OnceLock<IndexedDataset>,
+    resource_digest: OnceLock<Result<ResourceDigest, SortedNQuadsError>>,
+    #[cfg(test)]
+    resource_digests_computed: std::sync::atomic::AtomicUsize,
+}
+
+impl Pinned {
+    fn new(graph: Graph) -> Self {
+        Self {
+            graph,
+            dataset: OnceLock::new(),
+            resource_digest: OnceLock::new(),
+            #[cfg(test)]
+            resource_digests_computed: Default::default(),
+        }
+    }
+}
+
+/// A digest of a pin's Resource-stratum content, with the algorithm and
+/// version that define it (engine-split D190, D192).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResourceDigest {
+    /// [`RESOURCE_DIGEST_ALGORITHM`].
+    pub algorithm: &'static str,
+    /// [`RESOURCE_DIGEST_VERSION`].
+    pub version: u32,
+    /// Lowercase hex of the 32-byte BLAKE3 output.
+    pub digest: String,
+}
+
+/// Every Resource-stratum quad of `graph`, held and withdrawn reifiers, as
+/// Graphshell's P8 probe reads them; may repeat a quad.
+fn resource_quads(graph: &Graph) -> impl Iterator<Item = oxrdf::Quad> + '_ {
+    let resources = graph.resource_graph();
+    resources
+        .held_quads()
+        .chain(resources.withdrawn_reifier_quads())
+}
+
+/// BLAKE3 key derivation under `domain` over `nquads`, as hex.
+fn digest_nquads(domain: &str, nquads: &str) -> String {
+    let mut hasher = blake3::Hasher::new_derive_key(domain);
+    hasher.update(nquads.as_bytes());
+    hasher.finalize().to_hex().to_string()
+}
+
+/// The Resource digest of `graph`: D190's sorted N-Quads under
+/// [`RESOURCE_DIGEST_DOMAIN`].
+fn resource_digest_of(graph: &Graph) -> Result<ResourceDigest, SortedNQuadsError> {
+    let nquads = sorted_nquads(resource_quads(graph))?;
+    Ok(ResourceDigest {
+        algorithm: RESOURCE_DIGEST_ALGORITHM,
+        version: RESOURCE_DIGEST_VERSION,
+        digest: digest_nquads(RESOURCE_DIGEST_DOMAIN, &nquads),
+    })
 }
 
 /// Identity of a journal revision without its graph or index.
@@ -79,6 +145,30 @@ impl PinnedView {
             .get_or_init(|| IndexedDataset::for_graph(&self.pinned.graph))
     }
 
+    /// The digest of every Resource-stratum quad at this cursor, reifier rows
+    /// included: BLAKE3 over their deduplicated, sorted RDF 1.2 N-Quads,
+    /// domain-separated and versioned (engine-split D190). Computed on the
+    /// first call and held from then on (D191); the asker pays, about 3 s at
+    /// 100k nodes, and no edit computes it.
+    ///
+    /// # Errors
+    ///
+    /// [`SortedNQuadsError::BlankNode`] if a Resource quad holds a blank node,
+    /// which sorting cannot label canonically; the refusal is kept too.
+    pub fn resource_digest(&self) -> Result<&ResourceDigest, SortedNQuadsError> {
+        self.pinned
+            .resource_digest
+            .get_or_init(|| {
+                #[cfg(test)]
+                self.pinned
+                    .resource_digests_computed
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                resource_digest_of(&self.pinned.graph)
+            })
+            .as_ref()
+            .map_err(Clone::clone)
+    }
+
     #[cfg(test)]
     pub(super) fn downgrade(&self) -> std::sync::Weak<Pinned> {
         Arc::downgrade(&self.pinned)
@@ -87,6 +177,13 @@ impl PinnedView {
     #[cfg(test)]
     pub(super) fn is_indexed(&self) -> bool {
         self.pinned.dataset.get().is_some()
+    }
+
+    #[cfg(test)]
+    pub(super) fn resource_digests_computed(&self) -> usize {
+        self.pinned
+            .resource_digests_computed
+            .load(std::sync::atomic::Ordering::Relaxed)
     }
 }
 
@@ -97,6 +194,7 @@ impl std::fmt::Debug for PinnedView {
             .field("cursor", &self.cursor.0)
             .field("digest", &self.digest)
             .field("rows", &self.pinned.dataset.get().map(IndexedDataset::len))
+            .field("resource_digest", &self.pinned.resource_digest.get())
             .finish()
     }
 }
@@ -123,10 +221,7 @@ impl<B: Backend> GraphSession<B> {
             session: revision.session,
             cursor: revision.cursor,
             digest: revision.digest,
-            pinned: Arc::new(Pinned {
-                graph,
-                dataset: OnceLock::new(),
-            }),
+            pinned: Arc::new(Pinned::new(graph)),
         })
     }
 

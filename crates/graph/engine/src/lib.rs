@@ -78,7 +78,7 @@ pub use acquire::ingest::{
 };
 pub use formats::canon::{
     CanonError, CanonHash, CanonOptions, Canonical, DEFAULT_MAX_HNDQ_CALLS, DEFAULT_MAX_PERMUTATIONS,
-    canonicalize, canonicalize_quads,
+    SortedNQuadsError, canonicalize, canonicalize_quads, sorted_nquads,
 };
 pub use formats::parse::{
     JsonLdOptions, ProcessingMode, parse_jsonld, parse_nquads, parse_ntriples, parse_rdfxml,
