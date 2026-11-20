@@ -64,3 +64,7 @@ reason = "bindgen 0.72.1 via crabgrind 0.3.1 (upstream); gone when bindgen moves
 [[bans.skip]]
 crate = "syn@2.0.119"
 reason = "some sixty proc-macro crates (async-stream-impl, derive_more-impl, hax-lib-macros, irpc-derive and others, upstream) still on syn 2; gone as they move to syn 3"
+
+[[bans.skip]]
+crate = "windows-sys@0.52.0"
+reason = "ring 0.17.14 (its latest release) via iroh, aarch64-windows only; dirs-sys 0.5 under the Rudof fork holds 0.61.2; gone when ring moves to windows-sys 0.61"

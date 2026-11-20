@@ -184,3 +184,6 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
   in the [receipt](../../archive_docs/receipts/2026-11-13_one_version_plan_receipts.md).
 - 2026-11-18: `async-stream-impl` left Mere's graph with P2mere 0.11.1 (`async-stream` behind the store's `sqlite` feature);
   `enumn` left with the AccessKit adapter's removal (`13a084dde`). D7 to D9 rule the rest, queued behind the cutover.
+- 2026-11-20: a fresh resolve of Mere main failed `cargo deny check bans` on `windows-sys` 0.52.0 (ring 0.17.14 via iroh,
+  aarch64-windows only) beside 0.61.2 (dirs-sys 0.5 under the Rudof fork that `mere-shacl` brought on 2026-11-19). Mark,
+  2026-11-20: "Skip 0.52 like Graphshell (Recommended)": a stopgap skip with Graphshell's reason, gone when ring moves to 0.61.
