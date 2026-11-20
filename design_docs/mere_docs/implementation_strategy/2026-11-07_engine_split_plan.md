@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-20. D1 to D189 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-20. D1 to D193 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2958,6 +2958,22 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D181 · plans engine-split P8 · summary The engine revision is an optional SceneSnapshot field first; the CBOR keyframe envelope lands with missed-delta recovery.
 
+- **D190. The Resource digest hashes sorted N-Quads and refuses blank nodes (Mark, 2026-11-20):** the P8 host lane (`Code/testing/engine-split/p8_host/`, Graphshell branch `p8-pinned-host` `548b0e94`, bench on Mere `6c5c0f816`) found RDFC-1.0 refusing the Resource stratum at every size with `CanonError::TripleTerm`: a quarter of its quads are reifier rows carrying RDF 1.2 triple terms (200,000 of 800,000 at 100k nodes) and none holds a blank node. "Sorted N-Quads, refuse blank nodes (Recommended)": the digest is over the deduplicated, sorted RDF 1.2 N-Quads of every Resource-stratum quad, reifier rows included, versioned and domain-separated, and a dataset holding a blank node is refused, which for a blank-free set is byte-identical to RDFC-1.0's output; a blank node in the stratum returns as its own fork; against RDFC without the triple-term rows, a versioned mapping to RDF 1.1 reification, and waiting for an RDF 1.2 RDFC. Outcome: refines D181.
+
+  Links: area The stack · draws on engine-split D147, engine-split D181 · plans engine-split P8 · summary The Resource digest is over deduplicated sorted RDF 1.2 N-Quads, reifier rows included, refusing a dataset with a blank node.
+
+- **D191. The Resource digest is computed on demand and kept on the pin (Mark, 2026-11-20):** a whole recompute took 0.26 to 0.33 s at 10k nodes and 2.6 to 3.4 s at 100k (collecting the quads 1.4 s of it), 26 to 34 times D161's 100 ms edit target. "On demand, kept on the pin (Recommended)": never per edit; a pin computes it once, lazily, and keeps it, as it keeps its dataset, the asker paying about 3 s at 100k; against incremental per-source digests over a published multiset hash and a budget with a cache. Outcome: applies D161.
+
+  Links: area The stack · draws on engine-split D161, engine-split D166 · plans engine-split P8 · summary The Resource digest is never computed per edit; a pin computes it lazily once and keeps it.
+
+- **D192. Mere exposes the Resource digest; Graphshell reports it (Mark, 2026-11-20):** D148 has the host mint no revision identity and D181 an engine encoding with an algorithm id and work limits. "Mere exposes it (Recommended)": `PinnedView` exposes the digest with its algorithm id and version and Graphshell reports it with the view; against Graphshell computing it from the pin's graph. Outcome: applies D148.
+
+  Links: area The stack · draws on engine-split D148, engine-split D181 · plans engine-split P8 · summary PinnedView exposes the Resource digest with its algorithm id and version; the host only reports it.
+
+- **D193. A stale reply names the engine revision now current (Mark, 2026-11-20):** `IntentResult::Stale` carried an epoch and counter only, so when only the engine moved the reply repeated the counter; a new field touches 17 sites in Graphshell and 2 in Turnstone. "Optional field on Stale (Recommended)": `Stale` gains an optional current engine revision that old readers ignore, the Graphshell sites are updated and Turnstone's two are fixed forward; against naming it only in a re-fetched snapshot until E3 and a host accessor for in-process callers. Outcome: refines D189.
+
+  Links: area The stack · draws on engine-split D188, engine-split D189 · plans engine-split P8 · summary IntentResult::Stale carries an optional current engine revision beside its epoch and counter.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -3918,3 +3934,7 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   manifest is scored, the finding-to-evidence read).
 - 2026-11-20: P8's host binding ruled (D187 to D189) from Graphshell `da3a7812`; Graphshell's engine binding plan E1 and E2 cite
   them. E3 waits on the envelope and the retention bound, E4 on the Resource digest's measurement on the edit path.
+- 2026-11-20: Graphshell branch `p8-pinned-host` (`19bd3652`, `1b6b9793`, `548b0e94`, unpushed) shows a pinned view, stamps every
+  scene with its engine revision, refuses an intent the engine moved past, and checks that a Graphshell arrangement edit leaves
+  every Resource quad (probe 2 and probe 3's content half, each with its controls). Its digest bench found RDFC-1.0 refusing the
+  stratum's triple terms and a whole recompute at 2.6 to 3.4 s at 100k; D190 to D193 rule the digest and the stale reply.

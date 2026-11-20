@@ -2079,6 +2079,38 @@ summary = "The engine revision is an optional SceneSnapshot field first; the CBO
 draws_on = ["engine-split D181"]
 plans = ["engine-split"]
 
+[decisions."engine-split D190"]
+title = "The Resource digest hashes sorted N-Quads and refuses blank nodes (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Resource digest is over deduplicated sorted RDF 1.2 N-Quads, reifier rows included, refusing a dataset with a blank node."
+draws_on = ["engine-split D147", "engine-split D181"]
+plans = ["engine-split"]
+
+[decisions."engine-split D191"]
+title = "The Resource digest is computed on demand and kept on the pin (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The Resource digest is never computed per edit; a pin computes it lazily once and keeps it."
+draws_on = ["engine-split D161", "engine-split D166"]
+plans = ["engine-split"]
+
+[decisions."engine-split D192"]
+title = "Mere exposes the Resource digest; Graphshell reports it (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "PinnedView exposes the Resource digest with its algorithm id and version; the host only reports it."
+draws_on = ["engine-split D148", "engine-split D181"]
+plans = ["engine-split"]
+
+[decisions."engine-split D193"]
+title = "A stale reply names the engine revision now current (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "IntentResult::Stale carries an optional current engine revision beside its epoch and counter."
+draws_on = ["engine-split D188", "engine-split D189"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
