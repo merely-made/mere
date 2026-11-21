@@ -16,6 +16,9 @@ path = "src/main.rs"
 mere = { path = "../graph/engine", features = ["query"] }
 transport = { workspace = true, features = ["reticulum", "noise", "i2p"] }
 identity.workspace = true
+webrtc-carrier = { package = "murm-webrtc", git = "https://github.com/merely-made/murm.git", branch = "main", features = ["native"] }
+wtransport = "0.7"
+base64 = "0.22"
 serde.workspace = true
 serde_json.workspace = true
 anyhow = "1"

@@ -6,6 +6,7 @@
 
 mod carrier;
 mod protocol;
+mod webrtc;
 
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
@@ -34,7 +35,7 @@ enum Command {
         /// Local RDF dataset to query.
         #[arg(long)]
         graph: Option<PathBuf>,
-        /// Private invitation file from the graph owner (selects the carrier).
+        /// JSON peer invitation for iroh, Reticulum, or I2P. Open WebRTC HTML in a browser.
         #[arg(long)]
         peer: Option<PathBuf>,
         /// UTF-8 SPARQL query file.
@@ -51,12 +52,12 @@ enum Command {
         /// Query file the owner permits. Requests must match its contents.
         #[arg(long)]
         allow_query: PathBuf,
-        /// Write a private invitation for this session to a new file.
+        /// Write a new private invitation (.html for WebRTC) for this session.
         #[arg(long)]
         invite: PathBuf,
         #[arg(long, value_enum)]
         via: Carrier,
-        /// Reticulum TCP interface: a reachable local IP address and port.
+        /// Reachable local IP and port for Reticulum (TCP) or WebRTC signaling (UDP).
         #[arg(long)]
         listen: Option<SocketAddr>,
         /// Loopback I2P SAM bridge (default 127.0.0.1:7656).
@@ -70,6 +71,8 @@ enum Carrier {
     Iroh,
     Reticulum,
     I2p,
+    /// Open the private HTML invitation in a browser.
+    Webrtc,
 }
 
 fn dataset(path: &Path) -> Result<IndexedDataset> {
@@ -94,7 +97,7 @@ async fn main() -> Result<()> {
         } => {
             let query = read_query(&query)?;
             let rows = match (graph, peer) {
-                (Some(path), None) => protocol::evaluate(&dataset(&path)?, &query)?,
+                (Some(path), None) => protocol::evaluate(&dataset(&path)?, &query)?.rows,
                 (None, Some(file)) => {
                     let invitation: Invitation = serde_json::from_slice(&read_small(&file, 65536)?)
                         .context("invalid peer invitation")?;
@@ -117,7 +120,7 @@ async fn main() -> Result<()> {
             ensure!(!invite.exists(), "choose a new invitation file");
             let service = protocol::Service::new(dataset(&graph)?, read_query(&allow_query)?)?;
             tokio::select! {
-                result = carrier::serve(via, listen, sam, &invite, &service) => result?,
+                result = carrier::serve(via, listen, sam, &invite, service) => result?,
                 signal = tokio::signal::ctrl_c() => signal?,
             }
         },

@@ -2,10 +2,54 @@
 
 You can ask “Who named each author of this paper?” from a laptop that has
 only the query and an invitation. The other laptop opens the graph, runs the
-query through Mere’s SPARQL engine, and sends the rows back. The route comes
-from the invitation, so the reader uses the same command on all three carriers.
+query through Mere’s SPARQL engine, and sends the rows back. Choose WebRTC for a browser
+reader, or iroh, Reticulum, or I2P for a terminal reader. Each invitation selects its own carrier.
 
-## Try the author query
+## Open a WebRTC invitation in a browser
+
+Only the graph owner needs Mere. In the repository root on the owner, install
+the CLI and start a session. Replace the example IP with the owner's LAN
+address. Choose an available UDP port.
+
+```sh
+cargo install --path crates/cli
+sample=crates/graph/engine/examples/fixtures
+mere serve --via webrtc --listen 192.168.1.10:43864 \
+  --graph "$sample/paper-authors.trig" --allow-query "$sample/paper-authors.rq" \
+  --invite paper-webrtc.html
+```
+
+When the owner sees `Ready`, privately transfer **paper-webrtc.html** to
+the reader using a trusted file-sharing channel. On the reader, open the
+saved file in a browser that supports WebRTC and WebTransport with certificate
+pinning, such as Chrome. Use **View allowed SPARQL query** to inspect the
+question, then **Run query**. If the browser asks to reach devices on the
+local network, allow that connection to query the owner.
+
+| author | namedBy |
+| --- | --- |
+| Ada | Library catalog |
+| Ada | Publisher |
+| Grace | Publisher |
+
+The file includes the browser reader, the allowed query, a session secret,
+and the fingerprint of the owner's temporary signaling certificate. Open
+invitations only from an owner you trust. Each click establishes a fresh
+connection. WebTransport uses the fingerprint to authenticate the owner and
+exchange WebRTC connection details. The query and response travel over the
+WebRTC data channel. The graph stays on the owner. The reader needs only
+the HTML file and the browser.
+
+This direct connection needs UDP reachability to the owner's signaling port
+and the per-connection WebRTC port. Start with both devices on the same LAN.
+A browser compatibility message means the necessary browser APIs are
+unavailable. For a connection timeout, check that the owner is still serving,
+the invitation is current, and the devices can reach each other over UDP.
+Ctrl-C on the owner ends access. Restart with a fresh filename after changing
+the graph or query, or when the temporary signaling certificate expires
+after 14 days.
+
+## Try the author query from another terminal
 
 Install the CLI from the Mere repository root on each machine with Rust and
 Cargo available. Set `sample` in each terminal where you use the example.
@@ -51,7 +95,7 @@ The columns follow the query’s `SELECT ?author ?namedBy`. Ada appears twice
 because the library catalog and the publisher each credit her. SSH is used once
 to hand over the invitation. Subsequent queries and replies use the selected carrier.
 
-## Choose a carrier
+## Choose a terminal carrier
 
 * **iroh** connects to the endpoint in the invitation through Murm’s p2mere
   adapter. The CLI uses direct connections. Start with two machines on the

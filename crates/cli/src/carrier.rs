@@ -94,19 +94,27 @@ pub async fn serve(
     listen: Option<SocketAddr>,
     sam: Option<SocketAddr>,
     file: &Path,
-    service: &Service,
+    service: Service,
 ) -> Result<()> {
-    ensure!(
-        via == Carrier::Reticulum || listen.is_none(),
-        "--listen is for Reticulum"
-    );
     ensure!(via == Carrier::I2p || sam.is_none(), "--sam is for I2P");
+    ensure!(
+        matches!(via, Carrier::Reticulum | Carrier::Webrtc) || listen.is_none(),
+        "--listen is for Reticulum or WebRTC"
+    );
     let key = UnassociatedKeypair::generate();
     let owner = PeerID::from_public_key(key.public_key());
     let alpn = Alpn::new(PROTOCOL);
     let gate = SetupGate::new(1);
     let policy = policy(via == Carrier::Iroh, None);
     match via {
+        Carrier::Webrtc => {
+            crate::webrtc::serve(
+                listen.context("WebRTC needs --listen <reachable-local-IP:port>")?,
+                file,
+                service,
+            )
+            .await
+        },
         Carrier::Iroh => {
             let t = iroh(&key).await?;
             t.register_bounded_alpn(alpn.clone(), 8, Duration::from_secs(15))
@@ -120,7 +128,7 @@ pub async fn serve(
             )?;
             loop {
                 let stream = t.accept(alpn.clone()).await?.into_stream();
-                answer(service, gate.reserve(&policy)?.native(stream)).await;
+                answer(&service, gate.reserve(&policy)?.native(stream)).await;
             }
         },
         Carrier::Reticulum => {
@@ -140,7 +148,7 @@ pub async fn serve(
             )?;
             loop {
                 let stream = t.accept(alpn.clone()).await?.into_stream();
-                answer(service, gate.noise_responder(&key, stream, &policy).await).await;
+                answer(&service, gate.noise_responder(&key, stream, &policy).await).await;
             }
         },
         Carrier::I2p => {
@@ -154,7 +162,7 @@ pub async fn serve(
             )?;
             loop {
                 let stream = t.accept().await?;
-                answer(service, gate.noise_responder(&key, stream, &policy).await).await;
+                answer(&service, gate.noise_responder(&key, stream, &policy).await).await;
             }
         },
     }

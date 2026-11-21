@@ -19,8 +19,8 @@ use tokio::time::timeout;
 use transport::{PeerID, security::SetupGuard};
 
 pub const PROTOCOL: &str = "mere/sparql-rows/v1";
-const MAX_QUERY: usize = 64 * 1024;
-const MAX_REPLY: usize = 1024 * 1024;
+pub const MAX_QUERY: usize = 64 * 1024;
+pub const MAX_REPLY: usize = 1024 * 1024;
 const EXCHANGE: Duration = Duration::from_secs(90);
 
 pub type Rows = Vec<Vec<Option<String>>>;
@@ -77,12 +77,9 @@ pub fn read_query(path: &Path) -> Result<String> {
     Ok(text.replace("\r\n", "\n"))
 }
 
-pub fn evaluate(dataset: &IndexedDataset, query: &str) -> Result<Rows> {
-    Ok(
-        mere::query::sparql_on(dataset, query, View::Live, Default::default())
-            .map_err(anyhow::Error::msg)?
-            .rows,
-    )
+pub fn evaluate(dataset: &IndexedDataset, query: &str) -> Result<mere::query::QueryRows> {
+    mere::query::sparql_on(dataset, query, View::Live, Default::default())
+        .map_err(anyhow::Error::msg)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -110,28 +107,33 @@ impl Service {
     }
 
     pub fn invite(&self, file: &Path, owner: PeerID, route: Route) -> Result<()> {
-        let dir = file
-            .parent()
-            .filter(|p| !p.as_os_str().is_empty())
-            .unwrap_or(Path::new("."));
-        let mut tmp = tempfile::NamedTempFile::new_in(dir)?;
-        serde_json::to_writer(
-            &mut tmp,
-            &Invitation {
-                protocol: PROTOCOL.to_string(),
-                owner: owner.to_bytes(),
-                route,
-                token: self.token,
-            },
-        )?;
-        tmp.flush()?;
-        tmp.persist_noclobber(file)
-            .context("write a new private invitation")?;
-        eprintln!(
-            "Ready. Share {} privately with the reader. Press Ctrl-C to stop.",
-            file.display()
+        let bytes = serde_json::to_vec(&Invitation {
+            protocol: PROTOCOL.to_string(),
+            owner: owner.to_bytes(),
+            route,
+            token: self.token,
+        })?;
+        write_invitation(file, &bytes)
+    }
+
+    pub fn allowed_query(&self) -> &str {
+        &self.allowed
+    }
+
+    pub fn token(&self) -> &[u8; 32] {
+        &self.token
+    }
+
+    pub fn matches_token(&self, token: &[u8]) -> bool {
+        bool::from(self.token.as_slice().ct_eq(token))
+    }
+
+    pub fn select_allowed(&self, query: &[u8]) -> Result<mere::query::QueryRows> {
+        ensure!(
+            query == self.allowed.as_bytes(),
+            "query is not enabled by this invitation"
         );
-        Ok(())
+        evaluate(&self.dataset, &self.allowed)
     }
 
     pub async fn answer<S: AsyncRead + AsyncWrite + Unpin>(
@@ -141,19 +143,15 @@ impl Service {
     ) -> Result<()> {
         timeout(EXCHANGE, async {
             let token = read_frame(&mut stream, 32).await?;
-            if !bool::from(self.token.as_slice().ct_eq(&token)) {
+            if !self.matches_token(&token) {
                 guard.refused();
                 bail!("invalid invitation");
             }
             guard.admitted()?;
             let query = read_frame(&mut stream, MAX_QUERY).await?;
-            let reply = if query != self.allowed.as_bytes() {
-                Reply::Error("query is not enabled by this invitation".into())
-            } else {
-                match evaluate(&self.dataset, &self.allowed) {
-                    Ok(rows) => Reply::Rows(rows),
-                    Err(error) => Reply::Error(error.to_string()),
-                }
+            let reply = match self.select_allowed(&query) {
+                Ok(result) => Reply::Rows(result.rows),
+                Err(error) => Reply::Error(error.to_string()),
             };
             let mut bytes = serde_json::to_vec(&reply)?;
             if bytes.len() > MAX_REPLY {
@@ -173,7 +171,7 @@ impl Service {
     }
 }
 
-async fn read_frame<S: AsyncRead + Unpin>(s: &mut S, max: usize) -> Result<Vec<u8>> {
+pub async fn read_frame<S: AsyncRead + Unpin>(s: &mut S, max: usize) -> Result<Vec<u8>> {
     let len = s.read_u32().await? as usize;
     ensure!((1..=max).contains(&len), "invalid message size");
     let mut bytes = vec![0; len];
@@ -181,7 +179,7 @@ async fn read_frame<S: AsyncRead + Unpin>(s: &mut S, max: usize) -> Result<Vec<u
     Ok(bytes)
 }
 
-async fn write_frame<S: AsyncWrite + Unpin>(s: &mut S, bytes: &[u8]) -> Result<()> {
+pub async fn write_frame<S: AsyncWrite + Unpin>(s: &mut S, bytes: &[u8]) -> Result<()> {
     s.write_u32(u32::try_from(bytes.len())?).await?;
     s.write_all(bytes).await?;
     s.flush().await?;
@@ -207,4 +205,21 @@ pub async fn request<S: AsyncRead + AsyncWrite + Unpin>(
     })
     .await
     .context("peer query timed out")?
+}
+
+pub fn write_invitation(file: &Path, bytes: &[u8]) -> Result<()> {
+    let dir = file
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or(Path::new("."));
+    let mut tmp = tempfile::NamedTempFile::new_in(dir)?;
+    tmp.write_all(bytes)?;
+    tmp.flush()?;
+    tmp.persist_noclobber(file)
+        .context("write a new private invitation")?;
+    eprintln!(
+        "Ready. Share {} privately with the reader. Press Ctrl-C to stop.",
+        file.display()
+    );
+    Ok(())
 }

@@ -72,7 +72,10 @@ mere query --peer paper.peer --query "$sample/paper-authors.rq"
 
 The owner evaluates the query. Only the rows come back, and the credits
 still refer to the catalog and publisher whichever device hosts the graph.
-The invitation selects iroh, Reticulum, or I2P. [Try it on two devices](crates/cli/README.md)
+For a browser reader, the owner selects `--via webrtc` and shares a private
+HTML invitation. Open it in a browser tab and choose **Run query** to see
+the same rows. Terminal readers can use iroh, Reticulum, or I2P.
+[Try the browser or terminal walkthrough](crates/cli/README.md)
 
 For live graph sharing, Turnstone has a **Co-op** view where the
 owner can invite a contact and grant access to a particular graph. In a
