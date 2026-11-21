@@ -58,10 +58,23 @@ no row for that credit.
 
 ## Across devices
 
-If a colleague sends you this graph, running the query on your copy gives
-the same answer. The publisher still gets credit for naming Grace even when
-your colleague’s laptop delivers the file. The terminal inspector reads a
-local file. For live graph sharing, Turnstone has a **Co-op** view where the
+A reader can ask the same question while the graph stays on its owner’s
+device. In the Mere CLI, the owner runs `mere serve` with the graph and the
+query they want to share. The reader gets a private invitation and runs the following command.
+
+```sh
+mere query --peer paper.peer --query "$sample/paper-authors.rq"
+```
+
+```json
+[["Ada","Library catalog"],["Ada","Publisher"],["Grace","Publisher"]]
+```
+
+The owner evaluates the query. Only the rows come back, and the credits
+still refer to the catalog and publisher whichever device hosts the graph.
+The invitation selects iroh, Reticulum, or I2P. [Try it on two devices](crates/cli/README.md)
+
+For live graph sharing, Turnstone has a **Co-op** view where the
 owner can invite a contact and grant access to a particular graph. In a
 test on two Linux desktops, Turnstone used Djinn, the local background
 service on each device, and a direct iroh connection. The guest edited the

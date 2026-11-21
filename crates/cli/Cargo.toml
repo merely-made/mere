@@ -1,0 +1,29 @@
+[package]
+name = "mere-cli"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Query a linked-data graph locally or on an invited peer."
+publish = false
+
+[[bin]]
+name = "mere"
+path = "src/main.rs"
+
+[dependencies]
+mere = { path = "../graph/engine", features = ["query"] }
+transport = { workspace = true, features = ["reticulum", "noise", "i2p"] }
+identity.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+getrandom = "0.4"
+subtle = "2"
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "io-util", "time", "signal"] }
+
+[lints]
+workspace = true
