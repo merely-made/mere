@@ -1,6 +1,6 @@
 # Engine split plan: Mere as the semantic-web engine, Graphshell as the host, Inker and Conatus as suppliers
 
-**Status:** 2026-11-20. D1 to D193 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
+**Status:** 2026-11-20. D1 to D194 are ruled. P1 (Inker) and P2 (Seiche) are done: `merely-made/inker`
 holds eleven crates and `merely-made/seiche` the seven spatial crates, each taken as a `branch = "main"`
 git dependency. **P3 (Graphshell: the host) is done, 2026-11-12:** the toolkit and the `mere-resident`
 assembly are Graphshell's `host/`, the reference app is Turnstone's `ports/graphshell`, and Mere's workspace
@@ -2973,6 +2973,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 - **D193. A stale reply names the engine revision now current (Mark, 2026-11-20):** `IntentResult::Stale` carried an epoch and counter only, so when only the engine moved the reply repeated the counter; a new field touches 17 sites in Graphshell and 2 in Turnstone. "Optional field on Stale (Recommended)": `Stale` gains an optional current engine revision that old readers ignore, the Graphshell sites are updated and Turnstone's two are fixed forward; against naming it only in a re-fetched snapshot until E3 and a host accessor for in-process callers. Outcome: refines D189.
 
   Links: area The stack · draws on engine-split D188, engine-split D189 · plans engine-split P8 · summary IntentResult::Stale carries an optional current engine revision beside its epoch and counter.
+
+- **D194. The sorted N-Quads serializer lives in `mere::formats::canon`; the digest is `mere-resource-sorted-nquads-blake3` version 1 (Mark, 2026-11-20):** the digest lane (`Code/testing/engine-split/p8_digest/`, Mere branch `p8-resource-digest` `f2b9867ed`) built `sorted_nquads` beside the RDFC wrapper, byte-identical to `mere-rdfc` on blank-free sets without triple terms, and `PinnedView::resource_digest` as BLAKE3 derive-key (D158's construction) under a private domain, pinned by two independent known-answer vectors. "mere::formats::canon (Recommended)": `mere` owns the formats stage and `mere-rdfc` stays RDFC-1.0 alone; against a second entry point in `mere-rdfc`. "Keep as built (Recommended)": algorithm `mere-resource-sorted-nquads-blake3`, version 1, domain `mere resource digest v1`; against an algorithm named for the construction. Outcome: applies D190 and D192.
+
+  Links: area The stack · draws on engine-split D158, engine-split D190, engine-split D192 · plans engine-split P8 · summary Sorted N-Quads live in mere::formats::canon and the Resource digest is mere-resource-sorted-nquads-blake3 v1 under the domain mere resource digest v1.
 
 ## Open questions
 

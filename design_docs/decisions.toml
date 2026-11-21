@@ -2111,6 +2111,14 @@ summary = "IntentResult::Stale carries an optional current engine revision besid
 draws_on = ["engine-split D188", "engine-split D189"]
 plans = ["engine-split"]
 
+[decisions."engine-split D194"]
+title = "The sorted N-Quads serializer lives in `mere::formats::canon`; the digest is `mere-resource-sorted-nquads-blake3` version 1 (Mark, 2026-11-20)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Sorted N-Quads live in mere::formats::canon and the Resource digest is mere-resource-sorted-nquads-blake3 v1 under the domain mere resource digest v1."
+draws_on = ["engine-split D158", "engine-split D190", "engine-split D192"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
