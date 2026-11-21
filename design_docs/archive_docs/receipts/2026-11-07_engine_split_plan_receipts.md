@@ -1555,3 +1555,45 @@ Failing test names, before to after:
 - Others unchanged: `ntriples-version-1`; parser-only SPARQL 1.2 syntax `nested-aggregate-functions`, `tripleterm-subject-03`, `-06`.
 
 Ledger edits: the two RDF/XML rows, the SPARQL 1.2 query evaluation row, the JSON-LD toRdf row and the declared-profile table, each dated 2026-11-14 with the Mere and fork commits; the rest of the ledger is unchanged. Not run in this pass: the `engine_controls` printout beside the old RDF/XML controls (the fails it explained no longer occur).
+
+## 2026-11-21 SHACL 1.0 Core through Mere on Linux
+
+Mere `f8a413d16` ran on T-PC, Fedora 45 x86_64, with Rust `1.99.1`,
+Rudof SHACL `0.3.39` at `b9ff155079dd`, and Oxigraph `ba9a2ae36e55`. The
+only source addition in the measured checkout was the suite runner.
+Cargo generated the lockfile in the source snapshot before the run.
+
+The runner traversed the checked-out W3C Core manifest at
+`2f64c74e220d7118a6fd8c12b8059225411cd75d`. The entire Core directory
+matches the ledger's earlier suite revision `9c102cbb5309`.
+The guarded Cargo arguments were:
+
+```sh
+cargo +1.99.1 run --locked --offline -j 2 -p mere-shacl --example shacl_core_suite -- /path/to/data-shapes-test-suite/tests/core
+```
+
+The runner parses the fixture graphs through Mere, calls
+`mere_shacl::validate` with `View::Live` and `GraphSelector::Default`,
+and compares the typed conformance flag and the RDF report graph separately.
+For report isomorphism it projects the [W3C comparison fields](https://w3c.github.io/data-shapes/data-shapes-test-suite/#test-cases-format-and-process),
+normalizes report and result identifiers to blank nodes, copies complex path
+structures for each result, and compares canonical RDF. The suite rows cover
+Core. SHACL-SPARQL and SHACL 1.2 have no result in this run.
+
+| Core manifest | Conformance flag pass / fail / skip | Report graph pass / fail / skip |
+|---|---:|---:|
+| Complex | 2 / 0 / 0 | 2 / 0 / 0 |
+| Miscellaneous | 5 / 0 / 0 | 5 / 0 / 0 |
+| Node | 32 / 0 / 0 | 32 / 0 / 0 |
+| Path | 13 / 0 / 0 | 13 / 0 / 0 |
+| Property | 38 / 0 / 0 | 38 / 0 / 0 |
+| Targets | 7 / 0 / 0 | 7 / 0 / 0 |
+| Validation reports | 1 / 0 / 0 | 1 / 0 / 0 |
+| **Total** | **98 / 0 / 0** | **98 / 0 / 0** |
+
+In a scratch copy, changing only the expected `sh:resultPath` in
+`property/datatype-001` kept the conformance pass and failed the graph
+comparison. Flipping the expected `sh:conforms` in `misc/deactivated-001`
+failed both comparisons. The other 96 rows stayed green. The fixture-by-fixture
+results, negative controls, and exact lockfile are in
+`Code/output/shacl-core-20261121/{core.tsv,control.tsv,mere.lock}`.
