@@ -58,7 +58,7 @@ sporran = { version = ">=0.0.1", git = "https://github.com/merely-made/dramatis.
 blake3 = "1"
 
 # The reservoir service, split from pandect (engine split P4, D3, D9).
-catchment = { version = "0.1.0", path = "crates/system/catchment" }
+catchment = { version = ">=0.2.0", path = "crates/system/catchment" }
 
 eidetic = { version = ">=0.0.3", default-features = false, features = ["product"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 

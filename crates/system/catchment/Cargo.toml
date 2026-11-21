@@ -1,6 +1,6 @@
 [package]
 name = "catchment"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["@mark-ik"]
 license.workspace = true
 edition = "2024"
