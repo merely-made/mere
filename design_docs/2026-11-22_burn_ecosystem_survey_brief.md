@@ -206,7 +206,7 @@ Open, nothing scheduled:
    contract shape, not a model family.
    - **`image`: agreed by Mark.** He would "almost consider that part of
      knot", since Knot documents embed images. Ruled 2026-11-22 ("Agreed on
-     not", answering the proposal not to place it in Knot): execution stays in `esp`, as Knot's embedding features already do, with
+     knot"): execution stays in `esp`, as Knot's embedding features already do, with
      Knot the first host and owner of what an image means in a document;
      Isocosm, Inker and Graphshell are likely second hosts.
    - **Video folds into `image`.** Per-frame work is image work. What video
@@ -218,8 +218,7 @@ Open, nothing scheduled:
      own namespace sharing the encoder in `embed`; the name is open. In a
      game a label is a proposal one authority commits to the record; peers
      read it and do not recompute it.
-   - **Policy: no namespace, and not Gemot's** (same 2026-11-22 reply, read
-     as covering both proposals). Mark had asked whether it is Gemot's. Gemot's
+   - **Policy: proposed dropped, not ruled.** Mark asked whether it is Gemot's. Gemot's
      policy is governance and must stay legible. The one learned policy in the
      stack, Cosmograph's lineage net, is integer so every peer replays it, and
      belongs in the game. Gemot's role with models is the FLORA split: it
