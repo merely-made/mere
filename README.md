@@ -59,11 +59,13 @@ no row for that credit.
 ## Across devices
 
 A reader can ask the same question while the graph stays on its owner’s
-device. In the Mere CLI, the owner runs `mere serve` with the graph and the
-query they want to share. The reader gets a private invitation and runs the following command.
+device. With the `mere` command-line tool, the reader sends the owner a
+contact, and the owner runs `mere serve` with the graph, the query they want
+to share and that contact. The reader gets a private invitation and runs the
+following command.
 
 ```sh
-mere query --peer paper.peer --query "$sample/paper-authors.rq"
+mere query --invite paper.invite --query "$sample/paper-authors.rq"
 ```
 
 ```json
@@ -72,10 +74,9 @@ mere query --peer paper.peer --query "$sample/paper-authors.rq"
 
 The owner evaluates the query. Only the rows come back, and the credits
 still refer to the catalog and publisher whichever device hosts the graph.
-For a browser reader, the owner selects `--via webrtc` and shares a private
-HTML invitation. Open it in a browser tab and choose **Run query** to see
-the same rows. Terminal readers can use iroh, Reticulum, or I2P.
-[Try the browser or terminal walkthrough](crates/cli/README.md)
+Terminal readers use iroh, I2P or Reticulum; a browser reader opens a link in
+Turnstone’s query page. The tool is built on Graphshell’s host toolkit and
+lives there: [mere-cli](https://github.com/merely-made/graphshell/tree/main/host/ports/mere-cli).
 
 For live graph sharing, Turnstone has a **Co-op** view where the
 owner can invite a contact and grant access to a particular graph. In a

@@ -4,7 +4,6 @@ resolver = "2"
 # The engine (engine split D59, P3 slice 4): the toolkit went to Graphshell's host/,
 # the reference app to Turnstone, pictograph to emblem (D102 to D104).
 members = [
-    "crates/cli",
     "crates/graph/graph-kernel",
     "crates/graph/engine",
     "crates/graph/rdfc",
