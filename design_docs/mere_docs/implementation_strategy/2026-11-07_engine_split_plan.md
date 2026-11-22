@@ -3942,3 +3942,9 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   scene with its engine revision, refuses an intent the engine moved past, and checks that a Graphshell arrangement edit leaves
   every Resource quad (probe 2 and probe 3's content half, each with its controls). Its digest bench found RDFC-1.0 refusing the
   stratum's triple terms and a whole recompute at 2.6 to 3.4 s at 100k; D190 to D193 rule the digest and the stale reply.
+- 2026-11-20: E1 and E2 are on Graphshell main (`e145877a`) and the Resource digest on Mere main (`6b4271629`). D193's
+  constructor route: `IntentResult::stale` landed in chirograph (Graphshell `8cc8c6bf`) and distillery, dramatis, knot-editor,
+  cleromancy and Turnstone build stale replies with it; the field itself (step 3) is next.
+- 2026-11-21: the `mere` query CLI another session added as `crates/cli` brought murm's carriers, and 52 duplicates, into
+  the engine graph. Mark ruled it rebuilt on the stack in Graphshell's host workspace (Graphshell `2026-11-21_mere_cli_plan.md`,
+  D1 to D22); it landed as `host/ports/mere-cli` and left Mere (`0ce1c267b`), so the engine again links no carrier.

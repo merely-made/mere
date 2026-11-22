@@ -187,3 +187,10 @@ Done when: D144's stopgap wording can be removed from each `deny.toml` header.
 - 2026-11-20: a fresh resolve of Mere main failed `cargo deny check bans` on `windows-sys` 0.52.0 (ring 0.17.14 via iroh,
   aarch64-windows only) beside 0.61.2 (dirs-sys 0.5 under the Rudof fork that `mere-shacl` brought on 2026-11-19). Mark,
   2026-11-20: "Skip 0.52 like Graphshell (Recommended)": a stopgap skip with Graphshell's reason, gone when ring moves to 0.61.
+- 2026-11-20: jiff 1.0 arrived through servo's env_logger 0.11.12 beside jiff 0.2 in Turnstone and cleromancy-sky; both
+  moved to 1.0 (Turnstone `70a1b4cc`, cleromancy `6298721`). jiff-tzdb 0.1.10 stays under timezone_provider 0.2.6 (its
+  latest, via boa_engine and temporal_rs) beside jiff's 1.0.0. Mark, 2026-11-20: "Dated skip now, ledger it (Recommended)":
+  Turnstone skips it until timezone_provider moves to jiff-tzdb 1.0; the alternative was a patch-fork of timezone_provider.
+- 2026-11-21: the `windows-sys` 0.52.0 skip and the `shlex` 1.3.0 skip matched nothing once the query CLI left Mere for
+  Graphshell (`0ce1c267b`, Graphshell's `2026-11-21_mere_cli_plan.md`), and both are gone; Mere's bans check passes with
+  no duplicates.
