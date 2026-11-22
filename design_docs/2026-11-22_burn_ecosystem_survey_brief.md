@@ -155,6 +155,18 @@ needs the 0.22 port plus the parity tests it lacks. Watershed first.
 | [burn-onnx](https://github.com/tracel-ai/burn-onnx) | ONNX to native Burn code | Apache-2.0 | n/a | Any model with no Rust port; bunsen uses it for parity references |
 | [stable-diffusion-burn-wgpu](https://github.com/neka-nat/stable-diffusion-burn-wgpu) | Stable Diffusion; untouched since 2023 | MIT | 0.11 | Image generation, a long port |
 
+**Video (unread; metadata only).** These are image models run over frames:
+
+| Project | What | License | Burn |
+|---|---|---|---|
+| [av-denoise](https://github.com/ChillFish8/av-denoise) | Non-local-means video denoising kernels, as a crate | Apache-2.0 | CubeCL 0.11 |
+| [senmei](https://github.com/senmei-app/senmei) | Upscaling, denoising and frame interpolation; media through FFmpeg | Apache-2.0 | unchecked |
+| [vid2transparent](https://github.com/zwh20081/vid2transparent) | Video matting with MatAnyone2 and SAM 2; its description says non-commercial | MIT (code) | unchecked |
+| [mlvc-rs](https://github.com/Lyamc/mlvc-rs) | Decoder for a learned video codec | MIT | unchecked |
+| `gst-plugin-burn` (gst-plugins-rs) | A GStreamer element that runs Burn | MPL-2.0 AND (MIT OR Apache-2.0) | 0.21 |
+
+The stack's only video decode today is Genet's media component, on GStreamer.
+
 Neighbor, not a Burn project: [Maolan](https://github.com/maolan/maolan) is a
 Rust DAW (BSD-2-Clause) with its own engine, out-of-process plugin host, CLAP
 runtime and a clean-room ASIO host. Hocket is deliberately not a DAW, but its
@@ -190,7 +202,24 @@ Open, nothing scheduled:
    releases closely, which cuts both ways under the track-main rule.
 3. Is the `cubek-reduce` patch in Distillery the same fault Voxtral patched in
    `cubecl-wgpu`?
-4. Further `esp` namespaces. Candidates by contract shape: `image` (image in;
-   masks, depth, text or an image out) and text labeling (text in; spans and
-   tags out, sharing the BERT encoder in `embed`). No product index records a
-   need for either yet.
+4. Further `esp` namespaces, discussed 2026-11-22. A namespace follows a
+   contract shape, not a model family.
+   - **`image`: agreed by Mark.** He would "almost consider that part of
+     knot", since Knot documents embed images. Proposed and not yet ruled:
+     execution stays in `esp`, as Knot's embedding features already do, with
+     Knot the first host and owner of what an image means in a document;
+     Isocosm, Inker and Graphshell are likely second hosts.
+   - **Video folds into `image`.** Per-frame work is image work. What video
+     adds is state carried across frames, which is a session shape inside
+     `image`. Decode, encode and pacing are not model execution. Learned
+     codecs are out of scope until something wants one.
+   - **Text labeling** (text in; spans and tags out). Mark expects it to reach
+     several products, the Cosmograph games among them. That argues for its
+     own namespace sharing the encoder in `embed`; the name is open. In a
+     game a label is a proposal one authority commits to the record; peers
+     read it and do not recompute it.
+   - **Policy: proposed dropped.** Mark asked whether it is Gemot's. Gemot's
+     policy is governance and must stay legible. The one learned policy in the
+     stack, Cosmograph's lineage net, is integer so every peer replays it, and
+     belongs in the game. Gemot's role with models is the FLORA split: it
+     governs membership, weights and adoption; Distillery transforms.
