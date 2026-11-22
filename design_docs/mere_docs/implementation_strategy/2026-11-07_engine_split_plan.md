@@ -3948,3 +3948,7 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 - 2026-11-21: the `mere` query CLI another session added as `crates/cli` brought murm's carriers, and 52 duplicates, into
   the engine graph. Mark ruled it rebuilt on the stack in Graphshell's host workspace (Graphshell `2026-11-21_mere_cli_plan.md`,
   D1 to D22); it landed as `host/ports/mere-cli` and left Mere (`0ce1c267b`), so the engine again links no carrier.
+- 2026-11-22: D193's step 3 landed. `IntentResult::Stale` carries an optional current engine revision, absent on the wire
+  when unset, and Graphshell's `MereHost` names the live one in both stale branches (Graphshell `59f594ae`; its 25 literal
+  stale replies now use the constructors). Turnstone's MCP tool reports it in its stale reply (`3e87ce7c`). The pin test
+  checks both branches; a chirograph test reads a pre-D193 reply.
