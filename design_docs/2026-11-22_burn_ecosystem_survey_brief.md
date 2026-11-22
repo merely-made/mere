@@ -1,7 +1,7 @@
 # Burn ecosystem survey: what outside Burn, CubeCL and wgpu work fits the stack
 
 **Date:** 2026-11-22
-**Status:** research brief with two rulings (§8, 2026-11-22). Nothing is adopted or scheduled. Four
+**Status:** research brief with rulings (§8, 2026-11-22): `esp` namespaces `audio`, `image` and `label`, no `policy`; weights fetched, never bundled. Nothing is adopted or scheduled. Four
 projects were read at source (§3 to §6); everything in §7 is known from
 crates.io and GitHub metadata only and is marked unread.
 **Home:** Mere holds this because it spans Distillery (`esp`), Woodshed, Hocket
@@ -213,9 +213,10 @@ Open, nothing scheduled:
      adds is state carried across frames, which is a session shape inside
      `image`. Decode, encode and pacing are not model execution. Learned
      codecs are out of scope until something wants one.
-   - **Text labeling** (text in; spans and tags out). Mark expects it to reach
-     several products, the Cosmograph games among them. That argues for its
-     own namespace sharing the encoder in `embed`; the name is open. In a
+   - **`label`: ruled 2026-11-22** ("Ok, label"). Text in; spans and tags out. Mark expects it to reach
+     several products, the Cosmograph games among them. It is its own
+     namespace sharing the encoder in `embed`. `text` was rejected as too
+     wide beside `infer` and `embed`. In a
      game a label is a proposal one authority commits to the record; peers
      read it and do not recompute it.
    - **Policy: no namespace.** Ruled 2026-11-22 ("No policy"). Mark had asked
