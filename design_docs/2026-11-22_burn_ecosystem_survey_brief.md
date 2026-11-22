@@ -218,7 +218,8 @@ Open, nothing scheduled:
      own namespace sharing the encoder in `embed`; the name is open. In a
      game a label is a proposal one authority commits to the record; peers
      read it and do not recompute it.
-   - **Policy: proposed dropped, not ruled.** Mark asked whether it is Gemot's. Gemot's
+   - **Policy: no namespace.** Ruled 2026-11-22 ("No policy"). Mark had asked
+     whether it is Gemot's. Gemot's
      policy is governance and must stay legible. The one learned policy in the
      stack, Cosmograph's lineage net, is integer so every peer replays it, and
      belongs in the game. Gemot's role with models is the FLORA split: it
