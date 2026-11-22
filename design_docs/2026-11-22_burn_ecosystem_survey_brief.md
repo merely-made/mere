@@ -194,16 +194,36 @@ Ruled by Mark, 2026-11-22:
   hash-pinned row the person fetches. A row should still record the license or
   its absence, and the origin.
 
-Open, nothing scheduled:
+- **Watershed lifts on its plain-Burn path first** (ruled 2026-11-22). Its
+  CubeCL kernels and hand-tuned matmul table stay behind until the plain path
+  is measured on the family's machines. Keep the `MAX_SCORES` attention
+  slicing, which is what bounds GPU memory.
+- **bunsen is harvested by kit, not taken as a dependency** (ruled 2026-11-22).
+  Parakeet first, for word times. The catalog row shape is borrowed as an
+  idea, not as code.
+- **Lift order, proposed:** Watershed's RoFormer into `esp::audio`, then
+  Parakeet, then demucs-rs as the CPU fallback.
 
-1. Does Watershed's kernel set come along, or only the plain-Burn path until
-   measured on the family's machines?
-2. bunsen by kit, or as a dependency behind an `esp` feature? It tracks Burn
-   releases closely, which cuts both ways under the track-main rule.
-3. Is the `cubek-reduce` patch in Distillery the same fault Voxtral patched in
-   `cubecl-wgpu`?
-4. Further `esp` namespaces, discussed 2026-11-22. A namespace follows a
-   contract shape, not a model family.
+Scoped 2026-11-22, the `cubek-reduce` question: **two different faults.**
+
+- Distillery's patch (against `cubek-reduce` 0.3.1) is one helper and two
+  call sites in `components/instructions/extrema.rs`: WGSL constant
+  evaluation rejects non-finite `f32`, so the infinity identities for min and
+  max are built from bits at run time. The rest of the diff is formatting.
+- Voxtral's patch (against `cubecl-wgpu` 0.9.0, `runtime.rs`) caps the
+  stand-in subgroup size so a reduce workgroup of `plane_size * 8` stays
+  within WebGPU's 256 invocations.
+- At the family's versions the second fault looks handled upstream by other
+  means: `cubecl-wgpu` 0.11.3 still substitutes 128 as the maximum subgroup
+  size, but passes `max_compute_invocations_per_workgroup` through as
+  `max_units_per_cube`, and `cubek-reduce` 0.3.1 divides by it when choosing
+  planes per cube (`launch/utils.rs`). Read from source, not run in a browser.
+- Remaining work: one reduce on the WebGPU backend in a browser, when
+  something targets wasm. Nothing to port from Voxtral's patch.
+
+Namespaces:
+
+A namespace follows a contract shape, not a model family.
    - **`image`: agreed by Mark.** He would "almost consider that part of
      knot", since Knot documents embed images. Ruled 2026-11-22 ("Agreed on
      knot"): execution stays in `esp`, as Knot's embedding features already do, with
