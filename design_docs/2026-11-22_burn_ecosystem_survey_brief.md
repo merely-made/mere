@@ -1,7 +1,7 @@
 # Burn ecosystem survey: what outside Burn, CubeCL and wgpu work fits the stack
 
 **Date:** 2026-11-22
-**Status:** research brief. Nothing here is adopted, scheduled or ruled. Four
+**Status:** research brief with two rulings (§8, 2026-11-22). Nothing is adopted or scheduled. Four
 projects were read at source (§3 to §6); everything in §7 is known from
 crates.io and GitHub metadata only and is marked unread.
 **Home:** Mere holds this because it spans Distillery (`esp`), Woodshed, Hocket
@@ -148,7 +148,7 @@ needs the 0.22 port plus the parity tests it lacks. Watershed first.
 | [fluxion](https://github.com/matteospanio/fluxion) | Lowers a DSP graph to CubeCL and CPU SIMD | MIT | CubeCL 0.10 | Woodshed's DSP graph |
 | [dsp-kitchen](https://github.com/neuro-kitchen/dsp-kitchen) | Multi-channel DSP kernels in CubeCL | Apache-2.0 | CubeCL 0.11 | Filter and resampling kernels |
 | [gpu-fft](https://github.com/eugenehp/gpu-fft) | FFT in CubeCL | MIT | CubeCL 0.9 | STFT on the GPU |
-| [gloss](https://github.com/Meshcapade/gloss) `wgpu-burn-interop`, `wgpu-burn-global-device` | Share one wgpu device between a renderer and Burn | MIT | 0.18 | The one-device requirement and D1 |
+| [gloss](https://github.com/Meshcapade/gloss) `wgpu-burn-global-device`, `wgpu-burn-interop` | Read 2026-11-22 at `e0f7ebf`: 37 lines registering a host wgpu device with CubeCL, 82 lines copying a tensor's buffer into a new wgpu buffer | MIT | 0.18 | Nothing: Conatus `ResidentClient` already registers the host device and lends planes without a copy |
 | [manifolds-rs](https://github.com/GregorLueg/manifolds-rs), [node2vec-rs](https://github.com/GregorLueg/node2vec-rs) | UMAP, t-SNE, PaCMAP, ForceAtlas2; node embeddings | MIT | 0.22 | Graphshell layouts and projections |
 | [harper](https://github.com/automattic/harper) `harper-pos-utils` | Part-of-speech tagging for a grammar checker | Apache-2.0 | 0.19 | Knot |
 | [brush](https://github.com/ArthurBrussee/brush) | Gaussian splat training and viewing | Apache-2.0 | n/a | Isocosm, if splats enter |
@@ -165,21 +165,32 @@ host audio work covers the same ground.
 `shigedangao/brioche`, `ninjawarrior1337/maizou`. Whisper-burn (MIT, 2024) is
 superseded by bunsen's Whisper on the same Burn version.
 
-## 8. Open questions
+## 8. Rulings and open questions
 
-Nothing below is scheduled.
+Ruled by Mark, 2026-11-22:
 
-1. `esp` has `infer` and `embed`. Separation, transcription and pitch are a
-   third kind of work (audio in, audio or timed events out). Whether that is a
-   third namespace, and its name, is Mark's call.
-2. Unlicensed weights: is "fetched by the person, pinned by hash, never shipped"
-   acceptable for a family product, or are only licensed checkpoints admitted?
-3. Does Watershed's kernel set come along, or only the plain-Burn path until
+- **`esp` gets an `audio` namespace** beside `infer` and `embed`:
+
+  > we can have an `audio` namespace.
+
+- **Weights are fetched, never bundled.** The family ships no weights or models
+  it did not make:
+
+  > i think it's ok for people to fetch weights and I don't want to bundle weights, models, etc. that i don't make myself
+
+  So a checkpoint with no declared license (BS-RoFormer SW) is admissible as a
+  hash-pinned row the person fetches. A row should still record the license or
+  its absence, and the origin.
+
+Open, nothing scheduled:
+
+1. Does Watershed's kernel set come along, or only the plain-Burn path until
    measured on the family's machines?
-4. bunsen by kit, or as a dependency behind an `esp` feature? It tracks Burn
+2. bunsen by kit, or as a dependency behind an `esp` feature? It tracks Burn
    releases closely, which cuts both ways under the track-main rule.
-5. Is the `cubek-reduce` patch in Distillery the same fault Voxtral patched in
+3. Is the `cubek-reduce` patch in Distillery the same fault Voxtral patched in
    `cubecl-wgpu`?
-6. The 2026-07-11 audio material analysis plan lists only SAM Audio and Demucs
-   for separation, and no tempo, key or chord baseline. It should take
-   BS-RoFormer and Watershed's estimators as candidates.
+4. Further `esp` namespaces. Candidates by contract shape: `image` (image in;
+   masks, depth, text or an image out) and text labeling (text in; spans and
+   tags out, sharing the BERT encoder in `embed`). No product index records a
+   need for either yet.
