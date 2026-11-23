@@ -299,7 +299,35 @@ automation, credentials, grants or publication.
 
 ## Findings
 
-- 2026-10-29: retained-payload custody admits Turnstone and Graphshell with
+- 2026-11-22: Distillery's Athanor now lets a decision driver act at the
+  evidence brief's proposing step, under rulings recorded in Distillery, not
+  here (`distillery:decision-driver D11`, `D15`, `D16`;
+  `distillery/design_docs/implementation_strategy/2026-11-20_decision_driver_plan.md`,
+  P1 and P2). What that changes against this plan:
+  - The first-workflow fixture limits in Constraints (three decisions, two
+    tool calls, zero model tokens, 30,000 ms, zero consecutive retryable
+    failures) still hold for a run begun without a driver, and its
+    interruption test is unchanged. A run begun with a driver carries four
+    decisions, one retryable failure and a token limit of twice the driver's
+    per-turn cap.
+  - The workshop no longer requires a worker's proposal to equal the brief
+    built from the run's passages in their original order. It accepts a brief
+    rebuilt from a duplicate-free subset of at least two of them, in any
+    order, and the confirming step must equal the recorded candidate. The
+    brief text is still built deterministically from the chosen passages.
+  - The stored run record's schema is 2 and older records are refused on
+    load; `WorkshopView` gains `turns`. Turnstone and Graphshell's host take
+    `mere-athanor` from Distillery's `main` and have not been rebuilt or run
+    against this.
+  - "Model-driven rows need a real provider receipt and evidence of value
+    beyond deterministic assembly": a real provider has run the step
+    (Qwen3-0.6B on Burn wgpu, in tests that are ignored without the
+    checkpoint), recorded there as findings, not as a receipt. There is no
+    evidence of value: in the workshop's fixture run the model kept all
+    three passages in their original order.
+  - W1, W2, W3 and the two-host matrix are untouched, and W3's statement
+    that model decisions have a separate gate stands. Whether this plan
+    adopts the driver, and under what acceptance, is open here.- 2026-10-29: retained-payload custody admits Turnstone and Graphshell with
   distinct authenticated application scopes. Turnstone's existing AAD remains
   exact for retained ciphertext compatibility; Graphshell has a separate scope.
   This separates admitted application labels, not authenticated executable

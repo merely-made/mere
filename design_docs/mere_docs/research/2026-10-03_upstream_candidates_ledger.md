@@ -321,6 +321,30 @@ So, for each item:
 - **Last checked:** audit basis `7c718105`; `support/patches` unchanged
   through main `c25c2d441`.
 
+### 15. CubeCL: `cubecl-runtime` 0.12.0-pre.2 does not compile for wasm
+
+- **What happens:** `crates/cubecl-runtime/src/tune/mod.rs` declares
+  `mod sampler` under `#[cfg(not(target_family = "wasm"))]`, while
+  `tune/tuner.rs` imports `crate::tune::sampler::measured` unconditionally
+  and calls it in the profile pass the wasm build keeps. The crate fails with
+  E0432 on `wasm32-unknown-unknown`. Upstream `main` read the same on
+  2026-11-20 (`ed9f1fbb8a`, not compiled).
+- **Why it matters:** Burn 0.23.0-pre.2 with the wgpu backend cannot be built
+  for a browser at all. In Distillery it went unseen for eight days after
+  the move to that cohort (`d563e42`, 2026-11-12), because the browser probe
+  was still pinned to 0.22.1.
+- **What we carry:** the fork `mark-ik/cubecl`, branch `mark-ik/0.12`: tag
+  `v0.12.0-pre.2` (`ca011104`) plus one commit (`fbfd084a`) that defines
+  `measured` beside its use on wasm, with the same body. A workspace that
+  patches `cubecl-runtime` from the fork must take every CubeCL crate in its
+  graph from it (15 in Distillery's browser probe), or six siblings resolve
+  from two sources and their types disagree. With it the probe passes headed
+  (Chrome 157, WebGPU on an RTX 4060 Laptop GPU, 2026-11-21). Detail:
+  `distillery/design_docs/implementation_strategy/2026-10-28_distillery_models_plan.md`,
+  Findings of 2026-11-20 and 2026-11-21.
+- **Last checked:** CubeCL 0.12.0-pre.2 (published 2026-11-09), the newest
+  release; no later prerelease existed on 2026-11-20.
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
@@ -343,4 +367,8 @@ audit plan's ruling R4. Not raised.
 
 **2026-10-20.** Item 14 (Burn and CubeCL carried patches, eleven
 misleading-success findings) added from the ownership repair plan's lane L6.
+Not raised.
+
+**2026-11-22.** Item 15 (CubeCL 0.12.0-pre.2 does not compile for wasm)
+added from Distillery's models plan. Carried by the `mark-ik/cubecl` fork.
 Not raised.

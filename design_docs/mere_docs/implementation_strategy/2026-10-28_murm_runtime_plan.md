@@ -112,7 +112,7 @@ Mesh and the Moot object lane carry typed retention checkpoints, governed policy
 - From: `archive_docs/2026-10-28/2026-07-12_deletion_retention_and_native_drop_plan.md:95-101, 487-541, 683-686, 822-823, 905-907`; `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:1174-1176`
 
 ### M12. Drop carriage, peer wiring and group keys (D4-D5)
-The drop codec, protected path, staged import, file carriage, receipt frames and domain selectors are landed. Left: live peer command wiring for receipt frames; Iroh blob and Retinue R4 resource carriage of the same `DropId`; feeding Murm's protector from authorized p2panda group state; Personae and p2panda installing and persisting authorized epoch keys; migrating the remaining domains.
+The drop codec, protected path, staged import, file carriage, receipt frames and domain selectors are landed. The native conversation fixture exercises file, scoped Iroh blob fetch and Retinue Resources over loopback TCP. Live service wiring still needs receipt commands, loss and resume coverage, the release snapshot, and domain rollout. Murm's protector still needs authorized p2panda group state and durable epoch-key installation through Personae and p2panda.
 - Done when: file, Iroh and Retinue resource carriage preserve the same semantic `DropId` and identical import reports even when segmentation or protection changes; transport loss and resume change delivery only; private export is impossible without a configured protector; key rotation does not change `SpaceId` or checkpoint identity; each domain has a two-peer test for withdrawal, checkpoint, late-peer return, payload erasure and eventual prefix prune; stale documents that prescribe permanent federation tombstones are corrected.
 - Needs: Retinue's R4 resource layer and real private protection (Retinue's plans); M11.
 - Rulings: retention law; Willow Drop interoperability stays a separate adapter.
@@ -198,3 +198,8 @@ the host's existing endpoint.
   implemented and qualified with native secure admission, normal Gemot replica
   intake, revocation/expiry and lifetime controls. Optional runtime and wire
   qualification remain owned by Murm; broader product integration stays open.
+- 2026-11-10: Murm `ff047d1e7b2` adds passing locked small and segmented
+  protected conversation drop fixtures. File, scoped Iroh and Retinue over
+  loopback TCP agree on `DropId` and import report. Replay and tamper controls
+  pass. The synthetic 24 MiB run stopped during corpus setup. The release
+  snapshot and RF gates remain open.

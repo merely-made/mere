@@ -369,6 +369,46 @@ application cannot install authority, the property the comment at `resident_mere
 states ("applications cannot select a weaker callback"): an embedding application is its
 own store's owner, and the daemon's builder chooses what the daemon carries.
 
+### Mere identity and carriers (2026-11-10)
+
+**Just meres.** Private and shared meres use the same registration and log
+contract. Identity, membership and carrier choices are policy for a mere.
+The domain registers its grammar, fold and admission policy. Each mere
+chooses an identity tier and which carriers it permits for participation.
+Its member is the admitted principal. Carrier facts and secure-channel facts
+are recorded separately.
+
+The tiers follow [release log D3](../implementation_strategy/2026-11-03_release_log_plan.md#decisions).
+
+| Stake | Member identity | On retirement |
+| --- | --- | --- |
+| Anonymous (default) | A fresh `UnassociatedKeypair` for this mere, independent of any root. Keep it sealed if the identity should survive a restart. A throwaway key lives in memory. | Drop the key and retire any sealed copy. |
+| Managed (family, business, organization) | An associated, disposable persona derived from a managing root. | The managing root revokes the persona's authority for that mere. |
+| Reputational | The root is the admitted identity. A separate carrier key stays below admission. | The root's lifetime is independent of the mere. |
+
+An unassociated key holder can explicitly link identities by signing an
+insigne `AssociationClaim`. The claim establishes the subject's consent within
+its scope and validity period. A policy that requires the other party's
+consent checks its own claim or delegation. Personae generates the key from
+OS randomness. For a durable key, the custodian seals it under the open
+profile's storage key (`dramatis/crates/personae/src/unassociated.rs`,
+`dramatis/crates/djinn-custodian/src/host/unassociated.rs`).
+The custody API exposes create, sign and release. Retiring sealed copies
+is still part of the per-mere lifecycle work.
+
+The resident design is one endpoint per distinct carrier key on each selected
+carrier, shared by services using that key. [Personal graph sync](../../../ports/mere-resident/src/sync/personal_sync_host.rs)
+already binds a graph-scoped derived key. General per-mere selection and
+endpoint lifetimes are design work. See Murm's "Endpoints for mere participation"
+in `murm/design_docs/2026-10-29_secure_sessions_and_live_interaction_plan.md`.
+
+Separate keys remove a key-based link between anonymous meres. Reusing a
+retained key keeps the same mere identity recognizable across visits. I2P is
+the carrier in this set intended to hide the host IP from the remote peer.
+That requires an I2P path for the mere's peer traffic and keeping direct
+addresses out of discovery and invitations. The unassociated SAM destination
+has unit coverage. Its live-router run is still unconfirmed.
+
 ### 3. What the resident needs from a domain today, by name
 
 **Knot** (the only lane). Quoted from `graphshell/host/ports/mere-resident` at `1a26ec4e6`.
