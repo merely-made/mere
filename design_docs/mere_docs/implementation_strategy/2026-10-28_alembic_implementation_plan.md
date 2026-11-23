@@ -12,7 +12,8 @@ bounded local workshop: private-source storage and custody gates (W0P), prioriti
 product and recovery matrix), slice C's promote, demote, editable-policy and
 by-sessions tails, slice D's scheduling, facet pass and surfacing, the image GC's host caller, Phase
 4's closure and Phase 6's re-measure. On 2026-11-23, D10 adopted Distillery's P3 driver for an
-opt-in trial on public evidence briefs. Deterministic assembly remains the default.
+opt-in trial on public evidence briefs. Resident Qwen3 4B Q8 with one CubeCL stream met that
+fixture's criteria on O-PC. Deterministic assembly remains the default.
 
 **For:** the Alembic as a memory and workshop subsystem: a three-level memory model, graph codicils
 over eidetic, the Athanor daemon and the granted-agent workshop (create, grant, run, observe,
@@ -326,6 +327,19 @@ Servitor and Armillary and flesh out a first workflow in two hosts. Their done-c
 automation, credentials, grants or publication.
 
 ## Findings
+
+- 2026-11-23: P3 met D10's value and run-budget criteria for resident Qwen3 4B
+  Q8 with one CubeCL stream on O-PC. In two independent processes, every
+  public proposal reached review with exactly the required passages in an
+  allowed order. The model improved five of six distinct briefs relative
+  to deterministic assembly, which kept all the passages in input order.
+  The corpus had two presentations per brief. 0.6B omitted required evidence.
+  Streamed 4B F32 produced no reviewable brief, and resident 4B Q8 with
+  per-thread streams missed deadlines. Results, load cost, memory and the
+  predeclared rubric are in
+  `distillery/design_docs/archive_docs/receipts/2026-11-20_decision_driver_plan_receipts.md`.
+  This qualifies the configured opt-in public trial. The first-workflow
+  default and W3 recovery matrix retain their existing acceptance requirements.
 
 - 2026-11-23: both native consumers exercised the schema-2 workshop with model-free
   public inputs on an Apple M4. Graphshell generated, accepted and reconciled in
