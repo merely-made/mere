@@ -19,3 +19,24 @@ Turnstone refused a sealed schema-1 fixture under synthetic protection with
 unchanged storage bytes. These process and host-adapter results cover the
 D18 compatibility checks. W3's full matrix, headed controls and production
 custody have separate qualification.
+
+### Integration with template binding
+
+Both host checks and the Turnstone product build passed again with the
+published template-binding implementation, Distillery
+`c8f2240ab43ec2042ac02c9402d6e4bd8e7544a5`, at clean Turnstone
+`da3706de025aa47e74881b07b9445f89e0721e02`. The generated lockfile SHA-256
+was `c600f20b7597ce3a61ae24088b77b9a4705d98dd07452beafb85641bc4ec9322`.
+All package names and versions and the other Git supplier revisions matched
+the first run. Cargo also changed the existing itertools edge of prost-derive
+and the heck edge of snafu-derive.
+
+| Final M4 artifact | SHA-256 |
+|---|---|
+| Graphshell native probe | `1083b26e921a794a89a7ea96b2fa806c320d349fb63ccfa99d13dce02bb68eff` |
+| Turnstone product | `5b9d1b9ab5e02ecc186a5e5dcc5a770d159d18efc33eff4f18abc84f5b0dbff1` |
+| Turnstone native test executable | `5f0697a60f57d7192bb13e6e2176bd9a5fa1db8234d8a90d9c2873785fe20976` |
+
+`host-qualification.json` in the local receipt directory binds the two
+resolutions, the consumer commits, the host checks and the frozen binaries.
+Its SHA-256 is `c13175910578b762e1469cd685c5321ad3effa315cd0b3c45ff099b5c49c5090`.

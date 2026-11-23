@@ -332,7 +332,7 @@ automation, credentials, grants or publication.
   separate native processes. Turnstone recovered the original proposal and receipt
   after a lost acknowledgement through its leased graph writer in a fresh test
   process. Both refused a schema-1 fixture while preserving its bytes.
-  The Turnstone product binary also built with workshop support. See the
+  Both checks and the Turnstone product build passed again with D20 template binding. See the
   [consumer receipt](../../archive_docs/receipts/2026-10-28_alembic_implementation_plan_receipts.md).
   W3 still requires its full per-host matrix and headed controls.
 
