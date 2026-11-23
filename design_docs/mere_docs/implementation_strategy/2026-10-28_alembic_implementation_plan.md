@@ -327,6 +327,15 @@ automation, credentials, grants or publication.
 
 ## Findings
 
+- 2026-11-23: both native consumers exercised the schema-2 workshop with model-free
+  public inputs on an Apple M4. Graphshell generated, accepted and reconciled in
+  separate native processes. Turnstone recovered the original proposal and receipt
+  after a lost acknowledgement through its leased graph writer in a fresh test
+  process. Both refused a schema-1 fixture while preserving its bytes.
+  The Turnstone product binary also built with workshop support. See the
+  [consumer receipt](../../archive_docs/receipts/2026-10-28_alembic_implementation_plan_receipts.md).
+  W3 still requires its full per-host matrix and headed controls.
+
 - 2026-11-22: Distillery's Athanor now lets a decision driver act at the
   evidence brief's proposing step, under rulings recorded in Distillery, not
   here (`distillery:decision-driver D11`, `D15`, `D16`;
