@@ -11,7 +11,8 @@ bounded local workshop: private-source storage and custody gates (W0P), prioriti
 2026-10-28, and W1-W2 owner adapters with shared native controls. Open: W3 (the complete per-host
 product and recovery matrix), slice C's promote, demote, editable-policy and
 by-sessions tails, slice D's scheduling, facet pass and surfacing, the image GC's host caller, Phase
-4's closure and Phase 6's re-measure.
+4's closure and Phase 6's re-measure. On 2026-11-23, D10 adopted Distillery's P3 driver for an
+opt-in trial on public evidence briefs. Deterministic assembly remains the default.
 
 **For:** the Alembic as a memory and workshop subsystem: a three-level memory model, graph codicils
 over eidetic, the Athanor daemon and the granted-agent workshop (create, grant, run, observe,
@@ -196,6 +197,21 @@ separate gates.
 - Rulings: alembic-implementation D8
 - From: `archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md:386-460,483-519,569-571,584-608`
 
+### P3. Opt-in public evidence-brief trial
+
+Run deterministic assembly, Qwen3 0.6B and Qwen3 4B on the same public selections and
+shuffled presentations. Declare required sources and allowed orderings before the runs.
+Review the resulting briefs blind for omissions, irrelevant inclusions and ordering.
+Retain a real provider receipt identifying the model, template, render settings and
+placement, with latency, peak memory, observed token use and retries. Measure a first
+4B load and turn on the target GPU before running its full comparison.
+
+The trial succeeds technically when the task reaches review through the workshop's
+existing authority checks and failures can be traced to their decisions. Promotion to
+ordinary use requires consistent improvements in the briefs, preservation of required
+evidence and operation inside the workshop budget. W3 keeps its model-free exact-order
+fixture and per-host recovery requirements.
+
 ### IM1. Image GC host caller (image Phase 5)
 `propose_image_gc` and `apply_image_gc` (athanor `lib.rs:182,198`, with per-role reference
 forgetting) exist in library code and no host invokes them. The sweep diffs the store's
@@ -292,6 +308,18 @@ win.
 
   Links: area Stack · draws on stack.1 · summary Private source and derived-state protection precede further workshop UI completion.
 
+- **D10, adopt the decision driver for an opt-in public trial (2026-11-23).**
+  Mark: "I accept all four recommendations." This applies the existing workshop
+  ownership rule. Only the proposing step uses a driver. It may choose and order
+  at least two distinct passages from the owner's selection. Athanor reconstructs
+  the brief and its citations and confirms the recorded candidate. The human
+  reviews the proposal and the destination owner commits acceptance. Model runs
+  use D15's separate limits. An integrity refusal pauses without a journal write
+  or a retry charge under D16. Model-free assembly remains the default. P3 above
+  sets the comparison required before a change to ordinary use.
+
+  Links: area Stack · draws on stack.1, distillery:decision-driver D11, distillery:decision-driver D15, distillery:decision-driver D16 · summary The public evidence brief admits an opt-in proposing driver with separate limits and a measured comparison against deterministic assembly.
+
 The ownership constraints and W1-W3 workflow above are the design
 specified in response to Mark's request to reconcile the workshop with
 Servitor and Armillary and flesh out a first workflow in two hosts. Their done-conditions do not authorize new standing
@@ -326,8 +354,8 @@ automation, credentials, grants or publication.
     evidence of value: in the workshop's fixture run the model kept all
     three passages in their original order.
   - W1, W2, W3 and the two-host matrix are untouched, and W3's statement
-    that model decisions have a separate gate stands. Whether this plan
-    adopts the driver, and under what acceptance, is open here.- 2026-10-29: retained-payload custody admits Turnstone and Graphshell with
+    that model decisions have a separate gate stands. D10 subsequently adopted the P3 trial.
+- 2026-10-29: retained-payload custody admits Turnstone and Graphshell with
   distinct authenticated application scopes. Turnstone's existing AAD remains
   exact for retained ciphertext compatibility; Graphshell has a separate scope.
   This separates admitted application labels, not authenticated executable
@@ -449,6 +477,8 @@ automation, credentials, grants or publication.
   an unresolved presentation/inspection boundary, not a privacy qualification.
 
 ## Progress
+
+- 2026-11-23: D10 adopted the bounded P3 trial and set its evidence and promotion criteria.
 
 - 2026-10-29: integrated the selected published custody and renderer cohort and
   requalified the bounded private workshop in both native application hosts.
