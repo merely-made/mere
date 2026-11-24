@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use super::{
     Coupling, CouplingId, EdgeAssertion, Field, FieldId, FrameLayoutHint, Graph, NavigationTrigger,
-    NodeKey, RelationKey, RelationSelector, SemanticSubKind,
+    NodeKey, RelationKey, RelationSelector, SemanticSubKind, Traversal,
     capture::{
         CapturedDelta, coupling_from_persisted, field_from_persisted,
         persisted_coupling_from_coupling, persisted_field_from_field,
@@ -61,11 +61,11 @@ pub enum GraphDelta {
         to_id: Uuid,
         selector: RelationSelector,
     },
+    /// Replays a recorded event whole: its minted id and attribution included.
     ReplayAppendTraversalByIds {
         from_id: Uuid,
         to_id: Uuid,
-        trigger: NavigationTrigger,
-        timestamp_ms: u64,
+        traversal: Traversal,
     },
     ReplaySetNodeTitleById {
         node_id: Uuid,
@@ -673,18 +673,12 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::ReplayAppendTraversalByIds {
             from_id,
             to_id,
-            trigger,
-            timestamp_ms,
+            traversal,
         } => {
-            let appended =
-                graph.replay_append_traversal_by_ids(from_id, to_id, trigger, timestamp_ms);
+            let captured = CapturedDelta::replay_append_traversal(from_id, to_id, &traversal);
+            let appended = graph.replay_append_traversal_by_ids(from_id, to_id, traversal);
             if appended {
-                graph.record_delta(&CapturedDelta::ReplayAppendTraversalByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    trigger,
-                    timestamp_ms,
-                });
+                graph.record_delta(&captured);
             }
             GraphDeltaResult::TraversalAppended(appended)
         },
@@ -707,14 +701,11 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     .find_edge_key(from, to)
                     .and_then(|edge| graph.get_edge(edge))
                     .and_then(|payload| payload.traversals().last())
-                    .copied()
+                    .cloned()
             {
-                graph.record_delta(&CapturedDelta::ReplayAppendTraversalByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    trigger: traversal.trigger,
-                    timestamp_ms: traversal.timestamp_ms,
-                });
+                graph.record_delta(&CapturedDelta::replay_append_traversal(
+                    from_id, to_id, &traversal,
+                ));
             }
             GraphDeltaResult::TraversalAppended(appended)
         },

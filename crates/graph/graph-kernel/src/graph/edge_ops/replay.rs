@@ -112,12 +112,12 @@ impl Graph {
         Some(RelationKey::Surface(edge_key))
     }
 
+    /// Replay keeps the event's minted id and its recorder's attribution.
     pub(crate) fn replay_append_traversal_by_ids(
         &mut self,
         from_id: Uuid,
         to_id: Uuid,
-        trigger: mere::model::edge_taxonomy::NavigationTrigger,
-        timestamp_ms: u64,
+        traversal: mere::model::edge_data::Traversal,
     ) -> bool {
         let Some(from_key) = self.get_node_key_by_id(from_id) else {
             return false;
@@ -125,7 +125,7 @@ impl Graph {
         let Some(to_key) = self.get_node_key_by_id(to_id) else {
             return false;
         };
-        self.append_traversal(from_key, to_key, trigger, Some(timestamp_ms))
+        self.push_traversal(from_key, to_key, traversal)
     }
 
     /// Historical replay path. Missing source time stays absent; replay never

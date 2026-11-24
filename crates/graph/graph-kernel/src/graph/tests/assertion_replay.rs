@@ -43,10 +43,7 @@ fn exact_surface_pair_replay_keeps_parallel_traversals_and_complete_payloads() {
             basis: Default::default(),
         });
         payload.traversal = Some(TraversalData {
-            traversals: vec![Traversal {
-                timestamp_ms: time,
-                trigger,
-            }],
+            traversals: vec![Traversal::at(time, trigger, "urn:test:recorder")],
             ..Default::default()
         });
         payload.assert_relation(EdgeAssertion::Containment {

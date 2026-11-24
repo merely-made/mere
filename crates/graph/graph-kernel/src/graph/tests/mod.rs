@@ -24,6 +24,7 @@ pub mod snapshot_canonical;
 pub mod snapshot_imports;
 pub mod snapshot_navigation;
 pub mod snapshot_size;
+pub mod traversal_identity;
 
 #[path = "family_assertions.rs"]
 mod family_assertions;

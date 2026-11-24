@@ -73,10 +73,7 @@ pub(super) fn complete_payload() -> EdgePayload {
         NavigationTrigger::InPageSearchJump,
         NavigationTrigger::ImportedHistory,
     ] {
-        payload.push_traversal(Traversal {
-            timestamp_ms: 55,
-            trigger,
-        });
+        payload.push_traversal(Traversal::at(55, trigger, "urn:test:recorder"));
     }
     payload
 }

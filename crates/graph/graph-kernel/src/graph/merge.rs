@@ -193,8 +193,10 @@ mod tests {
         CapturedDelta::ReplayAppendTraversalByIds {
             from_id: id(from).to_string(),
             to_id: id(to).to_string(),
+            traversal_id: Uuid::from_u128(u128::from(at)).to_string(),
             trigger: NavigationTrigger::LinkClick,
             timestamp_ms: at,
+            recorded_by: "urn:test:recorder".into(),
         }
     }
 

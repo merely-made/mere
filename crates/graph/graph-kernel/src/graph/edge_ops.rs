@@ -503,7 +503,9 @@ impl Graph {
     /// that just have a `NavigationTrigger` don't need to build a
     /// `Traversal` struct themselves. `timestamp_ms = None` stamps
     /// now-via-`Traversal::now`; `Some(t)` uses the supplied
-    /// timestamp (importers, replay).
+    /// timestamp (importers). Either way the event gets a fresh id and the
+    /// write author's attribution; replay restores both through
+    /// [`Self::push_traversal`].
     pub(crate) fn append_traversal(
         &mut self,
         from: NodeKey,
@@ -511,12 +513,10 @@ impl Graph {
         trigger: mere::model::edge_taxonomy::NavigationTrigger,
         timestamp_ms: Option<u64>,
     ) -> bool {
+        let recorded_by = self.write_author().asserter_iri();
         let traversal = match timestamp_ms {
-            Some(timestamp_ms) => Traversal {
-                timestamp_ms,
-                trigger,
-            },
-            None => Traversal::now(trigger),
+            Some(timestamp_ms) => Traversal::at(timestamp_ms, trigger, recorded_by),
+            None => Traversal::now(trigger, recorded_by),
         };
         self.push_traversal(from, to, traversal)
     }

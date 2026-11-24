@@ -326,7 +326,9 @@ fn restore_payload_at(
             .traversals
             .iter()
             .map(|record| Traversal {
+                id: record.id,
                 timestamp_ms: record.timestamp_ms,
+                recorded_by: record.recorded_by.clone(),
                 trigger: match record.trigger {
                     PersistedNavigationTrigger::Unknown => NavigationTrigger::Unknown,
                     PersistedNavigationTrigger::LinkClick => NavigationTrigger::LinkClick,

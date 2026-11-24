@@ -334,7 +334,9 @@ fn persisted_edge_with_ids(
                     .traversals
                     .iter()
                     .map(|traversal| PersistedTraversalRecord {
+                        id: traversal.id,
                         timestamp_ms: traversal.timestamp_ms,
+                        recorded_by: traversal.recorded_by.clone(),
                         trigger: match traversal.trigger {
                             NavigationTrigger::Unknown => PersistedNavigationTrigger::Unknown,
                             NavigationTrigger::LinkClick => PersistedNavigationTrigger::LinkClick,

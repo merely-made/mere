@@ -10,6 +10,7 @@
 use std::collections::BTreeSet;
 
 use rkyv::{Archive, Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::model::types::{
     AssertionBasis, AssertionWithdrawal, GraphScope, mint_local_statement_id,
@@ -21,10 +22,13 @@ use super::edge_taxonomy::{
 };
 
 /// A temporal traversal event recorded on an edge.
+///
+/// `id` is minted when the event is recorded and exported as `urn:uuid:<id>`
+/// (engine-split D195); `recorded_by` is the asserter IRI of whoever recorded
+/// it, the attribution assertions carry (D198).
 #[derive(
     Debug,
     Clone,
-    Copy,
     PartialEq,
     Eq,
     Archive,
@@ -36,14 +40,26 @@ use super::edge_taxonomy::{
 pub struct Traversal {
     pub timestamp_ms: u64,
     pub trigger: NavigationTrigger,
+    // Field order matches `PersistedTraversalRecord`, whose JSON shape a
+    // borrowed serializer reproduces from this type.
+    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
+    pub id: Uuid,
+    pub recorded_by: String,
 }
 
 impl Traversal {
-    pub fn now(trigger: NavigationTrigger) -> Self {
-        let timestamp_ms = crate::model::clock::unix_epoch_millis();
+    /// A new event recorded now.
+    pub fn now(trigger: NavigationTrigger, recorded_by: impl Into<String>) -> Self {
+        Self::at(crate::model::clock::unix_epoch_millis(), trigger, recorded_by)
+    }
+
+    /// A new event recorded at a supplied time (importers), with a fresh id.
+    pub fn at(timestamp_ms: u64, trigger: NavigationTrigger, recorded_by: impl Into<String>) -> Self {
         Self {
             timestamp_ms,
             trigger,
+            id: Uuid::new_v4(),
+            recorded_by: recorded_by.into(),
         }
     }
 }
@@ -78,7 +94,7 @@ impl EdgeMetrics {
         }
     }
 
-    fn record(&mut self, traversal: Traversal) {
+    fn record(&mut self, traversal: &Traversal) {
         self.total_navigations = self.total_navigations.saturating_add(1);
         if traversal.trigger.contributes_to_forward_count() {
             self.forward_navigations = self.forward_navigations.saturating_add(1);
@@ -415,7 +431,7 @@ pub struct TraversalData {
 
 impl TraversalData {
     pub fn push(&mut self, traversal: Traversal) {
-        self.metrics.record(traversal);
+        self.metrics.record(&traversal);
         self.traversals.push(traversal);
     }
 }

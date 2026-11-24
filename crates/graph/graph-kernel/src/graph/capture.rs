@@ -72,11 +72,16 @@ pub enum CapturedDelta {
         to_id: String,
         selector: RelationSelector,
     },
+    /// A recorded traversal event, with the id minted at record time and the
+    /// asserter IRI of its recorder (engine-split D195, D198). Entries written
+    /// before these fields do not read.
     ReplayAppendTraversalByIds {
         from_id: String,
         to_id: String,
+        traversal_id: String,
         trigger: NavigationTrigger,
         timestamp_ms: u64,
+        recorded_by: String,
     },
     ReplaySetNodeTitleById {
         node_id: String,
@@ -323,13 +328,19 @@ impl CapturedDelta {
             Self::ReplayAppendTraversalByIds {
                 from_id,
                 to_id,
+                traversal_id,
                 trigger,
                 timestamp_ms,
+                recorded_by,
             } => GraphDelta::ReplayAppendTraversalByIds {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
-                trigger: *trigger,
-                timestamp_ms: *timestamp_ms,
+                traversal: mere::model::edge_data::Traversal {
+                    id: parse_uuid(traversal_id),
+                    timestamp_ms: *timestamp_ms,
+                    trigger: *trigger,
+                    recorded_by: recorded_by.clone(),
+                },
             },
             Self::ReplaySetNodeTitleById { node_id, title } => GraphDelta::ReplaySetNodeTitleById {
                 node_id: parse_uuid(node_id),
@@ -642,6 +653,24 @@ impl CapturedDelta {
             *asserter_iri = author.asserter_iri();
         }
         replay
+    }
+}
+
+impl CapturedDelta {
+    /// The journal form of a recorded traversal event.
+    pub fn replay_append_traversal(
+        from_id: Uuid,
+        to_id: Uuid,
+        traversal: &mere::model::edge_data::Traversal,
+    ) -> Self {
+        Self::ReplayAppendTraversalByIds {
+            from_id: from_id.to_string(),
+            to_id: to_id.to_string(),
+            traversal_id: traversal.id.to_string(),
+            trigger: traversal.trigger,
+            timestamp_ms: traversal.timestamp_ms,
+            recorded_by: traversal.recorded_by.clone(),
+        }
     }
 }
 
@@ -1301,8 +1330,10 @@ mod tests {
         let delta = CapturedDelta::ReplayAppendTraversalByIds {
             from_id: Uuid::from_u128(3).to_string(),
             to_id: Uuid::from_u128(4).to_string(),
+            traversal_id: Uuid::from_u128(12_345).to_string(),
             trigger: NavigationTrigger::Redirect,
             timestamp_ms: 12_345,
+            recorded_by: "urn:test:recorder".into(),
         };
         let bytes = postcard::to_allocvec(&delta).expect("encode");
         let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
@@ -1520,8 +1551,10 @@ mod tests {
             CapturedDelta::ReplayAppendTraversalByIds {
                 from_id: a_id.to_string(),
                 to_id: b_id.to_string(),
+                traversal_id: Uuid::from_u128(6_789).to_string(),
                 trigger: NavigationTrigger::LinkClick,
                 timestamp_ms: 6_789,
+                recorded_by: "urn:test:recorder".into(),
             },
             CapturedDelta::ReplaySetNodeTitleById {
                 node_id: a_id.to_string(),

@@ -32,6 +32,8 @@ pub mod shared;
 pub use shared::Shared;
 pub mod resource_record;
 pub mod types;
+pub mod uuid_archive;
+pub use uuid_archive::UuidAsBytes;
 
 pub use author::{Author, AuthorKind, USER_AUTHOR};
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};

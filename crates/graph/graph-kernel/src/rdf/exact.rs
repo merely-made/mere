@@ -468,8 +468,10 @@ mod tests {
         first.families.push(PersistedEdgeFamily::Traversal);
         first.traversal = Some(PersistedTraversalEdgeData {
             traversals: vec![PersistedTraversalRecord {
+                id: uuid::Uuid::from_u128(11),
                 timestamp_ms: 11,
                 trigger: PersistedNavigationTrigger::LinkClick,
+                recorded_by: "urn:test:recorder".into(),
             }],
             metrics: PersistedTraversalMetrics {
                 total_navigations: 1,

@@ -108,42 +108,7 @@ impl Default for GraphViewId {
     }
 }
 
-pub(crate) struct UuidAsBytes;
-
-impl ArchiveWith<Uuid> for UuidAsBytes {
-    type Archived = Archived<[u8; 16]>;
-    type Resolver = Resolver<[u8; 16]>;
-
-    fn resolve_with(field: &Uuid, resolver: Self::Resolver, out: Place<Self::Archived>) {
-        let bytes = *field.as_bytes();
-        bytes.resolve(resolver, out);
-    }
-}
-
-impl<S> SerializeWith<Uuid, S> for UuidAsBytes
-where
-    S: Fallible + ?Sized,
-    [u8; 16]: Serialize<S>,
-{
-    fn serialize_with(field: &Uuid, serializer: &mut S) -> Result<Self::Resolver, S::Error> {
-        let bytes = *field.as_bytes();
-        bytes.serialize(serializer)
-    }
-}
-
-impl<D> DeserializeWith<Archived<[u8; 16]>, Uuid, D> for UuidAsBytes
-where
-    D: Fallible + ?Sized,
-    Archived<[u8; 16]>: Deserialize<[u8; 16], D>,
-{
-    fn deserialize_with(
-        field: &Archived<[u8; 16]>,
-        deserializer: &mut D,
-    ) -> Result<Uuid, D::Error> {
-        let bytes = field.deserialize(deserializer)?;
-        Ok(Uuid::from_bytes(bytes))
-    }
-}
+pub(crate) use mere::model::UuidAsBytes;
 
 // `Point2DAsTuple` (the rkyv with-adapter for `Node.position`) left with the
 // position field (S2): position is no longer graph truth, so the node carries no

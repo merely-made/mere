@@ -318,6 +318,13 @@ pub struct PersistedSemanticEdgeData {
 pub struct PersistedTraversalRecord {
     pub timestamp_ms: u64,
     pub trigger: PersistedNavigationTrigger,
+    /// The event's minted id (engine-split D195). Archives written before it
+    /// do not read. It follows the time so a snapshot's edges, ordered by
+    /// their JSON bytes, still order by time first.
+    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
+    pub id: uuid::Uuid,
+    /// Asserter IRI of whoever recorded the event (D198).
+    pub recorded_by: String,
 }
 
 #[derive(
