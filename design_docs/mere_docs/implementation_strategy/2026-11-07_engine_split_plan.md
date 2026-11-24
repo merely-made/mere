@@ -3007,6 +3007,14 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D181, engine-split D189 · plans engine-split P8 · summary A host retains its last 64 deltas, evicted early past one keyframe's encoded bytes, falls back to a keyframe beyond them, and replays a suffix with one clone of the scene.
 
+- **D202. A browsing session sits beside the launch counter, in the kernel graph (Mark, 2026-11-24):** D200 rested on there being no session concept, but the trail lane found one: `Graph::current_session: u64` is a launch counter, installed by Graphshell's `MereHost::with_launch` from the persona setting `session_count`, stamping `last_session_visited` and journaled in navigate deltas, the launch-to-exit boundary D200 declined. "Idle-gap sessions beside launches (Recommended)": the launch counter keeps what it stamps, and the idle-gap session is a second concept with its own name; its state lives in the kernel `Graph`, set when a traversal is recorded and carried by the journal; the gap is a Graphshell `PersonaSettings` field, 30 minutes by default; a session is a UUID v4 exported as `urn:uuid`; a manual split is an unjournaled kernel call that closes the current session, so the next recorded event carries it; against the session replacing the launch counter and renaming the counter to a launch first. Outcome: refines D200.
+
+  Links: area The stack · draws on engine-split D197, engine-split D200 · plans engine-split P7 · summary The idle-gap session is a UUID kept in the kernel graph beside the launch counter, its gap a persona setting and its manual split an unjournaled call.
+
+- **D203. A traversal's attribution is the graph's write author, person-level (Mark, 2026-11-24):** D198's attribution was built from `Graph::write_author().asserter_iri()`, the identity attribution assertions and FrameMember's reifier carry; it names a person, and `Author::person(persona).via(app)` keeps the app out of the IRI, so one person's devices are not told apart; the stack's only device identity, dramatis `personae::carry::DeviceId`, is outside Mere. "Keep person-level (Recommended)": against adding a device IRI. Outcome: refines D198.
+
+  Links: area The stack · draws on engine-split D198 · plans engine-split P7 · summary A traversal event is attributed to the graph's write author, a person-level IRI; devices are not distinguished.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

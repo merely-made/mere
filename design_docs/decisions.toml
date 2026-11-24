@@ -2182,6 +2182,22 @@ summary = "A host retains its last 64 deltas, evicted early past one keyframe's 
 draws_on = ["engine-split D181", "engine-split D189"]
 plans = ["engine-split"]
 
+[decisions."engine-split D202"]
+title = "A browsing session sits beside the launch counter, in the kernel graph (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The idle-gap session is a UUID kept in the kernel graph beside the launch counter, its gap a persona setting and its manual split an unjournaled call."
+draws_on = ["engine-split D197", "engine-split D200"]
+plans = ["engine-split"]
+
+[decisions."engine-split D203"]
+title = "A traversal's attribution is the graph's write author, person-level (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A traversal event is attributed to the graph's write author, a person-level IRI; devices are not distinguished."
+draws_on = ["engine-split D198"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
