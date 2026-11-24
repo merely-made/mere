@@ -3989,3 +3989,14 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   when unset, and Graphshell's `MereHost` names the live one in both stale branches (Graphshell `59f594ae`; its 25 literal
   stale replies now use the constructors). Turnstone's MCP tool reports it in its stale reply (`3e87ce7c`). The pin test
   checks both branches; a chirograph test reads a pre-D193 reply.
+- 2026-11-24: P7, D195 and D198 built on branch `trail/event-identity` (`a37784bb4`, unmerged). `Traversal` and
+  `PersistedTraversalRecord` carry an `id` minted at record time and `recorded_by`, the write author's asserter IRI, the
+  attribution assertions and FrameMember's reifier already use (`Author::asserter_iri`); the journal's
+  `ReplayAppendTraversalByIds` carries both and replay restores them. Archives and journal entries written before the
+  fields no longer read. `mere`, `mere-kernel`, `pandect` and `mere-facts` pass with `--all-features`; a new test's
+  changed-id control fails as it should. Graphshell's `graphshell-rdf-trail` rework (D196, D197, D199) passes its
+  round trips against this branch through a local patch and waits on it. Found: the session D200 says neither repository
+  has exists as a launch number (`Graph::current_session`, set by Graphshell's `MereHost::with_launch` from the
+  persona's `session_count`, stamping `last_session_visited`), the launch-to-exit boundary D200 declined; no code evicts
+  traversals, so D196's eviction is shown on an edited snapshot; Graphshell `55988ecb` carried no tests. The session's
+  shape (where it lives, the gap setting's home, the id's type, a manual split) is out as a fork.
