@@ -3027,6 +3027,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D201, engine-split D205 · plans engine-split P8 · summary A host keeps E3's identity checks and resume but answers every gap with a keyframe, retaining no deltas, until placement makes deltas local.
 
+- **D207. P8 builds D181's CBOR keyframe envelope before it closes (Mark, 2026-11-24):** since D181, D189 put the engine revision on `SceneSnapshot`, Graphshell's engine-binding D5 put base and target engine identities on every `SceneDiff` and `ResumeRequest`, and D206 made recovery keyframe-only, all over the NDJSON wire; the envelope's schema and vectors were still unwritten. Asked whether to retire it, with CBOR arriving when a carrier first crosses a trust boundary, Mark: "ugh. 1 is poison, i can tell from "when an x first y"; that's no plan, that's limbo. 2". "Build the envelope now": the versioned CBOR envelope around the projection snapshot, its schema and interoperability vectors, land before P8 closes and ahead of the kernel move; against retiring it and building it for remote-peer carriers only after P8. Outcome: applies D181.
+
+  Links: area The stack · draws on engine-split D181, engine-split D189, engine-split D206 · plans engine-split P8 · summary P8 builds the versioned CBOR keyframe envelope, with its schema and vectors, before it closes.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
