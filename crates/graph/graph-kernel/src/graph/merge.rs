@@ -197,6 +197,7 @@ mod tests {
             trigger: NavigationTrigger::LinkClick,
             timestamp_ms: at,
             recorded_by: "urn:test:recorder".into(),
+            browsing_session: Uuid::from_u128(0x5e55).to_string(),
         }
     }
 

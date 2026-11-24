@@ -310,6 +310,7 @@ impl Graph {
         if legacy_derived_containment {
             graph.rebuild_derived_containment_relations();
         }
+        graph.seed_browsing_session();
 
         graph
     }

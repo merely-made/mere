@@ -25,7 +25,9 @@ use super::edge_taxonomy::{
 ///
 /// `id` is minted when the event is recorded and exported as `urn:uuid:<id>`
 /// (engine-split D195); `recorded_by` is the asserter IRI of whoever recorded
-/// it, the attribution assertions carry (D198).
+/// it, the attribution assertions carry (D198); `browsing_session` names the
+/// idle-gap browsing session it belongs to (D200, D202), apart from the launch
+/// number a graph stamps on visited nodes.
 #[derive(
     Debug,
     Clone,
@@ -45,21 +47,38 @@ pub struct Traversal {
     #[rkyv(with = super::uuid_archive::UuidAsBytes)]
     pub id: Uuid,
     pub recorded_by: String,
+    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
+    pub browsing_session: Uuid,
 }
 
 impl Traversal {
-    /// A new event recorded now.
-    pub fn now(trigger: NavigationTrigger, recorded_by: impl Into<String>) -> Self {
-        Self::at(crate::model::clock::unix_epoch_millis(), trigger, recorded_by)
+    /// A new event recorded now, with a fresh id.
+    pub fn now(
+        trigger: NavigationTrigger,
+        recorded_by: impl Into<String>,
+        browsing_session: Uuid,
+    ) -> Self {
+        Self::at(
+            crate::model::clock::unix_epoch_millis(),
+            trigger,
+            recorded_by,
+            browsing_session,
+        )
     }
 
     /// A new event recorded at a supplied time (importers), with a fresh id.
-    pub fn at(timestamp_ms: u64, trigger: NavigationTrigger, recorded_by: impl Into<String>) -> Self {
+    pub fn at(
+        timestamp_ms: u64,
+        trigger: NavigationTrigger,
+        recorded_by: impl Into<String>,
+        browsing_session: Uuid,
+    ) -> Self {
         Self {
             timestamp_ms,
             trigger,
             id: Uuid::new_v4(),
             recorded_by: recorded_by.into(),
+            browsing_session,
         }
     }
 }

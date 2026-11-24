@@ -73,7 +73,12 @@ pub(super) fn complete_payload() -> EdgePayload {
         NavigationTrigger::InPageSearchJump,
         NavigationTrigger::ImportedHistory,
     ] {
-        payload.push_traversal(Traversal::at(55, trigger, "urn:test:recorder"));
+        payload.push_traversal(Traversal::at(
+            55,
+            trigger,
+            "urn:test:recorder",
+            uuid::Uuid::from_u128(0x5e55),
+        ));
     }
     payload
 }

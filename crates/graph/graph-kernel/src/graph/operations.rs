@@ -27,6 +27,7 @@ impl Graph {
             content_revision: 0,
             visit_revision: 0,
             current_session: 0,
+            browsing_session: Default::default(),
             write_author: Author::user(),
             recorder: capture::Recorder::default(),
             pending_link_state: PendingLinkState::default(),

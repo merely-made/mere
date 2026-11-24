@@ -501,11 +501,10 @@ impl Graph {
     /// Thin wrapper over [`Self::push_traversal`] matching the
     /// 2026-05-11 relation-taxonomy plan §7 signature — callers
     /// that just have a `NavigationTrigger` don't need to build a
-    /// `Traversal` struct themselves. `timestamp_ms = None` stamps
-    /// now-via-`Traversal::now`; `Some(t)` uses the supplied
-    /// timestamp (importers). Either way the event gets a fresh id and the
-    /// write author's attribution; replay restores both through
-    /// [`Self::push_traversal`].
+    /// `Traversal` struct themselves. `timestamp_ms = None` stamps the
+    /// wall clock's now; `Some(t)` uses the supplied timestamp (importers). Either way the event gets a fresh id, the
+    /// write author's attribution and the browsing session its time joins;
+    /// replay restores all three.
     pub(crate) fn append_traversal(
         &mut self,
         from: NodeKey,
@@ -513,12 +512,13 @@ impl Graph {
         trigger: mere::model::edge_taxonomy::NavigationTrigger,
         timestamp_ms: Option<u64>,
     ) -> bool {
+        if from == to || !self.inner.contains_node(from) || !self.inner.contains_node(to) {
+            return false;
+        }
         let recorded_by = self.write_author().asserter_iri();
-        let traversal = match timestamp_ms {
-            Some(timestamp_ms) => Traversal::at(timestamp_ms, trigger, recorded_by),
-            None => Traversal::now(trigger, recorded_by),
-        };
-        self.push_traversal(from, to, traversal)
+        let at_ms = timestamp_ms.unwrap_or_else(mere::model::clock::unix_epoch_millis);
+        let session = self.browsing_session.session_for(at_ms);
+        self.push_traversal(from, to, Traversal::at(at_ms, trigger, recorded_by, session))
     }
 }
 

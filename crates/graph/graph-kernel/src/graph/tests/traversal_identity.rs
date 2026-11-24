@@ -4,8 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! A traversal event's minted id and attribution (engine-split D195, D198)
-//! survive the snapshot codecs and journal replay.
+//! A traversal event's minted id, attribution and browsing session
+//! (engine-split D195, D198, D202) survive the snapshot codecs and journal
+//! replay; an idle gap or a manual split opens a new browsing session.
 
 use std::sync::{Arc, Mutex};
 
@@ -121,4 +122,64 @@ fn journal_replay_restores_the_minted_id_not_a_fresh_one() {
         replayed.get_node_key_by_id(b_id).unwrap(),
     );
     assert_eq!(traversals(&replayed, ra, rb), expected);
+    assert_eq!(
+        replayed.open_browsing_session(),
+        Some(expected[0].browsing_session)
+    );
+}
+
+fn sessions(graph: &Graph, from: NodeKey, to: NodeKey) -> Vec<uuid::Uuid> {
+    traversals(graph, from, to)
+        .iter()
+        .map(|event| event.browsing_session)
+        .collect()
+}
+
+#[test]
+fn an_idle_gap_reaching_the_setting_opens_a_new_browsing_session() {
+    let mut graph = Graph::new();
+    assert_eq!(
+        graph.browsing_idle_gap_ms(),
+        crate::graph::browsing_session::DEFAULT_BROWSING_IDLE_GAP_MS
+    );
+    graph.set_browsing_idle_gap_ms(1_000);
+    let a = graph.add_node("https://a.test/".into(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b.test/".into(), Point2D::new(1.0, 0.0));
+    for at in [0, 999, 1_999, 2_500] {
+        assert!(graph.append_traversal(a, b, NavigationTrigger::LinkClick, Some(at)));
+    }
+    let s = sessions(&graph, a, b);
+    assert_eq!(s[0], s[1], "999 ms is inside a 1000 ms gap");
+    assert_ne!(s[1], s[2], "1000 ms without a traversal ends the session");
+    assert_eq!(s[2], s[3]);
+    assert_eq!(graph.open_browsing_session(), Some(s[3]));
+}
+
+#[test]
+fn a_manual_split_opens_a_new_session_for_the_next_traversal() {
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.test/".into(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b.test/".into(), Point2D::new(1.0, 0.0));
+    assert!(graph.append_traversal(a, b, NavigationTrigger::LinkClick, Some(10)));
+    graph.split_browsing_session();
+    assert_eq!(graph.open_browsing_session(), None);
+    assert!(graph.append_traversal(a, b, NavigationTrigger::LinkClick, Some(11)));
+    assert!(graph.append_traversal(a, b, NavigationTrigger::LinkClick, Some(12)));
+    let s = sessions(&graph, a, b);
+    assert_ne!(s[0], s[1]);
+    assert_eq!(s[1], s[2]);
+}
+
+#[test]
+fn a_reopened_graph_continues_its_latest_browsing_session() {
+    let (graph, a, b) = two_clicks();
+    let latest = sessions(&graph, a, b)[1];
+    let mut restored = Graph::try_from_snapshot(&graph.to_snapshot()).unwrap();
+    assert_eq!(restored.open_browsing_session(), Some(latest));
+    assert!(restored.append_traversal(a, b, NavigationTrigger::Forward, Some(8)));
+    assert_eq!(sessions(&restored, a, b)[2], latest);
+    // Control: past the gap the reopened graph opens a new session.
+    let late = 8 + restored.browsing_idle_gap_ms();
+    assert!(restored.append_traversal(a, b, NavigationTrigger::Forward, Some(late)));
+    assert_ne!(sessions(&restored, a, b)[3], latest);
 }

@@ -337,6 +337,7 @@ fn persisted_edge_with_ids(
                         id: traversal.id,
                         timestamp_ms: traversal.timestamp_ms,
                         recorded_by: traversal.recorded_by.clone(),
+                        browsing_session: traversal.browsing_session,
                         trigger: match traversal.trigger {
                             NavigationTrigger::Unknown => PersistedNavigationTrigger::Unknown,
                             NavigationTrigger::LinkClick => PersistedNavigationTrigger::LinkClick,

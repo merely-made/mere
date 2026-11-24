@@ -292,6 +292,7 @@ fn an_undo_reverts_exactly_and_reverting_the_undo_redoes() {
         trigger: NavigationTrigger::LinkClick,
         timestamp_ms: 1_700_000_000_000,
         recorded_by: "urn:test:recorder".into(),
+        browsing_session: Uuid::from_u128(0x5e55).to_string(),
     };
     let (before, made, after) = scene(&[add(1), add(2)], &[relate(1, 2), traverse]);
     let mut live = after.clone();

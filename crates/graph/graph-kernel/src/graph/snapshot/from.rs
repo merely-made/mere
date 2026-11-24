@@ -329,6 +329,7 @@ fn restore_payload_at(
                 id: record.id,
                 timestamp_ms: record.timestamp_ms,
                 recorded_by: record.recorded_by.clone(),
+                browsing_session: record.browsing_session,
                 trigger: match record.trigger {
                     PersistedNavigationTrigger::Unknown => NavigationTrigger::Unknown,
                     PersistedNavigationTrigger::LinkClick => NavigationTrigger::LinkClick,

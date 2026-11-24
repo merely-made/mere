@@ -1398,6 +1398,13 @@ impl<B: Backend> GraphSession<B> {
         self.graph.set_current_session(launch);
     }
 
+    /// Install the host's browsing idle gap (engine-split D202): traversals
+    /// recorded after a gap this long open a new browsing session. Host wiring
+    /// like the launch number, neither journaled nor compared.
+    pub fn set_browsing_idle_gap_ms(&mut self, idle_gap_ms: u64) {
+        self.graph.set_browsing_idle_gap_ms(idle_gap_ms);
+    }
+
     pub fn journal(&self) -> &GraphJournal {
         &self.journal
     }

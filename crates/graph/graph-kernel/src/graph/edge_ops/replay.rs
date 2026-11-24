@@ -125,7 +125,12 @@ impl Graph {
         let Some(to_key) = self.get_node_key_by_id(to_id) else {
             return false;
         };
-        self.push_traversal(from_key, to_key, traversal)
+        let (session, at_ms) = (traversal.browsing_session, traversal.timestamp_ms);
+        let appended = self.push_traversal(from_key, to_key, traversal);
+        if appended {
+            self.browsing_session.observe(session, at_ms);
+        }
+        appended
     }
 
     /// Historical replay path. Missing source time stays absent; replay never

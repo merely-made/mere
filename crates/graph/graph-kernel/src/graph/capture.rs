@@ -73,8 +73,8 @@ pub enum CapturedDelta {
         selector: RelationSelector,
     },
     /// A recorded traversal event, with the id minted at record time and the
-    /// asserter IRI of its recorder (engine-split D195, D198). Entries written
-    /// before these fields do not read.
+    /// asserter IRI of its recorder and its browsing session (engine-split
+    /// D195, D198, D202). Entries written before these fields do not read.
     ReplayAppendTraversalByIds {
         from_id: String,
         to_id: String,
@@ -82,6 +82,7 @@ pub enum CapturedDelta {
         trigger: NavigationTrigger,
         timestamp_ms: u64,
         recorded_by: String,
+        browsing_session: String,
     },
     ReplaySetNodeTitleById {
         node_id: String,
@@ -332,6 +333,7 @@ impl CapturedDelta {
                 trigger,
                 timestamp_ms,
                 recorded_by,
+                browsing_session,
             } => GraphDelta::ReplayAppendTraversalByIds {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
@@ -340,6 +342,7 @@ impl CapturedDelta {
                     timestamp_ms: *timestamp_ms,
                     trigger: *trigger,
                     recorded_by: recorded_by.clone(),
+                    browsing_session: parse_uuid(browsing_session),
                 },
             },
             Self::ReplaySetNodeTitleById { node_id, title } => GraphDelta::ReplaySetNodeTitleById {
@@ -670,6 +673,7 @@ impl CapturedDelta {
             trigger: traversal.trigger,
             timestamp_ms: traversal.timestamp_ms,
             recorded_by: traversal.recorded_by.clone(),
+            browsing_session: traversal.browsing_session.to_string(),
         }
     }
 }
@@ -1334,6 +1338,7 @@ mod tests {
             trigger: NavigationTrigger::Redirect,
             timestamp_ms: 12_345,
             recorded_by: "urn:test:recorder".into(),
+            browsing_session: Uuid::from_u128(0x5e55).to_string(),
         };
         let bytes = postcard::to_allocvec(&delta).expect("encode");
         let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
@@ -1555,6 +1560,7 @@ mod tests {
                 trigger: NavigationTrigger::LinkClick,
                 timestamp_ms: 6_789,
                 recorded_by: "urn:test:recorder".into(),
+                browsing_session: Uuid::from_u128(0x5e55).to_string(),
             },
             CapturedDelta::ReplaySetNodeTitleById {
                 node_id: a_id.to_string(),

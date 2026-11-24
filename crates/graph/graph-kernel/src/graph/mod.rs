@@ -102,6 +102,7 @@ pub mod filter;
 /// migration). Feature-gated: enable `fixtures` in dev-dependencies only.
 #[cfg(feature = "fixtures")]
 pub mod fixtures;
+pub mod browsing_session;
 pub mod history;
 pub mod identity;
 mod input_key;
@@ -444,6 +445,10 @@ pub struct Graph {
     /// host opts in. Not part of the persisted snapshot: it is per-launch host state, not
     /// graph truth. (Alembic B5 — by-sessions eviction.)
     current_session: u64,
+
+    /// The idle-gap browsing session traversals join (engine-split D202), a
+    /// concept apart from the launch number above. Runtime state.
+    browsing_session: browsing_session::BrowsingSessionClock,
 
     /// Attribution context supplied by the session performing a write.
     write_author: Author,

@@ -472,6 +472,7 @@ mod tests {
                 timestamp_ms: 11,
                 trigger: PersistedNavigationTrigger::LinkClick,
                 recorded_by: "urn:test:recorder".into(),
+                browsing_session: uuid::Uuid::from_u128(0x5e55),
             }],
             metrics: PersistedTraversalMetrics {
                 total_navigations: 1,

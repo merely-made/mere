@@ -73,7 +73,12 @@ fn freezes_surface_pair_buckets_as_independent_immutable_resource_facets() {
     let forward = claim(&mut graph, first, second, "forward");
     let reverse = claim(&mut graph, second, first, "reverse");
     let mut parallel = EdgePayload::new();
-    parallel.push_traversal(Traversal::at(456, NavigationTrigger::Programmatic, "urn:test:recorder"));
+    parallel.push_traversal(Traversal::at(
+        456,
+        NavigationTrigger::Programmatic,
+        "urn:test:recorder",
+        uuid::Uuid::from_u128(0x5e55),
+    ));
     graph.inner.connect(first, second, (parallel).into());
     let source = available_source();
     let source_revision = source.clone();

@@ -4000,3 +4000,12 @@ reads evidence from the same journal cursor. The capture's custody remains the c
   persona's `session_count`, stamping `last_session_visited`), the launch-to-exit boundary D200 declined; no code evicts
   traversals, so D196's eviction is shown on an edited snapshot; Graphshell `55988ecb` carried no tests. The session's
   shape (where it lives, the gap setting's home, the id's type, a manual split) is out as a fork.
+- 2026-11-24: P7, D202 built on `trail/event-identity` (D203 keeps the attribution as built). A browsing session sits
+  beside the launch number: the kernel `Graph` holds the open session and its last traversal time
+  (`graph/browsing_session.rs`, 30 minutes by default), `append_traversal` joins it or, after the idle gap or
+  `split_browsing_session`, opens a new one under a fresh UUID, and each `Traversal`, its persisted record and the
+  journal's `ReplayAppendTraversalByIds` carry `browsing_session`. Replay and snapshot load seed the open session from the
+  latest event, so a reopen within the gap continues it; a split with no traversal after it is not kept. pandect's
+  `GraphSession::set_browsing_idle_gap_ms` installs the host's gap. `mere`, `mere-kernel` (629), `pandect` and
+  `mere-facts` pass with `--all-features`. Graphshell's side (the persona setting, `MereHost::with_browsing_idle_gap_ms`,
+  and each event's `browsingSession` in the trail export) waits on this branch landing.

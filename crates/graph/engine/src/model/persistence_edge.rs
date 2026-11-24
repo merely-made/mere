@@ -325,6 +325,9 @@ pub struct PersistedTraversalRecord {
     pub id: uuid::Uuid,
     /// Asserter IRI of whoever recorded the event (D198).
     pub recorded_by: String,
+    /// The idle-gap browsing session the event belongs to (D200, D202).
+    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
+    pub browsing_session: uuid::Uuid,
 }
 
 #[derive(
