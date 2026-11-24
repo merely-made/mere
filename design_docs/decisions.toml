@@ -2198,6 +2198,14 @@ summary = "A traversal event is attributed to the graph's write author, a person
 draws_on = ["engine-split D198"]
 plans = ["engine-split"]
 
+[decisions."engine-split D204"]
+title = "A resource's tag labels come from its own outgoing edges (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "resource_tag_labels walks the resource's own outgoing edges, O(degree), with the same labels and API."
+draws_on = ["engine-split D161"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

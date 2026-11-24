@@ -3015,6 +3015,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D198 · plans engine-split P7 · summary A traversal event is attributed to the graph's write author, a person-level IRI; devices are not distinguished.
 
+- **D204. A resource's tag labels come from its own outgoing edges (Mark, 2026-11-24):** the keyframe lane (`Code/testing/engine-split/kf_perf/`) found `Graph::resource_tag_labels` scanning every Resource edge per call, O(n·E), paid twice per keyframe (served_layout's spiral score and the host's build) and again by Sets views. "Walk the node's own edges (Recommended)": look the resource up and walk its outgoing edges only, O(degree), the same label set and API (Mere `37b06156d`, tested equal to the old scan with a control); against a bulk per-graph tags map and sharing one scan per keyframe. With Graphshell's indexed interner the 100k-node keyframe went from 607 s to 3.06 s, byte-identical. Outcome: applies D161.
+
+  Links: area The stack · draws on engine-split D161 · plans engine-split P8 · summary resource_tag_labels walks the resource's own outgoing edges, O(degree), with the same labels and API.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
