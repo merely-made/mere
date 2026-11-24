@@ -128,6 +128,8 @@ mod resource_content_edge_tests;
 mod resource_content_handle_tests;
 #[cfg(test)]
 mod resource_content_tests;
+#[cfg(test)]
+mod resource_tags_tests;
 mod resource_pair_bounds;
 pub mod resource_properties;
 pub mod resource_tag_admission;

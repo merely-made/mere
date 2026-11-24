@@ -11,6 +11,8 @@ use super::resource_content::{ContentError, TAG_CONCEPT};
 use super::{CapturedDelta, EdgePayload, Graph, NodeKey, ResourceNode, SemanticStatement};
 use crate::persistence::PersistedResourceRecord;
 use crate::types::GraphScope;
+use petgraph::Direction;
+use petgraph::visit::EdgeRef;
 use std::collections::HashSet;
 use uuid::Uuid;
 
@@ -34,15 +36,23 @@ impl Graph {
         self.resource_content(id, TAG_CONCEPT)
     }
 
+    /// Labels of the concepts `id` is tagged with. Walks the resource's own
+    /// outgoing edges: scanning every Resource edge per call made tagging each
+    /// node of a graph quadratic.
     pub fn resource_tag_labels(&self, id: Uuid) -> HashSet<String> {
-        self.resource_edges()
-            .filter(|(from, _, payload)| {
-                from.id() == id
-                    && payload
-                        .held_semantic_statements()
-                        .any(|statement| statement.predicate == TAGGED_WITH_IRI)
+        let Some(key) = self.resources.key_of(&id) else {
+            return HashSet::new();
+        };
+        self.resources
+            .inner()
+            .edges_directed(key, Direction::Outgoing)
+            .filter(|edge| {
+                edge.weight()
+                    .held_semantic_statements()
+                    .any(|statement| statement.predicate == TAGGED_WITH_IRI)
             })
-            .filter_map(|(_, to, _)| {
+            .filter_map(|edge| {
+                let to = self.resources.node(edge.target())?;
                 self.resource_tag_concept(to.id())
                     .map(|concept| concept.label)
             })
