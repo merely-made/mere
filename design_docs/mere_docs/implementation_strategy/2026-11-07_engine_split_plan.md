@@ -795,8 +795,9 @@ rules stay in the workspace.
 - Acceptance added, 2026-11-19: the round-trip is shown on a trail a person made in Turnstone, not on
   a constructed one. The same address is visited twice through two distinct surfaces, the workspace
   is exported as an RDF dataset and reopened in a fresh store, and both events come back with their
-  endpoints, triggers, timestamps and frame membership. It waits on D182's four forks (event
-  identity, multiplicity, graph scope, provenance). The format rows do not show this: D182's probe
+  endpoints, triggers, timestamps and frame membership. D195 to D198 answer D182's four forks (event
+  identity, multiplicity, graph scope, provenance); where a session ends is still open, and D199
+  reworks Graphshell's `graphshell-rdf-trail` to them. The format rows do not show this: D182's probe
   lost the click with every one of them passing. Turnstone's half is in
   `turnstone/design_docs/2026-10-28_graphshell_host_plan.md` (L2).
 
@@ -2977,6 +2978,26 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 - **D194. The sorted N-Quads serializer lives in `mere::formats::canon`; the digest is `mere-resource-sorted-nquads-blake3` version 1 (Mark, 2026-11-20):** the digest lane (`Code/testing/engine-split/p8_digest/`, Mere branch `p8-resource-digest` `f2b9867ed`) built `sorted_nquads` beside the RDFC wrapper, byte-identical to `mere-rdfc` on blank-free sets without triple terms, and `PinnedView::resource_digest` as BLAKE3 derive-key (D158's construction) under a private domain, pinned by two independent known-answer vectors. "mere::formats::canon (Recommended)": `mere` owns the formats stage and `mere-rdfc` stays RDFC-1.0 alone; against a second entry point in `mere-rdfc`. "Keep as built (Recommended)": algorithm `mere-resource-sorted-nquads-blake3`, version 1, domain `mere resource digest v1`; against an algorithm named for the construction. Outcome: applies D190 and D192.
 
   Links: area The stack · draws on engine-split D158, engine-split D190, engine-split D192 · plans engine-split P8 · summary Sorted N-Quads live in mere::formats::canon and the Resource digest is mere-resource-sorted-nquads-blake3 v1 under the domain mere resource digest v1.
+
+- **D195. A traversal event is named by a UUID minted when it is recorded (Mark, 2026-11-23):** a traversal is `{timestamp_ms, trigger}` inside its edge's list with no identity of its own, and Graphshell's trail exchange (`55988ecb`) names events by position within one export. "Minted UUID (Recommended)": `Traversal` and `PersistedTraversalRecord` gain an id minted at record time and exported as `urn:uuid:<id>` (RFC 9562), the scheme the exchange already uses for Surfaces; archives written before the field stop reading and are fixed forward. Mark first asked whether it was spec conformant and rkyv compatible, "if not, eh, 1"; it is conformant, and rkyv takes the field without schema evolution. Against a hash of source, target, trigger and timestamp, which collapses identical clicks in one millisecond, and a reifier with no stable identity. Outcome: refines D182.
+
+  Links: area The stack · draws on engine-split D182 · plans engine-split P7 · summary A traversal event carries a UUID minted at record time, exported as urn:uuid.
+
+- **D196. A trail exports each retained traversal and the edge's metrics (Mark, 2026-11-23):** an edge keeps a rolling window of traversals, which can be evicted, beside durable `EdgeMetrics`. "Events + metrics (Recommended)": one event resource per retained traversal and the metrics as aggregate quads, both restored on import, so evicted history still counts; against events only, which loses evicted counts, and metrics only, which loses each click. Outcome: refines D182.
+
+  Links: area The stack · draws on engine-split D182 · plans engine-split P7 · summary A trail exports every retained traversal as an event and the edge's metrics as aggregates; import restores both.
+
+- **D197. Traversal events live in one history graph per workspace, each naming its session (Mark, 2026-11-23):** Mark asked what a graph per session would need and offer over a workspace graph: a session entity, a rule for where a session ends and a session on each traversal, in return for sharing or deleting one session as a unit. "Workspace graph + session tag (Recommended)": one history graph per workspace, apart from durable Surface statements, each event naming its session, so a session is shared or deleted by filter; against a graph per session, which multiplies graphs and needs unions to query across sessions, and a workspace graph with no session. Where a session ends is not yet ruled. Outcome: refines D182.
+
+  Links: area The stack · draws on engine-split D182 · plans engine-split P7 · summary Traversal events go in one history graph per workspace, separate from Surface statements, and each names its session.
+
+- **D198. Each traversal event names the agent that recorded it (Mark, 2026-11-23):** FrameMember exports an RDF-star reifier with attribution and generated and last-asserted times. "Attribution per event (Recommended)": an event names the agent or device that recorded it and its own timestamp stands for generation, about one quad more, so merged history from several devices keeps who recorded what; against FrameMember's full reifier, about four quads per click, and one attribution for the whole graph. Outcome: refines D182.
+
+  Links: area The stack · draws on engine-split D182 · plans engine-split P7 · summary A traversal event carries the attribution of the agent or device that recorded it; its timestamp stands for generation.
+
+- **D199. Graphshell's trail exchange is reworked to D195–D198 (Mark, 2026-11-23):** `graphshell-rdf-trail` (Graphshell `55988ecb`, 2026-11-22) was built before D182's forks returned: positional event ids, events without metrics, one graph per export origin and `prov:wasDerivedFrom` as its only provenance; nothing consumes it. "Rework it to the rulings (Recommended)": the crate and its round-trip tests stay, and identity, metrics, sessions and attribution change to the rulings; against a rewrite and keeping it as built. Outcome: applies D195, D196, D197 and D198.
+
+  Links: area The stack · draws on engine-split D182, engine-split D195, engine-split D196, engine-split D197, engine-split D198 · plans engine-split P7 · summary graphshell-rdf-trail is kept and reworked to minted event ids, metrics, per-workspace history with sessions and per-event attribution.
 
 ## Open questions
 

@@ -2126,6 +2126,46 @@ summary = "Sorted N-Quads live in mere::formats::canon and the Resource digest i
 draws_on = ["engine-split D158", "engine-split D190", "engine-split D192"]
 plans = ["engine-split"]
 
+[decisions."engine-split D195"]
+title = "A traversal event is named by a UUID minted when it is recorded (Mark, 2026-11-23)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A traversal event carries a UUID minted at record time, exported as urn:uuid."
+draws_on = ["engine-split D182"]
+plans = ["engine-split"]
+
+[decisions."engine-split D196"]
+title = "A trail exports each retained traversal and the edge's metrics (Mark, 2026-11-23)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A trail exports every retained traversal as an event and the edge's metrics as aggregates; import restores both."
+draws_on = ["engine-split D182"]
+plans = ["engine-split"]
+
+[decisions."engine-split D197"]
+title = "Traversal events live in one history graph per workspace, each naming its session (Mark, 2026-11-23)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Traversal events go in one history graph per workspace, separate from Surface statements, and each names its session."
+draws_on = ["engine-split D182"]
+plans = ["engine-split"]
+
+[decisions."engine-split D198"]
+title = "Each traversal event names the agent that recorded it (Mark, 2026-11-23)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A traversal event carries the attribution of the agent or device that recorded it; its timestamp stands for generation."
+draws_on = ["engine-split D182"]
+plans = ["engine-split"]
+
+[decisions."engine-split D199"]
+title = "Graphshell's trail exchange is reworked to D195–D198 (Mark, 2026-11-23)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "graphshell-rdf-trail is kept and reworked to minted event ids, metrics, per-workspace history with sessions and per-event attribution."
+draws_on = ["engine-split D182", "engine-split D195", "engine-split D196", "engine-split D197", "engine-split D198"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
