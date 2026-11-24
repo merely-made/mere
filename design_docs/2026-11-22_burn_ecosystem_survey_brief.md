@@ -201,7 +201,7 @@ Ruled by Mark, 2026-11-22:
 - **bunsen is harvested by kit, not taken as a dependency** (ruled 2026-11-22).
   Parakeet first, for word times. The catalog row shape is borrowed as an
   idea, not as code.
-- **Lift order, proposed:** Watershed's RoFormer into `esp::audio`, then
+- **Lift order, ruled 2026-11-23:** Watershed's RoFormer into `esp::audio`, then
   Parakeet, then demucs-rs as the CPU fallback.
 
 Scoped 2026-11-22, the `cubek-reduce` question: **two different faults.**
