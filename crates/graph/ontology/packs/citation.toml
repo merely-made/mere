@@ -1,0 +1,30 @@
+# Selected CiTO properties, from https://sparontologies.github.io/cito/current/cito.html
+id = "pack:citation"
+version = "0.1.0"
+kind = ["vocabulary"]
+licence = "MPL-2.0"
+provides = ["cito:"]
+
+[prefixes]
+pack = "https://mere.computer/packs/"
+cito = "http://purl.org/spar/cito/"
+
+[[vocabulary.terms]]
+iri = "cito:cites"
+kind = "predicate"
+labels = { en = "cites" }
+
+[[vocabulary.terms]]
+iri = "cito:includesQuotationFrom"
+kind = "predicate"
+labels = { en = "includes quotation from" }
+
+[[vocabulary.terms]]
+iri = "cito:supports"
+kind = "predicate"
+labels = { en = "supports" }
+
+[[vocabulary.terms]]
+iri = "cito:disputes"
+kind = "predicate"
+labels = { en = "disputes" }

@@ -199,15 +199,32 @@ pub fn load_local_shape_selection(
     load_inner(
         &PackRef::Pinned(pack.pin.clone()),
         &source,
-        &|_, verdict, origin| match (verdict, origin) {
-            (Verdict::Unsigned, Origin::Local) => Ok(Admission::Local),
-            (Verdict::Broken(step), _) => Err(Refusal::Broken(*step)),
-            (Verdict::Trusted(signers), _) => Err(Refusal::UnacceptedSigner(signers.clone())),
-            (Verdict::Unsigned, _) => Err(Refusal::Unsigned),
-        },
+        &admit_local,
         limits,
         true,
     )
+}
+
+/// Admit a lens from an application's bundled and explicitly selected local packs.
+///
+/// # Errors
+///
+/// Returns a refusal for invalid selections or any offer outside unsigned local origin.
+pub fn load_local_lens(
+    lens: &PackRef,
+    source: &dyn PackSource,
+    limits: &Limits,
+) -> Result<Profile, LoadRefusal> {
+    load_inner(lens, source, &admit_local, limits, false).map(|loaded| loaded.profile)
+}
+
+fn admit_local(_: &str, verdict: &Verdict, origin: Origin) -> Result<Admission, Refusal> {
+    match (verdict, origin) {
+        (Verdict::Unsigned, Origin::Local) => Ok(Admission::Local),
+        (Verdict::Broken(step), _) => Err(Refusal::Broken(*step)),
+        (Verdict::Trusted(signers), _) => Err(Refusal::UnacceptedSigner(signers.clone())),
+        (Verdict::Unsigned, _) => Err(Refusal::Unsigned),
+    }
 }
 
 struct LocalPack<'a> {

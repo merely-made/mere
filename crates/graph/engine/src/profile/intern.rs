@@ -138,10 +138,33 @@ pub struct TermEntry {
     pub uuid: Uuid,
     pub kind: TermKind,
     pub family: Option<String>,
+    /// Language-tagged names supplied by the winning vocabulary.
+    pub labels: BTreeMap<String, String>,
     pub handler: Option<String>,
     /// The pack whose row this is, by id.
     pub pack: String,
     pub row: AxisRow,
+}
+
+impl TermEntry {
+    /// Prefer the requested language, its parent tags, then English or the stable IRI.
+    pub fn display_label(&self, language: &str) -> &str {
+        let mut tag = language;
+        while !tag.is_empty() {
+            if let Some((_, label)) = self
+                .labels
+                .iter()
+                .find(|(key, text)| key.eq_ignore_ascii_case(tag) && !text.trim().is_empty())
+            {
+                return label;
+            }
+            tag = tag.rsplit_once('-').map_or("", |(parent, _)| parent);
+        }
+        self.labels
+            .iter()
+            .find(|(key, text)| key.eq_ignore_ascii_case("en") && !text.trim().is_empty())
+            .map_or(&self.iri, |(_, label)| label)
+    }
 }
 
 /// Dense id to term; IRI to id; the core defaults for unknown IRIs.
@@ -253,6 +276,7 @@ pub(crate) fn intern(
             uuid: Uuid::new_v5(&Uuid::NAMESPACE_URL, term.iri.as_bytes()),
             kind: term.kind,
             family: term.family.clone(),
+            labels: term.labels.clone(),
             handler: term.handler.clone(),
             pack: pack.to_string(),
             row: row(term, pack, &defaults, diagnostics),

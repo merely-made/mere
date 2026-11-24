@@ -1,0 +1,61 @@
+# Web Annotation Vocabulary, https://www.w3.org/TR/annotation-vocab/
+id = "pack:web-annotation"
+version = "0.1.0"
+kind = ["vocabulary"]
+licence = "MPL-2.0"
+provides = ["oa:", "as:"]
+
+[prefixes]
+pack = "https://mere.computer/packs/"
+oa = "http://www.w3.org/ns/oa#"
+as = "http://www.w3.org/ns/activitystreams#"
+
+[[vocabulary.terms]]
+iri = "oa:Annotation"
+kind = "class"
+labels = { en = "Annotation" }
+
+[[vocabulary.terms]]
+iri = "oa:SpecificResource"
+kind = "class"
+labels = { en = "Selected resource" }
+
+[[vocabulary.terms]]
+iri = "oa:FragmentSelector"
+kind = "class"
+labels = { en = "Media fragment" }
+
+[[vocabulary.terms]]
+iri = "oa:TextualBody"
+kind = "class"
+labels = { en = "Text body" }
+
+[[vocabulary.terms]]
+iri = "oa:hasTarget"
+kind = "predicate"
+labels = { en = "Target" }
+
+[[vocabulary.terms]]
+iri = "oa:hasBody"
+kind = "predicate"
+labels = { en = "Body" }
+
+[[vocabulary.terms]]
+iri = "oa:hasSource"
+kind = "predicate"
+labels = { en = "Source" }
+
+[[vocabulary.terms]]
+iri = "oa:hasSelector"
+kind = "predicate"
+labels = { en = "Selector" }
+
+[[vocabulary.terms]]
+iri = "as:OrderedCollectionPage"
+kind = "class"
+labels = { en = "Annotation page" }
+
+[[vocabulary.terms]]
+iri = "as:items"
+kind = "predicate"
+labels = { en = "Items" }
