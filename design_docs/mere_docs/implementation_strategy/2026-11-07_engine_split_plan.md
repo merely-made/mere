@@ -3023,6 +3023,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D201 · plans engine-split P8 · summary MereHost keeps each node's instance slot within an epoch so deltas stay small; D201's bound is re-measured on real deltas.
 
+- **D206. Hosts serve keyframes only until placement keeps edits local (Mark, 2026-11-24):** with D205's slot-stable builds a one-node edit still rewrites every node, because the served phyllotaxis places nodes by recency rank and a new node pushes every other one outward; deltas measured 630 KB of a 1.50 MB keyframe at 1k nodes and 64.3 of 152 MB at 100k (about 42%), so D201's byte cap binds at two deltas and its count of 64 is moot (`Code/testing/engine-split/e3_retention/numbers_e3_build.tsv`, rows v3). "Drop retention until placement changes": recovery keeps E3's identity checks and its resume, but a gap is answered with a fresh keyframe and no deltas are retained; against landing retention as built and asking the layout question first. Retention returns when placement moves only what an edit touches. Outcome: refines D201 and D205.
+
+  Links: area The stack · draws on engine-split D201, engine-split D205 · plans engine-split P8 · summary A host keeps E3's identity checks and resume but answers every gap with a keyframe, retaining no deltas, until placement makes deltas local.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
