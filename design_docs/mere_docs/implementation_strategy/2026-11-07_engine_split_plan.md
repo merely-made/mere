@@ -3019,6 +3019,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D161 · plans engine-split P8 · summary resource_tag_labels walks the resource's own outgoing edges, O(degree), with the same labels and API.
 
+- **D205. Host builds keep a node's instance slot within an epoch; the retention bound is re-measured on real deltas (Mark, 2026-11-24):** D201 rested on deltas of 0.4 to 1.5 KB, but those were shaped by hand in the E3 evidence probe; the E3 lane (Graphshell `e3/recovery`, `Code/testing/engine-split/e3_retention/numbers_e3_build.tsv`) diffed real `MereHost` builds and found the newest node built first, so a one-node edit shifts every older node's slot and a delta is 37% of a keyframe (544 KB of 1.50 MB at 1k nodes, 55.6 of 151 MB at 100k), leaving the byte cap binding at two deltas. "Slot-stable builds (Recommended)": a node keeps its instance within an epoch, new nodes append, removed ones tombstone and visual order goes through `item_order`; the 64-delta bound is checked again on the deltas that produces; against keeping the builds, which makes recovery almost always a keyframe, and an epoch per structural edit. Outcome: refines D201.
+
+  Links: area The stack · draws on engine-split D201 · plans engine-split P8 · summary MereHost keeps each node's instance slot within an epoch so deltas stay small; D201's bound is re-measured on real deltas.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

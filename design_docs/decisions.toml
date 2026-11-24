@@ -2206,6 +2206,14 @@ summary = "resource_tag_labels walks the resource's own outgoing edges, O(degree
 draws_on = ["engine-split D161"]
 plans = ["engine-split"]
 
+[decisions."engine-split D205"]
+title = "Host builds keep a node's instance slot within an epoch; the retention bound is re-measured on real deltas (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "MereHost keeps each node's instance slot within an epoch so deltas stay small; D201's bound is re-measured on real deltas."
+draws_on = ["engine-split D201"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
