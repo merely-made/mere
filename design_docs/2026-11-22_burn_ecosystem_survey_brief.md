@@ -204,6 +204,19 @@ Ruled by Mark, 2026-11-22:
 - **Lift order, ruled 2026-11-23:** Watershed's RoFormer into `esp::audio`, then
   Parakeet, then demucs-rs as the CPU fallback.
 
+- **Watershed's CPU estimators go to Woodshed `audio-primitives`** (ruled
+  2026-11-23): tempo, beat tracking for unclicked performances, key and chords,
+  shared with Hocket, and the audio material plan's baselines.
+- **Hocket takes mono and stereo** (Mark, 2026-11-23, leaning that way: "would
+  it make sense to be able to do both mono and stereo? is there a constraint
+  that forced us to do only mono before?"). No constraint forced mono: capture
+  is one microphone, and `hocket-project/src/export.rs` already writes stereo,
+  duplicating the mono mix "until pan or stereo devices exist". So a phrase
+  would carry its channel count: mono for capture, stereo for imported stems.
+  That touches `hocket-model`, the `.hock` manifest and playback; not started.
+- **A1 landed 2026-11-23:** BS-RoFormer in `esp::audio::separation`, tracked by
+  `distillery/design_docs/implementation_strategy/2026-11-23_esp_audio_plan.md`.
+
 Scoped 2026-11-22, the `cubek-reduce` question: **two different faults.**
 
 - Distillery's patch (against `cubek-reduce` 0.3.1) is one helper and two
