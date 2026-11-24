@@ -796,7 +796,7 @@ rules stay in the workspace.
   a constructed one. The same address is visited twice through two distinct surfaces, the workspace
   is exported as an RDF dataset and reopened in a fresh store, and both events come back with their
   endpoints, triggers, timestamps and frame membership. D195 to D198 answer D182's four forks (event
-  identity, multiplicity, graph scope, provenance); where a session ends is still open, and D199
+  identity, multiplicity, graph scope, provenance); D200 ends a session after an idle gap, and D199
   reworks Graphshell's `graphshell-rdf-trail` to them. The format rows do not show this: D182's probe
   lost the click with every one of them passing. Turnstone's half is in
   `turnstone/design_docs/2026-10-28_graphshell_host_plan.md` (L2).
@@ -2998,6 +2998,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 - **D199. Graphshell's trail exchange is reworked to D195–D198 (Mark, 2026-11-23):** `graphshell-rdf-trail` (Graphshell `55988ecb`, 2026-11-22) was built before D182's forks returned: positional event ids, events without metrics, one graph per export origin and `prov:wasDerivedFrom` as its only provenance; nothing consumes it. "Rework it to the rulings (Recommended)": the crate and its round-trip tests stay, and identity, metrics, sessions and attribution change to the rulings; against a rewrite and keeping it as built. Outcome: applies D195, D196, D197 and D198.
 
   Links: area The stack · draws on engine-split D182, engine-split D195, engine-split D196, engine-split D197, engine-split D198 · plans engine-split P7 · summary graphshell-rdf-trail is kept and reworked to minted event ids, metrics, per-workspace history with sessions and per-event attribution.
+
+- **D200. A browsing session ends after a configurable idle gap, 30 minutes by default (Mark, 2026-11-23):** D197 left open where a session ends, and neither Mere nor Graphshell has a session concept today. "Configurable, idle-gap default (Recommended)": a session ends when no traversal is recorded for a set gap, 30 minutes by default, the gap is a setting, and a person can split a session by hand; against launch to exit, one window's life, and sessions only a person starts and ends. Outcome: refines D197.
+
+  Links: area The stack · draws on engine-split D197 · plans engine-split P7 · summary A browsing session ends after a configurable idle gap with no traversal, 30 minutes by default, and can be split by hand.
 
 ## Open questions
 
