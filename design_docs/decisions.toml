@@ -2174,6 +2174,14 @@ summary = "A browsing session ends after a configurable idle gap with no travers
 draws_on = ["engine-split D197"]
 plans = ["engine-split"]
 
+[decisions."engine-split D201"]
+title = "A host retains the last 64 deltas, evicted early past one keyframe's bytes, and replays a suffix with one clone (Mark, 2026-11-23)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A host retains its last 64 deltas, evicted early past one keyframe's encoded bytes, falls back to a keyframe beyond them, and replays a suffix with one clone of the scene."
+draws_on = ["engine-split D181", "engine-split D189"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

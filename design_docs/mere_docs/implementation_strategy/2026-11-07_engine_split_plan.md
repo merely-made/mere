@@ -3003,6 +3003,10 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D197 · plans engine-split P7 · summary A browsing session ends after a configurable idle gap with no traversal, 30 minutes by default, and can be split by hand.
 
+- **D201. A host retains the last 64 deltas, evicted early past one keyframe's bytes, and replays a suffix with one clone (Mark, 2026-11-23):** D189 left the retention bound to Graphshell's E3. The E3 evidence (`Code/testing/engine-split/e3_retention/`, Graphshell `7809663e`, Mere `8a86b3e`, release, CBOR) measured keyframes of 1.17, 11.7 and 118 MB at 1k, 10k and 100k nodes, built in 27 ms, 1.69 s and 445 s; typical deltas of 0.4 to 1.5 KB at any scale; replay at 7.8 ms and 83 ms per delta at 10k and 100k, because `SceneSnapshot::apply_diff` clones the whole scene each time; and deltas at the edit rate only, since drag and physics never reach the engine. No path retains or sends deltas today. "64 deltas, capped at a keyframe (Recommended)": the last 64 deltas, about 115 KB typically, evicted early when they would hold more bytes than one keyframe, and a fresh keyframe past them; against no retention, a byte budget alone, which can hold more deltas than replay can beat a keyframe with, and a 30-second window. "One clone per suffix (Recommended)": E3 applies a retained suffix with a single clone of the scene, not one per delta. Outcome: refines D189.
+
+  Links: area The stack · draws on engine-split D181, engine-split D189 · plans engine-split P8 · summary A host retains its last 64 deltas, evicted early past one keyframe's encoded bytes, falls back to a keyframe beyond them, and replays a suffix with one clone of the scene.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
