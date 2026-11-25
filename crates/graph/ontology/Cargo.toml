@@ -7,6 +7,10 @@ rust-version.workspace = true
 description = "Local application lenses and subject vocabularies for Mere"
 
 [dependencies]
+serde.workspace = true
+serde_json.workspace = true
+oxiri = "0.3.1"
+oxrdf = "0.3"
 mere = { version = "0.1.0", path = "../engine", default-features = false }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", branch = "main", version = ">=0.0.3", default-features = false, features = ["pack-authoring"] }
 

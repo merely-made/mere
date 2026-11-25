@@ -55,6 +55,20 @@ impl ContextCache {
         self
     }
 
+    /// Identify the context URLs and exact documents that can affect offline
+    /// JSON-LD expansion. Registration order has no effect on the result.
+    pub fn revision(&self) -> eidetic::Hash {
+        let mut contexts: Vec<_> = self.documents.iter().collect();
+        contexts.sort_unstable_by(|(left, _), (right, _)| left.cmp(right));
+        let mut identity = b"mere.contexts/1\0".to_vec();
+        for (url, bytes) in contexts {
+            identity.extend_from_slice(&(url.len() as u64).to_be_bytes());
+            identity.extend_from_slice(url.as_bytes());
+            identity.extend(eidetic::Hash::of(bytes).to_multihash_bytes());
+        }
+        eidetic::Hash::of(&identity)
+    }
+
     pub(super) fn get(&self, url: &str) -> Option<&[u8]> {
         self.documents.get(url).map(Vec::as_slice)
     }
