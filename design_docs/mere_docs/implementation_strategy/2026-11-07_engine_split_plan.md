@@ -3141,6 +3141,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D224, engine-split D231 · plans engine-split P8 · summary Payload schema names version the type's shape, not the door's encoding; the move to CBOR keeps them at v1.
 
+- **D234. D231 takes in Distillery and Isocosm (Mark, 2026-11-25):** the generic `graphshell-client` `invoke` and chirograph `compose_payload` build every endpoint's payload, so moving them to CBOR breaks each JSON decoder they reach. Those are Distillery's inference route (eight decoders, `inference.rs:1929-1990`) and Isocosm's endpoints (mesocosm-runtime, cosmograph-host, `graph_world`, isocosm-native), beside the Knot, Cleromancy, Turnstone and dramatis-surface endpoint intents the lane had already moved. "Yes, into this lane (Recommended)": both move under D231, landing after Graphshell and dramatis (back to back) with Turnstone, Cleromancy and Knot, each built against the branches first. Against keeping the generic client on JSON, which would give a payload a different codec depending on who built it. Outcome: applies D231.
+
+  Links: area The stack · draws on engine-split D231 · plans engine-split P8 · summary D231's intent payload move covers every endpoint the generic client reaches, Distillery and Isocosm included, landed in one sequence.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

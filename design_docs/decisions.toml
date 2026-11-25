@@ -2437,6 +2437,14 @@ summary = "Payload schema names version the type's shape, not the door's encodin
 draws_on = ["engine-split D224", "engine-split D231"]
 plans = ["engine-split"]
 
+[decisions."engine-split D234"]
+title = "D231 takes in Distillery and Isocosm (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "D231's intent payload move covers every endpoint the generic client reaches, Distillery and Isocosm included, landed in one sequence."
+draws_on = ["engine-split D231"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
