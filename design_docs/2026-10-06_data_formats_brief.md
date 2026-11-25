@@ -42,6 +42,10 @@ question.
   Encoding is deterministic, and decoding is strict wherever bytes are signed,
   content-addressed or validated on the wire. That is ruling 24's line in the
   [device pairing plan](archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md).
+  The codec is `cbor-core` (CBOR::Core), the one p2panda chose. Our own code
+  uses no other, and ciborium stays only inside coset and the dev-only codec
+  race (engine-split D209, 2026-11-24). Graphshell's projection wire is the
+  CBOR envelope alone (engine-split D210).
 - **No third binary format in production.** Codec races stay
   dev-dependencies.
 

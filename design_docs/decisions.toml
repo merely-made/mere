@@ -2230,6 +2230,29 @@ summary = "P8 builds the versioned CBOR keyframe envelope, with its schema and v
 draws_on = ["engine-split D181", "engine-split D189", "engine-split D206"]
 plans = ["engine-split"]
 
+[decisions."engine-split D208"]
+title = "A blake3 binding ties the envelope's identity to its scene (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The envelope carries a domain-separated blake3 over its canonical identity and scene bytes; decoding recomputes it and refuses a mismatch."
+draws_on = ["engine-split D181", "engine-split D207"]
+plans = ["engine-split"]
+
+[decisions."engine-split D209"]
+title = "cbor-core is the family's one CBOR codec (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Our own code encodes and decodes CBOR only through cbor-core; ciborium survives only inside coset and the dev-only codec race."
+draws_on = ["engine-split D181", "engine-split D207"]
+
+[decisions."engine-split D210"]
+title = "The projection wire has one encoding, the CBOR envelope (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Keyframes, diffs and resume messages cross every carrier only in the versioned CBOR envelope, pinned by a CDDL schema and vectors; NDJSON and the WIT ciborium payload are removed."
+draws_on = ["engine-split D181", "engine-split D207", "engine-split D208", "engine-split D209"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
