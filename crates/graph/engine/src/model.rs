@@ -20,6 +20,7 @@ pub mod author;
 pub mod clock;
 pub mod coverage;
 pub mod edge_data;
+pub mod edge_encode;
 pub mod edge_payload;
 pub mod edge_taxonomy;
 pub mod frozen;
@@ -32,6 +33,7 @@ pub mod resource_graph;
 pub mod shared;
 pub use shared::Shared;
 pub mod resource_record;
+pub mod resource_store;
 pub mod types;
 pub mod uuid_archive;
 pub use uuid_archive::UuidAsBytes;
@@ -73,6 +75,7 @@ pub use resource_content::{
 };
 pub use resource_graph::ResourceGraph;
 pub use resource_record::{PersistedResourceFacet, PersistedResourceRecord};
+pub use resource_store::ResourceStore;
 pub use types::{
     AssertionBasis, AssertionMethod, AssertionWithdrawal, ClassificationProvenance,
     ClassificationScheme, ClassificationStatus, GraphScope, NodeClassification, NodeProperty,

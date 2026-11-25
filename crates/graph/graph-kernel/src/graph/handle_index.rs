@@ -195,7 +195,7 @@ impl Graph {
     /// Mutable Resource relation payload, noted as written.
     pub(crate) fn resource_edge_mut(&mut self, key: EdgeIndex) -> Option<&mut EdgePayload> {
         self.note_relation_handles(RelationKey::Resource(ResourceEdgeKey::from_raw(key)));
-        self.resources.edge_mut(key).map(|e| &mut **e)
+        self.resources.edge_mut(key)
     }
 
     /// Every relation that retains `statement_id`, in scan order (Surface

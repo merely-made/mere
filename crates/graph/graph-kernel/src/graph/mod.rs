@@ -372,7 +372,7 @@ pub struct Graph {
     /// with the one live authority for ordinary resource metadata (its facets).
     /// The engine's model (`mere::model::ResourceGraph`); `pub(crate)` so every
     /// write goes through a recorded `Graph` method, as for `inner`.
-    pub(crate) resources: mere::model::ResourceGraph,
+    pub(crate) resources: mere::model::ResourceStore,
     /// Explicit surface UUID to resource UUID associations.
     pub(crate) shown_resources: mere::model::Shared<BTreeMap<Uuid, Uuid>>,
     /// `shown_resources` inverted: the surfaces showing each resource. Kept

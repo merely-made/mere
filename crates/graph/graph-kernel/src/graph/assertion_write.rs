@@ -10,9 +10,8 @@ use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
 use super::{
-    CapturedDelta, EdgePayload, Graph, GraphStratum, NodeKey, PredicateDeclarationError,
-    RelationKey, ResourceEdgeKey, ResourceNode, SemanticStatement, SemanticStatementSpec,
-    StatementAssert,
+    EdgePayload, Graph, GraphStratum, NodeKey, PredicateDeclarationError, RelationKey,
+    ResourceEdgeKey, ResourceNode, SemanticStatement, SemanticStatementSpec, StatementAssert,
 };
 use crate::time::unix_epoch_millis;
 use crate::types::AssertionWithdrawal;
@@ -518,12 +517,9 @@ impl Graph {
         }
     }
 
+    /// Records the pair as the engine store holds it after a composite edit.
     pub(crate) fn capture_resource_pair(&self, from: Uuid, to: Uuid) {
-        self.record_delta(&CapturedDelta::ReplaySetResourceEdgesByIds {
-            from_resource_id: from.to_string(),
-            to_resource_id: to.to_string(),
-            edges: self.persisted_resource_edges_between(from, to),
-        });
+        self.record_delta(&self.resources.pair_delta(from, to).into());
     }
 
     /// All-family aliases retain exact owner, ID, basis and lifecycle admission.

@@ -1125,11 +1125,8 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             if let Err(refused) = graph.admit_record_literals(resource_id, record.as_ref()) {
                 return GraphDeltaResult::Refused(refused);
             }
-            if graph.set_resource_record(resource_id, record) {
-                graph.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
-                    resource_id: resource_id.to_string(),
-                    record: graph.resource_record(resource_id),
-                });
+            if let Some(delta) = graph.write_resource_record(resource_id, record) {
+                graph.record_delta(&delta.into());
             }
             GraphDeltaResult::Applied
         },
@@ -1143,12 +1140,10 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             {
                 return GraphDeltaResult::Refused(refused);
             }
-            if graph.set_resource_edges_between(from_resource_id, to_resource_id, &edges) {
-                graph.record_delta(&CapturedDelta::ReplaySetResourceEdgesByIds {
-                    from_resource_id: from_resource_id.to_string(),
-                    to_resource_id: to_resource_id.to_string(),
-                    edges: graph.persisted_resource_edges_between(from_resource_id, to_resource_id),
-                });
+            if let Some(delta) =
+                graph.write_resource_edges(from_resource_id, to_resource_id, &edges)
+            {
+                graph.record_delta(&delta.into());
             }
             GraphDeltaResult::Applied
         },

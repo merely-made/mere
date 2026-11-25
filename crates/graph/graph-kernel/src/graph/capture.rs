@@ -939,7 +939,13 @@ impl ReplayAttribution {
     }
 
     pub(crate) fn repair_checkpoint(&self, graph: &mut Graph) {
-        let changed = self.repair_edges(&mut graph.inner) | self.repair_edges(&mut graph.resources);
+        let mut changed = self.repair_edges(&mut graph.inner);
+        let keys: Vec<_> = graph.resources.inner().edge_indices().collect();
+        for key in keys {
+            if let Some(payload) = graph.resources.edge_mut(key) {
+                changed |= self.repair_payload(payload);
+            }
+        }
         if changed {
             graph.clear_handle_index();
             graph.bump_revision();
@@ -951,29 +957,35 @@ impl ReplayAttribution {
         &self,
         graph: &mut portolan::Graph<N, mere::model::Shared<super::EdgePayload>>,
     ) -> bool {
-        let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
         let keys: Vec<_> = graph.inner().edge_indices().collect();
         let mut changed = false;
         for key in keys {
             if let Some(payload) = graph.edge_mut(key) {
-                let semantic = &mut payload.assertions;
-                for statement in &mut semantic.statements {
-                    if statement.statement_id.starts_with(
-                        super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX,
-                    ) {
-                        continue;
-                    }
-                    if statement
-                        .provenance_iri
-                        .as_deref()
-                        .is_none_or(|source| source == unknown)
-                        && let Some(source) = self.0.get(&statement.statement_id)
-                        && statement.provenance_iri.as_deref() != Some(source.as_str())
-                    {
-                        statement.provenance_iri = Some(source.clone());
-                        changed = true;
-                    }
-                }
+                changed |= self.repair_payload(payload);
+            }
+        }
+        changed
+    }
+
+    fn repair_payload(&self, payload: &mut super::EdgePayload) -> bool {
+        let unknown = mere::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+        let mut changed = false;
+        for statement in &mut payload.assertions.statements {
+            if statement
+                .statement_id
+                .starts_with(super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX)
+            {
+                continue;
+            }
+            if statement
+                .provenance_iri
+                .as_deref()
+                .is_none_or(|source| source == unknown)
+                && let Some(source) = self.0.get(&statement.statement_id)
+                && statement.provenance_iri.as_deref() != Some(source.as_str())
+            {
+                statement.provenance_iri = Some(source.clone());
+                changed = true;
             }
         }
         changed

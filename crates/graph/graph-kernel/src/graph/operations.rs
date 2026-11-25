@@ -13,7 +13,7 @@ impl Graph {
             runtime_input_keys: [GraphInputKey::new_source(); 4],
             inner: portolan::Graph::new(),
             surface_node_lifetimes: HashMap::new(),
-            resources: mere::model::ResourceGraph::new(),
+            resources: mere::model::ResourceStore::new(),
             shown_resources: BTreeMap::new().into(),
             resource_surfaces: Default::default(),
             facets: portolan::FacetStore::new(),

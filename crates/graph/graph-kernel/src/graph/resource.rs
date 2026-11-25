@@ -8,7 +8,8 @@
 
 use super::{Graph, NodeKey};
 use crate::persistence::{PersistedEdge, PersistedResourceRecord};
-use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+use mere::model::ResourceDelta;
+use petgraph::visit::EdgeRef;
 use uuid::Uuid;
 
 pub use super::resource_pair_bounds::ResourceEdgesBoundError;
@@ -61,40 +62,42 @@ impl Graph {
         id: Uuid,
         record: Option<PersistedResourceRecord>,
     ) -> bool {
+        self.write_resource_record(id, record).is_some()
+    }
+
+    /// Write or remove a resource record through the engine store, returning
+    /// the delta it made for the caller to record (engine split D250).
+    pub(crate) fn write_resource_record(
+        &mut self,
+        id: Uuid,
+        record: Option<PersistedResourceRecord>,
+    ) -> Option<ResourceDelta> {
         let Some(record) = record else {
-            let Some(key) = self.resources.key_of(&id) else {
-                return false;
-            };
+            // A binding still showing the resource is the join's to refuse.
             if self
                 .shown_resources
                 .values()
                 .any(|resource| *resource == id)
-                || self
-                    .resources
-                    .inner()
-                    .edge_references()
-                    .any(|edge| edge.source() == key || edge.target() == key)
             {
-                return false;
+                return None;
             }
-            self.resources.remove(key);
-            self.resources.facets_mut().remove_node(&id);
+            let delta = self.resources.remove_record(id)?;
             self.bump_revision();
-            return true;
+            return Some(delta);
         };
         let mut resource = ResourceNode::from_canonical_iri(&record.canonical_iri);
         let Ok(selection) = super::frozen_selection::selection_from_record(&record) else {
-            return false;
+            return None;
         };
         let Ok(link) = super::frozen_link::validate_frozen_link_record(&record) else {
-            return false;
+            return None;
         };
         if let Some(existing) = self
             .resource(id)
             .and_then(|resource| resource.nested_selection())
             && selection.as_ref() != Some(existing)
         {
-            return false;
+            return None;
         }
         if self
             .resource(id)
@@ -112,7 +115,7 @@ impl Graph {
                     serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
                 });
             if stored != incoming.as_ref() {
-                return false;
+                return None;
             }
         }
         if let Some(existing) = self
@@ -120,7 +123,7 @@ impl Graph {
             .and_then(|resource| resource.nested_link())
             && link.as_ref() != Some(existing)
         {
-            return false;
+            return None;
         }
         if self
             .resource(id)
@@ -138,95 +141,45 @@ impl Graph {
                     serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
                 });
             if stored != incoming.as_ref() {
-                return false;
+                return None;
             }
         }
         resource = resource.with_frozen(selection, link);
         if resource.id() != id {
-            return false;
+            return None;
         }
         if super::predicate_declarations::predicate_declarations_from_record(&record).is_err() {
-            return false;
+            return None;
         }
         if super::resource_content::validate_content_record(&record).is_err() {
-            return false;
+            return None;
         }
         let mut facets = std::collections::BTreeMap::new();
         for facet in record.facets {
             let Ok(value) = serde_json::from_str::<serde_json::Value>(&facet.value_json) else {
-                return false;
+                return None;
             };
             if facets
                 .insert(portolan::FacetId::new(facet.facet), value)
                 .is_some()
             {
-                return false;
+                return None;
             }
-        }
-        if self
-            .resource(id)
-            .is_some_and(|existing| existing == &resource)
-            && self
-                .resource_facets()
-                .facets_of(&id)
-                .map(|values| {
-                    values
-                        .iter()
-                        .map(|(key, value)| (key.clone(), value.clone()))
-                        .collect::<std::collections::BTreeMap<_, _>>()
-                })
-                .unwrap_or_default()
-                == facets
-        {
-            return false;
-        }
-        self.resources.insert(resource.into());
-        self.write_resource_facets(id, facets);
-        self.bump_revision();
-        true
-    }
-
-    /// Replace a resource's facets with `facets`: drop the ones it no longer
-    /// holds and write the rest in place. Taking the node out and putting it
-    /// back would rebalance the persistent store twice per record (engine split
-    /// D168); the store ends the same either way.
-    fn write_resource_facets(
-        &mut self,
-        id: Uuid,
-        facets: std::collections::BTreeMap<portolan::FacetId, serde_json::Value>,
-    ) {
-        let dropped: Vec<portolan::FacetId> = self
-            .resources
-            .facets()
-            .facets_of(&id)
-            .into_iter()
-            .flat_map(|held| held.iter().map(|(facet, _)| facet))
-            .filter(|facet| !facets.contains_key(*facet))
-            .cloned()
-            .collect();
-        let store = self.resources.facets_mut();
-        if facets.is_empty() {
-            // An emptied resource holds no facet node at all, as before.
-            store.remove_node(&id);
-        }
-        for facet in &dropped {
-            store.remove(&id, facet);
         }
         let properties = self.handle_index_built().then(|| {
             facets
-                .get(&portolan::FacetId::new(super::resource_content::RESOURCE_PROPERTIES))
+                .get(&portolan::FacetId::new(
+                    super::resource_content::RESOURCE_PROPERTIES,
+                ))
                 .and_then(|value| serde::Deserialize::deserialize(value).ok())
                 .unwrap_or_default()
         });
-        let store = self.resources.facets_mut();
-        for (facet, value) in facets {
-            store
-                .set(id, facet, value, &portolan::AcceptAll)
-                .expect("permissive facet validator");
-        }
+        let delta = self.resources.put_record(resource, facets)?;
         if let Some(properties) = properties {
             self.note_resource_literals_held(id, properties);
         }
+        self.bump_revision();
+        Some(delta)
     }
 
     /// Runtime receipt for completed new shown-Resource associations.
@@ -283,16 +236,7 @@ impl Graph {
         from: Uuid,
         to: Uuid,
     ) -> Vec<PersistedEdge> {
-        let (Some(source), Some(target)) =
-            (self.resources.key_of(&from), self.resources.key_of(&to))
-        else {
-            return Vec::new();
-        };
-        self.resources
-            .inner()
-            .edges_connecting(source, target)
-            .map(|edge| super::snapshot::persisted_edge_for_ids(from, to, edge.weight()))
-            .collect()
+        self.resources.persisted_edges_between(from, to)
     }
 
     pub(crate) fn set_resource_edges_between(
@@ -301,27 +245,38 @@ impl Graph {
         to: Uuid,
         edges: &[PersistedEdge],
     ) -> bool {
+        self.write_resource_edges(from, to, edges).is_some()
+    }
+
+    /// Replace a resource pair's edges through the engine store, returning the
+    /// delta it made for the caller to record (engine split D250).
+    pub(crate) fn write_resource_edges(
+        &mut self,
+        from: Uuid,
+        to: Uuid,
+        edges: &[PersistedEdge],
+    ) -> Option<ResourceDelta> {
         let (Some(source), Some(target)) =
             (self.resources.key_of(&from), self.resources.key_of(&to))
         else {
-            return false;
+            return None;
         };
         if !super::edge_admission::resource_rows_wellformed(from, to, edges) {
-            return false;
+            return None;
         }
         let mut statements = std::collections::BTreeMap::new();
         for statement in edges.iter().flat_map(|edge| edge.retained_assertions()) {
             if let Some(previous) = statements.insert(&statement.statement_id, statement)
                 && previous != statement
             {
-                return false;
+                return None;
             }
         }
         if statements
             .keys()
             .any(|id| self.handle_held_off_resource_pair(id, source, target))
         {
-            return false;
+            return None;
         }
         let payloads: Vec<_> = edges
             .iter()
@@ -334,31 +289,20 @@ impl Graph {
                 )
             })
             .collect();
-        let current: Vec<_> = self
-            .resources
-            .inner()
-            .edges_connecting(source, target)
-            .map(|edge| &**edge.weight())
-            .collect();
-        if current.len() == payloads.len()
-            && current.iter().zip(&payloads).all(|(old, new)| *old == new)
-        {
-            return false;
-        }
-        let old: Vec<_> = self
+        let delta = self.resources.replace_edges(from, to, payloads)?;
+        let keys: Vec<_> = self
             .resources
             .inner()
             .edges_connecting(source, target)
             .map(|edge| edge.id())
             .collect();
-        for edge in old {
-            self.resources.disconnect(edge);
-        }
-        for payload in payloads.into_iter().rev() {
-            self.connect_resource(source, target, payload);
+        for key in keys {
+            self.note_relation_handles(super::RelationKey::Resource(
+                super::ResourceEdgeKey::from_raw(key),
+            ));
         }
         self.bump_revision();
-        true
+        Some(delta)
     }
 }
 
