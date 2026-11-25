@@ -3145,6 +3145,14 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D231 · plans engine-split P8 · summary D231's intent payload move covers every endpoint the generic client reaches, Distillery and Isocosm included, landed in one sequence.
 
+- **D235. Isocosm's line-codec consumer moves onto the envelope in the D231 lane, and all seven repos land together (Mark, 2026-11-25):** Isocosm main has been red since Graphshell `1fc18a9e` removed `chirograph::line` under D210. `isocosm-genet/src/family_guest.rs` still uses it and `graphshell_client::pump::LinePump` (:27, :203, :209, :293), and nothing checked Isocosm's build before that landing. The lane's Isocosm port can't commit past a hook that fails on that file, and landing the other six first would also break Isocosm's endpoints, which still decode JSON. "Lane ports it, all 7 land": the lane moves `family_guest.rs` onto the envelope carrier, and Graphshell, dramatis, Turnstone, Cleromancy, Knot, Distillery and Isocosm land in one sequence. Against landing six and leaving Isocosm to a later lane. Outcome: applies D210 and D234.
+
+  Links: area The stack · draws on engine-split D210, D234 · plans engine-split P8 · summary The consumer D210's landing broke is ported in the same lane, and no landing leaves a main redder than it found it.
+
+- **D236. Wherever JSON enters, typed per-intent translation applies, from people as well as agents (Mark, 2026-11-25):** Isocosm's VTT table sends JSON that a person types into a text field. The lane converted it generically (JSON value to CBOR, `isocosm-genet/src/family_view.rs:118`), which works for strings and numbers but refuses a uuid or bytes field. "Typed, like D232": the table maps each intent to its Rust type, parses the typed JSON into it and re-encodes canonical CBOR, done in the D231 lane. Against keeping the generic conversion. Outcome: refines D232.
+
+  Links: area The stack · draws on engine-split D232 · plans engine-split P8 · summary JSON from a person or an agent is parsed into the intent's Rust type before it becomes CBOR, never converted blind.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
