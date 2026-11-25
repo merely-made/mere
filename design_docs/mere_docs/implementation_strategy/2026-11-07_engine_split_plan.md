@@ -3161,6 +3161,14 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D236 · plans engine-split P8 · summary Each typed JSON-to-CBOR table sits with the crate that owns the intent types, so the mapping cannot drift from them.
 
+- **D239. Bytes ciborium stored get a clean break, not a normalising read (Mark, 2026-11-25):** the D209 lane found that ciborium wrote struct fields in declaration order and cbor-core sorts map keys. Lengths, widths and tags all match. eidetic packs came out byte-identical across 2000 random bodies and every fixture, and `FIXTURE_BLAKE3` still holds. Sporran's records do not: insigne's signatures stay valid, but every `CarryRef` over a certificate, epoch record or revocation ledger moves (one epoch record goes from `d8c66fe1…` to `5e750dfc…`), and stored `.cert`/`.cbor` files and issued pairing QR codes fail strict decoding. The lane had read pre-D209 `.hock` manifests through a lenient fallback with no expiry. For sporran, "Clean break": cbor-core, old records and QR codes are refused, and devices re-pair. For manifests, "Clean break": strict only, and pre-D209 manifests are refused. Against normalising once and re-deriving refs, against a ciborium exception in sporran, and against the lenient fallback or a rewrite on load. Outcome: refines D209, whose read-once normalisation of stored files leaves the doctrine.
+
+  Links: area The stack · draws on engine-split D209 · plans engine-split P8 · summary Stored bytes ciborium wrote are refused by strict cbor-core; no normalising reader or migration is kept.
+
+- **D240. The hocket hand-off signs canonical bytes at format v3 (Mark, 2026-11-25):** hocket-project's hand-off carries an Ed25519 signature over ciborium's bytes of `UnsignedHandoff`, so signing cbor-core's sorted bytes breaks every existing `.handoff`. "Bump to v3, drop v2 (Recommended)": `FORMAT_VERSION` 3, salt `hocket/handoff/v3/`, the signature covers canonical cbor-core bytes, v2 envelopes are refused, and ciborium leaves woodshed. Against verifying v2 over raw bytes and against a ciborium exception. Outcome: applies D239.
+
+  Links: area The stack · draws on engine-split D239 · plans engine-split P8 · summary Hand-offs sign canonical CBOR at v3; v2 envelopes are refused.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
