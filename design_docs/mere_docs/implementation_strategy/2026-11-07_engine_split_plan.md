@@ -4163,3 +4163,12 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   `FrameError::Cbor` arm) for about 40 minutes. Found: Graphshell `119f848c`'s `saved_views` test fails on Windows before and
   after these changes (os error 123): it hard-codes a `/tmp/mv-<root>.sock` endpoint, not a valid named-pipe name. Not
   verified here: Knot's ported test and graphshell-door's `projection_provider` socket tests, both Unix-only.
+- 2026-11-25: D230 to D238 built and landed. Every app-door intent payload is canonical cbor-core, resources keep their
+  codecs, and the MCP bridge and Isocosm's VTT table parse typed JSON into each intent's Rust type (Graphshell `2474e3bf`,
+  `7d4d5c70`; dramatis `756b748`; Turnstone `dd5e518e`; Cleromancy `ae300de`; Knot `75b3bb4`; Distillery `de5f059`; Isocosm
+  `4d81033d`). Isocosm main had been red since Graphshell `1fc18a9e`: `isocosm-genet` still used the removed line codec. The
+  same lane ported it (D235), and Isocosm's 53 test targets pass. Isocosm's game gains a typed `submit_game_input` (D237).
+  D236's uuid-bearing test case has nothing to test in the VTT vocabulary, which carries no uuid. Its test covers a typed
+  positive control, a mistyped payload and an unknown intent. Pre-existing on Windows, the same on each main: `personal_facts`
+  and `saved_views` (`/tmp/*.sock` endpoints, os error 123), Distillery's `inference_automatic` and `inference_route`, Cleromancy
+  `granted_ambient`, and Knot's `checkpoint_confidentiality`, `composition_retention` and `relation_intake`.
