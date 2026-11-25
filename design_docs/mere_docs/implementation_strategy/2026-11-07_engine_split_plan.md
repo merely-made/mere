@@ -3197,6 +3197,18 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split engine-split D216 · plans engine-split P8 · summary mere-facts writes resource facets in the move; L7 makes the facts RDF statements under a declared vocabulary.
 
+- **D248. The personal-facts rewrite lands with Graphshell's tamper test, in the consumer-flip lane (Mark, 2026-11-25):** Under D246 and D247 facts place no surface node, so mere-resident's `personal_facts_two_apps_share_exact_revisions_and_refuse_tampering` (`resident_mere.rs:4207`), which forges a `ReplaySetNodeFacetById` on a record's node, replays as a silent no-op and is Accepted where it expected Rejected. "Land with Graphshell test fix (Recommended)": the facts commit lands with a mere-resident test update in the consumer-flip lane. The tamper becomes a `ReplaySetResourceRecordById` carrying altered facts, which `validate` rejects, and the node-facet forgery stays as a no-op case. Mere's step 1 lands without it. Against the kernel refusing replays on missing nodes, and against keeping a bare node per record. Outcome: applies D246 and D247.
+
+  Links: area The stack · draws on engine-split engine-split D246, engine-split D247 · plans engine-split P8 · summary The facts rewrite waits for the consumer flip, landing with Graphshell's tamper test rewritten onto resource records.
+
+- **D249. The journal is engine-generic over the graph's delta type (Mark, 2026-11-25):** With pandect's default `G = kernel::graph::Graph` (D244), journal entries must stay the kernel's `AttributedDelta`: Turnstone matches them as `CapturedDelta` (`ports/graphshell/src/product.rs:2331`) and Graphshell cartography builds `GraphJournal::new()` and calls `record` and `replay` itself (`fold_and_source_time.rs:326`). "Engine journal over G::Delta (Recommended)": an engine journal stores `Attributed<G::Delta>`; the kernel's delta is `CapturedDelta` and a new host's is `JournalDelta<S>`; the kernel's `GraphJournal` becomes an alias, and its `migrated_*` methods move to an extension trait used only by kernel tests. Against a per-host journal as an associated type, and against envelope entries for all hosts now. Outcome: applies D148, D242 and D244.
+
+  Links: area The stack · draws on engine-split engine-split D148, engine-split D242, engine-split D244 · plans engine-split P8 · summary One engine journal type is generic over the graph's delta; the kernel's GraphJournal is its alias, so no consumer changes.
+
+- **D250. The recorded store returns the deltas it makes, and the host records them (Mark, 2026-11-25):** `set_resource_record` (`resource.rs:59-140`) mixes the binding check, the revision bump and frozen-link validation into the store write. "Store returns deltas (Recommended)": store writes validate, apply and return the `ResourceDelta`s they made, and the host records them in its one journal with its surface deltas, so one cursor and one recorder stay with the host. Against a store holding its own forwarding recorder. Outcome: refines D243.
+
+  Links: area The stack · draws on engine-split engine-split D243 · plans engine-split P8 · summary Store writes are pure and return their ResourceDeltas; only the host records, on one cursor.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
