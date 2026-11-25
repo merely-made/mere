@@ -2365,6 +2365,14 @@ summary = "Envelope payloads refuse unknown fields; a new field is a schema and 
 draws_on = ["engine-split D210"]
 plans = ["engine-split"]
 
+[decisions."engine-split D225"]
+title = "The resident's app door carries the CBOR wire item (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The resident's app door keeps ostiary's length-prefixed frame with a canonical CBOR body carrying the envelope; only the browser door stays JSON."
+draws_on = ["engine-split D210", "engine-split D220"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

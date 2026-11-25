@@ -3103,6 +3103,10 @@ D217 to D224 rule the envelope lane's forks (Graphshell `p8/cbor-envelope` `a90f
 
   Links: area The stack · draws on engine-split D210 · plans engine-split P8 · summary Envelope payloads refuse unknown fields; a new field is a schema and version bump.
 
+- **D225. The resident's app door carries the CBOR wire item (Mark, 2026-11-25):** the lane found one carrier outside the rulings. `graphshell-door`'s AppBrokerClient and mere-resident's `app_broker` are Rust at both ends and carry live snapshots for mere-overmap and Turnstone's resident worker. They speak armillary's `ostiary` frames, a 32-bit length prefix around one JSON message, shared with the browser door "so one resident reads one framing", and no outside party dictates JSON there. "CBOR body for the app door (Recommended)": ostiary keeps its one length-prefixed frame, the app door's body becomes the canonical CBOR wire item carrying the envelope, and the browser door keeps JSON. Against base64 inside the JSON frame (about 157 MB at 100k) and against a second JSON exception. Outcome: applies D210.
+
+  Links: area The stack · draws on engine-split D210, engine-split D220 · plans engine-split P8 · summary The resident's app door keeps ostiary's length-prefixed frame with a canonical CBOR body carrying the envelope; only the browser door stays JSON.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
