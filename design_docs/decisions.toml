@@ -2450,7 +2450,7 @@ title = "Isocosm's line-codec consumer moves onto the envelope in the D231 lane,
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "The consumer D210's landing broke is ported in the same lane, and no landing leaves a main redder than it found it."
-draws_on = ["engine-split D210"]
+draws_on = ["engine-split D210", "engine-split D234"]
 plans = ["engine-split"]
 
 [decisions."engine-split D236"]
