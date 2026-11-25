@@ -122,13 +122,13 @@ p2panda-sync = { path = "../../crates/p2panda/p2panda-sync" }
 layout-dom-api = { path = "../genet/components/shared/layout-dom" }
 
 # Every entry below is live: signalman consumes this whole family from the
-# neighbouring Murm checkout. They read as unused in any ordinary workspace
+# neighbouring Retinue checkout. They read as unused in any ordinary workspace
 # build because signalman sits outside the workspace.
-[patch."https://github.com/merely-made/murm.git"]
-retinue = { path = "../murm/crates/retinue" }
-postilion = { path = "../murm/crates/postilion" }
-outrider = { path = "../murm/crates/outrider" }
-tulle = { path = "../murm/crates/tulle" }
+[patch."https://github.com/merely-made/retinue.git"]
+retinue = { path = "../retinue/crates/retinue" }
+postilion = { path = "../retinue/crates/postilion" }
+outrider = { path = "../retinue/crates/outrider" }
+tulle = { path = "../retinue/crates/tulle" }
 
 # ---------------------------------------------------------------------------
 # Aliases
