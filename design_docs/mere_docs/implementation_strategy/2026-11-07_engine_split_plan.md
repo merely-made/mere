@@ -3043,6 +3043,32 @@ reads evidence from the same journal cursor. The capture's custody remains the c
 
   Links: area The stack · draws on engine-split D181, engine-split D207, engine-split D208, engine-split D209 · plans engine-split P8 · summary Keyframes, diffs and resume messages cross every carrier only in the versioned CBOR envelope, pinned by a CDDL schema and vectors; NDJSON and the WIT ciborium payload are removed.
 
+D211 to D216 rule the forks of the D146 assessment (`Code/testing/engine-split/d146_assessment.md`, read-only, Mere `9b9dd9a38`, Graphshell `ab16d9d7`). Two of its forks were not asked because rulings already settle them. Its F1: the engine owns the journal and the resource store, the surface `Graph` moves to Graphshell, and pandect is generic over an engine-side replay, snapshot and apply trait (plan:116, D148). Its F3: D141's re-exports retire in each consumer's flip commit (D141).
+
+- **D211. The surface half lands as `incipit-graph` (Mark, 2026-11-24):** 14 manifests name both incipit and the kernel, and Cargo takes one package under one name only. "Separate crate incipit-graph (Recommended)": a new crate at `host/crates/incipit/graph`, taken as `kernel = { package = "incipit-graph", git = graphshell.git, branch = "main" }` so `kernel::` imports stay. The `mere-kernel` name retires from the family. Against folding into the incipit package (about 1,420 import rewrites) and another name. Outcome: applies D8 and D146.
+
+  Links: area The stack · draws on engine-split D8, engine-split D146 · plans engine-split P8 · summary The kernel's surface half becomes Graphshell's incipit-graph, taken by renamed rows so imports stay; mere-kernel retires.
+
+- **D212. Traversals are surface (Mark, 2026-11-24):** `Traversal`, with D195 to D203's id, `recorded_by` and `browsing_session`, sits in the engine (`edge_data.rs:42`) because `EdgePayload` names it, while its recording, the session clock and arrangement are kernel `Graph` state. "Surface (Recommended)": traversals, the browsing session and arrangement move with `Graph`, their types leave the engine through L7, and the engine sees a trail only as exported RDF (D196), like any other dataset. Against keeping traversal records as engine provenance. Outcome: applies D146.
+
+  Links: area The stack · draws on engine-split D146, engine-split D196, engine-split D202 · plans engine-split P8 · summary Traversals, browsing sessions and arrangement are workspace state that moves with Graph; the engine meets a trail only as exported RDF.
+
+- **D213. `predicate_declarations.rs` stays in the engine as an L7 pack (Mark, 2026-11-24):** its header records predicate declarations "as ordinary resource metadata", and declared-lens L7 left it in the kernel "until P8 moves it". "Engine, as an L7 pack (Recommended)": it stays in Mere and becomes pack data under L7. Against moving it with `Graph`. Outcome: applies D146 and declared-lens L7.
+
+  Links: area The stack · draws on engine-split D146 · plans engine-split P8 · summary Predicate declarations are Resource metadata: they stay in Mere and become pack data under L7.
+
+- **D214. The kernel's nine unused host modules are deleted before the move (Mark, 2026-11-24):** async_host, async_request, content, host_event, host_toolkit, intents, overlay, signal_router and verso_address, 2,037 lines, have no users in Graphshell, Turnstone, Cleromancy, Knot or Distillery. Their type names appear nowhere there either, and the positive control `kernel::rdf` was found. "Delete before the move (Recommended)": deleted in Mere in their own commit, before the move. Against moving them. Outcome: applies D146.
+
+  Links: area The stack · draws on engine-split D146 · plans engine-split P8 · summary Nine unused kernel host-vocabulary modules are deleted in Mere before the move.
+
+- **D215. L7 is the lane after the move, and P8 closes on it (Mark, 2026-11-24):** D146 had L7 "ride on" the move. The move relocates about 48k lines, while L7 changes stored data. "Next lane, P8 waits for it (Recommended)": the move changes no stored data, as its tests show, and L7 runs as the very next lane, with P8 closing only once it has landed. Against landing both together. Outcome: refines D146.
+
+  Links: area The stack · draws on engine-split D146 · plans engine-split P8 · summary The kernel move changes no stored data; L7 follows as the next lane and P8 closes only when it lands.
+
+- **D216. mere-facts is rewritten onto resources (Mark, 2026-11-24):** `mere-facts` (782 lines) turns dramatis birth facts and subject associations into graph content, and is the one Mere crate besides pandect naming the kernel: it adds surface nodes at a `PortablePoint` (lib.rs:18). Graphshell host and Cleromancy take it. "Rewrite onto resources (Recommended)": it stays in Mere and emits Resource assertions only, and placing a node becomes the host's job when it shows the resource. Against moving it to Graphshell or to dramatis. Outcome: applies D146.
+
+  Links: area The stack · draws on engine-split D146 · plans engine-split P8 · summary mere-facts stays in Mere and emits only Resource assertions; node placement is the host's.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

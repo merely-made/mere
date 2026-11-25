@@ -2253,6 +2253,54 @@ summary = "Keyframes, diffs and resume messages cross every carrier only in the 
 draws_on = ["engine-split D181", "engine-split D207", "engine-split D208", "engine-split D209"]
 plans = ["engine-split"]
 
+[decisions."engine-split D211"]
+title = "The surface half lands as `incipit-graph` (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The kernel's surface half becomes Graphshell's incipit-graph, taken by renamed rows so imports stay; mere-kernel retires."
+draws_on = ["engine-split D8", "engine-split D146"]
+plans = ["engine-split"]
+
+[decisions."engine-split D212"]
+title = "Traversals are surface (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Traversals, browsing sessions and arrangement are workspace state that moves with Graph; the engine meets a trail only as exported RDF."
+draws_on = ["engine-split D146", "engine-split D196", "engine-split D202"]
+plans = ["engine-split"]
+
+[decisions."engine-split D213"]
+title = "`predicate_declarations.rs` stays in the engine as an L7 pack (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Predicate declarations are Resource metadata: they stay in Mere and become pack data under L7."
+draws_on = ["engine-split D146"]
+plans = ["engine-split"]
+
+[decisions."engine-split D214"]
+title = "The kernel's nine unused host modules are deleted before the move (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Nine unused kernel host-vocabulary modules are deleted in Mere before the move."
+draws_on = ["engine-split D146"]
+plans = ["engine-split"]
+
+[decisions."engine-split D215"]
+title = "L7 is the lane after the move, and P8 closes on it (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The kernel move changes no stored data; L7 follows as the next lane and P8 closes only when it lands."
+draws_on = ["engine-split D146"]
+plans = ["engine-split"]
+
+[decisions."engine-split D216"]
+title = "mere-facts is rewritten onto resources (Mark, 2026-11-24)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-facts stays in Mere and emits only Resource assertions; node placement is the host's."
+draws_on = ["engine-split D146"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
