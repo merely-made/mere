@@ -4180,3 +4180,11 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   positive control, a mistyped payload and an unknown intent. Pre-existing on Windows, the same on each main: `personal_facts`
   and `saved_views` (`/tmp/*.sock` endpoints, os error 123), Distillery's `inference_automatic` and `inference_route`, Cleromancy
   `granted_ambient`, and Knot's `checkpoint_confidentiality`, `composition_retention` and `relation_intake`.
+- 2026-11-25: D209's remainder, with D239 and D240, built and landed. ciborium leaves our code apart from coset, graph-kernel's
+  dev-only race and chirograph's `cddl` dev-dep (eidetic `9716622`, `e78c967`; dramatis `412f6dc`; woodshed `c06a6355`,
+  `09873b1b`; Graphshell `1f994c32`). eidetic packs are byte-identical under cbor-core, across every fixture and 2000 random
+  bodies, and `FIXTURE_BLAKE3` holds. Sporran's records and `.hock` manifests from before D209 are refused (D239). Hocket
+  hand-offs sign canonical bytes at v3 (D240). The scene and sheet version bytes stay at 1 under D233. eidetic's stale
+  `shlex@1.3.0` deny skip had blocked every eidetic commit, and went first. Left, outside this lane: woodshed's
+  `block_conformance.rs` passes `--locked` to a nested build, and `ports/hocket/design_docs/PROJECT_DESCRIPTION.md:150`, which
+  is maintainer-reserved, still says "CBOR (ciborium)".
