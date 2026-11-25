@@ -23,6 +23,7 @@ pub mod edge_data;
 pub mod edge_payload;
 pub mod edge_taxonomy;
 pub mod frozen;
+pub mod journal_delta;
 pub mod persistence_edge;
 pub mod predicate_registry;
 pub mod resource;
@@ -53,6 +54,7 @@ pub use frozen::{
     FROZEN_LINK, FROZEN_SELECTION, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource,
     FrozenSelection, FrozenSourceBinding, FrozenSourceRevision,
 };
+pub use journal_delta::{Attributed, JournalDelta, ResourceDelta};
 pub use persistence_edge::{
     PersistedArrangementEdgeData, PersistedArrangementSubKind, PersistedContainmentEdgeData,
     PersistedContainmentSubKind, PersistedEdge, PersistedEdgeAssertion, PersistedEdgeFamily,

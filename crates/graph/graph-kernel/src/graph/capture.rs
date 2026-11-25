@@ -38,6 +38,7 @@ use crate::types::{
 };
 
 mod edge_assertion_compat;
+mod envelope;
 mod replay_outcome;
 pub(crate) use replay_outcome::replay_outcomes_onto;
 pub use replay_outcome::{Malformed, Replay, Unwritable};
@@ -271,7 +272,7 @@ pub enum CapturedDelta {
     ReplayRetractCouplingById {
         coupling_id: String,
     },
-    /// Appended so existing postcard enum ordinals stay stable.
+    /// Appended last; journal entries are tagged by name (engine split D242).
     ReplaySetNodeContentById {
         node_id: String,
         content: Option<[u8; 32]>,
@@ -1191,6 +1192,14 @@ mod tests {
         Point2D::new(x, y)
     }
 
+    /// A delta through the journal envelope's name-tagged encoding (D242).
+    fn by_name(delta: &CapturedDelta) -> CapturedDelta {
+        let json = serde_json::to_vec(&mere::model::JournalDelta::from(delta.clone())).unwrap();
+        serde_json::from_slice::<mere::model::JournalDelta<CapturedDelta>>(&json)
+            .unwrap()
+            .into()
+    }
+
     fn sample_field(id: FieldId) -> Field {
         Field::new(id, FieldDefinition::Scalar(ScalarField::Const(1.0)))
             .with_name("focus")
@@ -1213,7 +1222,7 @@ mod tests {
     }
 
     #[test]
-    fn structural_captured_delta_round_trips_through_postcard() {
+    fn structural_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayAssertRelationByIds {
             from_id: Uuid::from_u128(1).to_string(),
             to_id: Uuid::from_u128(2).to_string(),
@@ -1222,8 +1231,7 @@ mod tests {
                 label: Some("next".into()),
             },
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
@@ -1330,7 +1338,7 @@ mod tests {
     }
 
     #[test]
-    fn traversal_captured_delta_round_trips_through_postcard() {
+    fn traversal_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayAppendTraversalByIds {
             from_id: Uuid::from_u128(3).to_string(),
             to_id: Uuid::from_u128(4).to_string(),
@@ -1340,24 +1348,22 @@ mod tests {
             recorded_by: "urn:test:recorder".into(),
             browsing_session: Uuid::from_u128(0x5e55).to_string(),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn node_content_captured_delta_round_trips_through_postcard() {
+    fn node_content_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplaySetNodeContentById {
             node_id: Uuid::from_u128(5).to_string(),
             content: Some([7; 32]),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn node_enrichment_captured_delta_round_trips_through_postcard() {
+    fn node_enrichment_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayAddNodeClassificationById {
             node_id: Uuid::from_u128(6).to_string(),
             classification: NodeClassification {
@@ -1370,45 +1376,41 @@ mod tests {
                 primary: true,
             },
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn classification_admin_captured_delta_round_trips_through_postcard() {
+    fn classification_admin_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplaySetNodeClassificationStatusById {
             node_id: Uuid::from_u128(61).to_string(),
             scheme: ClassificationScheme::ContentKind,
             value: "article".into(),
             status: ClassificationStatus::Verified,
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn tag_presentation_captured_delta_round_trips_through_postcard() {
+    fn tag_presentation_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplaySetNodeTagIconOverrideById {
             node_id: Uuid::from_u128(62).to_string(),
             tag: "paper".into(),
             icon: Some(BadgeIcon::Lucide("file-text".into())),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn node_media_captured_delta_round_trips_through_postcard() {
+    fn node_media_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplaySetNodeImageById {
             node_id: Uuid::from_u128(7).to_string(),
             role: ImageRole::Preview,
             image: ImageRef::new([4u8; 32], 2, 2),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
@@ -1423,8 +1425,7 @@ mod tests {
             width: 2,
             height: 2,
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta, "an old journal entry still reads");
         assert!(
             matches!(restored.replay(), Replay::Skip),
@@ -1433,7 +1434,7 @@ mod tests {
     }
 
     #[test]
-    fn navigation_captured_delta_round_trips_through_postcard() {
+    fn navigation_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayNavigateNodeById {
             node_id: Uuid::from_u128(8).to_string(),
             url: "https://example.test/two".into(),
@@ -1441,70 +1442,64 @@ mod tests {
             timestamp_ms: 123,
             last_session_visited: 77,
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn semantic_edge_captured_delta_round_trips_through_postcard() {
+    fn semantic_edge_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
             from_id: Uuid::from_u128(81).to_string(),
             to_id: Uuid::from_u128(82).to_string(),
             predicate: Some("https://schema.org/author".into()),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn field_layer_captured_delta_round_trips_through_postcard() {
+    fn field_layer_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayAddField {
             field: persisted_field_from_field(&sample_field(FieldId::from_uuid(Uuid::from_u128(
                 9,
             )))),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn field_admin_captured_delta_round_trips_through_postcard() {
+    fn field_admin_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayRetractCouplingById {
             coupling_id: Uuid::from_u128(91).to_string(),
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn last_visited_captured_delta_round_trips_through_postcard() {
+    fn last_visited_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayTouchNodeLastVisitedById {
             node_id: Uuid::from_u128(93).to_string(),
             timestamp_ms: 1_763_573_400_123,
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn frame_history_captured_delta_round_trips_through_postcard() {
+    fn frame_history_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplayUpdateNodeHistoryById {
             node_id: Uuid::from_u128(10).to_string(),
             entries: vec!["https://a.test".into(), "https://b.test".into()],
             current_index: 1,
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
     #[test]
-    fn import_records_captured_delta_round_trips_through_postcard() {
+    fn import_records_captured_delta_round_trips_by_name() {
         let delta = CapturedDelta::ReplaySetImportRecords {
             import_records: vec![ImportRecord {
                 record_id: "import-record:seed".into(),
@@ -1517,8 +1512,7 @@ mod tests {
                 }],
             }],
         };
-        let bytes = postcard::to_allocvec(&delta).expect("encode");
-        let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
+        let restored = by_name(&delta);
         assert_eq!(restored, delta);
     }
 
@@ -2850,48 +2844,64 @@ mod resource_capture_tests {
     }
 
     #[test]
-    fn resource_capture_codecs_preserve_old_ordinals_and_new_payloads() {
-        let old_pair = CapturedDelta::ReplaySetEdgesByIds {
-            from_id: "a".into(),
-            to_id: "b".into(),
-            edges: Vec::new(),
+    fn resource_capture_codecs_tag_by_name_and_route_resource_writes() {
+        use mere::model::JournalDelta;
+        let tag = |delta: &CapturedDelta| {
+            let json = serde_json::to_value(delta).unwrap();
+            json.as_object().unwrap().keys().next().unwrap().clone()
         };
-        assert_eq!(
-            postcard::to_allocvec(&old_pair).unwrap(),
-            [37, 1, b'a', 1, b'b', 0]
-        );
-        let old_content = CapturedDelta::ReplaySetNodeContentById {
-            node_id: "a".into(),
-            content: None,
-        };
-        assert_eq!(
-            postcard::to_allocvec(&old_content).unwrap(),
-            [46, 1, b'a', 0]
-        );
         let iri = "https://resource.test/a";
         let resource = portolan::resource_id(iri);
         let other = portolan::resource_id("https://resource.test/b");
         let variants = [
-            record(iri),
-            CapturedDelta::ReplaySetResourceEdgesByIds {
-                from_resource_id: resource.to_string(),
-                to_resource_id: other.to_string(),
-                edges: edges(resource, other),
-            },
-            CapturedDelta::ReplaySetShownResourceById {
-                surface_id: Uuid::from_u128(1).to_string(),
-                resource_id: Some(resource.to_string()),
-            },
+            (
+                CapturedDelta::ReplaySetEdgesByIds {
+                    from_id: "a".into(),
+                    to_id: "b".into(),
+                    edges: Vec::new(),
+                },
+                "ReplaySetEdgesByIds",
+                false,
+            ),
+            (
+                CapturedDelta::ReplaySetNodeContentById {
+                    node_id: "a".into(),
+                    content: None,
+                },
+                "ReplaySetNodeContentById",
+                false,
+            ),
+            (record(iri), "ReplaySetResourceRecordById", true),
+            (
+                CapturedDelta::ReplaySetResourceEdgesByIds {
+                    from_resource_id: resource.to_string(),
+                    to_resource_id: other.to_string(),
+                    edges: edges(resource, other),
+                },
+                "ReplaySetResourceEdgesByIds",
+                true,
+            ),
+            (
+                CapturedDelta::ReplaySetShownResourceById {
+                    surface_id: Uuid::from_u128(1).to_string(),
+                    resource_id: Some(resource.to_string()),
+                },
+                "ReplaySetShownResourceById",
+                false,
+            ),
         ];
-        for (ordinal, delta) in (47u8..).zip(variants) {
-            let bytes = postcard::to_allocvec(&delta).unwrap();
-            assert_eq!(bytes[0], ordinal);
+        for (delta, name, resource_side) in variants {
+            assert_eq!(tag(&delta), name);
+            let envelope = JournalDelta::from(delta.clone());
             assert_eq!(
-                postcard::from_bytes::<CapturedDelta>(&bytes).unwrap(),
-                delta
+                matches!(envelope, JournalDelta::Resource(_)),
+                resource_side,
+                "{name}"
             );
-            let json = serde_json::to_string(&delta).unwrap();
-            assert_eq!(serde_json::from_str::<CapturedDelta>(&json).unwrap(), delta);
+            let json = serde_json::to_string(&envelope).unwrap();
+            assert_eq!(json, serde_json::to_string(&delta).unwrap());
+            let back: JournalDelta<CapturedDelta> = serde_json::from_str(&json).unwrap();
+            assert_eq!(CapturedDelta::from(back), delta);
         }
     }
 
