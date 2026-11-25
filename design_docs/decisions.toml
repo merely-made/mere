@@ -2405,6 +2405,14 @@ summary = "On CBOR frames ostiary wipes the body but not cbor-core's value tree;
 draws_on = ["engine-split D209", "engine-split D223", "engine-split D225"]
 plans = ["engine-split"]
 
+[decisions."engine-split D230"]
+title = "Mere-route intent payloads move to cbor-core (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Mere-route intent payloads are canonical cbor-core; on the app door only PortableCardV1 stays JSON."
+draws_on = ["engine-split D209", "engine-split D225", "engine-split D228"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

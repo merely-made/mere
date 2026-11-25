@@ -3125,6 +3125,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D209, engine-split D223, engine-split D225 · plans engine-split P8 · summary On CBOR frames ostiary wipes the body but not cbor-core's value tree; accepted while no app-door field is secret.
 
+- **D230. Mere-route intent payloads move to cbor-core (Mark, 2026-11-25):** after D225 and D228, `SessionsActionV1`, `ApplyEditsV1` and their sibling intent payloads still crossed the app door as JSON inside the CBOR frame, decoded as JSON by the resident (`resident_mere.rs:1603`, `:2044`). Their callers are Rust in Graphshell (mere-overmap, mere-resident), Cleromancy, Knot and Turnstone, about 30 production sites, and no outside party reads them. "Move to cbor-core (Recommended)": every mere-route intent payload becomes canonical, strictly decoded cbor-core in one lane, landed resident first and callers in the same sequence, which leaves `PortableCardV1` as the app door's only JSON. Against leaving them as an application format. Outcome: applies D209 and D228.
+
+  Links: area The stack · draws on engine-split D209, engine-split D225, engine-split D228 · plans engine-split P8 · summary Mere-route intent payloads are canonical cbor-core; on the app door only PortableCardV1 stays JSON.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -4119,3 +4123,11 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   `GraphSession::set_browsing_idle_gap_ms` installs the host's gap. `mere`, `mere-kernel` (629), `pandect` and
   `mere-facts` pass with `--all-features`. Graphshell's side (the persona setting, `MereHost::with_browsing_idle_gap_ms`,
   and each event's `browsingSession` in the trail export) waits on this branch landing.
+- 2026-11-25: D207 to D229 built and landed. The projection wire is the CBOR envelope on every carrier (Graphshell `a90f7262`,
+  `1fc18a9e`; Turnstone `021295ee`, `b1acd959`), with its CDDL schema, vectors and a dev-only `cddl` check, and NDJSON removed.
+  The resident's app door frames canonical CBOR at a 256 MiB bound (armillary `530a0c7`, `ec1f543`; Graphshell `5e17db27`,
+  `d539226a`/`4671a76b` with D228's BlobRequest), and the JSON-faking harnesses are ported (dramatis `60416e1`, Mere
+  `086895633`, Knot `57f726a`). Landing armillary before Graphshell left Graphshell main unable to compile mere-resident (a new
+  `FrameError::Cbor` arm) for about 40 minutes. Found: Graphshell `119f848c`'s `saved_views` test fails on Windows before and
+  after these changes (os error 123): it hard-codes a `/tmp/mv-<root>.sock` endpoint, not a valid named-pipe name. Not
+  verified here: Knot's ported test and graphshell-door's `projection_provider` socket tests, both Unix-only.
