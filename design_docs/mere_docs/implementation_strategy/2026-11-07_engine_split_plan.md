@@ -3069,6 +3069,40 @@ D211 to D216 rule the forks of the D146 assessment (`Code/testing/engine-split/d
 
   Links: area The stack · draws on engine-split D146 · plans engine-split P8 · summary mere-facts stays in Mere and emits only Resource assertions; node placement is the host's.
 
+D217 to D224 rule the envelope lane's forks (Graphshell `p8/cbor-envelope` `a90f7262`, Turnstone `021295ee`, unmerged). The envelope is in `chirograph/src/envelope.rs`, because the presentation sidecar every keyframe carries is a chirograph type. Its schema is `chirograph/wire/projection.cddl` and its vectors are `wire/vectors/`. A local rename of `sceno::Region::confidence` failed both vectors. Two built choices follow precedent and were not asked: the blake3 key-derivation context "graphshell projection envelope v1" (pandect's "mere resource digest v1", `graph_session_pin.rs:25`), and the payload embedded as a CBOR byte string, so the header verifies without decoding the scene (17 ms at 100k).
+
+- **D217. The engine identity stays required, and "no engine" is declared (Mark, 2026-11-25):** only MereHost stamps an engine revision (`mere_host.rs:1503`), while about 45 producers (settings, resident status and devices, the identity endpoint, query_host, coop, canary, the endpoint catalog, the testkit, Turnstone's transfer endpoint) have no engine, and D208 as written would cut them off. "Required, with a declared 'no engine' (Recommended)": `engine` is an engine revision or an explicit no-engine marker, the binding covers either, and an omitted field is refused. Against each producer supplying its own identity, and against enveloping only engine keyframes. Outcome: refines D208.
+
+  Links: area The stack · draws on engine-split D208, engine-split D210 · plans engine-split P8 · summary The envelope's engine field is required and is either an engine revision or a declared no-engine marker; omission is refused.
+
+- **D218. The WIT door's resume takes a payload (Mark, 2026-11-25):** `resume: func(epoch: u64, revision: u64)` (`world.wit:206`, in graphshell-endpoint and host script) has no engine revision. "resume takes a payload (Recommended)": `resume: func(request: payload)` carries the request as cbor-core bytes, like every other door call, and the guests are rebuilt. Against adding an engine-revision parameter. Outcome: applies D210.
+
+  Links: area The stack · draws on engine-split D210 · plans engine-split P8 · summary The WIT door's resume carries its request as a cbor-core payload.
+
+- **D219. Resume replies that carry scenes travel in envelopes; the rest go plain (Mark, 2026-11-25):** the request and `Current` carry no scene, while `Diffs` carries several. "Scenes enveloped, rest plain (Recommended)": a Snapshot reply is a keyframe envelope, Diffs is a sequence of diff envelopes each bound alone, and the request and `Current` travel as plain canonical cbor-core. Against a resume envelope kind and against enveloping everything. Outcome: refines D210.
+
+  Links: area The stack · draws on engine-split D210 · plans engine-split P8 · summary Snapshot and Diffs replies travel as keyframe and diff envelopes; resume requests and Current acknowledgements are plain canonical cbor-core.
+
+- **D220. JSON at the native-messaging edge only (Mark, 2026-11-25):** the browser extension's `bridge.js` reads the snapshot's `session` and `presentation` as JSON over WebExtensions native messaging, which browsers fix as JSON (`browser_carrier.rs:14`). D210's "no reader is JavaScript" was wrong. Compared with moving that reading into wasm (a wasm-bindgen build, `wasm-unsafe-eval` in both manifests, about 120 lines into Rust, envelope bytes still base64 inside JSON), Mark chose "1: JSON at the native edge (Recommended)": the native host opens and verifies the envelope and gives the extension JSON, and `serde_json` stays only in `browser_carrier`. Against base64 envelopes checked in JavaScript and against the wasm move. Outcome: refines D210 with its one named exception.
+
+  Links: area The stack · draws on engine-split D210 · plans engine-split P8 · summary The WebExtensions native-messaging hop is D210's one JSON exception; the native host verifies the envelope first.
+
+- **D221. The binding covers the whole payload (Mark, 2026-11-25):** as built, the blake3 binding covers the scene, the presentation sidecar (73.9 of 118 MB at 100k), cache policy, session and protocol version. "Whole payload (Recommended)". Against the scene only. Outcome: refines D208.
+
+  Links: area The stack · draws on engine-split D208 · plans engine-split P8 · summary The envelope's blake3 binding covers every byte of the payload, sidecar included.
+
+- **D222. A test validates the vectors against the CDDL (Mark, 2026-11-25):** the only Rust validator, `cddl` 0.10.7, decodes through ciborium internally. "cddl dev-dep, test validates (Recommended)": a dev-dependency and a test validating both vectors. D209's exceptions become dev-only tools, and production code uses only cbor-core. Against keeping the schema as a document checked by hand. Outcome: refines D209.
+
+  Links: area The stack · draws on engine-split D209, engine-split D210 · plans engine-split P8 · summary A dev-only cddl test validates the vectors; ciborium may appear only inside coset and dev-only tools.
+
+- **D223. The envelope's cost at 100k is accepted and recorded (Mark, 2026-11-25):** on a synthetic 100k keyframe (104,870,460 bytes against JSON's 141,565,570) sealing takes 2.1 s and opening 2.0 to 2.2 s, with about 2.3 GB at peak. JSON took 0.23 s to encode and 0.49 s to decode, and E3's ciborium 0.36 s and 1.09 s. About 1.0 s of the seal is cbor-core's serde path building a value tree; the header alone verifies in 17 ms. "Accept, record the numbers (Recommended)". Against a streaming canonical encoder of our own, which would reverse D209. Outcome: applies D209.
+
+  Links: area The stack · draws on engine-split D206, engine-split D209 · plans engine-split P8 · summary The envelope's 100k seal and open cost (about 2 s each, 2.3 GB peak) is accepted as the price of one codec.
+
+- **D224. Payload decoding refuses unknown fields (Mark, 2026-11-25):** the schema forbids them, but serde ignored them, as the JSON wire did. "Refuse them (Recommended)": wire types are `deny_unknown_fields`, with a refusal test and a positive control, and a new field is a schema and version bump. Against ignoring them. Outcome: applies D210.
+
+  Links: area The stack · draws on engine-split D210 · plans engine-split P8 · summary Envelope payloads refuse unknown fields; a new field is a schema and version bump.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

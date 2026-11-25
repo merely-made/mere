@@ -2301,6 +2301,70 @@ summary = "mere-facts stays in Mere and emits only Resource assertions; node pla
 draws_on = ["engine-split D146"]
 plans = ["engine-split"]
 
+[decisions."engine-split D217"]
+title = "The engine identity stays required, and \"no engine\" is declared (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The envelope's engine field is required and is either an engine revision or a declared no-engine marker; omission is refused."
+draws_on = ["engine-split D208", "engine-split D210"]
+plans = ["engine-split"]
+
+[decisions."engine-split D218"]
+title = "The WIT door's resume takes a payload (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The WIT door's resume carries its request as a cbor-core payload."
+draws_on = ["engine-split D210"]
+plans = ["engine-split"]
+
+[decisions."engine-split D219"]
+title = "Resume replies that carry scenes travel in envelopes; the rest go plain (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Snapshot and Diffs replies travel as keyframe and diff envelopes; resume requests and Current acknowledgements are plain canonical cbor-core."
+draws_on = ["engine-split D210"]
+plans = ["engine-split"]
+
+[decisions."engine-split D220"]
+title = "JSON at the native-messaging edge only (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The WebExtensions native-messaging hop is D210's one JSON exception; the native host verifies the envelope first."
+draws_on = ["engine-split D210"]
+plans = ["engine-split"]
+
+[decisions."engine-split D221"]
+title = "The binding covers the whole payload (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The envelope's blake3 binding covers every byte of the payload, sidecar included."
+draws_on = ["engine-split D208"]
+plans = ["engine-split"]
+
+[decisions."engine-split D222"]
+title = "A test validates the vectors against the CDDL (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "A dev-only cddl test validates the vectors; ciborium may appear only inside coset and dev-only tools."
+draws_on = ["engine-split D209", "engine-split D210"]
+plans = ["engine-split"]
+
+[decisions."engine-split D223"]
+title = "The envelope's cost at 100k is accepted and recorded (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The envelope's 100k seal and open cost (about 2 s each, 2.3 GB peak) is accepted as the price of one codec."
+draws_on = ["engine-split D206", "engine-split D209"]
+plans = ["engine-split"]
+
+[decisions."engine-split D224"]
+title = "Payload decoding refuses unknown fields (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Envelope payloads refuse unknown fields; a new field is a schema and version bump."
+draws_on = ["engine-split D210"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
