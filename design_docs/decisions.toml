@@ -2373,6 +2373,38 @@ summary = "The resident's app door keeps ostiary's length-prefixed frame with a 
 draws_on = ["engine-split D210", "engine-split D220"]
 plans = ["engine-split"]
 
+[decisions."engine-split D226"]
+title = "The lane ports the three JSON-faking harnesses and everything lands together (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The app door lands with its three JSON-faking harnesses ported in the same sequence."
+draws_on = ["engine-split D225"]
+plans = ["engine-split"]
+
+[decisions."engine-split D227"]
+title = "The app door's CBOR frame bound is 256 MiB (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "App-door CBOR frames are bounded at 256 MiB; the browser door keeps 1 MiB."
+draws_on = ["engine-split D225"]
+plans = ["engine-split"]
+
+[decisions."engine-split D228"]
+title = "BlobRequest moves to CBOR; PortableCardV1 stays JSON (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "BlobRequest payloads are cbor-core; PortableCardV1 stays JSON because the browser reads it."
+draws_on = ["engine-split D209", "engine-split D220"]
+plans = ["engine-split"]
+
+[decisions."engine-split D229"]
+title = "CBOR frames wipe only their body, and that is documented (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "On CBOR frames ostiary wipes the body but not cbor-core's value tree; accepted while no app-door field is secret."
+draws_on = ["engine-split D209", "engine-split D223", "engine-split D225"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

@@ -3107,6 +3107,24 @@ D217 to D224 rule the envelope lane's forks (Graphshell `p8/cbor-envelope` `a90f
 
   Links: area The stack · draws on engine-split D210, engine-split D220 · plans engine-split P8 · summary The resident's app door keeps ostiary's length-prefixed frame with a canonical CBOR body carrying the envelope; only the browser door stays JSON.
 
+D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0c7`, Graphshell `5e17db27`, unmerged; Turnstone needed no change). D225 supersedes armillary's djinn-slimming D9 where it kept custody, MCP and overmap "on the JSON wire". A misdialed JSON client on the app door now fails as a malformed frame with no typed refusal, which follows from D225.
+
+- **D226. The lane ports the three JSON-faking harnesses and everything lands together (Mark, 2026-11-25):** knot-editor `mere_overlay/tests.rs`, dramatis castellan-client `custody_client/connection_tests.rs` and Mere's `support/fixtures/custody-projection/portable` fake the resident with JSON frames and break against armillary's CBOR app door. "Lane ports all three, lands together (Recommended)": in order, armillary, Graphshell, then the three ports, so nothing stays red. Against landing first and porting as a follow-up. Outcome: applies D225.
+
+  Links: area The stack · draws on engine-split D225 · plans engine-split P8 · summary The app door lands with its three JSON-faking harnesses ported in the same sequence.
+
+- **D227. The app door's CBOR frame bound is 256 MiB (Mark, 2026-11-25):** both doors shared a 1 MiB bound set by Chrome's 1 MB native-host-to-browser cap, which refused even a 1k-node keyframe (about 1.17 MB) on the app door. A 100k keyframe is about 118 MB. "256 MiB (Recommended)": about 2x headroom at 100k, the allocation exposure bounded by Djinn's admission of first-party applications. The browser door keeps 1 MiB. Against 128 MiB and chunked keyframes under 1 MiB. Outcome: new.
+
+  Links: area The stack · draws on engine-split D225 · plans engine-split P8 · summary App-door CBOR frames are bounded at 256 MiB; the browser door keeps 1 MiB.
+
+- **D228. BlobRequest moves to CBOR; PortableCardV1 stays JSON (Mark, 2026-11-25):** `BlobRequest` inside intent payloads is Rust at both ends (graphshell-door `blob_door`, mere-resident `resident_blob_door`). The browser extension reads `PortableCardV1` bytes (`bridge.js` parses them as JSON). "BlobRequest to CBOR, cards stay JSON (Recommended)": BlobRequest becomes cbor-core, and cards fall under D220's native-messaging edge. Against leaving both and moving both. Outcome: applies D209 and D220.
+
+  Links: area The stack · draws on engine-split D209, engine-split D220 · plans engine-split P8 · summary BlobRequest payloads are cbor-core; PortableCardV1 stays JSON because the browser reads it.
+
+- **D229. CBOR frames wipe only their body, and that is documented (Mark, 2026-11-25):** ostiary wipes every frame body buffer, but cbor-core first builds an in-memory value tree that is not wiped. JSON wrote straight into the wiped buffer. No app-door wire field is marked secret, so the wipe is defense in depth. "Accept, documented (Recommended)": ostiary's README and this record say that on CBOR frames only the body is wiped, revisited if a secret-bearing field joins the app door. Against holding for a review. Outcome: applies D209 and D223.
+
+  Links: area The stack · draws on engine-split D209, engine-split D223, engine-split D225 · plans engine-split P8 · summary On CBOR frames ostiary wipes the body but not cbor-core's value tree; accepted while no app-door field is secret.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
