@@ -2493,6 +2493,58 @@ summary = "Hand-offs sign canonical CBOR at v3; v2 envelopes are refused."
 draws_on = ["engine-split D239"]
 plans = ["engine-split"]
 
+[decisions."engine-split D241"]
+title = "pandect is generic over an engine trait beside `RdfSource` (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect becomes generic over a ~24-method engine trait; its surface-reading modules stay concrete until their home is ruled."
+plans = ["engine-split"]
+
+[decisions."engine-split D242"]
+title = "The journal carries an engine envelope: resource deltas, and surface deltas the engine doesn't name (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "One journal holds JournalDelta<S>: the engine's ResourceDelta, or a surface delta it doesn't name, with bytes unchanged."
+draws_on = ["engine-split D212"]
+plans = ["engine-split"]
+
+[decisions."engine-split D243"]
+title = "The resource half becomes an engine recorded store (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Resource-side Graph code becomes a recorded store in mere::model that Graph holds and delegates to."
+plans = ["engine-split"]
+
+[decisions."engine-split D244"]
+title = "pandect takes the graph as a type parameter, defaulted until graph-kernel drops (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect is generic with a defaulted graph type parameter so step 1 is additive; consumers name it before the default goes."
+plans = ["engine-split"]
+
+[decisions."engine-split D245"]
+title = "Probe 1 runs on a minimal test surface (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Probe 1 runs on a dev-only minimal surface in pandect, with no kernel."
+draws_on = ["engine-split D242"]
+plans = ["engine-split"]
+
+[decisions."engine-split D246"]
+title = "Personal-facts records stored as node facets get a clean break (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Old node-facet personal facts are refused; D215 covers the move, not D216's rewrite."
+draws_on = ["engine-split D216", "engine-split D239"]
+plans = ["engine-split"]
+
+[decisions."engine-split D247"]
+title = "Personal facts are resource facets now and become RDF statements with L7 (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-facts writes resource facets in the move; L7 makes the facts RDF statements under a declared vocabulary."
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
