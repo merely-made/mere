@@ -3153,6 +3153,14 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D232 · plans engine-split P8 · summary JSON from a person or an agent is parsed into the intent's Rust type before it becomes CBOR, never converted blind.
 
+- **D237. Isocosm's game takes a typed input at the door (Mark, 2026-11-25):** `vtt.apply` handed the app-door payload to `submit_game_access`, which reads it as JSON (`isocosm-native/src/native/game.rs:376`) and never keeps the bytes. Under D231 the door sends CBOR, so a valid `vtt.apply` would be refused. Internal callers (seats, roster, statements, storylets, adventure) build JSON only to have it parsed straight back. "Typed entry point (Recommended)": a new `submit_game_input(&Input)` is what the byte functions call once they've parsed their JSON. The endpoint decodes the CBOR into `Input` and calls it directly, and internal callers stay as they are. Against re-encoding JSON at the endpoint, and against moving the game's input bytes to CBOR everywhere. Outcome: applies D231.
+
+  Links: area The stack · draws on engine-split D231 · plans engine-split P8 · summary The door decodes CBOR into the game's typed input; the game's internal JSON byte path is untouched and the door carries no JSON.
+
+- **D238. A typed JSON table lives beside the types it parses (Mark, 2026-11-25):** D236's VTT table can't share D232's, which covers mere-route intents and lives in Turnstone. "isocosm-native (Recommended)": `vtt_payload(intent, json)` goes beside the decoders that own the operation types, `isocosm-genet`'s `family_view.rs` calls it and refuses unknown intents. Against placing it in `isocosm-genet`, which would import every type. Outcome: refines D236.
+
+  Links: area The stack · draws on engine-split D236 · plans engine-split P8 · summary Each typed JSON-to-CBOR table sits with the crate that owns the intent types, so the mapping cannot drift from them.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

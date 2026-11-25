@@ -2461,6 +2461,22 @@ summary = "JSON from a person or an agent is parsed into the intent's Rust type 
 draws_on = ["engine-split D232"]
 plans = ["engine-split"]
 
+[decisions."engine-split D237"]
+title = "Isocosm's game takes a typed input at the door (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The door decodes CBOR into the game's typed input; the game's internal JSON byte path is untouched and the door carries no JSON."
+draws_on = ["engine-split D231"]
+plans = ["engine-split"]
+
+[decisions."engine-split D238"]
+title = "A typed JSON table lives beside the types it parses (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Each typed JSON-to-CBOR table sits with the crate that owns the intent types, so the mapping cannot drift from them."
+draws_on = ["engine-split D236"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
