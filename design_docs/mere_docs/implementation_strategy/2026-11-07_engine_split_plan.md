@@ -3129,6 +3129,18 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D209, engine-split D225, engine-split D228 · plans engine-split P8 · summary Mere-route intent payloads are canonical cbor-core; on the app door only PortableCardV1 stays JSON.
 
+- **D231. The door owns the encoding: every app-door intent payload is cbor-core, and resources keep their codecs (Mark, 2026-11-25):** D230's question claimed that moving the mere route would leave `PortableCardV1` as the app door's only JSON. The D230 lane found that wrong. Identity (`TransferAcceptIntentV1` and its confirmations), reservoir `EnsureMereV1`, site publish and chunk, graphshell-host coop, canary, `live_endpoint` and MereHost's `OpenAddressV1` also cross as JSON intent payloads, and resources carry declared codecs of their own (`SessionGraphV1`, `PendingMergeV1`, the catalog card, saved views, `BlobLedger`, `PortableCardV1`). "All intent payloads; resources keep codecs (Recommended)": every app-door intent payload becomes canonical cbor-core. The browser door and the MCP bridge translate to JSON at their edges from the same Rust types. A resource's bytes are content named by its declared codec, not door encoding, and do not change. Against the mere route only, and against giving resources CBOR codecs too. Outcome: refines D230.
+
+  Links: area The stack · draws on engine-split D220, engine-split D228, engine-split D230 · plans engine-split P8 · summary Every app-door intent payload is canonical cbor-core and edges translate to JSON from the same types; resource bytes keep their declared codecs.
+
+- **D232. The MCP bridge translates agents' JSON by type (Mark, 2026-11-25):** `graphshell-mcp` (Turnstone, `tools.rs:139-143`) forwards an agent's payload as JSON bytes, and MCP is JSON-RPC by protocol. In a binary format `uuid` accepts only 16 raw bytes (uuid 1.29.3 `serde_support.rs:89-98`), so a blind conversion would refuse every SessionId-bearing payload. "Typed translation at the bridge (Recommended)": the bridge maps each known intent to its Rust type, parses the agent's JSON into it, re-encodes canonical CBOR and refuses unknown intents, and `mere_actions` keeps describing JSON. Against blind conversion and against a JSON path in the resident. Outcome: applies D220 and D231.
+
+  Links: area The stack · draws on engine-split D220, engine-split D231 · plans engine-split P8 · summary Agents' JSON payloads are parsed into their Rust types at the MCP bridge and re-encoded as CBOR; unknown intents are refused.
+
+- **D233. Payload schema names keep their versions across the encoding change (Mark, 2026-11-25):** in CBOR a SessionId is 16 bytes, not a uuid string, so bytes change shape while the Rust types do not. "Keep v1 (Recommended)": a schema name names the type's shape, the door owns the encoding, and D224's bump covers changes to a type. Against bumping every name to v2. Outcome: refines D224.
+
+  Links: area The stack · draws on engine-split D224, engine-split D231 · plans engine-split P8 · summary Payload schema names version the type's shape, not the door's encoding; the move to CBOR keeps them at v1.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

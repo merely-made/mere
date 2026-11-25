@@ -2413,6 +2413,30 @@ summary = "Mere-route intent payloads are canonical cbor-core; on the app door o
 draws_on = ["engine-split D209", "engine-split D225", "engine-split D228"]
 plans = ["engine-split"]
 
+[decisions."engine-split D231"]
+title = "The door owns the encoding: every app-door intent payload is cbor-core, and resources keep their codecs (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Every app-door intent payload is canonical cbor-core and edges translate to JSON from the same types; resource bytes keep their declared codecs."
+draws_on = ["engine-split D220", "engine-split D228", "engine-split D230"]
+plans = ["engine-split"]
+
+[decisions."engine-split D232"]
+title = "The MCP bridge translates agents' JSON by type (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Agents' JSON payloads are parsed into their Rust types at the MCP bridge and re-encoded as CBOR; unknown intents are refused."
+draws_on = ["engine-split D220", "engine-split D231"]
+plans = ["engine-split"]
+
+[decisions."engine-split D233"]
+title = "Payload schema names keep their versions across the encoding change (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Payload schema names version the type's shape, not the door's encoding; the move to CBOR keeps them at v1."
+draws_on = ["engine-split D224", "engine-split D231"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
