@@ -18,15 +18,8 @@
 
 pub mod accessibility;
 pub mod address;
-pub mod async_host;
-pub mod async_request;
-pub mod content;
 pub mod geometry;
 pub mod graph;
-pub mod host_event;
-pub mod host_toolkit;
-pub mod intents;
-pub mod overlay;
 pub mod paint;
 pub mod pane;
 /// Settings/permissions scope hierarchy + the narrowing rule (R0 invariant).
@@ -46,10 +39,8 @@ pub mod persistence_fields;
 /// The surface half of the RDF projection and the contribution importer: the
 /// legacy snapshot adapter, which leaves with the kernel at P8.
 pub mod rdf;
-pub mod signal_router;
 pub mod time;
 pub mod types;
-pub mod verso_address;
 
 #[cfg(test)]
 mod tests;

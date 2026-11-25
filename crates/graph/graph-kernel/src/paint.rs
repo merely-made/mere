@@ -9,8 +9,7 @@
 //! These types are the kernel's framework-agnostic color + stroke
 //! vocabulary. Host painters convert to backend-specific types
 //! (egui `Color32`, iced `Color`, vello / wgpu colors) at the draw-
-//! call boundary; portable descriptors flow through `kernel`'s
-//! overlay surface (`OverlayStrokePass`), through `host-contract`
+//! call boundary; portable descriptors flow through `host-contract`
 //! ports, and through `graph-canvas`'s `packet::SceneDrawItem` /
 //! `node_style` / `derive` surfaces — all without coupling the kernel
 //! to a renderer crate.
