@@ -4244,3 +4244,15 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   `shlex@1.3.0` deny skip had blocked every eidetic commit, and went first. Left, outside this lane: woodshed's
   `block_conformance.rs` passes `--locked` to a nested build, and `ports/hocket/design_docs/PROJECT_DESCRIPTION.md:150`, which
   is maintainer-reserved, still says "CBOR (ciborium)".
+- 2026-11-25: Step 1 of the kernel move (D146 assessment §4), Mere additive, landed in five commits: the journal envelope
+  (D242, `6595699ba`), the engine's resource store returning its deltas (D243, D250, `07f881125`), the record rules and the
+  resource handle index joining the store (D243, `bff43b0f5`), the `SessionGraph` trait with `SessionJournal<G>`,
+  `ReplayPoint<G>` and a pandect generic over `G = kernel::graph::Graph` (D241, D244, D249, D251 to D254, `b14f1cba2`), and
+  P8's first probe on a dev-only surface with no kernel (D245, `33eda2d73`). Fourteen pandect types take `G`;
+  `ProductCodicilV3`, merge and the surface readers stay on the kernel graph. Journal JSON, postcard, rkyv and CBOR, and the
+  v1, v2 and chain digests at every prefix, are byte-identical to captures taken before any type changed, with positive
+  controls. No consumer changed: Graphshell's resident and cartography tests, Turnstone's `product.rs:2331` test, Knot,
+  Cleromancy and Distillery all build and pass against each commit. Red on their own mains and not Mere's: Graphshell's
+  `pelt-desktop` test (`HostMutation` has no `target_id`) and Turnstone's root (`TurnOutcome::PageMoved` unmatched), besides
+  the Turnstone web and Cleromancy core failures already recorded. The personal-facts rewrite (D246 to D248) waits on its
+  side branch for the consumer flips.
