@@ -1496,6 +1496,12 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
         &self.manifest
     }
 
+    /// The store this session reads and writes, for a host's own stores over
+    /// the same backend (engine split D268).
+    pub fn backend(&self) -> &B {
+        self.slots.backend()
+    }
+
     /// Explicit baseline placement. Absence remains unqualified.
     pub fn placement(&self) -> Option<&SessionPlacement> {
         self.placement.as_ref()
@@ -2515,6 +2521,11 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
     pub fn with_publication(mut self, hook: &'static PublicationHook<G>) -> Self {
         self.hooks.publication = Some(hook);
         self
+    }
+
+    /// The store these sessions live in (engine split D268).
+    pub fn backend(&self) -> &B {
+        &self.backend
     }
 
     fn slots(&self) -> JsonSlots<B> {
