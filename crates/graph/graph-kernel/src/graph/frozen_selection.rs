@@ -3,151 +3,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
-
 //! Immutable selections owned by Resources, independent of local appearances.
-use super::{CoverageNote, Graph, GraphStratum};
-use uuid::Uuid;
-
-pub use mere::model::frozen::{FROZEN_SELECTION, FrozenSelection};
-
-pub struct OpenedFrozenSelection<'a> {
-    pub selection: &'a FrozenSelection,
-    pub coverage: CoverageNote,
-}
 // Legacy edge DTOs deliberately remain permissive. This v1 carrier checks
 // every nested key against what their typed serialization retains instead.
-pub(super) fn validate_retained_keys(
-    input: &serde_json::Value,
-    known: &serde_json::Value,
-) -> Result<(), String> {
-    match (input, known) {
-        (serde_json::Value::Object(input), serde_json::Value::Object(known)) => {
-            for (key, value) in input {
-                let expected = known
-                    .get(key)
-                    .ok_or_else(|| format!("unknown frozen payload field {key}"))?;
-                validate_retained_keys(value, expected)?;
-            }
-        },
-        (serde_json::Value::Array(input), serde_json::Value::Array(known)) => {
-            for (value, expected) in input.iter().zip(known) {
-                validate_retained_keys(value, expected)?;
-            }
-        },
-        (serde_json::Value::Object(_), _) | (serde_json::Value::Array(_), _) => {
-            return Err("unrepresentable frozen payload shape".into());
-        },
-        _ => {},
-    }
-    Ok(())
-}
 
-pub(super) fn normalize_statement_defaults(statements: &mut [serde_json::Value]) {
-    for statement in statements {
-        let object = statement
-            .as_object_mut()
-            .expect("serialized statement object");
-        for field in [
-            "recognized_sub_kind",
-            "label",
-            "graph_scope",
-            "provenance_iri",
-            "asserted_at_ms",
-            "first_asserted_ms",
-            "withdrawn",
-            "basis",
-        ] {
-            object.entry(field).or_insert(serde_json::Value::Null);
-        }
-    }
-}
-
-/// Decode and check nested references without requiring member residency.
-pub(crate) fn selection_from_record(
-    record: &crate::persistence::PersistedResourceRecord,
-) -> Result<Option<FrozenSelection>, String> {
-    let Some(facet) = record
-        .facets
-        .iter()
-        .find(|facet| facet.facet == FROZEN_SELECTION)
-    else {
-        return Ok(None);
-    };
-    let raw: serde_json::Value = serde_json::from_str(&facet.value_json)
-        .map_err(|e| format!("invalid frozen selection: {e}"))?;
-    let selection: FrozenSelection = serde_json::from_value(raw.clone())
-        .map_err(|e| format!("invalid frozen selection: {e}"))?;
-    let mut known = serde_json::to_value(&selection).map_err(|e| e.to_string())?;
-    // Human-readable statement serialization omits default metadata. Their
-    // known fields are still accepted explicitly, including null/default values.
-    for edge in known["statements"]
-        .as_array_mut()
-        .expect("serialized edge array")
-    {
-        if let Some(statements) = edge
-            .get_mut("assertions")
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            normalize_statement_defaults(statements);
-        }
-        if let Some(statements) = edge
-            .get_mut("semantic")
-            .and_then(|semantic| semantic.get_mut("statements"))
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            normalize_statement_defaults(statements);
-        }
-    }
-    validate_retained_keys(&raw, &known)?;
-    if selection.version() != 1 {
-        return Err("unsupported frozen selection version".into());
-    }
-    let members: std::collections::BTreeSet<_> = selection.members().iter().copied().collect();
-    if members.len() != selection.members().len() || members.contains(&Uuid::nil()) {
-        return Err("invalid frozen member references".into());
-    }
-    super::assertion_handles::validate_assertion_handles(
-        selection
-            .statements()
-            .iter()
-            .map(|edge| (GraphStratum::Resource, edge)),
-    )
-    .map_err(|error| error.to_string())?;
-    for edge in selection.statements() {
-        let from = edge
-            .from_node_id
-            .parse::<Uuid>()
-            .map_err(|_| "invalid frozen source id")?;
-        let to = edge
-            .to_node_id
-            .parse::<Uuid>()
-            .map_err(|_| "invalid frozen target id")?;
-        if from.to_string() != edge.from_node_id
-            || to.to_string() != edge.to_node_id
-            || !members.contains(&from)
-            || !members.contains(&to)
-        {
-            return Err("frozen statement endpoints must be member references".into());
-        }
-        if edge.assertions.is_some() && edge.has_legacy_assertion_data() {
-            return Err("frozen relation mixes canonical and legacy assertion data".into());
-        }
-        if edge.assertions.is_none() {
-            if let Some(semantic) = &edge.semantic
-                && semantic.statements.is_empty()
-                && (!semantic.sub_kinds.is_empty() || semantic.predicate.is_some())
-            {
-                return Err("frozen semantic statements require exact handles".into());
-            }
-        }
-        // Reject malformed family/payload combinations instead of normalizing away data.
-        let payload = super::snapshot::payload_from_persisted(edge);
-        if super::snapshot::persisted_edge_for_ids(from, to, &payload) != *edge {
-            return Err("inconsistent frozen relation payload".into());
-        }
-    }
-    Ok(Some(selection))
-}
+use super::Graph;
+pub use mere::model::frozen::{FROZEN_SELECTION, FrozenSelection};
+pub use mere::model::frozen_rules::OpenedFrozenSelection;
+pub(crate) use mere::model::frozen_rules::selection_from_record;
+use uuid::Uuid;
 
 impl Graph {
     /// Mint a Resource that bears a revision-frozen nested graph of references and

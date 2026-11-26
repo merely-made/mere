@@ -39,6 +39,8 @@ uuid = { workspace = true, features = ["v5"] }
 rkyv = { version = "0.8", features = ["std"] }
 strum = { version = "0.28", features = ["derive"] }
 petgraph = { version = "0.8.3", features = ["serde-1"] }
+# Persistent maps for the resource store's handle index, shared across clones.
+rpds = "1.2.1"
 url = "2.5"
 # Link-header targets resolve against the response URL (already in the tree through oxrdf).
 oxiri = "0.3.1"

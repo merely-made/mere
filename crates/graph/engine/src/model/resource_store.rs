@@ -27,12 +27,16 @@ use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
 use super::edge_encode::persisted_edge_for_ids;
-use super::{EdgePayload, PersistedEdge, ResourceDelta, ResourceGraph, ResourceNode};
+use super::{
+    EdgePayload, PersistedEdge, PersistedResourceRecord, ResourceDelta, ResourceGraph, ResourceNode,
+};
 
 /// The resource graph behind its write path. Reads go through [`Deref`].
 #[derive(Clone, Debug, Default)]
 pub struct ResourceStore {
     graph: ResourceGraph,
+    /// The resource half of the statement-handle index.
+    pub(super) handles: super::resource_handles::ResourceHandles,
 }
 
 impl Deref for ResourceStore {
@@ -48,9 +52,104 @@ impl ResourceStore {
         Self::default()
     }
 
-    /// Write `resource` holding exactly `facets`. `None` when it already
-    /// held both.
+    /// Write `record` as the resource `id`. `None` when the record breaks a
+    /// rule (its identity is not `id`, a frozen selection or link differs
+    /// from the one held, a declaration or content facet is malformed, a
+    /// facet repeats or is not JSON) or the store already holds it.
     pub fn put_record(
+        &mut self,
+        id: Uuid,
+        record: PersistedResourceRecord,
+    ) -> Option<ResourceDelta> {
+        let mut resource = ResourceNode::from_canonical_iri(&record.canonical_iri);
+        let Ok(selection) = super::frozen_rules::selection_from_record(&record) else {
+            return None;
+        };
+        let Ok(link) = super::frozen_rules::validate_frozen_link_record(&record) else {
+            return None;
+        };
+        if let Some(existing) = self
+            .graph
+            .resource(id)
+            .and_then(|resource| resource.nested_selection())
+            && selection.as_ref() != Some(existing)
+        {
+            return None;
+        }
+        if self
+            .graph
+            .resource(id)
+            .is_some_and(|resource| resource.nested_selection().is_some())
+        {
+            let stored = self
+                .graph
+                .facets()
+                .get(&id, &portolan::FacetId::new(super::FROZEN_SELECTION));
+            let incoming = record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == super::FROZEN_SELECTION)
+                .and_then(|facet| {
+                    serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
+                });
+            if stored != incoming.as_ref() {
+                return None;
+            }
+        }
+        if let Some(existing) = self
+            .graph
+            .resource(id)
+            .and_then(|resource| resource.nested_link())
+            && link.as_ref() != Some(existing)
+        {
+            return None;
+        }
+        if self
+            .graph
+            .resource(id)
+            .is_some_and(|resource| resource.nested_link().is_some())
+        {
+            let stored = self
+                .graph
+                .facets()
+                .get(&id, &portolan::FacetId::new(super::FROZEN_LINK));
+            let incoming = record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == super::FROZEN_LINK)
+                .and_then(|facet| {
+                    serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
+                });
+            if stored != incoming.as_ref() {
+                return None;
+            }
+        }
+        resource = resource.with_frozen(selection, link);
+        if resource.id() != id {
+            return None;
+        }
+        if super::predicate_declarations::predicate_declarations_from_record(&record).is_err() {
+            return None;
+        }
+        if super::resource_rules::validate_content_record(&record).is_err() {
+            return None;
+        }
+        let mut facets = std::collections::BTreeMap::new();
+        for facet in record.facets {
+            let Ok(value) = serde_json::from_str::<serde_json::Value>(&facet.value_json) else {
+                return None;
+            };
+            if facets
+                .insert(portolan::FacetId::new(facet.facet), value)
+                .is_some()
+            {
+                return None;
+            }
+        }
+        self.write(resource, facets)
+    }
+
+    fn write(
         &mut self,
         resource: ResourceNode,
         facets: BTreeMap<portolan::FacetId, serde_json::Value>,
@@ -69,6 +168,7 @@ impl ResourceStore {
         }
         self.graph.insert(resource.into());
         self.write_facets(id, facets);
+        self.note_literals(id);
         Some(self.record_delta(id))
     }
 
@@ -114,18 +214,22 @@ impl ResourceStore {
         }
         // Connected last to first, so the pair reads back in `payloads` order.
         for payload in payloads.into_iter().rev() {
-            self.graph.connect(source, target, payload.into());
+            let key = self.graph.connect(source, target, payload.into());
+            self.note_edge(key);
         }
         Some(self.pair_delta(from, to))
     }
 
     /// One part of a composite edit: a new edge between held resources.
     pub fn connect(&mut self, from: NodeIndex, to: NodeIndex, payload: EdgePayload) -> EdgeIndex {
-        self.graph.connect(from, to, payload.into())
+        let key = self.graph.connect(from, to, payload.into());
+        self.note_edge(key);
+        key
     }
 
     /// One part of a composite edit: an edge's payload, in place.
     pub fn edge_mut(&mut self, key: EdgeIndex) -> Option<&mut EdgePayload> {
+        self.note_edge(key);
         self.graph.edge_mut(key).map(|edge| &mut **edge)
     }
 

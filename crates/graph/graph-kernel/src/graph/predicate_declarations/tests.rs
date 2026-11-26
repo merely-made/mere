@@ -7,12 +7,14 @@
 use std::sync::{Arc, Mutex};
 
 use super::*;
+use crate::graph::Author;
 use crate::graph::revert::{Part, revert_change};
 use crate::graph::{
     EdgePayload, SemanticStatement, SemanticSubKind, predicate_iri, replay_captured_deltas_onto,
 };
 use crate::types::GraphScope;
 use euclid::default::Point2D;
+use serde_json::Value;
 
 const PREDICATE: &str = "https://Vocabulary.test/terms?edition=1#custom";
 

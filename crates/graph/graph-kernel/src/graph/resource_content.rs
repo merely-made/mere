@@ -3,78 +3,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
-
 //! Typed, recorded content on shared resources. Unknown facets remain untouched.
 
 use super::{CapturedDelta, Graph, NodeKey};
 use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use crate::types::{ClassificationScheme, ClassificationStatus, NodeClassification, NodeProperty};
-use petgraph::visit::{EdgeRef, IntoEdgeReferences};
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
-use uuid::Uuid;
-
 pub use mere::model::resource_content::{
     RESOURCE_CLASSIFICATIONS, RESOURCE_PROPERTIES, TAG_CONCEPT,
 };
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ContentError {
-    MissingResource,
-    HandleCollision(String),
-    AmbiguousClassification(Vec<String>),
-    MissingClassification(String),
-    InvalidFacet(String),
-}
-impl std::fmt::Display for ContentError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{self:?}")
-    }
-}
-impl std::error::Error for ContentError {}
-
-pub(crate) fn validate_content_record(
-    record: &PersistedResourceRecord,
-) -> Result<(), ContentError> {
-    for facet in &record.facets {
-        match facet.facet.as_str() {
-            super::frozen_selection::FROZEN_SELECTION => {
-                super::frozen_selection::selection_from_record(record)
-                    .map_err(ContentError::InvalidFacet)?;
-            },
-            super::frozen_link::FROZEN_LINK => {
-                super::frozen_link::validate_frozen_link_record(record)
-                    .map_err(ContentError::InvalidFacet)?;
-            },
-            RESOURCE_PROPERTIES => {
-                let properties: Vec<crate::types::NodeProperty> =
-                    serde_json::from_str(&facet.value_json)
-                        .map_err(|e| ContentError::InvalidFacet(e.to_string()))?;
-                let mut handles = std::collections::BTreeMap::new();
-                for property in &properties {
-                    if let Some(previous) = handles.insert(&property.statement_id, property)
-                        && previous != property
-                    {
-                        return Err(ContentError::HandleCollision(property.statement_id.clone()));
-                    }
-                }
-            },
-            RESOURCE_CLASSIFICATIONS => {
-                let variants: Vec<super::resource_classifications::ClassificationVariant> =
-                    serde_json::from_str(&facet.value_json)
-                        .map_err(|e| ContentError::InvalidFacet(e.to_string()))?;
-                super::resource_classifications::validate_variants(&variants)?;
-            },
-            TAG_CONCEPT => {
-                let concept: super::resource_tags::TagConcept =
-                    serde_json::from_str(&facet.value_json)
-                        .map_err(|e| ContentError::InvalidFacet(e.to_string()))?;
-                super::resource_tags::validate_tag_concept(&record.canonical_iri, &concept)?;
-            },
-            _ => {},
-        }
-    }
-    Ok(())
-}
+pub use mere::model::resource_rules::ContentError;
+pub(crate) use mere::model::resource_rules::validate_content_record;
+use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use uuid::Uuid;
 
 #[derive(Clone, PartialEq, Eq)]
 enum ResourceHandlePayload {

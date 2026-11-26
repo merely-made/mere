@@ -3,101 +3,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
-
 //! Complete classification variants, retained origins and exact review edits.
 
 use super::resource_content::{ContentError, RESOURCE_CLASSIFICATIONS};
 use super::{Graph, NodeKey};
 use crate::types::{ClassificationScheme, ClassificationStatus, NodeClassification};
-use uuid::Uuid;
-
 pub use mere::model::resource_content::{ClassificationOrigin, ClassificationVariant};
-
-pub(crate) fn validate_variants(variants: &[ClassificationVariant]) -> Result<(), ContentError> {
-    let mut ids = std::collections::BTreeMap::new();
-    for variant in variants {
-        if let Some(previous) = ids.insert(&variant.variant_id, variant)
-            && previous != variant
-        {
-            return Err(ContentError::InvalidFacet(format!(
-                "conflicting classification ID {:?}",
-                variant.variant_id
-            )));
-        }
-    }
-    Ok(())
-}
-
-/// Union exact variants and origins. Differing records for one logical key remain separate.
-pub fn merge_classification_variants(
-    left: &[ClassificationVariant],
-    right: &[ClassificationVariant],
-) -> Result<Vec<ClassificationVariant>, ContentError> {
-    // Two replicas may carry divergent review versions under the original ID.
-    // Admission requires normalized unique IDs; composition expands the versions.
-    let mut lineage = std::collections::BTreeMap::new();
-    for variant in left.iter().chain(right) {
-        let root = variant
-            .original_variant_id
-            .as_ref()
-            .unwrap_or(&variant.variant_id);
-        if let Some(previous) = lineage.insert(&variant.variant_id, root)
-            && previous != root
-        {
-            return Err(ContentError::InvalidFacet(
-                "conflicting classification lineage".into(),
-            ));
-        }
-    }
-    let mut groups = std::collections::BTreeMap::<
-        String,
-        std::collections::BTreeMap<String, ClassificationVariant>,
-    >::new();
-    for variant in left.iter().chain(right) {
-        let original = variant
-            .original_variant_id
-            .as_ref()
-            .unwrap_or(&variant.variant_id)
-            .clone();
-        let payload = serde_json::to_string(&variant.classification)
-            .map_err(|e| ContentError::InvalidFacet(e.to_string()))?;
-        let versions = groups.entry(original).or_default();
-        if let Some(existing) = versions.get_mut(&payload) {
-            for origin in &variant.origins {
-                if !existing.origins.contains(origin) {
-                    existing.origins.push(origin.clone());
-                }
-            }
-            if variant.original_variant_id.is_some() {
-                existing.original_variant_id = variant.original_variant_id.clone();
-            }
-        } else {
-            versions.insert(payload, variant.clone());
-        }
-    }
-    let mut merged = Vec::new();
-    for (original, versions) in groups {
-        let diverged = versions.len() > 1;
-        for (payload, mut version) in versions {
-            if diverged || version.original_variant_id.is_some() {
-                let key =
-                    serde_json::to_vec(&(&original, &payload)).expect("version key serializes");
-                version.variant_id = format!(
-                    "classification-version:{}",
-                    Uuid::new_v5(&Uuid::NAMESPACE_URL, &key)
-                );
-                version.original_variant_id = Some(original.clone());
-            }
-            version
-                .origins
-                .sort_by_key(|origin| serde_json::to_string(origin).expect("origin serializes"));
-            version.origins.dedup();
-            merged.push(version);
-        }
-    }
-    merged.sort_by(|a, b| a.variant_id.cmp(&b.variant_id));
-    Ok(merged)
-}
+pub use mere::model::resource_rules::merge_classification_variants;
+use uuid::Uuid;
 
 impl Graph {
     pub fn resource_classification_variants(&self, id: Uuid) -> Vec<ClassificationVariant> {

@@ -9,7 +9,6 @@
 use super::{Graph, NodeKey};
 use crate::persistence::{PersistedEdge, PersistedResourceRecord};
 use mere::model::ResourceDelta;
-use petgraph::visit::EdgeRef;
 use uuid::Uuid;
 
 pub use super::resource_pair_bounds::ResourceEdgesBoundError;
@@ -85,99 +84,7 @@ impl Graph {
             self.bump_revision();
             return Some(delta);
         };
-        let mut resource = ResourceNode::from_canonical_iri(&record.canonical_iri);
-        let Ok(selection) = super::frozen_selection::selection_from_record(&record) else {
-            return None;
-        };
-        let Ok(link) = super::frozen_link::validate_frozen_link_record(&record) else {
-            return None;
-        };
-        if let Some(existing) = self
-            .resource(id)
-            .and_then(|resource| resource.nested_selection())
-            && selection.as_ref() != Some(existing)
-        {
-            return None;
-        }
-        if self
-            .resource(id)
-            .is_some_and(|resource| resource.nested_selection().is_some())
-        {
-            let stored = self.resources.facets().get(
-                &id,
-                &portolan::FacetId::new(super::frozen_selection::FROZEN_SELECTION),
-            );
-            let incoming = record
-                .facets
-                .iter()
-                .find(|facet| facet.facet == super::frozen_selection::FROZEN_SELECTION)
-                .and_then(|facet| {
-                    serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
-                });
-            if stored != incoming.as_ref() {
-                return None;
-            }
-        }
-        if let Some(existing) = self
-            .resource(id)
-            .and_then(|resource| resource.nested_link())
-            && link.as_ref() != Some(existing)
-        {
-            return None;
-        }
-        if self
-            .resource(id)
-            .is_some_and(|resource| resource.nested_link().is_some())
-        {
-            let stored = self.resources.facets().get(
-                &id,
-                &portolan::FacetId::new(super::frozen_link::FROZEN_LINK),
-            );
-            let incoming = record
-                .facets
-                .iter()
-                .find(|facet| facet.facet == super::frozen_link::FROZEN_LINK)
-                .and_then(|facet| {
-                    serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
-                });
-            if stored != incoming.as_ref() {
-                return None;
-            }
-        }
-        resource = resource.with_frozen(selection, link);
-        if resource.id() != id {
-            return None;
-        }
-        if super::predicate_declarations::predicate_declarations_from_record(&record).is_err() {
-            return None;
-        }
-        if super::resource_content::validate_content_record(&record).is_err() {
-            return None;
-        }
-        let mut facets = std::collections::BTreeMap::new();
-        for facet in record.facets {
-            let Ok(value) = serde_json::from_str::<serde_json::Value>(&facet.value_json) else {
-                return None;
-            };
-            if facets
-                .insert(portolan::FacetId::new(facet.facet), value)
-                .is_some()
-            {
-                return None;
-            }
-        }
-        let properties = self.handle_index_built().then(|| {
-            facets
-                .get(&portolan::FacetId::new(
-                    super::resource_content::RESOURCE_PROPERTIES,
-                ))
-                .and_then(|value| serde::Deserialize::deserialize(value).ok())
-                .unwrap_or_default()
-        });
-        let delta = self.resources.put_record(resource, facets)?;
-        if let Some(properties) = properties {
-            self.note_resource_literals_held(id, properties);
-        }
+        let delta = self.resources.put_record(id, record)?;
         self.bump_revision();
         Some(delta)
     }
@@ -290,17 +197,6 @@ impl Graph {
             })
             .collect();
         let delta = self.resources.replace_edges(from, to, payloads)?;
-        let keys: Vec<_> = self
-            .resources
-            .inner()
-            .edges_connecting(source, target)
-            .map(|edge| edge.id())
-            .collect();
-        for key in keys {
-            self.note_relation_handles(super::RelationKey::Resource(
-                super::ResourceEdgeKey::from_raw(key),
-            ));
-        }
         self.bump_revision();
         Some(delta)
     }

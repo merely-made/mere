@@ -3,129 +3,18 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
-
 //! Immutable, source-qualified link readings borne by Resources.
 
 use super::{CoverageNote, Graph, GraphStratum};
 use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
-use petgraph::visit::{EdgeRef, IntoEdgeReferences};
-use uuid::Uuid;
-
 pub use mere::model::frozen::{
     FROZEN_LINK, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource, FrozenSourceBinding,
     FrozenSourceRevision,
 };
-
-pub struct OpenedFrozenLink<'a> {
-    pub link: &'a FrozenLink,
-    pub coverage: CoverageNote,
-}
-
-pub(super) fn validate_frozen_link_record(
-    record: &PersistedResourceRecord,
-) -> Result<Option<FrozenLink>, String> {
-    let facets = record
-        .facets
-        .iter()
-        .filter(|facet| facet.facet == FROZEN_LINK)
-        .collect::<Vec<_>>();
-    if facets.len() > 1 {
-        return Err("duplicate frozen link facets".into());
-    }
-    let Some(facet) = facets.first() else {
-        return Ok(None);
-    };
-    let raw: serde_json::Value = serde_json::from_str(&facet.value_json)
-        .map_err(|error| format!("invalid frozen link: {error}"))?;
-    let link: FrozenLink = serde_json::from_value(raw.clone())
-        .map_err(|error| format!("invalid frozen link: {error}"))?;
-    let mut known = serde_json::to_value(&link).map_err(|error| error.to_string())?;
-    for edge in known["statements"]
-        .as_array_mut()
-        .expect("serialized edge array")
-    {
-        if let Some(statements) = edge
-            .get_mut("assertions")
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            super::frozen_selection::normalize_statement_defaults(statements);
-        }
-        if let Some(statements) = edge
-            .get_mut("semantic")
-            .and_then(|semantic| semantic.get_mut("statements"))
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            super::frozen_selection::normalize_statement_defaults(statements);
-        }
-    }
-    super::frozen_selection::validate_retained_keys(&raw, &known)?;
-    if link.version() != 1 {
-        return Err("unsupported frozen link version".into());
-    }
-    link.source().validate()?;
-    if link.first().id > link.second().id {
-        return Err("frozen link endpoints must be in canonical order".into());
-    }
-    for endpoint in [&link.first(), &link.second()] {
-        if endpoint.id.is_nil()
-            || endpoint.resource.is_some_and(|id| id.is_nil())
-            || endpoint
-                .address
-                .as_ref()
-                .is_some_and(|address| address.trim().is_empty() || address != address.trim())
-        {
-            return Err("invalid frozen link endpoint".into());
-        }
-    }
-    if link.stratum() == GraphStratum::Resource
-        && (link.first().resource != Some(link.first().id)
-            || link.second().resource != Some(link.second().id))
-    {
-        return Err("resource link endpoints must retain resource identity".into());
-    }
-    if link.stratum() == GraphStratum::Resource
-        && [&link.first(), &link.second()].into_iter().any(|endpoint| {
-            endpoint.address.as_ref().is_none_or(|address| {
-                portolan::resource_id_from_canonical_iri(address) != endpoint.id
-            })
-        })
-    {
-        return Err("resource endpoint address does not match its identity".into());
-    }
-    if link.statements().is_empty() {
-        return Err("frozen link must retain at least one pair bucket".into());
-    }
-    super::assertion_handles::validate_assertion_handles(
-        link.statements().iter().map(|edge| (link.stratum(), edge)),
-    )
-    .map_err(|error| error.to_string())?;
-    for edge in link.statements() {
-        let from = edge
-            .from_node_id
-            .parse::<Uuid>()
-            .map_err(|_| "invalid frozen link source id")?;
-        let to = edge
-            .to_node_id
-            .parse::<Uuid>()
-            .map_err(|_| "invalid frozen link target id")?;
-        let valid_pair = (from == link.first().id && to == link.second().id)
-            || (from == link.second().id && to == link.first().id);
-        if from.to_string() != edge.from_node_id || to.to_string() != edge.to_node_id || !valid_pair
-        {
-            return Err("frozen link bucket is outside its canonical endpoint pair".into());
-        }
-        for statement in edge.retained_assertions() {
-            if statement.statement_id.trim().is_empty() {
-                return Err("frozen link assertion id must be nonempty".into());
-            }
-        }
-        let payload = super::snapshot::payload_from_persisted(edge);
-        if super::snapshot::persisted_edge_for_ids(from, to, &payload) != *edge {
-            return Err("inconsistent frozen link bucket payload".into());
-        }
-    }
-    Ok(Some(link))
-}
+pub use mere::model::frozen_rules::OpenedFrozenLink;
+pub(crate) use mere::model::frozen_rules::validate_frozen_link_record;
+use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+use uuid::Uuid;
 
 impl Graph {
     fn link_coverage(&self, resources: &[Uuid], surfaces: &[Uuid]) -> CoverageNote {

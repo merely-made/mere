@@ -16,22 +16,28 @@
 //! re-exports, at their old paths, the names other repositories use, until it
 //! moves at P8. Every serialized shape is unchanged.
 
+pub mod assertion_handles;
 pub mod author;
 pub mod clock;
 pub mod coverage;
 pub mod edge_data;
+pub mod edge_decode;
 pub mod edge_encode;
 pub mod edge_payload;
 pub mod edge_taxonomy;
 pub mod frozen;
+pub mod frozen_rules;
 pub mod journal_delta;
 pub mod persistence_edge;
+pub mod predicate_declarations;
 pub mod predicate_registry;
 pub mod resource;
 pub mod resource_content;
 pub mod resource_graph;
+pub mod resource_rules;
 pub mod shared;
 pub use shared::Shared;
+mod resource_handles;
 pub mod resource_record;
 pub mod resource_store;
 pub mod types;

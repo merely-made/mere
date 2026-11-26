@@ -13,6 +13,10 @@
 //! here, and the facet writers. Writes that replace a store wholesale clear the
 //! index, and the next read rebuilds it.
 //!
+//! This is the surface half. The resource half, resource edges and resource
+//! literals, is the engine store's own (engine split D243); every query here
+//! asks both, surface holders first.
+//!
 //! Admission reads it too: a write is checked against the holders of its own
 //! handles, so replaying a journal costs each entry its handles, not the graph.
 
@@ -31,20 +35,18 @@ use uuid::Uuid;
 #[derive(Clone, Default)]
 pub(crate) struct HandleIndex {
     built: OnceLock<Holders>,
-    /// Relations handed out for writing since the last fold. Reads check them
-    /// live; the next note folds them in, so this stays a few keys long.
-    dirty: Vec<RelationKey>,
+    /// Surface edges handed out for writing since the last fold. Reads check
+    /// them live; the next note folds them in, so this stays a few keys long.
+    dirty: Vec<EdgeKey>,
 }
 
 #[derive(Clone, Default)]
 struct Holders {
-    relations: Holding<RelationKey>,
-    resource_literals: Holding<Uuid>,
+    relations: Holding<EdgeKey>,
     /// Retained Surface literals, by Surface node id.
     surface_literals: Holding<Uuid>,
 }
 
-/// Holders by statement id, in a persistent map: a clone shares it whole.
 type Holding<T> = rpds::HashTrieMapSync<std::sync::Arc<str>, mere::model::Shared<Vec<T>>>;
 
 fn add<T: PartialEq + Clone>(map: &mut Holding<T>, id: &str, holder: T) {
@@ -63,17 +65,8 @@ fn add<T: PartialEq + Clone>(map: &mut Holding<T>, id: &str, holder: T) {
     }
 }
 
-/// Iteration order of [`Graph::find_semantic_statement`]'s scan: every Surface
-/// edge, then every Resource relation, each by edge index.
-fn scan_order(key: RelationKey) -> (u8, usize) {
-    match key {
-        RelationKey::Surface(key) => (0, key.index()),
-        RelationKey::Resource(key) => (1, key.raw().index()),
-    }
-}
-
 impl Holders {
-    fn note_relation(&mut self, key: RelationKey, payload: &EdgePayload) {
+    fn note_relation(&mut self, key: EdgeKey, payload: &EdgePayload) {
         for statement in payload.assertions() {
             add(&mut self.relations, &statement.statement_id, key);
         }
@@ -85,23 +78,9 @@ impl Graph {
         self.handle_index.built.get_or_init(|| {
             let mut holders = Holders::default();
             for edge in self.inner.inner().edge_references() {
-                holders.note_relation(RelationKey::Surface(edge.id()), edge.weight());
+                holders.note_relation(edge.id(), edge.weight());
             }
-            for (key, ..) in self.resource_relations() {
-                if let Some(payload) = self.get_resource_edge(key) {
-                    holders.note_relation(RelationKey::Resource(key), payload);
-                }
-            }
-            use mere::model::resource_graph::{facets_of_each, properties_in};
-            for (resource, facets) in self.resources.resources_with_facets() {
-                for held in properties_in(facets) {
-                    add(
-                        &mut holders.resource_literals,
-                        &held.statement_id,
-                        resource.id(),
-                    );
-                }
-            }
+            use mere::model::resource_graph::facets_of_each;
             let nodes: Vec<Uuid> = self.nodes().map(|(_, node)| node.id).collect();
             let semantic = portolan::FacetId::new(SEMANTIC_PROPERTIES);
             for (id, facets) in nodes.iter().zip(facets_of_each(&self.facets, &nodes)) {
@@ -117,37 +96,29 @@ impl Graph {
         })
     }
 
-    /// Whether the index has been built (a write must then note itself).
-    pub(crate) fn handle_index_built(&self) -> bool {
-        self.handle_index.built.get().is_some()
-    }
-
-    /// Forget the index; the next read rebuilds it from the stores.
+    /// Forget both halves of the index; the next reads rebuild them.
     pub(crate) fn clear_handle_index(&mut self) {
         self.handle_index = HandleIndex::default();
+        self.resources.clear_handle_index();
     }
 
     /// Fold relations written since the last note, then mark `key` as written.
+    /// A resource edge is the store's to note.
     pub(crate) fn note_relation_handles(&mut self, key: RelationKey) {
+        let key = match key {
+            RelationKey::Surface(key) => key,
+            RelationKey::Resource(key) => return self.resources.note_edge(key.raw()),
+        };
         let mut index = std::mem::take(&mut self.handle_index);
         if let Some(holders) = index.built.get_mut() {
             for dirty in index.dirty.drain(..) {
-                if let Some(payload) = self.get_relation(dirty) {
+                if let Some(payload) = self.get_edge(dirty) {
                     holders.note_relation(dirty, payload);
                 }
             }
             index.dirty.push(key);
         }
         self.handle_index = index;
-    }
-
-    /// Note the literal properties a resource now holds, given in hand.
-    pub(crate) fn note_resource_literals_held(&mut self, id: Uuid, held: Vec<NodeProperty>) {
-        if let Some(holders) = self.handle_index.built.get_mut() {
-            for property in held {
-                add(&mut holders.resource_literals, &property.statement_id, id);
-            }
-        }
     }
 
     pub(crate) fn note_surface_literals(&mut self, node_id: Uuid) {
@@ -181,122 +152,99 @@ impl Graph {
         key
     }
 
+    /// A new resource edge; the store notes its handles.
     pub(crate) fn connect_resource(
         &mut self,
         from: NodeKey,
         to: NodeKey,
         payload: EdgePayload,
     ) -> EdgeIndex {
-        let key = self.resources.connect(from, to, payload.into());
-        self.note_relation_handles(RelationKey::Resource(ResourceEdgeKey::from_raw(key)));
-        key
+        self.resources.connect(from, to, payload)
     }
 
-    /// Mutable Resource relation payload, noted as written.
+    /// Mutable Resource relation payload, noted as written by the store.
     pub(crate) fn resource_edge_mut(&mut self, key: EdgeIndex) -> Option<&mut EdgePayload> {
-        self.note_relation_handles(RelationKey::Resource(ResourceEdgeKey::from_raw(key)));
         self.resources.edge_mut(key)
+    }
+
+    fn surface_candidates(&self, statement_id: &str) -> impl Iterator<Item = EdgeKey> + '_ {
+        self.handle_holders()
+            .relations
+            .get(statement_id)
+            .into_iter()
+            .flatten()
+            .chain(&self.handle_index.dirty)
+            .copied()
+    }
+
+    fn surface_statement(&self, key: EdgeKey, statement_id: &str) -> Option<&SemanticStatement> {
+        self.get_edge(key)?
+            .assertions()
+            .iter()
+            .find(|statement| statement.statement_id == statement_id)
     }
 
     /// Every relation that retains `statement_id`, in scan order (Surface
     /// edges, then Resource edges). Looked up through the handle index, not by
     /// walking every edge; duplicates across buckets are all returned.
     pub(super) fn semantic_statement_owner_keys(&self, statement_id: &str) -> Vec<RelationKey> {
-        let indexed = self
-            .handle_holders()
-            .relations
-            .get(statement_id)
-            .into_iter()
-            .flatten();
-        let mut keys: Vec<RelationKey> = indexed
-            .chain(&self.handle_index.dirty)
-            .copied()
-            .filter(|key| {
-                self.get_relation(*key).is_some_and(|payload| {
-                    payload
-                        .assertions()
-                        .iter()
-                        .any(|statement| statement.statement_id == statement_id)
-                })
-            })
+        let mut surface: Vec<EdgeKey> = self
+            .surface_candidates(statement_id)
+            .filter(|key| self.surface_statement(*key, statement_id).is_some())
             .collect();
-        keys.sort_by_key(|key| scan_order(*key));
-        keys.dedup();
-        keys
+        surface.sort_by_key(|key| key.index());
+        surface.dedup();
+        surface
+            .into_iter()
+            .map(RelationKey::Surface)
+            .chain(
+                self.resources
+                    .statement_owner_edges(statement_id)
+                    .into_iter()
+                    .map(|key| RelationKey::Resource(ResourceEdgeKey::from_raw(key))),
+            )
+            .collect()
     }
 
-    /// Locate any retained handle, including withdrawn history, independent of
-    /// current nature. Use `find_held_semantic_statement` for default reads.
     pub fn find_semantic_statement(
         &self,
         statement_id: &str,
     ) -> Option<(RelationKey, &SemanticStatement)> {
-        let indexed = self
-            .handle_holders()
-            .relations
-            .get(statement_id)
-            .into_iter()
-            .flatten();
-        indexed
-            .chain(&self.handle_index.dirty)
-            .filter_map(|key| {
-                let statement = self
-                    .get_relation(*key)?
-                    .assertions()
-                    .iter()
-                    .find(|statement| statement.statement_id == statement_id)?;
-                Some((*key, statement))
+        self.surface_candidates(statement_id)
+            .filter_map(|key| Some((key, self.surface_statement(key, statement_id)?)))
+            .min_by_key(|(key, _)| key.index())
+            .map(|(key, statement)| (RelationKey::Surface(key), statement))
+            .or_else(|| {
+                self.resources
+                    .find_statement(statement_id)
+                    .map(|(key, statement)| {
+                        (
+                            RelationKey::Resource(ResourceEdgeKey::from_raw(key)),
+                            statement,
+                        )
+                    })
             })
-            .min_by_key(|(key, _)| scan_order(*key))
     }
 
-    /// Whether `property` may be held as a literal on `resource`: its id is no
-    /// semantic statement, no other Resource or Surface literal, and on
-    /// `resource` itself only a literal with the same content.
     pub(crate) fn literal_handle_available(&self, resource: Uuid, property: &NodeProperty) -> bool {
         let id = &property.statement_id;
         if self.find_semantic_statement(id).is_some() {
             return false;
         }
-        let holders = self.handle_holders();
-        for holder in holders
-            .resource_literals
-            .get(id.as_str())
-            .into_iter()
-            .flatten()
-        {
-            if self.resource(*holder).is_none() {
-                continue;
-            }
-            if self.resource_properties(*holder).iter().any(|held| {
-                held.statement_id == *id && (*holder != resource || !held.content_eq(property))
-            }) {
-                return false;
-            }
+        if self.resources.literal_taken(resource, property) {
+            return false;
         }
         !self.surface_literal_holds(id)
     }
 
-    /// Whether a live relation that `keep` accepts holds `statement_id`.
     fn relation_holds(&self, statement_id: &str, keep: impl Fn(RelationKey) -> bool) -> bool {
-        let indexed = self.handle_holders().relations.get(statement_id);
-        indexed
-            .into_iter()
-            .flatten()
-            .chain(&self.handle_index.dirty)
-            .any(|key| {
-                keep(*key)
-                    && self.get_relation(*key).is_some_and(|payload| {
-                        payload
-                            .assertions()
-                            .iter()
-                            .any(|statement| statement.statement_id == statement_id)
-                    })
-            })
+        self.surface_candidates(statement_id).any(|key| {
+            keep(RelationKey::Surface(key)) && self.surface_statement(key, statement_id).is_some()
+        }) || self.resources.edge_holds(statement_id, |key| {
+            keep(RelationKey::Resource(ResourceEdgeKey::from_raw(key)))
+        })
     }
 
-    /// Whether any relation but the Resource edges from `source` to `target`
-    /// holds `statement_id`.
     pub(super) fn handle_held_off_resource_pair(
         &self,
         statement_id: &str,
@@ -311,21 +259,10 @@ impl Graph {
         })
     }
 
-    /// Whether a Resource other than `except` holds `statement_id` as a literal.
     fn resource_literal_holds(&self, statement_id: &str, except: Option<Uuid>) -> bool {
-        let holders = self.handle_holders().resource_literals.get(statement_id);
-        holders
-            .into_iter()
-            .flatten()
-            .filter(|holder| Some(**holder) != except && self.resource(**holder).is_some())
-            .any(|holder| {
-                self.resource_properties(*holder)
-                    .iter()
-                    .any(|held| held.statement_id == statement_id)
-            })
+        self.resources.literal_holds(statement_id, except)
     }
 
-    /// Whether a retained Surface literal holds `statement_id`.
     fn surface_literal_holds(&self, statement_id: &str) -> bool {
         let holders = self.handle_holders().surface_literals.get(statement_id);
         holders
@@ -340,11 +277,6 @@ impl Graph {
             })
     }
 
-    /// Whether storing `write` puts one of its handles where the handle rule
-    /// refuses it, read through the index: a handle the write claims twice or
-    /// that another holder keeps. On a graph that passes the rule this agrees
-    /// with [`Self::validate_handles_after`], which walks every holder; only
-    /// the write's own handles can newly collide.
     pub(super) fn write_collides(&self, write: PendingWrite<'_>) -> bool {
         match write {
             PendingWrite::Literals(LiteralWrite::Resource(owner, incoming)) => {
@@ -359,7 +291,6 @@ impl Graph {
                         || self.surface_literal_holds(id)
                 })
             },
-            // Surface literals answer only to Resource holders.
             PendingWrite::Literals(LiteralWrite::Surface(_, incoming)) => {
                 incoming.iter().any(|property| {
                     let id = property.statement_id.as_str();
@@ -381,8 +312,6 @@ impl Graph {
                         || self.surface_literal_holds(id)
                 })
             },
-            // Held Surface-only duplicates keep their historical grammar, so
-            // Surface literals are not holders here.
             PendingWrite::SurfaceEdges(from, to, rows) => {
                 let Some(pair) = self
                     .get_node_key_by_id(from)

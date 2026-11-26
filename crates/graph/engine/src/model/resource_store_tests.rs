@@ -7,8 +7,15 @@
 use super::*;
 use crate::model::SemanticStatementSpec;
 
-fn facets(note: &str) -> BTreeMap<portolan::FacetId, serde_json::Value> {
-    BTreeMap::from([(portolan::FacetId::new("test.note"), serde_json::json!(note))])
+fn put(store: &mut ResourceStore, resource: &ResourceNode, note: &str) -> Option<ResourceDelta> {
+    let record = PersistedResourceRecord {
+        canonical_iri: resource.canonical_iri().to_owned(),
+        facets: vec![super::super::PersistedResourceFacet {
+            facet: "test.note".into(),
+            value_json: serde_json::json!(note).to_string(),
+        }],
+    };
+    store.put_record(resource.id(), record)
 }
 
 fn claim(predicate: &str) -> EdgePayload {
@@ -26,15 +33,15 @@ fn a_record_write_returns_the_state_it_made_once() {
     let mut store = ResourceStore::new();
     let resource = ResourceNode::for_term("urn:test:a");
     let id = resource.id();
-    let delta = store.put_record(resource.clone(), facets("one")).unwrap();
+    let delta = put(&mut store, &resource, "one").unwrap();
     assert_eq!(delta, store.record_delta(id));
     let ResourceDelta::ReplaySetResourceRecordById { record, .. } = &delta else {
         panic!("a record delta: {delta:?}");
     };
     assert_eq!(record.as_ref().unwrap().facets[0].value_json, "\"one\"");
     // Unchanged: no delta. Control: a changed facet makes one.
-    assert_eq!(store.put_record(resource.clone(), facets("one")), None);
-    assert!(store.put_record(resource, facets("two")).is_some());
+    assert_eq!(put(&mut store, &resource, "one"), None);
+    assert!(put(&mut store, &resource, "two").is_some());
 }
 
 #[test]
@@ -45,8 +52,8 @@ fn a_resource_an_edge_touches_is_not_removed() {
         ResourceNode::for_term("urn:test:b"),
     );
     let (ia, ib) = (a.id(), b.id());
-    store.put_record(a, facets("a"));
-    store.put_record(b, facets("b"));
+    put(&mut store, &a, "a");
+    put(&mut store, &b, "b");
     store
         .replace_edges(ia, ib, vec![claim("urn:test:p")])
         .unwrap();
@@ -78,8 +85,8 @@ fn an_edge_write_returns_the_pair_in_order_once() {
         None,
         "no endpoints"
     );
-    store.put_record(a, facets("a"));
-    store.put_record(b, facets("b"));
+    put(&mut store, &a, "a");
+    put(&mut store, &b, "b");
     let payloads = vec![claim("urn:test:p"), claim("urn:test:q")];
     let delta = store.replace_edges(ia, ib, payloads.clone()).unwrap();
     assert_eq!(delta, store.pair_delta(ia, ib));

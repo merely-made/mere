@@ -3,7 +3,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
-
 //! Identity-scoped tag concepts and separately attributable tagging assertions.
 
 use super::resource::TAGGED_WITH_IRI;
@@ -11,25 +10,12 @@ use super::resource_content::{ContentError, TAG_CONCEPT};
 use super::{CapturedDelta, EdgePayload, Graph, NodeKey, ResourceNode, SemanticStatement};
 use crate::persistence::PersistedResourceRecord;
 use crate::types::GraphScope;
+pub use mere::model::resource_content::{TagConcept, tag_concept_iri};
+pub(crate) use mere::model::resource_rules::validate_tag_concept;
 use petgraph::Direction;
 use petgraph::visit::EdgeRef;
 use std::collections::HashSet;
 use uuid::Uuid;
-
-pub use mere::model::resource_content::{TagConcept, tag_concept_iri};
-
-pub(crate) fn validate_tag_concept(iri: &str, concept: &TagConcept) -> Result<(), ContentError> {
-    for (role, value) in [("concept", iri), ("owner", concept.owner_iri.as_str())] {
-        if value.chars().any(|c| c.is_whitespace() || c.is_control())
-            || url::Url::parse(value).is_err()
-        {
-            return Err(ContentError::InvalidFacet(format!(
-                "{role} must be an absolute IRI"
-            )));
-        }
-    }
-    Ok(())
-}
 
 impl Graph {
     pub fn resource_tag_concept(&self, id: Uuid) -> Option<TagConcept> {
