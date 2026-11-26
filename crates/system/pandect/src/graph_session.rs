@@ -101,6 +101,9 @@ pub use publication::{
 struct SessionHooks<G: SessionGraph> {
     legacy: Option<&'static LegacyHook<G>>,
     publication: Option<&'static PublicationHook<G>>,
+    /// The schema ids and redaction of the graph's codicils (engine split
+    /// D265, D266).
+    codicil: Option<&'static crate::graph_codicil::CodicilHook<G>>,
 }
 
 impl<G: SessionGraph> Clone for SessionHooks<G> {
@@ -115,6 +118,7 @@ impl<G: SessionGraph> SessionHooks<G> {
     const NONE: Self = Self {
         legacy: None,
         publication: None,
+        codicil: None,
     };
 }
 
@@ -122,6 +126,7 @@ impl SessionHooks<Graph> {
     const KERNEL: Self = Self {
         legacy: Some(&legacy_hook::KERNEL),
         publication: Some(&residency::KERNEL_PUBLICATION),
+        codicil: Some(&crate::graph_codicil::KERNEL_CODICIL),
     };
 }
 
@@ -1125,18 +1130,6 @@ impl<B: Backend> GraphSession<B> {
         self.slots.backend().transact(transaction).await?;
         let error = rejected.lock().expect("translation rejection").take();
         error.map_or(Ok(()), |reason| Err(SessionError::Corrupt(reason)))
-    }
-
-    /// Complete source archive with explicit current placement when the session is qualified.
-    pub fn profiled_codicil_payload(&self) -> crate::graph_codicil::ProfiledGraphCodicil {
-        crate::graph_codicil::ProfiledGraphCodicil {
-            codicil: self.codicil_payload(),
-            // A legacy profile is admitted only with its validated translation receipt.
-            placement: self
-                .placement
-                .as_ref()
-                .map(|_| PlacementProfile::RecordedStrataV1),
-        }
     }
 }
 
@@ -2186,6 +2179,18 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
         Ok(())
     }
 
+    /// Complete source archive with explicit current placement when the session is qualified.
+    pub fn profiled_codicil_payload(&self) -> crate::graph_codicil::ProfiledGraphCodicil<G> {
+        crate::graph_codicil::ProfiledGraphCodicil {
+            codicil: self.codicil_payload(),
+            // A legacy profile is admitted only with its validated translation receipt.
+            placement: self
+                .placement
+                .as_ref()
+                .map(|_| PlacementProfile::RecordedStrataV1),
+        }
+    }
+
     /// Freeze graph, facets and the source's complete parallel histories.
     pub fn codicil_payload(&self) -> crate::graph_codicil::GraphCodicil<G> {
         use crate::graph_codicil::{ArchivedSession, ArchivedView, GraphCodicil};
@@ -2454,52 +2459,8 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
         validate: impl FnOnce(&Graph) -> Result<(), String>,
     ) -> Result<GraphSessionManifest, SessionError> {
-        let input = crate::graph_codicil::load_profiled_graph_codicil_sealed(store, None, id)
+        self.open_codicil_hooked(store, id, author, validate, SessionHooks::KERNEL)
             .await
-            .map_err(|e| SessionError::Corrupt(e.to_string()))?
-            .ok_or_else(|| SessionError::Corrupt(format!("no codicil {id} in this mere")))?;
-        let graph = input
-            .clone()
-            .into_graph()
-            .map_err(|error| SessionError::Corrupt(error.to_string()))?;
-        let recorded = input.placement == Some(PlacementProfile::RecordedStrataV1);
-        let payload = input.codicil;
-        validate(&graph).map_err(SessionError::Validation)?;
-        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        // The thaw is a new session: it names its source and the codicil, so
-        // it never reads as the session it was saved from.
-        manifest.display_name = Some(crate::graph_codicil::opened_codicil_session_name(
-            payload
-                .sessions
-                .first()
-                .and_then(|source| source.manifest.display_name.as_deref()),
-            &id.to_string(),
-        ));
-        manifest.source_codicil = Some(crate::manifest::CodicilId(id.to_string()));
-        let mut session = GraphSession::new(
-            self.backend.clone(),
-            manifest,
-            Some(graph),
-            author.clone(),
-            ChangeKind::OpenedCodicil {
-                codicil: id.to_string(),
-            },
-        );
-        if recorded {
-            session.placement = Some(SessionPlacement::recorded());
-        }
-        // Compose keeps the first source's view for each app/name, matching its graph base.
-        for source in &payload.sessions {
-            for view in &source.views {
-                let key = ViewKey::new(&view.app, &view.view)?;
-                if session.view(&key).is_none() {
-                    session.set_view_now(author.clone().via(&view.app), key, view.state.clone())?;
-                }
-            }
-        }
-        session.manifest.codicil_read_only = true;
-        session.store(wall_clock_now(), Vec::new(), false).await?;
-        Ok(session.manifest().clone())
     }
 
     /// Fork the connected component around node `seed` out of `parent`
@@ -2558,6 +2519,105 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
 
     fn slots(&self) -> JsonSlots<B> {
         JsonSlots::new(self.backend.clone())
+    }
+
+    /// [`open_codicil_checked`](MereSessions::open_codicil_checked) over any
+    /// graph, through these sessions' codicil hook (engine split D265).
+    pub async fn open_codicil_checked_with(
+        &self,
+        id: eidetic::ManifestId,
+        author: Author,
+        validate: impl FnOnce(&G) -> Result<(), String>,
+    ) -> Result<GraphSessionManifest, SessionError>
+    where
+        B: eidetic::Store,
+    {
+        let mut store = self.backend.clone();
+        self.open_codicil_from_checked_with(&mut store, id, author, validate)
+            .await
+    }
+
+    /// [`open_codicil_from_checked`](MereSessions::open_codicil_from_checked)
+    /// over any graph, through these sessions' codicil hook.
+    pub async fn open_codicil_from_checked_with(
+        &self,
+        store: &mut dyn eidetic::Store,
+        id: eidetic::ManifestId,
+        author: Author,
+        validate: impl FnOnce(&G) -> Result<(), String>,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        self.open_codicil_hooked(store, id, author, validate, self.hooks)
+            .await
+    }
+
+    /// Bind every session's codicils these open or begin through `hook`
+    /// (engine split D265).
+    pub fn with_codicil(mut self, hook: &'static crate::graph_codicil::CodicilHook<G>) -> Self {
+        self.hooks.codicil = Some(hook);
+        self
+    }
+
+    /// The owning resident supplies its Eidetic store; session files keep their
+    /// existing backend and layout. The complete candidate is checked before writes.
+    async fn open_codicil_hooked(
+        &self,
+        store: &mut dyn eidetic::Store,
+        id: eidetic::ManifestId,
+        author: Author,
+        validate: impl FnOnce(&G) -> Result<(), String>,
+        hooks: SessionHooks<G>,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let codicil = hooks.codicil.ok_or_else(|| {
+            SessionError::Validation("this session's graph has no codicil hook".into())
+        })?;
+        let input =
+            crate::graph_codicil::load_profiled_graph_codicil_sealed_with(store, None, codicil, id)
+                .await
+                .map_err(|e| SessionError::Corrupt(e.to_string()))?
+                .ok_or_else(|| SessionError::Corrupt(format!("no codicil {id} in this mere")))?;
+        let graph = input
+            .clone()
+            .into_graph_with()
+            .map_err(|error| SessionError::Corrupt(error.to_string()))?;
+        let recorded = input.placement == Some(PlacementProfile::RecordedStrataV1);
+        let payload = input.codicil;
+        validate(&graph).map_err(SessionError::Validation)?;
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        // The thaw is a new session: it names its source and the codicil, so
+        // it never reads as the session it was saved from.
+        manifest.display_name = Some(crate::graph_codicil::opened_codicil_session_name(
+            payload
+                .sessions
+                .first()
+                .and_then(|source| source.manifest.display_name.as_deref()),
+            &id.to_string(),
+        ));
+        manifest.source_codicil = Some(crate::manifest::CodicilId(id.to_string()));
+        let mut session = GraphSession::new_with(
+            self.backend.clone(),
+            manifest,
+            Some(graph),
+            author.clone(),
+            ChangeKind::OpenedCodicil {
+                codicil: id.to_string(),
+            },
+        );
+        session.hooks = hooks;
+        if recorded {
+            session.placement = Some(SessionPlacement::recorded());
+        }
+        // Compose keeps the first source's view for each app/name, matching its graph base.
+        for source in &payload.sessions {
+            for view in &source.views {
+                let key = ViewKey::new(&view.app, &view.view)?;
+                if session.view(&key).is_none() {
+                    session.set_view_now(author.clone().via(&view.app), key, view.state.clone())?;
+                }
+            }
+        }
+        session.manifest.codicil_read_only = true;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(session.manifest().clone())
     }
 
     /// Every session's manifest, trashed ones included, oldest first.

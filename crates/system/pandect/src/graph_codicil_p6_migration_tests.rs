@@ -73,7 +73,7 @@ fn v3_json_codicil_upgrades_legacy_sidecar_once_and_v4_reopen_keeps_id_and_unkno
     pollster::block_on(async {
         let (graph, from, to) = relation_graph();
         let mut store = muniment::MemoryBackend::default();
-        let profiled = ProfiledGraphCodicil {
+        let profiled: ProfiledGraphCodicil = ProfiledGraphCodicil {
             codicil: GraphCodicil {
                 snapshot: graph.to_snapshot(),
                 facets: graph.facets().clone(),

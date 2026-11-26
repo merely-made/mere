@@ -24,8 +24,8 @@
 pub use eidetic::ManifestId;
 use eidetic::{
     BlobManifest, BlobSource, Error, NoFetcher, PayloadSealer, PrivacyClass, ProvenanceOrigin,
-    ProvenanceRecord, Result, SchemaRef, Store, Timestamp, TrustEnvelope, TypedPayload, list_typed,
-    load_typed_sealed, save_typed_sealed,
+    ProvenanceRecord, Result, SchemaRef, Store, Timestamp, TrustEnvelope, TypedPayload,
+    save_typed_sealed,
 };
 use kernel::graph::Graph;
 use mere::session::SessionGraph;
@@ -37,14 +37,14 @@ use uuid::Uuid;
 
 use crate::graph_placement::{PlacementProfile, materialize_snapshot};
 use crate::{Change, GraphSessionManifest, NodeFacetStore, ViewEntry, ViewState};
-use eidetic::manifest::load_manifest;
 
 /// Schema id bytes for the graph-snapshot codicil schema. The [`SchemaRef`] is the
 /// BLAKE3 of these bytes, so it is stable across builds and machines.
 pub const GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v4";
-const LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v1";
-const V2_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v2";
-const V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v3";
+/// The input adapters' schema ids, which a host's [`CodicilHook`] names too.
+pub const LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v1";
+pub const V2_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v2";
+pub const V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v3";
 pub const PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot-profiled/v4";
 
 pub fn profiled_graph_snapshot_schema_ref() -> SchemaRef {
@@ -61,14 +61,23 @@ pub fn graph_snapshot_schema_ref() -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(GRAPH_SNAPSHOT_SCHEMA_ID))
 }
 
+// The input adapters' typed bindings, which the tests write old codicils with;
+// reading goes through the hook's ids.
+#[cfg(test)]
 fn legacy_graph_snapshot_schema_ref() -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID))
 }
 
+// The input adapters' typed bindings, which the tests write old codicils with;
+// reading goes through the hook's ids.
+#[cfg(test)]
 fn v2_graph_snapshot_schema_ref() -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(V2_GRAPH_SNAPSHOT_SCHEMA_ID))
 }
 
+// The input adapters' typed bindings, which the tests write old codicils with;
+// reading goes through the hook's ids.
+#[cfg(test)]
 fn v3_profiled_graph_snapshot_schema_ref() -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID))
 }
@@ -142,13 +151,31 @@ pub struct ArchivedView {
 }
 
 /// Placement belongs to the input envelope, never to inferred graph contents.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct ProfiledGraphCodicil {
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(bound = "")]
+pub struct ProfiledGraphCodicil<G: SessionGraph = Graph> {
     #[serde(flatten)]
-    pub codicil: GraphCodicil,
+    pub codicil: GraphCodicil<G>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub placement: Option<PlacementProfile>,
 }
+
+impl<G: SessionGraph> std::fmt::Debug for ProfiledGraphCodicil<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ProfiledGraphCodicil")
+            .field("codicil", &self.codicil)
+            .field("placement", &self.placement)
+            .finish()
+    }
+}
+
+#[path = "graph_codicil_hook.rs"]
+mod hook;
+pub use hook::{
+    CodicilHook, KERNEL_CODICIL, list_graph_codicils_with, load_profiled_graph_codicil_sealed_with,
+    open_codicil_as_session_sealed_with, save_graph_snapshot_codicil_sealed_with,
+    save_profiled_graph_codicil_sealed_with, save_profiled_session_codicil_checked_with,
+};
 
 impl ProfiledGraphCodicil {
     pub fn into_graph(self) -> Result<Graph> {
@@ -177,18 +204,6 @@ impl TypedPayload for ProfiledGraphCodicil {
     }
 }
 
-/// The profiled v3 JSON envelope. Retained only as an input adapter; new saves
-/// always use the v4 schema above.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
-#[serde(transparent)]
-struct V3ProfiledGraphCodicil(ProfiledGraphCodicil);
-
-impl TypedPayload for V3ProfiledGraphCodicil {
-    fn schema_ref() -> SchemaRef {
-        v3_profiled_graph_snapshot_schema_ref()
-    }
-}
-
 impl TypedPayload for GraphCodicil {
     fn schema_ref() -> SchemaRef {
         graph_snapshot_schema_ref()
@@ -202,20 +217,24 @@ impl TypedPayload for GraphCodicil {
 /// The v2 JSON envelope remains readable after the current codicil advances.
 /// Current snapshot serde defaults admit its older edge shape; this adapter does
 /// not claim compatibility with standalone rkyv archives.
+#[cfg(test)]
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
 struct V2GraphCodicil(GraphCodicil);
 
+#[cfg(test)]
 impl TypedPayload for V2GraphCodicil {
     fn schema_ref() -> SchemaRef {
         v2_graph_snapshot_schema_ref()
     }
 }
 
+#[cfg(test)]
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(transparent)]
 struct LegacyGraphCodicil(GraphSnapshot);
 
+#[cfg(test)]
 impl TypedPayload for LegacyGraphCodicil {
     fn schema_ref() -> SchemaRef {
         legacy_graph_snapshot_schema_ref()
@@ -383,26 +402,18 @@ pub async fn save_graph_snapshot_codicil(
 pub async fn save_graph_snapshot_codicil_sealed(
     store: &mut dyn Store,
     sealer: Option<&dyn PayloadSealer>,
-    mut snapshot: GraphSnapshot,
-    mut facets: NodeFacetStore,
+    snapshot: GraphSnapshot,
+    facets: NodeFacetStore,
     redaction: RedactionPolicy,
     created_at: Timestamp,
 ) -> Result<ManifestId> {
-    checked_graph(&snapshot, facets.clone(), None)?;
-    redaction.apply(&mut snapshot);
-    redaction.apply_facets(&mut facets);
-    save_typed_sealed(
+    save_graph_snapshot_codicil_sealed_with(
         store,
         sealer,
-        &GraphCodicil {
-            snapshot,
-            facets,
-            sessions: Vec::new(),
-        },
-        Vec::<BlobSource>::new(),
-        PrivacyClass::LocalOnly,
-        graph_codicil_provenance(created_at),
-        TrustEnvelope::self_asserted(),
+        &KERNEL_CODICIL,
+        snapshot,
+        facets,
+        redaction,
         created_at,
     )
     .await
@@ -414,28 +425,16 @@ pub async fn save_graph_snapshot_codicil_sealed(
 pub async fn save_profiled_graph_codicil_sealed(
     store: &mut dyn Store,
     sealer: Option<&dyn PayloadSealer>,
-    mut input: ProfiledGraphCodicil,
+    input: ProfiledGraphCodicil,
     redaction: RedactionPolicy,
     created_at: Timestamp,
 ) -> Result<ManifestId> {
-    checked_graph(
-        &input.codicil.snapshot,
-        input.codicil.facets.clone(),
-        input.placement,
-    )?;
-    redaction.apply(&mut input.codicil.snapshot);
-    redaction.apply_facets(&mut input.codicil.facets);
-    if redaction != RedactionPolicy::include_all() {
-        input.codicil.sessions.clear();
-    }
-    save_typed_sealed(
+    save_profiled_graph_codicil_sealed_with(
         store,
         sealer,
-        &input,
-        Vec::<BlobSource>::new(),
-        PrivacyClass::LocalOnly,
-        graph_codicil_provenance(created_at),
-        TrustEnvelope::self_asserted(),
+        &KERNEL_CODICIL,
+        input,
+        redaction,
         created_at,
     )
     .await
@@ -483,12 +482,7 @@ pub async fn open_codicil_as_session_sealed(
 /// explicitly profiled inputs. Order is store-defined; callers that want
 /// newest-first should sort on `created_at`.
 pub async fn list_graph_codicils(store: &mut dyn Store) -> Result<Vec<BlobManifest>> {
-    let mut manifests = list_typed::<GraphCodicil>(store).await?;
-    manifests.extend(list_typed::<LegacyGraphCodicil>(store).await?);
-    manifests.extend(list_typed::<V2GraphCodicil>(store).await?);
-    manifests.extend(list_typed::<V3ProfiledGraphCodicil>(store).await?);
-    manifests.extend(list_typed::<ProfiledGraphCodicil>(store).await?);
-    Ok(manifests)
+    list_graph_codicils_with(store, &KERNEL_CODICIL).await
 }
 
 /// The short form a person reads for a codicil id: its algorithm and the
@@ -555,20 +549,14 @@ pub async fn save_profiled_session_codicil_checked(
     created_at: Timestamp,
     validate: impl FnOnce(&Graph) -> std::result::Result<(), String>,
 ) -> Result<ManifestId> {
-    validate(&payload.clone().into_graph()?).map_err(Error::new)?;
-    let mut provenance = graph_codicil_provenance(created_at);
-    for source in &payload.codicil.sessions {
-        if let Some(source) = &source.manifest.source_codicil {
-            let id = parse_codicil_id(&source.0).map_err(Error::new)?;
-            if !provenance.upstream.contains(&id) {
-                provenance.upstream.push(id);
-            }
-        }
-    }
-    if !provenance.upstream.is_empty() {
-        provenance.origin = ProvenanceOrigin::Derived;
-    }
-    save_archive_codicil_payload(store, payload, provenance, created_at).await
+    save_profiled_session_codicil_checked_with(
+        store,
+        &KERNEL_CODICIL,
+        payload,
+        created_at,
+        validate,
+    )
+    .await
 }
 
 async fn save_archive_codicil_payload(
@@ -577,31 +565,8 @@ async fn save_archive_codicil_payload(
     provenance: ProvenanceRecord,
     created_at: Timestamp,
 ) -> Result<ManifestId> {
-    if payload.placement.is_some() {
-        save_typed_sealed(
-            store,
-            None,
-            &payload,
-            Vec::<BlobSource>::new(),
-            PrivacyClass::LocalOnly,
-            provenance,
-            TrustEnvelope::self_asserted(),
-            created_at,
-        )
+    hook::save_archive_codicil_payload_with(store, &KERNEL_CODICIL, payload, provenance, created_at)
         .await
-    } else {
-        save_typed_sealed(
-            store,
-            None,
-            &payload.codicil,
-            Vec::<BlobSource>::new(),
-            PrivacyClass::LocalOnly,
-            provenance,
-            TrustEnvelope::self_asserted(),
-            created_at,
-        )
-        .await
-    }
 }
 
 /// Compose complete local archives after validating the merged candidate. Both
@@ -774,74 +739,7 @@ pub async fn load_profiled_graph_codicil_sealed(
     sealer: Option<&dyn PayloadSealer>,
     id: ManifestId,
 ) -> Result<Option<ProfiledGraphCodicil>> {
-    let Some(manifest) = load_manifest(store, id).await? else {
-        return Ok(None);
-    };
-    let mut fetcher = NoFetcher;
-    if manifest.schema == profiled_graph_snapshot_schema_ref() {
-        let payload =
-            load_typed_sealed::<ProfiledGraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        if let Some(input) = &payload {
-            Graph::try_from_snapshot(&input.codicil.snapshot)
-                .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
-        }
-        return Ok(payload);
-    }
-    if manifest.schema == v3_profiled_graph_snapshot_schema_ref() {
-        let payload =
-            load_typed_sealed::<V3ProfiledGraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        if let Some(input) = &payload {
-            Graph::try_from_snapshot(&input.0.codicil.snapshot).map_err(|error| {
-                Error::new(format!("invalid v3 graph codicil snapshot: {error}"))
-            })?;
-        }
-        return Ok(payload.map(|input| input.0));
-    }
-    if manifest.schema == graph_snapshot_schema_ref() {
-        let payload = load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        if let Some(codicil) = &payload {
-            Graph::try_from_snapshot(&codicil.snapshot)
-                .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
-        }
-        return Ok(payload.map(|codicil| ProfiledGraphCodicil {
-            codicil,
-            placement: None,
-        }));
-    }
-    if manifest.schema == v2_graph_snapshot_schema_ref() {
-        let payload = load_typed_sealed::<V2GraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        if let Some(codicil) = &payload {
-            Graph::try_from_snapshot(&codicil.0.snapshot).map_err(|error| {
-                Error::new(format!("invalid v2 graph codicil snapshot: {error}"))
-            })?;
-        }
-        return Ok(payload.map(|codicil| ProfiledGraphCodicil {
-            codicil: codicil.0,
-            placement: None,
-        }));
-    }
-    if manifest.schema == legacy_graph_snapshot_schema_ref() {
-        return load_typed_sealed::<LegacyGraphCodicil>(store, &mut fetcher, sealer, id)
-            .await?
-            .map(|legacy| {
-                let graph = Graph::try_from_snapshot(&legacy.0).map_err(|error| {
-                    Error::new(format!("invalid legacy graph codicil snapshot: {error}"))
-                })?;
-                Ok(ProfiledGraphCodicil {
-                    codicil: GraphCodicil {
-                        snapshot: graph.to_snapshot(),
-                        facets: graph.facets().clone(),
-                        sessions: Vec::new(),
-                    },
-                    placement: None,
-                })
-            })
-            .transpose();
-    }
-    Err(Error::new(format!(
-        "manifest {} is not a graph codicil",
-        id
-    )))
+    load_profiled_graph_codicil_sealed_with(store, sealer, &KERNEL_CODICIL, id).await
 }
 
 fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> Result<GraphCodicil> {
