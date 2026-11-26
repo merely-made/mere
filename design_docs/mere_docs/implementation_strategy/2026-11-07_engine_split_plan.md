@@ -3225,6 +3225,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D244, engine-split D253 · plans engine-split P8 · summary ProductCodicilV3 stays concrete in step 1 because Turnstone's bare literals can't infer G; it takes G in the flips.
 
+- **D255. incipit-graph carries its own copy of the lens probe's fixtures (Mark, 2026-11-26):** The kernel arrived in Graphshell with history (D106's method: 265 commits, about +1.1 MiB packed). Its one reach outside the crate is the declared-lens L3 probe `examples/lens_dispatch.rs:49-50`, which `include_str!`s `workspace.toml` and `workspace_lens.toml` from Mere's `engine/src/profile/fixtures/`. Mere's engine tests read the same two files (`profile/tests/support.rs:19-20`). At `host/crates/incipit/graph` that path is gone, so the example, `check --all-targets` and the clippy hook fail. "Copy fixtures into the crate (Recommended)": the two files are copied byte for byte into `examples/fixtures/` and the include paths change, so the probe keeps running in Graphshell, at the cost of a copy that can drift from the engine's. Against leaving the example in Mere to retire with graph-kernel, and against Mere exporting the fixtures. Outcome: applies D211.
+
+  Links: area The stack · draws on engine-split D106, engine-split D211 · plans engine-split P8 · summary The lens_dispatch probe moves with incipit-graph and carries a byte copy of its two engine fixtures.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

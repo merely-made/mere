@@ -2605,6 +2605,14 @@ summary = "ProductCodicilV3 stays concrete in step 1 because Turnstone's bare li
 draws_on = ["engine-split D244", "engine-split D253"]
 plans = ["engine-split"]
 
+[decisions."engine-split D255"]
+title = "incipit-graph carries its own copy of the lens probe's fixtures (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The lens_dispatch probe moves with incipit-graph and carries a byte copy of its two engine fixtures."
+draws_on = ["engine-split D106", "engine-split D211"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
