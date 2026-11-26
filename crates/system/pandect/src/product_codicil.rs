@@ -22,7 +22,7 @@ use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
 use serde::{Deserialize, Serialize};
 
-use crate::graph_placement::{PlacementProfile, materialize_snapshot};
+use crate::graph_placement::{PlacementProfile, materialize_snapshot_with};
 use crate::{NodeFacetStore, SavedSceneV3};
 
 pub const PRODUCT_CODICIL_SCHEMA: &str = "graphshell.graph-codicil/v3";
@@ -152,11 +152,17 @@ pub fn profiled_codicil_graph(
     facets: NodeFacetStore,
     placement: Option<PlacementProfile>,
 ) -> Result<Graph, InvalidCodicil> {
-    let mut graph = materialize_snapshot(&snapshot, placement)
-        .map_err(|error| InvalidCodicil(error.to_string()))?;
-    graph
-        .install_facets(facets)
-        .map_err(|error| InvalidCodicil(error.to_string()))?;
+    profiled_codicil_graph_with::<Graph>(snapshot, facets, placement)
+}
+
+/// [`profiled_codicil_graph`] over any graph (engine split D257).
+pub fn profiled_codicil_graph_with<G: mere::session::SessionGraph>(
+    snapshot: G::Snapshot,
+    facets: NodeFacetStore,
+    placement: Option<PlacementProfile>,
+) -> Result<G, InvalidCodicil> {
+    let mut graph = materialize_snapshot_with::<G>(&snapshot, placement).map_err(InvalidCodicil)?;
+    graph.install_facets(facets).map_err(InvalidCodicil)?;
     Ok(graph)
 }
 

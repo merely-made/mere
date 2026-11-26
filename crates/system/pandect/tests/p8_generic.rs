@@ -423,3 +423,27 @@ mod personal_sync {
         });
     }
 }
+
+#[test]
+fn a_snapshot_materializes_under_its_placement_over_any_graph() {
+    use mere::session::SessionGraph;
+    use pandect::graph_placement::{PlacementProfile, materialize_snapshot_with};
+    use pandect::product_codicil::profiled_codicil_graph_with;
+
+    let mut graph = Surface::default();
+    graph.show(Uuid::from_u128(0xd1), "https://p8.test/codicil");
+    let snapshot = graph.to_snapshot();
+    for placement in [None, Some(PlacementProfile::RecordedStrataV1)] {
+        let read: Surface = materialize_snapshot_with(&snapshot, placement).unwrap();
+        assert_eq!(read.to_snapshot(), snapshot);
+        let read: Surface =
+            profiled_codicil_graph_with(snapshot.clone(), graph.facets().clone(), placement)
+                .unwrap();
+        assert_eq!(read.to_snapshot(), snapshot);
+    }
+    // Control: a legacy placement is refused without qualified replay.
+    assert!(
+        materialize_snapshot_with::<Surface>(&snapshot, Some(PlacementProfile::LegacySurfaceV1))
+            .is_err()
+    );
+}

@@ -30,14 +30,22 @@ pub fn materialize_snapshot(
     snapshot: &GraphSnapshot,
     placement: Option<PlacementProfile>,
 ) -> Result<Graph, String> {
+    materialize_snapshot_with::<Graph>(snapshot, placement)
+}
+
+/// [`materialize_snapshot`] over any graph (engine split D257). A twin rather
+/// than a type parameter: a graph type is not inferred from its snapshot.
+pub fn materialize_snapshot_with<G: SessionGraph>(
+    snapshot: &G::Snapshot,
+    placement: Option<PlacementProfile>,
+) -> Result<G, String> {
     match placement {
-        Some(PlacementProfile::RecordedStrataV1) => Graph::try_from_recorded_snapshot(snapshot),
-        None => Graph::try_from_snapshot(snapshot),
+        Some(PlacementProfile::RecordedStrataV1) => G::from_snapshot(snapshot, true),
+        None => G::from_snapshot(snapshot, false),
         Some(PlacementProfile::LegacySurfaceV1) => {
-            return Err("legacy graph placement requires qualified replay".into());
+            Err("legacy graph placement requires qualified replay".into())
         },
     }
-    .map_err(|error| error.to_string())
 }
 
 /// The retained baseline and the permanently qualified legacy journal prefix.
