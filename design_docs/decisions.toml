@@ -2693,6 +2693,14 @@ summary = "GraphCodicil's schema ids come from an installed hook; kernel and inc
 draws_on = ["engine-split D254", "engine-split D257"]
 plans = ["engine-split"]
 
+[decisions."engine-split D266"]
+title = "eidetic gains a runtime-schema typed save, load and list for the codicil hook (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "eidetic's typed layer takes a runtime schema; pandect's codicil hook supplies ids and redaction through it."
+draws_on = ["engine-split D265"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

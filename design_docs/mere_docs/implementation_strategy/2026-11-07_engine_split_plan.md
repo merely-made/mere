@@ -3269,6 +3269,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D257, engine-split D254 · plans engine-split P8 · summary GraphCodicil's schema ids come from an installed hook; kernel and incipit both name v4.
 
+- **D266. eidetic gains a runtime-schema typed save, load and list for the codicil hook (Mark, 2026-11-26):** D265's hook cannot be carried as a value as ruled: eidetic's `TypedPayload::schema_ref()` is static (`eidetic-core/src/typed.rs:53`), and `save_typed_sealed`, `load_typed_sealed` and `list_typed` all read `T::schema_ref()`. The generic save also needs the host's redaction, since `RedactionPolicy::apply` edits surface fields, and compose stays on the kernel graph (`merge_graph_codicils` uses the surface's `snapshot_merge`). "Value hook + eidetic runtime form (Recommended)": eidetic gains a save, load and list that take the schema at runtime, `save_typed_sealed` calls it so nothing is duplicated, and pandect's installed hook supplies the ids and the redaction. The eidetic commit lands first. Against a type-level hook on a host marker type, against pandect copying the typed save, and against a global registry. Outcome: refines D265.
+
+  Links: area The stack · draws on engine-split D265 · plans engine-split P8 · summary eidetic's typed layer takes a runtime schema; pandect's codicil hook supplies ids and redaction through it.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -4317,3 +4321,7 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   main's 977, the six new tests running each family on a non-kernel graph, each failing when its code was broken. Every
   consumer root checks and tests as on main; Turnstone web and Cleromancy core fail error for error as unpatched main does.
   The generic facts rewrite (D261) is held on `p8/kernel-move-1b-facts` for D248. Merge (D264) and codicils (D265) remain.
+- 2026-11-26: Merge went generic over `MergeGraph: SessionGraph` (D264, Mere `e4e581970`): 15 methods, the kernel's in
+  mere-kernel, incipit-graph's due in step 2b. Bytes unchanged; Mere's four crates test 984 passed; a branch merges back
+  over the dev-only surface, with a conflict refused and resolved as the control. Every consumer root checks and tests as
+  on main, Knot's merge types included. Codicils (D265) wait on eidetic's runtime-schema typed layer (D266).
