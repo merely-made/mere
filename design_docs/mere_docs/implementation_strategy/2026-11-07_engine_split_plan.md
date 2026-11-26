@@ -4325,3 +4325,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   mere-kernel, incipit-graph's due in step 2b. Bytes unchanged; Mere's four crates test 984 passed; a branch merges back
   over the dev-only surface, with a conflict refused and resolved as the control. Every consumer root checks and tests as
   on main, Knot's merge types included. Codicils (D265) wait on eidetic's runtime-schema typed layer (D266).
+- 2026-11-26: Codicils went generic through an installed `CodicilHook<G>` (D265, D266): eidetic's typed layer now saves,
+  loads and lists with the schema named at runtime (eidetic `72ddbee`, its typed functions calling the new form), and
+  Mere's codicil family takes the hook, the kernel's naming its own ids (Mere `b59db1cb0`). Stored bytes are unchanged, a
+  kernel codicil saved through the hook matches the typed layer byte for byte, and a codicil saves, lists and opens over the
+  dev-only surface through its own hook. Every consumer root, plus eidetic's typed-layer consumers (Distillery, gemot,
+  inker), checks and tests as on main. Step 1 of the kernel move is complete apart from the held facts branch (D261); step
+  2b, `incipit-session`, is next.
