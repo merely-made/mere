@@ -136,3 +136,129 @@ fn a_positional_journal_does_not_read_as_the_envelope() {
         kernel_entries()
     );
 }
+
+/// The kernel's journal entry as it was defined before the engine journal
+/// (engine split D249): the control every alias encoding is checked against.
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+struct PreSplitEntry {
+    author: kernel::graph::Author,
+    delta: CapturedDelta,
+}
+
+fn pre_split(entries: &[AttributedDelta]) -> Vec<PreSplitEntry> {
+    entries
+        .iter()
+        .map(|entry| PreSplitEntry {
+            author: entry.author.clone(),
+            delta: entry.delta.clone(),
+        })
+        .collect()
+}
+
+fn aligned(bytes: &[u8]) -> rkyv::util::AlignedVec<16> {
+    let mut out = rkyv::util::AlignedVec::<16>::new();
+    out.extend_from_slice(bytes);
+    out
+}
+
+#[test]
+fn the_alias_entry_encodes_as_the_pre_split_entry() {
+    let kernel = kernel_entries();
+    let old = pre_split(&kernel);
+    // JSON and postcard: the fixtures, and the pre-split entry's own bytes.
+    assert_eq!(serde_json::to_vec(&kernel).unwrap(), read("journal.json"));
+    assert_eq!(
+        serde_json::to_vec(&kernel).unwrap(),
+        serde_json::to_vec(&old).unwrap()
+    );
+    let postcard_bytes = read("journal.postcard");
+    assert_eq!(postcard::to_allocvec(&kernel).unwrap(), postcard_bytes);
+    assert_eq!(postcard::to_allocvec(&old).unwrap(), postcard_bytes);
+    // rkyv: the alias decodes the stored archive and writes it back exactly.
+    let rkyv_bytes = read("journal.rkyv");
+    let decoded = rkyv::from_bytes::<Vec<Attributed<CapturedDelta>>, rkyv::rancor::Error>(
+        &aligned(&rkyv_bytes),
+    )
+    .unwrap();
+    assert_eq!(decoded, kernel);
+    let again = rkyv::to_bytes::<rkyv::rancor::Error>(&decoded).unwrap();
+    assert_eq!(again.as_slice(), rkyv_bytes.as_slice());
+    let control = rkyv::to_bytes::<rkyv::rancor::Error>(&old).unwrap();
+    assert_eq!(control.as_slice(), rkyv_bytes.as_slice());
+    // CBOR on the wire.
+    assert_eq!(
+        cbor4ii::serde::to_vec(Vec::new(), &kernel).unwrap(),
+        cbor4ii::serde::to_vec(Vec::new(), &old).unwrap()
+    );
+    // Control: one changed delta changes every encoding.
+    let mut moved = kernel.clone();
+    moved[0].author = kernel::graph::Author::person("someone-else");
+    assert_ne!(serde_json::to_vec(&moved).unwrap(), read("journal.json"));
+    assert_ne!(
+        rkyv::to_bytes::<rkyv::rancor::Error>(&moved)
+            .unwrap()
+            .as_slice(),
+        rkyv_bytes.as_slice()
+    );
+}
+
+#[test]
+fn the_alias_journal_digests_as_the_pre_split_journal_at_every_prefix() {
+    let kernel = kernel_entries();
+    let mut journal = kernel::graph::GraphJournal::new();
+    for entry in &kernel {
+        journal.record_as(entry.author.clone(), entry.delta.clone());
+    }
+    assert_eq!(journal.entries(), kernel.as_slice());
+    let mut old = Journal::new();
+    for entry in pre_split(&kernel) {
+        old.append(entry);
+    }
+    let (chain, old_chain) = (
+        DigestChain::of(journal.log()).unwrap(),
+        DigestChain::of(&old).unwrap(),
+    );
+    for len in 0..=kernel.len() {
+        assert_eq!(
+            journal.log().prefix_digest(len).unwrap(),
+            old.prefix_digest(len).unwrap(),
+            "v1 at {len}"
+        );
+        assert_eq!(chain.at(len), old_chain.at(len), "v2 at {len}");
+    }
+    // The journal's own serde and its JSON entry writes match too.
+    assert_eq!(
+        serde_json::to_vec(journal.log()).unwrap(),
+        serde_json::to_vec(&old).unwrap()
+    );
+    assert_eq!(
+        journal
+            .log()
+            .entry_writes::<muniment::JsonCodec>("j", muniment::Seq(0))
+            .unwrap(),
+        old.entry_writes::<muniment::JsonCodec>("j", muniment::Seq(0))
+            .unwrap()
+    );
+    // Control: the digest sees a tampered entry from its position on.
+    let mut tampered = kernel::graph::GraphJournal::new();
+    for (i, entry) in kernel.iter().enumerate() {
+        let author = if i == 5 {
+            kernel::graph::Author::person("tamper")
+        } else {
+            entry.author.clone()
+        };
+        tampered.record_as(author, entry.delta.clone());
+    }
+    let tampered_chain = DigestChain::of(tampered.log()).unwrap();
+    assert_eq!(tampered_chain.at(5), chain.at(5));
+    assert_ne!(tampered_chain.at(6), chain.at(6));
+}

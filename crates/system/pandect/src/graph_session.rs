@@ -36,12 +36,14 @@ use catchment::{GraphId, SessionId};
 use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
-use kernel::graph::{
-    AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, ReplayPoint, Seq,
-    Touched, revert_change,
-};
+use kernel::graph::{Author, Graph, LogId, Seq};
+#[cfg(test)]
+use kernel::graph::{CapturedDelta, GraphJournal, Part};
+#[cfg(test)]
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
+use mere::model::Attributed;
+use mere::session::{ReplayPoint, SessionGraph, SessionJournal};
 use muniment::journal::DigestChain;
 use muniment::{Backend, Hash, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
@@ -57,11 +59,12 @@ use crate::manifest::{GraphSessionManifest, Lineage, MergedMark, TrashMark};
 use crate::view_state::ViewState;
 
 /// Product-owned validation of a complete candidate before graph/history installation.
-pub type GraphValidator = Arc<dyn Fn(&Graph) -> Result<(), String> + Send + Sync>;
+pub type GraphValidator<G = Graph> = Arc<dyn Fn(&G) -> Result<(), String> + Send + Sync>;
 
 /// Owner policy for newly introduced references. Unlike replay validation, this
 /// sees the previously admitted graph and may consult current owner authority.
-pub type GraphAdmissionValidator = Arc<dyn Fn(&Graph, &Graph) -> Result<(), String> + Send + Sync>;
+pub type GraphAdmissionValidator<G = Graph> =
+    Arc<dyn Fn(&G, &G) -> Result<(), String> + Send + Sync>;
 
 /// Where a mere keeps its sessions.
 pub const SESSIONS_PREFIX: &str = "sessions";
@@ -83,6 +86,8 @@ impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
 mod residency;
 mod page_claims;
+use legacy_hook::LegacyHook;
+mod legacy_hook;
 
 const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";
@@ -97,9 +102,9 @@ const MERGED: &str = "merged.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct PendingLinksSlot {
+struct PendingLinksSlot<H> {
     version: u32,
-    state: kernel::graph::PendingLinkState,
+    state: H,
 }
 const GRAPH: &str = "graph.json";
 const CHECKPOINT: &str = "checkpoint.json";
@@ -295,24 +300,73 @@ pub struct Applied {
 
 /// What an undo or redo did: the change it reverted or re-applied, what it
 /// wrote, and the parts it kept because another author changed them since.
-#[derive(Clone, Debug, PartialEq)]
-pub struct Reverted {
+pub struct Reverted<G: SessionGraph = Graph> {
     /// The change undone, or the undo redone, as an index into the change log.
     pub of: Seq,
     pub applied: Applied,
-    pub kept: Vec<Kept>,
+    pub kept: Vec<Kept<G>>,
 }
 
 /// A part an undo or redo left as it is, and who changed it since.
-#[derive(Clone, Debug, PartialEq)]
-pub struct Kept {
-    pub part: Part,
+pub struct Kept<G: SessionGraph = Graph> {
+    pub part: G::Part,
     pub by: Vec<Author>,
 }
 
+// By hand, so they ask nothing of the graph type itself (D253).
+impl<G: SessionGraph> Clone for Reverted<G> {
+    fn clone(&self) -> Self {
+        Self {
+            of: self.of,
+            applied: self.applied,
+            kept: self.kept.clone(),
+        }
+    }
+}
+
+impl<G: SessionGraph> std::fmt::Debug for Reverted<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Reverted")
+            .field("of", &self.of)
+            .field("applied", &self.applied)
+            .field("kept", &self.kept)
+            .finish()
+    }
+}
+
+impl<G: SessionGraph> PartialEq for Reverted<G> {
+    fn eq(&self, other: &Self) -> bool {
+        (self.of, self.applied) == (other.of, other.applied) && self.kept == other.kept
+    }
+}
+
+impl<G: SessionGraph> Clone for Kept<G> {
+    fn clone(&self) -> Self {
+        Self {
+            part: self.part.clone(),
+            by: self.by.clone(),
+        }
+    }
+}
+
+impl<G: SessionGraph> std::fmt::Debug for Kept<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Kept")
+            .field("part", &self.part)
+            .field("by", &self.by)
+            .finish()
+    }
+}
+
+impl<G: SessionGraph> PartialEq for Kept<G> {
+    fn eq(&self, other: &Self) -> bool {
+        self.part == other.part && self.by == other.by
+    }
+}
+
 #[derive(Serialize, Deserialize)]
-struct Baseline {
-    graph: GraphSnapshot,
+struct Baseline<S> {
+    graph: S,
     facets: NodeFacetStore,
 }
 
@@ -346,9 +400,9 @@ const JOURNAL_DIGEST_VERSION: u8 = 2;
 /// The v2 digest a checkpoint at `cursor` stores for `journal`: a lookup in
 /// the session's chain, once the chain has taken the entries since it last
 /// looked.
-fn journal_digest(
+fn journal_digest<G: SessionGraph>(
     digests: &Mutex<DigestChain>,
-    journal: &GraphJournal,
+    journal: &SessionJournal<G>,
     cursor: Seq,
 ) -> Result<Option<String>, SessionError> {
     let mut chain = digests.lock().unwrap_or_else(PoisonError::into_inner);
@@ -359,10 +413,10 @@ fn journal_digest(
 /// Whether `checkpoint` names `journal`'s first `cursor` entries, by the
 /// digest version it was written with: a v1 record is checked by recomputing
 /// v1, and an unknown version names nothing.
-fn names_journal(
+fn names_journal<G: SessionGraph>(
     checkpoint: &Checkpoint,
     digests: &Mutex<DigestChain>,
-    journal: &GraphJournal,
+    journal: &SessionJournal<G>,
 ) -> Result<bool, SessionError> {
     let Some(stored) = &checkpoint.journal_digest else {
         return Ok(false);
@@ -390,11 +444,11 @@ fn contents_digest(graph: &[u8], facets: &[u8]) -> String {
 
 /// The three records of a checkpoint at `cursor`: the graph, its facets, and the
 /// record naming the journal prefix and the exact bytes of the other two.
-fn checkpoint_ops(
+fn checkpoint_ops<G: SessionGraph>(
     keys: &Keys,
-    graph: &Graph,
+    graph: &G,
     digests: &Mutex<DigestChain>,
-    journal: &GraphJournal,
+    journal: &SessionJournal<G>,
     cursor: Seq,
     translated_receipt_digest: Option<String>,
 ) -> Result<[WriteOp; 3], SessionError> {
@@ -493,16 +547,17 @@ async fn read<B: Backend, T: DeserializeOwned>(
 /// rather than overlay what the snapshot's columns import: a session stores
 /// its whole facet store, and an overlay would add default-valued facets the
 /// graph never held.
-fn graph_of(
-    snapshot: &GraphSnapshot,
+fn graph_of<G: SessionGraph>(
+    snapshot: &G::Snapshot,
     facets: NodeFacetStore,
-) -> Result<Graph, kernel::graph::snapshot::ResourceSnapshotError> {
-    let mut graph = Graph::try_from_snapshot(snapshot)?;
+    recorded: bool,
+) -> Result<G, String> {
+    let mut graph = G::from_snapshot(snapshot, recorded)?;
     graph.install_facets(facets)?;
     Ok(graph)
 }
 
-fn baseline_of(graph: &Graph) -> Baseline {
+fn baseline_of<G: SessionGraph>(graph: &G) -> Baseline<G::Snapshot> {
     Baseline {
         graph: graph.to_snapshot(),
         facets: graph.facets().clone(),
@@ -606,12 +661,12 @@ impl RetainedSource {
     }
 }
 
-async fn load_retained_source<B: Backend>(
+async fn load_retained_source<B: Backend, G: SessionGraph>(
     slots: &JsonSlots<B>,
     keys: &Keys,
     manifest: &GraphSessionManifest,
     recorded: bool,
-) -> Result<(Graph, GraphJournal, RetainedSource), SessionError> {
+) -> Result<(G, SessionJournal<G>, RetainedSource), SessionError> {
     let baseline = slots.backend().get(&keys.at(BASELINE)).await?;
     let journal_prefix = keys.at(JOURNAL);
     let entry_keys = slots
@@ -631,8 +686,8 @@ async fn load_retained_source<B: Backend>(
     }
     let source = muniment::MemoryBackend::new();
     source.apply(&writes).await?;
-    let journal = GraphJournal::from_log(
-        Journal::<AttributedDelta>::load_entries(
+    let journal = SessionJournal::from_log(
+        Journal::<Attributed<G::Delta>>::load_entries(
             &JsonSlots::new(source),
             &journal_prefix,
             Some(LogId::new(manifest.session_id.as_uuid().to_string())),
@@ -643,15 +698,13 @@ async fn load_retained_source<B: Backend>(
     let graph = baseline
         .as_deref()
         .map(|bytes| {
-            let baseline: Baseline = serde_json::from_slice(bytes).map_err(|error| {
+            let baseline: Baseline<G::Snapshot> =
+                serde_json::from_slice(bytes).map_err(|error| {
+                    SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
+                })?;
+            let mut graph = G::from_snapshot(&baseline.graph, recorded).map_err(|error| {
                 SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
             })?;
-            let mut graph = if recorded {
-                Graph::try_from_recorded_snapshot(&baseline.graph)
-            } else {
-                Graph::try_from_snapshot(&baseline.graph)
-            }
-            .map_err(|error| SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE))))?;
             graph.install_facets(baseline.facets).map_err(|error| {
                 SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
             })?;
@@ -683,21 +736,19 @@ fn replay_state(graph: &Graph) -> Result<Vec<u8>, SessionError> {
 /// Whether the replayed clone and the candidate have equal replay states.
 /// Both are clones of the live graph, so only the entries either wrote are
 /// compared, as bytes (engine split D164).
-fn replay_matches(replay: &Graph, candidate: &Graph) -> Result<bool, SessionError> {
+fn replay_matches<G: SessionGraph>(replay: &G, candidate: &G) -> Result<bool, SessionError> {
     #[cfg(test)]
     if std::env::var_os("PANDECT_REPLAY_CHECK_OFF").is_some() {
         // The control for the escape tests: with no check they must fail.
         return Ok(true);
     }
-    crate::replay_state::replay_equal(replay, candidate)
-        .map(|(equal, _)| equal)
-        .map_err(|e| SessionError::NotReplayable(e.to_string()))
+    G::replay_matches(replay, candidate).map_err(SessionError::NotReplayable)
 }
 
 /// Route what `graph` records into `buffer`, for the session to journal.
-fn record_into(graph: &mut Graph, buffer: &Arc<Mutex<Vec<CapturedDelta>>>) {
+fn record_into<G: SessionGraph>(graph: &mut G, buffer: &Arc<Mutex<Vec<G::Delta>>>) {
     let buffer = Arc::clone(buffer);
-    graph.set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
+    graph.set_recorder(Some(Arc::new(move |delta: &G::Delta| {
         buffer.lock().expect("recorder buffer").push(delta.clone());
     })));
 }
@@ -706,8 +757,7 @@ fn record_into(graph: &mut Graph, buffer: &Arc<Mutex<Vec<CapturedDelta>>>) {
 /// covers. A host that writes through a batch of its own applies
 /// [`ops`](Self::ops) there and hands this back to [`GraphSession::stored`]
 /// once that batch commits.
-#[derive(Debug)]
-pub struct Pending {
+pub struct Pending<G: SessionGraph = Graph> {
     ops: Vec<WriteOp>,
     journal: Seq,
     changes: Seq,
@@ -715,12 +765,27 @@ pub struct Pending {
     updated_at: Option<SystemTime>,
     /// Views written, with the log position each was written through.
     views: Vec<(ViewKey, Seq)>,
-    pending_links: Option<(u64, kernel::graph::PendingLinkState)>,
+    pending_links: Option<(u64, G::Held)>,
     /// How many queued merged marks the batch writes.
     merge_marks: usize,
 }
 
-impl Pending {
+impl<G: SessionGraph> std::fmt::Debug for Pending<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Pending")
+            .field("ops", &self.ops)
+            .field("journal", &self.journal)
+            .field("changes", &self.changes)
+            .field("checkpoint", &self.checkpoint)
+            .field("updated_at", &self.updated_at)
+            .field("views", &self.views)
+            .field("pending_links", &self.pending_links)
+            .field("merge_marks", &self.merge_marks)
+            .finish()
+    }
+}
+
+impl<G: SessionGraph> Pending<G> {
     /// Commit batches in creation order. Storage receipts may arrive later.
     pub fn ops(&self) -> &[WriteOp] {
         &self.ops
@@ -734,23 +799,26 @@ impl Pending {
 /// One session, open: its graph, journal, changes and views, with every edit
 /// recorded under its author. The async edits store as they are made; the
 /// `_now` ones wait for [`flush`](Self::flush).
-pub struct GraphSession<B> {
+pub struct GraphSession<B, G: SessionGraph = Graph> {
     slots: JsonSlots<B>,
-    validator: Option<GraphValidator>,
-    admission_validator: Option<GraphAdmissionValidator>,
+    validator: Option<GraphValidator<G>>,
+    admission_validator: Option<GraphAdmissionValidator<G>>,
     keys: Keys,
     manifest: GraphSessionManifest,
-    baseline: Graph,
+    baseline: G,
     placement: Option<SessionPlacement>,
     translation: Option<LegacyTranslationReceipt>,
+    /// The legacy translation's reads over `G`: installed by the kernel's
+    /// open and qualification only (engine split D252).
+    legacy: Option<&'static LegacyHook<G>>,
     retained_source: Option<RetainedSource>,
-    graph: Graph,
-    journal: GraphJournal,
+    graph: G,
+    journal: SessionJournal<G>,
     /// Every journal prefix's v2 digest (engine-split D154), built at open and
     /// caught up whenever a checkpoint names a prefix, so naming one is a
     /// lookup. Behind a lock so a batch built through `&self` can catch it up.
     digests: Mutex<DigestChain>,
-    pending: Arc<Mutex<Vec<CapturedDelta>>>,
+    pending: Arc<Mutex<Vec<G::Delta>>>,
     changes: Journal<Change>,
     views: BTreeMap<ViewKey, View>,
     saved: Seq,
@@ -763,7 +831,7 @@ pub struct GraphSession<B> {
     /// Where a baseline replay stands at the stored checkpoint, which
     /// [`graph_at`](Self::graph_at) starts from (engine-split D161). A cache:
     /// shared with a detached candidate, and none for a legacy translation.
-    replay_point: Option<Arc<HeldPoint>>,
+    replay_point: Option<Arc<HeldPoint<G>>>,
     checkpoint_interval: u64,
     revision: u64,
     /// Whether the manifest and baseline are in the store yet.
@@ -771,7 +839,7 @@ pub struct GraphSession<B> {
     /// Whether the baseline is written with the head: a session begun from
     /// no graph stores none, and opens empty.
     write_baseline: bool,
-    saved_pending_links: kernel::graph::PendingLinkState,
+    saved_pending_links: G::Held,
     saved_pending_links_revision: u64,
     retained_pending_links_revision: u64,
     /// Merged marks to write on other sessions: an undone merge clears its
@@ -815,56 +883,7 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         kind: ChangeKind,
     ) -> Self {
-        let id = LogId::new(manifest.session_id.as_uuid().to_string());
-        let journal = match provenance(&manifest) {
-            Some(provenance) => GraphJournal::starting_from(id, provenance),
-            None => GraphJournal::with_id(id),
-        };
-        let mut changes = Journal::new();
-        changes.append(Change {
-            author,
-            kind,
-            first: Seq(0),
-            end: Seq(0),
-        });
-        let write_baseline = baseline.is_some();
-        let placement = (!write_baseline).then(SessionPlacement::recorded);
-        let mut baseline = baseline.unwrap_or_default();
-        let mut graph = baseline.clone();
-        baseline.clear_semantic_context();
-        let pending = Arc::default();
-        record_into(&mut graph, &pending);
-        Self {
-            slots: JsonSlots::new(backend),
-            validator: None,
-            admission_validator: None,
-            keys: Keys::new(manifest.session_id),
-            manifest,
-            baseline,
-            placement,
-            translation: None,
-            retained_source: None,
-            graph,
-            journal,
-            digests: Mutex::default(),
-            pending,
-            changes,
-            views: BTreeMap::new(),
-            saved: Seq(0),
-            changes_saved: Seq(0),
-            checkpointed: Seq(0),
-            checkpoint_v1: false,
-            replay_point: None,
-            checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
-            revision: 1,
-            head_stored: false,
-            write_baseline,
-            saved_pending_links: Default::default(),
-            saved_pending_links_revision: 0,
-            retained_pending_links_revision: 1,
-            merge_marks: Vec::new(),
-            observing: false,
-        }
+        Self::new_with(backend, manifest, baseline, author, kind)
     }
 
     /// Begin from explicitly recorded store placement. An arbitrary graph supplied
@@ -884,234 +903,7 @@ impl<B: Backend> GraphSession<B> {
     /// Open session `id` from a mere's store: the latest checkpoint and the
     /// journal past it, or the baseline and the whole journal.
     pub async fn open(backend: B, id: SessionId) -> Result<Self, SessionError> {
-        let slots = JsonSlots::new(backend);
-        let keys = Keys::new(id);
-        let mut manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
-            .await?
-            .ok_or(SessionError::Missing(id))?;
-        manifest.merged = read(&slots, &keys.at(MERGED)).await?;
-        let placement: Option<SessionPlacement> = read(&slots, &keys.at(PLACEMENT)).await?;
-        let recorded = placement
-            .as_ref()
-            .is_some_and(|profile| profile.baseline == PlacementProfile::RecordedStrataV1);
-        let (baseline, journal, retained_source) =
-            load_retained_source(&slots, &keys, &manifest, recorded).await?;
-        let changes = Journal::load_entries(&slots, &keys.at(CHANGES), None, None).await?;
-        let live = journal.live_cursor();
-        if let Some(profile) = &placement {
-            if profile.cutoff() > live {
-                return Err(SessionError::Corrupt(format!(
-                    "{}: legacy cursor lies past the journal",
-                    keys.at(PLACEMENT)
-                )));
-            }
-            if profile.baseline == PlacementProfile::RecordedStrataV1
-                && (profile.cutoff() != Seq(0) || !profile.origins.is_empty())
-            {
-                return Err(SessionError::Corrupt(format!(
-                    "{}: recorded placement has legacy history metadata",
-                    keys.at(PLACEMENT)
-                )));
-            }
-        }
-
-        let translation: Option<LegacyTranslationReceipt> =
-            read(&slots, &keys.at(TRANSLATION)).await?;
-        match (&placement, &translation) {
-            (Some(profile), Some(receipt))
-                if profile.baseline == PlacementProfile::LegacySurfaceV1 =>
-            {
-                let digest = retained_source_digest(&slots, &keys, profile).await?;
-                receipt
-                    .validate(profile, &digest, journal.entries())
-                    .map_err(|error| {
-                        SessionError::Corrupt(format!("{}: {error}", keys.at(TRANSLATION)))
-                    })?;
-            },
-            (Some(profile), None) if profile.baseline == PlacementProfile::LegacySurfaceV1 => {
-                return Err(SessionError::Corrupt(format!(
-                    "{}: missing legacy translation receipt",
-                    keys.at(TRANSLATION)
-                )));
-            },
-            (_, Some(_)) => {
-                return Err(SessionError::Corrupt(format!(
-                    "{}: receipt has no legacy placement",
-                    keys.at(TRANSLATION)
-                )));
-            },
-            _ => {},
-        }
-
-        let checkpoint: Option<Checkpoint> = read(&slots, &keys.at(CHECKPOINT)).await?;
-        // A checkpoint is read only beside the journal prefix and the files it
-        // names. Any other is a cache the journal outranks: it is replayed past,
-        // and the next checkpoint names what it was written with. A session with
-        // a retained translation compares its checkpoint with that translation
-        // below instead, and refuses a difference. A v1 digest is checked as
-        // v1; the session's chain gives v2 from here on (engine-split D154).
-        let digests = Mutex::new(DigestChain::of(journal.log())?);
-        let checkpoint = match checkpoint {
-            Some(checkpoint)
-                if checkpoint.cursor <= live
-                    && names_journal(&checkpoint, &digests, &journal)?
-                    && (translation.is_some()
-                        || stored_contents_match(&slots, &keys, &checkpoint).await?) =>
-            {
-                Some(checkpoint)
-            },
-            _ => None,
-        };
-        let checkpoint_v1 = checkpoint
-            .as_ref()
-            .is_some_and(|checkpoint| checkpoint.journal_digest_version.is_none());
-        let (mut graph, checkpointed) = match checkpoint {
-            Some(checkpoint)
-                if checkpoint.cursor <= live
-                    && translation.as_ref().is_none_or(|receipt| {
-                        checkpoint.cursor >= receipt.placement.cutoff()
-                            && checkpoint.translated_receipt_digest.as_deref()
-                                == Some(receipt.translation_digest.as_str())
-                    }) =>
-            {
-                let snapshot: GraphSnapshot = read(&slots, &keys.at(GRAPH))
-                    .await?
-                    .ok_or_else(|| SessionError::Corrupt(keys.at(GRAPH)))?;
-                let facets: NodeFacetStore = read(&slots, &keys.at(NODE_FACETS_FILE))
-                    .await?
-                    .unwrap_or_default();
-                let graph = if translation.is_some() || recorded {
-                    FrozenGraph {
-                        graph: snapshot,
-                        facets,
-                    }
-                    .materialize()
-                    .map_err(|error| {
-                        SessionError::Corrupt(format!("{}: {error}", keys.at(GRAPH)))
-                    })?
-                } else {
-                    graph_of(&snapshot, facets).map_err(|error| {
-                        SessionError::Corrupt(format!("{}: {error}", keys.at(GRAPH)))
-                    })?
-                };
-                if let Some(receipt) = &translation {
-                    let expected = receipt
-                        .graph_at(journal.entries(), checkpoint.cursor)
-                        .map_err(SessionError::Corrupt)?
-                        .ok_or_else(|| SessionError::Corrupt(keys.at(CHECKPOINT)))?;
-                    if FrozenGraph::of(&graph) != FrozenGraph::of(&expected) {
-                        return Err(SessionError::Corrupt(format!(
-                            "{}: checkpoint differs from retained translation",
-                            keys.at(CHECKPOINT)
-                        )));
-                    }
-                }
-                (graph, checkpoint.cursor)
-            },
-            _ => (
-                match &translation {
-                    Some(receipt) => receipt
-                        .baseline
-                        .materialize()
-                        .map_err(SessionError::Corrupt)?,
-                    None => baseline.clone(),
-                },
-                Seq(0),
-            ),
-        };
-        // The prefix replay that recovers attribution reaches the checkpoint's
-        // replay point, which the session keeps for `graph_at`.
-        let replay_point = if let Some(receipt) = &translation {
-            let translated = receipt
-                .journal(journal.entries(), live)
-                .expect("receipt validated against journal");
-            let baseline = receipt
-                .baseline
-                .materialize()
-                .map_err(SessionError::Corrupt)?;
-            translated
-                .replay_from_with_baseline(
-                    receipt.effect_cursor(checkpointed),
-                    &mut graph,
-                    &baseline,
-                )
-                .map(|()| None)
-        } else {
-            journal
-                .replay_point_from(&baseline, checkpointed)
-                .and_then(|point| {
-                    let point = point.expect("an opened checkpoint lies within its journal");
-                    journal.replay_from_point(&point, &mut graph)?;
-                    Ok((checkpointed > Seq(0)).then_some(point))
-                })
-        }
-        .map_err(|error| {
-            SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
-        })?;
-        let replay_point = match replay_point {
-            Some(point) => Some(Arc::new(HeldPoint {
-                digest: journal_digest(&digests, &journal, point.cursor())?,
-                point,
-            })),
-            None => None,
-        };
-        graph
-            .validate_active_resource_assertion_handles()
-            .map_err(|error| {
-                SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
-            })?;
-
-        let mut saved_pending_links =
-            match read::<B, PendingLinksSlot>(&slots, &keys.at(PENDING_LINKS)).await? {
-                Some(slot) if slot.version == 1 => slot.state,
-                Some(slot) => {
-                    return Err(SessionError::Corrupt(format!(
-                        "{}: unsupported pending-links version {}",
-                        keys.at(PENDING_LINKS),
-                        slot.version,
-                    )));
-                },
-                None => Default::default(),
-            };
-        if saved_pending_links.retention == kernel::graph::PendingLinkRetention::SessionOnly {
-            saved_pending_links.entries.clear();
-        }
-        graph.restore_pending_link_state(saved_pending_links.clone());
-
-        let mut session = Self {
-            slots,
-            validator: None,
-            admission_validator: None,
-            keys,
-            manifest,
-            baseline,
-            placement,
-            translation,
-            retained_source: Some(retained_source),
-            graph,
-            journal,
-            digests,
-            pending: Arc::default(),
-            changes_saved: changes.next_seq(),
-            changes,
-            views: BTreeMap::new(),
-            saved: live,
-            checkpointed,
-            checkpoint_v1,
-            replay_point,
-            checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
-            revision: 1,
-            head_stored: true,
-            write_baseline: false,
-            saved_pending_links,
-            saved_pending_links_revision: 1,
-            retained_pending_links_revision: 1,
-            merge_marks: Vec::new(),
-            observing: false,
-        };
-        session.load_views().await?;
-        record_into(&mut session.graph, &session.pending);
-        Ok(session)
+        Self::open_inner(backend, id, Some(&legacy_hook::KERNEL)).await
     }
 
     /// Qualify an already-durable legacy input and retain its original authority.
@@ -1276,6 +1068,7 @@ impl<B: Backend> GraphSession<B> {
         self.graph = graph;
         self.placement = Some(placement);
         self.translation = Some(receipt);
+        self.legacy = Some(&legacy_hook::KERNEL);
         self.checkpointed = live;
         self.checkpoint_v1 = false;
         self.revision += 1;
@@ -1294,6 +1087,318 @@ impl<B: Backend> GraphSession<B> {
         self.slots.backend().transact(transaction).await?;
         let error = rejected.lock().expect("translation rejection").take();
         error.map_or(Ok(()), |reason| Err(SessionError::Corrupt(reason)))
+    }
+
+    /// Complete source archive with explicit current placement when the session is qualified.
+    pub fn profiled_codicil_payload(&self) -> crate::graph_codicil::ProfiledGraphCodicil {
+        crate::graph_codicil::ProfiledGraphCodicil {
+            codicil: self.codicil_payload(),
+            // A legacy profile is admitted only with its validated translation receipt.
+            placement: self
+                .placement
+                .as_ref()
+                .map(|_| PlacementProfile::RecordedStrataV1),
+        }
+    }
+}
+
+impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
+    /// Begin a new session over any graph in memory, from `baseline` or empty, with `kind` as
+    /// its first change. Nothing is written until the first flush, which
+    /// stores the manifest and baseline with everything since.
+    pub fn new_with(
+        backend: B,
+        manifest: GraphSessionManifest,
+        baseline: Option<G>,
+        author: Author,
+        kind: ChangeKind,
+    ) -> Self {
+        let id = LogId::new(manifest.session_id.as_uuid().to_string());
+        let journal = match provenance(&manifest) {
+            Some(provenance) => SessionJournal::starting_from(id, provenance),
+            None => SessionJournal::with_id(id),
+        };
+        let mut changes = Journal::new();
+        changes.append(Change {
+            author,
+            kind,
+            first: Seq(0),
+            end: Seq(0),
+        });
+        let write_baseline = baseline.is_some();
+        let placement = (!write_baseline).then(SessionPlacement::recorded);
+        let mut baseline = baseline.unwrap_or_default();
+        let mut graph = baseline.clone();
+        baseline.clear_semantic_context();
+        let pending = Arc::default();
+        record_into(&mut graph, &pending);
+        Self {
+            slots: JsonSlots::new(backend),
+            validator: None,
+            admission_validator: None,
+            keys: Keys::new(manifest.session_id),
+            manifest,
+            baseline,
+            placement,
+            translation: None,
+            legacy: None,
+            retained_source: None,
+            graph,
+            journal,
+            digests: Mutex::default(),
+            pending,
+            changes,
+            views: BTreeMap::new(),
+            saved: Seq(0),
+            changes_saved: Seq(0),
+            checkpointed: Seq(0),
+            checkpoint_v1: false,
+            replay_point: None,
+            checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
+            revision: 1,
+            head_stored: false,
+            write_baseline,
+            saved_pending_links: Default::default(),
+            saved_pending_links_revision: 0,
+            retained_pending_links_revision: 1,
+            merge_marks: Vec::new(),
+            observing: false,
+        }
+    }
+
+    /// [`open`](GraphSession::open) over any graph: a session with a stored
+    /// legacy translation is refused, since only the kernel graph reads one.
+    pub async fn open_with(backend: B, id: SessionId) -> Result<Self, SessionError> {
+        Self::open_inner(backend, id, None).await
+    }
+
+    /// Open session `id`, reading a stored legacy translation through
+    /// `legacy` and refusing one without it (engine split D252).
+    async fn open_inner(
+        backend: B,
+        id: SessionId,
+        legacy: Option<&'static LegacyHook<G>>,
+    ) -> Result<Self, SessionError> {
+        let slots = JsonSlots::new(backend);
+        let keys = Keys::new(id);
+        let mut manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
+            .await?
+            .ok_or(SessionError::Missing(id))?;
+        manifest.merged = read(&slots, &keys.at(MERGED)).await?;
+        let placement: Option<SessionPlacement> = read(&slots, &keys.at(PLACEMENT)).await?;
+        let recorded = placement
+            .as_ref()
+            .is_some_and(|profile| profile.baseline == PlacementProfile::RecordedStrataV1);
+        let (baseline, journal, retained_source) =
+            load_retained_source::<B, G>(&slots, &keys, &manifest, recorded).await?;
+        let changes = Journal::load_entries(&slots, &keys.at(CHANGES), None, None).await?;
+        let live = journal.live_cursor();
+        if let Some(profile) = &placement {
+            if profile.cutoff() > live {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: legacy cursor lies past the journal",
+                    keys.at(PLACEMENT)
+                )));
+            }
+            if profile.baseline == PlacementProfile::RecordedStrataV1
+                && (profile.cutoff() != Seq(0) || !profile.origins.is_empty())
+            {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: recorded placement has legacy history metadata",
+                    keys.at(PLACEMENT)
+                )));
+            }
+        }
+
+        let translation: Option<LegacyTranslationReceipt> =
+            read(&slots, &keys.at(TRANSLATION)).await?;
+        let hook = match (&translation, legacy) {
+            (Some(_), None) => {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: a legacy translation opens only over the kernel graph",
+                    keys.at(TRANSLATION)
+                )));
+            },
+            (_, hook) => hook,
+        };
+        match (&placement, &translation) {
+            (Some(profile), Some(receipt))
+                if profile.baseline == PlacementProfile::LegacySurfaceV1 =>
+            {
+                let digest = retained_source_digest(&slots, &keys, profile).await?;
+                let hook = hook.expect("a receipt is read with its hook");
+                (hook.validate)(receipt, profile, &digest, journal.entries()).map_err(|error| {
+                    SessionError::Corrupt(format!("{}: {error}", keys.at(TRANSLATION)))
+                })?;
+            },
+            (Some(profile), None) if profile.baseline == PlacementProfile::LegacySurfaceV1 => {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: missing legacy translation receipt",
+                    keys.at(TRANSLATION)
+                )));
+            },
+            (_, Some(_)) => {
+                return Err(SessionError::Corrupt(format!(
+                    "{}: receipt has no legacy placement",
+                    keys.at(TRANSLATION)
+                )));
+            },
+            _ => {},
+        }
+
+        let checkpoint: Option<Checkpoint> = read(&slots, &keys.at(CHECKPOINT)).await?;
+        // A checkpoint is read only beside the journal prefix and the files it
+        // names. Any other is a cache the journal outranks: it is replayed past,
+        // and the next checkpoint names what it was written with. A session with
+        // a retained translation compares its checkpoint with that translation
+        // below instead, and refuses a difference. A v1 digest is checked as
+        // v1; the session's chain gives v2 from here on (engine-split D154).
+        let digests = Mutex::new(DigestChain::of(journal.log())?);
+        let checkpoint = match checkpoint {
+            Some(checkpoint)
+                if checkpoint.cursor <= live
+                    && names_journal(&checkpoint, &digests, &journal)?
+                    && (translation.is_some()
+                        || stored_contents_match(&slots, &keys, &checkpoint).await?) =>
+            {
+                Some(checkpoint)
+            },
+            _ => None,
+        };
+        let checkpoint_v1 = checkpoint
+            .as_ref()
+            .is_some_and(|checkpoint| checkpoint.journal_digest_version.is_none());
+        let (mut graph, checkpointed) = match checkpoint {
+            Some(checkpoint)
+                if checkpoint.cursor <= live
+                    && translation.as_ref().is_none_or(|receipt| {
+                        checkpoint.cursor >= receipt.placement.cutoff()
+                            && checkpoint.translated_receipt_digest.as_deref()
+                                == Some(receipt.translation_digest.as_str())
+                    }) =>
+            {
+                let snapshot: G::Snapshot = read(&slots, &keys.at(GRAPH))
+                    .await?
+                    .ok_or_else(|| SessionError::Corrupt(keys.at(GRAPH)))?;
+                let facets: NodeFacetStore = read(&slots, &keys.at(NODE_FACETS_FILE))
+                    .await?
+                    .unwrap_or_default();
+                // A translated or recorded checkpoint materializes by the
+                // recorded rules, as `FrozenGraph::materialize` does.
+                let graph = graph_of::<G>(&snapshot, facets, translation.is_some() || recorded)
+                    .map_err(|error| {
+                        SessionError::Corrupt(format!("{}: {error}", keys.at(GRAPH)))
+                    })?;
+                if let Some(receipt) = &translation {
+                    let hook = hook.expect("a receipt is read with its hook");
+                    let expected = (hook.graph_at)(receipt, journal.entries(), checkpoint.cursor)
+                        .map_err(SessionError::Corrupt)?
+                        .ok_or_else(|| SessionError::Corrupt(keys.at(CHECKPOINT)))?;
+                    if !(hook.same_graph)(&graph, &expected) {
+                        return Err(SessionError::Corrupt(format!(
+                            "{}: checkpoint differs from retained translation",
+                            keys.at(CHECKPOINT)
+                        )));
+                    }
+                }
+                (graph, checkpoint.cursor)
+            },
+            _ => (
+                match (&translation, hook) {
+                    (Some(receipt), Some(hook)) => {
+                        (hook.baseline)(receipt).map_err(SessionError::Corrupt)?
+                    },
+                    _ => baseline.clone(),
+                },
+                Seq(0),
+            ),
+        };
+        // The prefix replay that recovers attribution reaches the checkpoint's
+        // replay point, which the session keeps for `graph_at`.
+        let replay_point = if let (Some(receipt), Some(hook)) = (&translation, hook) {
+            let translated = (hook.journal)(receipt, journal.entries(), live)
+                .expect("receipt validated against journal");
+            let baseline = (hook.baseline)(receipt).map_err(SessionError::Corrupt)?;
+            translated
+                .replay_from_with_baseline(
+                    receipt.effect_cursor(checkpointed),
+                    &mut graph,
+                    &baseline,
+                )
+                .map(|()| None)
+        } else {
+            journal
+                .replay_point_from(&baseline, checkpointed)
+                .and_then(|point| {
+                    let point = point.expect("an opened checkpoint lies within its journal");
+                    journal.replay_from_point(&point, &mut graph)?;
+                    Ok((checkpointed > Seq(0)).then_some(point))
+                })
+        }
+        .map_err(|error| {
+            SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
+        })?;
+        let replay_point = match replay_point {
+            Some(point) => Some(Arc::new(HeldPoint {
+                digest: journal_digest(&digests, &journal, point.cursor())?,
+                point,
+            })),
+            None => None,
+        };
+        graph.validate_handles().map_err(|error| {
+            SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
+        })?;
+
+        let saved_pending_links =
+            match read::<B, PendingLinksSlot<G::Held>>(&slots, &keys.at(PENDING_LINKS)).await? {
+                Some(slot) if slot.version == 1 => slot.state,
+                Some(slot) => {
+                    return Err(SessionError::Corrupt(format!(
+                        "{}: unsupported pending-links version {}",
+                        keys.at(PENDING_LINKS),
+                        slot.version,
+                    )));
+                },
+                None => Default::default(),
+            };
+        let saved_pending_links = G::retained(saved_pending_links);
+        graph.restore_held(saved_pending_links.clone());
+
+        let mut session = Self {
+            slots,
+            validator: None,
+            admission_validator: None,
+            keys,
+            manifest,
+            baseline,
+            placement,
+            translation,
+            legacy: hook,
+            retained_source: Some(retained_source),
+            graph,
+            journal,
+            digests,
+            pending: Arc::default(),
+            changes_saved: changes.next_seq(),
+            changes,
+            views: BTreeMap::new(),
+            saved: live,
+            checkpointed,
+            checkpoint_v1,
+            replay_point,
+            checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
+            revision: 1,
+            head_stored: true,
+            write_baseline: false,
+            saved_pending_links,
+            saved_pending_links_revision: 1,
+            retained_pending_links_revision: 1,
+            merge_marks: Vec::new(),
+            observing: false,
+        };
+        session.load_views().await?;
+        record_into(&mut session.graph, &session.pending);
+        Ok(session)
     }
 
     async fn load_views(&mut self) -> Result<(), SessionError> {
@@ -1342,7 +1447,7 @@ impl<B: Backend> GraphSession<B> {
     /// The live graph. Edits go through [`apply`](Self::apply), so every one is
     /// journaled.
     /// Attach product authority, refusing an already invalid graph.
-    pub fn with_validator(mut self, validator: GraphValidator) -> Result<Self, SessionError> {
+    pub fn with_validator(mut self, validator: GraphValidator<G>) -> Result<Self, SessionError> {
         validator(&self.graph).map_err(SessionError::Validation)?;
         self.validator = Some(validator);
         Ok(self)
@@ -1350,12 +1455,12 @@ impl<B: Backend> GraphSession<B> {
 
     /// Attach admission policy to an already admitted/replayed baseline. Pure
     /// replay uses `with_validator`; history does not require live referents.
-    pub fn with_admission_validator(mut self, validator: GraphAdmissionValidator) -> Self {
+    pub fn with_admission_validator(mut self, validator: GraphAdmissionValidator<G>) -> Self {
         self.admission_validator = Some(validator);
         self
     }
 
-    fn validate(&self, graph: &Graph) -> Result<(), SessionError> {
+    fn validate(&self, graph: &G) -> Result<(), SessionError> {
         if let Some(validator) = &self.validator {
             validator(graph).map_err(SessionError::Validation)?;
         }
@@ -1386,7 +1491,7 @@ impl<B: Backend> GraphSession<B> {
         Ok(())
     }
 
-    pub fn graph(&self) -> &Graph {
+    pub fn graph(&self) -> &G {
         &self.graph
     }
 
@@ -1405,7 +1510,7 @@ impl<B: Backend> GraphSession<B> {
         self.graph.set_browsing_idle_gap_ms(idle_gap_ms);
     }
 
-    pub fn journal(&self) -> &GraphJournal {
+    pub fn journal(&self) -> &SessionJournal<G> {
         &self.journal
     }
 
@@ -1427,7 +1532,7 @@ impl<B: Backend> GraphSession<B> {
     pub async fn apply(
         &mut self,
         author: Author,
-        edits: Vec<CapturedDelta>,
+        edits: Vec<G::Delta>,
     ) -> Result<Applied, SessionError> {
         let applied = self.apply_now(author, edits)?;
         self.store(wall_clock_now(), Vec::new(), false).await?;
@@ -1441,7 +1546,7 @@ impl<B: Backend> GraphSession<B> {
     pub async fn apply_deltas(
         &mut self,
         author: Author,
-        deltas: Vec<GraphDelta>,
+        deltas: Vec<G::Edit>,
     ) -> Result<Applied, SessionError> {
         self.apply_as(author, ChangeKind::Edit, deltas).await
     }
@@ -1451,14 +1556,13 @@ impl<B: Backend> GraphSession<B> {
     pub fn apply_now(
         &mut self,
         author: Author,
-        edits: Vec<CapturedDelta>,
+        edits: Vec<G::Delta>,
     ) -> Result<Applied, SessionError> {
         self.ensure_writable()?;
         let deltas = edits
             .iter()
             .map(|edit| {
-                edit.replay_as(&author)
-                    .into_write()
+                G::edit_of(edit, &author)
                     .map_err(|why| SessionError::NotReplayable(format!("{why}: {edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -1477,7 +1581,7 @@ impl<B: Backend> GraphSession<B> {
     pub fn edit_now<R>(
         &mut self,
         author: Author,
-        edit: impl FnOnce(&mut Graph) -> R,
+        edit: impl FnOnce(&mut G) -> R,
     ) -> Result<(R, Applied), SessionError> {
         self.ensure_writable()?;
         self.edit_as(author, ChangeKind::Edit, edit)
@@ -1487,7 +1591,7 @@ impl<B: Backend> GraphSession<B> {
         &mut self,
         author: Author,
         kind: ChangeKind,
-        edit: impl FnOnce(&mut Graph) -> R,
+        edit: impl FnOnce(&mut G) -> R,
     ) -> Result<(R, Applied), SessionError> {
         self.try_edit_as(author, kind, |graph| Ok(edit(graph)))
     }
@@ -1498,29 +1602,25 @@ impl<B: Backend> GraphSession<B> {
         &mut self,
         author: Author,
         kind: ChangeKind,
-        edit: impl FnOnce(&mut Graph) -> Result<R, SessionError>,
+        edit: impl FnOnce(&mut G) -> Result<R, SessionError>,
     ) -> Result<(R, Applied), SessionError> {
         self.ensure_writable()?;
-        let observation = self.graph.semantic_observation_revision();
+        let observation = self.graph.observation_revision();
         let mut candidate = self.graph.clone();
         let captured = Arc::default();
         record_into(&mut candidate, &captured);
-        let result =
-            kernel::graph::with_isolated_capture(|| candidate.write_as(author.clone(), edit))?;
+        // The graph's write runs with only its own recorder.
+        let result = candidate.write_as(author.clone(), edit)?;
         self.validate(&candidate)?;
         let recorded = std::mem::take(&mut *captured.lock().expect("candidate recorder buffer"));
         let mut replay = self.graph.clone();
-        kernel::graph::replay_captured_deltas_as_onto(
-            &mut replay,
-            &author,
-            recorded.iter().cloned(),
-        );
+        replay.replay_as(&author, &recorded);
         if !replay_matches(&replay, &candidate)? {
             return Err(SessionError::NotReplayable(
                 "candidate changed graph truth outside the journaled mutation path".into(),
             ));
         }
-        if candidate.retained_pending_link_state() != self.graph.retained_pending_link_state() {
+        if candidate.held() != self.graph.held() {
             self.retained_pending_links_revision += 1;
         }
         self.graph = candidate;
@@ -1538,7 +1638,7 @@ impl<B: Backend> GraphSession<B> {
                 end,
             });
             self.revision += 1;
-        } else if self.graph.semantic_observation_revision() != observation {
+        } else if self.graph.observation_revision() != observation {
             self.revision += 1;
         }
         let applied = Applied {
@@ -1553,7 +1653,7 @@ impl<B: Backend> GraphSession<B> {
         &mut self,
         author: Author,
         kind: ChangeKind,
-        deltas: Vec<GraphDelta>,
+        deltas: Vec<G::Edit>,
     ) -> Result<Applied, SessionError> {
         self.ensure_writable()?;
         let (_, applied) = self.try_edit_as(author, kind, |graph| apply_all(graph, deltas))?;
@@ -1589,7 +1689,7 @@ impl<B: Backend> GraphSession<B> {
         !self.head_stored
             || !self.merge_marks.is_empty()
             || self.retained_pending_links_revision > self.saved_pending_links_revision
-            || self.graph.retained_pending_link_state() != self.saved_pending_links
+            || self.graph.held() != self.saved_pending_links
             || self.journal.live_cursor() > self.saved
             || self.changes.next_seq() > self.changes_saved
             || self
@@ -1598,17 +1698,17 @@ impl<B: Backend> GraphSession<B> {
                 .any(|view| view.log.next_seq() > view.saved)
     }
 
-    pub fn pending(&self, at: SystemTime) -> Result<Pending, SessionError> {
+    pub fn pending(&self, at: SystemTime) -> Result<Pending<G>, SessionError> {
         self.pending_with(at, false)
     }
 
-    fn pending_with(&self, at: SystemTime, checkpoint: bool) -> Result<Pending, SessionError> {
+    fn pending_with(&self, at: SystemTime, checkpoint: bool) -> Result<Pending<G>, SessionError> {
         self.validate(&self.graph)?;
         let journal = self.journal.live_cursor();
         let changes = self.changes.next_seq();
         let updated_at = (changes > self.changes_saved).then_some(at);
         let mut ops = Vec::new();
-        let retained_pending_links = self.graph.retained_pending_link_state();
+        let retained_pending_links = self.graph.held();
         // Returning to the saved value still needs a write when an earlier
         // batch may commit an intervening value. Session-only observations
         // and host coverage do not advance this durable-cache revision.
@@ -1700,7 +1800,7 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Mark a [`Pending`] batch as stored, once it has committed.
-    pub fn stored(&mut self, pending: Pending) {
+    pub fn stored(&mut self, pending: Pending<G>) {
         let written = pending.merge_marks.min(self.merge_marks.len());
         self.merge_marks.drain(..written);
         if let Some((revision, state)) = pending.pending_links {
@@ -1746,7 +1846,7 @@ impl<B: Backend> GraphSession<B> {
     /// Undo `author`'s latest change still in effect. Every part nobody has
     /// changed since goes back; the rest is kept and reported with who changed
     /// it (reservoir plan §7 item 17). `None` when there is nothing to undo.
-    pub async fn undo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+    pub async fn undo(&mut self, author: Author) -> Result<Option<Reverted<G>>, SessionError> {
         let reverted = self.undo_now(author)?;
         self.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(reverted)
@@ -1755,7 +1855,7 @@ impl<B: Backend> GraphSession<B> {
     /// [`undo`](Self::undo), journaled but not stored until the next flush,
     /// for a host that writes its batches itself ([`pending`](Self::pending),
     /// then [`stored`](Self::stored)).
-    pub fn undo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+    pub fn undo_now(&mut self, author: Author) -> Result<Option<Reverted<G>>, SessionError> {
         self.ensure_writable()?;
         let Some(of) = self.stacks(&author).0.last().copied() else {
             return Ok(None);
@@ -1765,14 +1865,14 @@ impl<B: Backend> GraphSession<B> {
 
     /// Redo `author`'s most recent undo, unless an edit of theirs since has
     /// cleared it (§7 item 18). `None` when there is nothing to redo.
-    pub async fn redo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+    pub async fn redo(&mut self, author: Author) -> Result<Option<Reverted<G>>, SessionError> {
         let reverted = self.redo_now(author)?;
         self.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(reverted)
     }
 
     /// [`redo`](Self::redo), journaled but not stored until the next flush.
-    pub fn redo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+    pub fn redo_now(&mut self, author: Author) -> Result<Option<Reverted<G>>, SessionError> {
         self.ensure_writable()?;
         let Some(of) = self.stacks(&author).1.last().copied() else {
             return Ok(None);
@@ -1810,20 +1910,22 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// The edits change `of` wrote.
-    fn edits_of(&self, change: &Change) -> Vec<CapturedDelta> {
+    fn edits_of(&self, change: &Change) -> Vec<G::Delta> {
         self.edits_in(change.first, change.end)
     }
 
     /// The edits the journal entries `[first, end)` wrote.
-    fn edits_in(&self, first: Seq, end: Seq) -> Vec<CapturedDelta> {
+    fn edits_in(&self, first: Seq, end: Seq) -> Vec<G::Delta> {
         self.journal.entries()[first.index()..end.index()]
             .iter()
             .enumerate()
             .flat_map(|(offset, entry)| {
                 self.translation
                     .as_ref()
-                    .and_then(|receipt| receipt.entry_effects.get(first.index() + offset))
-                    .cloned()
+                    .zip(self.legacy)
+                    .and_then(|(receipt, hook)| {
+                        (hook.entry_effects)(receipt, first.index() + offset)
+                    })
                     .unwrap_or_else(|| vec![entry.delta.clone()])
             })
             .collect()
@@ -1836,7 +1938,7 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         of: Seq,
         kind: ChangeKind,
-    ) -> Result<Reverted, SessionError> {
+    ) -> Result<Reverted<G>, SessionError> {
         let change = self
             .changes
             .get(of)
@@ -1848,28 +1950,25 @@ impl<B: Backend> GraphSession<B> {
             self.graph_at(change.end)
                 .expect("a change lies within its journal"),
         );
-        let revert = revert_change(&self.edits_of(&change), &before, &after, &self.graph);
-        let kept = revert
-            .kept
+        let (edits, kept) = G::revert(&self.edits_of(&change), &before, &after, &self.graph);
+        let kept = kept
             .into_iter()
             .map(|part| Kept {
                 by: self.changed_since(of, &part),
                 part,
             })
             .collect();
-        let deltas = revert
-            .edits
+        let deltas = edits
             .iter()
             .map(|edit| {
-                edit.replay_as(&author)
-                    .into_write()
+                G::edit_of(edit, &author)
                     .map_err(|why| SessionError::NotReplayable(format!("{why}: {edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
         let mark = self.merge_mark_after(&kind);
         let (_, applied) = self.edit_as(author, kind, |graph| {
             for delta in deltas {
-                let _ = apply_graph_delta(graph, delta);
+                let _ = graph.apply(delta);
             }
         })?;
         self.merge_marks.extend(mark);
@@ -1919,11 +2018,11 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Who, after change `of`, made a change that reached `part`.
-    fn changed_since(&self, of: Seq, part: &Part) -> Vec<Author> {
+    fn changed_since(&self, of: Seq, part: &G::Part) -> Vec<Author> {
         let mut by: Vec<Author> = Vec::new();
         for change in &self.changes.entries()[of.index() + 1..] {
             let edits = self.edits_of(change);
-            if Touched::of(&edits).reaches(part) && !by.contains(&change.author) {
+            if G::reaches(&edits, part) && !by.contains(&change.author) {
                 by.push(change.author.clone());
             }
         }
@@ -1952,10 +2051,9 @@ impl<B: Backend> GraphSession<B> {
     /// stored checkpoint's replay point when that lies at or before `cursor`
     /// and its digest still names the journal there, and from the baseline
     /// otherwise, with the same result (engine-split D161).
-    pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
-        let mut graph = match &self.translation {
-            Some(receipt) => receipt
-                .graph_at(self.journal.entries(), cursor)
+    pub fn graph_at(&self, cursor: Seq) -> Option<G> {
+        let mut graph = match self.translation.as_ref().zip(self.legacy) {
+            Some((receipt, hook)) => (hook.graph_at)(receipt, self.journal.entries(), cursor)
                 .ok()
                 .flatten(),
             None => match self.replay_point_for(cursor) {
@@ -1965,7 +2063,7 @@ impl<B: Backend> GraphSession<B> {
             .ok()
             .flatten(),
         }?;
-        graph.validate_active_resource_assertion_handles().ok()?;
+        graph.validate_handles().ok()?;
         graph.set_known_coverage(self.graph.known_coverage().clone());
         Some(graph)
     }
@@ -2026,20 +2124,8 @@ impl<B: Backend> GraphSession<B> {
         Ok(())
     }
 
-    /// Complete source archive with explicit current placement when the session is qualified.
-    pub fn profiled_codicil_payload(&self) -> crate::graph_codicil::ProfiledGraphCodicil {
-        crate::graph_codicil::ProfiledGraphCodicil {
-            codicil: self.codicil_payload(),
-            // A legacy profile is admitted only with its validated translation receipt.
-            placement: self
-                .placement
-                .as_ref()
-                .map(|_| PlacementProfile::RecordedStrataV1),
-        }
-    }
-
     /// Freeze graph, facets and the source's complete parallel histories.
-    pub fn codicil_payload(&self) -> crate::graph_codicil::GraphCodicil {
+    pub fn codicil_payload(&self) -> crate::graph_codicil::GraphCodicil<G> {
         use crate::graph_codicil::{ArchivedSession, ArchivedView, GraphCodicil};
         GraphCodicil {
             snapshot: self.graph.to_snapshot(),
@@ -2223,51 +2309,16 @@ pub fn fork_component_graph(
     Ok(Some(fork))
 }
 
-/// A mere's sessions, over its one store.
-pub struct MereSessions<B> {
+/// A mere's sessions, over its one store: the kernel graph's by default
+/// (engine split D244), any [`SessionGraph`]'s through the `_with` twins.
+pub struct MereSessions<B, G: SessionGraph = Graph> {
     backend: B,
+    graph: std::marker::PhantomData<fn() -> G>,
 }
 
 impl<B: Backend + Clone> MereSessions<B> {
     pub fn new(backend: B) -> Self {
-        Self { backend }
-    }
-
-    fn slots(&self) -> JsonSlots<B> {
-        JsonSlots::new(self.backend.clone())
-    }
-
-    /// Every session's manifest, trashed ones included, oldest first.
-    pub async fn list(&self) -> Result<Vec<GraphSessionManifest>, SessionError> {
-        let slots = self.slots();
-        let mut manifests = Vec::new();
-        for key in slots.keys(&format!("{SESSIONS_PREFIX}/")).await? {
-            if key.ends_with(&format!("/{MANIFEST}"))
-                && let Some(mut manifest) = read::<B, GraphSessionManifest>(&slots, &key).await?
-            {
-                manifest.merged = read(&slots, &Keys::new(manifest.session_id).at(MERGED)).await?;
-                manifests.push(manifest);
-            }
-        }
-        manifests.sort_by_key(|manifest| (manifest.created_at, *manifest.session_id.as_uuid()));
-        Ok(manifests)
-    }
-
-    /// The live session changed last: untrashed, latest by `updated_at`, then
-    /// by minting (reservoir plan §7 items 24 and 28). `None` when there is none.
-    pub async fn latest_live(&self) -> Result<Option<GraphSessionManifest>, SessionError> {
-        Ok(self
-            .list()
-            .await?
-            .into_iter()
-            .filter(|manifest| manifest.trashed.is_none())
-            .max_by_key(|manifest| {
-                (
-                    manifest.updated_at,
-                    manifest.created_at,
-                    *manifest.session_id.as_uuid(),
-                )
-            }))
+        Self::new_with(backend)
     }
 
     /// Open a session.
@@ -2310,18 +2361,6 @@ impl<B: Backend + Clone> MereSessions<B> {
             author,
             ChangeKind::Minted,
         )
-    }
-
-    /// Mint an empty session.
-    pub async fn mint(
-        &self,
-        author: Author,
-        display_name: Option<String>,
-    ) -> Result<GraphSessionManifest, SessionError> {
-        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        manifest.display_name = display_name;
-        self.create(manifest, None, author, ChangeKind::Minted)
-            .await
     }
 
     /// Open an archive as a new read-only session after checking the complete candidate.
@@ -2397,112 +2436,6 @@ impl<B: Backend + Clone> MereSessions<B> {
         Ok(session.manifest().clone())
     }
 
-    /// Fork `parent` at journal cursor `at`: a new session whose baseline is
-    /// the parent's graph there and whose journal starts empty.
-    pub async fn fork_at(
-        &self,
-        parent: &GraphSession<B>,
-        at: Seq,
-        author: Author,
-    ) -> Result<GraphSessionManifest, SessionError> {
-        let mut session = self.begin_fork_at(parent, at, author)?;
-        session.store(wall_clock_now(), Vec::new(), false).await?;
-        Ok(session.manifest().clone())
-    }
-
-    /// Stage an independent fork without writing it. The caller can validate
-    /// and apply its first edit, then flush the entire new session in one batch.
-    pub fn begin_fork_at(
-        &self,
-        parent: &GraphSession<B>,
-        at: Seq,
-        author: Author,
-    ) -> Result<GraphSession<B>, SessionError> {
-        self.begin_copy_at(parent, at, author, Lineage::Fork)
-    }
-
-    /// Branch `parent` at journal cursor `at`: a copy of the whole session,
-    /// like a fork, that keeps its lineage link and is meant to merge back
-    /// ([`merge_in`](Self::merge_in)). Its baseline is the parent's graph there
-    /// and its journal starts empty.
-    pub async fn branch_at(
-        &self,
-        parent: &GraphSession<B>,
-        at: Seq,
-        author: Author,
-    ) -> Result<GraphSessionManifest, SessionError> {
-        let mut session = self.begin_branch_at(parent, at, author)?;
-        session.store(wall_clock_now(), Vec::new(), false).await?;
-        Ok(session.manifest().clone())
-    }
-
-    /// Stage a branch without writing it, as [`begin_fork_at`](Self::begin_fork_at)
-    /// stages a fork.
-    pub fn begin_branch_at(
-        &self,
-        parent: &GraphSession<B>,
-        at: Seq,
-        author: Author,
-    ) -> Result<GraphSession<B>, SessionError> {
-        self.begin_copy_at(parent, at, author, Lineage::Branch)
-    }
-
-    /// A whole-session copy of `parent` at `at`, of the given lineage.
-    fn begin_copy_at(
-        &self,
-        parent: &GraphSession<B>,
-        at: Seq,
-        author: Author,
-        lineage: Lineage,
-    ) -> Result<GraphSession<B>, SessionError> {
-        let graph = parent.graph_at(at).ok_or(SessionError::CursorOutOfRange {
-            cursor: at,
-            live: parent.journal().live_cursor(),
-        })?;
-        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        manifest.parent_session = Some(parent.id());
-        manifest.forked_at = Some(at.0);
-        manifest.lineage = lineage;
-        let parent_name = parent.manifest().display_name.as_deref();
-        let (name, kind) = match lineage {
-            Lineage::Fork => (
-                forked_session_name(parent_name),
-                ChangeKind::Forked {
-                    from: parent.id(),
-                    at,
-                },
-            ),
-            Lineage::Branch => (
-                branched_session_name(parent_name),
-                ChangeKind::Branched {
-                    from: parent.id(),
-                    at,
-                },
-            ),
-        };
-        manifest.display_name = Some(name);
-        manifest.source_codicil = parent.manifest().source_codicil.clone();
-        let mut session = GraphSession::new(
-            self.backend.clone(),
-            manifest,
-            Some(graph),
-            author.clone(),
-            kind,
-        );
-        for key in parent.views.keys() {
-            if let Some(state) = parent.view_at(key, at) {
-                session.set_view_now(author.clone().via(key.app()), key.clone(), state.clone())?;
-            }
-        }
-        if let Some(validator) = &parent.validator {
-            session = session.with_validator(Arc::clone(validator))?;
-        }
-        if let Some(validator) = &parent.admission_validator {
-            session = session.with_admission_validator(Arc::clone(validator));
-        }
-        Ok(session)
-    }
-
     /// Fork the connected component around node `seed` out of `parent`
     /// (Turnstone's tear-out), as a new session.
     #[cfg(not(target_arch = "wasm32"))]
@@ -2539,17 +2472,200 @@ impl<B: Backend + Clone> MereSessions<B> {
         };
         self.create(manifest, Some(&graph), author, kind).await
     }
+}
+
+impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
+    /// [`new`](MereSessions::new) over any graph.
+    pub fn new_with(backend: B) -> Self {
+        Self {
+            backend,
+            graph: std::marker::PhantomData,
+        }
+    }
+
+    fn slots(&self) -> JsonSlots<B> {
+        JsonSlots::new(self.backend.clone())
+    }
+
+    /// Every session's manifest, trashed ones included, oldest first.
+    pub async fn list(&self) -> Result<Vec<GraphSessionManifest>, SessionError> {
+        let slots = self.slots();
+        let mut manifests = Vec::new();
+        for key in slots.keys(&format!("{SESSIONS_PREFIX}/")).await? {
+            if key.ends_with(&format!("/{MANIFEST}"))
+                && let Some(mut manifest) = read::<B, GraphSessionManifest>(&slots, &key).await?
+            {
+                manifest.merged = read(&slots, &Keys::new(manifest.session_id).at(MERGED)).await?;
+                manifests.push(manifest);
+            }
+        }
+        manifests.sort_by_key(|manifest| (manifest.created_at, *manifest.session_id.as_uuid()));
+        Ok(manifests)
+    }
+
+    /// The live session changed last: untrashed, latest by `updated_at`, then
+    /// by minting (reservoir plan §7 items 24 and 28). `None` when there is none.
+    pub async fn latest_live(&self) -> Result<Option<GraphSessionManifest>, SessionError> {
+        Ok(self
+            .list()
+            .await?
+            .into_iter()
+            .filter(|manifest| manifest.trashed.is_none())
+            .max_by_key(|manifest| {
+                (
+                    manifest.updated_at,
+                    manifest.created_at,
+                    *manifest.session_id.as_uuid(),
+                )
+            }))
+    }
+
+    /// [`open`](MereSessions::open) over any graph, refusing a stored legacy
+    /// translation.
+    pub async fn open_with(&self, id: SessionId) -> Result<GraphSession<B, G>, SessionError> {
+        GraphSession::open_with(self.backend.clone(), id).await
+    }
+
+    /// [`begin`](MereSessions::begin) over any graph.
+    pub fn begin_with(&self, author: Author, baseline: Option<G>) -> GraphSession<B, G> {
+        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        GraphSession::new_with(
+            self.backend.clone(),
+            manifest,
+            baseline,
+            author,
+            ChangeKind::Minted,
+        )
+    }
+
+    /// Mint an empty session.
+    pub async fn mint(
+        &self,
+        author: Author,
+        display_name: Option<String>,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        manifest.display_name = display_name;
+        self.create(manifest, None, author, ChangeKind::Minted)
+            .await
+    }
+
+    /// Fork `parent` at journal cursor `at`: a new session whose baseline is
+    /// the parent's graph there and whose journal starts empty.
+    pub async fn fork_at(
+        &self,
+        parent: &GraphSession<B, G>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let mut session = self.begin_fork_at(parent, at, author)?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(session.manifest().clone())
+    }
+
+    /// Stage an independent fork without writing it. The caller can validate
+    /// and apply its first edit, then flush the entire new session in one batch.
+    pub fn begin_fork_at(
+        &self,
+        parent: &GraphSession<B, G>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSession<B, G>, SessionError> {
+        self.begin_copy_at(parent, at, author, Lineage::Fork)
+    }
+
+    /// Branch `parent` at journal cursor `at`: a copy of the whole session,
+    /// like a fork, that keeps its lineage link and is meant to merge back
+    /// ([`merge_in`](Self::merge_in)). Its baseline is the parent's graph there
+    /// and its journal starts empty.
+    pub async fn branch_at(
+        &self,
+        parent: &GraphSession<B, G>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let mut session = self.begin_branch_at(parent, at, author)?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(session.manifest().clone())
+    }
+
+    /// Stage a branch without writing it, as [`begin_fork_at`](Self::begin_fork_at)
+    /// stages a fork.
+    pub fn begin_branch_at(
+        &self,
+        parent: &GraphSession<B, G>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSession<B, G>, SessionError> {
+        self.begin_copy_at(parent, at, author, Lineage::Branch)
+    }
+
+    /// A whole-session copy of `parent` at `at`, of the given lineage.
+    fn begin_copy_at(
+        &self,
+        parent: &GraphSession<B, G>,
+        at: Seq,
+        author: Author,
+        lineage: Lineage,
+    ) -> Result<GraphSession<B, G>, SessionError> {
+        let graph = parent.graph_at(at).ok_or(SessionError::CursorOutOfRange {
+            cursor: at,
+            live: parent.journal().live_cursor(),
+        })?;
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        manifest.parent_session = Some(parent.id());
+        manifest.forked_at = Some(at.0);
+        manifest.lineage = lineage;
+        let parent_name = parent.manifest().display_name.as_deref();
+        let (name, kind) = match lineage {
+            Lineage::Fork => (
+                forked_session_name(parent_name),
+                ChangeKind::Forked {
+                    from: parent.id(),
+                    at,
+                },
+            ),
+            Lineage::Branch => (
+                branched_session_name(parent_name),
+                ChangeKind::Branched {
+                    from: parent.id(),
+                    at,
+                },
+            ),
+        };
+        manifest.display_name = Some(name);
+        manifest.source_codicil = parent.manifest().source_codicil.clone();
+        let mut session = GraphSession::new_with(
+            self.backend.clone(),
+            manifest,
+            Some(graph),
+            author.clone(),
+            kind,
+        );
+        for key in parent.views.keys() {
+            if let Some(state) = parent.view_at(key, at) {
+                session.set_view_now(author.clone().via(key.app()), key.clone(), state.clone())?;
+            }
+        }
+        if let Some(validator) = &parent.validator {
+            session = session.with_validator(Arc::clone(validator))?;
+        }
+        if let Some(validator) = &parent.admission_validator {
+            session = session.with_admission_validator(Arc::clone(validator));
+        }
+        Ok(session)
+    }
 
     /// Write a new session's manifest, baseline and first change as one batch.
     /// Nobody else holds it, so there is nothing to recheck.
     async fn create(
         &self,
         manifest: GraphSessionManifest,
-        baseline: Option<&Graph>,
+        baseline: Option<&G>,
         author: Author,
         kind: ChangeKind,
     ) -> Result<GraphSessionManifest, SessionError> {
-        let mut session = GraphSession::new(
+        let mut session = GraphSession::<B, G>::new_with(
             self.backend.clone(),
             manifest,
             baseline.cloned(),
@@ -4455,7 +4571,7 @@ mod tests {
                     }
                     let slots = JsonSlots::new(store.clone());
                     let held = if column == BASELINE {
-                        read::<_, Baseline>(&slots, &keys.at(column))
+                        read::<_, Baseline<GraphSnapshot>>(&slots, &keys.at(column))
                             .await
                             .unwrap()
                             .unwrap()
@@ -5591,11 +5707,15 @@ mod tests {
                 baseline_truth,
                 "failed publication does not mutate the live graph"
             );
-            let retained =
-                load_retained_source(&session.slots, &session.keys, &session.manifest, true)
-                    .await
-                    .unwrap()
-                    .2;
+            let retained = load_retained_source::<_, Graph>(
+                &session.slots,
+                &session.keys,
+                &session.manifest,
+                true,
+            )
+            .await
+            .unwrap()
+            .2;
             match mere.open(id).await {
                 Err(SessionError::Corrupt(error)) => {
                     assert!(error.contains(&session.keys.at(JOURNAL)));
@@ -5604,11 +5724,15 @@ mod tests {
                 Err(error) => panic!("unexpected error: {error}"),
                 Ok(_) => panic!("colliding journal replay was published"),
             }
-            let after =
-                load_retained_source(&session.slots, &session.keys, &session.manifest, true)
-                    .await
-                    .unwrap()
-                    .2;
+            let after = load_retained_source::<_, Graph>(
+                &session.slots,
+                &session.keys,
+                &session.manifest,
+                true,
+            )
+            .await
+            .unwrap()
+            .2;
             assert_eq!(after.baseline, retained.baseline);
             assert_eq!(after.entries, retained.entries);
             let receipt = LegacyTranslationReceipt::new(

@@ -8,20 +8,30 @@
 //! starts from the stored checkpoint's replay point, and an imported change
 //! with a refused edit commits nothing.
 use super::*;
-use kernel::graph::apply::GraphDeltaResult;
 
 /// The replay point at the stored checkpoint, with the v2 digest of the
 /// journal prefix it was replayed from.
-#[derive(Clone)]
-pub(super) struct HeldPoint {
-    pub(super) point: ReplayPoint,
+pub(super) struct HeldPoint<G: SessionGraph> {
+    pub(super) point: ReplayPoint<G>,
     pub(super) digest: Option<String>,
+}
+
+impl<G: SessionGraph> Clone for HeldPoint<G> {
+    fn clone(&self) -> Self {
+        Self {
+            point: self.point.clone(),
+            digest: self.digest.clone(),
+        }
+    }
 }
 
 /// Apply `deltas` in order as one change, refusing it at the first edit
 /// admission refuses: the error names that edit and its reason, the handle
 /// for a collision, and the change commits nothing.
-pub(super) fn apply_all(graph: &mut Graph, deltas: Vec<GraphDelta>) -> Result<(), SessionError> {
+pub(super) fn apply_all<G: SessionGraph>(
+    graph: &mut G,
+    deltas: Vec<G::Edit>,
+) -> Result<(), SessionError> {
     for (position, delta) in deltas.into_iter().enumerate() {
         apply_one(graph, position, delta)?;
     }
@@ -30,22 +40,19 @@ pub(super) fn apply_all(graph: &mut Graph, deltas: Vec<GraphDelta>) -> Result<()
 
 /// Apply the edit at `position` in a change, refusing the change if
 /// admission refuses the edit, with the error [`apply_all`] gives.
-pub(crate) fn apply_one(
-    graph: &mut Graph,
+pub(crate) fn apply_one<G: SessionGraph>(
+    graph: &mut G,
     position: usize,
-    delta: GraphDelta,
+    delta: G::Edit,
 ) -> Result<(), SessionError> {
-    match apply_graph_delta(graph, delta) {
-        GraphDeltaResult::Refused(reason) => Err(SessionError::Validation(format!(
-            "edit {position} refused: {reason}"
-        ))),
-        _ => Ok(()),
-    }
+    graph
+        .apply(delta)
+        .map_err(|reason| SessionError::Validation(format!("edit {position} refused: {reason}")))
 }
 
-impl<B: Backend> GraphSession<B> {
+impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
     /// Whether `held`'s digest names the journal's prefix at its cursor.
-    fn verifies(&self, held: &HeldPoint) -> bool {
+    fn verifies(&self, held: &HeldPoint<G>) -> bool {
         held.digest.is_some()
             && journal_digest(&self.digests, &self.journal, held.point.cursor())
                 .is_ok_and(|digest| digest == held.digest)
@@ -53,7 +60,7 @@ impl<B: Backend> GraphSession<B> {
 
     /// The replay point `graph_at(cursor)` starts from: the held checkpoint's,
     /// when it lies at or before `cursor` and verifies.
-    pub(super) fn replay_point_for(&self, cursor: Seq) -> Option<&ReplayPoint> {
+    pub(super) fn replay_point_for(&self, cursor: Seq) -> Option<&ReplayPoint<G>> {
         let held = self.replay_point.as_deref()?;
         (held.point.cursor() <= cursor && self.verifies(held)).then_some(&held.point)
     }

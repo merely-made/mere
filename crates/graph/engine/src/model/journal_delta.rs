@@ -60,8 +60,17 @@ pub enum JournalDelta<S> {
 }
 
 /// A journal entry: who wrote it and what. Field names and order match the
-/// kernel's `AttributedDelta`.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// kernel's `AttributedDelta`, and so does its rkyv archive.
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Serialize,
+    Deserialize,
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+)]
 pub struct Attributed<D> {
     pub author: Author,
     pub delta: D,

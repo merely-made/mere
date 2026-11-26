@@ -897,9 +897,10 @@ where
     );
 }
 
-/// Attribution outlives a handle's removal so an undo keeps its original source.
+/// Attribution outlives a handle's removal so an undo keeps its original source:
+/// what a kernel replay carries from entry to entry (engine split D251).
 #[derive(Clone)]
-pub(crate) struct ReplayAttribution(
+pub struct ReplayAttribution(
     BTreeMap<String, String>,
     super::legacy_family_attribution::LegacyFamilyAttribution,
 );
@@ -1028,33 +1029,11 @@ impl ReplayAttribution {
     }
 }
 
-/// A replayed entry the graph refused: the journal and the graph it replays to
-/// disagree from `position` (an index into the entries replayed) onward.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ReplayRefused {
-    pub position: usize,
-    pub reason: super::resource_content::ContentError,
-}
+/// A replayed entry the graph refused (the engine's, D251).
+pub use mere::session::ReplayRefused;
 
-impl std::fmt::Display for ReplayRefused {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "replayed entry {} refused: {}",
-            self.position, self.reason
-        )
-    }
-}
-
-impl std::error::Error for ReplayRefused {}
-
-/// What a replay does with an entry the graph refuses: stop there, so the graph
-/// holds exactly the entries before it, or drop it and keep going.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum OnRefusal {
-    Stop,
-    Drop,
-}
+/// What a replay does with an entry the graph refuses (the engine's, D251).
+pub(crate) use mere::session::OnRefusal;
 
 pub(crate) fn replay_attributed_deltas_onto<'a, I>(
     graph: &mut Graph,

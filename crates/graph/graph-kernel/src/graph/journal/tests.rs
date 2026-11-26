@@ -10,6 +10,7 @@ use crate::graph::capture::{replay_captured_deltas, replay_captured_deltas_onto}
 use crate::graph::set_captured_delta_hook;
 use crate::graph::{EdgeAssertion, SemanticSubKind, SourceExtent, SourceTime};
 use euclid::default::Point2D;
+use muniment::LogId;
 use uuid::Uuid;
 
 #[test]

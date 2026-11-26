@@ -30,64 +30,26 @@
 
 use std::sync::{Arc, Mutex};
 
-use muniment::{Backend, Codec, SlotStore, StoreError};
-use muniment::{Journal, LogId, Provenance, Seq};
-
-use rkyv::{Archive, Deserialize, Serialize};
+use muniment::Seq;
 
 use super::Graph;
-use super::capture::{
-    CapturedDelta, DeltaRecorder, OnRefusal, ReplayAttribution, ReplayRefused,
-    replay_attributed_deltas_onto, replay_outcomes_onto,
-};
+use super::capture::{CapturedDelta, DeltaRecorder};
 use super::source_time::{SourceExtent, SourceTime};
 pub use mere::model::author::{Author, AuthorKind, USER_AUTHOR};
 
 /// One journal entry: a captured delta in the attribution envelope — the
 /// participant-gate plan's B1 adoption of chartulary's `Batch { author, edits }`
 /// shape over mere's edit spine. WHO made a change rides the journal, so a
-/// participant's edits read back attributed and compensable.
-#[derive(
-    Debug, Clone, PartialEq, Archive, Serialize, Deserialize, serde::Serialize, serde::Deserialize,
-)]
-pub struct AttributedDelta {
-    pub author: Author,
-    pub delta: CapturedDelta,
-}
+/// participant's edits read back attributed and compensable. The engine's
+/// [`Attributed`](mere::model::Attributed) over the kernel delta (engine
+/// split D249), with the same JSON, postcard and rkyv forms.
+pub type AttributedDelta = mere::model::Attributed<CapturedDelta>;
 
 /// An append-only journal of a graph's captured edits: the persisted edit
 /// spine. The materialized [`Graph`] is the replay of this log; forking it forks
 /// the graph's whole history with provenance, and it persists whole through one
-/// muniment slot.
-#[derive(Clone, Debug)]
-pub struct GraphJournal {
-    log: Journal<AttributedDelta>,
-    /// The author the next [`record`](Self::record) attributes: [`Author::user`]
-    /// by default; a host scopes a participant run with
-    /// [`set_author`](Self::set_author) and restores afterwards.
-    author: Author,
-}
-
-impl Default for GraphJournal {
-    fn default() -> Self {
-        Self {
-            log: Journal::default(),
-            author: Author::user(),
-        }
-    }
-}
-
-fn replay_entries_onto<'a, I>(
-    graph: &mut Graph,
-    entries: I,
-    on_refusal: OnRefusal,
-) -> Result<(), ReplayRefused>
-where
-    I: IntoIterator<Item = &'a AttributedDelta>,
-{
-    let mut attribution = ReplayAttribution::from_baseline(graph);
-    replay_attributed_deltas_onto(graph, &mut attribution, entries, on_refusal)
-}
+/// muniment slot. The engine journal over the kernel graph (D249).
+pub type GraphJournal = mere::session::SessionJournal<Graph>;
 
 impl SourceTime for GraphJournal {
     type Cursor = Seq;
@@ -140,6 +102,7 @@ mod tests;
 
 #[path = "journal/operations.rs"]
 mod operations;
-#[path = "journal/replay_point.rs"]
-mod replay_point;
-pub use replay_point::ReplayPoint;
+pub use operations::LegacyJournalMigration;
+
+/// Where a replay from a baseline stands at a journal cursor (D161, D251).
+pub type ReplayPoint = mere::session::ReplayPoint<Graph>;

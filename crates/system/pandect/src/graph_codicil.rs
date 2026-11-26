@@ -28,8 +28,9 @@ use eidetic::{
     load_typed_sealed, save_typed_sealed,
 };
 use kernel::graph::Graph;
+use mere::session::SessionGraph;
 /// Complete candidate graph passed to product-owned validators.
-pub type GraphCandidate = Graph;
+pub type GraphCandidate<G = Graph> = G;
 use kernel::persistence::GraphSnapshot;
 use kernel::types::ImageRole;
 use uuid::Uuid;
@@ -37,7 +38,6 @@ use uuid::Uuid;
 use crate::graph_placement::{PlacementProfile, materialize_snapshot};
 use crate::{Change, GraphSessionManifest, NodeFacetStore, ViewEntry, ViewState};
 use eidetic::manifest::load_manifest;
-use kernel::graph::AttributedDelta;
 
 /// Schema id bytes for the graph-snapshot codicil schema. The [`SchemaRef`] is the
 /// BLAKE3 of these bytes, so it is stable across builds and machines.
@@ -79,25 +79,57 @@ fn v3_profiled_graph_snapshot_schema_ref() -> SchemaRef {
 /// Version 1 carried a bare [`GraphSnapshot`]. Version 2 added facets, version 3
 /// added an explicit placement profile, and version 4 stores assertion records
 /// as the canonical edge representation.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct GraphCodicil {
-    pub snapshot: GraphSnapshot,
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(bound = "")]
+pub struct GraphCodicil<G: SessionGraph = Graph> {
+    pub snapshot: G::Snapshot,
     #[serde(default)]
     pub facets: NodeFacetStore,
     /// Optional reservoir history. Graph-only v2 codicils decode unchanged.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub sessions: Vec<ArchivedSession>,
+    pub sessions: Vec<ArchivedSession<G>>,
 }
 
 /// One immutable source session's complete graph and parallel histories.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct ArchivedSession {
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(bound = "")]
+pub struct ArchivedSession<G: SessionGraph = Graph> {
     pub manifest: GraphSessionManifest,
-    pub baseline: GraphSnapshot,
+    pub baseline: G::Snapshot,
     pub baseline_facets: NodeFacetStore,
-    pub journal: Vec<AttributedDelta>,
+    pub journal: Vec<mere::model::Attributed<G::Delta>>,
     pub changes: Vec<Change>,
     pub views: Vec<ArchivedView>,
+}
+
+// Debug by hand, so it asks nothing of the graph type itself (D244).
+impl<G: SessionGraph> std::fmt::Debug for GraphCodicil<G>
+where
+    G::Snapshot: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GraphCodicil")
+            .field("snapshot", &self.snapshot)
+            .field("facets", &self.facets)
+            .field("sessions", &self.sessions)
+            .finish()
+    }
+}
+
+impl<G: SessionGraph> std::fmt::Debug for ArchivedSession<G>
+where
+    G::Snapshot: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ArchivedSession")
+            .field("manifest", &self.manifest)
+            .field("baseline", &self.baseline)
+            .field("baseline_facets", &self.baseline_facets)
+            .field("journal", &self.journal)
+            .field("changes", &self.changes)
+            .field("views", &self.views)
+            .finish()
+    }
 }
 
 /// One source application's view and its full parallel stream.

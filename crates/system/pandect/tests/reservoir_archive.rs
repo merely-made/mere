@@ -49,7 +49,7 @@ fn state_parts(
 
 #[test]
 fn state_fingerprint_ignores_generation_time_but_retains_graph_changes() {
-    let mut graph = pandect::graph_codicil::GraphCandidate::new();
+    let mut graph = <pandect::graph_codicil::GraphCandidate>::new();
     graph.add_node(
         "mere://v3/fingerprint".to_string(),
         euclid::Point2D::new(4.0, 9.0),

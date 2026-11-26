@@ -9,6 +9,7 @@ use super::super::{
     SemanticSubKind, Seq, predicate_iri, replay_captured_deltas_onto,
 };
 use super::*;
+use crate::graph::journal::LegacyJournalMigration;
 use crate::types::GraphScope;
 use euclid::default::Point2D;
 

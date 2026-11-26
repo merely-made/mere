@@ -101,7 +101,7 @@ fn last_stored<T: Serialize>(
         .next())
 }
 
-impl<B: LegacyTransactionBackend> GraphSession<B> {
+impl<B: LegacyTransactionBackend, G: SessionGraph> GraphSession<B, G> {
     /// Store everything not stored yet, stamping new changes `at`, in one
     /// backend transaction. It lands only if the store still holds what this
     /// handle was opened or last stored at (log lengths, last entries, no
@@ -119,7 +119,11 @@ impl<B: LegacyTransactionBackend> GraphSession<B> {
 
     /// Write `pending` and `extra` atomically if the store passes this
     /// handle's recheck; mark `pending` stored once it has landed.
-    async fn commit(&mut self, pending: Pending, extra: CommitExtra) -> Result<(), SessionError> {
+    async fn commit(
+        &mut self,
+        pending: Pending<G>,
+        extra: CommitExtra,
+    ) -> Result<(), SessionError> {
         let check = self.recheck(extra.expect)?;
         let mut ops = pending.ops().to_vec();
         ops.extend(extra.ops);
@@ -424,7 +428,9 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         *self = candidate;
         Ok(generation)
     }
+}
 
+impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
     /// A private copy with its own recorder, to edit and offer to
     /// [`commit_candidate`](Self::commit_candidate). No candidate edit can reach
     /// the acknowledged graph's capture buffer through an Arc shared by
@@ -442,6 +448,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             baseline: self.baseline.clone(),
             placement: self.placement.clone(),
             translation: self.translation.clone(),
+            legacy: self.legacy,
             retained_source: self.retained_source.clone(),
             graph,
             pending,

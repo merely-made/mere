@@ -112,6 +112,9 @@ pub struct SourceQuads {
     pub withdrawn: Vec<Quad>,
 }
 
+/// The graph a session holds, beside the graph the engine projects.
+pub use crate::session::SessionGraph;
+
 /// A graph the engine projects to RDF.
 pub trait RdfSource {
     /// Every held quad of the projection, in a stable order; may repeat a quad.

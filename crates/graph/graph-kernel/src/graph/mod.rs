@@ -119,6 +119,7 @@ pub mod predicate_declarations;
 mod relation_read;
 #[cfg(test)]
 mod replay_admission_tests;
+pub mod replay_state;
 pub mod resource;
 pub mod resource_classifications;
 pub mod resource_content;
@@ -136,6 +137,7 @@ pub mod resource_tag_admission;
 pub mod resource_tags;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
 pub mod revert;
+mod session_graph;
 pub mod source_time;
 // chartulary capability-trait impls for `Node` (graph re-base, G5).
 mod chart;

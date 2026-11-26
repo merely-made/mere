@@ -49,6 +49,8 @@ pub mod model;
 /// half of the projection.
 pub mod projection;
 
+pub mod session;
+
 pub use model::ResourceGraph;
 pub use projection::{ProjectionKey, ProjectionSource, RdfSource, SourceQuads};
 

@@ -36,8 +36,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use kernel::graph::{
-    Part, ProvenanceSubKind, part_edits, part_node, part_of, part_value, recreate_node_edits,
-    replay_captured_deltas_onto,
+    CapturedDelta, Part, ProvenanceSubKind, Touched, part_edits, part_node, part_of, part_value,
+    recreate_node_edits, replay_captured_deltas_onto, revert_change,
 };
 use kernel::graph::apply::GraphDeltaResult;
 use kernel::persistence::PersistedResourceFacet;
@@ -94,9 +94,10 @@ pub enum MergeMatch {
 
 /// A planned merge-in: the edits that apply cleanly and the conflicts that
 /// wait for a choice. Nothing is written until
-/// [`MereSessions::apply_merge`].
+/// [`MereSessions::apply_merge`]. Its graph type is the kernel's until merge
+/// moves onto [`SessionGraph`] (engine split D253).
 #[derive(Clone)]
-pub struct PendingMerge {
+pub struct PendingMerge<G: SessionGraph = Graph> {
     target: SessionId,
     source: SessionId,
     matched: MergeMatch,
@@ -104,11 +105,11 @@ pub struct PendingMerge {
     planned_at: Seq,
     conflicts: Vec<MergeConflict>,
     /// The clean edits, rule merges included, in the target's ids.
-    edits: Vec<CapturedDelta>,
+    edits: Vec<G::Delta>,
     /// The source's edits since the base, in the target's ids.
-    change: Vec<CapturedDelta>,
+    change: Vec<G::Delta>,
     /// The source as merge-in reads it, in the target's ids.
-    source_graph: Graph,
+    source_graph: G,
     /// Each target id the source names, with the source's own id for it.
     origins: BTreeMap<Uuid, Uuid>,
     source_container: Uuid,

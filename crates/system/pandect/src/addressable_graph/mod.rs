@@ -175,9 +175,10 @@ impl<B: Backend> AddressableGraphStore<B> {
     }
 }
 /// A read-only available-data view. Editing/checkpointing uses the recorded session.
-pub struct ResidentGraph<B> {
+/// Its graph type is the kernel's until the surface readers move (D241, D244).
+pub struct ResidentGraph<B, G: mere::session::SessionGraph = Graph> {
     store: AddressableGraphStore<B>,
-    graph: Graph,
+    graph: G,
     generation: String,
     catalog: Option<Catalog>,
     records: BTreeMap<GraphAddress, StoredNode>,

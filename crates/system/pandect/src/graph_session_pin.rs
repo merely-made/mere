@@ -26,16 +26,16 @@ const RESOURCE_DIGEST_DOMAIN: &str = "mere resource digest v1";
 
 /// What a pin holds: the graph at its cursor and, once read, its index and
 /// Resource digest.
-pub(super) struct Pinned {
-    graph: Graph,
+pub(super) struct Pinned<G> {
+    graph: G,
     dataset: OnceLock<IndexedDataset>,
     resource_digest: OnceLock<Result<ResourceDigest, SortedNQuadsError>>,
     #[cfg(test)]
     resource_digests_computed: std::sync::atomic::AtomicUsize,
 }
 
-impl Pinned {
-    fn new(graph: Graph) -> Self {
+impl<G> Pinned<G> {
+    fn new(graph: G) -> Self {
         Self {
             graph,
             dataset: OnceLock::new(),
@@ -60,7 +60,7 @@ pub struct ResourceDigest {
 
 /// Every Resource-stratum quad of `graph`, held and withdrawn reifiers, as
 /// Graphshell's P8 probe reads them; may repeat a quad.
-fn resource_quads(graph: &Graph) -> impl Iterator<Item = oxrdf::Quad> + '_ {
+fn resource_quads<G: RdfSource>(graph: &G) -> impl Iterator<Item = oxrdf::Quad> + '_ {
     let resources = graph.resource_graph();
     resources
         .held_quads()
@@ -76,7 +76,7 @@ fn digest_nquads(domain: &str, nquads: &str) -> String {
 
 /// The Resource digest of `graph`: D190's sorted N-Quads under
 /// [`RESOURCE_DIGEST_DOMAIN`].
-fn resource_digest_of(graph: &Graph) -> Result<ResourceDigest, SortedNQuadsError> {
+fn resource_digest_of<G: RdfSource>(graph: &G) -> Result<ResourceDigest, SortedNQuadsError> {
     let nquads = sorted_nquads(resource_quads(graph))?;
     Ok(ResourceDigest {
         algorithm: RESOURCE_DIGEST_ALGORITHM,
@@ -103,14 +103,14 @@ pub struct GraphRevision {
 /// indexed pin took about 0.4 s at 100k nodes and about 36 ms at 10k on the
 /// reference laptop (engine-split D166). A host that cannot wait drops it on a
 /// worker.
-pub struct PinnedView {
+pub struct PinnedView<G: SessionGraph = Graph> {
     session: SessionId,
     cursor: Seq,
     digest: String,
-    pinned: Arc<Pinned>,
+    pinned: Arc<Pinned<G>>,
 }
 
-impl PinnedView {
+impl<G: SessionGraph> PinnedView<G> {
     pub fn session(&self) -> SessionId {
         self.session
     }
@@ -133,7 +133,7 @@ impl PinnedView {
         }
     }
 
-    pub fn graph(&self) -> &Graph {
+    pub fn graph(&self) -> &G {
         &self.pinned.graph
     }
 
@@ -170,7 +170,7 @@ impl PinnedView {
     }
 
     #[cfg(test)]
-    pub(super) fn downgrade(&self) -> std::sync::Weak<Pinned> {
+    pub(super) fn downgrade(&self) -> std::sync::Weak<Pinned<G>> {
         Arc::downgrade(&self.pinned)
     }
 
@@ -187,7 +187,7 @@ impl PinnedView {
     }
 }
 
-impl std::fmt::Debug for PinnedView {
+impl<G: SessionGraph> std::fmt::Debug for PinnedView<G> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("PinnedView")
             .field("session", &self.session.as_uuid())
@@ -199,7 +199,7 @@ impl std::fmt::Debug for PinnedView {
     }
 }
 
-impl<B: Backend> GraphSession<B> {
+impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
     /// Identify the live journal revision without copying the graph or index.
     pub fn live_revision(&self) -> Result<GraphRevision, SessionError> {
         self.revision_at(self.journal.live_cursor())
@@ -209,7 +209,7 @@ impl<B: Backend> GraphSession<B> {
     /// now, its `IndexedDataset` on the view's first
     /// [`dataset`](PinnedView::dataset) read. [`SessionError::CursorOutOfRange`]
     /// past the live cursor or where `graph_at` has no graph.
-    pub fn pin(&self, cursor: Seq) -> Result<PinnedView, SessionError> {
+    pub fn pin(&self, cursor: Seq) -> Result<PinnedView<G>, SessionError> {
         let revision = self.revision_at(cursor)?;
         let graph = self
             .graph_at(cursor)

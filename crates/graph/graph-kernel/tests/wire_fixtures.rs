@@ -386,3 +386,48 @@ fn snapshot_rkyv_reencodes_byte_identical_and_restores_the_graph() {
         "graph round trip"
     );
 }
+
+#[test]
+fn the_engine_journal_replays_the_fixture_to_the_candidate_graph() {
+    // The kernel's journal is the engine's over the kernel graph (engine
+    // split D249, D251): whole replay, a checked prefix and a replay point all
+    // reach the candidate the fixture was written from.
+    let entries: Vec<AttributedDelta> = serde_json::from_slice(&read("journal.json")).unwrap();
+    let candidate: Candidate = serde_json::from_slice(&read("candidate.json")).unwrap();
+    let mut journal = kernel::graph::GraphJournal::new();
+    for entry in &entries {
+        journal.record_as(entry.author.clone(), entry.delta.clone());
+    }
+    let live = journal.live_cursor();
+    let point = journal
+        .replay_point_from(&Graph::new(), muniment::Seq(live.0 / 2))
+        .unwrap()
+        .unwrap();
+    let graphs = [
+        journal.replay(),
+        journal.snapshot_at(live).unwrap().unwrap(),
+        journal
+            .snapshot_at_from_point(&point, live)
+            .unwrap()
+            .unwrap(),
+    ];
+    for graph in &graphs {
+        assert_eq!(
+            serde_json::to_value(graph.to_snapshot_at(1_700_000_000)).unwrap(),
+            serde_json::to_value(&candidate.snapshot).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(graph.facets()).unwrap(),
+            serde_json::to_value(&candidate.facets).unwrap()
+        );
+    }
+    // Control: the prefix before the last entry is a different graph.
+    let short = journal
+        .snapshot_at(muniment::Seq(live.0 - 1))
+        .unwrap()
+        .unwrap();
+    assert_ne!(
+        serde_json::to_value(short.to_snapshot_at(1_700_000_000)).unwrap(),
+        serde_json::to_value(&candidate.snapshot).unwrap()
+    );
+}

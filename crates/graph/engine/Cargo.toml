@@ -59,6 +59,8 @@ oxrdfxml = { version = "0.2", features = ["rdf-12"] }
 # feature's held dataset wraps.
 portolan.workspace = true
 quadstore.workspace = true
+# The session journal's log (engine split D249), from the eidetic source portolan comes from.
+muniment.workspace = true
 # The `mere.pack/2` header, codec, envelope and body types (declared-lens L1,
 # L2, R1); the substrate only, not the browsing product.
 eidetic = { version = ">=0.0.3", default-features = false, features = ["pack-signing"], git = "https://github.com/merely-made/eidetic.git", branch = "main" }

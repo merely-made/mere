@@ -443,9 +443,10 @@ pub enum KeyAgreementEvent {
     Dispatch(Vec<u8>),
 }
 
-/// Deterministic projection of one retained operation set.
-pub struct SyncProjection {
-    pub graph: Graph,
+/// Deterministic projection of one retained operation set; its graph type is
+/// the kernel's until the surface readers move (engine split D241, D244).
+pub struct SyncProjection<G: mere::session::SessionGraph = Graph> {
+    pub graph: G,
     pub access_records: Vec<AccessRecord>,
     pub scenes: BTreeMap<Uuid, SavedSceneV2>,
     pub handler_preferences: BTreeMap<String, String>,
