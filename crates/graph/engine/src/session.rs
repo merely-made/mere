@@ -25,7 +25,9 @@ use serde::Serialize;
 use serde::de::DeserializeOwned;
 use uuid::Uuid;
 
-use crate::model::{Attributed, Author, CoverageNote, ResourceStore};
+use crate::model::{
+    Attributed, Author, CoverageNote, PersistedResourceRecord, ResourceDelta, ResourceStore,
+};
 use crate::projection::RdfSource;
 
 mod journal;
@@ -75,6 +77,7 @@ pub trait SessionGraph: RdfSource + Clone + Default + Sized + 'static {
         + DeserializeOwned
         + Send
         + Sync
+        + From<ResourceDelta>
         + 'static;
     /// A live edit, as [`apply`](Self::apply) takes it.
     type Edit;
@@ -165,4 +168,21 @@ pub trait SessionGraph: RdfSource + Clone + Default + Sized + 'static {
     fn resources(&self) -> &ResourceStore;
     /// Refuse a graph whose active resource handles conflict.
     fn validate_handles(&self) -> Result<(), String>;
+
+    /// Write or remove resource `id`'s record as one recorded edit under
+    /// `author`, applied as its replay would apply it, or say why the graph
+    /// refused it (engine split D257). Every host reaches it through its own
+    /// [`edit_of`](Self::edit_of) and [`apply`](Self::apply).
+    fn write_resource_record(
+        &mut self,
+        author: &Author,
+        id: Uuid,
+        record: Option<PersistedResourceRecord>,
+    ) -> Result<(), String> {
+        let delta = Self::Delta::from(ResourceDelta::ReplaySetResourceRecordById {
+            resource_id: id.to_string(),
+            record,
+        });
+        self.apply(Self::edit_of(&delta, author)?)
+    }
 }

@@ -59,6 +59,14 @@ pub enum JournalDelta<S> {
     Surface(S),
 }
 
+/// A resource write as a host's journal delta: the engine's own resource
+/// writes reach any host's journal through this (engine split D257).
+impl<S> From<ResourceDelta> for JournalDelta<S> {
+    fn from(delta: ResourceDelta) -> Self {
+        Self::Resource(delta)
+    }
+}
+
 /// A journal entry: who wrote it and what. Field names and order match the
 /// kernel's `AttributedDelta`, and so does its rkyv archive.
 #[derive(

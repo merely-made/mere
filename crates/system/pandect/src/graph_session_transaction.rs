@@ -189,45 +189,6 @@ impl<B: LegacyTransactionBackend, G: SessionGraph> GraphSession<B, G> {
 }
 
 impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
-    /// Apply one complete, validated change against a session.
-    /// Storage failure, a competing append or an edit admission refuses
-    /// (engine-split D163) leaves graph and history unchanged.
-    /// Append-only log lengths and their last retained entries are rechecked in
-    /// the write transaction. This is not a journal corruption/tampering audit.
-    pub async fn transact_deltas(
-        &mut self,
-        author: Author,
-        deltas: Vec<GraphDelta>,
-        at: SystemTime,
-    ) -> Result<Applied, SessionError> {
-        self.transact_change(at, false, move |candidate| {
-            candidate
-                .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))
-                .map(|(_, applied)| applied)
-        })
-        .await
-        .map(|(applied, _)| applied)
-    }
-
-    /// [`transact_deltas`](Self::transact_deltas), with the addressable
-    /// publication of the resulting graph in the same atomic write. Returns the
-    /// published generation. A reader never sees an edit without its
-    /// publication, and a refused write leaves neither.
-    pub async fn transact_deltas_published(
-        &mut self,
-        author: Author,
-        deltas: Vec<GraphDelta>,
-        at: SystemTime,
-    ) -> Result<(Applied, String), SessionError> {
-        self.transact_change(at, true, move |candidate| {
-            candidate
-                .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))
-                .map(|(_, applied)| applied)
-        })
-        .await
-        .map(|(applied, generation)| (applied, generation.expect("published write")))
-    }
-
     /// Preflight observed stable-ID commands against this complete writer, then
     /// apply their live deltas and the resulting addressable publication in one
     /// atomic write. Every refusal comes before anything is written: a stale
@@ -262,6 +223,47 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             generation.expect("published write"),
         ))
     }
+}
+
+impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
+    /// Apply one complete, validated change against a session.
+    /// Storage failure, a competing append or an edit admission refuses
+    /// (engine-split D163) leaves graph and history unchanged.
+    /// Append-only log lengths and their last retained entries are rechecked in
+    /// the write transaction. This is not a journal corruption/tampering audit.
+    pub async fn transact_deltas(
+        &mut self,
+        author: Author,
+        deltas: Vec<G::Edit>,
+        at: SystemTime,
+    ) -> Result<Applied, SessionError> {
+        self.transact_change(at, false, move |candidate| {
+            candidate
+                .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))
+                .map(|(_, applied)| applied)
+        })
+        .await
+        .map(|(applied, _)| applied)
+    }
+
+    /// [`transact_deltas`](Self::transact_deltas), with the addressable
+    /// publication of the resulting graph in the same atomic write. Returns the
+    /// published generation. A reader never sees an edit without its
+    /// publication, and a refused write leaves neither.
+    pub async fn transact_deltas_published(
+        &mut self,
+        author: Author,
+        deltas: Vec<G::Edit>,
+        at: SystemTime,
+    ) -> Result<(Applied, String), SessionError> {
+        self.transact_change(at, true, move |candidate| {
+            candidate
+                .try_edit_as(author, ChangeKind::Edit, |graph| apply_all(graph, deltas))
+                .map(|(_, applied)| applied)
+        })
+        .await
+        .map(|(applied, generation)| (applied, generation.expect("published write")))
+    }
 
     /// The same staged/acknowledged boundary for this author's saved history.
     pub async fn transact_history(
@@ -269,7 +271,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         author: Author,
         redo: bool,
         at: SystemTime,
-    ) -> Result<Option<Reverted>, SessionError> {
+    ) -> Result<Option<Reverted<G>>, SessionError> {
         self.transact_change(at, false, move |candidate| {
             if redo {
                 candidate.redo_now(author)
@@ -288,7 +290,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         author: Author,
         redo: bool,
         at: SystemTime,
-    ) -> Result<(Option<Reverted>, String), SessionError> {
+    ) -> Result<(Option<Reverted<G>>, String), SessionError> {
         self.transact_change(at, true, move |candidate| {
             if redo {
                 candidate.redo_now(author)
@@ -390,11 +392,11 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         }
         let pending = candidate.pending(at)?;
         // The publication describes the candidate's graph and joins its write.
-        // Preparation refuses before anything is written or installed.
+        // Preparation, through the host's hook (engine split D257), refuses
+        // before anything is written or installed.
         let staged = if publish {
-            let publication = candidate.prepare_resident_publication()?;
-            let generation = publication.generation().to_owned();
-            Some((generation, candidate.resident_store().stage(publication)))
+            let publication = candidate.prepare_publication()?;
+            Some((publication.generation, publication.writes))
         } else {
             None
         };
@@ -409,7 +411,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             let ops = std::mem::take(&mut extra.ops);
             let decide = extra.decide.take();
             extra.decide = Some(Box::new(move |reader: &dyn muniment::TransactionReader| {
-                let mut writes = publication.decide(reader);
+                let mut writes = publication(reader);
                 writes.extend(ops);
                 if let Some(decide) = decide {
                     writes.extend(decide(reader)?);
@@ -448,7 +450,7 @@ impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
             baseline: self.baseline.clone(),
             placement: self.placement.clone(),
             translation: self.translation.clone(),
-            legacy: self.legacy,
+            hooks: self.hooks,
             retained_source: self.retained_source.clone(),
             graph,
             pending,

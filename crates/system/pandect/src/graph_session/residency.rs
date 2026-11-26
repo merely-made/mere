@@ -5,8 +5,63 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Addressable checkpoints share the recorded session's writer authority.
+use super::publication::{Publication, PublicationHook, PublishedGeneration, SessionBackend};
 use super::*;
 use crate::addressable_graph::{AddressableGraphStore, ResidencyRoots, ResidentGraph};
+
+/// The kernel graph's publication: the addressable store's (engine split
+/// D257). Each is the call a kernel session made before the hook.
+pub(super) static KERNEL_PUBLICATION: PublicationHook<Graph> = PublicationHook {
+    check: |graph| {
+        crate::addressable_graph::refuse_residency_limited(graph).map_err(SessionError::Store)
+    },
+    prepare: kernel_prepare,
+    revision: kernel_revision,
+    published: kernel_published,
+};
+
+fn kernel_prepare(
+    graph: &Graph,
+    backend: SessionBackend<'_>,
+    container: Uuid,
+) -> Result<Publication, SessionError> {
+    let store = AddressableGraphStore::new(backend, container);
+    let publication = store
+        .prepare_recorded_graph(graph)
+        .map_err(SessionError::Store)?;
+    let generation = publication.generation().to_owned();
+    let staged = store.stage(publication);
+    Ok(Publication {
+        generation,
+        writes: Box::new(move |reader: &dyn muniment::TransactionReader| staged.decide(reader)),
+    })
+}
+
+/// Snapshot reconstruction synthesizes visit times; the exact authoritative
+/// facet sidecar replaces them before the generation is named.
+fn kernel_revision(
+    graph: &Graph,
+    backend: SessionBackend<'_>,
+    container: Uuid,
+) -> Result<String, SessionError> {
+    let mut normalized = Graph::try_from_recorded_snapshot(&graph.to_snapshot_at(0))
+        .map_err(|error| SessionError::Validation(error.to_string()))?;
+    normalized
+        .install_facets(graph.facets().clone())
+        .map_err(|error| SessionError::Validation(error.to_string()))?;
+    let publication =
+        AddressableGraphStore::new(backend, container).prepare_recorded_graph(&normalized)?;
+    Ok(publication.generation().to_owned())
+}
+
+fn kernel_published(backend: SessionBackend<'_>, container: Uuid) -> PublishedGeneration<'_> {
+    Box::pin(async move {
+        let resident = AddressableGraphStore::new(backend, container)
+            .open(ResidencyRoots::default())
+            .await?;
+        Ok(resident.generation().to_owned())
+    })
+}
 impl<B: Backend + Clone> GraphSession<B> {
     /// The addressable store of this session's root graph, for a host that
     /// stages its own settings writes beside the policy.

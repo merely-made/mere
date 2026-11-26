@@ -6,16 +6,16 @@
 
 use std::time::SystemTime;
 
-use kernel::graph::apply::{GraphDelta, apply_graph_delta};
-use kernel::graph::{Author, Graph, ResourceNode};
+use kernel::graph::{Author, ResourceNode};
 use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use mere::acquire::page_claims::{KEPT_PAGE_CLAIMS_FACET, KeptPageClaims, PageClaims};
+use mere::session::SessionGraph;
 use muniment::Backend;
 use oxrdf::NamedNode;
 
 use super::{ChangeKind, GraphSession, LegacyTransactionBackend, PinnedView, SessionError};
 
-impl<B: Backend> GraphSession<B> {
+impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
     /// Read a capture's kept assertions and block provenance from this session.
     pub fn kept_page_claims(
         &self,
@@ -25,7 +25,7 @@ impl<B: Backend> GraphSession<B> {
     }
 }
 
-impl PinnedView {
+impl<G: SessionGraph> PinnedView<G> {
     /// Read the same evidence as it was at this journal cursor.
     pub fn kept_page_claims(
         &self,
@@ -35,7 +35,7 @@ impl PinnedView {
     }
 }
 
-impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
+impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
     /// Admit one kept capture through the existing session journal. The caller
     /// owns the capture and policy and supplies an IRI for its immutable edition.
     /// Use a custody-backed session for claims from a sealed capture.
@@ -50,8 +50,8 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         let kept = KeptPageClaims::new(source.clone(), claims);
         let value = kept.facet_value();
         self.transact_change(at, false, |candidate| {
-            candidate.try_edit_as(author, ChangeKind::Edit, |graph| {
-                store_kept(graph, &kept, value)
+            candidate.try_edit_as(author.clone(), ChangeKind::Edit, |graph| {
+                store_kept(graph, &author, &kept, value)
             })?;
             Ok(())
         })
@@ -60,9 +60,12 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     }
 }
 
-fn read_kept(graph: &Graph, source: &NamedNode) -> Result<Option<KeptPageClaims>, SessionError> {
+fn read_kept<G: SessionGraph>(
+    graph: &G,
+    source: &NamedNode,
+) -> Result<Option<KeptPageClaims>, SessionError> {
     let resource = ResourceNode::for_term(source.as_str());
-    let Some(record) = graph.resource_record(resource.id()) else {
+    let Some(record) = graph.resources().resource_record(resource.id()) else {
         return Ok(None);
     };
     let Some(facet) = record
@@ -79,8 +82,9 @@ fn read_kept(graph: &Graph, source: &NamedNode) -> Result<Option<KeptPageClaims>
         .map_err(|_| SessionError::Corrupt("Malformed page claim evidence".into()))
 }
 
-fn store_kept(
-    graph: &mut Graph,
+fn store_kept<G: SessionGraph>(
+    graph: &mut G,
+    author: &Author,
     kept: &KeptPageClaims,
     value: serde_json::Value,
 ) -> Result<(), SessionError> {
@@ -94,24 +98,20 @@ fn store_kept(
         };
     }
     let resource = ResourceNode::for_term(kept.source.as_str());
-    let mut record =
-        graph
-            .resource_record(resource.id())
-            .unwrap_or_else(|| PersistedResourceRecord {
-                canonical_iri: resource.canonical_iri().to_owned(),
-                facets: Vec::new(),
-            });
+    let mut record = graph
+        .resources()
+        .resource_record(resource.id())
+        .unwrap_or_else(|| PersistedResourceRecord {
+            canonical_iri: resource.canonical_iri().to_owned(),
+            facets: Vec::new(),
+        });
     record.facets.push(PersistedResourceFacet {
         facet: KEPT_PAGE_CLAIMS_FACET.to_owned(),
         value_json: value.to_string(),
     });
-    let _ = apply_graph_delta(
-        graph,
-        GraphDelta::ReplaySetResourceRecordById {
-            resource_id: resource.id(),
-            record: Some(record),
-        },
-    );
+    // The engine's one recorded resource write (engine split D257). A
+    // refusal shows in the read-back below.
+    let _ = graph.write_resource_record(author, resource.id(), Some(record));
     if read_kept(graph, &kept.source)?.as_ref() != Some(kept) {
         return Err(SessionError::Validation(
             "Kept source claims could not be admitted".into(),

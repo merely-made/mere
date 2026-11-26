@@ -33,7 +33,9 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::SystemTime;
 
 use catchment::{GraphId, SessionId};
-use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+#[cfg(test)]
+use kernel::graph::apply::GraphDelta;
+use kernel::graph::apply::apply_graph_delta;
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{Author, Graph, LogId, Seq};
@@ -84,10 +86,45 @@ pub trait LegacyTransactionBackend: Backend {}
 #[cfg(target_arch = "wasm32")]
 impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
-mod residency;
 mod page_claims;
+mod residency;
 use legacy_hook::LegacyHook;
 mod legacy_hook;
+mod publication;
+pub use publication::{
+    Publication, PublicationHook, PublicationWrites, PublishedGeneration, SessionBackend,
+};
+
+/// What a session's host installs on it: how it publishes its graph and how
+/// it reads a stored legacy translation (engine split D252, D257). The
+/// kernel graph's constructors install the kernel's; the `_with` twins
+/// install what their [`MereSessions`] carries, and a bare one none.
+struct SessionHooks<G: SessionGraph> {
+    legacy: Option<&'static LegacyHook<G>>,
+    publication: Option<&'static PublicationHook<G>>,
+}
+
+impl<G: SessionGraph> Clone for SessionHooks<G> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<G: SessionGraph> Copy for SessionHooks<G> {}
+
+impl<G: SessionGraph> SessionHooks<G> {
+    const NONE: Self = Self {
+        legacy: None,
+        publication: None,
+    };
+}
+
+impl SessionHooks<Graph> {
+    const KERNEL: Self = Self {
+        legacy: Some(&legacy_hook::KERNEL),
+        publication: Some(&residency::KERNEL_PUBLICATION),
+    };
+}
 
 const MANIFEST: &str = "manifest.json";
 const BASELINE: &str = "baseline.json";
@@ -808,9 +845,9 @@ pub struct GraphSession<B, G: SessionGraph = Graph> {
     baseline: G,
     placement: Option<SessionPlacement>,
     translation: Option<LegacyTranslationReceipt>,
-    /// The legacy translation's reads over `G`: installed by the kernel's
-    /// open and qualification only (engine split D252).
-    legacy: Option<&'static LegacyHook<G>>,
+    /// The host's hooks: the legacy translation's reads over `G`, and the
+    /// publication of `G` (engine split D252, D257).
+    hooks: SessionHooks<G>,
     retained_source: Option<RetainedSource>,
     graph: G,
     journal: SessionJournal<G>,
@@ -883,7 +920,9 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         kind: ChangeKind,
     ) -> Self {
-        Self::new_with(backend, manifest, baseline, author, kind)
+        let mut session = Self::new_with(backend, manifest, baseline, author, kind);
+        session.hooks = SessionHooks::KERNEL;
+        session
     }
 
     /// Begin from explicitly recorded store placement. An arbitrary graph supplied
@@ -895,15 +934,15 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         kind: ChangeKind,
     ) -> Self {
-        let mut session = Self::new(backend, manifest, baseline, author, kind);
-        session.placement = Some(SessionPlacement::recorded());
+        let mut session = Self::new_recorded_with(backend, manifest, baseline, author, kind);
+        session.hooks = SessionHooks::KERNEL;
         session
     }
 
     /// Open session `id` from a mere's store: the latest checkpoint and the
     /// journal past it, or the baseline and the whole journal.
     pub async fn open(backend: B, id: SessionId) -> Result<Self, SessionError> {
-        Self::open_inner(backend, id, Some(&legacy_hook::KERNEL)).await
+        Self::open_inner(backend, id, SessionHooks::KERNEL).await
     }
 
     /// Qualify an already-durable legacy input and retain its original authority.
@@ -1068,7 +1107,7 @@ impl<B: Backend> GraphSession<B> {
         self.graph = graph;
         self.placement = Some(placement);
         self.translation = Some(receipt);
-        self.legacy = Some(&legacy_hook::KERNEL);
+        self.hooks.legacy = Some(&legacy_hook::KERNEL);
         self.checkpointed = live;
         self.checkpoint_v1 = false;
         self.revision += 1;
@@ -1141,7 +1180,7 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
             baseline,
             placement,
             translation: None,
-            legacy: None,
+            hooks: SessionHooks::NONE,
             retained_source: None,
             graph,
             journal,
@@ -1166,19 +1205,34 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
         }
     }
 
+    /// [`new_recorded`](GraphSession::new_recorded) over any graph.
+    pub fn new_recorded_with(
+        backend: B,
+        manifest: GraphSessionManifest,
+        baseline: Option<G>,
+        author: Author,
+        kind: ChangeKind,
+    ) -> Self {
+        let mut session = Self::new_with(backend, manifest, baseline, author, kind);
+        session.placement = Some(SessionPlacement::recorded());
+        session
+    }
+
     /// [`open`](GraphSession::open) over any graph: a session with a stored
     /// legacy translation is refused, since only the kernel graph reads one.
     pub async fn open_with(backend: B, id: SessionId) -> Result<Self, SessionError> {
-        Self::open_inner(backend, id, None).await
+        Self::open_inner(backend, id, SessionHooks::NONE).await
     }
 
-    /// Open session `id`, reading a stored legacy translation through
-    /// `legacy` and refusing one without it (engine split D252).
+    /// Open session `id` with `hooks`, reading a stored legacy translation
+    /// through its legacy hook and refusing one without it (engine split
+    /// D252).
     async fn open_inner(
         backend: B,
         id: SessionId,
-        legacy: Option<&'static LegacyHook<G>>,
+        hooks: SessionHooks<G>,
     ) -> Result<Self, SessionError> {
+        let legacy = hooks.legacy;
         let slots = JsonSlots::new(backend);
         let keys = Keys::new(id);
         let mut manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
@@ -1373,7 +1427,10 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
             baseline,
             placement,
             translation,
-            legacy: hook,
+            hooks: SessionHooks {
+                legacy: hook,
+                ..hooks
+            },
             retained_source: Some(retained_source),
             graph,
             journal,
@@ -1922,7 +1979,7 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
             .flat_map(|(offset, entry)| {
                 self.translation
                     .as_ref()
-                    .zip(self.legacy)
+                    .zip(self.hooks.legacy)
                     .and_then(|(receipt, hook)| {
                         (hook.entry_effects)(receipt, first.index() + offset)
                     })
@@ -2052,7 +2109,7 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
     /// and its digest still names the journal there, and from the baseline
     /// otherwise, with the same result (engine-split D161).
     pub fn graph_at(&self, cursor: Seq) -> Option<G> {
-        let mut graph = match self.translation.as_ref().zip(self.legacy) {
+        let mut graph = match self.translation.as_ref().zip(self.hooks.legacy) {
             Some((receipt, hook)) => (hook.graph_at)(receipt, self.journal.entries(), cursor)
                 .ok()
                 .flatten(),
@@ -2313,12 +2370,16 @@ pub fn fork_component_graph(
 /// (engine split D244), any [`SessionGraph`]'s through the `_with` twins.
 pub struct MereSessions<B, G: SessionGraph = Graph> {
     backend: B,
-    graph: std::marker::PhantomData<fn() -> G>,
+    /// What every session these open or begin carries (engine split D257).
+    hooks: SessionHooks<G>,
 }
 
 impl<B: Backend + Clone> MereSessions<B> {
     pub fn new(backend: B) -> Self {
-        Self::new_with(backend)
+        Self {
+            backend,
+            hooks: SessionHooks::KERNEL,
+        }
     }
 
     /// Open a session.
@@ -2479,8 +2540,15 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
     pub fn new_with(backend: B) -> Self {
         Self {
             backend,
-            graph: std::marker::PhantomData,
+            hooks: SessionHooks::NONE,
         }
+    }
+
+    /// Publish every session these open or begin through `hook` (engine
+    /// split D257).
+    pub fn with_publication(mut self, hook: &'static PublicationHook<G>) -> Self {
+        self.hooks.publication = Some(hook);
+        self
     }
 
     fn slots(&self) -> JsonSlots<B> {
@@ -2523,19 +2591,36 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
     /// [`open`](MereSessions::open) over any graph, refusing a stored legacy
     /// translation.
     pub async fn open_with(&self, id: SessionId) -> Result<GraphSession<B, G>, SessionError> {
-        GraphSession::open_with(self.backend.clone(), id).await
+        GraphSession::open_inner(self.backend.clone(), id, self.hooks).await
     }
 
     /// [`begin`](MereSessions::begin) over any graph.
     pub fn begin_with(&self, author: Author, baseline: Option<G>) -> GraphSession<B, G> {
         let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        GraphSession::new_with(
+        self.hooked(GraphSession::new_with(
             self.backend.clone(),
             manifest,
             baseline,
             author,
             ChangeKind::Minted,
-        )
+        ))
+    }
+
+    /// [`begin_recorded`](MereSessions::begin_recorded) over any graph.
+    pub fn begin_recorded_with(&self, author: Author, baseline: Option<G>) -> GraphSession<B, G> {
+        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        self.hooked(GraphSession::new_recorded_with(
+            self.backend.clone(),
+            manifest,
+            baseline,
+            author,
+            ChangeKind::Minted,
+        ))
+    }
+
+    fn hooked(&self, mut session: GraphSession<B, G>) -> GraphSession<B, G> {
+        session.hooks = self.hooks;
+        session
     }
 
     /// Mint an empty session.
@@ -2642,6 +2727,8 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
             author.clone(),
             kind,
         );
+        // A copy publishes and reads as its parent does, as it validates.
+        session.hooks = parent.hooks;
         for key in parent.views.keys() {
             if let Some(state) = parent.view_at(key, at) {
                 session.set_view_now(author.clone().via(key.app()), key.clone(), state.clone())?;
@@ -2665,13 +2752,13 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
         author: Author,
         kind: ChangeKind,
     ) -> Result<GraphSessionManifest, SessionError> {
-        let mut session = GraphSession::<B, G>::new_with(
+        let mut session = self.hooked(GraphSession::<B, G>::new_with(
             self.backend.clone(),
             manifest,
             baseline.cloned(),
             author,
             kind,
-        );
+        ));
         session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }

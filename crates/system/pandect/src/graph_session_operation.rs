@@ -19,7 +19,7 @@ pub struct OperationReceipt {
     pub generation: String,
 }
 
-impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
+impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
     /// Content-bound graph and history head, stable across a cold reopen.
     /// Partial resident graphs and pending changes are refused.
     pub fn operation_revision(&self) -> Result<String, SessionError> {
@@ -29,19 +29,14 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             ));
         }
         // Keep the publication's completeness/placement refusals, without
-        // preparing a publication only to drop it. Snapshot reconstruction
-        // synthesizes visit times; replace them with the exact authoritative
-        // facet sidecar before hashing.
-        self.check_resident_publishable()?;
-        let mut normalized = Graph::try_from_recorded_snapshot(&self.graph.to_snapshot_at(0))
-            .map_err(|error| SessionError::Validation(error.to_string()))?;
-        normalized
-            .install_facets(self.graph.facets().clone())
-            .map_err(|error| SessionError::Validation(error.to_string()))?;
-        let publication = self.resident_store().prepare_recorded_graph(&normalized)?;
+        // preparing a publication only to drop it. The hook names the
+        // generation a cold reopen of the graph publishes as (engine split
+        // D257).
+        self.check_publishable()?;
+        let generation = self.publication_revision()?;
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"mere.graph-operation-revision/v1");
-        hasher.update(publication.generation().as_bytes());
+        hasher.update(generation.as_bytes());
         for (name, ops) in [
             (
                 "journal",
@@ -103,7 +98,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             ));
         }
         // Refuse unqualified or residency-limited writers before any reload.
-        self.check_resident_publishable()?;
+        self.check_publishable()?;
         let Some(receipt) = self.operation_receipt(operation).await? else {
             return Ok(None);
         };
@@ -113,19 +108,18 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             ));
         }
         let launch = self.graph.current_session();
-        let mut candidate = Self::open(self.slots.backend().clone(), self.id()).await?;
+        // Reopened with this session's hooks, as the kernel's open installs
+        // its own.
+        let mut candidate =
+            Self::open_inner(self.slots.backend().clone(), self.id(), self.hooks).await?;
         candidate.ensure_writable()?;
         // This checks the reconstructed complete graph, not newly introduced
         // references: live admission does not rewrite committed history.
-        candidate.prepare_resident_publication()?;
+        candidate.prepare_publication()?;
         if let Some(validator) = &self.validator {
             validator(&candidate.graph).map_err(SessionError::Validation)?;
         }
-        let resident = candidate
-            .resident_store()
-            .open(crate::addressable_graph::ResidencyRoots::default())
-            .await?;
-        let generation = resident.generation().to_owned();
+        let generation = candidate.published_generation().await?;
         candidate.graph.set_current_session(launch);
         candidate.checkpoint_interval = self.checkpoint_interval;
         candidate.validator = self.validator.clone();
@@ -145,7 +139,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         request: Vec<u8>,
         result: Vec<u8>,
         author: Author,
-        deltas: Vec<GraphDelta>,
+        deltas: Vec<G::Edit>,
         at: SystemTime,
     ) -> Result<OperationReceipt, SessionError> {
         self.transact_operation_published_checked(
@@ -172,9 +166,9 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         request: Vec<u8>,
         result: Vec<u8>,
         author: Author,
-        deltas: Vec<GraphDelta>,
+        deltas: Vec<G::Edit>,
         at: SystemTime,
-        validate: impl FnOnce(&Graph) -> Result<(), String>,
+        validate: impl FnOnce(&G) -> Result<(), String>,
     ) -> Result<OperationReceipt, SessionError> {
         let session = self.id().as_uuid().to_string();
         let same = |held: &OperationReceipt| {
