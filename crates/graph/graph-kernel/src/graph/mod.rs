@@ -137,6 +137,7 @@ pub mod resource_tag_admission;
 pub mod resource_tags;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
 pub mod revert;
+mod merge_graph;
 mod session_graph;
 pub mod source_time;
 // chartulary capability-trait impls for `Node` (graph re-base, G5).

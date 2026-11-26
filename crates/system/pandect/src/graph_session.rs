@@ -34,8 +34,7 @@ use std::time::SystemTime;
 
 use catchment::{GraphId, SessionId};
 #[cfg(test)]
-use kernel::graph::apply::GraphDelta;
-use kernel::graph::apply::apply_graph_delta;
+use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{Author, Graph, LogId, Seq};

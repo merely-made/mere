@@ -31,9 +31,11 @@ use crate::model::{
 use crate::projection::RdfSource;
 
 mod journal;
+mod merge;
 mod replay_point;
 
 pub use journal::SessionJournal;
+pub use merge::{MergeGraph, MergePart, MergeTouch};
 pub use replay_point::ReplayPoint;
 
 /// Where a graph that records sends each delta it applies.

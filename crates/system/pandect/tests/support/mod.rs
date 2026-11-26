@@ -33,6 +33,8 @@ use portolan::FacetStore;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+mod merge;
+
 /// The surface's own writes: which resource a surface shows.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum SurfaceDelta {
@@ -77,7 +79,7 @@ pub struct SurfaceSnapshot {
 }
 
 /// What an undo can keep: a surface binding, a resource, or a resource pair.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Part {
     Surface(Uuid),
     Resource(Uuid),
@@ -353,11 +355,12 @@ impl Surface {
     }
 }
 
+/// Ordered so a revert writes resources before the surfaces showing them.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum PartKey {
-    Surface(Uuid),
     Resource(Uuid),
     Pair(Uuid, Uuid),
+    Surface(Uuid),
 }
 
 impl PartKey {

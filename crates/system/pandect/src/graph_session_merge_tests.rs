@@ -10,7 +10,9 @@
 
 use super::*;
 use kernel::graph::resource_content::RESOURCE_PROPERTIES;
+use kernel::graph::{CapturedDelta, Part, ProvenanceSubKind};
 use kernel::persistence::PersistedResourceRecord;
+use kernel::types::NodeDerivation;
 use muniment::MemoryBackend;
 
 fn person() -> Author {

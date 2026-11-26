@@ -29,19 +29,17 @@
 //!   import provenance) never reads as an edit. A node the target never held is
 //!   added under a new id.
 //!
-//! The comparison is undo's own (`kernel::graph::revert_change`): reverting
+//! The comparison is undo's own ([`SessionGraph::revert`]): reverting
 //! "base to source" against the target is exactly taking each source change
 //! the target left alone. Deletions merge the same way (M7).
+//!
+//! Merge runs over any graph that implements [`MergeGraph`] (engine split
+//! D264); the kernel graph's is the kernel's revert and capture calls.
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use kernel::graph::{
-    CapturedDelta, Part, ProvenanceSubKind, Touched, part_edits, part_node, part_of, part_value,
-    recreate_node_edits, replay_captured_deltas_onto, revert_change,
-};
-use kernel::graph::apply::GraphDeltaResult;
-use kernel::persistence::PersistedResourceFacet;
-use kernel::types::NodeDerivation;
+use mere::model::{PersistedResourceFacet, ResourceDelta};
+use mere::session::{MergeGraph, MergePart};
 use serde_json::Value;
 
 use super::*;
@@ -70,9 +68,10 @@ pub enum MergeChoice {
 
 /// One part both sides changed differently since the base. Values are the
 /// part as each graph holds it (`None`: absent), in the target's ids.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct MergeConflict {
-    pub part: Part,
+#[derive(Serialize, Deserialize)]
+#[serde(bound = "")]
+pub struct MergeConflict<G: MergeGraph = Graph> {
+    pub part: G::Part,
     pub base: Option<Value>,
     pub source: Option<Value>,
     pub target: Option<Value>,
@@ -80,6 +79,48 @@ pub struct MergeConflict {
     /// node has since been deleted (the vanished source).
     #[serde(default)]
     pub add_as_new: bool,
+}
+
+impl<G: MergeGraph> Clone for MergeConflict<G> {
+    fn clone(&self) -> Self {
+        Self {
+            part: self.part.clone(),
+            base: self.base.clone(),
+            source: self.source.clone(),
+            target: self.target.clone(),
+            add_as_new: self.add_as_new,
+        }
+    }
+}
+
+impl<G: MergeGraph> std::fmt::Debug for MergeConflict<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MergeConflict")
+            .field("part", &self.part)
+            .field("base", &self.base)
+            .field("source", &self.source)
+            .field("target", &self.target)
+            .field("add_as_new", &self.add_as_new)
+            .finish()
+    }
+}
+
+impl<G: MergeGraph> PartialEq for MergeConflict<G> {
+    fn eq(&self, other: &Self) -> bool {
+        (
+            &self.part,
+            &self.base,
+            &self.source,
+            &self.target,
+            self.add_as_new,
+        ) == (
+            &other.part,
+            &other.base,
+            &other.source,
+            &other.target,
+            other.add_as_new,
+        )
+    }
 }
 
 /// How a merge matched the source's nodes to the target's.
@@ -94,16 +135,14 @@ pub enum MergeMatch {
 
 /// A planned merge-in: the edits that apply cleanly and the conflicts that
 /// wait for a choice. Nothing is written until
-/// [`MereSessions::apply_merge`]. Its graph type is the kernel's until merge
-/// moves onto [`SessionGraph`] (engine split D253).
-#[derive(Clone)]
-pub struct PendingMerge<G: SessionGraph = Graph> {
+/// [`MereSessions::apply_merge`].
+pub struct PendingMerge<G: MergeGraph = Graph> {
     target: SessionId,
     source: SessionId,
     matched: MergeMatch,
     through: Seq,
     planned_at: Seq,
-    conflicts: Vec<MergeConflict>,
+    conflicts: Vec<MergeConflict<G>>,
     /// The clean edits, rule merges included, in the target's ids.
     edits: Vec<G::Delta>,
     /// The source's edits since the base, in the target's ids.
@@ -115,7 +154,25 @@ pub struct PendingMerge<G: SessionGraph = Graph> {
     source_container: Uuid,
 }
 
-impl std::fmt::Debug for PendingMerge {
+impl<G: MergeGraph> Clone for PendingMerge<G> {
+    fn clone(&self) -> Self {
+        Self {
+            target: self.target,
+            source: self.source,
+            matched: self.matched,
+            through: self.through,
+            planned_at: self.planned_at,
+            conflicts: self.conflicts.clone(),
+            edits: self.edits.clone(),
+            change: self.change.clone(),
+            source_graph: self.source_graph.clone(),
+            origins: self.origins.clone(),
+            source_container: self.source_container,
+        }
+    }
+}
+
+impl<G: MergeGraph> std::fmt::Debug for PendingMerge<G> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("PendingMerge")
             .field("target", &self.target)
@@ -128,7 +185,7 @@ impl std::fmt::Debug for PendingMerge {
     }
 }
 
-impl PendingMerge {
+impl<G: MergeGraph> PendingMerge<G> {
     pub fn target(&self) -> SessionId {
         self.target
     }
@@ -151,13 +208,13 @@ impl PendingMerge {
         self.conflicts.is_empty()
     }
 
-    pub fn conflicts(&self) -> &[MergeConflict] {
+    pub fn conflicts(&self) -> &[MergeConflict<G>] {
         &self.conflicts
     }
 
     /// The edits the merge writes before any conflict's choice, in the
     /// target's ids.
-    pub fn edits(&self) -> &[CapturedDelta] {
+    pub fn edits(&self) -> &[G::Delta] {
         &self.edits
     }
 
@@ -167,8 +224,8 @@ impl PendingMerge {
     /// person can see what to choose again.
     pub fn carry_choices(
         &self,
-        choices: &BTreeMap<Part, MergeChoice>,
-    ) -> (BTreeMap<Part, MergeChoice>, Vec<DroppedChoice>) {
+        choices: &BTreeMap<G::Part, MergeChoice>,
+    ) -> (BTreeMap<G::Part, MergeChoice>, Vec<DroppedChoice<G>>) {
         let mut carried = BTreeMap::new();
         let mut dropped = Vec::new();
         for (part, choice) in choices {
@@ -183,13 +240,11 @@ impl PendingMerge {
                 },
                 Some(_) => match choice {
                     MergeChoice::Hand(value)
-                        if !matches!(part, Part::ResourceFacet(..))
-                            && part_edits(
-                                &self.source_graph,
-                                part,
-                                (!value.is_null()).then_some(value),
-                            )
-                            .is_err() =>
+                        if !matches!(G::part_kind(part), MergePart::ResourceFacet(..))
+                            && self
+                                .source_graph
+                                .part_edits(part, (!value.is_null()).then_some(value))
+                                .is_err() =>
                     {
                         Some("the value given by hand does not fit")
                     },
@@ -212,33 +267,111 @@ impl PendingMerge {
 }
 
 /// What a merge-in wrote, and the edits admission refused (engine-split D169).
-#[derive(Clone, Debug, PartialEq)]
-pub struct Merged {
+pub struct Merged<G: MergeGraph = Graph> {
     pub applied: Applied,
     /// The edits left out while the rest applied, in order.
-    pub refused: Vec<Refused>,
+    pub refused: Vec<Refused<G>>,
 }
 
 /// An edit a merge-in could not apply because admission refused it.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Refused {
+#[derive(Serialize, Deserialize)]
+#[serde(bound = "")]
+pub struct Refused<G: MergeGraph = Graph> {
     /// Its position among the edits the merge wrote: the plan's clean edits,
     /// then each choice's, then the derivation records.
     pub position: usize,
     /// The part it writes; `None` for an edit with no part, such as a
     /// derivation record.
-    pub part: Option<Part>,
+    pub part: Option<G::Part>,
     /// Why admission refused it, naming the handle for a collision.
     pub reason: String,
 }
 
 /// A choice made on an earlier plan that a new plan of the same merge could
 /// not take, and why.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct DroppedChoice {
-    pub part: Part,
+#[derive(Serialize, Deserialize)]
+#[serde(bound = "")]
+pub struct DroppedChoice<G: MergeGraph = Graph> {
+    pub part: G::Part,
     pub choice: MergeChoice,
     pub reason: String,
+}
+
+// By hand, so they ask nothing of the graph type itself (D244).
+impl<G: MergeGraph> Clone for Merged<G> {
+    fn clone(&self) -> Self {
+        Self {
+            applied: self.applied.clone(),
+            refused: self.refused.clone(),
+        }
+    }
+}
+
+impl<G: MergeGraph> std::fmt::Debug for Merged<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Merged")
+            .field("applied", &self.applied)
+            .field("refused", &self.refused)
+            .finish()
+    }
+}
+
+impl<G: MergeGraph> PartialEq for Merged<G> {
+    fn eq(&self, other: &Self) -> bool {
+        self.applied == other.applied && self.refused == other.refused
+    }
+}
+
+impl<G: MergeGraph> Clone for Refused<G> {
+    fn clone(&self) -> Self {
+        Self {
+            position: self.position,
+            part: self.part.clone(),
+            reason: self.reason.clone(),
+        }
+    }
+}
+
+impl<G: MergeGraph> std::fmt::Debug for Refused<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Refused")
+            .field("position", &self.position)
+            .field("part", &self.part)
+            .field("reason", &self.reason)
+            .finish()
+    }
+}
+
+impl<G: MergeGraph> PartialEq for Refused<G> {
+    fn eq(&self, other: &Self) -> bool {
+        (self.position, &self.part, &self.reason) == (other.position, &other.part, &other.reason)
+    }
+}
+
+impl<G: MergeGraph> Clone for DroppedChoice<G> {
+    fn clone(&self) -> Self {
+        Self {
+            part: self.part.clone(),
+            choice: self.choice.clone(),
+            reason: self.reason.clone(),
+        }
+    }
+}
+
+impl<G: MergeGraph> std::fmt::Debug for DroppedChoice<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DroppedChoice")
+            .field("part", &self.part)
+            .field("choice", &self.choice)
+            .field("reason", &self.reason)
+            .finish()
+    }
+}
+
+impl<G: MergeGraph> PartialEq for DroppedChoice<G> {
+    fn eq(&self, other: &Self) -> bool {
+        (&self.part, &self.choice, &self.reason) == (&other.part, &other.choice, &other.reason)
+    }
 }
 
 /// One step of a pick chain: the session picked from, its journal cursor then,
@@ -253,37 +386,25 @@ struct Hop {
 }
 
 /// What merge-in compares, once the source is matched to the target.
-struct Basis {
+struct Basis<G: MergeGraph> {
     matched: MergeMatch,
-    base: Graph,
-    source_graph: Graph,
-    change: Vec<CapturedDelta>,
+    base: G,
+    source_graph: G,
+    change: Vec<G::Delta>,
     /// Source id to target id, for every source node.
     ids: BTreeMap<Uuid, Uuid>,
 }
 
 /// The `CopiedFrom` derivation of node `id` into `container`, looked up in
 /// each graph in turn.
-fn copied_from(graphs: &[&Graph], id: Uuid, container: Uuid) -> Option<Uuid> {
+fn copied_from<G: MergeGraph>(graphs: &[&G], id: Uuid, container: Uuid) -> Option<Uuid> {
     let container = container.to_string();
-    graphs.iter().find_map(|graph| {
-        let (key, _) = graph.get_node_by_id(id)?;
-        graph
-            .node_derivations(key)?
-            .into_iter()
-            .find(|derivation| {
-                derivation.sub_kind == ProvenanceSubKind::CopiedFrom
-                    && derivation.source_graph.as_deref() == Some(container.as_str())
-            })
-            .and_then(|derivation| Uuid::parse_str(&derivation.source_node).ok())
-    })
+    graphs
+        .iter()
+        .find_map(|graph| graph.copied_from(id, &container))
 }
 
-fn node_ids(graph: &Graph) -> BTreeSet<Uuid> {
-    graph.nodes().map(|(_, node)| node.id).collect()
-}
-
-impl<B: Backend + Clone> MereSessions<B> {
+impl<B: Backend + Clone, G: MergeGraph> MereSessions<B, G> {
     async fn manifest_of(&self, id: SessionId) -> Result<GraphSessionManifest, SessionError> {
         let slots = self.slots();
         let mut manifest: GraphSessionManifest = read(&slots, &Keys::new(id).at(MANIFEST))
@@ -297,9 +418,9 @@ impl<B: Backend + Clone> MereSessions<B> {
     /// The plan is clean, or lists its conflicts; nothing is written.
     pub async fn merge_in(
         &self,
-        target: &GraphSession<B>,
-        source: &GraphSession<B>,
-    ) -> Result<PendingMerge, SessionError> {
+        target: &GraphSession<B, G>,
+        source: &GraphSession<B, G>,
+    ) -> Result<PendingMerge<G>, SessionError> {
         if target.id() == source.id() {
             return Err(SessionError::NotMergeable(
                 "a session cannot merge into itself".into(),
@@ -323,36 +444,29 @@ impl<B: Backend + Clone> MereSessions<B> {
             .map(|(source_id, target_id)| (*target_id, *source_id))
             .collect();
         let live = target.graph();
-        let compared = revert_change(&basis.change, &basis.source_graph, &basis.base, live);
-        let mut edits = compared.edits;
+        let (mut edits, kept) = G::revert(&basis.change, &basis.source_graph, &basis.base, live);
         let mut conflicts = Vec::new();
         let mut joined: BTreeMap<Uuid, Vec<(String, Value)>> = BTreeMap::new();
-        let kept: BTreeSet<Part> = compared.kept.into_iter().collect();
+        let kept: BTreeSet<G::Part> = kept.into_iter().collect();
         for part in kept {
-            let (theirs, ours) = (
-                part_value(&basis.source_graph, &part),
-                part_value(live, &part),
-            );
+            let (theirs, ours) = (basis.source_graph.part_value(&part), live.part_value(&part));
             if theirs == ours {
                 continue;
             }
-            if let (Part::ResourceFacet(resource, facet), Some(theirs), Some(ours)) =
-                (&part, &theirs, &ours)
-                && resource_facet_has_rule(facet)
-                && let Some(record) = live.resource_record(*resource)
+            if let (MergePart::ResourceFacet(resource, facet), Some(theirs), Some(ours)) =
+                (G::part_kind(&part), &theirs, &ours)
+                && resource_facet_has_rule(&facet)
+                && let Some(record) = live.resources().resource_record(resource)
                 && let Ok(FacetMerge::Merged(value)) =
-                    merge_resource_facet(&record.canonical_iri, facet, ours, theirs)
+                    merge_resource_facet(&record.canonical_iri, &facet, ours, theirs)
             {
-                joined
-                    .entry(*resource)
-                    .or_default()
-                    .push((facet.clone(), value));
+                joined.entry(resource).or_default().push((facet, value));
                 continue;
             }
             conflicts.push(MergeConflict {
-                base: part_value(&basis.base, &part),
+                base: basis.base.part_value(&part),
                 add_as_new: basis.matched == MergeMatch::Pick
-                    && matches!(part, Part::Node(_))
+                    && matches!(G::part_kind(&part), MergePart::Node(_))
                     && theirs.is_some()
                     && ours.is_none(),
                 source: theirs,
@@ -364,17 +478,17 @@ impl<B: Backend + Clone> MereSessions<B> {
         // only when neither end is, and wait for the node's choice otherwise.
         let disputed: BTreeSet<Uuid> = conflicts
             .iter()
-            .filter_map(|conflict| match conflict.part {
-                Part::Node(id) => Some(id),
+            .filter_map(|conflict| match G::part_kind(&conflict.part) {
+                MergePart::Node(id) => Some(id),
                 _ => None,
             })
             .collect();
-        let follows = |part: &Part| matches!(part, Part::Edges(from, to) if disputed.contains(from) || disputed.contains(to));
+        let follows = |part: &G::Part| matches!(G::part_kind(part), MergePart::Edges(from, to) if disputed.contains(&from) || disputed.contains(&to));
         conflicts.retain(|conflict| !follows(&conflict.part));
-        edits.retain(|edit| !part_of(edit).is_some_and(|part| follows(&part)));
+        edits.retain(|edit| !G::part_of(edit).is_some_and(|part| follows(&part)));
         if !joined.is_empty() {
             let mut scratch = live.clone();
-            replay_captured_deltas_onto(&mut scratch, edits.iter().cloned());
+            scratch.replay_scratch(&edits);
             for (resource, facets) in joined {
                 edits.extend(record_with(
                     &scratch,
@@ -406,9 +520,9 @@ impl<B: Backend + Clone> MereSessions<B> {
     /// from it, M6).
     async fn branch_basis(
         &self,
-        target: &GraphSession<B>,
-        source: &GraphSession<B>,
-    ) -> Result<Basis, SessionError> {
+        target: &GraphSession<B, G>,
+        source: &GraphSession<B, G>,
+    ) -> Result<Basis<G>, SessionError> {
         let mut parent = source
             .manifest()
             .parent_session
@@ -436,8 +550,9 @@ impl<B: Backend + Clone> MereSessions<B> {
         let source_graph = source.graph().clone();
         let live = source.journal().live_cursor();
         let change = source.edits_in(Seq(0), live);
-        let ids = node_ids(&base)
-            .union(&node_ids(&source_graph))
+        let ids = base
+            .node_ids()
+            .union(&source_graph.node_ids())
             .map(|id| (*id, *id))
             .collect();
         Ok(Basis {
@@ -454,7 +569,7 @@ impl<B: Backend + Clone> MereSessions<B> {
     async fn pick_hop(
         &self,
         manifest: &GraphSessionManifest,
-        target: &GraphSession<B>,
+        target: &GraphSession<B, G>,
     ) -> Result<Option<Hop>, SessionError> {
         if let Some(picked) = &manifest.picked_from {
             return Ok(Some(Hop {
@@ -489,9 +604,9 @@ impl<B: Backend + Clone> MereSessions<B> {
     /// own edits.
     async fn pick_basis(
         &self,
-        target: &GraphSession<B>,
-        source: &GraphSession<B>,
-    ) -> Result<Basis, SessionError> {
+        target: &GraphSession<B, G>,
+        source: &GraphSession<B, G>,
+    ) -> Result<Basis<G>, SessionError> {
         let not_a_pick = || {
             SessionError::NotMergeable(format!(
                 "{} is neither a branch nor a part picked from {}",
@@ -502,7 +617,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         // The chain: hops[i] goes from level i (0: the source) to level i + 1
         // (the last: the target); middles hold the parts between, opened.
         let mut hops = Vec::new();
-        let mut middles: Vec<GraphSession<B>> = Vec::new();
+        let mut middles: Vec<GraphSession<B, G>> = Vec::new();
         let mut manifest = source.manifest().clone();
         loop {
             if hops.len() >= MAX_LINEAGE_HOPS {
@@ -516,16 +631,17 @@ impl<B: Backend + Clone> MereSessions<B> {
             if hop.session == target.id() {
                 break;
             }
-            let parent = self.open(hop.session).await?;
+            // Opened with these sessions' hooks: the kernel's for its own.
+            let parent = self.open_with(hop.session).await?;
             manifest = parent.manifest().clone();
             middles.push(parent);
         }
-        let levels: Vec<&GraphSession<B>> = std::iter::once(source).chain(&middles).collect();
+        let levels: Vec<&GraphSession<B, G>> = std::iter::once(source).chain(&middles).collect();
         // Every graph a level's nodes are read from: its baseline, where the
         // level below was picked from it, and now.
-        let graphs_of = |level: usize| -> Vec<Graph> {
+        let graphs_of = |level: usize| -> Vec<G> {
             let session = levels[level];
-            let mut graphs: Vec<Graph> = session.graph_at(Seq(0)).into_iter().collect();
+            let mut graphs: Vec<G> = session.graph_at(Seq(0)).into_iter().collect();
             if level > 0 {
                 graphs.extend(session.graph_at(hops[level - 1].at));
             }
@@ -538,8 +654,8 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut maps: Vec<BTreeMap<Uuid, Uuid>> = vec![BTreeMap::new(); levels.len()];
         for level in (0..levels.len()).rev() {
             let graphs = graphs_of(level);
-            let refs: Vec<&Graph> = graphs.iter().collect();
-            let ids: BTreeSet<Uuid> = graphs.iter().flat_map(node_ids).collect();
+            let refs: Vec<&G> = graphs.iter().collect();
+            let ids: BTreeSet<Uuid> = graphs.iter().flat_map(G::node_ids).collect();
             let mut derived = 0;
             let mut map = BTreeMap::new();
             for id in ids {
@@ -581,12 +697,8 @@ impl<B: Backend + Clone> MereSessions<B> {
             let within = |id: &Uuid| map.get(id).is_some_and(|mapped| held.contains(mapped));
             let names = names(map);
             for edit in levels[level].edits_in(Seq(0), hops[level - 1].at) {
-                let touched = Touched::of([&edit]);
-                let session_level = !touched.fields.is_empty()
-                    || !touched.couplings.is_empty()
-                    || !touched.coupled_fields.is_empty()
-                    || touched.import_records;
-                if session_level
+                let touched = G::touched(std::slice::from_ref(&edit));
+                if touched.session_level
                     || !touched.nodes.iter().all(&within)
                     || !touched
                         .edges
@@ -596,7 +708,7 @@ impl<B: Backend + Clone> MereSessions<B> {
                 {
                     continue;
                 }
-                change.push(edit.remap_ids(&names));
+                change.push(G::remap_ids(&edit, &names));
             }
         }
         // A node of the source's baseline the replay did not bring (a part
@@ -606,30 +718,32 @@ impl<B: Backend + Clone> MereSessions<B> {
             .graph_at(Seq(0))
             .ok_or_else(|| SessionError::Corrupt("a part's baseline does not load".into()))?;
         let mut rebuilt = base.clone();
-        replay_captured_deltas_onto(&mut rebuilt, change.iter().cloned());
-        let missing: Vec<Uuid> = node_ids(&baseline)
+        rebuilt.replay_scratch(&change);
+        let missing: Vec<Uuid> = baseline
+            .node_ids()
             .into_iter()
-            .filter(|id| rebuilt.get_node_by_id(maps[0][id]).is_none())
+            .filter(|id| !rebuilt.has_node(maps[0][id]))
             .collect();
         for id in &missing {
-            if let Some(made) = recreate_node_edits(&baseline, *id) {
-                change.extend(made.iter().map(|edit| edit.remap_ids(&names)));
+            if let Some(made) = baseline.recreate_node_edits(*id) {
+                change.extend(made.iter().map(|edit| G::remap_ids(edit, &names)));
             }
         }
         change.extend(
-            incident_edge_edits(&baseline, &missing)
+            baseline
+                .incident_edge_edits(&missing)
                 .iter()
-                .map(|edit| edit.remap_ids(&names)),
+                .map(|edit| G::remap_ids(edit, &names)),
         );
         let live = source.journal().live_cursor();
         change.extend(
             source
                 .edits_in(Seq(0), live)
                 .iter()
-                .map(|edit| edit.remap_ids(&names)),
+                .map(|edit| G::remap_ids(edit, &names)),
         );
         let mut source_graph = base.clone();
-        replay_captured_deltas_onto(&mut source_graph, change.iter().cloned());
+        source_graph.replay_scratch(&change);
         Ok(Basis {
             matched: MergeMatch::Pick,
             base,
@@ -649,12 +763,12 @@ impl<B: Backend + Clone> MereSessions<B> {
     /// in [`Merged::refused`] while the rest applies (engine-split D169).
     pub async fn apply_merge(
         &self,
-        target: &mut GraphSession<B>,
-        source: &mut GraphSession<B>,
-        pending: PendingMerge,
-        choices: &BTreeMap<Part, MergeChoice>,
+        target: &mut GraphSession<B, G>,
+        source: &mut GraphSession<B, G>,
+        pending: PendingMerge<G>,
+        choices: &BTreeMap<G::Part, MergeChoice>,
         author: Author,
-    ) -> Result<Merged, SessionError> {
+    ) -> Result<Merged<G>, SessionError> {
         if target.id() != pending.target || source.id() != pending.source {
             return Err(SessionError::NotMergeable(
                 "the plan names other sessions".into(),
@@ -683,37 +797,36 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut origins = pending.origins.clone();
         let mut edits = pending.edits.clone();
         let mut scratch = target.graph().clone();
-        replay_captured_deltas_onto(&mut scratch, edits.iter().cloned());
-        let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
-            replay_captured_deltas_onto(scratch, more.iter().cloned());
+        scratch.replay_scratch(&edits);
+        let add = |scratch: &mut G, more: Vec<G::Delta>, edits: &mut Vec<_>| {
+            scratch.replay_scratch(&more);
             edits.extend(more);
         };
 
         // Source: the edits that make each taken part read as the source
         // does. A node brought back or removed takes its relations with it.
-        let taken: BTreeSet<&Part> = pending
+        let taken: BTreeSet<&G::Part> = pending
             .conflicts
             .iter()
             .map(|conflict| &conflict.part)
             .filter(|part| choices.get(*part) == Some(&MergeChoice::Source))
             .collect();
         if !taken.is_empty() {
-            let forced = revert_change(&pending.change, &pending.source_graph, &scratch, &scratch);
+            let (forced, _) = G::revert(&pending.change, &pending.source_graph, &scratch, &scratch);
             let whole: BTreeSet<Uuid> = taken
                 .iter()
-                .filter_map(|part| match part {
-                    Part::Node(id) => Some(*id),
+                .filter_map(|part| match G::part_kind(part) {
+                    MergePart::Node(id) => Some(id),
                     _ => None,
                 })
                 .collect();
-            let chosen: Vec<CapturedDelta> = forced
-                .edits
+            let chosen: Vec<G::Delta> = forced
                 .into_iter()
                 .filter(|edit| {
-                    part_of(edit).is_some_and(|part| {
+                    G::part_of(edit).is_some_and(|part| {
                         taken.contains(&part)
-                            || part_node(&part).is_some_and(|node| whole.contains(&node))
-                            || matches!(part, Part::Edges(from, to)
+                            || G::part_node(&part).is_some_and(|node| whole.contains(&node))
+                            || matches!(G::part_kind(&part), MergePart::Edges(from, to)
                                 if whole.contains(&from) || whole.contains(&to))
                     })
                 })
@@ -721,11 +834,11 @@ impl<B: Backend + Clone> MereSessions<B> {
             add(&mut scratch, chosen, &mut edits);
             let mut facets: BTreeMap<Uuid, Vec<(String, Option<Value>)>> = BTreeMap::new();
             for part in &taken {
-                if let Part::ResourceFacet(resource, facet) = part {
+                if let MergePart::ResourceFacet(resource, facet) = G::part_kind(part) {
                     facets
-                        .entry(*resource)
+                        .entry(resource)
                         .or_default()
-                        .push((facet.clone(), part_value(&pending.source_graph, part)));
+                        .push((facet, pending.source_graph.part_value(part)));
                 }
             }
             for (resource, facets) in facets {
@@ -739,7 +852,7 @@ impl<B: Backend + Clone> MereSessions<B> {
                 // Edit by hand: the part as supplied, `null` for absent.
                 Some(MergeChoice::Hand(value)) => {
                     let value = (!value.is_null()).then_some(value);
-                    let made = part_edits(&scratch, &conflict.part, value).map_err(|why| {
+                    let made = scratch.part_edits(&conflict.part, value).map_err(|why| {
                         SessionError::NotMergeable(format!(
                             "a hand edit does not fit {:?}: {why}",
                             conflict.part
@@ -750,7 +863,7 @@ impl<B: Backend + Clone> MereSessions<B> {
                 // Add as new: the source node, under a new id, with its
                 // relations, beside the target's choice to have deleted it.
                 Some(MergeChoice::AddAsNew) => {
-                    let Part::Node(node) = &conflict.part else {
+                    let MergePart::Node(node) = G::part_kind(&conflict.part) else {
                         return Err(SessionError::NotMergeable(
                             "only a node can be added as new".into(),
                         ));
@@ -765,11 +878,13 @@ impl<B: Backend + Clone> MereSessions<B> {
                         format!("add-as-new:{node}").as_bytes(),
                     );
                     let names = BTreeMap::from([(node.to_string(), fresh.to_string())]);
-                    let mut made =
-                        recreate_node_edits(&pending.source_graph, *node).unwrap_or_default();
-                    made.extend(incident_edge_edits(&pending.source_graph, &[*node]));
-                    let made = made.iter().map(|edit| edit.remap_ids(&names)).collect();
-                    if let Some(origin) = origins.get(node).copied() {
+                    let mut made = pending
+                        .source_graph
+                        .recreate_node_edits(node)
+                        .unwrap_or_default();
+                    made.extend(pending.source_graph.incident_edge_edits(&[node]));
+                    let made = made.iter().map(|edit| G::remap_ids(edit, &names)).collect();
+                    if let Some(origin) = origins.get(&node).copied() {
                         origins.insert(fresh, origin);
                     }
                     add(&mut scratch, made, &mut edits);
@@ -780,27 +895,19 @@ impl<B: Backend + Clone> MereSessions<B> {
 
         // Every node the merge made or changed records where it came from.
         let container = Some(pending.source_container.to_string());
-        for node in Touched::of(&edits).nodes {
-            if scratch.get_node_by_id(node).is_none() {
+        for node in G::touched(&edits).nodes {
+            if !scratch.has_node(node) {
                 continue;
             }
             let Some(origin) = origins.get(&node) else {
                 continue;
             };
-            edits.push(CapturedDelta::ReplayRecordNodeDerivationById {
-                node_id: node.to_string(),
-                derivation: NodeDerivation {
-                    sub_kind: ProvenanceSubKind::MergedFrom,
-                    source_node: origin.to_string(),
-                    source_graph: container.clone(),
-                },
-            });
+            edits.extend(G::merged_from_edit(node, *origin, container.clone()));
         }
         let deltas = edits
             .iter()
             .map(|edit| {
-                edit.replay_as(&author)
-                    .into_write()
+                G::edit_of(edit, &author)
                     .map_err(|why| SessionError::NotReplayable(format!("{why}: {edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -811,11 +918,11 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut refused = Vec::new();
         let (_, applied) = target.edit_as(author.clone(), kind, |graph| {
             for (position, (edit, delta)) in edits.iter().zip(deltas).enumerate() {
-                if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta) {
+                if let Err(reason) = graph.apply(delta) {
                     refused.push(Refused {
                         position,
-                        part: part_of(edit),
-                        reason: reason.to_string(),
+                        part: G::part_of(edit),
+                        reason,
                     });
                 }
             }
@@ -849,46 +956,15 @@ impl<B: Backend + Clone> MereSessions<B> {
     }
 }
 
-/// The relations between each of `nodes` and every node of `graph`, either
-/// way round, as edits that set them.
-fn incident_edge_edits(graph: &Graph, nodes: &[Uuid]) -> Vec<CapturedDelta> {
-    let mut pairs = BTreeSet::new();
-    let mut edits = Vec::new();
-    for id in nodes {
-        let Some((key, _)) = graph.get_node_by_id(*id) else {
-            continue;
-        };
-        for (other_key, other) in graph.nodes() {
-            for ((from_key, from), (to_key, to)) in [
-                ((key, *id), (other_key, other.id)),
-                ((other_key, other.id), (key, *id)),
-            ] {
-                if !pairs.insert((from, to)) {
-                    continue;
-                }
-                let edges = graph.persisted_edges_between(from_key, to_key);
-                if !edges.is_empty() {
-                    edits.push(CapturedDelta::ReplaySetEdgesByIds {
-                        from_id: from.to_string(),
-                        to_id: to.to_string(),
-                        edges,
-                    });
-                }
-            }
-        }
-    }
-    edits
-}
-
 /// The edit that sets `resource`'s record as `graph` holds it, with each
 /// named facet set to its value or, for `None`, removed. Empty when the graph
 /// holds no such resource.
-fn record_with(
-    graph: &Graph,
+fn record_with<G: MergeGraph>(
+    graph: &G,
     resource: Uuid,
     facets: impl IntoIterator<Item = (String, Option<Value>)>,
-) -> Vec<CapturedDelta> {
-    let Some(mut record) = graph.resource_record(resource) else {
+) -> Vec<G::Delta> {
+    let Some(mut record) = graph.resources().resource_record(resource) else {
         return Vec::new();
     };
     for (facet, value) in facets {
@@ -900,10 +976,10 @@ fn record_with(
             });
         }
     }
-    vec![CapturedDelta::ReplaySetResourceRecordById {
+    vec![G::Delta::from(ResourceDelta::ReplaySetResourceRecordById {
         resource_id: resource.to_string(),
         record: Some(record),
-    }]
+    })]
 }
 
 #[cfg(test)]

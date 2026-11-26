@@ -447,3 +447,125 @@ fn a_snapshot_materializes_under_its_placement_over_any_graph() {
             .is_err()
     );
 }
+
+/// Merge over the surface (engine split D264): a branch's changes come in
+/// where the target left a part alone, the target's own changes stay, and a
+/// part both changed is a conflict that waits for a choice.
+#[test]
+fn a_branch_merges_back_over_a_host_graph() {
+    use std::collections::BTreeMap;
+
+    use mere::model::ResourceNode;
+    use pandect::{MergeChoice, MergeMatch};
+    use support::Part;
+
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let sessions = Sessions::new_with(backend.clone());
+        let author = Author::person("p8-merge");
+        let (_, mut target) = minted(&sessions).await;
+        let (a, b, c) = (
+            Uuid::from_u128(0xe1),
+            Uuid::from_u128(0xe2),
+            Uuid::from_u128(0xe3),
+        );
+        let resource = |iri: &str| ResourceNode::for_term(iri).id();
+        target
+            .edit_now(author.clone(), |graph| {
+                graph.show(a, "https://p8.test/a1");
+                graph.show(b, "https://p8.test/b1");
+            })
+            .unwrap();
+        target.flush(UNIX_EPOCH).await.unwrap();
+        let at = target.journal().live_cursor();
+        let branch = sessions
+            .branch_at(&target, at, author.clone())
+            .await
+            .unwrap()
+            .session_id;
+        let mut source = sessions.open_with(branch).await.unwrap();
+        source
+            .edit_now(author.clone(), |graph| {
+                graph.show(a, "https://p8.test/a2");
+                graph.show(c, "https://p8.test/c1");
+            })
+            .unwrap();
+        source.flush(UNIX_EPOCH).await.unwrap();
+        target
+            .edit_now(author.clone(), |graph| {
+                graph.show(b, "https://p8.test/b2");
+            })
+            .unwrap();
+        target.flush(UNIX_EPOCH).await.unwrap();
+
+        let plan = sessions.merge_in(&target, &source).await.unwrap();
+        assert_eq!(plan.matched(), MergeMatch::Branch);
+        assert!(plan.is_clean(), "{:?}", plan.conflicts());
+        let merged = sessions
+            .apply_merge(
+                &mut target,
+                &mut source,
+                plan,
+                &BTreeMap::new(),
+                author.clone(),
+            )
+            .await
+            .unwrap();
+        assert!(merged.refused.is_empty());
+        let graph = target.graph();
+        assert_eq!(graph.shown(a), Some(resource("https://p8.test/a2")));
+        assert_eq!(graph.shown(b), Some(resource("https://p8.test/b2")));
+        assert_eq!(graph.shown(c), Some(resource("https://p8.test/c1")));
+        assert!(source.manifest().merged.is_some());
+
+        // Control: a part both sides changed is a conflict, refused without a
+        // choice and taken from the source with one.
+        let at = target.journal().live_cursor();
+        let branch = sessions
+            .branch_at(&target, at, author.clone())
+            .await
+            .unwrap()
+            .session_id;
+        let mut source = sessions.open_with(branch).await.unwrap();
+        source
+            .edit_now(author.clone(), |graph| {
+                graph.show(a, "https://p8.test/a-source");
+            })
+            .unwrap();
+        source.flush(UNIX_EPOCH).await.unwrap();
+        target
+            .edit_now(author.clone(), |graph| {
+                graph.show(a, "https://p8.test/a-target");
+            })
+            .unwrap();
+        target.flush(UNIX_EPOCH).await.unwrap();
+        let plan = sessions.merge_in(&target, &source).await.unwrap();
+        let parts: Vec<&Part> = plan.conflicts().iter().map(|c| &c.part).collect();
+        assert_eq!(parts, [&Part::Surface(a)]);
+        assert!(matches!(
+            sessions
+                .apply_merge(
+                    &mut target,
+                    &mut source,
+                    plan.clone(),
+                    &BTreeMap::new(),
+                    author.clone(),
+                )
+                .await,
+            Err(SessionError::Unresolved(1))
+        ));
+        assert_eq!(
+            target.graph().shown(a),
+            Some(resource("https://p8.test/a-target"))
+        );
+        let choices = BTreeMap::from([(Part::Surface(a), MergeChoice::Source)]);
+        sessions
+            .apply_merge(&mut target, &mut source, plan, &choices, author)
+            .await
+            .unwrap();
+        assert_eq!(
+            target.graph().shown(a),
+            Some(resource("https://p8.test/a-source"))
+        );
+    });
+}
