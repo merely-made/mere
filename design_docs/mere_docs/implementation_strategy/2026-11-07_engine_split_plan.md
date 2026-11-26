@@ -3209,6 +3209,18 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D243 · plans engine-split P8 · summary Store writes are pure and return their ResourceDeltas; only the host records, on one cursor.
 
+- **D251. Replay carries host state as a sixth associated type, and replay points are engine-generic (Mark, 2026-11-25):** Every `GraphJournal` replay method threads the kernel's `ReplayAttribution` through the journal prefix, and D161's `ReplayPoint` stores it between calls; pandect resumes from one in `open` (`graph_session.rs:1024-1051`) and `graph_at`/`hold_replay_point`. Once `GraphJournal` is an alias of a mere type the kernel cannot keep inherent methods on it, and none of D241's five associated types holds that state. No consumer uses the replay-point API; pandect does. "Carry type + ReplayPoint<G> (Recommended)": the trait gains `type Carry: Clone` (the kernel's is `ReplayAttribution`), mere gets `ReplayPoint<G> { cursor, graph, carry }` with a kernel alias, and `ReplayRefused` moves to mere, so every host keeps D161's checkpoint reopen. Against an opaque point type with four trait methods, and against kernel-only replay points. Outcome: refines D241 and D249.
+
+  Links: area The stack · draws on engine-split D161, engine-split D241, engine-split D249 · plans engine-split P8 · summary The engine trait gains a Carry type and mere owns a generic ReplayPoint, so every host keeps checkpoint reopen.
+
+- **D252. Generic open shares one core; the kernel installs the legacy translation as a private hook (Mark, 2026-11-25):** pandect's `open` validates and replays a `LegacyTranslationReceipt` for `LegacySurfaceV1` sessions (`graph_session.rs:918-1038`), and `graph_at` (`:1956`) and undo (`:1818`) read it; it is kernel types throughout and only kernel sessions can hold one. "Shared core, private hook (Recommended)": one open path, the kernel-specialised `open` installs the translation hook, and any other host's `open_with` refuses a stored receipt as `Corrupt`. No public API is added and kernel behaviour is unchanged. Against a private `LegacyHost` trait every host implements, and against a second, legacy-free open path. Outcome: applies D241 and D244.
+
+  Links: area The stack · draws on engine-split D241, engine-split D244 · plans engine-split P8 · summary One generic open; legacy translation is a kernel-only private hook, refused as Corrupt elsewhere.
+
+- **D253. Undo goes generic in step 1; merge stays on the kernel graph until it moves (Mark, 2026-11-25):** The trait's `Part` reaches five pub types D244 didn't list: undo's `Kept` and `Reverted` (`graph_session.rs:299`, `:308`) and merge's `MergeConflict`, `Refused` and `DroppedChoice` (`graph_session_merge.rs`), and merge also needs `part_edits`, `part_of`, `part_value`, `part_node` and `recreate_node_edits`. "Undo generic, merge later (Recommended)": `Kept` and `Reverted` take `G` (15 types in all), merge stays concrete on the kernel `Graph` in step 1, and `PendingMerge`'s `G` is a placeholder until merge moves, which is ruled with the surface-reading modules' home before Mere drops graph-kernel. Against all five and merge now, and against undo and merge both kernel-only. Outcome: refines D244.
+
+  Links: area The stack · draws on engine-split D241, engine-split D244 · plans engine-split P8 · summary Undo's Kept and Reverted take G now; merge and its Part types stay on the kernel graph until ruled with the surface readers.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
