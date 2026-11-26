@@ -257,3 +257,169 @@ fn page_claims_are_kept_through_the_engines_recorded_resource_write() {
         assert_eq!(read.claims.blocks[0].order, 5);
     });
 }
+
+/// The personal graph's protocol folding into the surface through its host
+/// fold (engine split D259).
+#[cfg(feature = "personal-sync")]
+mod personal_sync {
+    use eidetic::PrivacyClass;
+    use identity::{IdentityProvider, InMemoryProvider};
+    use mere::model::{JournalDelta, ResourceNode};
+    use mere::session::SessionGraph;
+    use muniment::MemoryBackend;
+    use pandect::access::{
+        ACCESS_HISTORY_FACET, AccessAction, AccessHistory, AccessRecord, AccessTransition,
+    };
+    use pandect::personal_sync::{
+        KernelFold, PersonalFold, PersonalGraphError, PersonalGraphEvent, PersonalGraphReplica,
+        SyncRoster, SyncSelection,
+    };
+    use pandect::{AcceptAll, FacetId};
+    use uuid::Uuid;
+
+    use super::support::{Surface, SurfaceDelta};
+
+    const GRAPH: [u8; 32] = [0x8b; 32];
+    const A: Uuid = Uuid::from_u128(0xc1);
+    const B: Uuid = Uuid::from_u128(0xc2);
+
+    /// Nodes become surfaces showing their address; access history rides as
+    /// the surface's facet. It folds nothing else.
+    struct SurfaceFold;
+
+    impl PersonalFold<Surface> for SurfaceFold {
+        fn apply(
+            &self,
+            graph: &mut Surface,
+            _asserter_iri: &str,
+            _fallback_id: &str,
+            event: &PersonalGraphEvent,
+        ) -> Result<(), PersonalGraphError> {
+            match event {
+                PersonalGraphEvent::AddNode { id, address, .. } => {
+                    graph.show(*id, address);
+                    Ok(())
+                },
+                PersonalGraphEvent::RemoveNode { id } => graph
+                    .apply(JournalDelta::Surface(SurfaceDelta::HideSurface {
+                        surface_id: *id,
+                    }))
+                    .map_err(PersonalGraphError::Excluded),
+                other => Err(PersonalGraphError::Excluded(format!(
+                    "the surface folds no {other:?}"
+                ))),
+            }
+        }
+
+        fn set_access_history(&self, graph: &mut Surface, node: Uuid, history: AccessHistory) {
+            let mut facets = graph.facets().clone();
+            facets
+                .set(
+                    node,
+                    FacetId::new(ACCESS_HISTORY_FACET),
+                    serde_json::to_value(history).unwrap(),
+                    &AcceptAll,
+                )
+                .unwrap();
+            graph.install_facets(facets).unwrap();
+        }
+    }
+
+    fn access(id: u128) -> AccessRecord {
+        AccessRecord {
+            record_id: Uuid::from_u128(id),
+            container_id: A,
+            address: "https://p8.test/sync-a".into(),
+            action: AccessAction::Examine,
+            persona: "personae://profile/shared".into(),
+            device: "p8".into(),
+            application: "p8".into(),
+            at_ms: 1,
+            handler: "p8.inspect".into(),
+            dwell_ms: None,
+            referring_container_id: None,
+            referring_address: None,
+            transition: AccessTransition::Unknown,
+            capture_source: "p8.generic".into(),
+            source_event_id: None,
+            privacy: PrivacyClass::TrustedPeersOnly,
+        }
+    }
+
+    #[test]
+    fn a_host_fold_materializes_the_personal_graph_into_its_own_graph() {
+        pollster::block_on(async {
+            let identity = InMemoryProvider::from_seed([0x8c; 32]);
+            let roster = SyncRoster::new([identity.master_public_key().to_bytes()]);
+            let mut replica = PersonalGraphReplica::for_identity(
+                MemoryBackend::new(),
+                GRAPH,
+                &identity,
+                roster,
+                SyncSelection::default().with_access_records(true),
+            )
+            .unwrap();
+            let add = |id, address: &str| PersonalGraphEvent::AddNode {
+                id,
+                address: address.into(),
+                title: String::new(),
+            };
+            replica
+                .author(vec![
+                    add(A, "https://p8.test/sync-a"),
+                    add(B, "https://p8.test/sync-b"),
+                ])
+                .await
+                .unwrap();
+            replica
+                .author(vec![
+                    PersonalGraphEvent::RemoveNode { id: B },
+                    PersonalGraphEvent::AppendAccess {
+                        record: access(0xacc),
+                    },
+                ])
+                .await
+                .unwrap();
+
+            let projection = replica.projection_with(&SurfaceFold).await.unwrap();
+            let graph = &projection.graph;
+            assert_eq!(
+                graph.shown(A),
+                Some(ResourceNode::for_term("https://p8.test/sync-a").id())
+            );
+            assert_eq!(graph.shown(B), None);
+            // The protocol's bookkeeping stays pandect's; the fold holds it.
+            assert_eq!(projection.access_records.len(), 1);
+            let held = graph
+                .facets()
+                .get(&A, &FacetId::new(ACCESS_HISTORY_FACET))
+                .expect("access history on the surface");
+            assert_eq!(
+                held["records"][0]["record_id"],
+                access(0xacc).record_id.to_string()
+            );
+            assert_eq!(projection.writers.len(), 2);
+
+            // Control: the kernel's fold of the same operations holds the
+            // same nodes in its own graph.
+            let kernel = replica.projection_with(&KernelFold).await.unwrap();
+            let ids: Vec<Uuid> = kernel.graph.nodes().map(|(_, node)| node.id).collect();
+            assert_eq!(ids, [A]);
+
+            // Control: a fold that refuses an event refuses the projection,
+            // so every graph event reached the host's fold.
+            replica
+                .author(vec![PersonalGraphEvent::SetTitle {
+                    node: A,
+                    title: "titled".into(),
+                }])
+                .await
+                .unwrap();
+            assert!(matches!(
+                replica.projection_with(&SurfaceFold).await,
+                Err(PersonalGraphError::Excluded(why)) if why.contains("SetTitle")
+            ));
+            assert!(replica.projection().await.is_ok());
+        });
+    }
+}

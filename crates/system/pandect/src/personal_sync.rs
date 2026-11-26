@@ -22,6 +22,7 @@ use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
 use kernel::graph::{Author, EdgeAssertion, Graph, RelationSelector};
 use kernel::types::AssertionBasis;
+use mere::session::SessionGraph;
 use muniment::Backend;
 use p2panda_core::cbor::{decode_cbor_strict, encode_cbor};
 use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
@@ -1232,12 +1233,22 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonalGraphReplica<B> {
     }
 
     pub async fn projection(&self) -> Result<SyncProjection, PersonalGraphError> {
-        materialize(
+        self.projection_with(&KernelFold).await
+    }
+
+    /// [`projection`](Self::projection) into any graph, through the host's
+    /// `fold` (engine split D259).
+    pub async fn projection_with<G: SessionGraph, F: PersonalFold<G> + ?Sized>(
+        &self,
+        fold: &F,
+    ) -> Result<SyncProjection<G>, PersonalGraphError> {
+        materialize_with(
             &self.store,
             self.graph,
             &self.roster,
             self.keyring.as_ref(),
             &self.selection,
+            fold,
         )
         .await
     }
@@ -1319,6 +1330,25 @@ pub async fn materialize<B: Backend + Clone + Send + Sync + 'static>(
     keyring: Option<&Arc<DataKeyring>>,
     selection: &SyncSelection,
 ) -> Result<SyncProjection, PersonalGraphError> {
+    materialize_with(store, graph_id, roster, keyring, selection, &KernelFold).await
+}
+
+/// [`materialize`] into any graph, through the host's `fold` (engine split
+/// D259): the protocol, its admission and its bookkeeping stay here, and the
+/// fold writes the graph events into the host's graph.
+pub async fn materialize_with<B, G, F>(
+    store: &MunimentStore<B, PersonalGraphExt>,
+    graph_id: [u8; 32],
+    roster: &SyncRoster,
+    keyring: Option<&Arc<DataKeyring>>,
+    selection: &SyncSelection,
+    fold: &F,
+) -> Result<SyncProjection<G>, PersonalGraphError>
+where
+    B: Backend + Clone + Send + Sync + 'static,
+    G: SessionGraph,
+    F: PersonalFold<G> + ?Sized,
+{
     let (records, unreadable) = load_records(store, graph_id, keyring).await?;
     let entries = causal_entries(&records);
     let entries_by_hash = causal_entry_index(&entries);
@@ -1330,7 +1360,7 @@ pub async fn materialize<B: Backend + Clone + Send + Sync + 'static>(
     };
     let processor = OperationProcessor::new(store.clone(), policy);
     let conflicts = collect_conflicts(&records, &entries, &causal.order, selection);
-    let mut graph = Graph::new();
+    let mut graph = G::default();
     let mut access = BTreeMap::<Uuid, AccessRecord>::new();
     let mut scenes = BTreeMap::new();
     let mut handlers = BTreeMap::new();
@@ -1406,6 +1436,7 @@ pub async fn materialize<B: Backend + Clone + Send + Sync + 'static>(
             }
             if selection.projects(event) {
                 apply_event(
+                    fold,
                     &mut graph,
                     &mut access,
                     &mut scenes,
@@ -1430,15 +1461,7 @@ pub async fn materialize<B: Backend + Clone + Send + Sync + 'static>(
                 .push(record.clone());
         }
         for (node, records) in by_node {
-            apply_graph_delta(
-                &mut graph,
-                GraphDelta::ReplaySetNodeFacetById {
-                    node_id: node,
-                    facet: ACCESS_HISTORY_FACET.to_string(),
-                    value: serde_json::to_value(AccessHistory { records })
-                        .expect("access history always serializes"),
-                },
-            );
+            fold.set_access_history(&mut graph, node, AccessHistory { records });
         }
     }
 
@@ -1483,8 +1506,199 @@ pub async fn materialize<B: Backend + Clone + Send + Sync + 'static>(
     })
 }
 
-fn apply_event(
-    graph: &mut Graph,
+/// How a host folds personal-graph events into its graph (engine split D259).
+/// pandect keeps the protocol and its bookkeeping: access records, saved
+/// scenes, handler preferences and blob availability are collected here, and
+/// key agreement and readers fold into nothing.
+pub trait PersonalFold<G: SessionGraph> {
+    /// Fold one graph event written by `asserter_iri`; `fallback_id` names a
+    /// statement the event leaves unnamed. A saved scene arrives here too,
+    /// for the graph to hold.
+    fn apply(
+        &self,
+        graph: &mut G,
+        asserter_iri: &str,
+        fallback_id: &str,
+        event: &PersonalGraphEvent,
+    ) -> Result<(), PersonalGraphError>;
+
+    /// Hold `history` as node `node`'s access history, once every event has
+    /// folded.
+    fn set_access_history(&self, graph: &mut G, node: Uuid, history: AccessHistory);
+}
+
+/// The kernel graph's fold, kept for pandect's default graph until the
+/// kernel leaves (engine split D259).
+#[derive(Clone, Copy, Debug, Default)]
+pub struct KernelFold;
+
+impl PersonalFold<Graph> for KernelFold {
+    fn apply(
+        &self,
+        graph: &mut Graph,
+        asserter_iri: &str,
+        fallback_id: &str,
+        event: &PersonalGraphEvent,
+    ) -> Result<(), PersonalGraphError> {
+        match event {
+            PersonalGraphEvent::AddNode { id, address, title } => {
+                if graph.get_node_key_by_id(*id).is_none() {
+                    let key = add_node(
+                        graph,
+                        Some(*id),
+                        address.clone(),
+                        PortablePoint::new(0.0, 0.0),
+                    );
+                    if !title.is_empty() {
+                        apply_graph_delta(
+                            graph,
+                            GraphDelta::SetNodeTitle {
+                                key,
+                                title: title.clone(),
+                            },
+                        );
+                    }
+                }
+            },
+            PersonalGraphEvent::RemoveNode { id } => {
+                apply_graph_delta(graph, GraphDelta::ReplayRemoveNodeById { node_id: *id });
+            },
+            PersonalGraphEvent::SetTitle { node, title } => {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplaySetNodeTitleById {
+                        node_id: *node,
+                        title: title.clone(),
+                    },
+                );
+            },
+            PersonalGraphEvent::AddTag { node, tag } => {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplayInsertNodeTagById {
+                        node_id: *node,
+                        tag: tag.clone(),
+                    },
+                );
+            },
+            PersonalGraphEvent::RemoveTag { node, tag } => {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplayRemoveNodeTagById {
+                        node_id: *node,
+                        tag: tag.clone(),
+                    },
+                );
+            },
+            PersonalGraphEvent::AssertRelation {
+                from,
+                to,
+                assertion,
+                assertion_version,
+                statement_id,
+                asserted_at_ms,
+                basis,
+            } => {
+                if matches!(assertion_version, Some(1))
+                    || matches!(assertion, EdgeAssertion::Semantic { .. })
+                {
+                    assertions::assert_statement(
+                        graph,
+                        *from,
+                        *to,
+                        assertion,
+                        asserter_iri,
+                        statement_id.as_deref().unwrap_or(fallback_id),
+                        *asserted_at_ms,
+                        basis.clone(),
+                    )?;
+                } else {
+                    apply_graph_delta(
+                        graph,
+                        GraphDelta::ReplayAssertRelationByIds {
+                            from_id: *from,
+                            to_id: *to,
+                            assertion: assertion.clone(),
+                            asserter_iri: asserter_iri.to_owned(),
+                        },
+                    );
+                }
+            },
+            PersonalGraphEvent::RetractRelation { from, to, selector } => {
+                if assertions::retract_legacy(graph, *from, *to, *selector, asserter_iri) {
+                    return Ok(());
+                }
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplayRetractRelationsByIds {
+                        from_id: *from,
+                        to_id: *to,
+                        selector: *selector,
+                    },
+                );
+            },
+            PersonalGraphEvent::RetractAssertion {
+                from: _,
+                to: _,
+                statement_id,
+                withdrawn_at_ms,
+            } => {
+                graph.apply_imported_semantic_withdrawal(
+                    statement_id,
+                    *withdrawn_at_ms,
+                    Some(asserter_iri.to_owned()),
+                );
+            },
+            PersonalGraphEvent::SetFacet { node, facet, value } => {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplaySetNodeFacetById {
+                        node_id: *node,
+                        facet: facet.clone(),
+                        value: value.clone(),
+                    },
+                );
+            },
+            PersonalGraphEvent::RemoveFacet { node, facet } => {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplayRemoveNodeFacetById {
+                        node_id: *node,
+                        facet: facet.clone(),
+                    },
+                );
+            },
+            PersonalGraphEvent::SaveScene { node, scene } => {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplaySetNodeFacetById {
+                        node_id: *node,
+                        facet: SAVED_SCENE_FACET_V3.to_string(),
+                        value: serde_json::to_value(scene).expect("saved scene always serializes"),
+                    },
+                );
+            },
+            _ => {},
+        }
+        Ok(())
+    }
+
+    fn set_access_history(&self, graph: &mut Graph, node: Uuid, history: AccessHistory) {
+        apply_graph_delta(
+            graph,
+            GraphDelta::ReplaySetNodeFacetById {
+                node_id: node,
+                facet: ACCESS_HISTORY_FACET.to_string(),
+                value: serde_json::to_value(history).expect("access history always serializes"),
+            },
+        );
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn apply_event<G: SessionGraph, F: PersonalFold<G> + ?Sized>(
+    fold: &F,
+    graph: &mut G,
     access: &mut BTreeMap<Uuid, AccessRecord>,
     scenes: &mut BTreeMap<Uuid, SavedSceneV2>,
     handlers: &mut BTreeMap<String, String>,
@@ -1494,133 +1708,6 @@ fn apply_event(
     event: &PersonalGraphEvent,
 ) -> Result<(), PersonalGraphError> {
     match event {
-        PersonalGraphEvent::AddNode { id, address, title } => {
-            if graph.get_node_key_by_id(*id).is_none() {
-                let key = add_node(
-                    graph,
-                    Some(*id),
-                    address.clone(),
-                    PortablePoint::new(0.0, 0.0),
-                );
-                if !title.is_empty() {
-                    apply_graph_delta(
-                        graph,
-                        GraphDelta::SetNodeTitle {
-                            key,
-                            title: title.clone(),
-                        },
-                    );
-                }
-            }
-        },
-        PersonalGraphEvent::RemoveNode { id } => {
-            apply_graph_delta(graph, GraphDelta::ReplayRemoveNodeById { node_id: *id });
-        },
-        PersonalGraphEvent::SetTitle { node, title } => {
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplaySetNodeTitleById {
-                    node_id: *node,
-                    title: title.clone(),
-                },
-            );
-        },
-        PersonalGraphEvent::AddTag { node, tag } => {
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplayInsertNodeTagById {
-                    node_id: *node,
-                    tag: tag.clone(),
-                },
-            );
-        },
-        PersonalGraphEvent::RemoveTag { node, tag } => {
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplayRemoveNodeTagById {
-                    node_id: *node,
-                    tag: tag.clone(),
-                },
-            );
-        },
-        PersonalGraphEvent::AssertRelation {
-            from,
-            to,
-            assertion,
-            assertion_version,
-            statement_id,
-            asserted_at_ms,
-            basis,
-        } => {
-            if matches!(assertion_version, Some(1))
-                || matches!(assertion, EdgeAssertion::Semantic { .. })
-            {
-                assertions::assert_statement(
-                    graph,
-                    *from,
-                    *to,
-                    assertion,
-                    asserter_iri,
-                    statement_id.as_deref().unwrap_or(fallback_id),
-                    *asserted_at_ms,
-                    basis.clone(),
-                )?;
-            } else {
-                apply_graph_delta(
-                    graph,
-                    GraphDelta::ReplayAssertRelationByIds {
-                        from_id: *from,
-                        to_id: *to,
-                        assertion: assertion.clone(),
-                        asserter_iri: asserter_iri.to_owned(),
-                    },
-                );
-            }
-        },
-        PersonalGraphEvent::RetractRelation { from, to, selector } => {
-            if assertions::retract_legacy(graph, *from, *to, *selector, asserter_iri) {
-                return Ok(());
-            }
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplayRetractRelationsByIds {
-                    from_id: *from,
-                    to_id: *to,
-                    selector: *selector,
-                },
-            );
-        },
-        PersonalGraphEvent::RetractAssertion {
-            from: _,
-            to: _,
-            statement_id,
-            withdrawn_at_ms,
-        } => {
-            graph.apply_imported_semantic_withdrawal(
-                statement_id,
-                *withdrawn_at_ms,
-                Some(asserter_iri.to_owned()),
-            );
-        },
-        PersonalGraphEvent::SetFacet { node, facet, value } => {
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplaySetNodeFacetById {
-                    node_id: *node,
-                    facet: facet.clone(),
-                    value: value.clone(),
-                },
-            );
-        },
-        PersonalGraphEvent::RemoveFacet { node, facet } => {
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplayRemoveNodeFacetById {
-                    node_id: *node,
-                    facet: facet.clone(),
-                },
-            );
-        },
         PersonalGraphEvent::AppendAccess { record } => {
             access
                 .entry(record.record_id)
@@ -1630,14 +1717,7 @@ fn apply_event(
         // facet and converts when it opens (F142).
         PersonalGraphEvent::SaveScene { node, scene } => {
             scenes.insert(*node, scene.clone());
-            apply_graph_delta(
-                graph,
-                GraphDelta::ReplaySetNodeFacetById {
-                    node_id: *node,
-                    facet: SAVED_SCENE_FACET_V3.to_string(),
-                    value: serde_json::to_value(scene).expect("saved scene always serializes"),
-                },
-            );
+            fold.apply(graph, asserter_iri, fallback_id, event)?;
         },
         PersonalGraphEvent::SetHandlerPreference { key, handler } => {
             handlers.insert(key.clone(), handler.clone());
@@ -1654,6 +1734,7 @@ fn apply_event(
         | PersonalGraphEvent::GroupDispatch { .. }
         | PersonalGraphEvent::AdmitReader { .. }
         | PersonalGraphEvent::RetireReader { .. } => {},
+        _ => fold.apply(graph, asserter_iri, fallback_id, event)?,
     }
     Ok(())
 }
