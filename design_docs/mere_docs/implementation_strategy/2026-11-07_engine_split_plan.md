@@ -3273,6 +3273,14 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D265 · plans engine-split P8 · summary eidetic's typed layer takes a runtime schema; pandect's codicil hook supplies ids and redaction through it.
 
+- **D267. Consumers keep the plain constructor names through incipit-session's extension traits (Mark, 2026-11-26):** Step 2b found D262's premise does not hold: `MereSessions::new_with` installs no hooks, so moving callers to `_with` would silently drop publication, legacy and codicil. incipit-session's `IncipitSessions` and `IncipitSession` traits give `new`, `open`, `begin`, `begin_recorded`, `open_codicil_checked`, `open_codicil_from_checked`, `open_resident_graph`, `resident_store`, `publish_resident_checkpoint` and `transact_live` over incipit-graph with every incipit hook installed, and resolve over the kernel's inherent methods because those apply only to the kernel graph. "Keep plain names (Recommended)": lane 3 changes aliases and imports only, and lane 4 has nothing to rename back. Against distinct trait names, about 80 rewritten sites, renamed back in lane 4. Outcome: replaces D262.
+
+  Links: area The stack · draws on engine-split D262, engine-split D256 · plans engine-split P8 · summary Consumers keep MereSessions::new and the rest through incipit-session's extension traits; no rename in lane 3 or lane 4.
+
+- **D268. Step 2b's smaller forks take the recommendations (Mark, 2026-11-26):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) pandect gains `GraphSession::backend()` and `MereSessions::backend()`, an additive Mere commit, so incipit-session's `resident_store`, `publish_resident_checkpoint` and `open_resident_graph` keep pandect's signatures; against passing the store as a first argument at about five Graphshell host sites. (2) incipit-session's compose records pandect's tooling string, so a compose over incipit names the same manifest as the kernel's; against its own string. (3) `.projection()` is inherent on `PersonalGraphReplica` and cannot be shadowed, so callers write `.projection_with(&IncipitFold)`: about 9 Graphshell, 3 Turnstone and 11 Cleromancy sites in lane 3; against an incipit free function. Outcome: applies D256, D259.
+
+  Links: area The stack · draws on engine-split D256, engine-split D259 · plans engine-split P8 · summary pandect hands out its backend, compose keeps pandect's tooling string, and callers write projection_with(&IncipitFold).
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

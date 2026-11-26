@@ -2701,6 +2701,22 @@ summary = "eidetic's typed layer takes a runtime schema; pandect's codicil hook 
 draws_on = ["engine-split D265"]
 plans = ["engine-split"]
 
+[decisions."engine-split D267"]
+title = "Consumers keep the plain constructor names through incipit-session's extension traits (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Consumers keep MereSessions::new and the rest through incipit-session's extension traits; no rename in lane 3 or lane 4."
+draws_on = ["engine-split D256", "engine-split D262"]
+plans = ["engine-split"]
+
+[decisions."engine-split D268"]
+title = "Step 2b's smaller forks take the recommendations (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect hands out its backend, compose keeps pandect's tooling string, and callers write projection_with(&IncipitFold)."
+draws_on = ["engine-split D256", "engine-split D259"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
