@@ -3261,6 +3261,14 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D146 · plans engine-split P8 · summary All flips are prepared and verified first, then pushed root by root back to back; if the red window would run to hours, one push.
 
+- **D264. Merge goes generic over a sub-trait, `MergeGraph: SessionGraph` (Mark, 2026-11-26):** Step 1b found D258 cannot be additive: Graphshell's `incipit-graph` implements `SessionGraph` with the kernel's code (`session_graph.rs`), so any new required method stops Graphshell's host from building against Mere's head. Generic merge also needs about 15 methods, not 8: D258's eight, plus `CopiedFrom` reads, the edge-set and `MergedFrom` delta constructors, `remap_ids`, touched classification, part kinds and an unattributed scratch replay (merge uses `replay()`, not `replay_as`). "Sub-trait MergeGraph (Recommended)": merge takes `G: MergeGraph`, a trait in mere extending `SessionGraph`; the kernel implements it in Mere, `incipit-graph` in step 2b. Against provided methods that refuse by default behind a `MERGES` flag, and against required methods landed with a paired Graphshell commit. D258's "not a second trait" was aimed at a surface trait and does not cover this. Outcome: refines D258.
+
+  Links: area The stack · draws on engine-split D258 · plans engine-split P8 · summary Merge takes G: MergeGraph, a sub-trait of SessionGraph; the kernel implements it now, incipit-graph in step 2b.
+
+- **D265. Codicil schema ids come from an installed hook (Mark, 2026-11-26):** `TypedPayload` for `GraphCodicil` names the kernel's schema ids (`mere.graph-snapshot/v4`, profiled v4, the v3, v2 and v1 adapters). After the flip incipit must read the same ids or old codicils stop opening, and the orphan rule keeps `incipit-session` from implementing `TypedPayload` for pandect's type. Graphshell calls `open_codicil_*` and `graph_codicil` at 4 sites, all in `resident_mere.rs`. "Installed schema hook (Recommended)": the ids come from a hook installed like the publication and legacy hooks, and the kernel's and incipit's both name v4. Against one blanket impl over every `G` with the kernel's ids, and against leaving codicils kernel-only until `incipit-session`. Outcome: refines D257.
+
+  Links: area The stack · draws on engine-split D257, engine-split D254 · plans engine-split P8 · summary GraphCodicil's schema ids come from an installed hook; kernel and incipit both name v4.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -4301,3 +4309,11 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   wire and envelope byte checks included, plus a probe where pandect holds incipit-graph's `Graph` and reopens at the same
   digest while a tampered journal line moves it. wasm32 checks pass, the host workspace check differs from main only by the
   new crate, and `lens_dispatch` fails its checksum under `LENS_MUTATE=1`. Lane 3, the consumer flips, is next.
+- 2026-11-26: Step 1b of the kernel move landed in four commits (Mere `90c306276` to `c8d6b0cc3`). Transactions, operations
+  and page claims run over any `SessionGraph` through a publication hook and one engine resource write (D257); personal sync
+  folds through a host `PersonalFold` (D259); the legacy translation hook is installable (D260); `materialize_snapshot` and
+  `profiled_codicil_graph` have `_with` twins. Stored bytes are unchanged (ten fixture encodings, the seeded scenario and a
+  session's codicil and log, each comparator catching its positive control). Mere's four crates test 983 passed against
+  main's 977, the six new tests running each family on a non-kernel graph, each failing when its code was broken. Every
+  consumer root checks and tests as on main; Turnstone web and Cleromancy core fail error for error as unpatched main does.
+  The generic facts rewrite (D261) is held on `p8/kernel-move-1b-facts` for D248. Merge (D264) and codicils (D265) remain.

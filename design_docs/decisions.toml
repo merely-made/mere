@@ -2677,6 +2677,22 @@ summary = "All flips are prepared and verified first, then pushed root by root b
 draws_on = ["engine-split D146"]
 plans = ["engine-split"]
 
+[decisions."engine-split D264"]
+title = "Merge goes generic over a sub-trait, `MergeGraph: SessionGraph` (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Merge takes G: MergeGraph, a sub-trait of SessionGraph; the kernel implements it now, incipit-graph in step 2b."
+draws_on = ["engine-split D258"]
+plans = ["engine-split"]
+
+[decisions."engine-split D265"]
+title = "Codicil schema ids come from an installed hook (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "GraphCodicil's schema ids come from an installed hook; kernel and incipit both name v4."
+draws_on = ["engine-split D254", "engine-split D257"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
