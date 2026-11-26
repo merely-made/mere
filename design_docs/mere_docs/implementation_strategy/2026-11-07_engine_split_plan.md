@@ -3221,6 +3221,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D241, engine-split D244 · plans engine-split P8 · summary Undo's Kept and Reverted take G now; merge and its Part types stay on the kernel graph until ruled with the surface readers.
 
+- **D254. ProductCodicilV3 stays on the kernel snapshot until the consumer flips (Mark, 2026-11-25):** Its only graph-dependent field is `graph: GraphSnapshot`, which would become `G::Snapshot`. Rust cannot infer `G` from an associated-type field and a default parameter does not take part in inference, so Turnstone's bare literals (`let mut codicil = ProductCodicilV3 { .. }`, `ports/graphshell/src/product.rs` 1469, 2133, 2244, 2287, 2407) fail with E0283; the lane reproduced this in a 10-line rustc test. Graphshell's one literal (`transfer_staging.rs:309`) is typed by context and compiles. No other of the 15 types has a consumer literal. "Stays concrete for now (Recommended)": 12 of D244's 13 types plus `Kept` and `Reverted` take `G` in step 1, and `ProductCodicilV3` takes `G` in the consumer flips with the per-crate alias. Against parameterising it by the snapshot type, and against threading `G` and editing Turnstone's literals in step 1. Outcome: refines D244 and D253.
+
+  Links: area The stack · draws on engine-split D244, engine-split D253 · plans engine-split P8 · summary ProductCodicilV3 stays concrete in step 1 because Turnstone's bare literals can't infer G; it takes G in the flips.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the

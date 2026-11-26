@@ -2597,6 +2597,14 @@ summary = "Undo's Kept and Reverted take G now; merge and its Part types stay on
 draws_on = ["engine-split D241", "engine-split D244"]
 plans = ["engine-split"]
 
+[decisions."engine-split D254"]
+title = "ProductCodicilV3 stays on the kernel snapshot until the consumer flips (Mark, 2026-11-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "ProductCodicilV3 stays concrete in step 1 because Turnstone's bare literals can't infer G; it takes G in the flips."
+draws_on = ["engine-split D244", "engine-split D253"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
