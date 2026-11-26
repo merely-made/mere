@@ -2613,6 +2613,70 @@ summary = "The lens_dispatch probe moves with incipit-graph and carries a byte c
 draws_on = ["engine-split D106", "engine-split D211"]
 plans = ["engine-split"]
 
+[decisions."engine-split D256"]
+title = "pandect's surface half is copied into Graphshell's `incipit-session` before the flips (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect's surface readers are copied into Graphshell's incipit-session as step 2b, before the consumer flips; lane 4 deletes pandect's copies."
+draws_on = ["engine-split D8", "engine-split D146", "engine-split D241"]
+plans = ["engine-split"]
+
+[decisions."engine-split D257"]
+title = "pandect's transaction, operation and constructor families go generic through a publication hook (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect's transactions, operations and constructors go generic in place via a publication hook, _with twins and one engine resource write."
+draws_on = ["engine-split D241", "engine-split D244"]
+plans = ["engine-split"]
+
+[decisions."engine-split D258"]
+title = "Merge stays in pandect, generic over a grown `SessionGraph` (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "SessionGraph grows about eight methods so merge goes generic and stays in pandect."
+draws_on = ["engine-split D241", "engine-split D253"]
+plans = ["engine-split"]
+
+[decisions."engine-split D259"]
+title = "Personal sync keeps its protocol in pandect and folds through the host (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect keeps the personal-sync protocol; materialize takes a host fold, incipit's in incipit-session."
+draws_on = ["engine-split D256"]
+plans = ["engine-split"]
+
+[decisions."engine-split D260"]
+title = "The legacy translation hook is installable, so old sessions still open after the flip (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "The legacy translation hook becomes installable; incipit-session installs it so receipt-bearing sessions open after the flip."
+draws_on = ["engine-split D252"]
+plans = ["engine-split"]
+
+[decisions."engine-split D261"]
+title = "mere-facts goes generic over `SessionGraph` and stays in Mere (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "mere-facts becomes generic over SessionGraph via the engine resource write; it stays in Mere and lands with the Graphshell flip."
+draws_on = ["engine-split D216", "engine-split D248", "engine-split D257"]
+plans = ["engine-split"]
+
+[decisions."engine-split D262"]
+title = "Consumers take the `_with` constructors at the flip, and lane 4 renames them back (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Consumers use _with constructors from the flip; lane 4 renames them back to new/open/begin."
+draws_on = ["engine-split D244"]
+plans = ["engine-split"]
+
+[decisions."engine-split D263"]
+title = "Lane 3 lands root by root only if the red window is short (Mark, 2026-11-26)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "All flips are prepared and verified first, then pushed root by root back to back; if the red window would run to hours, one push."
+draws_on = ["engine-split D146"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
