@@ -88,7 +88,7 @@ impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
 mod page_claims;
 mod residency;
-use legacy_hook::LegacyHook;
+pub use legacy_hook::LegacyHook;
 mod legacy_hook;
 mod publication;
 pub use publication::{
@@ -844,7 +844,7 @@ pub struct GraphSession<B, G: SessionGraph = Graph> {
     manifest: GraphSessionManifest,
     baseline: G,
     placement: Option<SessionPlacement>,
-    translation: Option<LegacyTranslationReceipt>,
+    translation: Option<LegacyTranslationReceipt<G>>,
     /// The host's hooks: the legacy translation's reads over `G`, and the
     /// publication of `G` (engine split D252, D257).
     hooks: SessionHooks<G>,
@@ -1264,26 +1264,28 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
             }
         }
 
-        let translation: Option<LegacyTranslationReceipt> =
+        // A stored receipt is read only through the host's legacy hook, and
+        // refused before it is decoded without one.
+        if legacy.is_none() && slots.backend().get(&keys.at(TRANSLATION)).await?.is_some() {
+            return Err(SessionError::Corrupt(format!(
+                "{}: a legacy translation opens only through its graph's legacy hook",
+                keys.at(TRANSLATION)
+            )));
+        }
+        let translation: Option<LegacyTranslationReceipt<G>> =
             read(&slots, &keys.at(TRANSLATION)).await?;
-        let hook = match (&translation, legacy) {
-            (Some(_), None) => {
-                return Err(SessionError::Corrupt(format!(
-                    "{}: a legacy translation opens only over the kernel graph",
-                    keys.at(TRANSLATION)
-                )));
-            },
-            (_, hook) => hook,
-        };
+        let hook = legacy;
         match (&placement, &translation) {
             (Some(profile), Some(receipt))
                 if profile.baseline == PlacementProfile::LegacySurfaceV1 =>
             {
                 let digest = retained_source_digest(&slots, &keys, profile).await?;
                 let hook = hook.expect("a receipt is read with its hook");
-                (hook.validate)(receipt, profile, &digest, journal.entries()).map_err(|error| {
-                    SessionError::Corrupt(format!("{}: {error}", keys.at(TRANSLATION)))
-                })?;
+                receipt
+                    .validate_with(hook, profile, &digest, journal.entries())
+                    .map_err(|error| {
+                        SessionError::Corrupt(format!("{}: {error}", keys.at(TRANSLATION)))
+                    })?;
             },
             (Some(profile), None) if profile.baseline == PlacementProfile::LegacySurfaceV1 => {
                 return Err(SessionError::Corrupt(format!(
@@ -1345,10 +1347,11 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
                     })?;
                 if let Some(receipt) = &translation {
                     let hook = hook.expect("a receipt is read with its hook");
-                    let expected = (hook.graph_at)(receipt, journal.entries(), checkpoint.cursor)
+                    let expected = receipt
+                        .graph_at(journal.entries(), checkpoint.cursor)
                         .map_err(SessionError::Corrupt)?
                         .ok_or_else(|| SessionError::Corrupt(keys.at(CHECKPOINT)))?;
-                    if !(hook.same_graph)(&graph, &expected) {
+                    if !FrozenGraph::of(&graph).same(&FrozenGraph::of(&expected), hook) {
                         return Err(SessionError::Corrupt(format!(
                             "{}: checkpoint differs from retained translation",
                             keys.at(CHECKPOINT)
@@ -1358,21 +1361,26 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
                 (graph, checkpoint.cursor)
             },
             _ => (
-                match (&translation, hook) {
-                    (Some(receipt), Some(hook)) => {
-                        (hook.baseline)(receipt).map_err(SessionError::Corrupt)?
-                    },
-                    _ => baseline.clone(),
+                match &translation {
+                    Some(receipt) => receipt
+                        .baseline
+                        .materialize()
+                        .map_err(SessionError::Corrupt)?,
+                    None => baseline.clone(),
                 },
                 Seq(0),
             ),
         };
         // The prefix replay that recovers attribution reaches the checkpoint's
         // replay point, which the session keeps for `graph_at`.
-        let replay_point = if let (Some(receipt), Some(hook)) = (&translation, hook) {
-            let translated = (hook.journal)(receipt, journal.entries(), live)
+        let replay_point = if let Some(receipt) = &translation {
+            let translated = receipt
+                .journal(journal.entries(), live)
                 .expect("receipt validated against journal");
-            let baseline = (hook.baseline)(receipt).map_err(SessionError::Corrupt)?;
+            let baseline = receipt
+                .baseline
+                .materialize()
+                .map_err(SessionError::Corrupt)?;
             translated
                 .replay_from_with_baseline(
                     receipt.effect_cursor(checkpointed),
@@ -1979,10 +1987,7 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
             .flat_map(|(offset, entry)| {
                 self.translation
                     .as_ref()
-                    .zip(self.hooks.legacy)
-                    .and_then(|(receipt, hook)| {
-                        (hook.entry_effects)(receipt, first.index() + offset)
-                    })
+                    .and_then(|receipt| receipt.entry_effects.get(first.index() + offset).cloned())
                     .unwrap_or_else(|| vec![entry.delta.clone()])
             })
             .collect()
@@ -2109,8 +2114,9 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
     /// and its digest still names the journal there, and from the baseline
     /// otherwise, with the same result (engine-split D161).
     pub fn graph_at(&self, cursor: Seq) -> Option<G> {
-        let mut graph = match self.translation.as_ref().zip(self.hooks.legacy) {
-            Some((receipt, hook)) => (hook.graph_at)(receipt, self.journal.entries(), cursor)
+        let mut graph = match &self.translation {
+            Some(receipt) => receipt
+                .graph_at(self.journal.entries(), cursor)
                 .ok()
                 .flatten(),
             None => match self.replay_point_for(cursor) {

@@ -148,7 +148,8 @@ pub use facet_store::{
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, DroppedChoice,
-    GraphAdmissionValidator, GraphRevision, GraphSession, GraphValidator, Kept, MereSessions,
+    GraphAdmissionValidator, GraphRevision, GraphSession, GraphValidator, Kept, LegacyHook,
+    MereSessions,
     MergeChoice, MergeConflict, MergeMatch, Merged, Pending, PendingMerge, PinnedView, Publication,
     PublicationHook, PublicationWrites, PublishedGeneration, RESOURCE_DIGEST_ALGORITHM,
     RESOURCE_DIGEST_VERSION, Refused, ResourceDigest, Reverted, SESSIONS_PREFIX, SessionBackend,

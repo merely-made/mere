@@ -7,9 +7,13 @@
 //! Explicit input placement; a missing profile remains unqualified.
 
 use crate::NodeFacetStore;
+#[cfg(test)]
+use kernel::graph::CapturedDelta;
 use kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution;
-use kernel::graph::{AttributedDelta, CapturedDelta, Graph, GraphJournal, Seq};
+use kernel::graph::{Graph, Seq};
 use kernel::persistence::GraphSnapshot;
+use mere::model::Attributed;
+use mere::session::{SessionGraph, SessionJournal};
 use muniment::Journal;
 use serde::{Deserialize, Serialize};
 
@@ -69,35 +73,54 @@ impl SessionPlacement {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(crate) struct FrozenGraph {
-    pub graph: GraphSnapshot,
+/// How a host's graph reads a stored legacy translation (engine split D252,
+/// D260). The read path is pandect's, over [`SessionGraph`]; the host says
+/// which assertion schema a stored snapshot was written with. A host installs
+/// its hook on [`MereSessions`](crate::MereSessions); the kernel graph's
+/// constructors install the kernel's.
+pub struct LegacyHook<G: SessionGraph> {
+    /// `0` for the legacy sidecar shape, which compares as it materializes
+    /// now; `1` for the current shape, compared as stored; any other refuses.
+    pub assertion_schema: fn(&G::Snapshot) -> u32,
+}
+
+/// The kernel graph's legacy hook.
+pub(crate) static KERNEL_LEGACY: LegacyHook<Graph> = LegacyHook {
+    assertion_schema: |snapshot: &GraphSnapshot| snapshot.assertion_schema,
+};
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, bound = "")]
+pub(crate) struct FrozenGraph<G: SessionGraph = Graph> {
+    pub graph: G::Snapshot,
     pub facets: NodeFacetStore,
+}
+
+impl<G: SessionGraph> std::fmt::Debug for FrozenGraph<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FrozenGraph")
+            .field("graph", &self.graph)
+            .field("facets", &self.facets)
+            .finish()
+    }
 }
 
 impl PartialEq for FrozenGraph {
     fn eq(&self, other: &Self) -> bool {
-        self.facets == other.facets
-            && matches!(
-                (comparison_graph_value(&self.graph), comparison_graph_value(&other.graph)),
-                (Some(left), Some(right)) if left == right
-            )
+        self.same(other, &KERNEL_LEGACY)
     }
 }
 
-fn comparison_graph_value(snapshot: &GraphSnapshot) -> Option<serde_json::Value> {
+fn comparison_graph_value<G: SessionGraph>(
+    hook: &LegacyHook<G>,
+    snapshot: &G::Snapshot,
+) -> Option<serde_json::Value> {
     // Historical translation receipts keep their original legacy-sidecar JSON
     // and checksum. Only legacy-schema receipts are restored into the current
     // assertion shape for truth comparison; canonical snapshots retain their
     // exact persisted columns in the comparison.
-    let mut value = match snapshot.assertion_schema {
-        0 => serde_json::to_value(
-            Graph::try_from_recorded_snapshot(snapshot)
-                .ok()?
-                .to_snapshot(),
-        )
-        .ok()?,
+    let mut value = match (hook.assertion_schema)(snapshot) {
+        0 => serde_json::to_value(G::from_snapshot(snapshot, true).ok()?.to_snapshot()).ok()?,
         1 => serde_json::to_value(snapshot).ok()?,
         _ => return None,
     };
@@ -109,46 +132,83 @@ fn comparison_graph_value(snapshot: &GraphSnapshot) -> Option<serde_json::Value>
     Some(value)
 }
 
-impl FrozenGraph {
-    pub fn of(graph: &Graph) -> Self {
+impl<G: SessionGraph> FrozenGraph<G> {
+    pub fn of(graph: &G) -> Self {
         Self {
             graph: graph.to_snapshot(),
             facets: graph.facets().clone(),
         }
     }
 
-    pub fn materialize(&self) -> Result<Graph, String> {
-        let mut graph =
-            Graph::try_from_recorded_snapshot(&self.graph).map_err(|error| error.to_string())?;
-        graph
-            .install_facets(self.facets.clone())
-            .map_err(|error| error.to_string())?;
+    /// Whether the two hold the same graph truth, as `hook` reads their
+    /// snapshots.
+    pub fn same(&self, other: &Self, hook: &LegacyHook<G>) -> bool {
+        self.facets == other.facets
+            && matches!(
+                (
+                    comparison_graph_value(hook, &self.graph),
+                    comparison_graph_value(hook, &other.graph)
+                ),
+                (Some(left), Some(right)) if left == right
+            )
+    }
+
+    pub fn materialize(&self) -> Result<G, String> {
+        let mut graph = G::from_snapshot(&self.graph, true)?;
+        graph.install_facets(self.facets.clone())?;
         Ok(graph)
     }
 }
 
 /// An exact translation, separate from its retained original authority.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(crate) struct LegacyTranslationReceipt {
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, bound = "")]
+pub(crate) struct LegacyTranslationReceipt<G: SessionGraph = Graph> {
     version: u32,
     pub source_digest: String,
     pub translation_digest: String,
     pub placement: SessionPlacement,
-    pub baseline: FrozenGraph,
-    pub entry_effects: Vec<Vec<CapturedDelta>>,
+    pub baseline: FrozenGraph<G>,
+    pub entry_effects: Vec<Vec<G::Delta>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub content_context: Option<kernel::graph::legacy_resource_migration::LegacyContentContext>,
-    legacy_final: FrozenGraph,
+    legacy_final: FrozenGraph<G>,
+}
+
+impl<G: SessionGraph> std::fmt::Debug for LegacyTranslationReceipt<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("LegacyTranslationReceipt")
+            .field("version", &self.version)
+            .field("source_digest", &self.source_digest)
+            .field("translation_digest", &self.translation_digest)
+            .field("placement", &self.placement)
+            .field("baseline", &self.baseline)
+            .field("entry_effects", &self.entry_effects)
+            .field("content_context", &self.content_context)
+            .field("legacy_final", &self.legacy_final)
+            .finish()
+    }
 }
 
 impl LegacyTranslationReceipt {
+    /// [`validate_with`](Self::validate_with) the kernel graph's hook.
+    pub fn validate(
+        &self,
+        placement: &SessionPlacement,
+        source_digest: &str,
+        entries: &[Attributed<kernel::graph::CapturedDelta>],
+    ) -> Result<(), String> {
+        self.validate_with(&KERNEL_LEGACY, placement, source_digest, entries)
+    }
+}
+
+impl<G: SessionGraph> LegacyTranslationReceipt<G> {
     pub fn new(
         source_digest: String,
         placement: SessionPlacement,
-        baseline: FrozenGraph,
-        entry_effects: Vec<Vec<CapturedDelta>>,
-        legacy_final: FrozenGraph,
+        baseline: FrozenGraph<G>,
+        entry_effects: Vec<Vec<G::Delta>>,
+        legacy_final: FrozenGraph<G>,
     ) -> Result<Self, String> {
         let mut receipt = Self {
             version: 1,
@@ -192,11 +252,14 @@ impl LegacyTranslationReceipt {
         Ok(())
     }
 
-    pub fn validate(
+    /// Refuse a receipt that is not exactly the translation of `entries`
+    /// under `placement`, reading its snapshots through `hook`.
+    pub fn validate_with(
         &self,
+        hook: &LegacyHook<G>,
         placement: &SessionPlacement,
         source_digest: &str,
-        entries: &[AttributedDelta],
+        entries: &[Attributed<G::Delta>],
     ) -> Result<(), String> {
         if self.version != 1
             || self.placement != *placement
@@ -218,14 +281,18 @@ impl LegacyTranslationReceipt {
         let graph = self
             .graph_at(entries, placement.cutoff())?
             .ok_or("invalid legacy translation cursor")?;
-        if FrozenGraph::of(&graph) != self.legacy_final {
+        if !FrozenGraph::of(&graph).same(&self.legacy_final, hook) {
             return Err("legacy translation effects do not reproduce their frozen result".into());
         }
         self.legacy_final.materialize()?;
         Ok(())
     }
 
-    pub fn journal(&self, entries: &[AttributedDelta], cursor: Seq) -> Option<GraphJournal> {
+    pub fn journal(
+        &self,
+        entries: &[Attributed<G::Delta>],
+        cursor: Seq,
+    ) -> Option<SessionJournal<G>> {
         if cursor.index() > entries.len() {
             return None;
         }
@@ -233,7 +300,7 @@ impl LegacyTranslationReceipt {
         for (index, entry) in entries[..cursor.index()].iter().enumerate() {
             if let Some(effects) = self.entry_effects.get(index) {
                 for effect in effects {
-                    translated.append(AttributedDelta {
+                    translated.append(Attributed {
                         author: entry.author.clone(),
                         delta: effect.clone(),
                     });
@@ -242,14 +309,14 @@ impl LegacyTranslationReceipt {
                 translated.append(entry.clone());
             }
         }
-        Some(GraphJournal::from_log(translated))
+        Some(SessionJournal::from_log(translated))
     }
 
     pub fn graph_at(
         &self,
-        entries: &[AttributedDelta],
+        entries: &[Attributed<G::Delta>],
         cursor: Seq,
-    ) -> Result<Option<Graph>, String> {
+    ) -> Result<Option<G>, String> {
         let Some(journal) = self.journal(entries, cursor) else {
             return Ok(None);
         };
@@ -257,9 +324,7 @@ impl LegacyTranslationReceipt {
             .snapshot_at_from(&self.baseline.materialize()?, journal.live_cursor())
             .map_err(|error| error.to_string())?;
         if let Some(graph) = &graph {
-            graph
-                .validate_active_resource_assertion_handles()
-                .map_err(|error| error.to_string())?;
+            graph.validate_handles()?;
         }
         Ok(graph)
     }
@@ -274,7 +339,7 @@ impl LegacyTranslationReceipt {
     }
 }
 
-fn validate_effect_ids(effect: &CapturedDelta) -> Result<(), String> {
+fn validate_effect_ids<D: Serialize>(effect: &D) -> Result<(), String> {
     let encoded = serde_json::to_value(effect).map_err(|error| error.to_string())?;
     let (_, fields) = encoded
         .as_object()
