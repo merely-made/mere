@@ -2498,6 +2498,7 @@ title = "pandect is generic over an engine trait beside `RdfSource` (Mark, 2026-
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "pandect becomes generic over a ~24-method engine trait; its surface-reading modules stay concrete until their home is ruled."
+draws_on = ["engine-split D146"]
 plans = ["engine-split"]
 
 [decisions."engine-split D242"]
@@ -2505,7 +2506,7 @@ title = "The journal carries an engine envelope: resource deltas, and surface de
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "One journal holds JournalDelta<S>: the engine's ResourceDelta, or a surface delta it doesn't name, with bytes unchanged."
-draws_on = ["engine-split D212"]
+draws_on = ["engine-split D148", "engine-split D212"]
 plans = ["engine-split"]
 
 [decisions."engine-split D243"]
@@ -2513,6 +2514,7 @@ title = "The resource half becomes an engine recorded store (Mark, 2026-11-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "Resource-side Graph code becomes a recorded store in mere::model that Graph holds and delegates to."
+draws_on = ["engine-split D146"]
 plans = ["engine-split"]
 
 [decisions."engine-split D244"]
@@ -2520,6 +2522,7 @@ title = "pandect takes the graph as a type parameter, defaulted until graph-kern
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "pandect is generic with a defaulted graph type parameter so step 1 is additive; consumers name it before the default goes."
+draws_on = ["engine-split D241"]
 plans = ["engine-split"]
 
 [decisions."engine-split D245"]
@@ -2527,7 +2530,7 @@ title = "Probe 1 runs on a minimal test surface (Mark, 2026-11-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "Probe 1 runs on a dev-only minimal surface in pandect, with no kernel."
-draws_on = ["engine-split D242"]
+draws_on = ["engine-split D241", "engine-split D242"]
 plans = ["engine-split"]
 
 [decisions."engine-split D246"]
@@ -2535,7 +2538,7 @@ title = "Personal-facts records stored as node facets get a clean break (Mark, 2
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "Old node-facet personal facts are refused; D215 covers the move, not D216's rewrite."
-draws_on = ["engine-split D216", "engine-split D239"]
+draws_on = ["engine-split D215", "engine-split D216", "engine-split D239"]
 plans = ["engine-split"]
 
 [decisions."engine-split D247"]
@@ -2543,6 +2546,7 @@ title = "Personal facts are resource facets now and become RDF statements with L
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "mere-facts writes resource facets in the move; L7 makes the facts RDF statements under a declared vocabulary."
+draws_on = ["engine-split D216"]
 plans = ["engine-split"]
 
 [decisions."engine-split D248"]
@@ -2550,7 +2554,7 @@ title = "The personal-facts rewrite lands with Graphshell's tamper test, in the 
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "The facts rewrite waits for the consumer flip, landing with Graphshell's tamper test rewritten onto resource records."
-draws_on = ["engine-split D247"]
+draws_on = ["engine-split D246", "engine-split D247"]
 plans = ["engine-split"]
 
 [decisions."engine-split D249"]
@@ -2558,7 +2562,7 @@ title = "The journal is engine-generic over the graph's delta type (Mark, 2026-1
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "One engine journal type is generic over the graph's delta; the kernel's GraphJournal is its alias, so no consumer changes."
-draws_on = ["engine-split D242", "engine-split D244"]
+draws_on = ["engine-split D148", "engine-split D242", "engine-split D244"]
 plans = ["engine-split"]
 
 [decisions."engine-split D250"]
@@ -2566,6 +2570,7 @@ title = "The recorded store returns the deltas it makes, and the host records th
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
 area = "The stack"
 summary = "Store writes are pure and return their ResourceDeltas; only the host records, on one cursor."
+draws_on = ["engine-split D243"]
 plans = ["engine-split"]
 
 [decisions."house-style D1"]
