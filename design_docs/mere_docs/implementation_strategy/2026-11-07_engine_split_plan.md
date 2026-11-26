@@ -4260,3 +4260,12 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   `pelt-desktop` test (`HostMutation` has no `target_id`) and Turnstone's root (`TurnOutcome::PageMoved` unmatched), besides
   the Turnstone web and Cleromancy core failures already recorded. The personal-facts rewrite (D246 to D248) waits on its
   side branch for the consumer flips.
+- 2026-11-26: Step 2 of the kernel move landed: Graphshell has `incipit-graph` at `host/crates/incipit/graph` (D211), beside
+  `mere-kernel` and taken by nothing yet (Graphshell `9e070df7`, `f79dfa97`, `040c570d`). The kernel came with its history by
+  D106's method: 265 commits through filter-repo on its five directories and the 42 former paths of the 20 files that moved
+  in from the engine, merged as an unrelated history, about +1.1 MiB packed. pandect's `replay_state.rs` is left out, as it
+  was copied, not moved. The tree is byte-identical to Mere `0a27ca76a` apart from the manifest, the `lens_dispatch` fixtures
+  (D255) and five run commands naming the new package. Its tests match `mere-kernel`'s name for name (582 passed, 4 ignored),
+  wire and envelope byte checks included, plus a probe where pandect holds incipit-graph's `Graph` and reopens at the same
+  digest while a tampered journal line moves it. wasm32 checks pass, the host workspace check differs from main only by the
+  new crate, and `lens_dispatch` fails its checksum under `LENS_MUTATE=1`. Lane 3, the consumer flips, is next.
