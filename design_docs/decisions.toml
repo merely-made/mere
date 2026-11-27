@@ -2717,6 +2717,30 @@ summary = "pandect hands out its backend, compose keeps pandect's tooling string
 draws_on = ["engine-split D256", "engine-split D259"]
 plans = ["engine-split"]
 
+[decisions."engine-split D269"]
+title = "Legacy qualification is dropped, not ported (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Legacy qualification goes with the kernel; stored legacy sessions keep opening, and nothing upgrades one any more."
+draws_on = ["engine-split D252", "engine-split D260"]
+plans = ["engine-split"]
+
+[decisions."engine-split D270"]
+title = "Knot and Cleromancy take the constant_time_eq skip too (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Knot and Cleromancy carry the constant_time_eq 0.4.2 stopgap skip so their flips can land."
+draws_on = ["engine-split D263"]
+plans = ["engine-split"]
+
+[decisions."engine-split D271"]
+title = "Lane 3's smaller forks take the recommendations (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "Turnstone shims pandect's kernel-only helpers, mere-view's row is renamed mere, and roots land Mere, Graphshell, Distillery, Turnstone, Knot, Cleromancy."
+draws_on = ["engine-split D244", "engine-split D254", "engine-split D263"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
