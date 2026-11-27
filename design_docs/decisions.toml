@@ -2741,6 +2741,22 @@ summary = "Turnstone shims pandect's kernel-only helpers, mere-view's row is ren
 draws_on = ["engine-split D244", "engine-split D254", "engine-split D263"]
 plans = ["engine-split"]
 
+[decisions."engine-split D272"]
+title = "pandect's kernel-graph tests port onto the test Surface (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect's tests that used the kernel as their graph move onto the dev-only Surface, so no kernel survives even as a test crate."
+draws_on = ["engine-split D211", "engine-split D245", "engine-split D269"]
+plans = ["engine-split"]
+
+[decisions."engine-split D273"]
+title = "Lane 4's smaller forks take the recommendations (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
+area = "The stack"
+summary = "pandect picks a component part over any graph, the engine holds the stored legacy shapes, and kernel-written stores are frozen as postcard fixtures."
+draws_on = ["engine-split D213", "engine-split D256", "engine-split D269"]
+plans = ["engine-split"]
+
 [decisions."house-style D1"]
 title = "Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

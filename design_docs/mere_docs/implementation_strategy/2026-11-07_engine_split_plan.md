@@ -3293,6 +3293,14 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D244, engine-split D254, engine-split D263 · plans engine-split P8 · summary Turnstone shims pandect's kernel-only helpers, mere-view's row is renamed mere, and roots land Mere, Graphshell, Distillery, Turnstone, Knot, Cleromancy.
 
+- **D272. pandect's kernel-graph tests port onto the test Surface (Mark, 2026-11-27):** Lane 4 could not commit the graph-kernel deletion: pandect's and mere-facts' tests (336 on main) build kernel graphs, and the clippy hook builds every target. 122 have name-for-name copies in incipit-session, 36 need no graph, 11 already run on D245's dev-only `Surface` (748 lines in `pandect/tests/support`), and 18 test qualification, which D269 drops. That leaves 40 whose code is now Graphshell's and 109 of pandect's own core, sync and facts. "Port onto Surface (Recommended)": the `Surface` becomes Mere's shared test graph; lane 4b ports the 109 onto it (about 6k test lines), copies the 40 into incipit-graph and incipit-session, deletes the 18, and then the deletion lands. Against keeping the kernel as an unpublished dev-only crate (against D211, and two surface graphs drifting), deleting the 169 (pandect keeps about 47 of 321), and moving them into Graphshell (most use pandect internals). A dev-dependency on incipit-graph is ruled out by the cycle-breaks plan. Outcome: applies D211 and D245.
+
+  Links: area The stack · draws on engine-split D211, engine-split D245, engine-split D269 · plans engine-split P8 · summary pandect's tests that used the kernel as their graph move onto the dev-only Surface, so no kernel survives even as a test crate.
+
+- **D273. Lane 4's smaller forks take the recommendations (Mark, 2026-11-27):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) pandect gains a generic `MereSessions::pick`, the half of a component fork that never reads the graph; the kernel's `fork_component` called it, so what it writes is unchanged, and incipit-session's `fork_component` is built on it, with `offer_for` copied into incipit-session. (2) The frozen kernel-written stores in incipit-session's tests are every key and value as postcard behind a version header, not muniment's directory store, which refuses codicil `blob:` keys; re-save comparisons take the kernel's `timestamp_secs` and skip the digest and content address over it, because a re-save dates its snapshot by the wall clock. (3) The engine takes the legacy content origins, `merge_resource_properties` and `wall_clock_now` unchanged (`model::legacy`, `resource_rules`, `clock`), because `placement.json` and `legacy-translation.json` store and hash them; pandect keeps no local copies. (4) No drift needed porting: the 24 differing files' 41 hunks are all incipit-graph's own, and the kernel's `predicate_declarations.rs` half lives on in incipit-graph, so D213 loses nothing. Outcome: applies D213, D256, D269.
+
+  Links: area The stack · draws on engine-split D213, engine-split D256, engine-split D269 · plans engine-split P8 · summary pandect picks a component part over any graph, the engine holds the stored legacy shapes, and kernel-written stores are frozen as postcard fixtures.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -4371,3 +4379,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   journals and codicils written by the old main open unchanged, with tamper controls; `cargo tree -i mere-kernel` reaches
   consumers only through pandect. After landing, each main checks green from git with no patch config and its resolved
   notes were re-recorded. Lane 4, Mere dropping graph-kernel and pandect's kernel copies, is next.
+- 2026-11-27: Lane 4's first half landed: Mere `675fd8111` (the engine holds the legacy shapes, the property merge and the
+  clock; pandect picks a component part over any graph, D273), Graphshell `e2c49a39` (incipit-session reads frozen
+  kernel-written stores, with a flipped byte failing each of the ten, and drops its mere-kernel dev-dependency;
+  `fork_component` and `offer_for` are incipit-session's own) and Turnstone `7aadb529` (no `furnace` feature). No drift
+  needed porting. From git with no patch config, Graphshell host and Turnstone check clean against the new Mere main and
+  incipit-session passes 127 of 127; resolved notes were re-recorded. The graph-kernel deletion waits on lane 4b, which
+  ports pandect's and mere-facts' kernel-graph tests onto the dev-only Surface (D272).
