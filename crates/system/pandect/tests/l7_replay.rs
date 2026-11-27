@@ -64,12 +64,10 @@ fn a_journal_written_before_l7_reopens_with_identical_held_assertions() {
         let held = session.graph().retained_statements();
         assert!(held.len() >= 9, "the fixture holds every case: {held:?}");
         assert_eq!(held, expected.journal_held);
+        // The pin's v2 journal digest is over each entry as it re-serializes,
+        // and new writes drop the enum-named fields, so it moves once (D17).
         let pin = session.pin(session.journal().live_cursor()).unwrap();
-        assert_eq!(
-            pin.digest(),
-            expected.pin_digest,
-            "the resource digest is unmoved"
-        );
+        assert_ne!(pin.digest(), expected.pin_digest);
     });
 }
 

@@ -5,24 +5,21 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use crate::model::{ContainmentSubKind, EdgeFamily, RelationKind};
+use crate::profile::core::{self, ids};
 
 #[test]
-fn canonical_predicate_owns_classification_and_legacy_hint_is_only_a_fallback() {
+fn the_predicate_alone_classifies_a_record() {
+    let vocabulary = Vocabulary::core();
     let mut record = SemanticStatement::new(
-        RelationKind::Containment(ContainmentSubKind::CollectionMember)
-            .predicate_iri()
-            .unwrap()
-            .into(),
-        Some(SemanticSubKind::Cites),
+        core::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER).into(),
         None,
         GraphScope::Default,
         None,
         None,
     );
     assert_eq!(
-        record.relation_kind(),
-        RelationKind::Containment(ContainmentSubKind::CollectionMember)
+        vocabulary.family(&record.predicate),
+        Some(ids::FAMILY_CONTAINMENT)
     );
     assert!(!record.is_semantic());
     let mut data = SemanticData {
@@ -30,21 +27,27 @@ fn canonical_predicate_owns_classification_and_legacy_hint_is_only_a_fallback() 
         ..Default::default()
     };
     data.rebuild_compat();
-    assert!(data.sub_kinds.is_empty());
-    record.predicate = predicate_iri(SemanticSubKind::Quotes).into();
-    assert_eq!(
-        record.relation_kind(),
-        RelationKind::Semantic(SemanticSubKind::Quotes)
-    );
+    assert_eq!(data.predicate, None, "a containment record is not semantic");
+    record.predicate = core::iri(ids::REL_QUOTES).into();
     data.statements = vec![record.clone()];
     data.rebuild_compat();
-    assert_eq!(data.sub_kinds, BTreeSet::from([SemanticSubKind::Quotes]));
+    assert_eq!(data.predicate.as_deref(), Some(core::iri(ids::REL_QUOTES)));
+    // An undeclared IRI is an open predicate, which counts as semantic.
     record.predicate = "urn:legacy:custom-predicate".into();
+    assert_eq!(vocabulary.family(&record.predicate), None);
     assert_eq!(
-        record.relation_kind(),
-        RelationKind::Semantic(SemanticSubKind::Cites)
+        vocabulary.relation_family(&record.predicate),
+        ids::FAMILY_SEMANTIC
     );
-    record.recognized_sub_kind = None;
-    assert_eq!(record.relation_kind(), RelationKind::OpenPredicate);
-    assert_eq!(record.relation_kind().family(), EdgeFamily::Semantic);
+    assert!(record.is_semantic());
+}
+
+#[test]
+fn a_record_stored_with_its_old_sub_kind_reads_by_its_predicate() {
+    let stored = r#"{"statement_id":"s","predicate":"https://mere.computer/ns/rel#cites",
+        "recognized_sub_kind":"Quotes","label":null}"#;
+    let record: SemanticStatement = serde_json::from_str(stored).unwrap();
+    assert_eq!(record.predicate, core::iri(ids::REL_CITES));
+    let written = serde_json::to_string(&record).unwrap();
+    assert!(!written.contains("recognized_sub_kind"), "{written}");
 }

@@ -19,7 +19,8 @@ use eidetic::PrivacyClass;
 use identity::{IdentityError, IdentityProvider};
 use insigne::DerivedKeyAttestation;
 use mere::model::author::Author;
-use mere::model::{AssertionBasis, EdgeAssertion, EdgeFamily, RelationSelector};
+use mere::model::{AssertionBasis, RelationSelector};
+use mere::profile::core::{self as core_pack, ids};
 use mere::session::SessionGraph;
 use muniment::Backend;
 use p2panda_core::cbor::{decode_cbor_strict, encode_cbor};
@@ -37,6 +38,9 @@ use uuid::Uuid;
 
 #[path = "personal_sync/assertions.rs"]
 mod assertions;
+#[path = "personal_sync/relation.rs"]
+mod relation;
+pub use relation::RelationClaim;
 
 use crate::access::{ACCESS_HISTORY_FACET, AccessHistory, AccessRecord};
 use crate::{SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3, SavedSceneV2};
@@ -136,7 +140,9 @@ pub enum PersonalGraphEvent {
     AssertRelation {
         from: Uuid,
         to: Uuid,
-        assertion: EdgeAssertion,
+        /// The relation by its predicate IRI (declared-lens D17).
+        #[serde(flatten)]
+        relation: RelationClaim,
         /// `None` is the legacy assertion event shape. Version 1 adds exact
         /// IDs and authored time for every relation family.
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -260,16 +266,6 @@ pub struct BlobAvailabilityObservation {
     pub device: String,
     pub available: bool,
     pub at_ms: u64,
-}
-
-/// One signed authoring turn.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PersonalGraphRecord {
-    pub events: Vec<PersonalGraphEvent>,
-    #[serde(default)]
-    pub parents: Vec<[u8; 32]>,
-    #[serde(default)]
-    pub writer_attestation: Option<DerivedKeyAttestation>,
 }
 
 /// Stable persona roots admitted to one personal graph pool.
@@ -1158,11 +1154,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonalGraphReplica<B> {
         for event in &mut events {
             if matches!(
                 event,
-                PersonalGraphEvent::RetractRelation {
-                    selector: RelationSelector::Semantic(_)
-                        | RelationSelector::Family(EdgeFamily::Semantic),
-                    ..
-                }
+                PersonalGraphEvent::RetractRelation { selector, .. } if names_semantic(selector)
             ) {
                 return Err(PersonalGraphError::Excluded(
                     "new semantic retractions must name an assertion id".into(),
@@ -1673,11 +1665,8 @@ fn event_target(event: &PersonalGraphEvent) -> String {
             format!("node/{node}/tag/{tag}")
         },
         PersonalGraphEvent::AssertRelation {
-            from,
-            to,
-            assertion,
-            ..
-        } => format!("relation/{from}/{to}/{}", relation_key(assertion)),
+            from, to, relation, ..
+        } => format!("relation/{from}/{to}/{}", relation.predicate),
         PersonalGraphEvent::RetractRelation { from, to, selector } => {
             format!("relation/{from}/{to}/{selector:?}")
         },
@@ -1723,8 +1712,15 @@ fn hex32(bytes: &[u8; 32]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
-fn relation_key(assertion: &EdgeAssertion) -> String {
-    serde_json::to_string(assertion).expect("edge assertion always serializes")
+/// Whether `selector` names the semantic family or a core semantic predicate:
+/// such retractions must name an assertion id instead.
+fn names_semantic(selector: &RelationSelector) -> bool {
+    match selector {
+        RelationSelector::Family(family) => family == core_pack::iri(ids::FAMILY_SEMANTIC),
+        RelationSelector::Predicate(predicate) => {
+            core_pack::terms().family(predicate) == Some(ids::FAMILY_SEMANTIC)
+        },
+    }
 }
 
 #[cfg(test)]
@@ -1732,10 +1728,9 @@ mod tests {
     use super::*;
     use crate::test_surface::{StatementFold, Surface};
     use identity::{IdentityProvider, InMemoryProvider};
-    use mere::model::{
-        ArrangementSubKind, ContainmentSubKind, EdgeFamily, GraphScope, ImportedSubKind,
-        ProvenanceSubKind, RelationKind, SemanticStatement, SemanticSubKind,
-    };
+    use mere::model::relation::legacy;
+    use mere::model::{GraphScope, SemanticStatement};
+    use mere::profile::intern::TermId;
     use muniment::MemoryBackend;
     use std::sync::Arc;
 
@@ -1743,11 +1738,12 @@ mod tests {
     const A: Uuid = Uuid::from_u128(0xa1);
     const B: Uuid = Uuid::from_u128(0xb2);
 
-    fn relation() -> EdgeAssertion {
-        EdgeAssertion::Semantic {
-            sub_kind: SemanticSubKind::Cites,
-            label: None,
-        }
+    fn relation() -> RelationClaim {
+        RelationClaim::new(core_pack::iri(ids::REL_CITES), None)
+    }
+
+    fn tile_group() -> String {
+        legacy::predicate_iri("Arrangement", "TileGroup")
     }
 
     async fn assertion_fixture() -> (PersonalGraphReplica<MemoryBackend>, String, String) {
@@ -1794,7 +1790,7 @@ mod tests {
             .author(vec![PersonalGraphEvent::AssertRelation {
                 from: A,
                 to: B,
-                assertion: relation(),
+                relation: relation(),
                 assertion_version: None,
                 statement_id: None,
                 asserted_at_ms: None,
@@ -1806,7 +1802,7 @@ mod tests {
             .author(vec![PersonalGraphEvent::AssertRelation {
                 from: A,
                 to: B,
-                assertion: relation(),
+                relation: relation(),
                 assertion_version: None,
                 statement_id: None,
                 asserted_at_ms: None,
@@ -1830,51 +1826,41 @@ mod tests {
     #[tokio::test]
     async fn p6_sync_authors_and_replays_exact_ids_for_every_relation_family() {
         let (mut replica, alice, _) = assertion_fixture().await;
-        let baseline = assertion_statements(&replica.projection_with(&StatementFold).await.unwrap())
-            .into_iter()
-            .map(|statement| (statement.statement_id.clone(), statement))
-            .collect::<std::collections::BTreeMap<_, _>>();
+        let baseline =
+            assertion_statements(&replica.projection_with(&StatementFold).await.unwrap())
+                .into_iter()
+                .map(|statement| (statement.statement_id.clone(), statement))
+                .collect::<std::collections::BTreeMap<_, _>>();
         assert_eq!(
             baseline.len(),
             2,
             "the fixture begins with two signed citations"
         );
-        assert!(baseline.values().all(|statement| {
-            statement.predicate
-                == RelationKind::Semantic(SemanticSubKind::Cites)
-                    .predicate_iri()
-                    .unwrap()
-        }));
+        assert!(
+            baseline
+                .values()
+                .all(|statement| { statement.predicate == core_pack::iri(ids::REL_CITES) })
+        );
         let assertions = [
-            EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Supports,
-                label: Some("supports the source passage".into()),
-            },
-            EdgeAssertion::Containment {
-                sub_kind: ContainmentSubKind::CollectionMember,
-            },
-            EdgeAssertion::Containment {
-                sub_kind: ContainmentSubKind::CollectionMember,
-            },
-            EdgeAssertion::Arrangement {
-                sub_kind: ArrangementSubKind::TileGroup,
-            },
-            EdgeAssertion::Imported {
-                sub_kind: ImportedSubKind::BookmarkFolder,
-            },
-            EdgeAssertion::Provenance {
-                sub_kind: ProvenanceSubKind::ClippedFrom,
-            },
+            RelationClaim::new(
+                core_pack::iri(ids::REL_SUPPORTS),
+                Some("supports the source passage".into()),
+            ),
+            RelationClaim::new(core_pack::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER), None),
+            RelationClaim::new(core_pack::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER), None),
+            RelationClaim::new(tile_group(), None),
+            RelationClaim::new(core_pack::iri(ids::REL_IMPORTED_BOOKMARK_FOLDER), None),
+            RelationClaim::new(core_pack::iri(ids::REL_PROVENANCE_CLIPPED_FROM), None),
         ];
         let operation = replica
             .author(
                 assertions
                     .iter()
                     .cloned()
-                    .map(|assertion| PersonalGraphEvent::AssertRelation {
+                    .map(|relation| PersonalGraphEvent::AssertRelation {
                         from: A,
                         to: B,
-                        assertion,
+                        relation,
                         assertion_version: None,
                         statement_id: None,
                         asserted_at_ms: None,
@@ -1958,8 +1944,7 @@ mod tests {
         let collection_ids: Vec<_> = authored_held
             .iter()
             .filter(|statement| {
-                statement.relation_kind()
-                    == RelationKind::Containment(ContainmentSubKind::CollectionMember)
+                statement.predicate == core_pack::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER)
             })
             .map(|statement| statement.statement_id.clone())
             .collect();
@@ -1989,21 +1974,13 @@ mod tests {
             baseline,
             "withdrawing one new assertion preserves both prior signed citations exactly"
         );
-        assert!(
-            history
-                .graph
-                .find_statement(&sibling_id).unwrap()
-                .is_held()
-        );
+        assert!(history.graph.find_statement(&sibling_id).unwrap().is_held());
         for before in authored_held
             .iter()
             .filter(|claim| claim.statement_id != collection_id)
         {
             assert_eq!(
-                history
-                    .graph
-                    .find_statement(&before.statement_id)
-                    .as_ref(),
+                history.graph.find_statement(&before.statement_id).as_ref(),
                 Some(before),
                 "withdrawing one exact reason preserves every other authored record"
             );
@@ -2052,9 +2029,7 @@ mod tests {
         let create = |id: &str| PersonalGraphEvent::AssertRelation {
             from: A,
             to: B,
-            assertion: EdgeAssertion::Arrangement {
-                sub_kind: ArrangementSubKind::TileGroup,
-            },
+            relation: RelationClaim::new(tile_group(), None),
             assertion_version: Some(1),
             statement_id: Some(id.into()),
             asserted_at_ms: Some(50),
@@ -2080,9 +2055,7 @@ mod tests {
         let bob_event = PersonalGraphEvent::AssertRelation {
             from: A,
             to: B,
-            assertion: EdgeAssertion::Arrangement {
-                sub_kind: ArrangementSubKind::TileGroup,
-            },
+            relation: RelationClaim::new(tile_group(), None),
             assertion_version: Some(1),
             statement_id: Some("urn:assertion:bob-arrangement".into()),
             asserted_at_ms: Some(51),
@@ -2098,9 +2071,7 @@ mod tests {
                 .author(vec![PersonalGraphEvent::RetractRelation {
                     from: A,
                     to: B,
-                    selector: RelationSelector::Arrangement(
-                        ArrangementSubKind::TileGroup,
-                    ),
+                    selector: RelationSelector::predicate(tile_group()),
                 }])
                 .await
                 .is_ok()
@@ -2108,9 +2079,11 @@ mod tests {
         let projection = replica.projection_with(&StatementFold).await.unwrap();
         let graph = &projection.graph;
         let alice_statement = graph
-            .find_statement("urn:assertion:alice-arrangement").unwrap();
+            .find_statement("urn:assertion:alice-arrangement")
+            .unwrap();
         let bob_statement = graph
-            .find_statement("urn:assertion:bob-arrangement").unwrap();
+            .find_statement("urn:assertion:bob-arrangement")
+            .unwrap();
         assert_eq!(
             alice_statement.provenance_iri.as_deref(),
             Some(alice.as_str())
@@ -2150,7 +2123,7 @@ mod tests {
             vec![PersonalGraphEvent::RetractRelation {
                 from: A,
                 to: B,
-                selector: RelationSelector::Semantic(SemanticSubKind::Cites),
+                selector: RelationSelector::predicate(core_pack::iri(ids::REL_CITES)),
             }],
         )
         .await;
@@ -2168,7 +2141,8 @@ mod tests {
             .await
             .unwrap()
             .graph
-            .find_statement(&alice_id).expect("legacy sync retraction retains exact history");
+            .find_statement(&alice_id)
+            .expect("legacy sync retraction retains exact history");
         assert_eq!(
             withdrawn.withdrawn.as_ref().unwrap().at_ms,
             None,
@@ -2208,14 +2182,11 @@ mod tests {
         operation
     }
 
-    fn statement_event(kind: SemanticSubKind, id: &str, time: u64) -> PersonalGraphEvent {
+    fn statement_event(kind: TermId, id: &str, time: u64) -> PersonalGraphEvent {
         PersonalGraphEvent::AssertRelation {
             from: A,
             to: B,
-            assertion: EdgeAssertion::Semantic {
-                sub_kind: kind,
-                label: None,
-            },
+            relation: RelationClaim::new(core_pack::iri(kind), None),
             assertion_version: None,
             statement_id: Some(id.into()),
             asserted_at_ms: Some(time),
@@ -2228,11 +2199,11 @@ mod tests {
         let (mut replica, _, _) = assertion_fixture().await;
         let id = "urn:co-op:assertion:one";
         let operation = replica
-            .author(vec![statement_event(SemanticSubKind::Supports, id, 100)])
+            .author(vec![statement_event(ids::REL_SUPPORTS, id, 100)])
             .await
             .unwrap();
         let record = from_operation(&operation, None).unwrap();
-        let mut newly_authored = statement_event(SemanticSubKind::Supports, id, 100);
+        let mut newly_authored = statement_event(ids::REL_SUPPORTS, id, 100);
         if let PersonalGraphEvent::AssertRelation {
             assertion_version, ..
         } = &mut newly_authored
@@ -2242,7 +2213,7 @@ mod tests {
         assert_eq!(record.events, vec![newly_authored]);
         replica
             .author(vec![statement_event(
-                SemanticSubKind::Supports,
+                ids::REL_SUPPORTS,
                 "urn:co-op:unused",
                 200,
             )])
@@ -2319,7 +2290,8 @@ mod tests {
             .await
             .unwrap()
             .graph
-            .find_statement(id).expect("exact withdrawal remains in retained history");
+            .find_statement(id)
+            .expect("exact withdrawal remains in retained history");
         assert!(withdrawn.withdrawn.as_ref().unwrap().at_ms.is_some());
         assert_eq!(
             after,
@@ -2332,38 +2304,58 @@ mod tests {
 
     #[tokio::test]
     async fn p1_sync_legacy_bytes_and_fallback_handles_are_stable() {
+        // An event signed before L7 named its relation by family and
+        // sub-kind; it reads as the IRI it meant, and new events write the IRI.
+        #[derive(Serialize)]
+        enum OldAssertion {
+            Semantic {
+                sub_kind: &'static str,
+                label: Option<String>,
+            },
+        }
         #[derive(Serialize)]
         #[serde(tag = "type", rename_all = "snake_case")]
         enum OldEvent {
             AssertRelation {
                 from: Uuid,
                 to: Uuid,
-                assertion: EdgeAssertion,
+                assertion: OldAssertion,
             },
         }
         let old = OldEvent::AssertRelation {
             from: A,
             to: B,
-            assertion: relation(),
+            assertion: OldAssertion::Semantic {
+                sub_kind: "Cites",
+                label: None,
+            },
         };
         let legacy = PersonalGraphEvent::AssertRelation {
             from: A,
             to: B,
-            assertion: relation(),
+            relation: relation(),
             assertion_version: None,
             statement_id: None,
             asserted_at_ms: None,
             basis: None,
         };
-        assert_eq!(encode_cbor(&legacy).unwrap(), encode_cbor(&old).unwrap());
+        let read: PersonalGraphEvent = decode_cbor_strict(&encode_cbor(&old).unwrap()[..]).unwrap();
+        assert_eq!(read, legacy);
+        let written = encode_cbor(&legacy).unwrap();
+        assert_ne!(
+            written,
+            encode_cbor(&old).unwrap(),
+            "new writes name the IRI"
+        );
+        assert_eq!(
+            decode_cbor_strict::<PersonalGraphEvent, _>(&written[..]).unwrap(),
+            legacy
+        );
         let (replica, _, _) = assertion_fixture().await;
         let operation = legacy_signed(
             &replica,
             vec![PersonalGraphEvent::AssertRelation {
-                assertion: EdgeAssertion::Semantic {
-                    sub_kind: SemanticSubKind::Supports,
-                    label: None,
-                },
+                relation: RelationClaim::new(core_pack::iri(ids::REL_SUPPORTS), None),
                 from: A,
                 to: B,
                 assertion_version: None,
@@ -2401,7 +2393,7 @@ mod tests {
         let (mut replica, alice, bob) = assertion_fixture().await;
         replica
             .author(vec![statement_event(
-                SemanticSubKind::Supports,
+                ids::REL_SUPPORTS,
                 "urn:co-op:extra",
                 100,
             )])
@@ -2414,14 +2406,15 @@ mod tests {
         let event = PersonalGraphEvent::RetractRelation {
             from: A,
             to: B,
-            selector: RelationSelector::Family(EdgeFamily::Semantic),
+            selector: RelationSelector::family(ids::FAMILY_SEMANTIC),
         };
         assert!(
             replica.author(vec![event.clone()]).await.is_err(),
             "new withdrawals must name an id"
         );
         legacy_signed(&replica, vec![event]).await;
-        let remaining = assertion_statements(&replica.projection_with(&StatementFold).await.unwrap());
+        let remaining =
+            assertion_statements(&replica.projection_with(&StatementFold).await.unwrap());
         assert_eq!(remaining.len(), 1);
         assert_eq!(remaining[0].provenance_iri.as_deref(), Some(bob.as_str()));
         assert!(

@@ -18,7 +18,7 @@ impl SemanticData {
     }
 
     /// Membership ensure: content-dedup on held statements by
-    /// `(recognized_sub_kind, predicate, graph_scope, provenance_iri)` (same key as
+    /// `(predicate, graph_scope, provenance_iri)` (same key as
     /// [`insert_statement`](Self::insert_statement)), updating the deduped
     /// statement's metadata in place; a miss mints a device-safe id and
     /// appends. Always returns the fact handle.
@@ -26,7 +26,6 @@ impl SemanticData {
         let spec = spec.normalized();
         if let Some(existing) = self.statements.iter_mut().find(|statement| {
             statement.is_held()
-                && statement.recognized_sub_kind == spec.recognized_sub_kind
                 && statement.predicate == spec.predicate
                 && statement.graph_scope == spec.graph_scope
                 && statement.provenance_iri == spec.provenance_iri
@@ -52,7 +51,6 @@ impl SemanticData {
         }
         let mut statement = SemanticStatement::new(
             spec.predicate,
-            spec.recognized_sub_kind,
             spec.label,
             spec.graph_scope,
             spec.provenance_iri,
@@ -104,7 +102,6 @@ impl SemanticData {
 
     pub fn insert_statement(
         &mut self,
-        recognized_sub_kind: Option<SemanticSubKind>,
         predicate: String,
         label: Option<String>,
         graph_scope: GraphScope,
@@ -117,7 +114,6 @@ impl SemanticData {
         };
         if let Some(existing) = self.statements.iter_mut().find(|statement| {
             statement.is_held()
-                && statement.recognized_sub_kind == recognized_sub_kind
                 && statement.predicate == predicate
                 && statement.graph_scope == graph_scope
                 && statement.provenance_iri == provenance_iri
@@ -139,7 +135,6 @@ impl SemanticData {
 
         let mut statement = SemanticStatement::new(
             predicate,
-            recognized_sub_kind,
             label,
             graph_scope,
             provenance_iri,
@@ -164,7 +159,6 @@ impl SemanticData {
                 return false;
             }
             if existing.predicate == statement.predicate
-                && existing.recognized_sub_kind == statement.recognized_sub_kind
                 && existing.graph_scope == statement.graph_scope
                 && existing.provenance_iri == statement.provenance_iri
                 && existing.label == statement.label
@@ -175,7 +169,6 @@ impl SemanticData {
                 return false;
             }
             existing.predicate = statement.predicate;
-            existing.recognized_sub_kind = statement.recognized_sub_kind;
             existing.graph_scope = statement.graph_scope;
             existing.provenance_iri = statement.provenance_iri;
             existing.label = statement.label;
@@ -205,11 +198,10 @@ impl SemanticData {
 
     /// Migration/retention compaction primitive. Authored graph retractions
     /// must use Graph's exact-ID withdrawal API instead.
-    pub fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    pub fn remove_statements_with_predicate(&mut self, predicate: &str) -> bool {
         let before = self.statements.len();
-        self.statements.retain(|statement| {
-            !statement.is_held() || statement.recognized_sub_kind != Some(sub_kind)
-        });
+        self.statements
+            .retain(|statement| !statement.is_held() || statement.predicate != predicate);
         if self.statements.len() == before {
             return false;
         }
@@ -217,45 +209,49 @@ impl SemanticData {
         true
     }
 
+    /// Classify by `vocabulary` from now on, re-sorting the records.
+    pub fn set_vocabulary(&mut self, vocabulary: Vocabulary) {
+        self.vocabulary = vocabulary;
+        self.rebuild_compat();
+    }
+
+    fn is_semantic(&self, statement: &SemanticStatement) -> bool {
+        statement.is_semantic_in(self.vocabulary)
+    }
+
     pub fn set_statement_predicate(&mut self, predicate: Option<String>) {
+        let vocabulary = self.vocabulary;
         match predicate {
             Some(predicate) => {
-                if !self.held_statements().any(SemanticStatement::is_semantic) {
+                if !self.held_statements().any(|s| s.is_semantic_in(vocabulary)) {
                     self.statements.push(SemanticStatement::new(
                         predicate,
-                        None,
                         self.label.clone(),
                         GraphScope::Default,
                         None,
                         None,
                     ));
                 } else {
-                    for statement in self
-                        .statements
-                        .iter_mut()
-                        .filter(|statement| statement.is_held() && statement.is_semantic())
-                    {
+                    for statement in self.statements.iter_mut().filter(|statement| {
+                        statement.is_held() && statement.is_semantic_in(vocabulary)
+                    }) {
                         statement.predicate = predicate.clone();
                     }
                 }
             },
             None => {
-                for statement in self
-                    .statements
-                    .iter_mut()
-                    .filter(|s| s.is_held() && s.is_semantic())
-                {
-                    if let Some(sub_kind) = statement.recognized_sub_kind {
-                        statement.predicate = predicate_iri(sub_kind).to_string();
-                    } else {
-                        // This compatibility setter has no authored event
-                        // envelope. Preserve an undated tombstone; callers
-                        // that need record time/actor use Graph's writer API.
-                        statement.withdrawn = Some(AssertionWithdrawal {
-                            at_ms: None,
-                            by: None,
-                        });
-                    }
+                // This compatibility setter has no authored event envelope.
+                // An undeclared predicate gets an undated tombstone; callers
+                // that need record time/actor use Graph's writer API.
+                for statement in self.statements.iter_mut().filter(|s| {
+                    s.is_held()
+                        && s.is_semantic_in(vocabulary)
+                        && vocabulary.terms().id(&s.predicate).is_none()
+                }) {
+                    statement.withdrawn = Some(AssertionWithdrawal {
+                        at_ms: None,
+                        by: None,
+                    });
                 }
             },
         }
@@ -266,22 +262,14 @@ impl SemanticData {
         // Semantic-only access remains a borrowed contiguous slice, even with
         // a large non-semantic withdrawal history. Stable partitioning keeps
         // the original relative order inside both groups.
+        let vocabulary = self.vocabulary;
         self.statements
-            .sort_by_key(|statement| !statement.is_semantic());
-        self.sub_kinds = self
-            .statements
-            .iter()
-            .filter(|statement| statement.is_held() && statement.is_semantic())
-            .filter_map(|statement| match statement.relation_kind() {
-                super::super::RelationKind::Semantic(kind) => Some(kind),
-                _ => None,
-            })
-            .collect();
+            .sort_by_key(|statement| !statement.is_semantic_in(vocabulary));
 
         let mut labels = self
             .statements
             .iter()
-            .filter(|statement| statement.is_held() && statement.is_semantic())
+            .filter(|statement| statement.is_held() && self.is_semantic(statement))
             .filter_map(|statement| statement.label.clone())
             .collect::<Vec<_>>();
         labels.sort();
@@ -293,14 +281,14 @@ impl SemanticData {
                 .statements
                 .iter()
                 .rev()
-                .filter(|statement| statement.is_held() && statement.is_semantic())
+                .filter(|statement| statement.is_held() && self.is_semantic(statement))
                 .find_map(|statement| statement.label.clone()),
         };
 
         let mut predicates = self
             .statements
             .iter()
-            .filter(|statement| statement.is_held() && statement.is_semantic())
+            .filter(|statement| statement.is_held() && self.is_semantic(statement))
             .map(|statement| statement.predicate.clone())
             .collect::<Vec<_>>();
         predicates.sort();

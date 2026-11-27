@@ -4,8 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use super::{EdgeAssertion, PersonalGraphError, PersonalGraphEvent};
-use mere::model::{GraphScope, RelationKind, SemanticStatement};
+use super::{PersonalGraphError, PersonalGraphEvent, RelationClaim};
+use mere::model::{GraphScope, SemanticStatement};
 use std::collections::BTreeMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use stickleback::Reject;
@@ -13,7 +13,7 @@ use uuid::Uuid;
 
 pub(super) fn prepare_event(event: &mut PersonalGraphEvent) {
     if let PersonalGraphEvent::AssertRelation {
-        assertion,
+        relation,
         assertion_version,
         statement_id,
         asserted_at_ms,
@@ -22,7 +22,7 @@ pub(super) fn prepare_event(event: &mut PersonalGraphEvent) {
     {
         assertion_version.get_or_insert(1);
         if statement_id.is_none() {
-            *statement_id = Some(new_statement_id(assertion));
+            *statement_id = Some(new_statement_id(relation));
         }
         asserted_at_ms.get_or_insert_with(now_ms);
     }
@@ -46,34 +46,9 @@ fn now_ms() -> u64 {
         .as_millis() as u64
 }
 
-fn relation_kind(assertion: &EdgeAssertion) -> RelationKind {
-    match assertion {
-        EdgeAssertion::Semantic { sub_kind, .. } => RelationKind::Semantic(*sub_kind),
-        EdgeAssertion::Containment { sub_kind } => RelationKind::Containment(*sub_kind),
-        EdgeAssertion::Arrangement { sub_kind } => RelationKind::Arrangement(*sub_kind),
-        EdgeAssertion::Imported { sub_kind } => RelationKind::Imported(*sub_kind),
-        EdgeAssertion::Provenance { sub_kind } => RelationKind::Provenance(*sub_kind),
-    }
-}
-
-fn assertion_label(assertion: &EdgeAssertion) -> Option<String> {
-    match assertion {
-        EdgeAssertion::Semantic { label, .. } => label.clone(),
-        _ => None,
-    }
-}
-
-fn new_statement_id(assertion: &EdgeAssertion) -> String {
-    let kind = relation_kind(assertion);
-    let predicate = kind
-        .predicate_iri()
-        .expect("assertion relation kinds have canonical predicates");
+fn new_statement_id(relation: &RelationClaim) -> String {
     SemanticStatement::new(
-        predicate.to_owned(),
-        match kind {
-            RelationKind::Semantic(sub_kind) => Some(sub_kind),
-            _ => None,
-        },
+        relation.predicate.clone(),
         None,
         GraphScope::Default,
         None,
@@ -85,7 +60,7 @@ fn new_statement_id(assertion: &EdgeAssertion) -> String {
 pub(super) fn validate_event(event: &PersonalGraphEvent) -> Result<(), Reject> {
     let id = match event {
         PersonalGraphEvent::AssertRelation {
-            assertion,
+            relation,
             assertion_version,
             statement_id,
             asserted_at_ms,
@@ -102,7 +77,7 @@ pub(super) fn validate_event(event: &PersonalGraphEvent) -> Result<(), Reject> {
             let valid = match *assertion_version {
                 Some(1) => paired,
                 Some(_) => false,
-                None if matches!(assertion, EdgeAssertion::Semantic { .. }) => paired || unpaired,
+                None if relation.is_semantic() => paired || unpaired,
                 None => unpaired,
             };
             if !valid {
@@ -130,7 +105,7 @@ pub(super) fn validate_event(event: &PersonalGraphEvent) -> Result<(), Reject> {
 struct AssertionOwner {
     from: Uuid,
     to: Uuid,
-    kind: RelationKind,
+    predicate: String,
     asserter: String,
     operation: [u8; 32],
     asserted_at_ms: Option<u64>,
@@ -155,16 +130,14 @@ impl IdentityIndex {
             PersonalGraphEvent::AssertRelation {
                 from,
                 to,
-                assertion,
+                relation,
                 assertion_version,
                 statement_id,
                 asserted_at_ms,
                 basis,
                 ..
             } => {
-                if assertion_version.is_none()
-                    && statement_id.is_none()
-                    && !matches!(assertion, EdgeAssertion::Semantic { .. })
+                if assertion_version.is_none() && statement_id.is_none() && !relation.is_semantic()
                 {
                     return Ok(());
                 }
@@ -176,18 +149,18 @@ impl IdentityIndex {
                 let identity = AssertionOwner {
                     from: *from,
                     to: *to,
-                    kind: relation_kind(assertion),
+                    predicate: relation.predicate.clone(),
                     asserter: asserter.to_owned(),
                     operation,
                     asserted_at_ms: *asserted_at_ms,
-                    note: basis.note.clone().or_else(|| assertion_label(assertion)),
+                    note: basis.note.clone().or_else(|| relation.label.clone()),
                     method_iri: basis.method.map(|method| method.iri),
                     evidence_key,
                 };
                 if let Some(existing) = self.0.get(id) {
                     if existing.from != identity.from
                         || existing.to != identity.to
-                        || existing.kind != identity.kind
+                        || existing.predicate != identity.predicate
                         || existing.asserter != identity.asserter
                         || existing.asserted_at_ms != identity.asserted_at_ms
                         || existing.note != identity.note
@@ -234,17 +207,16 @@ impl IdentityIndex {
 #[cfg(test)]
 mod lifecycle_tests {
     use super::*;
-    use mere::model::{
-        ArrangementSubKind, AssertionBasis, AssertionMethod, ContainmentSubKind, ImportedSubKind,
-        ProvenanceSubKind, SemanticSubKind,
-    };
+    use mere::model::relation::legacy;
+    use mere::model::{AssertionBasis, AssertionMethod};
+    use mere::profile::core::{self, ids};
     use std::collections::HashSet;
 
-    fn event(assertion: EdgeAssertion, id: &str, version: Option<u8>) -> PersonalGraphEvent {
+    fn event(relation: RelationClaim, id: &str, version: Option<u8>) -> PersonalGraphEvent {
         PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(1),
             to: Uuid::from_u128(2),
-            assertion,
+            relation,
             assertion_version: version,
             statement_id: Some(id.into()),
             asserted_at_ms: Some(10),
@@ -255,28 +227,17 @@ mod lifecycle_tests {
     #[test]
     fn all_relation_families_prepare_as_version_one_exact_records() {
         let assertions = [
-            EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Cites,
-                label: None,
-            },
-            EdgeAssertion::Containment {
-                sub_kind: ContainmentSubKind::CollectionMember,
-            },
-            EdgeAssertion::Arrangement {
-                sub_kind: ArrangementSubKind::TileGroup,
-            },
-            EdgeAssertion::Imported {
-                sub_kind: ImportedSubKind::BookmarkFolder,
-            },
-            EdgeAssertion::Provenance {
-                sub_kind: ProvenanceSubKind::ClippedFrom,
-            },
+            RelationClaim::new(core::iri(ids::REL_CITES), None),
+            RelationClaim::new(core::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER), None),
+            RelationClaim::new(legacy::predicate_iri("Arrangement", "TileGroup"), None),
+            RelationClaim::new(core::iri(ids::REL_IMPORTED_BOOKMARK_FOLDER), None),
+            RelationClaim::new(core::iri(ids::REL_PROVENANCE_CLIPPED_FROM), None),
         ];
         for assertion in assertions {
             let mut event = PersonalGraphEvent::AssertRelation {
                 from: Uuid::from_u128(1),
                 to: Uuid::from_u128(2),
-                assertion,
+                relation: assertion,
                 assertion_version: None,
                 statement_id: None,
                 asserted_at_ms: None,
@@ -301,15 +262,13 @@ mod lifecycle_tests {
 
     #[test]
     fn assertion_event_versions_preserve_legacy_and_reject_unknown_or_partial_v1() {
-        let assertion = EdgeAssertion::Containment {
-            sub_kind: ContainmentSubKind::CollectionMember,
-        };
+        let assertion = RelationClaim::new(core::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER), None);
         assert!(validate_event(&event(assertion.clone(), "exact", Some(1))).is_ok());
         assert!(validate_event(&event(assertion.clone(), "legacy-id", None)).is_err());
         let legacy = PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(1),
             to: Uuid::from_u128(2),
-            assertion: assertion.clone(),
+            relation: assertion.clone(),
             assertion_version: None,
             statement_id: None,
             asserted_at_ms: None,
@@ -320,7 +279,7 @@ mod lifecycle_tests {
         let partial = PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(1),
             to: Uuid::from_u128(2),
-            assertion,
+            relation: assertion,
             assertion_version: Some(1),
             statement_id: Some("id-only".into()),
             asserted_at_ms: None,
@@ -337,10 +296,7 @@ mod lifecycle_tests {
         let assert = PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(1),
             to: Uuid::from_u128(2),
-            assertion: EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Cites,
-                label: None,
-            },
+            relation: RelationClaim::new(core::iri(ids::REL_CITES), None),
             assertion_version: None,
             statement_id: Some(id.into()),
             asserted_at_ms: Some(10),
@@ -423,10 +379,7 @@ mod lifecycle_tests {
         let assertion = PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(1),
             to: Uuid::from_u128(2),
-            assertion: EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Cites,
-                label: None,
-            },
+            relation: RelationClaim::new(core::iri(ids::REL_CITES), None),
             assertion_version: None,
             statement_id: Some(id.into()),
             asserted_at_ms: Some(10),
@@ -462,10 +415,7 @@ mod lifecycle_tests {
         let event = |evidence: Vec<String>, version: &str| PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(1),
             to: Uuid::from_u128(2),
-            assertion: EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Cites,
-                label: None,
-            },
+            relation: RelationClaim::new(core::iri(ids::REL_CITES), None),
             assertion_version: None,
             statement_id: Some("urn:assertion:same-reason".into()),
             asserted_at_ms: Some(10),
@@ -511,9 +461,7 @@ mod lifecycle_tests {
     fn exact_identity_checks_kind_pair_author_and_reason_for_every_family() {
         let author = "urn:agent:alice";
         let known = HashSet::new();
-        let assertion = EdgeAssertion::Containment {
-            sub_kind: ContainmentSubKind::CollectionMember,
-        };
+        let assertion = RelationClaim::new(core::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER), None);
         let mut index = IdentityIndex::default();
         index
             .observe(
@@ -532,9 +480,7 @@ mod lifecycle_tests {
             index
                 .observe(
                     &event(
-                        EdgeAssertion::Arrangement {
-                            sub_kind: ArrangementSubKind::TileGroup,
-                        },
+                        RelationClaim::new(legacy::predicate_iri("Arrangement", "TileGroup"), None),
                         "same-id",
                         Some(1),
                     ),
@@ -549,7 +495,7 @@ mod lifecycle_tests {
         let retargeted = PersonalGraphEvent::AssertRelation {
             from: Uuid::from_u128(9),
             to: Uuid::from_u128(2),
-            assertion: assertion.clone(),
+            relation: assertion.clone(),
             assertion_version: Some(1),
             statement_id: Some("same-id".into()),
             asserted_at_ms: Some(10),
@@ -576,9 +522,7 @@ mod lifecycle_tests {
             index
                 .observe(
                     &event(
-                        EdgeAssertion::Containment {
-                            sub_kind: ContainmentSubKind::CollectionMember,
-                        },
+                        RelationClaim::new(core::iri(ids::REL_CONTAINMENT_COLLECTION_MEMBER), None),
                         "same-id",
                         Some(1),
                     ),

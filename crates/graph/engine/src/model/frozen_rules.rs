@@ -41,6 +41,46 @@ pub fn validate_retained_keys(
     Ok(())
 }
 
+/// The fields an edge written before L7 also carries: read, never written
+/// (declared-lens D17). A stored value is accepted as it stands.
+const LEGACY_EDGE_FIELDS: [&str; 7] = [
+    "families",
+    "semantic",
+    "traversal",
+    "containment",
+    "arrangement",
+    "imported",
+    "provenance",
+];
+
+/// Widen the re-serialized `statements` edges to every key a stored payload
+/// may carry, so a payload written by an older engine still validates.
+pub fn known_edge_keys(raw: &serde_json::Value, known: &mut serde_json::Value) {
+    let raw_edges = raw["statements"].as_array();
+    for (index, edge) in known["statements"]
+        .as_array_mut()
+        .expect("serialized edge array")
+        .iter_mut()
+        .enumerate()
+    {
+        let stored = raw_edges.and_then(|edges| edges.get(index));
+        if let Some(object) = edge.as_object_mut() {
+            for field in LEGACY_EDGE_FIELDS {
+                let value = stored.and_then(|s| s.get(field)).cloned();
+                object
+                    .entry(field)
+                    .or_insert(value.unwrap_or(serde_json::Value::Null));
+            }
+        }
+        if let Some(statements) = edge
+            .get_mut("assertions")
+            .and_then(serde_json::Value::as_array_mut)
+        {
+            normalize_statement_defaults(statements);
+        }
+    }
+}
+
 pub fn normalize_statement_defaults(statements: &mut [serde_json::Value]) {
     for statement in statements {
         let object = statement
@@ -79,24 +119,7 @@ pub fn selection_from_record(
     let mut known = serde_json::to_value(&selection).map_err(|e| e.to_string())?;
     // Human-readable statement serialization omits default metadata. Their
     // known fields are still accepted explicitly, including null/default values.
-    for edge in known["statements"]
-        .as_array_mut()
-        .expect("serialized edge array")
-    {
-        if let Some(statements) = edge
-            .get_mut("assertions")
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            normalize_statement_defaults(statements);
-        }
-        if let Some(statements) = edge
-            .get_mut("semantic")
-            .and_then(|semantic| semantic.get_mut("statements"))
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            normalize_statement_defaults(statements);
-        }
-    }
+    known_edge_keys(&raw, &mut known);
     validate_retained_keys(&raw, &known)?;
     if selection.version() != 1 {
         return Err("unsupported frozen selection version".into());
@@ -172,24 +195,7 @@ pub fn validate_frozen_link_record(
     let link: FrozenLink = serde_json::from_value(raw.clone())
         .map_err(|error| format!("invalid frozen link: {error}"))?;
     let mut known = serde_json::to_value(&link).map_err(|error| error.to_string())?;
-    for edge in known["statements"]
-        .as_array_mut()
-        .expect("serialized edge array")
-    {
-        if let Some(statements) = edge
-            .get_mut("assertions")
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            normalize_statement_defaults(statements);
-        }
-        if let Some(statements) = edge
-            .get_mut("semantic")
-            .and_then(|semantic| semantic.get_mut("statements"))
-            .and_then(serde_json::Value::as_array_mut)
-        {
-            normalize_statement_defaults(statements);
-        }
-    }
+    known_edge_keys(&raw, &mut known);
     validate_retained_keys(&raw, &known)?;
     if link.version() != 1 {
         return Err("unsupported frozen link version".into());

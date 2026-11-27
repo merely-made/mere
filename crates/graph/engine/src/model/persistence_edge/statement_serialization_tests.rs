@@ -10,7 +10,6 @@ fn cases() -> Vec<PersistedSemanticStatement> {
     let plain = PersistedSemanticStatement {
         statement_id: "held\nassertion".into(),
         predicate: "urn:predicate:held".into(),
-        recognized_sub_kind: None,
         label: None,
         graph_scope: GraphScope::Default,
         provenance_iri: Some("https://author.test/".into()),
@@ -25,7 +24,6 @@ fn cases() -> Vec<PersistedSemanticStatement> {
     marker.provenance_iri = Some(crate::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
     let mut rich = plain.clone();
     rich.statement_id = String::new();
-    rich.recognized_sub_kind = Some(PersistedSemanticSubKind::Cites);
     rich.label = Some(String::new());
     rich.graph_scope = GraphScope::Custom("urn:graph:held".into());
     rich.provenance_iri = Some(String::new());
@@ -62,7 +60,7 @@ fn statement_json_omits_absent_metadata_and_preserves_explicit_values() {
         crate::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
     );
     let rich = serde_json::to_value(&cases[3]).unwrap();
-    assert_eq!(rich.as_object().unwrap().len(), 9);
+    assert_eq!(rich.as_object().unwrap().len(), 8);
     assert_eq!(rich["statement_id"], "");
     assert_eq!(rich["label"], "");
     assert_eq!(rich["provenance_iri"], "");
@@ -99,7 +97,7 @@ fn legacy_postcard_sequence_is_not_a_supported_store_format() {
     struct Legacy {
         statement_id: String,
         predicate: String,
-        recognized_sub_kind: Option<PersistedSemanticSubKind>,
+        recognized_sub_kind: Option<String>,
         label: Option<String>,
         graph_scope: GraphScope,
         provenance_iri: Option<String>,
@@ -142,4 +140,34 @@ fn legacy_time_falls_back_only_when_first_time_is_absent() {
     let encoded = serde_json::to_value(decoded).unwrap();
     assert!(encoded.get("first_asserted_ms").is_some());
     assert!(encoded["first_asserted_ms"].is_null());
+}
+
+#[test]
+fn a_record_written_before_l7_reads_without_its_sub_kind_name() {
+    let stored = r#"{"statement_id":"s","predicate":"https://mere.computer/ns/rel#cites",
+        "recognized_sub_kind":"Cites","provenance_iri":"urn:a"}"#;
+    let record: PersistedSemanticStatement = serde_json::from_str(stored).unwrap();
+    assert_eq!(record.predicate, "https://mere.computer/ns/rel#cites");
+    let written = serde_json::to_string(&record).unwrap();
+    assert!(!written.contains("recognized_sub_kind"), "{written}");
+}
+
+#[test]
+fn an_edge_writes_its_records_and_never_a_sidecar() {
+    let stored = r#"{"from_node_id":"a","to_node_id":"b","families":["Containment"],
+        "containment":{"sub_kinds":["UserFolder"]},"traversal":null}"#;
+    let legacy: PersistedEdge = serde_json::from_str(stored).unwrap();
+    assert!(legacy.has_legacy_assertion_data());
+    assert_eq!(legacy.legacy_sub_kinds()[0].1, ["UserFolder".to_string()]);
+    let edge = PersistedEdge::of("a".into(), "b".into(), cases());
+    let json = serde_json::to_value(&edge).unwrap();
+    let mut keys: Vec<_> = json.as_object().unwrap().keys().cloned().collect();
+    keys.sort();
+    assert_eq!(keys, ["assertions", "from_node_id", "to_node_id"]);
+    assert_eq!(serde_json::from_value::<PersistedEdge>(json).unwrap(), edge);
+    let bytes = postcard::to_allocvec(&legacy).unwrap();
+    assert_eq!(
+        postcard::from_bytes::<PersistedEdge>(&bytes).unwrap(),
+        legacy
+    );
 }

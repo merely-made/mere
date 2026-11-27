@@ -12,7 +12,7 @@ use eidetic::pack::{Origin, SignerReview, TrustPolicy, compile_authored, sign_ca
 use eidetic::schema::TrustEnvelope;
 use identity::{Ed25519Keypair, Ed25519PublicKey};
 
-use crate::model::{GraphStratum, RelationKind};
+use crate::model::GraphStratum;
 use crate::profile::load::{Limits, LoadRefusal, Profile, load};
 use crate::profile::resolve::{Offered, PackRef, PackSource};
 
@@ -196,15 +196,8 @@ pub(crate) fn workspace_profile() -> Profile {
     load_with(&workspace_lens(), &workspace_source()).expect("the workspace fixture loads")
 }
 
-/// The stratum the pack gives `kind`: its predicate's row, Traversal's minted
-/// row, or the core default for an open predicate.
-pub(crate) fn pack_stratum(profile: &Profile, kind: RelationKind) -> GraphStratum {
-    let iri = match kind {
-        RelationKind::Traversal => TRAVERSAL_IRI,
-        RelationKind::OpenPredicate => "https://foreign.test/predicate",
-        other => other
-            .predicate_iri()
-            .expect("a sub-kind has a predicate IRI"),
-    };
+/// The stratum the pack gives `iri`: its row's, or the core default for an
+/// IRI no pack declares.
+pub(crate) fn pack_stratum(profile: &Profile, iri: &str) -> GraphStratum {
     profile.terms.stratum(iri)
 }

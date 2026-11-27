@@ -13,8 +13,7 @@ impl serde::Serialize for PersistedSemanticStatement {
         let human = serializer.is_human_readable();
         let scoped = self.graph_scope != GraphScope::Default;
         let fields = if human {
-            2 + usize::from(self.recognized_sub_kind.is_some())
-                + usize::from(self.label.is_some())
+            2 + usize::from(self.label.is_some())
                 + usize::from(scoped)
                 + usize::from(self.provenance_iri.is_some())
                 + usize::from(self.asserted_at_ms.is_some())
@@ -22,15 +21,12 @@ impl serde::Serialize for PersistedSemanticStatement {
                 + usize::from(self.withdrawn.is_some())
                 + usize::from(!self.basis.is_empty() || self.label.is_some())
         } else {
-            10
+            9
         };
         // Positional serializers receive every field in the current shape.
         let mut state = serializer.serialize_struct("PersistedSemanticStatement", fields)?;
         state.serialize_field("statement_id", &self.statement_id)?;
         state.serialize_field("predicate", &self.predicate)?;
-        if !human || self.recognized_sub_kind.is_some() {
-            state.serialize_field("recognized_sub_kind", &self.recognized_sub_kind)?;
-        }
         if !human || self.label.is_some() {
             state.serialize_field("label", &self.label)?;
         }
@@ -51,6 +47,31 @@ impl serde::Serialize for PersistedSemanticStatement {
         }
         if !human || !self.basis.is_empty() || self.label.is_some() {
             state.serialize_field("basis", &self.basis)?;
+        }
+        state.end()
+    }
+}
+
+impl serde::Serialize for PersistedEdge {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+
+        // JSON writes the pair and its records; the legacy sidecars are read
+        // only (D17). A positional format keeps each field in its place.
+        let human = serializer.is_human_readable();
+        let records = !human || self.assertions.is_some();
+        let fields = if human { 2 + usize::from(records) } else { 7 };
+        let mut state = serializer.serialize_struct("PersistedEdge", fields)?;
+        state.serialize_field("from_node_id", &self.from_node_id)?;
+        state.serialize_field("to_node_id", &self.to_node_id)?;
+        if !human {
+            state.serialize_field("semantic", &self.semantic)?;
+            state.serialize_field("containment", &self.containment)?;
+            state.serialize_field("imported", &self.imported)?;
+            state.serialize_field("provenance", &self.provenance)?;
+        }
+        if records {
+            state.serialize_field("assertions", &self.assertions)?;
         }
         state.end()
     }

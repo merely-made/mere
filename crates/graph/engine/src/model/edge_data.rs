@@ -4,131 +4,16 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Per-family edge runtime data structs and semantic IRI mapping.
-//! Extracted from `edge_taxonomy.rs` per the 600-LOC ceiling.
-
-use std::collections::BTreeSet;
+//! The assertion records an edge carries: one list per directed pair, every
+//! family alike, each record naming its predicate by IRI (declared-lens D20).
 
 use rkyv::{Archive, Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::model::types::{
     AssertionBasis, AssertionWithdrawal, GraphScope, mint_local_statement_id,
 };
 
-use super::edge_taxonomy::{
-    ArrangementSubKind, ContainmentSubKind, ImportedSubKind, NavigationTrigger, ProvenanceSubKind,
-    RelationDurability, SemanticSubKind,
-};
-
-/// A temporal traversal event recorded on an edge.
-///
-/// `id` is minted when the event is recorded and exported as `urn:uuid:<id>`
-/// (engine-split D195); `recorded_by` is the asserter IRI of whoever recorded
-/// it, the attribution assertions carry (D198); `browsing_session` names the
-/// idle-gap browsing session it belongs to (D200, D202), apart from the launch
-/// number a graph stamps on visited nodes.
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-pub struct Traversal {
-    pub timestamp_ms: u64,
-    pub trigger: NavigationTrigger,
-    // Field order matches `PersistedTraversalRecord`, whose JSON shape a
-    // borrowed serializer reproduces from this type.
-    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
-    pub id: Uuid,
-    pub recorded_by: String,
-    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
-    pub browsing_session: Uuid,
-}
-
-impl Traversal {
-    /// A new event recorded now, with a fresh id.
-    pub fn now(
-        trigger: NavigationTrigger,
-        recorded_by: impl Into<String>,
-        browsing_session: Uuid,
-    ) -> Self {
-        Self::at(
-            crate::model::clock::unix_epoch_millis(),
-            trigger,
-            recorded_by,
-            browsing_session,
-        )
-    }
-
-    /// A new event recorded at a supplied time (importers), with a fresh id.
-    pub fn at(
-        timestamp_ms: u64,
-        trigger: NavigationTrigger,
-        recorded_by: impl Into<String>,
-        browsing_session: Uuid,
-    ) -> Self {
-        Self {
-            timestamp_ms,
-            trigger,
-            id: Uuid::new_v4(),
-            recorded_by: recorded_by.into(),
-            browsing_session,
-        }
-    }
-}
-
-/// Durable traversal aggregates retained even when rolling-window records are evicted.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-pub struct EdgeMetrics {
-    pub total_navigations: u64,
-    pub forward_navigations: u64,
-    pub backward_navigations: u64,
-    pub last_navigated_at: Option<u64>,
-}
-
-impl EdgeMetrics {
-    fn new() -> Self {
-        Self {
-            total_navigations: 0,
-            forward_navigations: 0,
-            backward_navigations: 0,
-            last_navigated_at: None,
-        }
-    }
-
-    fn record(&mut self, traversal: &Traversal) {
-        self.total_navigations = self.total_navigations.saturating_add(1);
-        if traversal.trigger.contributes_to_forward_count() {
-            self.forward_navigations = self.forward_navigations.saturating_add(1);
-        } else {
-            self.backward_navigations = self.backward_navigations.saturating_add(1);
-        }
-        self.last_navigated_at = Some(traversal.timestamp_ms);
-    }
-}
-
-impl Default for EdgeMetrics {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+use super::relation::Vocabulary;
 
 /// Attribution for stored assertions whose original asserter is unknown.
 pub const UNKNOWN_LEGACY_ASSERTER_IRI: &str = "https://mere.computer/ns/agent#unknown-legacy";
@@ -137,7 +22,6 @@ pub const UNKNOWN_LEGACY_ASSERTER_IRI: &str = "https://mere.computer/ns/agent#un
 pub struct SemanticStatement {
     pub statement_id: String,
     pub predicate: String,
-    pub recognized_sub_kind: Option<SemanticSubKind>,
     pub label: Option<String>,
     /// Why this assertion exists. `label` remains a compatibility projection.
     pub basis: AssertionBasis,
@@ -159,27 +43,24 @@ pub type RelationAssertionSpec = SemanticStatementSpec;
 pub type AssertionData = SemanticData;
 
 impl SemanticStatement {
-    /// Classify the assertion by its canonical predicate. The old semantic
-    /// discriminant remains a compatibility input for existing records.
-    pub fn relation_kind(&self) -> super::RelationKind {
-        super::RelationKind::from_predicate_iri(&self.predicate)
-            .or_else(|| self.recognized_sub_kind.map(super::RelationKind::Semantic))
-            .unwrap_or(super::RelationKind::OpenPredicate)
+    /// Whether the record's predicate counts as semantic in `vocabulary`.
+    pub fn is_semantic_in(&self, vocabulary: Vocabulary) -> bool {
+        vocabulary.is_semantic(&self.predicate)
     }
 
+    /// Whether it does in the core profile.
     pub fn is_semantic(&self) -> bool {
-        self.relation_kind().family() == super::EdgeFamily::Semantic
+        self.is_semantic_in(Vocabulary::core())
     }
 
     pub fn is_held(&self) -> bool {
         self.withdrawn.is_none()
     }
 
-    /// Whether both records are one claim under a carried handle: predicate, sub-kind,
+    /// Whether both records are one claim under a carried handle: predicate,
     /// scope, asserter and basis reason. Labels, times and method version may differ.
     pub fn same_claim_as(&self, other: &Self) -> bool {
         self.predicate == other.predicate
-            && self.recognized_sub_kind == other.recognized_sub_kind
             && self.graph_scope == other.graph_scope
             && self.provenance_iri == other.provenance_iri
             && self.basis.same_reason_as(&other.basis)
@@ -203,7 +84,6 @@ impl SemanticStatement {
 
     pub fn new(
         predicate: String,
-        recognized_sub_kind: Option<SemanticSubKind>,
         label: Option<String>,
         graph_scope: GraphScope,
         provenance_iri: Option<String>,
@@ -212,7 +92,6 @@ impl SemanticStatement {
         Self {
             statement_id: mint_local_statement_id(),
             predicate,
-            recognized_sub_kind,
             label: label.clone(),
             basis: AssertionBasis {
                 note: label.clone(),
@@ -268,6 +147,8 @@ impl<'de> serde::Deserialize<'de> for PresentOptionU64 {
 }
 
 impl<'de> serde::Deserialize<'de> for SemanticStatement {
+    /// A record written before L7 also names `recognized_sub_kind`; the
+    /// predicate IRI already says it, so the name is not read (D17).
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -276,8 +157,6 @@ impl<'de> serde::Deserialize<'de> for SemanticStatement {
         struct Fields {
             statement_id: String,
             predicate: String,
-            #[serde(default)]
-            recognized_sub_kind: Option<SemanticSubKind>,
             #[serde(default)]
             label: Option<String>,
             #[serde(default)]
@@ -303,7 +182,6 @@ impl<'de> serde::Deserialize<'de> for SemanticStatement {
         Ok(Self {
             statement_id: fields.statement_id,
             predicate: fields.predicate,
-            recognized_sub_kind: fields.recognized_sub_kind,
             label,
             basis,
             graph_scope: fields.graph_scope,
@@ -328,22 +206,17 @@ impl<'de> serde::Deserialize<'de> for SemanticStatement {
     Default,
 )]
 pub struct SemanticData {
-    /// Compatibility aggregate: kept during the bucket migration so existing
-    /// readers can keep asking the pair-local edge what semantic kinds it
-    /// carries. The statement list below is the durable truth.
-    pub sub_kinds: BTreeSet<SemanticSubKind>,
     /// Compatibility aggregate over the statement labels.
     pub label: Option<String>,
-    /// Open predicate IRI (the statements-over-schema substrate, linked-data
-    /// plan Phase 0). `None` when the edge's meaning is fully carried by
-    /// `sub_kinds`; a canonical IRI ([`predicate_iri`]) for a recognized
-    /// predicate, or a raw IRI for an unrecognized one. `sub_kinds` stays
-    /// authoritative for behaviour; `predicate` carries identity + round-trip.
-    /// During the statement-bucket migration this is a compatibility view over
-    /// the statement predicates, not the durable truth.
+    /// The one predicate the held semantic statements share, if they share
+    /// one: a compatibility view over the statements, not the durable truth.
     pub predicate: Option<String>,
     /// The one durable assertion list carried between a directed pair.
     pub statements: Vec<SemanticStatement>,
+    /// The table the records are classified by; never stored.
+    #[serde(skip)]
+    #[rkyv(with = rkyv::with::Skip)]
+    pub vocabulary: Vocabulary,
 }
 
 /// A statement to assert: everything a [`SemanticStatement`] carries except
@@ -354,7 +227,6 @@ pub struct SemanticData {
 #[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct SemanticStatementSpec {
     pub predicate: String,
-    pub recognized_sub_kind: Option<SemanticSubKind>,
     pub label: Option<String>,
     /// Optional reason metadata; on admission `basis.note` is authoritative.
     pub basis: AssertionBasis,
@@ -382,191 +254,6 @@ pub struct StatementAssert {
     /// Whether anything changed (a new statement, or metadata updated on the
     /// deduped one). `false` = the exact statement already existed.
     pub changed: bool,
-}
-
-/// Base IRI for Mere's canonical relation vocabulary. Recognized
-/// [`SemanticSubKind`]s map to `{REL_VOCAB}{slug}` (the "small Mere vocabulary
-/// of canonical IRIs"); the JSON-LD export layer maps these onto standard
-/// vocabularies (CiTO, schema.org, …) through its `@context`. Provisional base.
-pub const REL_VOCAB: &str = "https://mere.computer/ns/rel#";
-
-/// The canonical relation IRI for a recognized semantic sub-kind. Inverse of
-/// [`sub_kind_from_iri`].
-pub fn predicate_iri(sub_kind: SemanticSubKind) -> &'static str {
-    match sub_kind {
-        SemanticSubKind::Hyperlink => "https://mere.computer/ns/rel#hyperlink",
-        SemanticSubKind::UserGrouped => "https://mere.computer/ns/rel#user-grouped",
-        SemanticSubKind::AgentDerived => "https://mere.computer/ns/rel#agent-derived",
-        SemanticSubKind::Cites => "https://mere.computer/ns/rel#cites",
-        SemanticSubKind::Quotes => "https://mere.computer/ns/rel#quotes",
-        SemanticSubKind::Summarizes => "https://mere.computer/ns/rel#summarizes",
-        SemanticSubKind::Elaborates => "https://mere.computer/ns/rel#elaborates",
-        SemanticSubKind::ExampleOf => "https://mere.computer/ns/rel#example-of",
-        SemanticSubKind::Supports => "https://mere.computer/ns/rel#supports",
-        SemanticSubKind::Contradicts => "https://mere.computer/ns/rel#contradicts",
-        SemanticSubKind::Questions => "https://mere.computer/ns/rel#questions",
-        SemanticSubKind::SameEntityAs => "https://mere.computer/ns/rel#same-entity-as",
-        SemanticSubKind::DuplicateOf => "https://mere.computer/ns/rel#duplicate-of",
-        SemanticSubKind::CanonicalMirrorOf => "https://mere.computer/ns/rel#canonical-mirror-of",
-        SemanticSubKind::DependsOn => "https://mere.computer/ns/rel#depends-on",
-        SemanticSubKind::Blocks => "https://mere.computer/ns/rel#blocks",
-        SemanticSubKind::NextStep => "https://mere.computer/ns/rel#next-step",
-    }
-}
-
-/// The recognized semantic sub-kind for a canonical relation IRI, if any.
-/// Inverse of [`predicate_iri`]; `None` for an unrecognized (raw) IRI, which is
-/// stored as an open predicate without a sub-kind.
-pub fn sub_kind_from_iri(iri: &str) -> Option<SemanticSubKind> {
-    use strum::IntoEnumIterator;
-    SemanticSubKind::iter().find(|&sub_kind| predicate_iri(sub_kind) == iri)
-}
-
-/// Every recognized semantic sub-kind, in declaration order. The kernel owns the
-/// enumeration of its recognized relation vocabulary; downstream projection code
-/// (e.g. linked-data's standard-vocabulary alignment) maps over it without
-/// re-deriving the list or pulling in `strum`.
-pub fn all_semantic_sub_kinds() -> impl Iterator<Item = SemanticSubKind> {
-    use strum::IntoEnumIterator;
-    SemanticSubKind::iter()
-}
-
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-)]
-pub struct TraversalData {
-    pub traversals: Vec<Traversal>,
-    pub metrics: EdgeMetrics,
-}
-
-impl TraversalData {
-    pub fn push(&mut self, traversal: Traversal) {
-        self.metrics.record(&traversal);
-        self.traversals.push(traversal);
-    }
-}
-
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-)]
-pub struct ArrangementData {
-    pub sub_kinds: BTreeSet<ArrangementSubKind>,
-}
-
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-)]
-pub struct ContainmentData {
-    pub sub_kinds: BTreeSet<ContainmentSubKind>,
-}
-
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-)]
-pub struct ImportedData {
-    pub sub_kinds: BTreeSet<ImportedSubKind>,
-}
-
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-)]
-pub struct ProvenanceData {
-    pub sub_kinds: BTreeSet<ProvenanceSubKind>,
-}
-
-impl ContainmentData {
-    pub fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
-        self.sub_kinds.insert(sub_kind)
-    }
-
-    pub fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
-        self.sub_kinds.remove(&sub_kind)
-    }
-
-    pub fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
-        self.sub_kinds.contains(&sub_kind)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.sub_kinds.is_empty()
-    }
-}
-
-impl ArrangementData {
-    pub fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
-        self.sub_kinds.insert(sub_kind)
-    }
-
-    pub fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
-        self.sub_kinds.remove(&sub_kind)
-    }
-
-    pub fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
-        self.sub_kinds.contains(&sub_kind)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.sub_kinds.is_empty()
-    }
-
-    pub fn has_durable_relation(&self) -> bool {
-        self.sub_kinds
-            .iter()
-            .copied()
-            .any(|sub_kind| sub_kind.durability() == RelationDurability::Durable)
-    }
-
-    pub fn has_session_relation(&self) -> bool {
-        self.sub_kinds
-            .iter()
-            .copied()
-            .any(|sub_kind| sub_kind.durability() == RelationDurability::Session)
-    }
 }
 
 #[cfg(test)]

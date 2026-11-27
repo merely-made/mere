@@ -9,8 +9,8 @@
 //! graph writes (engine split D259).
 
 use mere::model::{
-    AssertionBasis, AssertionWithdrawal, EdgeAssertion, EdgePayload, GraphScope, JournalDelta,
-    RelationSelector, SemanticStatement, selector_matches_kind,
+    AssertionBasis, AssertionWithdrawal, EdgePayload, GraphScope, JournalDelta, RelationSelector,
+    SemanticStatement, Vocabulary,
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -80,19 +80,25 @@ impl Surface {
         Ok(())
     }
 
-    /// The legacy membership ensure: `assertion` held once per family kind,
-    /// named by `asserter`, with no recorded time.
+    /// The legacy membership ensure: `predicate` held once (a semantic one
+    /// with `label`), named by `asserter`, with no recorded time.
     pub fn assert_relation(
         &mut self,
         from: Uuid,
         to: Uuid,
-        assertion: EdgeAssertion,
+        predicate: &str,
+        label: Option<String>,
         asserter: &str,
     ) -> bool {
-        let mut assertion = Some(assertion);
+        let mut label = Some(label);
         self.rewrite(from, to, |payload| {
-            assertion.take().is_some_and(|assertion| {
-                payload.assert_relation_with_context(assertion, Some(asserter.to_owned()), None)
+            label.take().is_some_and(|label| {
+                payload.assert_relation_with_context(
+                    predicate,
+                    label,
+                    Some(asserter.to_owned()),
+                    None,
+                )
             })
         })
     }
@@ -128,7 +134,7 @@ impl Surface {
         &mut self,
         from: Uuid,
         to: Uuid,
-        selector: RelationSelector,
+        selector: &RelationSelector,
         asserter: &str,
     ) {
         let ids: Vec<String> = self
@@ -136,7 +142,7 @@ impl Surface {
             .into_iter()
             .filter(|statement| {
                 statement.provenance_iri.as_deref() == Some(asserter)
-                    && selector_matches_kind(selector, statement.relation_kind())
+                    && selector.matches(&statement.predicate, Vocabulary::core())
             })
             .map(|statement| statement.statement_id)
             .collect();

@@ -10,44 +10,21 @@
 
 use std::collections::BTreeSet;
 
-use strum::IntoEnumIterator;
-
 use super::support::*;
-use crate::model::{
-    ArrangementSubKind, ContainmentSubKind, EdgeFamily, ImportedSubKind, ProvenanceSubKind,
-    RelationKind, SemanticSubKind, TAGGED_WITH_IRI,
-};
+use crate::model::TAGGED_WITH_IRI;
+use crate::model::placement_table::PLACEMENT;
+use crate::model::relation::legacy;
 use crate::profile::core::{CORE_PACK_ID, ids};
 use crate::profile::resolve::PackRef;
 
-fn sub_kinds() -> Vec<RelationKind> {
-    SemanticSubKind::iter()
-        .map(RelationKind::Semantic)
-        .chain(ContainmentSubKind::iter().map(RelationKind::Containment))
-        .chain(ImportedSubKind::iter().map(RelationKind::Imported))
-        .chain(ProvenanceSubKind::iter().map(RelationKind::Provenance))
-        .chain(ArrangementSubKind::iter().map(RelationKind::Arrangement))
-        .collect()
-}
-
-fn family_iri(family: EdgeFamily) -> String {
-    format!(
-        "https://mere.computer/ns/family#{}",
-        format!("{family:?}").to_lowercase()
-    )
-}
-
 #[test]
 fn engine_ids_are_in_the_core_pack_and_workspace_ids_in_the_stand_in() {
-    let (core_set, workspace_set): (Vec<_>, Vec<_>) = sub_kinds()
-        .into_iter()
-        .partition(|k| !matches!(k, RelationKind::Arrangement(_)));
-    let mut core_iris: Vec<&str> = core_set.iter().filter_map(|k| k.predicate_iri()).collect();
-    core_iris.push(TAGGED_WITH_IRI);
-    let mut workspace_iris: Vec<&str> = workspace_set
+    let (core_set, workspace_set): (Vec<_>, Vec<_>) = PLACEMENT
         .iter()
-        .filter_map(|k| k.predicate_iri())
-        .collect();
+        .partition(|(family, ..)| *family != "Arrangement");
+    let mut core_iris: Vec<&str> = core_set.iter().map(|(_, _, iri, _)| *iri).collect();
+    core_iris.push(TAGGED_WITH_IRI);
+    let mut workspace_iris: Vec<&str> = workspace_set.iter().map(|(_, _, iri, _)| *iri).collect();
     workspace_iris.push(TRAVERSAL_IRI);
     assert_eq!((core_iris.len(), workspace_iris.len()), (42, 4));
 
@@ -74,13 +51,20 @@ fn engine_ids_are_in_the_core_pack_and_workspace_ids_in_the_stand_in() {
         );
     }
     // The core pack holds nothing else but the four family terms.
-    let families: BTreeSet<String> = core_set.iter().map(|k| family_iri(k.family())).collect();
+    let families: BTreeSet<String> = core_set
+        .iter()
+        .map(|(family, ..)| legacy::family_iri(family))
+        .collect();
     assert_eq!(families.len(), 4);
     assert_eq!(core.terms.len(), core_iris.len() + families.len());
-    for kind in &core_set {
-        let iri = kind.predicate_iri().unwrap();
-        let family = core.terms.entry(iri).unwrap().family.clone();
-        assert_eq!(family, Some(family_iri(kind.family())), "{iri}");
+    for (family, _, iri, _) in &core_set {
+        let entry = core.terms.entry(iri).unwrap();
+        assert_eq!(entry.family, Some(legacy::family_iri(family)), "{iri}");
+        assert_eq!(
+            entry.family_id,
+            core.terms.id(&legacy::family_iri(family)),
+            "{iri}'s family id"
+        );
     }
     for family in &families {
         assert_eq!(
@@ -107,4 +91,12 @@ fn generated_constants_are_the_interned_ids() {
     // Known answer from Python's uuid.uuid5(NAMESPACE_URL, ...) (RFC 9562 §5.5).
     assert_eq!(uuid.to_string(), "f184840f-9510-5436-9d46-d021cf2525af");
     assert_eq!(uuid.get_version_num(), 5);
+    assert_eq!(core.terms.id_of_uuid(&uuid), Some(ids::REL_CITES));
+    // The instrument's own control: RFC 9562 Appendix A.4, in the DNS namespace.
+    assert_eq!(
+        uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_DNS, b"www.example.com").to_string(),
+        "2ed6657d-e927-568b-95e1-2665a8aea6a2"
+    );
+    // The process's core profile is the same table.
+    assert_eq!(crate::profile::core::terms(), &core.terms);
 }

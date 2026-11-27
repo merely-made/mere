@@ -9,13 +9,10 @@
 //! resources they show, and facets and scenes ride as surface facets. The
 //! protocol, its identities and its bookkeeping stay pandect's.
 
-use mere::model::{
-    AssertionBasis, EdgeAssertion, EdgeFamily, GraphScope, JournalDelta, RelationKind,
-    RelationSelector, SemanticStatement,
-};
+use mere::model::{AssertionBasis, GraphScope, JournalDelta, SemanticStatement};
 use mere::session::SessionGraph;
 use pandect::access::{ACCESS_HISTORY_FACET, AccessHistory};
-use pandect::personal_sync::{PersonalFold, PersonalGraphError, PersonalGraphEvent};
+use pandect::personal_sync::{PersonalFold, PersonalGraphError, PersonalGraphEvent, RelationClaim};
 use uuid::Uuid;
 
 use super::{Surface, SurfaceDelta};
@@ -23,43 +20,22 @@ use super::{Surface, SurfaceDelta};
 /// The surface's fold.
 pub struct StatementFold;
 
-fn relation_kind(assertion: &EdgeAssertion) -> RelationKind {
-    match assertion {
-        EdgeAssertion::Semantic { sub_kind, .. } => RelationKind::Semantic(*sub_kind),
-        EdgeAssertion::Containment { sub_kind } => RelationKind::Containment(*sub_kind),
-        EdgeAssertion::Arrangement { sub_kind } => RelationKind::Arrangement(*sub_kind),
-        EdgeAssertion::Imported { sub_kind } => RelationKind::Imported(*sub_kind),
-        EdgeAssertion::Provenance { sub_kind } => RelationKind::Provenance(*sub_kind),
-    }
-}
-
 /// The exact statement an assertion event names, under its asserter.
 fn statement(
-    assertion: &EdgeAssertion,
+    relation: &RelationClaim,
     asserter: &str,
     id: &str,
     at_ms: Option<u64>,
     basis: Option<AssertionBasis>,
 ) -> SemanticStatement {
-    let label = match assertion {
-        EdgeAssertion::Semantic { label, .. } => label.clone(),
-        _ => None,
-    };
+    let label = relation.label.clone();
     let basis = basis.unwrap_or_else(|| AssertionBasis {
         note: label.clone(),
         ..Default::default()
     });
-    let kind = relation_kind(assertion);
     SemanticStatement {
         statement_id: id.to_owned(),
-        predicate: kind
-            .predicate_iri()
-            .expect("assertion relation kinds have canonical predicates")
-            .to_owned(),
-        recognized_sub_kind: match kind {
-            RelationKind::Semantic(sub_kind) => Some(sub_kind),
-            _ => None,
-        },
+        predicate: relation.predicate.clone(),
         label: basis.note.clone().or(label),
         basis,
         graph_scope: GraphScope::Default,
@@ -95,29 +71,31 @@ impl PersonalFold<Surface> for StatementFold {
             PersonalGraphEvent::AssertRelation {
                 from,
                 to,
-                assertion,
+                relation,
                 assertion_version,
                 statement_id,
                 asserted_at_ms,
                 basis,
             } => {
-                if matches!(assertion_version, Some(1))
-                    || matches!(assertion, EdgeAssertion::Semantic { .. })
-                {
+                if matches!(assertion_version, Some(1)) || relation.is_semantic() {
                     let id = statement_id.as_deref().unwrap_or(fallback_id);
                     let exact =
-                        statement(assertion, asserter_iri, id, *asserted_at_ms, basis.clone());
+                        statement(relation, asserter_iri, id, *asserted_at_ms, basis.clone());
                     graph
                         .upsert_statement(*from, *to, exact)
                         .map_err(PersonalGraphError::Excluded)?;
                 } else {
-                    graph.assert_relation(*from, *to, assertion.clone(), asserter_iri);
+                    graph.assert_relation(
+                        *from,
+                        *to,
+                        &relation.predicate,
+                        relation.label.clone(),
+                        asserter_iri,
+                    );
                 }
             },
             PersonalGraphEvent::RetractRelation { from, to, selector } => {
-                if *selector != RelationSelector::Family(EdgeFamily::Traversal) {
-                    graph.withdraw_matching(*from, *to, *selector, asserter_iri);
-                }
+                graph.withdraw_matching(*from, *to, selector, asserter_iri);
             },
             PersonalGraphEvent::RetractAssertion {
                 statement_id,

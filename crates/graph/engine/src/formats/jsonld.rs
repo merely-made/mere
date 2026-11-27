@@ -9,7 +9,7 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::RdfSource;
-use crate::model::sub_kind_from_iri;
+use crate::profile::core::{self, ids};
 use oxrdf::{GraphName, NamedNode, NamedOrBlankNode, Quad, Term, Triple};
 use serde_json::{Map, Value, json};
 
@@ -152,7 +152,7 @@ fn subject_object(
         let key = if compact
             && (predicate == SCHEMA_NAME
                 || predicate == SCHEMA_KEYWORDS
-                || sub_kind_from_iri(&predicate).is_some())
+                || core::terms().family(&predicate) == Some(ids::FAMILY_SEMANTIC))
         {
             let term = predicate.rsplit(['#', '/']).next().unwrap_or(&predicate);
             context.insert(term.into(), Value::String(predicate.clone()));

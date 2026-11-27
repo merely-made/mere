@@ -6,8 +6,8 @@
 
 //! The profile stage, "load a semantic profile" (declared-lens plan §4): the
 //! pack loader over `eidetic::pack`, the embedded core pack, and the standard
-//! vocabulary alignment. The predicate registry is `model::predicate_registry`;
-//! the core pack reproduces its placement table until L7 retires it.
+//! vocabulary alignment. Placement reads the core pack's stratum axis
+//! (`model::predicate_registry`), with a mere's declarations layered after it.
 
 /// The core pack, embedded, and its generated id constants.
 pub mod core;
@@ -17,6 +17,8 @@ pub mod intern;
 pub mod lens;
 /// The entry point: [`load::load`].
 pub mod load;
+/// A mere's predicate declarations as a local pack (D24).
+pub mod local;
 /// Strict decoding and declare-and-verify.
 pub mod pack;
 /// Requirements to pins.

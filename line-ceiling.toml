@@ -14,9 +14,5 @@ path = "crates/system/pandect/src/personal_sync.rs"
 reason = "H7 personal-device synchronization for Graphshell's local Mere graph. Existing source-size debt; a responsibility split must preserve PersonalEncryption, PersonalGraphExt, PersonalGraphEvent and existing module visibility."
 
 [[exception]]
-path = "crates/system/pandect/src/personal_sync/assertions.rs"
-reason = "Assertions. Existing source-size debt; a responsibility split must preserve AssertionOwner, IdentityIndex and existing module visibility."
-
-[[exception]]
 path = "scripts/mere_doc_audit.py"
 reason = "Mere doc audit. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."

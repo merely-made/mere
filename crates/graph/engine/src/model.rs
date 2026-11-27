@@ -24,14 +24,16 @@ pub mod edge_data;
 pub mod edge_decode;
 pub mod edge_encode;
 pub mod edge_payload;
-pub mod edge_taxonomy;
 pub mod frozen;
 pub mod frozen_rules;
 pub mod journal_delta;
 pub mod legacy;
 pub mod persistence_edge;
+#[cfg(test)]
+pub(crate) mod placement_table;
 pub mod predicate_declarations;
 pub mod predicate_registry;
+pub mod relation;
 pub mod resource;
 pub mod resource_content;
 pub mod resource_graph;
@@ -48,33 +50,20 @@ pub use uuid_archive::UuidAsBytes;
 pub use author::{Author, AuthorKind, USER_AUTHOR};
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
 pub use edge_data::{
-    ArrangementData, AssertionData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData,
-    REL_VOCAB, RelationAssertion, RelationAssertionSpec, SemanticData, SemanticStatement,
-    SemanticStatementSpec, StatementAssert, Traversal, TraversalData, UNKNOWN_LEGACY_ASSERTER_IRI,
-    all_semantic_sub_kinds, predicate_iri, sub_kind_from_iri,
+    AssertionData, RelationAssertion, RelationAssertionSpec, SemanticData, SemanticStatement,
+    SemanticStatementSpec, StatementAssert, UNKNOWN_LEGACY_ASSERTER_IRI,
 };
-pub use edge_payload::{EdgePayload, SemanticDataView, selector_matches_kind};
-pub use edge_taxonomy::{
-    ArrangementSubKind, ContainmentSubKind, EdgeAssertion, EdgeFamily, ImportedSubKind,
-    NavigationTrigger, ProvenanceSubKind, RelationDurability, RelationKind, RelationSelector,
-    SemanticSubKind,
-};
+pub use edge_payload::{EdgePayload, SemanticDataView};
 pub use frozen::{
     FROZEN_LINK, FROZEN_SELECTION, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource,
     FrozenSelection, FrozenSourceBinding, FrozenSourceRevision,
 };
 pub use journal_delta::{Attributed, JournalDelta, ResourceDelta};
 pub use persistence_edge::{
-    PersistedArrangementEdgeData, PersistedArrangementSubKind, PersistedContainmentEdgeData,
-    PersistedContainmentSubKind, PersistedEdge, PersistedEdgeAssertion, PersistedEdgeFamily,
-    PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger,
-    PersistedProvenanceEdgeData, PersistedProvenanceSubKind, PersistedRelationSelector,
-    PersistedSemanticEdgeData, PersistedSemanticStatement, PersistedSemanticSubKind,
-    PersistedTraversalEdgeData, PersistedTraversalMetrics, PersistedTraversalRecord,
+    PersistedEdge, PersistedSemanticEdgeData, PersistedSemanticStatement, PersistedSubKinds,
 };
-pub use predicate_registry::{
-    GraphStratum, built_in_predicate_stratum, built_in_relation_stratum, default_predicate_stratum,
-};
+pub use predicate_registry::{GraphStratum, built_in_predicate_stratum, default_predicate_stratum};
+pub use relation::{RelationSelector, Vocabulary};
 pub use resource::{ResourceNode, TAGGED_WITH_IRI};
 pub use resource_content::{
     ClassificationOrigin, ClassificationVariant, RESOURCE_CLASSIFICATIONS, RESOURCE_PROPERTIES,

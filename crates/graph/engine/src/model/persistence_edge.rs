@@ -4,177 +4,21 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Edge persistence types — family/sub-kind enums, per-family data structs,
-//! and the edge container, which a surface graph's `persistence` names
-//! (engine split P5 L3).
+//! An edge as a snapshot and a journal store it: the pair and its assertion
+//! records, each naming its predicate by IRI (declared-lens D17). The sidecars
+//! older engines wrote, by family and sub-kind name, are read and never
+//! written. A surface's own edge record wraps this one with what only the
+//! surface holds (D22).
 
 use rkyv::{Archive, Deserialize, Serialize};
 
 use crate::model::types::{AssertionBasis, AssertionWithdrawal, GraphScope};
-
-// ---------------------------------------------------------------------------
-// Edge persistence types
-// ---------------------------------------------------------------------------
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedEdgeFamily {
-    Semantic,
-    Traversal,
-    Containment,
-    Arrangement,
-    Imported,
-    Provenance,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedSemanticSubKind {
-    Hyperlink,
-    UserGrouped,
-    AgentDerived,
-    Cites,
-    Quotes,
-    Summarizes,
-    Elaborates,
-    ExampleOf,
-    Supports,
-    Contradicts,
-    Questions,
-    SameEntityAs,
-    DuplicateOf,
-    CanonicalMirrorOf,
-    DependsOn,
-    Blocks,
-    NextStep,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedContainmentSubKind {
-    UrlPath,
-    Domain,
-    FileSystem,
-    UserFolder,
-    ClipSource,
-    NotebookSection,
-    CollectionMember,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedArrangementSubKind {
-    FrameMember,
-    TileGroup,
-    SplitPair,
-    TabNeighbor,
-    ActiveTab,
-    PinnedInFrame,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedImportedSubKind {
-    BookmarkFolder,
-    HistoryImport,
-    SessionImport,
-    RssMembership,
-    FileSystemImport,
-    ArchiveMembership,
-    SharedCollection,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedProvenanceSubKind {
-    ClippedFrom,
-    ExcerptedFrom,
-    SummarizedFrom,
-    TranslatedFrom,
-    RewrittenFrom,
-    GeneratedFrom,
-    ExtractedFrom,
-    ImportedFromSource,
-    /// Verbatim duplicate (cross-graph copy / tear-out fork). Appended last to
-    /// keep existing ordinals stable. Mirrors `ProvenanceSubKind::CopiedFrom`.
-    CopiedFrom,
-    /// Brought in by a session merge-in. Appended last to keep ordinals
-    /// stable. Mirrors `ProvenanceSubKind::MergedFrom`.
-    MergedFrom,
-}
 
 #[derive(Archive, Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[rkyv(derive(Debug, PartialEq))]
 pub struct PersistedSemanticStatement {
     pub statement_id: String,
     pub predicate: String,
-    pub recognized_sub_kind: Option<PersistedSemanticSubKind>,
     pub label: Option<String>,
     pub graph_scope: GraphScope,
     pub provenance_iri: Option<String>,
@@ -227,6 +71,8 @@ impl<'de> serde::Deserialize<'de> for PresentOptionU64 {
 }
 
 impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
+    /// A record written before L7 also names `recognized_sub_kind`; the
+    /// predicate IRI already says it, so the name is not read (D17).
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -235,8 +81,6 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
         struct Fields {
             statement_id: String,
             predicate: String,
-            #[serde(default)]
-            recognized_sub_kind: Option<PersistedSemanticSubKind>,
             #[serde(default)]
             label: Option<String>,
             #[serde(default)]
@@ -262,7 +106,6 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
         Ok(Self {
             statement_id: fields.statement_id,
             predicate: fields.predicate,
-            recognized_sub_kind: fields.recognized_sub_kind,
             label,
             basis,
             graph_scope: fields.graph_scope,
@@ -274,6 +117,8 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
     }
 }
 
+/// The semantic sidecar engines wrote before assertion records: sub-kind
+/// names, a label, an open predicate and an older statement bucket. Read only.
 #[derive(
     Archive,
     Serialize,
@@ -288,48 +133,19 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
 #[rkyv(derive(Debug, PartialEq))]
 pub struct PersistedSemanticEdgeData {
     #[serde(default)]
-    pub sub_kinds: Vec<PersistedSemanticSubKind>,
+    pub sub_kinds: Vec<String>,
     #[serde(default)]
     pub label: Option<String>,
     #[serde(default)]
     pub agent_decay_progress: Option<f32>,
-    /// Open predicate IRI (statements-over-schema). `#[serde(default)]` so old
-    /// graphs load with `None`.
     #[serde(default)]
     pub predicate: Option<String>,
-    /// Pair-local semantic statement bucket. `#[serde(default)]` keeps old
-    /// snapshots loading through the aggregate compatibility fields above.
     #[serde(default)]
     pub statements: Vec<PersistedSemanticStatement>,
 }
 
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedTraversalRecord {
-    pub timestamp_ms: u64,
-    pub trigger: PersistedNavigationTrigger,
-    /// The event's minted id (engine-split D195). Archives written before it
-    /// do not read. It follows the time so a snapshot's edges, ordered by
-    /// their JSON bytes, still order by time first.
-    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
-    pub id: uuid::Uuid,
-    /// Asserter IRI of whoever recorded the event (D198).
-    pub recorded_by: String,
-    /// The idle-gap browsing session the event belongs to (D200, D202).
-    #[rkyv(with = super::uuid_archive::UuidAsBytes)]
-    pub browsing_session: uuid::Uuid,
-}
-
+/// A family's sidecar engines wrote before assertion records: sub-kind names.
+/// Read only.
 #[derive(
     Archive,
     Serialize,
@@ -343,212 +159,49 @@ pub struct PersistedTraversalRecord {
     serde::Deserialize,
 )]
 #[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedTraversalMetrics {
-    pub total_navigations: u64,
-    pub forward_navigations: u64,
-    pub backward_navigations: u64,
-    pub last_navigated_at: Option<u64>,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedTraversalEdgeData {
+pub struct PersistedSubKinds {
     #[serde(default)]
-    pub traversals: Vec<PersistedTraversalRecord>,
-    #[serde(default)]
-    pub metrics: PersistedTraversalMetrics,
+    pub sub_kinds: Vec<String>,
 }
 
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedContainmentEdgeData {
-    #[serde(default)]
-    pub sub_kinds: Vec<PersistedContainmentSubKind>,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedArrangementEdgeData {
-    #[serde(default)]
-    pub sub_kinds: Vec<PersistedArrangementSubKind>,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedImportedEdgeData {
-    #[serde(default)]
-    pub sub_kinds: Vec<PersistedImportedSubKind>,
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub struct PersistedProvenanceEdgeData {
-    #[serde(default)]
-    pub sub_kinds: Vec<PersistedProvenanceSubKind>,
-}
-
-#[derive(
-    Archive, Serialize, Deserialize, Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedEdgeAssertion {
-    Semantic {
-        sub_kind: PersistedSemanticSubKind,
-        label: Option<String>,
-        agent_decay_progress: Option<f32>,
-    },
-    Containment {
-        sub_kind: PersistedContainmentSubKind,
-    },
-    Arrangement {
-        sub_kind: PersistedArrangementSubKind,
-    },
-    Imported {
-        sub_kind: PersistedImportedSubKind,
-    },
-    Provenance {
-        sub_kind: PersistedProvenanceSubKind,
-    },
-}
-
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedRelationSelector {
-    Family(PersistedEdgeFamily),
-    Semantic(PersistedSemanticSubKind),
-    Containment(PersistedContainmentSubKind),
-    Arrangement(PersistedArrangementSubKind),
-    Imported(PersistedImportedSubKind),
-    Provenance(PersistedProvenanceSubKind),
-}
-
-/// Persisted traversal trigger classification.
-#[derive(
-    Archive,
-    Serialize,
-    Deserialize,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-)]
-#[rkyv(derive(Debug, PartialEq))]
-pub enum PersistedNavigationTrigger {
-    Unknown,
-    LinkClick,
-    Back,
-    Forward,
-    AddressBarEntry,
-    PanePromotion,
-    Programmatic,
-    /// Server redirect (3xx) or meta-refresh.
-    Redirect,
-    /// Navigation re-issued by session restore.
-    ReopenSession,
-    /// In-document anchor / fragment jump.
-    JumpAnchor,
-    /// Find-in-page-style within-document search jump.
-    InPageSearchJump,
-    /// Imported from another browser's history database.
-    ImportedHistory,
-}
-
-/// Persisted edge.
-#[derive(
-    Archive, Serialize, Deserialize, Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize,
-)]
+/// Persisted edge. Its JSON names the pair and the records only; a
+/// positional format keeps every field in place (`serialization.rs`).
+#[derive(Archive, Serialize, Deserialize, Clone, Debug, PartialEq, serde::Deserialize)]
 pub struct PersistedEdge {
     pub from_node_id: String,
     pub to_node_id: String,
-    #[serde(default)]
-    pub families: Vec<PersistedEdgeFamily>,
+    /// Legacy sidecars, by family: read when `assertions` is absent, never written.
     #[serde(default)]
     pub semantic: Option<PersistedSemanticEdgeData>,
     #[serde(default)]
-    pub traversal: Option<PersistedTraversalEdgeData>,
+    pub containment: Option<PersistedSubKinds>,
     #[serde(default)]
-    pub containment: Option<PersistedContainmentEdgeData>,
+    pub imported: Option<PersistedSubKinds>,
     #[serde(default)]
-    pub arrangement: Option<PersistedArrangementEdgeData>,
-    #[serde(default)]
-    pub imported: Option<PersistedImportedEdgeData>,
-    #[serde(default)]
-    pub provenance: Option<PersistedProvenanceEdgeData>,
+    pub provenance: Option<PersistedSubKinds>,
     /// Canonical all-family records. None selects the legacy sidecar decoder;
     /// Some(empty) is an explicitly empty list, never a request to infer facts.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub assertions: Option<Vec<PersistedSemanticStatement>>,
 }
 
 impl PersistedEdge {
+    /// An edge holding `assertions`, in the form every new write takes.
+    pub fn of(
+        from_node_id: String,
+        to_node_id: String,
+        assertions: Vec<PersistedSemanticStatement>,
+    ) -> Self {
+        Self {
+            from_node_id,
+            to_node_id,
+            semantic: None,
+            containment: None,
+            imported: None,
+            provenance: None,
+            assertions: Some(assertions),
+        }
+    }
     pub fn retained_assertions(&self) -> &[PersistedSemanticStatement] {
         self.assertions.as_deref().unwrap_or_else(|| {
             self.semantic
@@ -573,22 +226,20 @@ impl PersistedEdge {
                 || !data.sub_kinds.is_empty()
                 || data.predicate.is_some()
                 || data.label.is_some()
-        }) || self
-            .containment
-            .as_ref()
-            .is_some_and(|data| !data.sub_kinds.is_empty())
-            || self
-                .arrangement
-                .as_ref()
-                .is_some_and(|data| !data.sub_kinds.is_empty())
-            || self
-                .imported
-                .as_ref()
-                .is_some_and(|data| !data.sub_kinds.is_empty())
-            || self
-                .provenance
-                .as_ref()
-                .is_some_and(|data| !data.sub_kinds.is_empty())
+        }) || [&self.containment, &self.imported, &self.provenance]
+            .into_iter()
+            .any(|data| data.as_ref().is_some_and(|d| !d.sub_kinds.is_empty()))
+    }
+    /// Each legacy sidecar's family name and sub-kind names, in decode order.
+    pub fn legacy_sub_kinds(&self) -> [(&'static str, &[String]); 3] {
+        fn names(data: &Option<PersistedSubKinds>) -> &[String] {
+            data.as_ref().map_or(&[], |d| d.sub_kinds.as_slice())
+        }
+        [
+            ("Containment", names(&self.containment)),
+            ("Imported", names(&self.imported)),
+            ("Provenance", names(&self.provenance)),
+        ]
     }
 }
 

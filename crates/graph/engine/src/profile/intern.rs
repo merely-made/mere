@@ -45,13 +45,26 @@ macro_rules! observed {
     };
 }
 
+const STRATUM_RESOURCE: &str = "https://mere.computer/ns/stratum#resource";
+const STRATUM_SURFACE: &str = "https://mere.computer/ns/stratum#surface";
+
 impl Observed for GraphStratum {
     const AXIS: &'static str = "https://mere.computer/ns/axis#stratum";
     fn from_iri(iri: &str) -> Option<Self> {
         match iri {
-            "https://mere.computer/ns/stratum#resource" => Some(Self::Resource),
-            "https://mere.computer/ns/stratum#surface" => Some(Self::Surface),
+            STRATUM_RESOURCE => Some(Self::Resource),
+            STRATUM_SURFACE => Some(Self::Surface),
             _ => None,
+        }
+    }
+}
+
+impl GraphStratum {
+    /// The stratum axis value IRI.
+    pub fn iri(self) -> &'static str {
+        match self {
+            Self::Resource => STRATUM_RESOURCE,
+            Self::Surface => STRATUM_SURFACE,
         }
     }
 }
@@ -138,6 +151,8 @@ pub struct TermEntry {
     pub uuid: Uuid,
     pub kind: TermKind,
     pub family: Option<String>,
+    /// The family's own dense id, when the family is a term of this table (D15).
+    pub family_id: Option<TermId>,
     /// Language-tagged names supplied by the winning vocabulary.
     pub labels: BTreeMap<String, String>,
     pub handler: Option<String>,
@@ -172,6 +187,7 @@ impl TermEntry {
 pub struct TermTable {
     entries: Vec<TermEntry>,
     by_iri: BTreeMap<String, TermId>,
+    by_uuid: BTreeMap<Uuid, TermId>,
     defaults: AxisRow,
 }
 
@@ -201,6 +217,26 @@ impl TermTable {
     /// The stratum of `iri`: its row's, else the core default.
     pub fn stratum(&self, iri: &str) -> GraphStratum {
         self.row(iri).stratum
+    }
+    /// The term whose UUIDv5 identity is `uuid` (D16).
+    pub fn id_of_uuid(&self, uuid: &Uuid) -> Option<TermId> {
+        self.by_uuid.get(uuid).copied()
+    }
+    /// The family `iri` belongs to, when both are terms here.
+    pub fn family(&self, iri: &str) -> Option<TermId> {
+        self.entry(iri).and_then(|e| e.family_id)
+    }
+    /// The family of the term `id`.
+    pub fn family_of(&self, id: TermId) -> Option<TermId> {
+        self.get(id).and_then(|e| e.family_id)
+    }
+    /// The IRI of the term `id`.
+    pub fn iri(&self, id: TermId) -> Option<&str> {
+        self.get(id).map(|e| e.iri.as_str())
+    }
+    /// The core defaults an undeclared IRI takes.
+    pub fn defaults(&self) -> &AxisRow {
+        &self.defaults
     }
 }
 
@@ -269,22 +305,29 @@ pub(crate) fn intern(
             });
         }
     }
-    let entries = winners
+    let entries: Vec<TermEntry> = winners
         .into_iter()
         .map(|(term, pack)| TermEntry {
             iri: term.iri.clone(),
             uuid: Uuid::new_v5(&Uuid::NAMESPACE_URL, term.iri.as_bytes()),
             kind: term.kind,
             family: term.family.clone(),
+            family_id: term.family.as_ref().and_then(|f| by_iri.get(f).copied()),
             labels: term.labels.clone(),
             handler: term.handler.clone(),
             pack: pack.to_string(),
             row: row(term, pack, &defaults, diagnostics),
         })
         .collect();
+    let by_uuid = entries
+        .iter()
+        .enumerate()
+        .map(|(i, e)| (e.uuid, TermId(i as u32)))
+        .collect();
     Ok(TermTable {
         entries,
         by_iri,
+        by_uuid,
         defaults,
     })
 }

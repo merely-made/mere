@@ -4,14 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Fixed placement catalog. Effective custom placement must also consult the
-//! mere's durable declarations; these defaults do not resolve those declarations.
+//! Placement by the core pack's stratum axis (declared-lens L7). Effective
+//! custom placement also consults the mere's durable declarations, layered
+//! after the core pack ([`super::predicate_declarations`]).
 
-use super::resource::TAGGED_WITH_IRI;
-use super::{
-    ArrangementSubKind, ContainmentSubKind, ImportedSubKind, ProvenanceSubKind, RelationKind,
-    SemanticSubKind,
-};
+use crate::profile::core;
+use eidetic::pack::TermKind;
 
 /// The owning graph stratum of a relation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -21,189 +19,82 @@ pub enum GraphStratum {
     Surface,
 }
 
-/// Built-in placement by relation nature. `OpenPredicate` supplies only the
-/// unfamiliar-predicate default, before any per-mere declaration is consulted.
-pub const fn built_in_relation_stratum(kind: RelationKind) -> GraphStratum {
-    match kind {
-        RelationKind::Semantic(kind) => match kind {
-            SemanticSubKind::UserGrouped => GraphStratum::Surface,
-            SemanticSubKind::Hyperlink
-            | SemanticSubKind::AgentDerived
-            | SemanticSubKind::Cites
-            | SemanticSubKind::Quotes
-            | SemanticSubKind::Summarizes
-            | SemanticSubKind::Elaborates
-            | SemanticSubKind::ExampleOf
-            | SemanticSubKind::Supports
-            | SemanticSubKind::Contradicts
-            | SemanticSubKind::Questions
-            | SemanticSubKind::SameEntityAs
-            | SemanticSubKind::DuplicateOf
-            | SemanticSubKind::CanonicalMirrorOf
-            | SemanticSubKind::DependsOn
-            | SemanticSubKind::Blocks
-            | SemanticSubKind::NextStep => GraphStratum::Resource,
-        },
-        RelationKind::Provenance(kind) => match kind {
-            ProvenanceSubKind::CopiedFrom | ProvenanceSubKind::MergedFrom => GraphStratum::Surface,
-            ProvenanceSubKind::ClippedFrom
-            | ProvenanceSubKind::ExcerptedFrom
-            | ProvenanceSubKind::SummarizedFrom
-            | ProvenanceSubKind::TranslatedFrom
-            | ProvenanceSubKind::RewrittenFrom
-            | ProvenanceSubKind::GeneratedFrom
-            | ProvenanceSubKind::ExtractedFrom
-            | ProvenanceSubKind::ImportedFromSource => GraphStratum::Resource,
-        },
-        RelationKind::Imported(kind) => match kind {
-            ImportedSubKind::BookmarkFolder
-            | ImportedSubKind::HistoryImport
-            | ImportedSubKind::SessionImport => GraphStratum::Surface,
-            ImportedSubKind::RssMembership
-            | ImportedSubKind::FileSystemImport
-            | ImportedSubKind::ArchiveMembership
-            | ImportedSubKind::SharedCollection => GraphStratum::Resource,
-        },
-        RelationKind::Containment(kind) => match kind {
-            ContainmentSubKind::UserFolder
-            | ContainmentSubKind::NotebookSection
-            | ContainmentSubKind::CollectionMember => GraphStratum::Surface,
-            ContainmentSubKind::UrlPath
-            | ContainmentSubKind::Domain
-            | ContainmentSubKind::FileSystem
-            | ContainmentSubKind::ClipSource => GraphStratum::Resource,
-        },
-        RelationKind::Arrangement(
-            ArrangementSubKind::FrameMember
-            | ArrangementSubKind::TileGroup
-            | ArrangementSubKind::SplitPair,
-        )
-        | RelationKind::Traversal => GraphStratum::Surface,
-        RelationKind::OpenPredicate => GraphStratum::Resource,
-    }
-}
-
-/// Fixed placement for canonical built-in predicate IRIs. Unfamiliar strings
-/// return `None`; their effective placement can include a custom declaration.
+/// The stratum the core pack places `iri` in, or `None` when the core pack
+/// declares no such predicate.
 pub fn built_in_predicate_stratum(iri: &str) -> Option<GraphStratum> {
-    if iri == TAGGED_WITH_IRI {
-        return Some(GraphStratum::Resource);
-    }
-    RelationKind::from_predicate_iri(iri).map(built_in_relation_stratum)
+    core::terms()
+        .entry(iri)
+        .filter(|entry| entry.kind == TermKind::Predicate)
+        .map(|entry| entry.row.stratum)
 }
 
-/// Predicate placement before per-mere declarations are applied. This fallback
-/// must not replace effective placement for registered custom predicates.
+/// The core pack's stratum for `iri`, or the core default (Resource).
 pub fn default_predicate_stratum(iri: &str) -> GraphStratum {
-    built_in_predicate_stratum(iri).unwrap_or(GraphStratum::Resource)
+    built_in_predicate_stratum(iri).unwrap_or(core::terms().defaults().stratum)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::predicate_iri;
-    use strum::IntoEnumIterator;
+    use crate::model::TAGGED_WITH_IRI;
+    use crate::model::placement_table::{BEYOND_THE_TABLE, PLACEMENT};
+    use crate::profile::core::ids;
 
-    /// Asserted twice: by the built-in table, and by the loaded pack (the core
-    /// pack with the workspace stand-in, declared-lens L2 and D13).
+    /// The pack row's parity half (D27 (1)): the core pack with the workspace
+    /// stand-in places every row as the frozen table does.
     #[test]
     fn all_recognized_kinds_match_the_settled_placement_table() {
         use crate::profile::tests::support::{pack_stratum, workspace_profile};
         let profile = workspace_profile();
-        let surfaces = [
-            RelationKind::Semantic(SemanticSubKind::UserGrouped),
-            RelationKind::Provenance(ProvenanceSubKind::CopiedFrom),
-            RelationKind::Provenance(ProvenanceSubKind::MergedFrom),
-            RelationKind::Imported(ImportedSubKind::BookmarkFolder),
-            RelationKind::Imported(ImportedSubKind::HistoryImport),
-            RelationKind::Imported(ImportedSubKind::SessionImport),
-            RelationKind::Containment(ContainmentSubKind::UserFolder),
-            RelationKind::Containment(ContainmentSubKind::NotebookSection),
-            RelationKind::Containment(ContainmentSubKind::CollectionMember),
-            RelationKind::Arrangement(ArrangementSubKind::FrameMember),
-            RelationKind::Arrangement(ArrangementSubKind::TileGroup),
-            RelationKind::Arrangement(ArrangementSubKind::SplitPair),
-        ];
-        let kinds: Vec<_> = SemanticSubKind::iter()
-            .map(RelationKind::Semantic)
-            .chain(ProvenanceSubKind::iter().map(RelationKind::Provenance))
-            .chain(ImportedSubKind::iter().map(RelationKind::Imported))
-            .chain(ContainmentSubKind::iter().map(RelationKind::Containment))
-            .chain(ArrangementSubKind::iter().map(RelationKind::Arrangement))
-            .collect();
-        assert_eq!(kinds.len(), 44);
-        let mut resource_count = 0;
-        let mut surface_count = 0;
-        for kind in kinds {
-            let expected = if surfaces.contains(&kind) {
-                surface_count += 1;
-                GraphStratum::Surface
-            } else {
-                resource_count += 1;
-                GraphStratum::Resource
-            };
-            assert_eq!(built_in_relation_stratum(kind), expected, "{kind:?}");
+        let mut counts = (0, 0);
+        for (family, sub_kind, iri, expected) in PLACEMENT {
+            match expected {
+                GraphStratum::Resource => counts.0 += 1,
+                GraphStratum::Surface => counts.1 += 1,
+            }
             assert_eq!(
-                pack_stratum(&profile, kind),
+                pack_stratum(&profile, iri),
                 expected,
-                "{kind:?} from the pack"
+                "{family}::{sub_kind} from the pack"
             );
+            if family != "Arrangement" {
+                assert_eq!(built_in_predicate_stratum(iri), Some(expected), "{iri}");
+            }
         }
-        assert_eq!((resource_count, surface_count), (32, 12));
-        for (kind, expected) in [
-            (RelationKind::Traversal, GraphStratum::Surface),
-            (RelationKind::OpenPredicate, GraphStratum::Resource),
-        ] {
-            assert_eq!(built_in_relation_stratum(kind), expected, "{kind:?}");
-            assert_eq!(
-                pack_stratum(&profile, kind),
-                expected,
-                "{kind:?} from the pack"
-            );
+        assert_eq!(counts, (32, 12));
+        for (iri, expected) in BEYOND_THE_TABLE {
+            assert_eq!(pack_stratum(&profile, iri), expected, "{iri} from the pack");
         }
     }
 
     #[test]
     fn canonical_predicates_tags_and_open_defaults_have_distinct_controls() {
-        assert_eq!(SemanticSubKind::iter().count(), 17);
-        for kind in SemanticSubKind::iter() {
-            let expected = if kind == SemanticSubKind::UserGrouped {
-                GraphStratum::Surface
-            } else {
-                GraphStratum::Resource
-            };
-            assert_eq!(
-                built_in_predicate_stratum(predicate_iri(kind)),
-                Some(expected)
-            );
-            assert_eq!(default_predicate_stratum(predicate_iri(kind)), expected);
-        }
-        for kind in [
-            SemanticSubKind::AgentDerived,
-            SemanticSubKind::DependsOn,
-            SemanticSubKind::Blocks,
-            SemanticSubKind::NextStep,
-        ] {
-            assert_eq!(
-                built_in_relation_stratum(RelationKind::Semantic(kind)),
-                GraphStratum::Resource
-            );
-        }
         assert_eq!(
-            built_in_relation_stratum(RelationKind::Imported(ImportedSubKind::SharedCollection)),
-            GraphStratum::Resource
+            built_in_predicate_stratum(core::iri(ids::REL_USER_GROUPED)),
+            Some(GraphStratum::Surface)
+        );
+        assert_eq!(
+            built_in_predicate_stratum(core::iri(ids::REL_IMPORTED_SHARED_COLLECTION)),
+            Some(GraphStratum::Resource)
         );
         assert_eq!(
             built_in_predicate_stratum(TAGGED_WITH_IRI),
             Some(GraphStratum::Resource)
+        );
+        // A family term is not a predicate.
+        assert_eq!(
+            built_in_predicate_stratum(core::iri(ids::FAMILY_SEMANTIC)),
+            None
         );
         for unfamiliar in [
             "https://foreign.test/predicate",
             "",
             "arbitrary predicate",
             "https://mere.computer/ns/rel#User-grouped",
+            "https://mere.computer/ns/rel#containment.UserFolder",
+            "https://mere.computer/ns/rel#arrangement.frame-member",
         ] {
-            assert_eq!(built_in_predicate_stratum(unfamiliar), None);
+            assert_eq!(built_in_predicate_stratum(unfamiliar), None, "{unfamiliar}");
             assert_eq!(
                 default_predicate_stratum(unfamiliar),
                 GraphStratum::Resource
@@ -212,50 +103,10 @@ mod tests {
     }
 
     #[test]
-    fn relation_predicate_mapping_is_unique_bidirectional_and_placement_preserving() {
-        let kinds: Vec<_> = SemanticSubKind::iter()
-            .map(RelationKind::Semantic)
-            .chain(ContainmentSubKind::iter().map(RelationKind::Containment))
-            .chain(ArrangementSubKind::iter().map(RelationKind::Arrangement))
-            .chain(ImportedSubKind::iter().map(RelationKind::Imported))
-            .chain(ProvenanceSubKind::iter().map(RelationKind::Provenance))
-            .collect();
-        assert_eq!(kinds.len(), 44);
-
-        let mut predicates = std::collections::BTreeSet::new();
-        for kind in kinds {
-            let iri = kind
-                .predicate_iri()
-                .expect("every sub-kind relation has a predicate IRI");
-            assert!(predicates.insert(iri), "duplicate predicate IRI {iri}");
-            assert_eq!(RelationKind::from_predicate_iri(iri), Some(kind), "{iri}");
-            assert_eq!(
-                built_in_predicate_stratum(iri),
-                Some(built_in_relation_stratum(kind)),
-                "placement for {iri}"
-            );
+    fn the_frozen_table_names_each_predicate_once() {
+        let mut seen = std::collections::BTreeSet::new();
+        for (_, _, iri, _) in PLACEMENT {
+            assert!(seen.insert(iri), "duplicate predicate IRI {iri}");
         }
-
-        for sub_kind in SemanticSubKind::iter() {
-            assert_eq!(
-                RelationKind::Semantic(sub_kind).predicate_iri(),
-                Some(predicate_iri(sub_kind)),
-                "semantic predicate bytes remain unchanged for {sub_kind:?}"
-            );
-        }
-        assert_eq!(RelationKind::Traversal.predicate_iri(), None);
-        assert_eq!(RelationKind::OpenPredicate.predicate_iri(), None);
-        assert_eq!(
-            RelationKind::from_predicate_iri("https://foreign.test/rel"),
-            None
-        );
-        assert_eq!(
-            RelationKind::from_predicate_iri("https://mere.computer/ns/rel#containment.UserFolder"),
-            None
-        );
-        assert_eq!(
-            built_in_predicate_stratum("https://mere.computer/ns/rel#containment.UserFolder"),
-            None
-        );
     }
 }
