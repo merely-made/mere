@@ -151,6 +151,29 @@ pub fn merge_classification_variants(
     Ok(merged)
 }
 
+/// Merge copied assertions by their exact handles, preserving distinct carried
+/// IDs, as mere-kernel's `resource_properties` did (engine split lane 4).
+pub fn merge_resource_properties(
+    left: &[NodeProperty],
+    right: &[NodeProperty],
+) -> Result<Vec<NodeProperty>, ContentError> {
+    let mut merged = left.to_vec();
+    for property in right {
+        if let Some(existing) = merged
+            .iter()
+            .find(|held| held.statement_id == property.statement_id)
+        {
+            if existing != property {
+                return Err(ContentError::HandleCollision(property.statement_id.clone()));
+            }
+        } else {
+            merged.push(property.clone());
+        }
+    }
+    merged.sort_by(|a, b| a.statement_id.cmp(&b.statement_id));
+    Ok(merged)
+}
+
 pub fn validate_tag_concept(iri: &str, concept: &TagConcept) -> Result<(), ContentError> {
     for (role, value) in [("concept", iri), ("owner", concept.owner_iri.as_str())] {
         if value.chars().any(|c| c.is_whitespace() || c.is_control())
@@ -162,4 +185,36 @@ pub fn validate_tag_concept(iri: &str, concept: &TagConcept) -> Result<(), Conte
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod merge_properties_tests {
+    use super::*;
+
+    fn property(id: &str, value: &str) -> NodeProperty {
+        let mut property = NodeProperty::new("urn:test:predicate".into(), value.into());
+        property.statement_id = id.into();
+        property
+    }
+
+    #[test]
+    fn properties_merge_by_exact_handle_and_refuse_one_handle_with_two_values() {
+        let merged = merge_resource_properties(
+            &[property("b", "two")],
+            &[property("a", "one"), property("b", "two")],
+        )
+        .unwrap();
+        assert_eq!(
+            merged
+                .iter()
+                .map(|p| p.statement_id.as_str())
+                .collect::<Vec<_>>(),
+            ["a", "b"]
+        );
+        // Control: the same handle carrying another value is a collision.
+        assert_eq!(
+            merge_resource_properties(&[property("b", "two")], &[property("b", "other")]),
+            Err(ContentError::HandleCollision("b".into()))
+        );
+    }
 }

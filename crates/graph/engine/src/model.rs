@@ -28,6 +28,7 @@ pub mod edge_taxonomy;
 pub mod frozen;
 pub mod frozen_rules;
 pub mod journal_delta;
+pub mod legacy;
 pub mod persistence_edge;
 pub mod predicate_declarations;
 pub mod predicate_registry;

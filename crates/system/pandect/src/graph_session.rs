@@ -2300,8 +2300,8 @@ pub fn branched_session_name(parent: Option<&str>) -> String {
 }
 
 /// The name a picked-off part carries: the session made by picking off the
-/// connected component around one node of another
-/// ([`MereSessions::fork_component`], Turnstone's tear-out). Picking off is
+/// connected component around one node of another ([`MereSessions::pick`],
+/// Turnstone's tear-out). Picking off is
 /// not forking: the part is not the whole session and starts with no session
 /// history, its nodes carrying only their derivation provenance. Its name
 /// starts from the source's, as a fork's does, and names where it was picked
@@ -2487,23 +2487,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         )
         .map_err(|error| SessionError::Validation(error.to_string()))?
         .ok_or(SessionError::NoSuchNode(seed))?;
-        parent.validate(&graph)?;
-        let at = parent.journal().live_cursor();
-        let mut manifest = GraphSessionManifest::new(SessionId::new(), fork_graph_id);
-        manifest.picked_from = Some(crate::manifest::PickedFrom {
-            session: parent.id(),
-            at: at.0,
-            container: *parent.manifest().root_graph_id.as_uuid(),
-        });
-        manifest.display_name = Some(picked_session_name(
-            parent.manifest().display_name.as_deref(),
-        ));
-        manifest.source_codicil = parent.manifest().source_codicil.clone();
-        let kind = ChangeKind::Picked {
-            from: parent.id(),
-            at,
-        };
-        self.create(manifest, Some(&graph), author, kind).await
+        self.pick(parent, fork_graph_id, graph, author).await
     }
 }
 
@@ -2759,6 +2743,37 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
         author: Author,
     ) -> Result<GraphSession<B, G>, SessionError> {
         self.begin_copy_at(parent, at, author, Lineage::Branch)
+    }
+
+    /// Pick off `part`, a graph a host copied out of `parent` into the fresh
+    /// container `container`, as a new session (Turnstone's tear-out). The
+    /// copy is the host's, since it knows its surfaces; the session, its
+    /// name and its `picked_from` record are these sessions'. `part` is
+    /// checked as `parent` checks its own graph.
+    pub async fn pick(
+        &self,
+        parent: &GraphSession<B, G>,
+        container: GraphId,
+        part: G,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        parent.validate(&part)?;
+        let at = parent.journal().live_cursor();
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), container);
+        manifest.picked_from = Some(crate::manifest::PickedFrom {
+            session: parent.id(),
+            at: at.0,
+            container: *parent.manifest().root_graph_id.as_uuid(),
+        });
+        manifest.display_name = Some(picked_session_name(
+            parent.manifest().display_name.as_deref(),
+        ));
+        manifest.source_codicil = parent.manifest().source_codicil.clone();
+        let kind = ChangeKind::Picked {
+            from: parent.id(),
+            at,
+        };
+        self.create(manifest, Some(&part), author, kind).await
     }
 
     /// A whole-session copy of `parent` at `at`, of the given lineage.
