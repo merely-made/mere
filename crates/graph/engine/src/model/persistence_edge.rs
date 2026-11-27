@@ -5,7 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! An edge as a snapshot and a journal store it: the pair and its assertion
-//! records, each naming its predicate by IRI (declared-lens D17). The sidecars
+//! records, each naming its predicate by UUIDv5, and by IRI when the core
+//! pack lacks it (declared-lens D17, D28). The sidecars
 //! older engines wrote, by family and sub-kind name, are read and never
 //! written. A surface's own edge record wraps this one with what only the
 //! surface holds (D22).
@@ -18,6 +19,8 @@ use crate::model::types::{AssertionBasis, AssertionWithdrawal, GraphScope};
 #[rkyv(derive(Debug, PartialEq))]
 pub struct PersistedSemanticStatement {
     pub statement_id: String,
+    /// The predicate IRI. Stored as its UUIDv5, and as text too only when the
+    /// core pack lacks the term (D28).
     pub predicate: String,
     pub label: Option<String>,
     pub graph_scope: GraphScope,
@@ -71,8 +74,10 @@ impl<'de> serde::Deserialize<'de> for PresentOptionU64 {
 }
 
 impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
-    /// A record written before L7 also names `recognized_sub_kind`; the
-    /// predicate IRI already says it, so the name is not read (D17).
+    /// A record names its predicate by UUID, with the IRI when the core pack
+    /// lacks the term (D28). One written before L7 names the IRI alone and
+    /// also `recognized_sub_kind`, which the IRI already says, so the name is
+    /// not read (D17).
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -80,7 +85,10 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
         #[derive(serde::Deserialize)]
         struct Fields {
             statement_id: String,
-            predicate: String,
+            #[serde(default)]
+            predicate_uuid: Option<uuid::Uuid>,
+            #[serde(default)]
+            predicate: Option<String>,
             #[serde(default)]
             label: Option<String>,
             #[serde(default)]
@@ -98,6 +106,9 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
         }
 
         let fields = <Fields as serde::Deserialize>::deserialize(deserializer)?;
+        let predicate =
+            crate::model::relation::stored::read_predicate(fields.predicate_uuid, fields.predicate)
+                .map_err(serde::de::Error::custom)?;
         let basis = fields.basis.0.flatten().unwrap_or_else(|| AssertionBasis {
             note: fields.label.clone(),
             ..Default::default()
@@ -105,7 +116,7 @@ impl<'de> serde::Deserialize<'de> for PersistedSemanticStatement {
         let label = basis.note.clone();
         Ok(Self {
             statement_id: fields.statement_id,
-            predicate: fields.predicate,
+            predicate,
             label,
             basis,
             graph_scope: fields.graph_scope,

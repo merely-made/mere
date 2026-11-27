@@ -37,7 +37,8 @@ fn cases() -> Vec<PersistedSemanticStatement> {
 fn statement_json_omits_absent_metadata_and_preserves_explicit_values() {
     let cases = cases();
     let plain = serde_json::to_value(&cases[0]).unwrap();
-    assert_eq!(plain.as_object().unwrap().len(), 3);
+    assert_eq!(plain.as_object().unwrap().len(), 4);
+    assert_eq!(plain["predicate"], "urn:predicate:held", "not a core term");
     assert_eq!(plain["statement_id"], "held\nassertion");
     assert_eq!(plain["provenance_iri"], "https://author.test/");
     for absent in [
@@ -60,7 +61,7 @@ fn statement_json_omits_absent_metadata_and_preserves_explicit_values() {
         crate::model::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI
     );
     let rich = serde_json::to_value(&cases[3]).unwrap();
-    assert_eq!(rich.as_object().unwrap().len(), 8);
+    assert_eq!(rich.as_object().unwrap().len(), 9);
     assert_eq!(rich["statement_id"], "");
     assert_eq!(rich["label"], "");
     assert_eq!(rich["provenance_iri"], "");
@@ -169,5 +170,49 @@ fn an_edge_writes_its_records_and_never_a_sidecar() {
     assert_eq!(
         postcard::from_bytes::<PersistedEdge>(&bytes).unwrap(),
         legacy
+    );
+}
+
+/// Declared-lens D28: a record names its predicate by UUIDv5, and by IRI too
+/// only when the core pack lacks the term.
+#[test]
+fn a_core_record_stores_its_uuid_alone_and_reads_back() {
+    let cites = "https://mere.computer/ns/rel#cites";
+    let mut record = cases().remove(0);
+    record.predicate = cites.into();
+    let json = serde_json::to_value(&record).unwrap();
+    assert!(json.get("predicate").is_none(), "{json}");
+    assert_eq!(
+        json["predicate_uuid"],
+        uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_URL, cites.as_bytes()).to_string()
+    );
+    assert_eq!(
+        serde_json::from_value::<PersistedSemanticStatement>(json).unwrap(),
+        record
+    );
+    let bytes = postcard::to_allocvec(&record).unwrap();
+    assert_eq!(
+        postcard::from_bytes::<PersistedSemanticStatement>(&bytes).unwrap(),
+        record
+    );
+}
+
+#[test]
+fn a_stored_predicate_that_does_not_resolve_is_refused() {
+    let open = serde_json::to_value(&cases()[0]).unwrap();
+    // Control: as written, with its IRI, the record reads.
+    assert!(serde_json::from_value::<PersistedSemanticStatement>(open.clone()).is_ok());
+    let mut bare = open.clone();
+    bare.as_object_mut().unwrap().remove("predicate");
+    let refused = serde_json::from_value::<PersistedSemanticStatement>(bare).unwrap_err();
+    assert!(refused.to_string().contains("no core term"), "{refused}");
+    let mut wrong = open;
+    wrong["predicate_uuid"] = uuid::Uuid::new_v5(&uuid::Uuid::NAMESPACE_URL, b"urn:other")
+        .to_string()
+        .into();
+    let refused = serde_json::from_value::<PersistedSemanticStatement>(wrong).unwrap_err();
+    assert!(
+        refused.to_string().contains("is not the UUIDv5"),
+        "{refused}"
     );
 }

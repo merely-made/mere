@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
+use crate::model::relation::stored::{predicate_uuid, stored_iri};
 
 impl serde::Serialize for PersistedSemanticStatement {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
@@ -12,8 +13,11 @@ impl serde::Serialize for PersistedSemanticStatement {
 
         let human = serializer.is_human_readable();
         let scoped = self.graph_scope != GraphScope::Default;
+        // The predicate's UUIDv5, and its IRI only when the core pack lacks it (D28).
+        let iri = stored_iri(&self.predicate);
         let fields = if human {
-            2 + usize::from(self.label.is_some())
+            2 + usize::from(iri.is_some())
+                + usize::from(self.label.is_some())
                 + usize::from(scoped)
                 + usize::from(self.provenance_iri.is_some())
                 + usize::from(self.asserted_at_ms.is_some())
@@ -21,12 +25,16 @@ impl serde::Serialize for PersistedSemanticStatement {
                 + usize::from(self.withdrawn.is_some())
                 + usize::from(!self.basis.is_empty() || self.label.is_some())
         } else {
-            9
+            10
         };
         // Positional serializers receive every field in the current shape.
         let mut state = serializer.serialize_struct("PersistedSemanticStatement", fields)?;
         state.serialize_field("statement_id", &self.statement_id)?;
-        state.serialize_field("predicate", &self.predicate)?;
+        // An Option, as the reader takes it: records before L7 have none.
+        state.serialize_field("predicate_uuid", &Some(predicate_uuid(&self.predicate)))?;
+        if !human || iri.is_some() {
+            state.serialize_field("predicate", &iri)?;
+        }
         if !human || self.label.is_some() {
             state.serialize_field("label", &self.label)?;
         }

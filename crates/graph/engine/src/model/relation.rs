@@ -7,7 +7,8 @@
 //! Relations named by IRI (declared-lens D20). A predicate is its IRI; what
 //! it is (family, stratum, durability) is its row in a term table, read
 //! through the generated ids. [`Vocabulary`] is the table a payload classifies
-//! by, [`RelationSelector`] picks relations by family or predicate, and
+//! by, [`RelationSelector`] picks relations by family or predicate,
+//! [`stored`] is how a stored record names its predicate (D28), and
 //! [`legacy`] maps the names older engines stored to the IRIs they meant (D17).
 
 use std::fmt;
@@ -17,6 +18,8 @@ use crate::profile::intern::{Durability, TermId, TermTable};
 
 #[path = "relation/legacy.rs"]
 pub mod legacy;
+#[path = "relation/stored.rs"]
+pub mod stored;
 
 /// The term table a payload classifies its predicates by: the core profile,
 /// or a host's table layered on it. A classification context, not content, so

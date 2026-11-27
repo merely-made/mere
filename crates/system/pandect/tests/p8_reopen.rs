@@ -13,6 +13,7 @@ use std::path::Path;
 use std::time::UNIX_EPOCH;
 
 use mere::dataset::View;
+use mere::model::relation::stored::predicate_uuid;
 use mere::model::{Author, JournalDelta};
 use muniment::DirectoryBackend;
 use muniment::journal::DigestChain;
@@ -210,12 +211,28 @@ fn surface_and_resource_deltas_share_one_journal_cursor_and_digest() {
             &Uuid::from_u128(0x9ff).to_string(),
         );
         assert_ne!(live_digest(&reopen(surface.path(), id).await), digest);
-        let resource = tamper(
+        // A record names its predicate by UUID beside the IRI (declared-lens
+        // D28), so the IRI changed alone is refused, and both changed are
+        // another record.
+        let linked = predicate_uuid("https://p8.test/linked").to_string();
+        let other = predicate_uuid("https://p8.test/other").to_string();
+        let iri_only = tamper(
             dir.path(),
             4,
             "https://p8.test/linked",
             "https://p8.test/other",
         );
+        let refused = Sessions::new_with(DirectoryBackend::open(iri_only.path()).unwrap())
+            .open_with(id)
+            .await;
+        assert!(
+            refused
+                .as_ref()
+                .is_err_and(|error| error.to_string().contains("is not the UUIDv5")),
+            "{:?}",
+            refused.err()
+        );
+        let resource = tamper(iri_only.path(), 4, &linked, &other);
         let forged = reopen(resource.path(), id).await;
         assert_ne!(live_digest(&forged), digest);
         let pin = forged.pin(forged.journal().live_cursor()).unwrap();
