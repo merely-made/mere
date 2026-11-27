@@ -40,9 +40,6 @@
 
 #![doc(html_root_url = "https://docs.rs/host-runtime/0.0.1")]
 
-// Application-scoped preferences live under the host's data root rather than
-// in one session's settings sidecar.
-// Portable address-access history (engine split D69, from the reference app).
 // The lib tests share the integration tests' surface and its hooks (engine
 // split D272), whose file names this crate `pandect`.
 #[cfg(test)]
@@ -51,6 +48,9 @@ extern crate self as pandect;
 #[path = "../tests/support/mod.rs"]
 mod test_surface;
 
+// Application-scoped preferences live under the host's data root rather than
+// in one session's settings sidecar.
+// Portable address-access history (engine split D69, from the reference app).
 pub mod access;
 pub mod application_settings_store;
 // The family-shared root moved to catchment with the reservoir (engine split
