@@ -5,65 +5,38 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use kernel::graph::{
-    PendingLink, PendingLinkRetention, SemanticStatementSpec, SemanticSubKind, predicate_iri,
+use crate::test_surface::{PendingLinks, Retention as PendingLinkRetention, Surface};
+use mere::model::{
+    CoverageLayer, CoverageLimit, CoverageNote, FrozenSelection, NodeProperty,
+    PersistedResourceFacet, PersistedResourceRecord, RESOURCE_PROPERTIES, ResourceNode,
 };
+use mere::projection::RdfSource;
 use muniment::MemoryBackend;
 
-fn baseline(retention: PendingLinkRetention) -> Graph {
-    let mut graph = Graph::new();
-    let source = kernel::graph::apply::add_node(
-        &mut graph,
-        None,
-        "https://example.org/source".into(),
-        Default::default(),
-    );
-    let shown = kernel::graph::apply::add_node(
-        &mut graph,
-        None,
-        "https://example.org/held".into(),
-        Default::default(),
-    );
-    let source_id = graph.shown_resource_id(source).unwrap();
-    graph
-        .try_assert_semantic_statement(
-            source,
-            shown,
-            SemanticStatementSpec {
-                predicate: predicate_iri(SemanticSubKind::Cites).into(),
-                recognized_sub_kind: Some(SemanticSubKind::Cites),
-                ..Default::default()
-            },
-        )
-        .unwrap();
-    graph.queue_pending_link(PendingLink {
-        source_resource: source_id,
-        source_surface: None,
-        target_iri: "https://example.org/absent".into(),
-        statement: SemanticStatementSpec {
-            predicate: predicate_iri(SemanticSubKind::Cites).into(),
-            recognized_sub_kind: Some(SemanticSubKind::Cites),
-            graph_scope: kernel::types::GraphScope::Source,
-            provenance_iri: Some("https://example.org/source".into()),
-            ..Default::default()
-        },
-    });
+type Sessions = MereSessions<MemoryBackend, Surface>;
+
+/// Two surfaces, a statement between them, and one link held pending.
+fn baseline(retention: PendingLinkRetention) -> Surface {
+    let mut graph = Surface::default();
+    let (source, shown) = (Uuid::from_u128(1), Uuid::from_u128(2));
+    graph.show(source, "https://example.org/source");
+    graph.show(shown, "https://example.org/held");
+    graph.assert(source, shown, "https://example.org/vocab#cites");
+    graph.queue_pending_link("https://example.org/absent");
     graph.set_pending_link_retention(retention);
     graph
 }
 
-fn truth(graph: &Graph) -> serde_json::Value {
-    let mut snapshot = graph.to_snapshot();
-    snapshot.timestamp_secs = 0;
-    serde_json::to_value(snapshot).unwrap()
+fn truth(graph: &Surface) -> serde_json::Value {
+    serde_json::to_value(graph.to_snapshot()).unwrap()
 }
 
 #[test]
 fn session_only_history_and_reopen_release_inputs_without_losing_truth() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let sessions = MereSessions::new(store);
-        let mut session = sessions.begin_recorded(
+        let sessions = Sessions::new_with(store);
+        let mut session = sessions.begin_recorded_with(
             Author::user(),
             Some(baseline(PendingLinkRetention::SessionOnly)),
         );
@@ -73,7 +46,7 @@ fn session_only_history_and_reopen_release_inputs_without_losing_truth() {
         assert!(session.graph_at(Seq(0)).unwrap().pending_links().is_empty());
         session.flush(SystemTime::now()).await.unwrap();
         drop(session);
-        let reopened = sessions.open(id).await.unwrap();
+        let reopened = sessions.open_with(id).await.unwrap();
         assert!(reopened.graph().pending_links().is_empty());
         assert_eq!(truth(reopened.graph()), before);
         assert_eq!(reopened.journal().live_cursor(), Seq(0));
@@ -83,17 +56,17 @@ fn session_only_history_and_reopen_release_inputs_without_losing_truth() {
 #[test]
 fn until_purged_reopens_and_purge_stores_only_a_cache_change() {
     pollster::block_on(async {
-        let sessions = MereSessions::new(MemoryBackend::new());
-        let mut session = sessions.begin_recorded(
+        let sessions = Sessions::new_with(MemoryBackend::new());
+        let mut session = sessions.begin_recorded_with(
             Author::user(),
             Some(baseline(PendingLinkRetention::UntilPurged)),
         );
         let id = session.manifest().session_id;
         let before = truth(session.graph());
-        let inputs = session.graph().pending_link_state().clone();
+        let inputs: PendingLinks = session.graph().pending_link_state().clone();
         session.flush(SystemTime::now()).await.unwrap();
         drop(session);
-        let mut reopened = sessions.open(id).await.unwrap();
+        let mut reopened = sessions.open_with(id).await.unwrap();
         assert_eq!(reopened.graph().pending_link_state(), &inputs);
         let revision = reopened.revision();
         let (_, applied) = reopened
@@ -105,7 +78,7 @@ fn until_purged_reopens_and_purge_stores_only_a_cache_change() {
         assert_eq!(truth(reopened.graph()), before);
         reopened.flush(SystemTime::now()).await.unwrap();
         drop(reopened);
-        let reopened = sessions.open(id).await.unwrap();
+        let reopened = sessions.open_with(id).await.unwrap();
         assert!(reopened.graph().pending_links().is_empty());
         assert_eq!(
             reopened.graph().pending_link_state().retention,
@@ -119,8 +92,8 @@ fn until_purged_reopens_and_purge_stores_only_a_cache_change() {
 #[test]
 fn cache_observations_are_revised_and_only_retained_entries_are_dirty() {
     pollster::block_on(async {
-        let sessions = MereSessions::new(MemoryBackend::new());
-        let mut session = sessions.begin_recorded(
+        let sessions = Sessions::new_with(MemoryBackend::new());
+        let mut session = sessions.begin_recorded_with(
             Author::user(),
             Some(baseline(PendingLinkRetention::SessionOnly)),
         );
@@ -138,9 +111,9 @@ fn cache_observations_are_revised_and_only_retained_entries_are_dirty() {
         assert!(session.pending(SystemTime::now()).unwrap().is_empty());
         session
             .edit_now(Author::user(), |graph| {
-                graph.set_known_coverage(kernel::graph::CoverageNote {
-                    limits: vec![kernel::graph::CoverageLimit::new(
-                        kernel::graph::CoverageLayer::Disclosure,
+                graph.set_known_coverage(CoverageNote {
+                    limits: vec![CoverageLimit::new(
+                        CoverageLayer::Disclosure,
                         "host boundary",
                     )],
                 })
@@ -164,8 +137,8 @@ fn cache_observations_are_revised_and_only_retained_entries_are_dirty() {
 fn retained_cache_batches_track_post_batch_edits_and_reversed_receipts() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
-        let mut session = sessions.begin_recorded(
+        let sessions = Sessions::new_with(backend.clone());
+        let mut session = sessions.begin_recorded_with(
             Author::user(),
             Some(baseline(PendingLinkRetention::UntilPurged)),
         );
@@ -176,7 +149,7 @@ fn retained_cache_batches_track_post_batch_edits_and_reversed_receipts() {
         let older = session.pending(SystemTime::now()).unwrap();
         let source = baseline(PendingLinkRetention::UntilPurged).pending_links()[0].clone();
         session
-            .edit_now(Author::user(), |graph| graph.queue_pending_link(source))
+            .edit_now(Author::user(), |graph| graph.queue_pending_link(&source))
             .unwrap();
         backend.apply(older.ops()).await.unwrap();
         session.stored(older);
@@ -200,7 +173,7 @@ fn retained_cache_batches_track_post_batch_edits_and_reversed_receipts() {
         assert_eq!(session.journal().live_cursor(), Seq(0));
         assert!(
             sessions
-                .open(session.id())
+                .open_with(session.id())
                 .await
                 .unwrap()
                 .graph()
@@ -214,8 +187,8 @@ fn retained_cache_batches_track_post_batch_edits_and_reversed_receipts() {
 fn an_unsupported_retained_cache_version_is_refused() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
-        let mut session = sessions.begin_recorded(
+        let sessions = Sessions::new_with(backend.clone());
+        let mut session = sessions.begin_recorded_with(
             Author::user(),
             Some(baseline(PendingLinkRetention::UntilPurged)),
         );
@@ -229,7 +202,7 @@ fn an_unsupported_retained_cache_version_is_refused() {
             .await
             .unwrap();
         assert!(matches!(
-            sessions.open(id).await,
+            sessions.open_with(id).await,
             Err(SessionError::Corrupt(_))
         ));
     });
@@ -239,8 +212,8 @@ fn an_unsupported_retained_cache_version_is_refused() {
 fn cache_returning_to_saved_state_still_writes_after_an_older_batch() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
-        let mut session = sessions.begin_recorded(
+        let sessions = Sessions::new_with(backend.clone());
+        let mut session = sessions.begin_recorded_with(
             Author::user(),
             Some(baseline(PendingLinkRetention::UntilPurged)),
         );
@@ -252,7 +225,7 @@ fn cache_returning_to_saved_state_still_writes_after_an_older_batch() {
             .unwrap();
         let older = session.pending(SystemTime::now()).unwrap();
         session
-            .edit_now(Author::user(), |graph| graph.queue_pending_link(original))
+            .edit_now(Author::user(), |graph| graph.queue_pending_link(&original))
             .unwrap();
         let newer = session.pending(SystemTime::now()).unwrap();
         backend.apply(older.ops()).await.unwrap();
@@ -262,7 +235,7 @@ fn cache_returning_to_saved_state_still_writes_after_an_older_batch() {
         assert!(!session.has_unstored());
         assert_eq!(
             sessions
-                .open(id)
+                .open_with(id)
                 .await
                 .unwrap()
                 .graph()
@@ -272,71 +245,83 @@ fn cache_returning_to_saved_state_still_writes_after_an_older_batch() {
     });
 }
 
+/// A resource owning a frozen selection of `members`, and its record.
+fn frozen_owner(members: Vec<Uuid>) -> (Uuid, FrozenSelection, PersistedResourceRecord) {
+    let selection = FrozenSelection::v1(
+        serde_json::json!({"kind":"saved-selection"}),
+        0,
+        members,
+        Vec::new(),
+    );
+    let iri = format!("urn:uuid:{}", Uuid::from_u128(0xf0));
+    let record = PersistedResourceRecord {
+        canonical_iri: iri.clone(),
+        facets: vec![PersistedResourceFacet {
+            facet: mere::model::FROZEN_SELECTION.into(),
+            value_json: serde_json::to_string(&selection).unwrap(),
+        }],
+    };
+    (ResourceNode::for_term(&iri).id(), selection, record)
+}
+
 #[test]
 fn frozen_resource_selection_and_annotations_survive_recorded_save_reopen() {
     pollster::block_on(async {
-        let sessions = MereSessions::new(MemoryBackend::new());
+        let sessions = Sessions::new_with(MemoryBackend::new());
         let base = baseline(PendingLinkRetention::SessionOnly);
-        let members: Vec<_> = base.resource_nodes().map(|node| node.id()).collect();
-        let mut session = sessions.begin_recorded(Author::user(), Some(base));
+        let members: Vec<_> = base.resources().resource_nodes().map(|node| node.id()).collect();
+        let mut session = sessions.begin_recorded_with(Author::user(), Some(base));
         let id = session.manifest().session_id;
-        let (owner, _) = session
-            .edit_now(Author::user(), |graph| {
-                graph
-                    .freeze_resource_selection(
-                        serde_json::json!({"kind":"saved-selection"}),
-                        members,
-                    )
-                    .unwrap()
-            })
-            .unwrap();
-        let frozen = session
-            .graph()
-            .resource(owner)
-            .unwrap()
-            .nested_selection()
-            .unwrap()
-            .clone();
+        let (owner, frozen, mut record) = frozen_owner(members);
         session
             .edit_now(Author::user(), |graph| {
                 graph
-                    .append_resource_properties(
-                        owner,
-                        vec![kernel::types::NodeProperty {
-                            statement_id: "frozen-annotation".into(),
-                            predicate: "urn:test:annotation".into(),
-                            value: "keep this".into(),
-                            datatype: None,
-                            lang: None,
-                            graph_scope: Default::default(),
-                            provenance_iri: Some("urn:test:user".into()),
-                            asserted_at_ms: Some(53),
-                        }],
-                    )
+                    .write_resource_record(&Author::user(), owner, Some(record.clone()))
+                    .unwrap();
+            })
+            .unwrap();
+        assert_eq!(
+            session.graph().resources().resource(owner).unwrap().nested_selection(),
+            Some(&frozen)
+        );
+        let annotation = NodeProperty {
+            statement_id: "frozen-annotation".into(),
+            predicate: "urn:test:annotation".into(),
+            value: "keep this".into(),
+            datatype: None,
+            lang: None,
+            graph_scope: Default::default(),
+            provenance_iri: Some("urn:test:user".into()),
+            asserted_at_ms: Some(53),
+        };
+        record.facets.push(PersistedResourceFacet {
+            facet: RESOURCE_PROPERTIES.into(),
+            value_json: serde_json::to_string(&[annotation]).unwrap(),
+        });
+        session
+            .edit_now(Author::user(), |graph| {
+                graph
+                    .write_resource_record(&Author::user(), owner, Some(record))
                     .unwrap();
             })
             .unwrap();
         session.flush(SystemTime::now()).await.unwrap();
         drop(session);
-        let reopened = sessions.open(id).await.unwrap();
+        let reopened = sessions.open_with(id).await.unwrap();
+        let resources = reopened.graph().resources();
         assert_eq!(
-            reopened.graph().resource(owner).unwrap().nested_selection(),
+            resources.resource(owner).unwrap().nested_selection(),
             Some(&frozen)
         );
         assert_eq!(
-            reopened.graph().resource_properties(owner)[0].statement_id,
+            resources.resource_properties(owner)[0].statement_id,
             "frozen-annotation"
         );
-        assert_eq!(
-            reopened.graph().resource_properties(owner)[0].value,
-            "keep this"
-        );
+        assert_eq!(resources.resource_properties(owner)[0].value, "keep this");
         assert!(
             reopened
                 .graph()
-                .open_frozen_selection(owner)
-                .unwrap()
-                .coverage
+                .coverage_for_resource_refs(frozen.members())
                 .limits
                 .is_empty()
         );

@@ -70,7 +70,7 @@ pub enum MergeChoice {
 /// part as each graph holds it (`None`: absent), in the target's ids.
 #[derive(Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct MergeConflict<G: MergeGraph = Graph> {
+pub struct MergeConflict<G: MergeGraph> {
     pub part: G::Part,
     pub base: Option<Value>,
     pub source: Option<Value>,
@@ -136,7 +136,7 @@ pub enum MergeMatch {
 /// A planned merge-in: the edits that apply cleanly and the conflicts that
 /// wait for a choice. Nothing is written until
 /// [`MereSessions::apply_merge`].
-pub struct PendingMerge<G: MergeGraph = Graph> {
+pub struct PendingMerge<G: MergeGraph> {
     target: SessionId,
     source: SessionId,
     matched: MergeMatch,
@@ -267,7 +267,7 @@ impl<G: MergeGraph> PendingMerge<G> {
 }
 
 /// What a merge-in wrote, and the edits admission refused (engine-split D169).
-pub struct Merged<G: MergeGraph = Graph> {
+pub struct Merged<G: MergeGraph> {
     pub applied: Applied,
     /// The edits left out while the rest applied, in order.
     pub refused: Vec<Refused<G>>,
@@ -276,7 +276,7 @@ pub struct Merged<G: MergeGraph = Graph> {
 /// An edit a merge-in could not apply because admission refused it.
 #[derive(Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct Refused<G: MergeGraph = Graph> {
+pub struct Refused<G: MergeGraph> {
     /// Its position among the edits the merge wrote: the plan's clean edits,
     /// then each choice's, then the derivation records.
     pub position: usize,
@@ -291,7 +291,7 @@ pub struct Refused<G: MergeGraph = Graph> {
 /// not take, and why.
 #[derive(Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct DroppedChoice<G: MergeGraph = Graph> {
+pub struct DroppedChoice<G: MergeGraph> {
     pub part: G::Part,
     pub choice: MergeChoice,
     pub reason: String,

@@ -8,9 +8,9 @@
 //!
 //! Every format writer, the held index and SPARQL read a graph through
 //! [`RdfSource`]. [`ResourceGraph`] implements it with the resource projection
-//! below; `mere-kernel`'s surface graph implements it by putting its surface
-//! walk before the same resource projection, which keeps the order and content
-//! of the projection the kernel had before the split.
+//! below; a host's surface graph (Graphshell's incipit-graph) implements it by
+//! putting its surface walk before the same resource projection, which keeps the
+//! order and content of the projection mere-kernel had before the split.
 
 use oxrdf::{GraphName, NamedNode, Quad};
 use petgraph::Direction;

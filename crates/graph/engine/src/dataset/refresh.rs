@@ -34,7 +34,7 @@ impl IndexedDataset {
     /// `touched` sources and applying the difference to the index.
     ///
     /// The caller's contract: `touched` names every source an edit since the
-    /// dataset's revision changed. Derive it only through the kernel's
+    /// dataset's revision changed. Derive it only through the surface graph's
     /// `touched_sources` over the captured edits, or rebuild with
     /// [`IndexedDataset::for_graph`]: that function matches every captured
     /// edit kind by name with no wildcard, so a new kind fails to compile until

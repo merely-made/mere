@@ -7,48 +7,42 @@
 //! A checkpoint is read back only beside the journal prefix it names.
 
 use super::*;
-use kernel::graph::apply::add_node;
+use crate::test_surface::{Surface, show_edits};
 use muniment::MemoryBackend;
 
-fn baseline() -> Graph {
-    let mut graph = Graph::new();
+type Sessions = MereSessions<MemoryBackend, Surface>;
+
+fn baseline() -> Surface {
+    let mut graph = Surface::default();
     for (id, url) in [(1, "https://one.test/"), (2, "https://two.test/")] {
-        add_node(
-            &mut graph,
-            Some(Uuid::from_u128(id)),
-            url.into(),
-            Default::default(),
-        );
+        graph.show(Uuid::from_u128(id), url);
     }
     graph
 }
 
-/// A recorded session whose first node is titled `title`, checkpointed.
-async fn checkpointed(sessions: &MereSessions<MemoryBackend>, title: &str) -> SessionId {
+/// A recorded session whose first surface shows `title`, checkpointed.
+async fn checkpointed(sessions: &Sessions, title: &str) -> SessionId {
     let author = Author::person("checkpoint");
-    let mut session = sessions.begin_recorded(author.clone(), Some(baseline()));
-    session
-        .apply(
-            author,
-            vec![CapturedDelta::ReplaySetNodeTitleById {
-                node_id: Uuid::from_u128(1).to_string(),
-                title: title.into(),
-            }],
-        )
-        .await
-        .unwrap();
+    let mut session = sessions.begin_recorded_with(author.clone(), Some(baseline()));
+    let (_, edits) = show_edits(Uuid::from_u128(1), &format!("https://{title}.test/"));
+    session.apply(author, edits).await.unwrap();
     session.checkpoint().await.unwrap();
     session.id()
 }
 
-fn title_of(session: &GraphSession<MemoryBackend>) -> String {
-    session
-        .graph()
-        .get_node_by_id(Uuid::from_u128(1))
-        .unwrap()
-        .1
-        .title
-        .clone()
+/// The title the first surface shows, read back from its resource's IRI.
+fn title_of(session: &GraphSession<MemoryBackend, Surface>) -> String {
+    let iri = session.graph().iri_of(Uuid::from_u128(1)).unwrap();
+    iri.trim_start_matches("https://")
+        .trim_end_matches(".test/")
+        .to_owned()
+}
+
+/// A graph from elsewhere: one surface no session here shows.
+fn foreign() -> Surface {
+    let mut foreign = Surface::default();
+    foreign.show(Uuid::from_u128(999), "https://foreign.test/");
+    foreign
 }
 
 async fn stored(backend: &MemoryBackend, id: SessionId, name: &str) -> Vec<u8> {
@@ -68,12 +62,12 @@ async fn put(backend: &MemoryBackend, id: SessionId, name: &str, value: Vec<u8>)
 fn a_checkpoint_names_the_journal_prefix_and_the_files_it_reflects_and_opens_beside_them() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let id = checkpointed(&sessions, "alpha").await;
 
         let record: serde_json::Value =
             serde_json::from_slice(&stored(&backend, id, CHECKPOINT).await).unwrap();
-        let opened = sessions.open(id).await.unwrap();
+        let opened = sessions.open_with(id).await.unwrap();
         let cursor = opened.journal().live_cursor();
         let digest = opened
             .journal()
@@ -128,8 +122,8 @@ async fn marked(
 }
 
 /// The v1 and v2 digests (hex) of `id`'s journal at its live cursor.
-async fn digests_of(sessions: &MereSessions<MemoryBackend>, id: SessionId) -> (String, String) {
-    let opened = sessions.open(id).await.unwrap();
+async fn digests_of(sessions: &Sessions, id: SessionId) -> (String, String) {
+    let opened = sessions.open_with(id).await.unwrap();
     let log = opened.journal().log();
     let cursor = opened.journal().live_cursor().index();
     (
@@ -142,7 +136,7 @@ async fn digests_of(sessions: &MereSessions<MemoryBackend>, id: SessionId) -> (S
 fn a_v1_era_checkpoint_is_read_by_its_v1_digest_and_rewritten_as_v2() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let id = checkpointed(&sessions, "alpha").await;
         // Its files come from another session, so reading them shows as "beta".
         let other = checkpointed(&sessions, "beta").await;
@@ -150,7 +144,7 @@ fn a_v1_era_checkpoint_is_read_by_its_v1_digest_and_rewritten_as_v2() {
         assert_ne!(v1, v2);
         marked(&backend, id, other, &v1, None).await;
 
-        let mut opened = sessions.open(id).await.unwrap();
+        let mut opened = sessions.open_with(id).await.unwrap();
         assert_eq!(title_of(&opened), "beta", "the v1 checkpoint was read");
         assert_eq!(opened.journal().live_cursor(), opened.checkpointed);
         opened.checkpoint_if_behind().await.unwrap();
@@ -159,7 +153,7 @@ fn a_v1_era_checkpoint_is_read_by_its_v1_digest_and_rewritten_as_v2() {
         assert_eq!(record["journal_digest"], v2.as_str(), "rewritten as v2");
         assert_eq!(record["journal_digest_version"], 2);
 
-        let reopened = sessions.open(id).await.unwrap();
+        let reopened = sessions.open_with(id).await.unwrap();
         assert_eq!(title_of(&reopened), "beta", "the v2 checkpoint is read");
         assert!(!reopened.checkpoint_v1, "nothing left to rewrite");
     });
@@ -169,18 +163,18 @@ fn a_v1_era_checkpoint_is_read_by_its_v1_digest_and_rewritten_as_v2() {
 fn a_checkpoint_whose_digest_is_not_of_its_version_is_replayed_past() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let id = checkpointed(&sessions, "alpha").await;
         let other = checkpointed(&sessions, "beta").await;
         let (v1, v2) = digests_of(&sessions, id).await;
         // Positive control: each digest under its own version is read.
         for (digest, version) in [(&v1, None), (&v2, Some(2))] {
             marked(&backend, id, other, digest, version).await;
-            assert_eq!(title_of(&sessions.open(id).await.unwrap()), "beta");
+            assert_eq!(title_of(&sessions.open_with(id).await.unwrap()), "beta");
         }
         for (digest, version) in [(&v1, Some(2)), (&v2, None), (&v2, Some(3))] {
             marked(&backend, id, other, digest, version).await;
-            let opened = sessions.open(id).await.unwrap();
+            let opened = sessions.open_with(id).await.unwrap();
             assert_eq!(title_of(&opened), "alpha", "{version:?} replayed past");
         }
     });
@@ -190,7 +184,7 @@ fn a_checkpoint_whose_digest_is_not_of_its_version_is_replayed_past() {
 fn a_checkpoint_taken_beside_another_journal_is_replayed_past() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let ours = checkpointed(&sessions, "alpha").await;
         // The same number of entries, from a different history.
         let theirs = checkpointed(&sessions, "beta").await;
@@ -199,12 +193,12 @@ fn a_checkpoint_taken_beside_another_journal_is_replayed_past() {
         }
 
         let mut opened = sessions
-            .open(ours)
+            .open_with(ours)
             .await
             .expect("not this journal's checkpoint");
         assert_eq!(title_of(&opened), "alpha");
         opened.checkpoint().await.unwrap();
-        assert_eq!(title_of(&sessions.open(ours).await.unwrap()), "alpha");
+        assert_eq!(title_of(&sessions.open_with(ours).await.unwrap()), "alpha");
     });
 }
 
@@ -212,16 +206,10 @@ fn a_checkpoint_taken_beside_another_journal_is_replayed_past() {
 fn a_checkpoint_whose_graph_and_facets_were_replaced_is_replayed_past() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let id = checkpointed(&sessions, "alpha").await;
         // The audit's probe: only the two files change, the record is the session's own.
-        let mut foreign = Graph::new();
-        add_node(
-            &mut foreign,
-            Some(Uuid::from_u128(999)),
-            "https://foreign.test/".into(),
-            Default::default(),
-        );
+        let foreign = foreign();
         put(
             &backend,
             id,
@@ -237,23 +225,17 @@ fn a_checkpoint_whose_graph_and_facets_were_replaced_is_replayed_past() {
         )
         .await;
 
-        let mut opened = sessions.open(id).await.expect("replayed past, not refused");
+        let mut opened = sessions.open_with(id).await.expect("replayed past, not refused");
         assert_eq!(title_of(&opened), "alpha");
         assert!(
-            opened
-                .graph()
-                .get_node_by_id(Uuid::from_u128(999))
-                .is_none()
+            opened.graph().shown(Uuid::from_u128(999)).is_none()
         );
 
         opened.checkpoint().await.unwrap();
-        let reopened = sessions.open(id).await.unwrap();
+        let reopened = sessions.open_with(id).await.unwrap();
         assert_eq!(title_of(&reopened), "alpha");
         assert!(
-            reopened
-                .graph()
-                .get_node_by_id(Uuid::from_u128(999))
-                .is_none()
+            reopened.graph().shown(Uuid::from_u128(999)).is_none()
         );
     });
 }
@@ -262,7 +244,7 @@ fn a_checkpoint_whose_graph_and_facets_were_replaced_is_replayed_past() {
 fn a_checkpoint_naming_no_files_is_replayed_past() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let id = checkpointed(&sessions, "alpha").await;
         let mut record: serde_json::Value =
             serde_json::from_slice(&stored(&backend, id, CHECKPOINT).await).unwrap();
@@ -274,13 +256,7 @@ fn a_checkpoint_naming_no_files_is_replayed_past() {
             serde_json::to_vec(&record).unwrap(),
         )
         .await;
-        let mut foreign = Graph::new();
-        add_node(
-            &mut foreign,
-            Some(Uuid::from_u128(999)),
-            "https://foreign.test/".into(),
-            Default::default(),
-        );
+        let foreign = foreign();
         put(
             &backend,
             id,
@@ -289,13 +265,10 @@ fn a_checkpoint_naming_no_files_is_replayed_past() {
         )
         .await;
 
-        let opened = sessions.open(id).await.unwrap();
+        let opened = sessions.open_with(id).await.unwrap();
         assert_eq!(title_of(&opened), "alpha");
         assert!(
-            opened
-                .graph()
-                .get_node_by_id(Uuid::from_u128(999))
-                .is_none()
+            opened.graph().shown(Uuid::from_u128(999)).is_none()
         );
     });
 }
@@ -305,7 +278,7 @@ fn a_checkpoint_without_a_journal_digest_is_ignored_for_a_full_replay_and_the_ne
  {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
-        let sessions = MereSessions::new(backend.clone());
+        let sessions = Sessions::new_with(backend.clone());
         let id = checkpointed(&sessions, "alpha").await;
         let mut record: serde_json::Value =
             serde_json::from_slice(&stored(&backend, id, CHECKPOINT).await).unwrap();
@@ -318,13 +291,7 @@ fn a_checkpoint_without_a_journal_digest_is_ignored_for_a_full_replay_and_the_ne
         )
         .await;
         // Its graph is another's: a checkpoint that names no journal is not trusted.
-        let mut foreign = Graph::new();
-        add_node(
-            &mut foreign,
-            Some(Uuid::from_u128(999)),
-            "https://foreign.test/".into(),
-            Default::default(),
-        );
+        let foreign = foreign();
         put(
             &backend,
             id,
@@ -341,15 +308,12 @@ fn a_checkpoint_without_a_journal_digest_is_ignored_for_a_full_replay_and_the_ne
         .await;
 
         let mut opened = sessions
-            .open(id)
+            .open_with(id)
             .await
             .expect("a digest-less checkpoint is skipped");
         assert_eq!(title_of(&opened), "alpha");
         assert!(
-            opened
-                .graph()
-                .get_node_by_id(Uuid::from_u128(999))
-                .is_none()
+            opened.graph().shown(Uuid::from_u128(999)).is_none()
         );
 
         opened.checkpoint().await.unwrap();
@@ -359,13 +323,10 @@ fn a_checkpoint_without_a_journal_digest_is_ignored_for_a_full_replay_and_the_ne
             record["journal_digest"].is_string(),
             "the new checkpoint names its journal"
         );
-        let reopened = sessions.open(id).await.unwrap();
+        let reopened = sessions.open_with(id).await.unwrap();
         assert_eq!(title_of(&reopened), "alpha");
         assert!(
-            reopened
-                .graph()
-                .get_node_by_id(Uuid::from_u128(999))
-                .is_none()
+            reopened.graph().shown(Uuid::from_u128(999)).is_none()
         );
     });
 }

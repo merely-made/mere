@@ -5,11 +5,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use kernel::graph::apply::{GraphDelta, apply_graph_delta};
-use kernel::graph::capture::replay_captured_deltas;
-use kernel::graph::{CapturedDelta, Graph, NodeKey};
+use mere::model::{Author, JournalDelta, ResourceDelta};
+use mere_test_surface::{Delta, Surface, Uuid};
 use serde_json::json;
 use std::sync::{Arc, Mutex};
+
+/// The shared test graph (engine split D272).
+type Graph = Surface;
+
 fn facts(subject: SubjectRef) -> BirthFacts {
     serde_json::from_value(json!({"schema":"dramatis.birth-facts/v1","subject":subject,"date":{"year":2000,"month":1,"day":1},"time":{"Known":{"hour":12,"minute":0,"second":0}},"place":{"label":"Public synthetic birthplace","latitude_microdegrees":0,"longitude_microdegrees":0,"precision":"synthetic point"},"timezone":"UTC","source":{"label":"Public synthetic receipt","reference":null}})).unwrap()
 }
@@ -23,9 +26,10 @@ fn personae_id(value: &str) -> personae::ProfileId {
 }
 /// Every resource record, for comparing a graph before and after a refusal.
 fn records(g: &Graph) -> serde_json::Value {
-    let all: Vec<_> = g
+    let resources = g.resources();
+    let all: Vec<_> = resources
         .resource_nodes()
-        .filter_map(|r| g.resource_record(r.id()))
+        .filter_map(|r| resources.resource_record(r.id()))
         .collect();
     serde_json::to_value(all).unwrap()
 }
@@ -33,6 +37,7 @@ fn records(g: &Graph) -> serde_json::Value {
 fn overwrite(g: &mut Graph, iri: &str, name: &str, value: serde_json::Value) {
     let resource = ResourceNode::for_term(iri);
     let mut record = g
+        .resources()
         .resource_record(resource.id())
         .unwrap_or(PersistedResourceRecord {
             canonical_iri: iri.into(),
@@ -43,25 +48,31 @@ fn overwrite(g: &mut Graph, iri: &str, name: &str, value: serde_json::Value) {
         facet: name.into(),
         value_json: value.to_string(),
     });
-    apply_graph_delta(
-        g,
-        GraphDelta::ReplaySetResourceRecordById {
-            resource_id: resource.id(),
-            record: Some(record),
-        },
-    );
+    let write = JournalDelta::Resource(ResourceDelta::ReplaySetResourceRecordById {
+        resource_id: resource.id().to_string(),
+        record: Some(record),
+    });
+    SessionGraph::apply(g, write).unwrap();
 }
-fn node_at(g: &mut Graph, url: &str) -> NodeKey {
-    kernel::graph::apply::add_node(
-        g,
-        Some(Graph::node_namespace_id(url)),
-        url.into(),
-        Default::default(),
-    )
+/// A surface showing the resource at `url`, as a host shows a record.
+fn node_at(g: &mut Graph, url: &str) -> Uuid {
+    let surface = ResourceNode::for_term(url).id();
+    g.show(surface, url);
+    surface
+}
+/// The graph the recorded `bytes` rebuild, each edit applied as it was made.
+fn replay_captured_deltas(bytes: &[u8]) -> Graph {
+    let deltas: Vec<Delta> = serde_json::from_slice(bytes).unwrap();
+    let mut graph = Graph::default();
+    for delta in &deltas {
+        let edit = Graph::edit_of(delta, &Author::user()).unwrap();
+        SessionGraph::apply(&mut graph, edit).unwrap();
+    }
+    graph
 }
 #[test]
 fn corrections_keep_prior_revision_and_its_subject_association() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let original = facts(profile());
     let first = save_birth(&mut g, &original).unwrap();
     let mut changed = original.clone();
@@ -80,7 +91,7 @@ fn corrections_keep_prior_revision_and_its_subject_association() {
 }
 #[test]
 fn a_keyless_subject_is_shared_and_persona_scoped() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let subject = create_contact(
         &mut g,
         "persona-a",
@@ -92,13 +103,13 @@ fn a_keyless_subject_is_shared_and_persona_scoped() {
     assert_eq!(contacts(&g).unwrap()[0].subject, subject);
     validate_for_persona(&g, "persona-a").unwrap();
     assert!(validate_for_persona(&g, "persona-b").is_err());
-    let mut missing = Graph::new();
+    let mut missing = Graph::default();
     assert!(save_birth(&mut missing, &facts(subject)).is_err());
-    assert_eq!(missing.resource_nodes().count(), 0);
+    assert_eq!(missing.resources().resource_nodes().count(), 0);
 }
 #[test]
 fn association_subject_revision_or_dangling_target_is_refused_without_mutation() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let record = save_birth(&mut g, &facts(profile())).unwrap();
     let before = records(&g);
     for bad in [
@@ -130,7 +141,7 @@ fn association_subject_revision_or_dangling_target_is_refused_without_mutation()
 }
 #[test]
 fn journal_replay_preserves_exact_inputs_and_links() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let edits = Arc::new(Mutex::new(Vec::new()));
     let held = edits.clone();
     g.set_recorder(Some(Arc::new(move |d| {
@@ -145,8 +156,7 @@ fn journal_replay_preserves_exact_inputs_and_links() {
     .unwrap();
     let expected = save_birth(&mut g, &facts(subject)).unwrap();
     let bytes = serde_json::to_vec(&*edits.lock().unwrap()).unwrap();
-    let deltas: Vec<kernel::graph::CapturedDelta> = serde_json::from_slice(&bytes).unwrap();
-    let replayed = replay_captured_deltas(deltas);
+    let replayed = replay_captured_deltas(&bytes);
     validate_for_persona(&replayed, "persona-a").unwrap();
     assert_eq!(births(&replayed).unwrap(), vec![expected]);
     assert_eq!(contacts(&replayed).unwrap(), contacts(&g).unwrap());
@@ -154,7 +164,7 @@ fn journal_replay_preserves_exact_inputs_and_links() {
 }
 #[test]
 fn tampering_cannot_reuse_an_existing_birth_revision() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let record = save_birth(&mut g, &facts(profile())).unwrap();
     // Control: the same overwrite with the saved facts stays valid.
     overwrite(
@@ -176,7 +186,7 @@ fn tampering_cannot_reuse_an_existing_birth_revision() {
 }
 #[test]
 fn external_resource_links_are_explicit_and_can_concern_multiple_subjects() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let target = ResourceRef {
         domain: "address-owner".into(),
         id: "household/address".into(),
@@ -199,7 +209,7 @@ fn external_resource_links_are_explicit_and_can_concern_multiple_subjects() {
 }
 #[test]
 fn unknown_time_remains_unknown_and_unsupported_facets_refuse() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let mut original = facts(profile());
     original.time = dramatis::birth::BirthTime::Unknown;
     let record = save_birth(&mut g, &original).unwrap();
@@ -226,7 +236,7 @@ fn external_target() -> ResourceRef {
 
 #[test]
 fn external_contact_associations_refuse_foreign_or_dangling_subject_without_mutation() {
-    let mut graph = Graph::new();
+    let mut graph = Graph::default();
     let id = LocalId::from_random([7; 16]);
     let local = create_contact(&mut graph, "persona-a", id, "Local subject").unwrap();
     let edits = Arc::new(Mutex::new(Vec::new()));
@@ -270,7 +280,7 @@ fn external_contact_associations_refuse_foreign_or_dangling_subject_without_muta
 
 #[test]
 fn external_association_to_retained_foreign_contact_still_requires_owner_scope_on_replay() {
-    let mut graph = Graph::new();
+    let mut graph = Graph::default();
     let edits = Arc::new(Mutex::new(Vec::new()));
     let captured = edits.clone();
     graph.set_recorder(Some(Arc::new(move |delta| {
@@ -289,8 +299,7 @@ fn external_association_to_retained_foreign_contact_still_requires_owner_scope_o
     assert!(validate_for_persona(&graph, "persona-a").is_err());
 
     let bytes = serde_json::to_vec(&*edits.lock().unwrap()).unwrap();
-    let deltas: Vec<kernel::graph::CapturedDelta> = serde_json::from_slice(&bytes).unwrap();
-    let replayed = replay_captured_deltas(deltas);
+    let replayed = replay_captured_deltas(&bytes);
     validate_for_persona(&replayed, "persona-b").unwrap();
     assert!(validate_for_persona(&replayed, "persona-a").is_err());
     assert!(associations(&replayed).unwrap().contains(&association));
@@ -298,7 +307,7 @@ fn external_association_to_retained_foreign_contact_still_requires_owner_scope_o
 
 #[test]
 fn newly_introduced_birth_profile_requires_positive_lookup_without_mutation() {
-    let before = Graph::new();
+    let before = Graph::default();
     let mut after = before.clone();
     save_birth(&mut after, &facts(profile())).unwrap();
     let before_records = records(&after);
@@ -313,7 +322,7 @@ fn newly_introduced_birth_profile_requires_positive_lookup_without_mutation() {
         Err("lookup denied".into())
     );
     assert_eq!(records(&after), before_records);
-    assert_eq!(before.resource_nodes().count(), 0);
+    assert_eq!(before.resources().resource_nodes().count(), 0);
     assert!(edits.lock().unwrap().is_empty());
 
     let calls = std::cell::RefCell::new(Vec::new());
@@ -331,7 +340,7 @@ fn newly_introduced_birth_profile_requires_positive_lookup_without_mutation() {
 
 #[test]
 fn association_only_profile_introduction_also_requires_lookup() {
-    let before = Graph::new();
+    let before = Graph::default();
     let mut after = before.clone();
     save_association(
         &mut after,
@@ -345,7 +354,7 @@ fn association_only_profile_introduction_also_requires_lookup() {
 
 #[test]
 fn historical_profiles_survive_unavailable_lookup_and_unrelated_edits() {
-    let mut before = Graph::new();
+    let mut before = Graph::default();
     let original = facts(profile());
     save_birth(&mut before, &original).unwrap();
     let mut after = before.clone();
@@ -386,7 +395,7 @@ fn historical_profiles_survive_unavailable_lookup_and_unrelated_edits() {
 
 #[test]
 fn invalid_before_or_after_shape_refuses_before_any_profile_lookup() {
-    let mut valid = Graph::new();
+    let mut valid = Graph::default();
     let birth = save_birth(&mut valid, &facts(profile())).unwrap();
     let mut invalid = valid.clone();
     let mut changed = birth.facts;
@@ -409,16 +418,16 @@ fn invalid_before_or_after_shape_refuses_before_any_profile_lookup() {
 
 #[test]
 fn records_are_resource_facets_and_place_no_node() {
-    let mut g = Graph::new();
+    let mut g = Graph::default();
     let edits = Arc::new(Mutex::new(Vec::new()));
     let held = edits.clone();
     g.set_recorder(Some(Arc::new(move |d| {
         held.lock().unwrap().push(d.clone())
     })));
     let record = save_birth(&mut g, &facts(profile())).unwrap();
-    assert_eq!(g.nodes().count(), 0, "placing a node is the host's job");
+    assert_eq!(g.surface_count(), 0, "placing a node is the host's job");
     let resource = ResourceNode::for_term(&record.resource.id);
-    let stored = g.resource_record(resource.id()).unwrap();
+    let stored = g.resources().resource_record(resource.id()).unwrap();
     assert_eq!(stored.canonical_iri, record.resource.id);
     assert_eq!(stored.facets.len(), 1);
     assert_eq!(stored.facets[0].facet, BIRTH_FACET);
@@ -431,7 +440,10 @@ fn records_are_resource_facets_and_place_no_node() {
     assert!(
         edits
             .iter()
-            .all(|d| matches!(d, CapturedDelta::ReplaySetResourceRecordById { .. })),
+            .all(|d| matches!(
+                d,
+                JournalDelta::Resource(ResourceDelta::ReplaySetResourceRecordById { .. })
+            )),
         "only resource-record writes: {edits:?}"
     );
 }
@@ -441,20 +453,13 @@ fn a_node_facet_record_is_refused_with_no_legacy_reader() {
     // The form before D216: a node at the record's address holding the facet.
     let facts = facts(profile());
     let birth = birth_resource(&facts).unwrap();
-    let mut legacy = Graph::new();
-    let key = node_at(&mut legacy, &birth.resource.id);
-    apply_graph_delta(
-        &mut legacy,
-        GraphDelta::SetNodeFacet {
-            key,
-            facet: BIRTH_FACET.into(),
-            value: serde_json::to_value(&facts).unwrap(),
-        },
-    );
+    let mut legacy = Graph::default();
+    let surface = node_at(&mut legacy, &birth.resource.id);
+    legacy.set_facet(surface, BIRTH_FACET, serde_json::to_value(&facts).unwrap());
     assert!(validate(&legacy).is_err());
     assert!(births(&legacy).is_err());
     // Control: a host may still show a record with a bare node at its address.
-    let mut shown = Graph::new();
+    let mut shown = Graph::default();
     let record = save_birth(&mut shown, &facts).unwrap();
     node_at(&mut shown, &record.resource.id);
     validate(&shown).unwrap();

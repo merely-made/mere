@@ -17,7 +17,7 @@ pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
 /// One resource identified by a canonical IRI.
 ///
 /// Identity and address are immutable together. Content records will be
-/// attached through the kernel's recorded write path.
+/// attached through the surface graph's recorded write path.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ResourceNode {
     container: portolan::Container<Uuid>,

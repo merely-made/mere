@@ -188,43 +188,6 @@ impl<B: LegacyTransactionBackend, G: SessionGraph> GraphSession<B, G> {
     }
 }
 
-impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
-    /// Preflight observed stable-ID commands against this complete writer, then
-    /// apply their live deltas and the resulting addressable publication in one
-    /// atomic write. Every refusal comes before anything is written: a stale
-    /// observation, a missing target, an unqualified session, an edit
-    /// admission refuses (engine-split D166) or a storage refusal leaves
-    /// graph, history, capture and storage as they were. Returns
-    /// the published generation with the application.
-    pub async fn transact_live(
-        &mut self,
-        author: Author,
-        commands: Vec<crate::live_graph::ObservedCommand>,
-        at: SystemTime,
-    ) -> Result<(crate::live_graph::LiveApplied, String), crate::live_graph::LiveEditError> {
-        use crate::live_graph::{LiveApplied, preflight};
-        self.ensure_writable()?;
-        // The complete current records are what external observations were
-        // taken against; the resident graph's filtered copy is never hashed.
-        let source = self.prepare_resident_publication()?;
-        let program = preflight(&self.graph, &source, &author, commands)?;
-        let created = program.created.clone();
-        let (applied, generation) = self
-            .transact_change(at, true, move |candidate| {
-                candidate
-                    .try_edit_as(author.clone(), ChangeKind::Edit, |graph| {
-                        program.apply(graph, &author)
-                    })
-                    .map(|(_, applied)| applied)
-            })
-            .await?;
-        Ok((
-            LiveApplied { applied, created },
-            generation.expect("published write"),
-        ))
-    }
-}
-
 impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
     /// Apply one complete, validated change against a session.
     /// Storage failure, a competing append or an edit admission refuses
@@ -451,7 +414,6 @@ impl<B: LegacyTransactionBackend + Clone, G: SessionGraph> GraphSession<B, G> {
             placement: self.placement.clone(),
             translation: self.translation.clone(),
             hooks: self.hooks,
-            retained_source: self.retained_source.clone(),
             graph,
             pending,
             journal: self.journal.clone(),

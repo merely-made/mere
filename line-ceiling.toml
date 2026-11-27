@@ -2,26 +2,6 @@
 ceiling = 600
 
 [[exception]]
-path = "crates/graph/graph-kernel/src/graph/apply.rs"
-reason = "Apply. Existing source-size debt; a responsibility split must preserve GraphDelta, GraphDeltaResult and existing module visibility."
-
-[[exception]]
-path = "crates/graph/graph-kernel/src/graph/capture.rs"
-reason = "Stable-id graph-delta capture/replay helpers. Existing source-size debt; a responsibility split must preserve CapturedDelta, GraphTableStats, ReplayAttribution and existing module visibility."
-
-[[exception]]
-path = "crates/system/pandect/src/furnace.rs"
-reason = "The furnace's graph passes: forgetting and consolidation over a mere. Existing source-size debt; a responsibility split must preserve ForgetProposal, ImageGcProposal, ImageReferenceDrop and existing module visibility."
-
-[[exception]]
-path = "crates/system/pandect/src/graph_codicil.rs"
-reason = "Graph codicils — freezing a live graph into an immutable, content-addressed eidetic codicil, and thawing one back into a live graph. Existing source-size debt; a responsibility split must preserve GraphCandidate, GraphCodicil, ArchivedSession and existing module visibility."
-
-[[exception]]
-path = "crates/system/pandect/src/graph_placement.rs"
-reason = "Explicit input placement; a missing profile remains unqualified. Existing source-size debt; a responsibility split must preserve PlacementProfile, SessionPlacement, FrozenGraph and existing module visibility."
-
-[[exception]]
 path = "crates/system/pandect/src/graph_session.rs"
 reason = "A mere's sessions: their schema over one muniment store, the live session ([GraphSession]) and the lifecycle ([MereSessions]). Existing source-size debt; a responsibility split must preserve GraphValidator, GraphAdmissionValidator, LegacyTransactionBackend and existing module visibility."
 
@@ -30,28 +10,12 @@ path = "crates/system/pandect/src/graph_session_merge.rs"
 reason = "Merging a branch or a picked-off part back into a session (session merge-in note, design_docs/mere_docs/technical_architecture/2026-10-15_session_merge_in_note.md, rulings M1–M8). Existing source-size debt; a responsibility split must preserve MergeChoice, MergeConflict, MergeMatch and existing module visibility."
 
 [[exception]]
-path = "crates/system/pandect/src/graph_session_merge_tests.rs"
-reason = "Session merge-in: branches round-trip, picks and picks of picks merge back, conflicts take each side, deletions merge three-way, and resource facets with a rule merge as Compose. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
 path = "crates/system/pandect/src/personal_sync.rs"
 reason = "H7 personal-device synchronization for Graphshell's local Mere graph. Existing source-size debt; a responsibility split must preserve PersonalEncryption, PersonalGraphExt, PersonalGraphEvent and existing module visibility."
 
 [[exception]]
 path = "crates/system/pandect/src/personal_sync/assertions.rs"
 reason = "Assertions. Existing source-size debt; a responsibility split must preserve AssertionOwner, IdentityIndex and existing module visibility."
-
-[[exception]]
-path = "crates/system/pandect/src/snapshot_merge.rs"
-reason = "Snapshot-level merge for codicil compose (Alembic tail B7 / decision 1). Existing source-size debt; a responsibility split must preserve MergeReport and existing module visibility."
-
-[[exception]]
-path = "crates/system/pandect/tests/graph_residency.rs"
-reason = "Graph residency. Existing source-size debt; a responsibility split must preserve ProbeBackend, ProbeBackend, ReadProbe and existing module visibility."
-
-[[exception]]
-path = "crates/system/pandect/tests/live_graph.rs"
-reason = "Live graph. Existing source-size debt; a responsibility split must preserve LiveNow, Session and existing module visibility."
 
 [[exception]]
 path = "scripts/mere_doc_audit.py"

@@ -18,8 +18,6 @@ use eidetic::{
     Hash, ManifestId, MereNativeFieldSpec, MereNativeSchemaBuilder, SchemaDefinition, SchemaRef,
     TypedPayload,
 };
-use kernel::graph::Graph;
-use kernel::persistence::GraphSnapshot;
 use mere::session::SessionGraph;
 use serde::{Deserialize, Serialize};
 
@@ -96,7 +94,7 @@ impl TransferScope {
 /// consumer names its graph through its per-crate alias.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct ProductCodicilV3<G: SessionGraph = Graph> {
+pub struct ProductCodicilV3<G: SessionGraph> {
     pub schema: String,
     pub scope: TransferScope,
     pub exported_at_ms: u64,
@@ -108,7 +106,7 @@ pub struct ProductCodicilV3<G: SessionGraph = Graph> {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct ProfiledProductCodicil<G: SessionGraph = Graph> {
+pub struct ProfiledProductCodicil<G: SessionGraph> {
     #[serde(flatten)]
     pub product: ProductCodicilV3<G>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -175,16 +173,8 @@ impl std::fmt::Display for InvalidCodicil {
 
 impl std::error::Error for InvalidCodicil {}
 
-/// Materialize a codicil's graph under its placement profile, with its facets.
-pub fn profiled_codicil_graph(
-    snapshot: GraphSnapshot,
-    facets: NodeFacetStore,
-    placement: Option<PlacementProfile>,
-) -> Result<Graph, InvalidCodicil> {
-    profiled_codicil_graph_with::<Graph>(snapshot, facets, placement)
-}
-
-/// [`profiled_codicil_graph`] over any graph (engine split D257).
+/// Materialize a codicil's graph under its placement profile, with its
+/// facets, over any graph (engine split D257).
 pub fn profiled_codicil_graph_with<G: SessionGraph>(
     snapshot: G::Snapshot,
     facets: NodeFacetStore,
@@ -196,14 +186,10 @@ pub fn profiled_codicil_graph_with<G: SessionGraph>(
 }
 
 /// Decode a codicil's payload, refusing a foreign schema, a relation naming an
-/// object outside the selection, and a graph that does not materialize.
-pub fn decode_profiled_codicil(bytes: &[u8]) -> Result<ProfiledProductCodicil, InvalidCodicil> {
-    decode_profiled_codicil_with::<Graph>(bytes)
-}
-
-/// [`decode_profiled_codicil`] over any graph (engine split D254). The
-/// selection check reads node ids and relation ends from the snapshot's
-/// stored form, which every graph's snapshot keeps.
+/// object outside the selection, and a graph that does not materialize, over
+/// any graph (engine split D254). The selection check reads node ids and
+/// relation ends from the snapshot's stored form, which every graph's
+/// snapshot keeps.
 pub fn decode_profiled_codicil_with<G: SessionGraph>(
     bytes: &[u8],
 ) -> Result<ProfiledProductCodicil<G>, InvalidCodicil> {

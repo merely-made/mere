@@ -6,7 +6,7 @@
 
 //! SPARQL query over the graph (the `query` feature).
 //!
-//! `spareval` evaluates over an [`IndexedDataset`]: the kernel's RDF
+//! `spareval` evaluates over an [`IndexedDataset`]: a graph's RDF
 //! projection interned into dense ids and indexed six ways, so every triple
 //! pattern reads one range. [`sparql`] builds one per call; a host that queries
 //! often holds one with [`IndexedDataset::for_graph`], rebuilds it when

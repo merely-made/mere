@@ -6,7 +6,7 @@
 
 //! The held dataset (no SPARQL evaluator needed; `query` reads it through `spareval`): `oxrdf` terms interned into a dense-id dictionary
 //! and their quads in a `quadstore::QuadIndex` (indexed dataset brief
-//! D1 to D5). Built once per revision and read until the kernel's change
+//! D1 to D5). Built once per revision and read until the graph's change
 //! counters move, or brought forward by [`IndexedDataset::refresh`] (quad index
 //! plan P4); who holds it is the consumer's (quad index plan D3).
 
@@ -35,7 +35,7 @@ pub(crate) type Row = (Quad, bool);
 pub struct IndexedDataset {
     pub(crate) terms: Dictionary<Term>,
     pub(crate) index: QuadIndex,
-    /// The kernel counters and input keys at build or last refresh; `None`
+    /// The graph's counters and input keys at build or last refresh; `None`
     /// for a dataset not built from a graph.
     key: Option<ProjectionKey>,
     /// What each source contributed, when the graph's projection splits.

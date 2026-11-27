@@ -6,8 +6,8 @@
 
 use std::time::SystemTime;
 
-use kernel::graph::{Author, ResourceNode};
-use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
+use mere::model::author::Author;
+use mere::model::{PersistedResourceFacet, PersistedResourceRecord, ResourceNode};
 use mere::acquire::page_claims::{KEPT_PAGE_CLAIMS_FACET, KeptPageClaims, PageClaims};
 use mere::session::SessionGraph;
 use muniment::Backend;
@@ -129,6 +129,7 @@ mod tests {
 
     use super::*;
     use crate::MereSessions;
+    use crate::test_surface::Surface;
 
     #[test]
     fn kept_source_reopens_at_its_original_cursor_through_a_sealed_journal() {
@@ -143,10 +144,10 @@ mod tests {
                     b"fixture secret",
                 ),
             );
-            let sessions = MereSessions::new(sealed.clone());
+            let sessions = MereSessions::<_, Surface>::new_with(sealed.clone());
             let author = Author::user();
             let manifest = sessions.mint(author.clone(), None).await.unwrap();
-            let mut session = sessions.open(manifest.session_id).await.unwrap();
+            let mut session = sessions.open_with(manifest.session_id).await.unwrap();
             let source = NamedNode::new_unchecked("urn:fixture:kept-capture");
             let page = "https://example.test/field-notes";
             let block =
@@ -186,7 +187,7 @@ mod tests {
             assert_eq!(session.journal().live_cursor(), cursor);
             drop(session);
 
-            let reopen = GraphSession::open(sealed, manifest.session_id)
+            let reopen = GraphSession::<_, Surface>::open_with(sealed, manifest.session_id)
                 .await
                 .unwrap();
             let reopened = reopen

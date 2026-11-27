@@ -9,7 +9,7 @@
 //!
 //! It is a [`portolan::Graph`] of [`ResourceNode`]s and [`EdgePayload`]s (it
 //! dereferences to one) plus the facets that hold resource content. A host that
-//! journals its writes, such as `mere-kernel`, owns one privately and never
+//! journals its writes, such as Graphshell's incipit-graph, owns one privately and never
 //! hands out `&mut`, so its recorded write path stays the only way in.
 
 use std::collections::HashSet;

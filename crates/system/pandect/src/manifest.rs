@@ -23,7 +23,7 @@ use std::time::SystemTime;
 
 use catchment::{GraphId, SessionId};
 pub use identity::PersonaId;
-use kernel::time::wall_clock_now;
+use mere::model::clock::wall_clock_now;
 use serde::{Deserialize, Serialize};
 
 /// Current manifest schema version. Bump on incompatible changes
@@ -163,7 +163,7 @@ pub struct PickedFrom {
 /// Who put a session in the trash, and when.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TrashMark {
-    pub by: kernel::graph::Author,
+    pub by: mere::model::author::Author,
     pub at: SystemTime,
 }
 

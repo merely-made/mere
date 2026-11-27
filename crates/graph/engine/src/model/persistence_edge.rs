@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Edge persistence types — family/sub-kind enums, per-family data structs,
-//! and the edge container. Re-exported through the kernel's `persistence` to keep
-//! `persistence.rs` under the per-file ceiling.
+//! and the edge container, which a surface graph's `persistence` names
+//! (engine split P5 L3).
 
 use rkyv::{Archive, Deserialize, Serialize};
 

@@ -9,13 +9,16 @@
 //! became catchment (engine split P4), since it is the graph domain's check.
 #![cfg(not(target_arch = "wasm32"))]
 
-use kernel::graph::Author;
+mod support;
+
+use mere::model::Author;
 use pandect::manifest::PersonaId;
 use pandect::{
     DomainId, MERES_DIR, MereId, MereSessions, ReservoirError, mere_dir, open_mere_backend,
     reservoir_dir,
 };
 use pollster::block_on;
+use support::Surface;
 use uuid::Uuid;
 
 fn persona(n: u128) -> PersonaId {
@@ -34,7 +37,7 @@ fn a_mere_keeps_its_sessions_in_its_own_directory() {
         ),
         "a mere's store has one owner"
     );
-    let session = block_on(MereSessions::new(store).mint(Author::user(), None)).unwrap();
+    let session = block_on(MereSessions::<_, Surface>::new_with(store).mint(Author::user(), None)).unwrap();
     let manifest = mere_dir(root.path(), persona(1), mere)
         .join("sessions")
         .join(session.session_id.as_uuid().to_string())

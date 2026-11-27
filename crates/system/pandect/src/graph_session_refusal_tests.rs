@@ -7,7 +7,7 @@
 //! Engine-split D163: the import-shaped paths refuse a change with a refused
 //! edit whole, as `apply_now` does, and `revert` still reverts what it can.
 use super::*;
-use kernel::graph::RelationKey;
+use crate::test_surface::{PUBLICATION, show_edits};
 
 #[derive(Clone, Copy, Debug)]
 enum Path {
@@ -16,18 +16,18 @@ enum Path {
     TransactPublished,
 }
 
-fn write(edits: Vec<CapturedDelta>) -> Vec<GraphDelta> {
+fn write(edits: Vec<Delta>) -> Vec<Delta> {
     edits
         .iter()
-        .map(|edit| edit.replay_as(&person()).into_write().unwrap())
+        .map(|edit| Surface::edit_of(edit, &person()).unwrap())
         .collect()
 }
 
-async fn run(
-    session: &mut GraphSession<MemoryBackend>,
-    path: Path,
-    deltas: Vec<GraphDelta>,
-) -> Result<Applied, SessionError> {
+fn hooked(store: &MemoryBackend) -> Sessions {
+    Sessions::new_with(store.clone()).with_publication(&PUBLICATION)
+}
+
+async fn run(session: &mut Session, path: Path, deltas: Vec<Delta>) -> Result<Applied, SessionError> {
     let at = SystemTime::now();
     match path {
         Path::ApplyDeltas => session.apply_deltas(person(), deltas).await,
@@ -42,7 +42,7 @@ async fn run(
 /// What a refused change leaves as it was.
 type Held = ((serde_json::Value, serde_json::Value), Seq, usize, u64);
 
-fn held(session: &GraphSession<MemoryBackend>) -> Held {
+fn held(session: &Session) -> Held {
     (
         whole(session.graph()),
         session.journal.live_cursor(),
@@ -51,14 +51,14 @@ fn held(session: &GraphSession<MemoryBackend>) -> Held {
     )
 }
 
-/// A change through `path` whose middle edit puts a held handle on a Surface
+/// A change through `path` whose middle edit puts a held handle on another
 /// relation is refused whole, naming the edit and the handle; the same change
 /// with a fresh handle commits whole.
 async fn refuses_whole(path: Path) {
     let store = MemoryBackend::new();
-    let mere = MereSessions::new(store.clone());
+    let mere = hooked(&store);
     let (graph, handle) = related();
-    let mut session = mere.begin_recorded(person(), Some(graph));
+    let mut session = mere.begin_recorded_with(person(), Some(graph));
     session.flush(SystemTime::now()).await.unwrap();
     let before = held(&session);
     let stored = stored_bytes(&store).await;
@@ -85,9 +85,11 @@ async fn refuses_whole(path: Path) {
     assert!(applied.end > applied.first, "{path:?}");
     assert_eq!(session.revision(), before.3 + 1, "{path:?}");
     let graph = session.graph();
-    let imported = graph.get_node_key_by_id(Uuid::from_u128(7)).unwrap();
-    assert_eq!(graph.get_node(imported).unwrap().title, "Imported");
-    assert!(graph.find_semantic_statement("fresh-import").is_some());
+    assert_eq!(
+        graph.iri_of(Uuid::from_u128(7)).as_deref(),
+        Some("https://imported.test/")
+    );
+    assert!(graph.statement("fresh-import").is_some());
     assert_ne!(stored_bytes(&store).await, stored, "{path:?}: stored");
 }
 
@@ -106,57 +108,51 @@ fn transact_deltas_published_refuses_a_change_whole() {
     pollster::block_on(refuses_whole(Path::TransactPublished));
 }
 
-/// `ReplaySetEdgesByIds` for the Surface pair `from -> to` holding one row
-/// with statement `handle`, or no rows.
-fn surface(template: &Graph, from: u128, to: u128, handle: Option<&str>) -> CapturedDelta {
-    let edges = handle
+/// The resource surface `n` shows once added.
+fn resource(n: u128) -> Uuid {
+    show_edits(Uuid::from_u128(n), &format!("https://{n}.test/")).0
+}
+
+/// The relation between the resources surfaces `from` and `to` show, holding
+/// one row with statement `handle`, or no rows.
+fn relation(template: &Surface, from: u128, to: u128, handle: Option<&str>) -> Delta {
+    let rows = handle
         .map(|handle| {
-            let mut row = template.to_snapshot().resource_edges[0].clone();
+            let mut row = template.rows_between(Uuid::from_u128(1), Uuid::from_u128(2))[0].clone();
             for statement in row.assertions.as_mut().unwrap() {
                 statement.statement_id = handle.into();
             }
             vec![row]
         })
         .unwrap_or_default();
-    CapturedDelta::ReplaySetEdgesByIds {
-        from_id: Uuid::from_u128(from).to_string(),
-        to_id: Uuid::from_u128(to).to_string(),
-        edges,
-    }
+    edges_edit(resource(from), resource(to), rows)
 }
 
-/// Undo still reverts what it can: an undo whose restoration of a Surface
-/// statement now collides with a handle another author took drops that part
-/// and reverts the rest, as before D163.
+/// Undo still reverts what it can: an undo whose restoration of a statement
+/// now collides with a handle another author took drops that part and
+/// reverts the rest, as before D163.
 #[test]
 fn revert_still_reverts_what_it_can() {
     pollster::block_on(async {
-        let mere = MereSessions::new(MemoryBackend::new());
+        let mere = Sessions::new_with(MemoryBackend::new());
         let (template, _) = related();
         let mut baseline = template.clone();
-        let surface_s = surface(&template, 1, 2, Some("surface-s"));
-        kernel::graph::replay_captured_deltas_onto(&mut baseline, [surface_s]);
-        assert!(baseline.find_semantic_statement("surface-s").is_some());
-        let mut session = mere.begin(person(), Some(baseline));
+        let surface_s = relation(&template, 1, 2, Some("surface-s"));
+        SessionGraph::apply(&mut baseline, surface_s).unwrap();
+        assert!(baseline.statement("surface-s").is_some());
+        let mut session = mere.begin_with(person(), Some(baseline));
 
-        // The person's change adds node 7 and clears the pair holding `s`.
-        session
-            .apply_now(person(), vec![add(7), surface(&template, 1, 2, None)])
-            .unwrap();
-        assert!(
-            session
-                .graph()
-                .find_semantic_statement("surface-s")
-                .is_none()
-        );
+        // The person's change adds surface 7 and clears the pair holding `s`.
+        let mut change = add(7);
+        change.push(relation(&template, 1, 2, None));
+        session.apply_now(person(), change).unwrap();
+        assert!(session.graph().statement("surface-s").is_none());
         // Another author puts `s` on a new pair 3 -> 4.
-        session
-            .apply_now(
-                restorer(),
-                vec![add(3), add(4), surface(&template, 3, 4, Some("surface-s"))],
-            )
-            .unwrap();
-        let taken = session.graph().find_semantic_statement("surface-s");
+        let mut change = add(3);
+        change.extend(add(4));
+        change.push(relation(&template, 3, 4, Some("surface-s")));
+        session.apply_now(restorer(), change).unwrap();
+        let taken = session.graph().statement("surface-s");
         assert!(taken.is_some(), "the other author holds `s`");
 
         let revision = session.revision();
@@ -165,15 +161,11 @@ fn revert_still_reverts_what_it_can() {
         assert_eq!(session.revision(), revision + 1);
         let graph = session.graph();
         assert!(
-            graph.get_node_key_by_id(Uuid::from_u128(7)).is_none(),
-            "the undo removes node 7"
+            graph.shown(Uuid::from_u128(7)).is_none(),
+            "the undo removes surface 7"
         );
-        let (one, two) = (
-            graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap(),
-            graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap(),
-        );
-        let holder = graph.find_semantic_statement("surface-s").map(|(at, _)| at);
-        let pair = graph.find_edge_key(one, two).map(RelationKey::Surface);
+        let holder = graph.statement("surface-s");
+        let pair = Some((resource(1), resource(2)));
         assert!(holder.is_some(), "the other author still holds `s`");
         assert_ne!(
             holder, pair,
@@ -189,9 +181,9 @@ fn revert_still_reverts_what_it_can() {
 fn transact_operation_published_refuses_an_operation_whole() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = hooked(&store);
         let (graph, handle) = related();
-        let mut session = mere.begin_recorded(person(), Some(graph));
+        let mut session = mere.begin_recorded_with(person(), Some(graph));
         session.flush(SystemTime::now()).await.unwrap();
         let before = held(&session);
         let stored = stored_bytes(&store).await;
@@ -237,104 +229,10 @@ fn transact_operation_published_refuses_an_operation_whole() {
             .await
             .unwrap();
         assert_eq!(session.revision(), before.3 + 1);
-        assert!(
-            session
-                .graph()
-                .find_semantic_statement("fresh-import")
-                .is_some()
-        );
+        assert!(session.graph().statement("fresh-import").is_some());
         assert_eq!(
             session.operation_receipt(operation).await.unwrap(),
             Some(receipt)
         );
-    });
-}
-
-/// `transact_live` refuses a change whole (engine-split D166): commands whose
-/// middle edit gives a Surface a literal holding a held handle are refused,
-/// naming the edit and the handle; the same commands with a fresh handle
-/// commit whole.
-#[test]
-fn transact_live_refuses_a_change_whole() {
-    use crate::addressable_graph::GraphAddress;
-    use crate::live_graph::{LiveCheck, LiveCommand, LiveEditError, ObservedCommand};
-    pollster::block_on(async {
-        let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
-        let (graph, handle) = related();
-        let mut session = mere.begin_recorded(person(), Some(graph));
-        session.flush(SystemTime::now()).await.unwrap();
-        let (one, nine) = (Uuid::from_u128(1), Uuid::from_u128(9));
-        let digest = session
-            .prepare_resident_publication()
-            .unwrap()
-            .record_digest(GraphAddress::Surface(one))
-            .unwrap()
-            .to_owned();
-        let observed = vec![LiveCheck::RecordUnchanged {
-            address: GraphAddress::Surface(one),
-            digest,
-        }];
-        let commands = |statement: &str| {
-            let mut property = kernel::types::NodeProperty::new(
-                "https://live.test/vocab#note".to_string(),
-                "held".to_string(),
-            );
-            property.statement_id = statement.into();
-            vec![
-                ObservedCommand {
-                    command: LiveCommand::SetPinned {
-                        surface: one,
-                        pinned: true,
-                    },
-                    checks: observed.clone(),
-                },
-                ObservedCommand {
-                    command: LiveCommand::SetFacet {
-                        surface: one,
-                        facet: kernel::graph::node_facets::SEMANTIC_PROPERTIES.into(),
-                        value: serde_json::to_value([property]).unwrap(),
-                    },
-                    checks: observed.clone(),
-                },
-                ObservedCommand {
-                    command: LiveCommand::CreateAddress {
-                        id: nine,
-                        address: "https://live.test/nine".into(),
-                        title: "Nine".into(),
-                    },
-                    checks: vec![LiveCheck::Absent(GraphAddress::Surface(nine))],
-                },
-            ]
-        };
-        let before = held(&session);
-        let stored = stored_bytes(&store).await;
-
-        let refused = session
-            .transact_live(person(), commands(&handle), SystemTime::now())
-            .await
-            .unwrap_err();
-        assert!(
-            matches!(refused, LiveEditError::Session(SessionError::Validation(_))),
-            "{refused:?}"
-        );
-        let message = refused.to_string();
-        assert!(message.contains(&handle), "{message}");
-        assert!(message.contains("edit 1"), "{message}");
-        assert_eq!(held(&session), before, "nothing is applied");
-        assert_eq!(stored_bytes(&store).await, stored, "nothing is stored");
-
-        // Control: the same commands with a fresh handle commit whole.
-        let (live, _) = session
-            .transact_live(person(), commands("fresh-live"), SystemTime::now())
-            .await
-            .unwrap();
-        assert!(live.applied.end > live.applied.first);
-        assert_eq!(live.created, vec![nine]);
-        let graph = session.graph();
-        let key = graph.get_node_key_by_id(one).unwrap();
-        assert_eq!(graph.node_is_pinned(key), Some(true));
-        assert!(graph.get_node_key_by_id(nine).is_some());
-        assert_ne!(stored_bytes(&store).await, stored, "stored");
     });
 }

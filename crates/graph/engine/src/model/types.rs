@@ -6,8 +6,7 @@
 
 //! The assertion model's leaf types: graph scope, assertion basis and
 //! withdrawal, classification records and literal properties, and the
-//! statement-id minter. Moved from the kernel's `types` (engine split P5 L3);
-//! the kernel re-exports them at their old paths.
+//! statement-id minter. Moved from the kernel's `types` (engine split P5 L3).
 
 use std::sync::atomic::{AtomicU64, Ordering};
 

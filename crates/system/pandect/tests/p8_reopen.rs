@@ -178,6 +178,7 @@ fn surface_and_resource_deltas_share_one_journal_cursor_and_digest() {
                 JournalDelta::Resource(_) => "resource",
                 JournalDelta::Surface(SurfaceDelta::ShowResource { .. }) => "show",
                 JournalDelta::Surface(SurfaceDelta::HideSurface { .. }) => "hide",
+                JournalDelta::Surface(_) => "other",
             })
             .collect();
         assert_eq!(kinds, ["resource", "show", "resource", "show", "resource"]);

@@ -7,8 +7,13 @@ into one volume. This crate is that for a running session: the record it
 accretes while it is alive.
 
 - Session manifests, graph and view sidecars, worker declarations.
-- Graph image-reference adapters, facet and manifest stores.
+- Facet and manifest stores.
 - Application and persona settings, with references to host-owned identity.
+
+The session core is generic over the engine's `SessionGraph`. The surface
+graph and the readers that walk it (the addressable store, live edits, images,
+the furnace, snapshot merge) are Graphshell's `incipit-graph` and
+`incipit-session`.
 
 Eidetic owns portable intake, retained content and image bytes, content caching,
 and schema validation. Pandect binds those records to the session and graph,

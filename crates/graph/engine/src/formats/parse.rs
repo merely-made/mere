@@ -11,7 +11,8 @@
 //! ledger's engine layer and the query path share one dataset type. The text
 //! is read as written: nothing is skolemized, nothing is dropped, and no graph
 //! is touched. Applying a dataset to a graph stays with the importers
-//! ([`from_quads`](crate::from_quads) and the kernel's `kernel::rdf`).
+//! ([`from_quads`](crate::from_quads) and a surface graph's own, such as
+//! incipit-graph's `rdf`).
 //!
 //! `base_iri` resolves relative IRIs. `None` leaves them unresolved, which the
 //! syntaxes then reject. N-Triples and N-Quads have no relative IRIs, so they

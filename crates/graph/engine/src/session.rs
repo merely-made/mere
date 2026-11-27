@@ -10,9 +10,9 @@
 //! beside the journal, and the resource store beneath it. [`SessionGraph`] is
 //! what a session needs from its graph: snapshots and facets, replay with the
 //! state a replay carries, edits and their recording, revert, the session
-//! clock, held state with coverage, and the resource store. The kernel's
-//! `Graph` implements it; so can a host that names its own surface delta
-//! inside [`JournalDelta`](crate::model::JournalDelta).
+//! clock, held state with coverage, and the resource store. Graphshell's
+//! incipit-graph implements it; so can any host that names its own surface
+//! delta inside [`JournalDelta`](crate::model::JournalDelta).
 //!
 //! [`SessionJournal`] is the engine journal over any such graph: one muniment
 //! log of [`Attributed`] deltas, one cursor and one digest per prefix.

@@ -9,8 +9,8 @@
 //! The Mere engine, stage modules over the linked-data code (engine split P5 L2)
 //! and the model it projects (P5 L3): [`model`] holds the assertion model and the
 //! [`ResourceGraph`]. A graph that projects to RDF implements [`RdfSource`]; the
-//! resource graph does, and `mere-kernel`'s surface graph does by composing its
-//! surface walk with the resource projection here.
+//! resource graph does, and a host's surface graph (Graphshell's incipit-graph)
+//! does by composing its surface walk with the resource projection here.
 //!
 //! **Export.** [`to_jsonld`] emits *expanded* JSON-LD (full IRIs, no `@context`);
 //! [`to_jsonld_compact`] emits the *compacted* form (a `@graph` under an inline
@@ -22,7 +22,7 @@
 //! **Ingest.** [`from_jsonld`] parses a document into a [`GraphContribution`]
 //! (via `oxjsonld`); [`from_jsonld_with_contexts`] resolves a remote `@context`
 //! from a bundled [`ContextCache`] rather than the network. Applying a
-//! contribution to a surface graph is the kernel's (`kernel::rdf`).
+//! contribution to a surface graph is the surface graph's (incipit-graph's `rdf`).
 //!
 //! Hosts parse HTML and dispatch preserved `application/ld+json` blocks into
 //! these JSON-LD entry points. `mere-document-lanes` owns that Fleece adapter;

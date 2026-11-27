@@ -7,19 +7,29 @@
 //! V3's durable receipt: an owner saves, exits, and a real child process opens
 //! the reservoir/session/archive stores, checks exact state and makes an edit fork.
 
-use kernel::graph::fixtures::GraphFixtures;
+mod support;
+
+use mere::model::Author;
+use mere::session::SessionGraph;
 use muniment::Backend;
 use pandect::graph_codicil::{
-    archive_timestamp, load_graph_codicil, parse_codicil_id, save_session_codicil_checked,
+    archive_timestamp, load_profiled_graph_codicil_sealed_with, parse_codicil_id,
+    save_profiled_session_codicil_checked_with,
 };
 use pandect::manifest::PersonaId;
 use pandect::{
-    Author, CapturedDelta, DomainId, MereId, MereSessions, ReservoirStore, ViewKey, ViewState,
+    DomainId, MereId, MereSessions, ReservoirStore, ViewKey, ViewState,
     open_mere_archive_backend, open_mere_backend, open_reservoir_backend,
 };
 use std::process::Command;
 use std::time::SystemTime;
+use support::{CODICIL, Surface, SurfaceSnapshot, show_edits};
 use uuid::Uuid;
+
+/// These sessions over the shared surface, with its codicil hook.
+fn sessions<B: Backend + Clone>(backend: B) -> MereSessions<B, Surface> {
+    MereSessions::new_with(backend).with_codicil(&CODICIL)
+}
 
 const CHILD: &str = "archive_child_reopens_and_forks";
 const ROOT: &str = "MERE_V3_ARCHIVE_RECEIPT_ROOT";
@@ -32,38 +42,26 @@ fn persona() -> PersonaId {
 fn author() -> Author {
     Author::person(persona().as_uuid().to_string()).via("cleromancy")
 }
-fn state(graph: &pandect::graph_codicil::GraphCandidate) -> Vec<u8> {
+fn state(graph: &Surface) -> Vec<u8> {
     state_parts(graph.to_snapshot(), graph.facets())
 }
 
-fn state_parts(
-    mut snapshot: kernel::persistence::GraphSnapshot,
-    facets: &pandect::NodeFacetStore,
-) -> Vec<u8> {
-    // to_snapshot stamps the serialization time, not graph state. Fresh
-    // processes may serialize in different seconds; retain every graph and
-    // facet field while excluding only that generated timestamp.
-    snapshot.timestamp_secs = 0;
+/// Every graph and facet field. The surface's snapshot stamps no time, so two
+/// processes serialize one state alike.
+fn state_parts(snapshot: SurfaceSnapshot, facets: &pandect::NodeFacetStore) -> Vec<u8> {
     serde_json::to_vec(&serde_json::to_value((snapshot, facets)).unwrap()).unwrap()
 }
 
 #[test]
 fn state_fingerprint_ignores_generation_time_but_retains_graph_changes() {
-    let mut graph = <pandect::graph_codicil::GraphCandidate>::new();
-    graph.add_node(
-        "mere://v3/fingerprint".to_string(),
-        euclid::Point2D::new(4.0, 9.0),
-    );
-    let mut earlier = graph.to_snapshot();
-    earlier.timestamp_secs = 10;
+    let mut graph = Surface::default();
+    graph.show(Uuid::from_u128(1), "mere://v3/fingerprint");
+    let earlier = graph.to_snapshot();
     let expected = state_parts(earlier.clone(), graph.facets());
+    assert_eq!(state_parts(earlier, graph.facets()), expected);
 
-    let mut later = earlier;
-    later.timestamp_secs = 11;
-    assert_eq!(state_parts(later.clone(), graph.facets()), expected);
-
-    later.nodes[0].title = "A changed title".into();
-    assert_ne!(state_parts(later, graph.facets()), expected);
+    graph.show(Uuid::from_u128(1), "mere://v3/a-changed-title");
+    assert_ne!(state_parts(graph.to_snapshot(), graph.facets()), expected);
 }
 
 #[test]
@@ -83,15 +81,11 @@ fn archive_survives_owner_exit_and_a_fresh_process_forks_the_thaw() {
             .0
             .id;
         let backend = open_mere_backend(root.path(), persona(), mere).unwrap();
-        let sessions = MereSessions::new(backend.clone());
-        let mut live = sessions.begin(author(), None);
+        let sessions = sessions(backend.clone());
+        let mut live = sessions.begin_with(author(), None);
         live.apply(
             author(),
-            vec![CapturedDelta::ReplayAddNodeWithIdIfMissing {
-                id: Uuid::from_u128(1).to_string(),
-                url: "mere://v3/kept-reading".into(),
-                position: [4.0, 9.0],
-            }],
+            show_edits(Uuid::from_u128(1), "mere://v3/kept-reading").1,
         )
         .await
         .unwrap();
@@ -133,9 +127,10 @@ fn archive_survives_owner_exit_and_a_fresh_process_forks_the_thaw() {
         );
         let contention = String::from_utf8_lossy(&contender.stdout).into_owned();
         assert!(contention.contains("V3_RECEIPT real second process refused"));
-        let id = save_session_codicil_checked(
+        let id = save_profiled_session_codicil_checked_with(
             &mut archive,
-            live.codicil_payload(),
+            &CODICIL,
+            live.profiled_codicil_payload(),
             archive_timestamp(),
             |_| Ok(()),
         )
@@ -164,12 +159,12 @@ fn archive_survives_owner_exit_and_a_fresh_process_forks_the_thaw() {
     );
     pollster::block_on(async {
         let backend = open_mere_backend(root.path(), persona(), mere).unwrap();
-        let sessions = MereSessions::new(backend);
+        let sessions = sessions(backend);
         let manifests = sessions.list().await.unwrap();
         assert_eq!(manifests.len(), 3);
         let thaw = manifests.iter().find(|m| m.codicil_read_only).unwrap();
         assert_eq!(
-            state(sessions.open(thaw.session_id).await.unwrap().graph()),
+            state(sessions.open_with(thaw.session_id).await.unwrap().graph()),
             expected
         );
         let fork = manifests
@@ -216,7 +211,7 @@ fn archive_child_reopens_and_forks() {
                 .unwrap();
         assert_eq!(reservoir.meres().count(), 1);
         let backend = open_mere_backend(&root, persona(), mere).unwrap();
-        let sessions = MereSessions::new(backend);
+        let sessions = sessions(backend);
         let mut archive = open_mere_archive_backend(&root, persona(), mere).unwrap();
         let mut keys = archive.list("").await.unwrap();
         keys.sort();
@@ -224,13 +219,16 @@ fn archive_child_reopens_and_forks() {
         for key in keys {
             archive_bytes.push((key.clone(), archive.get(&key).await.unwrap().unwrap()));
         }
-        let kept = load_graph_codicil(&mut archive, id).await.unwrap().unwrap();
-        assert_eq!(kept.sessions[0].journal.len(), 2);
+        let kept = load_profiled_graph_codicil_sealed_with(&mut archive, None, &CODICIL, id)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(kept.codicil.sessions[0].journal.len(), 2);
         let thaw = sessions
-            .open_codicil_from_checked(&mut archive, id, author(), |_| Ok(()))
+            .open_codicil_from_checked_with(&mut archive, id, author(), |_| Ok(()))
             .await
             .unwrap();
-        let mut thaw = sessions.open(thaw.session_id).await.unwrap();
+        let mut thaw = sessions.open_with(thaw.session_id).await.unwrap();
         let expected = std::fs::read(root.join("expected.json")).unwrap();
         assert_eq!(state(thaw.graph()), expected);
         let key = ViewKey::new("cleromancy", "scene").unwrap();
@@ -238,18 +236,15 @@ fn archive_child_reopens_and_forks() {
             thaw.view(&key).unwrap().value["strategy"].as_str(),
             Some("spectral.default")
         );
-        let edit = CapturedDelta::ReplaySetNodeTitleById {
-            node_id: Uuid::from_u128(1).to_string(),
-            title: "Edited child fork".into(),
-        };
+        let edit = show_edits(Uuid::from_u128(1), "mere://v3/edited-child-fork").1;
         assert!(matches!(
-            thaw.apply(author(), vec![edit.clone()]).await,
+            thaw.apply(author(), edit.clone()).await,
             Err(pandect::SessionError::ReadOnly(_))
         ));
         let mut fork = sessions
             .begin_fork_at(&thaw, thaw.journal().live_cursor(), author())
             .unwrap();
-        fork.apply_now(author(), vec![edit]).unwrap();
+        fork.apply_now(author(), edit).unwrap();
         fork.flush(SystemTime::now()).await.unwrap();
         assert_ne!(state(fork.graph()), expected);
         assert_eq!(state(thaw.graph()), expected);

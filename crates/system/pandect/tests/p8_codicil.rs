@@ -11,21 +11,25 @@ use mere::model::{Author, ResourceNode};
 use mere::session::SessionGraph;
 use muniment::MemoryBackend;
 use pandect::graph_codicil::{
-    CodicilHook, KERNEL_CODICIL, RedactionPolicy, list_graph_codicils_with,
+    CodicilHook, GRAPH_SNAPSHOT_SCHEMA_ID, LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID,
+    PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID, RedactionPolicy, V2_GRAPH_SNAPSHOT_SCHEMA_ID,
+    V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID, list_graph_codicils_with,
     load_profiled_graph_codicil_sealed_with, open_codicil_as_session_sealed_with,
     save_graph_snapshot_codicil_sealed_with,
 };
 use pandect::{MereSessions, SessionError};
 use uuid::Uuid;
 
-use support::Surface;
+use support::{CODICIL as SURFACE, Surface};
 
-static SURFACE: CodicilHook<Surface> = CodicilHook {
-    graph_schema: b"p8.surface-snapshot/v1",
-    profiled_schema: b"p8.surface-snapshot-profiled/v1",
-    v3_profiled_schema: b"p8.surface-snapshot/v0-profiled",
-    v2_schema: b"p8.surface-snapshot/v0-facets",
-    v1_schema: b"p8.surface-snapshot/v0",
+/// A hook naming Mere's own graph schemas over the surface: the control
+/// that another hook's schemas neither read nor list the surface's codicil.
+static FOREIGN: CodicilHook<Surface> = CodicilHook {
+    graph_schema: GRAPH_SNAPSHOT_SCHEMA_ID,
+    profiled_schema: PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID,
+    v3_profiled_schema: V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID,
+    v2_schema: V2_GRAPH_SNAPSHOT_SCHEMA_ID,
+    v1_schema: LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID,
     redact: |_, _| {},
 };
 
@@ -73,8 +77,8 @@ fn a_codicil_saves_and_opens_through_an_installed_hook() {
             Some(ResourceNode::for_term("https://p8.test/codicil").id())
         );
 
-        // Controls: sessions with no hook refuse; the kernel's schemas do
-        // not name the surface's codicil, nor list it.
+        // Controls: sessions with no hook refuse; Mere's own schemas do not
+        // name the surface's codicil, nor list it.
         let bare = MereSessions::<_, Surface>::new_with(store.clone())
             .open_codicil_checked_with(id, author, |_| Ok(()))
             .await;
@@ -83,7 +87,7 @@ fn a_codicil_saves_and_opens_through_an_installed_hook() {
             "{bare:?}"
         );
         let foreign =
-            load_profiled_graph_codicil_sealed_with(&mut store, None, &KERNEL_CODICIL, id)
+            load_profiled_graph_codicil_sealed_with(&mut store, None, &FOREIGN, id)
                 .await
                 .unwrap_err();
         assert!(
@@ -91,7 +95,7 @@ fn a_codicil_saves_and_opens_through_an_installed_hook() {
             "{foreign}"
         );
         assert!(
-            list_graph_codicils_with(&mut store, &KERNEL_CODICIL)
+            list_graph_codicils_with(&mut store, &FOREIGN)
                 .await
                 .unwrap()
                 .is_empty()
@@ -99,15 +103,28 @@ fn a_codicil_saves_and_opens_through_an_installed_hook() {
     });
 }
 
-/// The kernel's hook stores exactly what the kernel stored through eidetic's
-/// typed layer before it (D266): the same manifest and blob, byte for byte.
+/// A hook stores exactly what eidetic's typed layer stores under the hook's
+/// schema (D266): the same manifest and blob, byte for byte.
 #[test]
-fn the_kernel_hook_stores_what_the_typed_layer_stored() {
+fn a_hook_stores_what_the_typed_layer_stored() {
     use eidetic::{
-        PrivacyClass, ProvenanceOrigin, ProvenanceRecord, TrustEnvelope, save_typed_sealed,
+        ManifestId, PrivacyClass, ProvenanceOrigin, ProvenanceRecord, SchemaRef, TrustEnvelope,
+        TypedPayload, save_typed_sealed,
     };
     use muniment::Backend;
-    use pandect::graph_codicil::{GraphCodicil, save_graph_snapshot_codicil_sealed};
+    use pandect::graph_codicil::GraphCodicil;
+    use serde::{Deserialize, Serialize};
+
+    /// The surface's codicil as a typed payload under the hook's schema.
+    #[derive(Serialize, Deserialize)]
+    #[serde(transparent)]
+    struct Typed(GraphCodicil<Surface>);
+
+    impl TypedPayload for Typed {
+        fn schema_ref() -> SchemaRef {
+            SchemaRef::from_id(ManifestId::of_blob(SURFACE.graph_schema))
+        }
+    }
 
     async fn contents(store: &MemoryBackend) -> Vec<(String, Vec<u8>)> {
         let mut out = Vec::new();
@@ -119,18 +136,14 @@ fn the_kernel_hook_stores_what_the_typed_layer_stored() {
     }
 
     pollster::block_on(async {
-        let mut graph = kernel::graph::Graph::new();
-        kernel::graph::apply::add_node(
-            &mut graph,
-            None,
-            "https://p8.test/kernel-codicil".into(),
-            euclid::Point2D::new(1.0, 2.0),
-        );
+        let mut graph = Surface::default();
+        graph.show(Uuid::from_u128(0xf2), "https://p8.test/typed-codicil");
         let at = Timestamp(5);
         let mut hooked = MemoryBackend::new();
-        let id = save_graph_snapshot_codicil_sealed(
+        let id = save_graph_snapshot_codicil_sealed_with(
             &mut hooked,
             None,
+            &SURFACE,
             graph.to_snapshot(),
             graph.facets().clone(),
             RedactionPolicy::include_all(),
@@ -151,11 +164,11 @@ fn the_kernel_hook_stores_what_the_typed_layer_stored() {
         let typed_id = save_typed_sealed(
             &mut typed,
             None,
-            &GraphCodicil::<kernel::graph::Graph> {
+            &Typed(GraphCodicil {
                 snapshot: graph.to_snapshot(),
                 facets: graph.facets().clone(),
                 sessions: Vec::new(),
-            },
+            }),
             Vec::new(),
             PrivacyClass::LocalOnly,
             provenance,
@@ -168,9 +181,10 @@ fn the_kernel_hook_stores_what_the_typed_layer_stored() {
         assert_eq!(contents(&hooked).await, contents(&typed).await);
         // Control: another moment's save is another manifest.
         let mut later = MemoryBackend::new();
-        save_graph_snapshot_codicil_sealed(
+        save_graph_snapshot_codicil_sealed_with(
             &mut later,
             None,
+            &SURFACE,
             graph.to_snapshot(),
             graph.facets().clone(),
             RedactionPolicy::include_all(),

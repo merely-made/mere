@@ -5,78 +5,64 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use kernel::graph::GraphStratum;
-use kernel::graph::fixtures::GraphFixtures;
+use crate::test_surface::{Delta, Surface, show_edits};
 use muniment::MemoryBackend;
+
+type Sessions = MereSessions<MemoryBackend, Surface>;
 
 fn person() -> Author {
     Author::person("persona-a").via("turnstone")
 }
 
-fn add(id: u128) -> CapturedDelta {
-    CapturedDelta::ReplayAddNodeWithIdIfMissing {
-        id: Uuid::from_u128(id).to_string(),
-        url: format!("https://{id}.test/"),
-        position: [0.0, 0.0],
-    }
+fn add(id: u128) -> Vec<Delta> {
+    show_edits(Uuid::from_u128(id), &format!("https://{id}.test/")).1
 }
 
-fn holds(session: &GraphSession<MemoryBackend>, id: u128) -> bool {
-    session
-        .graph()
-        .get_node_key_by_id(Uuid::from_u128(id))
-        .is_some()
+fn holds(session: &GraphSession<MemoryBackend, Surface>, id: u128) -> bool {
+    session.graph().shown(Uuid::from_u128(id)).is_some()
 }
 
 #[test]
 fn a_transaction_carries_a_direct_writer_through_the_replay_check() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let id = mere.mint(person(), None).await.unwrap().session_id;
-        let mut session = mere.open(id).await.unwrap();
-        session.apply(person(), vec![add(1)]).await.unwrap();
-        let predicate = "urn:mere:receipt:transacted";
+        let mut session = mere.open_with(id).await.unwrap();
+        session.apply(person(), add(1)).await.unwrap();
+        let (one, transacted) = (Uuid::from_u128(1), "https://transacted.test/");
         let at = SystemTime::UNIX_EPOCH;
 
         session
             .transact_change(at, false, |candidate| {
                 candidate
-                    .edit_now(person(), |graph| {
-                        graph
-                            .declare_predicate(predicate, GraphStratum::Surface)
-                            .unwrap()
-                    })
+                    .edit_now(person(), |graph| graph.show(one, transacted))
                     .map(|_| ())
             })
             .await
             .unwrap();
-        let declared = |graph: &Graph| graph.effective_predicate_stratum(predicate).unwrap();
-        assert_eq!(declared(session.graph()), GraphStratum::Surface);
+        let shown = |graph: &Surface| graph.iri_of(one).unwrap();
+        assert_eq!(shown(session.graph()), transacted);
         assert!(!session.has_unstored());
-        let reopened = mere.open(id).await.unwrap();
-        assert_eq!(declared(reopened.graph()), GraphStratum::Surface);
+        let reopened = mere.open_with(id).await.unwrap();
+        assert_eq!(shown(reopened.graph()), transacted);
         assert_eq!(reopened.journal().len(), session.journal().len());
 
         // A writer that skips the capture is refused, whole, and leaves no trace.
-        let key = session
-            .graph()
-            .get_node_key_by_id(Uuid::from_u128(1))
-            .unwrap();
         let before = (session.journal().len(), session.changes().len());
         let refused = session
             .transact_change(at, false, |candidate| {
                 candidate
                     .edit_now(person(), |graph| {
-                        graph.set_node_title(key, "Unrecorded".into());
+                        graph.show_unrecorded(one, "https://unrecorded.test/");
                     })
                     .map(|_| ())
             })
             .await;
         assert!(matches!(refused, Err(SessionError::NotReplayable(_))));
         assert_eq!((session.journal().len(), session.changes().len()), before);
-        assert_ne!(session.graph().get_node(key).unwrap().title, "Unrecorded");
-        let reopened = mere.open(id).await.unwrap();
+        assert_ne!(shown(session.graph()), "https://unrecorded.test/");
+        let reopened = mere.open_with(id).await.unwrap();
         assert_eq!(reopened.journal().len(), before.0);
     });
 }
@@ -85,12 +71,12 @@ fn a_transaction_carries_a_direct_writer_through_the_replay_check() {
 fn two_handles_flushing_from_one_saved_point_refuse_the_stale_one() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let id = mere.mint(person(), None).await.unwrap().session_id;
-        let mut first = mere.open(id).await.unwrap();
-        let mut second = mere.open(id).await.unwrap();
-        first.apply_now(person(), vec![add(1)]).unwrap();
-        second.apply_now(person(), vec![add(2)]).unwrap();
+        let mut first = mere.open_with(id).await.unwrap();
+        let mut second = mere.open_with(id).await.unwrap();
+        first.apply_now(person(), add(1)).unwrap();
+        second.apply_now(person(), add(2)).unwrap();
 
         first.flush(SystemTime::UNIX_EPOCH).await.unwrap();
         let refused = second.flush(SystemTime::UNIX_EPOCH).await;
@@ -100,13 +86,13 @@ fn two_handles_flushing_from_one_saved_point_refuse_the_stale_one() {
         ));
         assert!(second.has_unstored(), "the refused edit stays pending");
         assert!(holds(&second, 2));
-        let stored = mere.open(id).await.unwrap();
+        let stored = mere.open_with(id).await.unwrap();
         assert!(holds(&stored, 1) && !holds(&stored, 2));
 
-        let mut rebased = mere.open(id).await.unwrap();
-        rebased.apply_now(person(), vec![add(2)]).unwrap();
+        let mut rebased = mere.open_with(id).await.unwrap();
+        rebased.apply_now(person(), add(2)).unwrap();
         rebased.flush(SystemTime::UNIX_EPOCH).await.unwrap();
-        let stored = mere.open(id).await.unwrap();
+        let stored = mere.open_with(id).await.unwrap();
         assert!(holds(&stored, 1) && holds(&stored, 2));
     });
 }
@@ -115,33 +101,36 @@ fn two_handles_flushing_from_one_saved_point_refuse_the_stale_one() {
 fn a_transaction_carries_the_handles_unstored_entries() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let id = mere.mint(person(), None).await.unwrap().session_id;
-        let mut session = mere.open(id).await.unwrap();
-        session.apply_now(person(), vec![add(1)]).unwrap();
+        let mut session = mere.open_with(id).await.unwrap();
+        session.apply_now(person(), add(1)).unwrap();
         assert!(session.has_unstored());
 
         session
-            .transact_deltas(person(), vec![add_delta(2)], SystemTime::UNIX_EPOCH)
+            .transact_deltas(person(), add_delta(2), SystemTime::UNIX_EPOCH)
             .await
             .unwrap();
         assert!(!session.has_unstored());
-        let stored = mere.open(id).await.unwrap();
+        let stored = mere.open_with(id).await.unwrap();
         assert!(holds(&stored, 1) && holds(&stored, 2));
     });
 }
 
-fn add_delta(id: u128) -> GraphDelta {
-    add(id).replay_as(&person()).into_write().unwrap()
+fn add_delta(id: u128) -> Vec<Delta> {
+    add(id)
+        .iter()
+        .map(|delta| Surface::edit_of(delta, &person()).unwrap())
+        .collect()
 }
 
 #[test]
 fn a_candidate_commits_extra_writes_and_refuses_a_key_that_changed() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let id = mere.mint(person(), None).await.unwrap().session_id;
-        let mut session = mere.open(id).await.unwrap();
+        let mut session = mere.open_with(id).await.unwrap();
         store.put("side/ledger", b"one").await.unwrap();
         let extra = |read: &[u8], write: &[u8]| CommitExtra {
             ops: vec![WriteOp::Put {
@@ -154,7 +143,7 @@ fn a_candidate_commits_extra_writes_and_refuses_a_key_that_changed() {
         let at = SystemTime::UNIX_EPOCH;
 
         let mut candidate = session.detached_candidate();
-        candidate.apply_now(person(), vec![add(1)]).unwrap();
+        candidate.apply_now(person(), add(1)).unwrap();
         // The key the extra write was decided against moves under the candidate.
         store.put("side/ledger", b"other").await.unwrap();
         let refused = session
@@ -163,74 +152,16 @@ fn a_candidate_commits_extra_writes_and_refuses_a_key_that_changed() {
         assert!(matches!(refused, Err(SessionError::Validation(_))));
         assert!(!holds(&session, 1) && !session.has_unstored());
         assert_eq!(store.get("side/ledger").await.unwrap().unwrap(), b"other");
-        assert!(!holds(&mere.open(id).await.unwrap(), 1));
+        assert!(!holds(&mere.open_with(id).await.unwrap(), 1));
 
         let mut candidate = session.detached_candidate();
-        candidate.apply_now(person(), vec![add(1)]).unwrap();
+        candidate.apply_now(person(), add(1)).unwrap();
         session
             .commit_candidate(candidate, at, false, extra(b"other", b"two"))
             .await
             .unwrap();
         assert!(holds(&session, 1) && !session.has_unstored());
         assert_eq!(store.get("side/ledger").await.unwrap().unwrap(), b"two");
-        assert!(holds(&mere.open(id).await.unwrap(), 1));
-    });
-}
-
-/// Engine split D171: the publication preflights make their refusals without
-/// preparing a publication only to drop it.
-#[test]
-fn publication_preflights_refuse_without_preparing() {
-    let prepares = || crate::addressable_graph::PREPARES.with(std::cell::Cell::get);
-    pollster::block_on(async {
-        let mere = MereSessions::new(MemoryBackend::new());
-        let made = mere.mint(person(), Some("Preflight".into())).await.unwrap();
-        let mut session = mere.open(made.session_id).await.unwrap();
-        session.apply(person(), vec![add(1), add(2)]).await.unwrap();
-        let before = prepares();
-        let revision = session.operation_revision().unwrap();
-        assert_eq!(prepares() - before, 1, "only the revision's own prepare");
-        // The full preflight it replaced prepared once more, for the same revision.
-        let before = prepares();
-        session.prepare_resident_publication().unwrap();
-        assert_eq!(session.operation_revision().unwrap(), revision);
-        assert_eq!(prepares() - before, 2);
-        // Reconcile without a receipt stops after its check, preparing nothing.
-        let before = prepares();
-        assert!(
-            session
-                .reconcile_operation([7; 32])
-                .await
-                .unwrap()
-                .is_none()
-        );
-        assert_eq!(prepares(), before);
-
-        // A residency-limited writer is still refused, before any prepare.
-        session
-            .graph
-            .set_known_coverage(kernel::graph::CoverageNote {
-                limits: vec![kernel::graph::CoverageLimit::new(
-                    kernel::graph::CoverageLayer::Residency,
-                    "a neighborhood",
-                )],
-            });
-        let limited = |result: Result<_, SessionError>| matches!(result, Err(SessionError::Store(e)) if e.to_string().contains("residency-limited"));
-        assert!(limited(session.operation_revision().map(|_| ())));
-        assert!(limited(
-            session.reconcile_operation([7; 32]).await.map(|_| ())
-        ));
-        // So is an unqualified one.
-        let mut legacy = mere.begin(person(), Some(Graph::new()));
-        legacy
-            .flush(std::time::SystemTime::UNIX_EPOCH)
-            .await
-            .unwrap();
-        let unqualified = |result: Result<_, SessionError>| matches!(result, Err(SessionError::Validation(m)) if m.contains("qualified recorded"));
-        assert!(unqualified(legacy.operation_revision().map(|_| ())));
-        assert!(unqualified(
-            legacy.reconcile_operation([7; 32]).await.map(|_| ())
-        ));
-        assert_eq!(prepares(), before);
+        assert!(holds(&mere.open_with(id).await.unwrap(), 1));
     });
 }

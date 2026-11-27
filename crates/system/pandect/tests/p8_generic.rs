@@ -271,7 +271,7 @@ mod personal_sync {
         ACCESS_HISTORY_FACET, AccessAction, AccessHistory, AccessRecord, AccessTransition,
     };
     use pandect::personal_sync::{
-        KernelFold, PersonalFold, PersonalGraphError, PersonalGraphEvent, PersonalGraphReplica,
+        PersonalFold, PersonalGraphError, PersonalGraphEvent, PersonalGraphReplica,
         SyncRoster, SyncSelection,
     };
     use pandect::{AcceptAll, FacetId};
@@ -322,6 +322,29 @@ mod personal_sync {
                 )
                 .unwrap();
             graph.install_facets(facets).unwrap();
+        }
+    }
+
+    /// [`SurfaceFold`] that folds a title as nothing: the control that the
+    /// refusal below is the fold's, not the protocol's.
+    struct TitlesIgnored;
+
+    impl PersonalFold<Surface> for TitlesIgnored {
+        fn apply(
+            &self,
+            graph: &mut Surface,
+            asserter_iri: &str,
+            fallback_id: &str,
+            event: &PersonalGraphEvent,
+        ) -> Result<(), PersonalGraphError> {
+            match event {
+                PersonalGraphEvent::SetTitle { .. } => Ok(()),
+                other => SurfaceFold.apply(graph, asserter_iri, fallback_id, other),
+            }
+        }
+
+        fn set_access_history(&self, graph: &mut Surface, node: Uuid, history: AccessHistory) {
+            SurfaceFold.set_access_history(graph, node, history);
         }
     }
 
@@ -400,12 +423,6 @@ mod personal_sync {
             );
             assert_eq!(projection.writers.len(), 2);
 
-            // Control: the kernel's fold of the same operations holds the
-            // same nodes in its own graph.
-            let kernel = replica.projection_with(&KernelFold).await.unwrap();
-            let ids: Vec<Uuid> = kernel.graph.nodes().map(|(_, node)| node.id).collect();
-            assert_eq!(ids, [A]);
-
             // Control: a fold that refuses an event refuses the projection,
             // so every graph event reached the host's fold.
             replica
@@ -419,7 +436,7 @@ mod personal_sync {
                 replica.projection_with(&SurfaceFold).await,
                 Err(PersonalGraphError::Excluded(why)) if why.contains("SetTitle")
             ));
-            assert!(replica.projection().await.is_ok());
+            assert!(replica.projection_with(&TitlesIgnored).await.is_ok());
         });
     }
 }

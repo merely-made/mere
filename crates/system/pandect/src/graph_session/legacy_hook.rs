@@ -12,9 +12,6 @@
 use super::*;
 pub use crate::graph_placement::LegacyHook;
 
-/// The kernel graph's hook.
-pub(super) use crate::graph_placement::KERNEL_LEGACY as KERNEL;
-
 impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
     /// Read a stored legacy translation of every session these open through
     /// `hook` (engine split D260).

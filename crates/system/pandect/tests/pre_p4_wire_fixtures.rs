@@ -6,7 +6,8 @@
 
 //! The saved scene stays a typed part of pandect's sync grammar and codicil
 //! (engine split D134, D69). Payloads written by the code before the sidecar
-//! moves decode strictly and re-encode to the same bytes.
+//! moves decode strictly and re-encode to the same bytes. The product codicil's
+//! fixture holds a kernel snapshot, so it runs in Graphshell's incipit-session.
 
 #[cfg(feature = "personal-sync")]
 #[test]
@@ -31,22 +32,5 @@ fn a_sync_record_written_before_the_change_re_encodes_unchanged() {
         p2panda_core::cbor::encode_cbor(&record).expect("re-encodes"),
         bytes,
         "the wire bytes do not move"
-    );
-}
-
-#[test]
-fn a_product_codicil_written_before_the_change_re_encodes_unchanged() {
-    let bytes: &[u8] = include_bytes!("fixtures/pre_p4_product_codicil_with_scene.json");
-    let codicil = pandect::product_codicil::decode_profiled_codicil(bytes)
-        .expect("the old codicil decodes and materializes");
-    let scene = codicil
-        .scene
-        .as_ref()
-        .expect("the codicil carries its scene");
-    assert_eq!(scene.name, "Codicil scene");
-    assert_eq!(
-        serde_json::to_vec_pretty(&codicil).expect("re-encodes"),
-        bytes,
-        "the codicil bytes do not move"
     );
 }

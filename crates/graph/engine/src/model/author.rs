@@ -6,7 +6,7 @@
 
 //! Who asserted: the author a journal entry, a predicate declaration or a
 //! classification origin records. Moved from the kernel's journal (engine
-//! split P5 L3); the kernel re-exports it at `kernel::graph::Author`.
+//! split P5 L3).
 
 use rkyv::{Archive, Deserialize, Serialize};
 

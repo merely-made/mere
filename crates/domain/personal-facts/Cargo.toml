@@ -20,8 +20,8 @@ serde_json.workspace = true
 personae.workspace = true
 
 [dev-dependencies]
-# The tests write records into the kernel graph.
-kernel.workspace = true
+# The tests write records into the shared test graph (engine split D272).
+mere-test-surface = { path = "../../graph/test-surface" }
 
 [lints]
 workspace = true

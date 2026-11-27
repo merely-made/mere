@@ -6,13 +6,15 @@
 
 //! Graph codicils over any session graph (engine split D265, D266). A host's
 //! [`CodicilHook`] names the schema ids its snapshot codicils carry and
-//! redacts its own snapshot; the save, open and list paths are the kernel
-//! graph's, through eidetic's runtime-schema payload layer. The kernel's hook
-//! names the kernel's ids, and the kernel's functions are these with it, so
-//! what they store is unchanged. Compose stays on the kernel graph.
+//! redacts its own snapshot; the save, open and list paths run through
+//! eidetic's runtime-schema payload layer. Compose belongs to the host whose
+//! graph it merges.
 
 use eidetic::manifest::load_manifest;
-use eidetic::{list_payloads, load_payload_sealed, save_payload_sealed};
+use eidetic::{
+    BlobManifest, BlobSource, Error, NoFetcher, PayloadSealer, PrivacyClass, TrustEnvelope,
+    list_payloads, load_payload_sealed, save_payload_sealed,
+};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
@@ -32,22 +34,13 @@ pub struct CodicilHook<G: SessionGraph> {
     pub redact: fn(&RedactionPolicy, &mut G::Snapshot),
 }
 
-/// The kernel graph's hook: the v4 schemas and its redaction.
-pub static KERNEL_CODICIL: CodicilHook<Graph> = CodicilHook {
-    graph_schema: GRAPH_SNAPSHOT_SCHEMA_ID,
-    profiled_schema: PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID,
-    v3_profiled_schema: V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID,
-    v2_schema: V2_GRAPH_SNAPSHOT_SCHEMA_ID,
-    v1_schema: LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID,
-    redact: |policy, snapshot| policy.apply(snapshot),
-};
-
 fn schema(id: &[u8]) -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(id))
 }
 
 impl<G: SessionGraph> ProfiledGraphCodicil<G> {
-    /// [`into_graph`](ProfiledGraphCodicil::into_graph) over any graph.
+    /// The graph this codicil loads as under its placement, through the
+    /// checked load every open and save runs.
     pub fn into_graph_with(self) -> Result<G> {
         checked_graph_with(&self.codicil.snapshot, self.codicil.facets, self.placement)
     }

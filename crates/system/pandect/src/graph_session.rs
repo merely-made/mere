@@ -33,25 +33,17 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::SystemTime;
 
 use catchment::{GraphId, SessionId};
-#[cfg(test)]
-use kernel::graph::apply::{GraphDelta, apply_graph_delta};
-#[cfg(not(target_arch = "wasm32"))]
-use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
-use kernel::graph::{Author, Graph, LogId, Seq};
-#[cfg(test)]
-use kernel::graph::{CapturedDelta, GraphJournal, Part};
-#[cfg(test)]
-use kernel::persistence::GraphSnapshot;
-use kernel::time::wall_clock_now;
+use mere::model::author::Author;
+use mere::model::clock::wall_clock_now;
 use mere::model::Attributed;
 use mere::session::{ReplayPoint, SessionGraph, SessionJournal};
 use muniment::journal::DigestChain;
-use muniment::{Backend, Hash, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
+use muniment::{
+    Backend, Hash, Journal, JsonCodec, JsonSlots, LogId, Provenance, Seq, StoreError, WriteOp,
+};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
-#[cfg(not(target_arch = "wasm32"))]
-use crate::facet_store::{AcceptAll, FacetId, copy_node_facets};
 use crate::facet_store::{NODE_FACETS_FILE, NodeFacetStore};
 use crate::graph_placement::{
     FrozenGraph, LegacyTranslationReceipt, PlacementProfile, SessionPlacement, source_digest,
@@ -60,11 +52,11 @@ use crate::manifest::{GraphSessionManifest, Lineage, MergedMark, TrashMark};
 use crate::view_state::ViewState;
 
 /// Product-owned validation of a complete candidate before graph/history installation.
-pub type GraphValidator<G = Graph> = Arc<dyn Fn(&G) -> Result<(), String> + Send + Sync>;
+pub type GraphValidator<G> = Arc<dyn Fn(&G) -> Result<(), String> + Send + Sync>;
 
 /// Owner policy for newly introduced references. Unlike replay validation, this
 /// sees the previously admitted graph and may consult current owner authority.
-pub type GraphAdmissionValidator<G = Graph> =
+pub type GraphAdmissionValidator<G> =
     Arc<dyn Fn(&G, &G) -> Result<(), String> + Send + Sync>;
 
 /// Where a mere keeps its sessions.
@@ -86,7 +78,6 @@ pub trait LegacyTransactionBackend: Backend {}
 impl<T: Backend + ?Sized> LegacyTransactionBackend for T {}
 
 mod page_claims;
-mod residency;
 pub use legacy_hook::LegacyHook;
 mod legacy_hook;
 mod publication;
@@ -96,8 +87,8 @@ pub use publication::{
 
 /// What a session's host installs on it: how it publishes its graph and how
 /// it reads a stored legacy translation (engine split D252, D257). The
-/// kernel graph's constructors install the kernel's; the `_with` twins
-/// install what their [`MereSessions`] carries, and a bare one none.
+/// `_with` constructors install what their [`MereSessions`] carries, and a
+/// bare one none.
 struct SessionHooks<G: SessionGraph> {
     legacy: Option<&'static LegacyHook<G>>,
     publication: Option<&'static PublicationHook<G>>,
@@ -119,14 +110,6 @@ impl<G: SessionGraph> SessionHooks<G> {
         legacy: None,
         publication: None,
         codicil: None,
-    };
-}
-
-impl SessionHooks<Graph> {
-    const KERNEL: Self = Self {
-        legacy: Some(&legacy_hook::KERNEL),
-        publication: Some(&residency::KERNEL_PUBLICATION),
-        codicil: Some(&crate::graph_codicil::KERNEL_CODICIL),
     };
 }
 
@@ -341,7 +324,7 @@ pub struct Applied {
 
 /// What an undo or redo did: the change it reverted or re-applied, what it
 /// wrote, and the parts it kept because another author changed them since.
-pub struct Reverted<G: SessionGraph = Graph> {
+pub struct Reverted<G: SessionGraph> {
     /// The change undone, or the undo redone, as an index into the change log.
     pub of: Seq,
     pub applied: Applied,
@@ -349,7 +332,7 @@ pub struct Reverted<G: SessionGraph = Graph> {
 }
 
 /// A part an undo or redo left as it is, and who changed it since.
-pub struct Kept<G: SessionGraph = Graph> {
+pub struct Kept<G: SessionGraph> {
     pub part: G::Part,
     pub by: Vec<Author>,
 }
@@ -621,100 +604,18 @@ async fn retained_source_digest<B: Backend>(
     source_digest(placement, baseline.as_deref(), &entries).map_err(SessionError::Corrupt)
 }
 
-#[derive(Clone)]
-struct RetainedSource {
-    baseline: Option<Vec<u8>>,
-    entries: Vec<Vec<u8>>,
-}
-
-fn translation_transaction(
-    keys: &Keys,
-    source: &RetainedSource,
-    ops: Vec<WriteOp>,
-) -> (muniment::TransactFn, Arc<Mutex<Option<String>>>) {
-    let baseline_key = keys.at(BASELINE);
-    let journal_prefix = keys.at(JOURNAL);
-    let profile_key = keys.at(PLACEMENT);
-    let receipt_key = keys.at(TRANSLATION);
-    let source = source.clone();
-    let error = Arc::new(Mutex::new(None));
-    let rejected = Arc::clone(&error);
-    let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
-        let check = || -> Result<(), String> {
-            if reader
-                .get(&baseline_key)
-                .map_err(|error| error.to_string())?
-                != source.baseline
-            {
-                return Err("legacy baseline changed before qualification commit".into());
-            }
-            let keys = reader
-                .list(&format!("{journal_prefix}/"))
-                .map_err(|error| error.to_string())?;
-            if keys.len() != source.entries.len() {
-                return Err("legacy journal changed before qualification commit".into());
-            }
-            for (index, expected) in source.entries.iter().enumerate() {
-                let key = muniment::journal::entry_key(&journal_prefix, Seq(index as u64));
-                if reader
-                    .get(&key)
-                    .map_err(|error| error.to_string())?
-                    .as_ref()
-                    != Some(expected)
-                {
-                    return Err("retained journal entry changed before qualification commit".into());
-                }
-            }
-            if reader
-                .get(&profile_key)
-                .map_err(|error| error.to_string())?
-                .is_some()
-                || reader
-                    .get(&receipt_key)
-                    .map_err(|error| error.to_string())?
-                    .is_some()
-            {
-                return Err("session placement changed before qualification commit".into());
-            }
-            Ok(())
-        };
-        if let Err(reason) = check() {
-            *rejected.lock().expect("translation rejection") = Some(reason);
-            Vec::new()
-        } else {
-            ops
-        }
-    });
-    (transaction, error)
-}
-
-impl RetainedSource {
-    fn digest(&self, placement: &SessionPlacement) -> Result<String, SessionError> {
-        let entries = self
-            .entries
-            .get(..placement.cutoff().index())
-            .ok_or_else(|| {
-                SessionError::Corrupt(
-                    "legacy qualification requires reopening the durable prefix".into(),
-                )
-            })?;
-        source_digest(placement, self.baseline.as_deref(), entries).map_err(SessionError::Corrupt)
-    }
-}
-
 async fn load_retained_source<B: Backend, G: SessionGraph>(
     slots: &JsonSlots<B>,
     keys: &Keys,
     manifest: &GraphSessionManifest,
     recorded: bool,
-) -> Result<(G, SessionJournal<G>, RetainedSource), SessionError> {
+) -> Result<(G, SessionJournal<G>), SessionError> {
     let baseline = slots.backend().get(&keys.at(BASELINE)).await?;
     let journal_prefix = keys.at(JOURNAL);
     let entry_keys = slots
         .backend()
         .scan(&format!("{journal_prefix}/"), &format!("{journal_prefix}0"))
         .await?;
-    let mut entries = Vec::new();
     let mut writes = Vec::new();
     for key in entry_keys {
         let value = slots
@@ -722,7 +623,6 @@ async fn load_retained_source<B: Backend, G: SessionGraph>(
             .get(&key)
             .await?
             .ok_or_else(|| SessionError::Corrupt(format!("{key}: vanished retained entry")))?;
-        entries.push(value.clone());
         writes.push(WriteOp::Put { key, value });
     }
     let source = muniment::MemoryBackend::new();
@@ -753,7 +653,7 @@ async fn load_retained_source<B: Backend, G: SessionGraph>(
         })
         .transpose()?
         .unwrap_or_default();
-    Ok((graph, journal, RetainedSource { baseline, entries }))
+    Ok((graph, journal))
 }
 
 /// The provenance a session's journal was recorded with: a fork's starts at
@@ -763,15 +663,6 @@ fn provenance(manifest: &GraphSessionManifest) -> Option<Provenance> {
         source: Some(LogId::new(manifest.parent_session?.as_uuid().to_string())),
         at: Seq(manifest.forked_at?),
     })
-}
-
-/// What the replay check compares: the whole snapshot and facets, visit
-/// stamps included, under one fixed date so the check never reads the clock
-/// (reservoir plan ruling 47). The edit compares through [`replay_matches`].
-#[cfg(test)]
-fn replay_state(graph: &Graph) -> Result<Vec<u8>, SessionError> {
-    crate::replay_state::replay_bytes(graph)
-        .map_err(|e| SessionError::NotReplayable(e.to_string()))
 }
 
 /// Whether the replayed clone and the candidate have equal replay states.
@@ -798,7 +689,7 @@ fn record_into<G: SessionGraph>(graph: &mut G, buffer: &Arc<Mutex<Vec<G::Delta>>
 /// covers. A host that writes through a batch of its own applies
 /// [`ops`](Self::ops) there and hands this back to [`GraphSession::stored`]
 /// once that batch commits.
-pub struct Pending<G: SessionGraph = Graph> {
+pub struct Pending<G: SessionGraph> {
     ops: Vec<WriteOp>,
     journal: Seq,
     changes: Seq,
@@ -840,7 +731,7 @@ impl<G: SessionGraph> Pending<G> {
 /// One session, open: its graph, journal, changes and views, with every edit
 /// recorded under its author. The async edits store as they are made; the
 /// `_now` ones wait for [`flush`](Self::flush).
-pub struct GraphSession<B, G: SessionGraph = Graph> {
+pub struct GraphSession<B, G: SessionGraph> {
     slots: JsonSlots<B>,
     validator: Option<GraphValidator<G>>,
     admission_validator: Option<GraphAdmissionValidator<G>>,
@@ -852,7 +743,6 @@ pub struct GraphSession<B, G: SessionGraph = Graph> {
     /// The host's hooks: the legacy translation's reads over `G`, and the
     /// publication of `G` (engine split D252, D257).
     hooks: SessionHooks<G>,
-    retained_source: Option<RetainedSource>,
     graph: G,
     journal: SessionJournal<G>,
     /// Every journal prefix's v2 digest (engine-split D154), built at open and
@@ -893,7 +783,6 @@ pub struct GraphSession<B, G: SessionGraph = Graph> {
 
 #[path = "graph_session_history.rs"]
 mod history;
-pub(crate) use history::apply_one;
 use history::{HeldPoint, apply_all};
 #[path = "graph_session_operation.rs"]
 mod operation;
@@ -912,226 +801,6 @@ pub use merge::{
     DroppedChoice, MergeChoice, MergeConflict, MergeMatch, Merged, PendingMerge, Refused,
 };
 pub use transaction::CommitExtra;
-
-impl<B: Backend> GraphSession<B> {
-    /// Begin a new session in memory, from `baseline` or empty, with `kind` as
-    /// its first change. Nothing is written until the first flush, which
-    /// stores the manifest and baseline with everything since.
-    pub fn new(
-        backend: B,
-        manifest: GraphSessionManifest,
-        baseline: Option<Graph>,
-        author: Author,
-        kind: ChangeKind,
-    ) -> Self {
-        let mut session = Self::new_with(backend, manifest, baseline, author, kind);
-        session.hooks = SessionHooks::KERNEL;
-        session
-    }
-
-    /// Begin from explicitly recorded store placement. An arbitrary graph supplied
-    /// to `new` remains unqualified; qualification must come from its caller.
-    pub fn new_recorded(
-        backend: B,
-        manifest: GraphSessionManifest,
-        baseline: Option<Graph>,
-        author: Author,
-        kind: ChangeKind,
-    ) -> Self {
-        let mut session = Self::new_recorded_with(backend, manifest, baseline, author, kind);
-        session.hooks = SessionHooks::KERNEL;
-        session
-    }
-
-    /// Open session `id` from a mere's store: the latest checkpoint and the
-    /// journal past it, or the baseline and the whole journal.
-    pub async fn open(backend: B, id: SessionId) -> Result<Self, SessionError> {
-        Self::open_inner(backend, id, SessionHooks::KERNEL).await
-    }
-
-    /// Qualify an already-durable legacy input and retain its original authority.
-    pub async fn open_legacy(
-        backend: B,
-        id: SessionId,
-        cutoff: Seq,
-        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
-    ) -> Result<Self, SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        let mut session = Self::open(backend, id).await?;
-        session.qualify_legacy(cutoff, origins).await?;
-        Ok(session)
-    }
-
-    /// Freeze a translation once. Its cutoff never grows with the modern journal.
-    pub async fn qualify_legacy(
-        &mut self,
-        cutoff: Seq,
-        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
-    ) -> Result<(), SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        self.qualify_legacy_content(cutoff, origins, None).await
-    }
-
-    /// Qualify tags with their original mere's explicit vocabulary namespace.
-    pub async fn qualify_legacy_with_content_context(
-        &mut self,
-        cutoff: Seq,
-        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
-        context: &kernel::graph::legacy_resource_migration::LegacyContentContext,
-    ) -> Result<(), SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        self.qualify_legacy_content(cutoff, origins, Some(context))
-            .await
-    }
-
-    pub async fn open_legacy_with_content_context(
-        backend: B,
-        id: SessionId,
-        cutoff: Seq,
-        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
-        context: &kernel::graph::legacy_resource_migration::LegacyContentContext,
-    ) -> Result<Self, SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        let mut session = Self::open(backend, id).await?;
-        session
-            .qualify_legacy_with_content_context(cutoff, origins, context)
-            .await?;
-        Ok(session)
-    }
-
-    async fn qualify_legacy_content(
-        &mut self,
-        cutoff: Seq,
-        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
-        content_context: Option<&kernel::graph::legacy_resource_migration::LegacyContentContext>,
-    ) -> Result<(), SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        let placement = SessionPlacement::legacy(cutoff, origins);
-        if let Some(existing) = &self.placement {
-            if existing == &placement
-                && self.translation.as_ref().is_some_and(|receipt| {
-                    content_context.is_none() || receipt.content_context.as_ref() == content_context
-                })
-            {
-                return Ok(());
-            }
-            return Err(SessionError::Corrupt(
-                "session already has a different placement contract".into(),
-            ));
-        }
-        let live = self.journal.live_cursor();
-        if cutoff > live {
-            return Err(SessionError::CursorOutOfRange {
-                cursor: cutoff,
-                live,
-            });
-        }
-        if !self.head_stored
-            || self.saved != live
-            || self.changes_saved != self.changes.next_seq()
-            || !self.pending.lock().expect("recorder buffer").is_empty()
-        {
-            return Err(SessionError::Corrupt(
-                "legacy qualification requires an already durable session".into(),
-            ));
-        }
-        let digest = retained_source_digest(&self.slots, &self.keys, &placement).await?;
-        let retained = self.retained_source.as_ref().ok_or_else(|| {
-            SessionError::Corrupt(
-                "legacy qualification requires reopening the durable session".into(),
-            )
-        })?;
-        if retained.entries.len() != live.index() || retained.digest(&placement)? != digest {
-            return Err(SessionError::Corrupt(
-                "legacy source changed since this session was opened; reopen before qualification"
-                    .into(),
-            ));
-        }
-        let migrated = if let Some(context) = content_context {
-            kernel::graph::legacy_resource_migration::migrate_legacy_prefix_with_content_context(
-                &self.baseline,
-                &self.journal.entries()[..cutoff.index()],
-                &placement.origins,
-                Some(context),
-            )
-        } else {
-            kernel::graph::legacy_resource_migration::migrate_legacy_prefix_with_resolutions(
-                &self.baseline,
-                &self.journal.entries()[..cutoff.index()],
-                &placement.origins,
-            )
-        }
-        .map_err(|error| SessionError::Corrupt(error.to_string()))?;
-        let mut baseline = self.baseline.clone();
-        kernel::graph::replay_captured_deltas_onto(&mut baseline, migrated.baseline_effects);
-        let mut receipt = LegacyTranslationReceipt::new(
-            digest.clone(),
-            placement.clone(),
-            FrozenGraph::of(&baseline),
-            migrated.entry_effects,
-            FrozenGraph::of(&migrated.graph),
-        )
-        .map_err(SessionError::Corrupt)?;
-        receipt
-            .bind_content_context(content_context)
-            .map_err(SessionError::Corrupt)?;
-        receipt
-            .validate(&placement, &digest, self.journal.entries())
-            .map_err(SessionError::Corrupt)?;
-        let mut graph = receipt
-            .graph_at(self.journal.entries(), live)
-            .map_err(SessionError::Corrupt)?
-            .expect("cutoff validated against live journal");
-        let mut ops = vec![
-            pretty(self.keys.at(PLACEMENT), &placement)?,
-            pretty(self.keys.at(TRANSLATION), &receipt)?,
-        ];
-        ops.extend(checkpoint_ops(
-            &self.keys,
-            &graph,
-            &self.digests,
-            &self.journal,
-            live,
-            Some(receipt.translation_digest.clone()),
-        )?);
-        self.commit_translation(retained, ops).await?;
-        graph.copy_semantic_context_from(&self.graph);
-        graph.set_current_session(self.graph.current_session());
-        record_into(&mut graph, &self.pending);
-        self.graph = graph;
-        self.placement = Some(placement);
-        self.translation = Some(receipt);
-        self.hooks.legacy = Some(&legacy_hook::KERNEL);
-        self.checkpointed = live;
-        self.checkpoint_v1 = false;
-        self.revision += 1;
-        Ok(())
-    }
-
-    async fn commit_translation(
-        &self,
-        retained: &RetainedSource,
-        ops: Vec<WriteOp>,
-    ) -> Result<(), SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        let (transaction, rejected) = translation_transaction(&self.keys, retained, ops);
-        self.slots.backend().transact(transaction).await?;
-        let error = rejected.lock().expect("translation rejection").take();
-        error.map_or(Ok(()), |reason| Err(SessionError::Corrupt(reason)))
-    }
-}
 
 impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
     /// Begin a new session over any graph in memory, from `baseline` or empty, with `kind` as
@@ -1173,7 +842,6 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
             placement,
             translation: None,
             hooks: SessionHooks::NONE,
-            retained_source: None,
             graph,
             journal,
             digests: Mutex::default(),
@@ -1210,8 +878,8 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
         session
     }
 
-    /// [`open`](GraphSession::open) over any graph: a session with a stored
-    /// legacy translation is refused, since only the kernel graph reads one.
+    /// Open session `id` with no hooks: a session with a stored legacy
+    /// translation is refused, since only a legacy hook reads one.
     pub async fn open_with(backend: B, id: SessionId) -> Result<Self, SessionError> {
         Self::open_inner(backend, id, SessionHooks::NONE).await
     }
@@ -1235,7 +903,7 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
         let recorded = placement
             .as_ref()
             .is_some_and(|profile| profile.baseline == PlacementProfile::RecordedStrataV1);
-        let (baseline, journal, retained_source) =
+        let (baseline, journal) =
             load_retained_source::<B, G>(&slots, &keys, &manifest, recorded).await?;
         let changes = Journal::load_entries(&slots, &keys.at(CHANGES), None, None).await?;
         let live = journal.live_cursor();
@@ -1431,7 +1099,6 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
                 legacy: hook,
                 ..hooks
             },
-            retained_source: Some(retained_source),
             graph,
             journal,
             digests,
@@ -1558,7 +1225,7 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
         &self.graph
     }
 
-    /// Install the host's launch number: the kernel stamps it as the
+    /// Install the host's launch number: the graph stamps it as the
     /// `last_session_visited` of every node navigated from now on. Per-launch
     /// host wiring, not graph truth, so it is neither journaled nor compared;
     /// the candidates an edit clones carry it.
@@ -2311,188 +1978,16 @@ pub fn picked_session_name(source: Option<&str>) -> String {
     format!("{} (picked from {source})", derived_name_base(source))
 }
 
-/// The graph a component fork starts from: the connected component around
-/// `seed`, copied with its facets through the id remap, and every facet of the
-/// donor container carried to the fork's container.
-///
-/// The container is one more remap pair, `(donor_container, fork_container)`,
-/// so its facets travel verbatim and this crate names no namespace (engine
-/// split D134). The values are the donor's exactly: a facet that names members
-/// (a saved scene's selection, arrangement regions, a mosaic) still names the
-/// donor's ids, including nodes outside the component, which the fork does not
-/// hold. Those ids are inert references; the host that opens the fork reads
-/// them against the fork's own nodes and may rewrite them. A donor container
-/// with no facets leaves the fork's with none, which reads as the defaults.
-///
-/// Audited 2026-11-12 (engine split D134): the facets any writer puts on a
-/// container id today are all canvas view state, none of which a fork must not
-/// inherit: `scene.size_by_degree`, `scene.size_by_importance`,
-/// `scene.importance_metric`, `scene.physics_damping` (Turnstone's older
-/// scenes), `graphshell.saved-scene/v4` (and the read-only `/v3`, `/v2`),
-/// `arrangement.regions` and `arrangement.mosaic`. No sharing or co-op
-/// enablement, sync or replication state, identity or denizen binding is keyed
-/// by a container; those ride per node, or beside the graph. A new container
-/// namespace that is not view state needs this carry revisited.
-///
-/// The product-neutral half of Turnstone's tear-out; nested worlds and resident
-/// admissions stay Turnstone's to carry. `None` when `seed` names no node;
-/// refused when the carried facets fail the handle rule. Native only, as the
-/// kernel's component copy is.
-#[cfg(not(target_arch = "wasm32"))]
-pub fn fork_component_graph(
-    donor: &Graph,
-    donor_container: Uuid,
-    seed: Uuid,
-    fork_container: Uuid,
-) -> Result<Option<Graph>, kernel::graph::snapshot::ResourceSnapshotError> {
-    let mut fork = Graph::new();
-    let copy = fork.copy_component_from(donor, seed, Some(donor_container.to_string()));
-    if copy.new_keys.is_empty() {
-        return Ok(None);
-    }
-    let mut facets = NodeFacetStore::new();
-    let mut remap = copy.id_remap.clone();
-    remap.push((donor_container, fork_container));
-    copy_node_facets(donor.facets(), &mut facets, &remap);
-    // The copy stamped each minted node's derivation from its donor; the
-    // overlay below would drop it, so keep it aside and set it again.
-    let derivation = FacetId::new(PROVENANCE_DERIVATIONS);
-    let derivations: Vec<(Uuid, serde_json::Value)> = copy
-        .id_remap
-        .iter()
-        .filter_map(|(_, minted)| {
-            fork.facets()
-                .get(minted, &derivation)
-                .cloned()
-                .map(|value| (*minted, value))
-        })
-        .collect();
-    let mut merged = fork.facets().clone();
-    merged.overlay(facets);
-    let import = FacetId::new(PROVENANCE_IMPORT);
-    for (_, minted) in &copy.id_remap {
-        merged.remove(minted, &import);
-    }
-    for (minted, value) in derivations {
-        merged
-            .set(minted, derivation.clone(), value, &AcceptAll)
-            .expect("AcceptAll admits every value");
-    }
-    fork.install_facets(merged)?;
-    Ok(Some(fork))
-}
-
-/// A mere's sessions, over its one store: the kernel graph's by default
-/// (engine split D244), any [`SessionGraph`]'s through the `_with` twins.
-pub struct MereSessions<B, G: SessionGraph = Graph> {
+/// A mere's sessions, over its one store, for any [`SessionGraph`] (engine
+/// split D244); a host installs its hooks through the `with_` builders.
+pub struct MereSessions<B, G: SessionGraph> {
     backend: B,
     /// What every session these open or begin carries (engine split D257).
     hooks: SessionHooks<G>,
 }
 
-impl<B: Backend + Clone> MereSessions<B> {
-    pub fn new(backend: B) -> Self {
-        Self {
-            backend,
-            hooks: SessionHooks::KERNEL,
-        }
-    }
-
-    /// Open a session.
-    pub async fn open(&self, id: SessionId) -> Result<GraphSession<B>, SessionError> {
-        GraphSession::open(self.backend.clone(), id).await
-    }
-
-    pub async fn open_legacy(
-        &self,
-        id: SessionId,
-        cutoff: Seq,
-        origins: Vec<kernel::graph::legacy_resource_migration::LegacyResourceOriginResolution>,
-    ) -> Result<GraphSession<B>, SessionError>
-    where
-        B: LegacyTransactionBackend,
-    {
-        GraphSession::open_legacy(self.backend.clone(), id, cutoff, origins).await
-    }
-
-    /// Begin a new session in memory, from `baseline` or empty. Its first
-    /// flush stores it.
-    pub fn begin(&self, author: Author, baseline: Option<Graph>) -> GraphSession<B> {
-        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        GraphSession::new(
-            self.backend.clone(),
-            manifest,
-            baseline,
-            author,
-            ChangeKind::Minted,
-        )
-    }
-
-    /// Begin from a caller-qualified recorded graph without changing its stores.
-    pub fn begin_recorded(&self, author: Author, baseline: Option<Graph>) -> GraphSession<B> {
-        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        GraphSession::new_recorded(
-            self.backend.clone(),
-            manifest,
-            baseline,
-            author,
-            ChangeKind::Minted,
-        )
-    }
-
-    /// Open an archive as a new read-only session after checking the complete candidate.
-    /// The immutable codicil retains original histories; the new journal starts at its graph.
-    pub async fn open_codicil_checked(
-        &self,
-        id: eidetic::ManifestId,
-        author: Author,
-        validate: impl FnOnce(&Graph) -> Result<(), String>,
-    ) -> Result<GraphSessionManifest, SessionError>
-    where
-        B: eidetic::Store,
-    {
-        let mut store = self.backend.clone();
-        self.open_codicil_from_checked(&mut store, id, author, validate)
-            .await
-    }
-
-    /// The owning resident supplies its Eidetic store; session files keep their
-    /// existing backend and layout. The complete candidate is checked before writes.
-    pub async fn open_codicil_from_checked(
-        &self,
-        store: &mut dyn eidetic::Store,
-        id: eidetic::ManifestId,
-        author: Author,
-        validate: impl FnOnce(&Graph) -> Result<(), String>,
-    ) -> Result<GraphSessionManifest, SessionError> {
-        self.open_codicil_hooked(store, id, author, validate, SessionHooks::KERNEL)
-            .await
-    }
-
-    /// Fork the connected component around node `seed` out of `parent`
-    /// (Turnstone's tear-out), as a new session.
-    #[cfg(not(target_arch = "wasm32"))]
-    pub async fn fork_component(
-        &self,
-        parent: &GraphSession<B>,
-        seed: Uuid,
-        author: Author,
-    ) -> Result<GraphSessionManifest, SessionError> {
-        let fork_graph_id = GraphId::new();
-        let graph = fork_component_graph(
-            parent.graph(),
-            *parent.manifest().root_graph_id.as_uuid(),
-            seed,
-            *fork_graph_id.as_uuid(),
-        )
-        .map_err(|error| SessionError::Validation(error.to_string()))?
-        .ok_or(SessionError::NoSuchNode(seed))?;
-        self.pick(parent, fork_graph_id, graph, author).await
-    }
-}
-
 impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
-    /// [`new`](MereSessions::new) over any graph.
+    /// Sessions in `backend` with no hooks; the `with_` builders add them.
     pub fn new_with(backend: B) -> Self {
         Self {
             backend,
@@ -2856,16 +2351,8 @@ impl<B: Backend + Clone, G: SessionGraph> MereSessions<B, G> {
 }
 
 #[cfg(test)]
-#[path = "graph_session_content_tests.rs"]
-mod content_tests;
-
-#[cfg(test)]
 #[path = "graph_session_pending_tests.rs"]
 mod pending_tests;
-
-#[cfg(test)]
-#[path = "graph_session_navigation_tests.rs"]
-mod navigation_tests;
 
 #[cfg(test)]
 #[path = "graph_session_checkpoint_tests.rs"]
@@ -2878,38 +2365,35 @@ mod transaction_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use kernel::graph::fixtures::GraphFixtures;
-    use kernel::graph::replay_captured_deltas_onto;
-
-    use euclid::default::Point2D;
+    use crate::test_surface::{
+        CODICIL, Delta, SURFACE_PROPERTIES, Surface, SurfaceDelta, SurfaceSnapshot, edges_edit,
+        show_edits,
+    };
+    use mere::model::{JournalDelta, NodeProperty, ResourceDelta, ResourceNode};
     use muniment::{DirectoryBackend, MemoryBackend};
+    use portolan::FacetId;
+
+    type Sessions<B = MemoryBackend> = MereSessions<B, Surface>;
+    type Session<B = MemoryBackend> = GraphSession<B, Surface>;
 
     #[test]
     fn facet_floats_replay_and_reopen_without_changing_bits() {
         pollster::block_on(async {
-            let mere = MereSessions::new(MemoryBackend::new());
+            let mere = Sessions::new_with(MemoryBackend::new());
             let manifest = mere.mint(person(), None).await.unwrap();
-            let mut session = mere.open(manifest.session_id).await.unwrap();
-            session.apply(person(), vec![add(7)]).await.unwrap();
+            let mut session = mere.open_with(manifest.session_id).await.unwrap();
+            session.apply(person(), add(7)).await.unwrap();
             let node = Uuid::from_u128(7);
-            let key = session.graph().get_node_key_by_id(node).unwrap();
-            let facet = portolan::FacetId::new("graphshell.saved-scene/v4");
+            let facet = FacetId::new("graphshell.saved-scene/v4");
             // Exact coordinates observed in the headed scene Save refusal.
             let coordinates = [21.345783233642578_f64, -26.827743530273438_f64];
             let value = serde_json::json!({ "cartography": { "positions": coordinates } });
             session
                 .edit_now(person(), |graph| {
-                    kernel::graph::apply::apply_graph_delta(
-                        graph,
-                        GraphDelta::SetNodeFacet {
-                            key,
-                            facet: facet.as_str().to_owned(),
-                            value: value.clone(),
-                        },
-                    );
+                    graph.set_facet(node, facet.as_str(), value.clone());
                 })
                 .expect("a captured facet must reproduce its exact floating-point values");
-            let check = |graph: &Graph| {
+            let check = |graph: &Surface| {
                 let actual = graph.facets().get(&node, &facet).unwrap();
                 assert_eq!(actual, &value);
                 for (index, expected) in coordinates.iter().enumerate() {
@@ -2926,947 +2410,40 @@ mod tests {
             check(&session.graph_at(session.journal().live_cursor()).unwrap());
             session.flush(wall_clock_now()).await.unwrap();
             drop(session);
-            check(mere.open(manifest.session_id).await.unwrap().graph());
+            check(mere.open_with(manifest.session_id).await.unwrap().graph());
         });
     }
 
-    async fn legacy_receipt_fixture() -> (MemoryBackend, SessionId, Seq) {
-        legacy_receipt_fixture_with_addresses(false).await
-    }
-
-    async fn legacy_receipt_fixture_with_addresses(
-        same_host: bool,
-    ) -> (MemoryBackend, SessionId, Seq) {
-        let store = MemoryBackend::new();
-        let mut baseline = kernel::graph::replay_captured_deltas([add(1), add(2)]);
-        if same_host {
-            replay_captured_deltas_onto(
-                &mut baseline,
-                [
-                    CapturedDelta::ReplaySetNodeUrlById {
-                        node_id: Uuid::from_u128(1).to_string(),
-                        new_url: "https://same-host.test/".into(),
-                    },
-                    CapturedDelta::ReplaySetNodeUrlById {
-                        node_id: Uuid::from_u128(2).to_string(),
-                        new_url: "https://same-host.test/child".into(),
-                    },
-                ],
-            );
-            baseline = Graph::try_from_snapshot(&baseline.to_snapshot()).unwrap();
-        }
-        let grouped = |from: u128, to: u128| CapturedDelta::ReplayAssertRelationByIds {
-            from_id: Uuid::from_u128(from).to_string(),
-            to_id: Uuid::from_u128(to).to_string(),
-            assertion: kernel::graph::EdgeAssertion::Semantic {
-                sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
-                label: Some("held surface".into()),
-            },
-        };
-        replay_captured_deltas_onto(&mut baseline, [grouped(1, 2)]);
-        let mut raw = baseline.to_snapshot();
-        // This retained baseline intentionally models the schema-0 sidecar
-        // wire shape; it must not accidentally keep schema-1 assertion rows.
-        raw.assertion_schema = 0;
-        for edge in &mut raw.edges {
-            let records = edge.assertions.take().unwrap_or_default();
-            let sub_kinds: Vec<_> = records
-                .iter()
-                .filter_map(|record| record.recognized_sub_kind.clone())
-                .collect();
-            if !sub_kinds.is_empty() {
-                edge.semantic = Some(kernel::persistence::PersistedSemanticEdgeData {
-                    sub_kinds,
-                    label: records.iter().find_map(|record| record.label.clone()),
-                    ..Default::default()
-                });
-            }
-            let containment: Vec<_> = records
-                .iter()
-                .filter_map(|record| match record.predicate.as_str() {
-                    "https://mere.computer/ns/rel#containment.url-path" => {
-                        Some(mere::model::PersistedContainmentSubKind::UrlPath)
-                    },
-                    "https://mere.computer/ns/rel#containment.domain" => {
-                        Some(mere::model::PersistedContainmentSubKind::Domain)
-                    },
-                    _ => None,
-                })
-                .collect();
-            if !containment.is_empty() {
-                edge.containment = Some(mere::model::PersistedContainmentEdgeData {
-                    sub_kinds: containment,
-                });
-            }
-        }
-        let mere = MereSessions::new(store.clone());
-        let mut session = mere.begin(person(), Some(baseline));
-        for (author, delta) in [
-            (Author::person("node-author").via("legacy-host"), add(3)),
-            (person(), relate(1, 2)),
-            (
-                Author::person("group-author").via("legacy-editor"),
-                grouped(2, 3),
-            ),
-        ] {
-            let first = session.journal.live_cursor();
-            session.journal.record_as(author.clone(), delta);
-            session.changes.append(Change {
-                author,
-                kind: ChangeKind::Edit,
-                first,
-                end: session.journal.live_cursor(),
-            });
-        }
-        session.graph = session
-            .journal
-            .snapshot_at_from(&session.baseline, session.journal.live_cursor())
-            .unwrap()
-            .unwrap();
-        session
-            .store(wall_clock_now(), Vec::new(), true)
-            .await
-            .unwrap();
-        let id = session.id();
-        store
-            .apply(&[pretty(
-                Keys::new(id).at(BASELINE),
-                &Baseline {
-                    graph: raw,
-                    facets: session.baseline.facets().clone(),
-                },
-            )
-            .unwrap()])
-            .await
-            .unwrap();
-        (store, id, Seq(3))
-    }
-
-    #[test]
-    fn prepared_translation_transaction_rechecks_every_retained_input() {
-        pollster::block_on(async {
-            let (store, id, _) = legacy_receipt_fixture().await;
-            let session = GraphSession::open(store.clone(), id).await.unwrap();
-            let source = session.retained_source.as_ref().unwrap();
-            let keys = Keys::new(id);
-            let baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
-            let entry_key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(0));
-            let entry = store.get(&entry_key).await.unwrap().unwrap();
-            let appended =
-                muniment::journal::entry_key(&keys.at(JOURNAL), Seq(source.entries.len() as u64));
-            let mut changed_baseline = baseline.clone();
-            changed_baseline.push(b'\n');
-            let mut changed_entry = entry.clone();
-            changed_entry.push(b'\n');
-            for (key, invalid, restore) in [
-                (keys.at(BASELINE), changed_baseline, Some(baseline)),
-                (entry_key, changed_entry, Some(entry)),
-                (appended, b"new concurrent entry".to_vec(), None),
-                (keys.at(PLACEMENT), b"new concurrent profile".to_vec(), None),
-            ] {
-                store.put(&key, &invalid).await.unwrap();
-                let candidate = || {
-                    vec![WriteOp::Put {
-                        key: keys.at(TRANSLATION),
-                        value: b"candidate".to_vec(),
-                    }]
-                };
-                let (transaction, rejected) = translation_transaction(&keys, source, candidate());
-                store.transact(transaction).await.unwrap();
-                assert!(rejected.lock().unwrap().is_some());
-                assert!(store.get(&keys.at(TRANSLATION)).await.unwrap().is_none());
-                assert_eq!(store.get(&key).await.unwrap().unwrap(), invalid);
-                match restore {
-                    Some(bytes) => store.put(&key, &bytes).await.unwrap(),
-                    None => store.delete(&key).await.unwrap(),
-                }
-                let (transaction, rejected) = translation_transaction(&keys, source, candidate());
-                store.transact(transaction).await.unwrap();
-                assert!(rejected.lock().unwrap().is_none());
-                assert_eq!(
-                    store.get(&keys.at(TRANSLATION)).await.unwrap().unwrap(),
-                    b"candidate"
-                );
-                store.delete(&keys.at(TRANSLATION)).await.unwrap();
-            }
-        });
-    }
-
-    #[test]
-    fn legacy_translation_receipt_preserves_first_handles_history_undo_and_modern_suffix() {
-        pollster::block_on(async {
-            let (store, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
-            let keys = Keys::new(id);
-            let retained_baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
-            let retained_entries = {
-                let mut values = Vec::new();
-                for index in 0..cutoff.0 {
-                    values.push(
-                        store
-                            .get(&muniment::journal::entry_key(&keys.at(JOURNAL), Seq(index)))
-                            .await
-                            .unwrap()
-                            .unwrap(),
-                    );
-                }
-                values
-            };
-            let mut session = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
-                .await
-                .unwrap();
-            let original_entries = session.journal().entries()[..cutoff.index()].to_vec();
-            let first = FrozenGraph::of(session.graph());
-            assert!(first.graph.resource_edges.iter().any(|edge| {
-                edge.retained_assertions().iter().any(|assertion| {
-                    assertion.predicate == "https://mere.computer/ns/rel#containment.domain"
-                })
-            }));
-            assert!(first.graph.resource_edges.iter().any(|edge| {
-                edge.retained_assertions().iter().any(|assertion| {
-                    assertion.predicate == "https://mere.computer/ns/rel#containment.url-path"
-                })
-            }));
-            assert!(
-                first
-                    .graph
-                    .edges
-                    .iter()
-                    .all(|edge| edge.retained_assertions().iter().all(|assertion| {
-                        assertion.predicate != "https://mere.computer/ns/rel#containment.domain"
-                            && assertion.predicate
-                                != "https://mere.computer/ns/rel#containment.url-path"
-                    }))
-            );
-            let histories: Vec<_> = (0..=cutoff.0)
-                .map(|cursor| FrozenGraph::of(&session.graph_at(Seq(cursor)).unwrap()))
-                .collect();
-            assert_eq!(histories[cutoff.index()], first);
-            assert_eq!(
-                histories[0]
-                    .graph
-                    .edges
-                    .iter()
-                    .flat_map(|edge| edge.retained_assertions())
-                    .count(),
-                1,
-                "aggregate-only held baseline gains one frozen handle"
-            );
-            let resource_claims: Vec<_> = first
-                .graph
-                .resource_edges
-                .iter()
-                .flat_map(|edge| edge.retained_assertions())
-                .filter(|assertion| {
-                    assertion.predicate
-                        == kernel::graph::predicate_iri(kernel::graph::SemanticSubKind::Cites)
-                })
-                .collect();
-            assert_eq!(resource_claims.len(), 1);
-            assert_eq!(
-                resource_claims[0].provenance_iri.as_deref(),
-                Some(person().asserter_iri().as_str())
-            );
-            let resource_handle = resource_claims[0].statement_id.clone();
-            let group_author = Author::person("group-author").via("legacy-editor");
-            assert!(
-                first
-                    .graph
-                    .edges
-                    .iter()
-                    .flat_map(|edge| edge.retained_assertions())
-                    .any(|claim| claim.provenance_iri.as_deref()
-                        == Some(group_author.asserter_iri().as_str()))
-            );
-            for _ in 0..2 {
-                let reopened = GraphSession::open(store.clone(), id).await.unwrap();
-                assert_eq!(FrozenGraph::of(reopened.graph()), first);
-                for (cursor, expected) in histories.iter().enumerate() {
-                    assert_eq!(
-                        FrozenGraph::of(&reopened.graph_at(Seq(cursor as u64)).unwrap()),
-                        *expected
-                    );
-                }
-                assert_eq!(
-                    reopened.journal().entries()[..cutoff.index()],
-                    original_entries
-                );
-            }
-            session.undo(group_author.clone()).await.unwrap().unwrap();
-            assert_eq!(
-                session.graph().to_snapshot().resource_edges,
-                first.graph.resource_edges,
-                "undo held Surface control keeps migrated Resource claim"
-            );
-            session.redo(group_author).await.unwrap().unwrap();
-            assert_eq!(
-                FrozenGraph::of(session.graph()),
-                first,
-                "redo restores first Surface handles and facets"
-            );
-            session.undo(person()).await.unwrap().unwrap();
-            assert!(
-                session
-                    .graph()
-                    .to_snapshot()
-                    .resource_edges
-                    .iter()
-                    .all(|edge| edge
-                        .retained_assertions()
-                        .iter()
-                        .all(|claim| { claim.statement_id != resource_handle }))
-            );
-            assert_eq!(
-                session.graph().to_snapshot().edges,
-                first.graph.edges,
-                "resource undo keeps held Surface controls"
-            );
-            session.redo(person()).await.unwrap().unwrap();
-            assert_eq!(
-                FrozenGraph::of(session.graph()),
-                first,
-                "resource redo restores exact original handles/source/time"
-            );
-
-            let modern = Author::person("modern-author").via("modern-host");
-            let predicate = "urn:mere:receipt:modern-held";
-            session.edit_now(modern.clone(), |graph| {
-                graph
-                    .declare_predicate(predicate, kernel::graph::GraphStratum::Surface)
-                    .unwrap()
-            });
-            session.flush(wall_clock_now()).await.unwrap();
-            session
-                .apply(
-                    modern.clone(),
-                    vec![CapturedDelta::ReplayAssertSemanticPredicateByIds {
-                        from_id: Uuid::from_u128(1).to_string(),
-                        to_id: Uuid::from_u128(2).to_string(),
-                        predicate: predicate.into(),
-                    }],
-                )
-                .await
-                .unwrap();
-            session.edit_now(modern.clone(), |graph| {
-                graph
-                    .declare_predicate(predicate, kernel::graph::GraphStratum::Resource)
-                    .unwrap()
-            });
-            session.checkpoint().await.unwrap();
-            let final_graph = FrozenGraph::of(session.graph());
-            assert!(
-                final_graph
-                    .graph
-                    .edges
-                    .iter()
-                    .flat_map(|edge| edge.retained_assertions())
-                    .any(|claim| claim.predicate == predicate
-                        && claim.provenance_iri.as_deref() == Some(modern.asserter_iri().as_str()))
-            );
-            assert!(
-                final_graph
-                    .graph
-                    .resource_edges
-                    .iter()
-                    .flat_map(|edge| edge.retained_assertions())
-                    .all(|claim| claim.predicate != predicate),
-                "later Resource declaration does not migrate modern held claims"
-            );
-            assert_eq!(session.placement().unwrap().cutoff(), cutoff);
-            for _ in 0..2 {
-                let reopened = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
-                    .await
-                    .unwrap();
-                assert_eq!(FrozenGraph::of(reopened.graph()), final_graph);
-                assert_eq!(
-                    FrozenGraph::of(&reopened.graph_at(reopened.journal().live_cursor()).unwrap()),
-                    final_graph
-                );
-                assert_eq!(
-                    reopened.journal().entries()[..cutoff.index()],
-                    original_entries
-                );
-            }
-            store
-                .apply(&[pretty(
-                    keys.at(CHECKPOINT),
-                    &Checkpoint {
-                        cursor: session.journal().live_cursor(),
-                        translated_receipt_digest: None,
-                        journal_digest: None,
-                        journal_digest_version: None,
-                        contents_digest: None,
-                    },
-                )
-                .unwrap()])
-                .await
-                .unwrap();
-            assert_eq!(
-                FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
-                final_graph,
-                "unqualified checkpoint falls back to the receipt, keeping first IDs"
-            );
-            assert_eq!(
-                store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
-                retained_baseline
-            );
-            for (index, expected) in retained_entries.iter().enumerate() {
-                assert_eq!(
-                    store
-                        .get(&muniment::journal::entry_key(
-                            &keys.at(JOURNAL),
-                            Seq(index as u64)
-                        ))
-                        .await
-                        .unwrap()
-                        .unwrap(),
-                    *expected
-                );
-            }
-        });
-    }
-
-    #[test]
-    fn legacy_translation_receipt_rejects_source_profile_and_receipt_damage_atomically() {
-        pollster::block_on(async {
-            let (store, id, cutoff) = legacy_receipt_fixture().await;
-            let mut session = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
-                .await
-                .unwrap();
-            let expected = FrozenGraph::of(session.graph());
-            let keys = Keys::new(id);
-            let checkpoint = store.get(&keys.at(GRAPH)).await.unwrap().unwrap();
-            let receipt = store.get(&keys.at(TRANSLATION)).await.unwrap().unwrap();
-            let baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
-            let profile = store.get(&keys.at(PLACEMENT)).await.unwrap().unwrap();
-            let first_key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(0));
-            let first_entry = store.get(&first_key).await.unwrap().unwrap();
-            let mut changed_source = baseline.clone();
-            changed_source.push(b'\n');
-            let mut changed_entry: serde_json::Value =
-                serde_json::from_slice(&first_entry).unwrap();
-            changed_entry["entry"]["author"]["id"] = serde_json::json!("changed-author");
-            let mut changed_receipt: serde_json::Value = serde_json::from_slice(&receipt).unwrap();
-            changed_receipt["translation_digest"] = serde_json::json!("invalid");
-            let changed_profile = SessionPlacement::legacy(Seq(0), vec![]);
-            for (key, invalid, original) in [
-                (keys.at(BASELINE), changed_source, baseline),
-                (
-                    first_key,
-                    serde_json::to_vec(&changed_entry).unwrap(),
-                    first_entry,
-                ),
-                (
-                    keys.at(TRANSLATION),
-                    serde_json::to_vec(&changed_receipt).unwrap(),
-                    receipt.clone(),
-                ),
-                (
-                    keys.at(PLACEMENT),
-                    serde_json::to_vec(&changed_profile).unwrap(),
-                    profile,
-                ),
-            ] {
-                store
-                    .apply(&[WriteOp::Put {
-                        key: key.clone(),
-                        value: invalid.clone(),
-                    }])
-                    .await
-                    .unwrap();
-                assert!(matches!(
-                    GraphSession::open(store.clone(), id).await,
-                    Err(SessionError::Corrupt(_))
-                ));
-                assert_eq!(store.get(&key).await.unwrap().unwrap(), invalid);
-                assert_eq!(
-                    store.get(&keys.at(GRAPH)).await.unwrap().unwrap(),
-                    checkpoint,
-                    "failed load writes no checkpoint"
-                );
-                assert_eq!(
-                    FrozenGraph::of(session.graph()),
-                    expected,
-                    "existing live session stays intact"
-                );
-                store
-                    .apply(&[WriteOp::Put {
-                        key,
-                        value: original,
-                    }])
-                    .await
-                    .unwrap();
-                assert_eq!(
-                    FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
-                    expected,
-                    "unchanged source positive control"
-                );
-            }
-            store.delete(&keys.at(TRANSLATION)).await.unwrap();
-            assert!(matches!(
-                GraphSession::open(store.clone(), id).await,
-                Err(SessionError::Corrupt(_))
-            ));
-            assert_eq!(
-                store.get(&keys.at(GRAPH)).await.unwrap().unwrap(),
-                checkpoint
-            );
-            store.put(&keys.at(TRANSLATION), &receipt).await.unwrap();
-            assert_eq!(
-                FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
-                expected
-            );
-            assert!(
-                session
-                    .qualify_legacy(Seq(cutoff.0 + 1), vec![])
-                    .await
-                    .is_err()
-            );
-            assert_eq!(FrozenGraph::of(session.graph()), expected);
-            let mere = MereSessions::new(store.clone());
-            let mut undurable = mere.begin(person(), Some(Graph::new()));
-            assert!(undurable.qualify_legacy(Seq(0), vec![]).await.is_err());
-            assert!(
-                store
-                    .get(&undurable.keys.at(TRANSLATION))
-                    .await
-                    .unwrap()
-                    .is_none()
-            );
-        });
-    }
-
-    #[test]
-    fn translated_checkpoint_rejects_valid_truth_changes_before_admission() {
-        pollster::block_on(async {
-            async fn stored_values(store: &MemoryBackend) -> Vec<(String, Vec<u8>)> {
-                let mut keys = store.list("").await.unwrap();
-                keys.sort();
-                let mut values = Vec::new();
-                for key in keys {
-                    values.push((key.clone(), store.get(&key).await.unwrap().unwrap()));
-                }
-                values
-            }
-
-            let (store, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
-            let session = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
-                .await
-                .unwrap();
-            let expected = FrozenGraph::of(session.graph());
-            let keys = Keys::new(id);
-            let checkpoint_bytes = store.get(&keys.at(GRAPH)).await.unwrap().unwrap();
-            let facet_bytes = store
-                .get(&keys.at(NODE_FACETS_FILE))
-                .await
-                .unwrap()
-                .unwrap();
-            let checkpoint: GraphSnapshot = serde_json::from_slice(&checkpoint_bytes).unwrap();
-            let facets: NodeFacetStore = serde_json::from_slice(&facet_bytes).unwrap();
-            let before = stored_values(&store).await;
-            let opened = GraphSession::open(store.clone(), id).await.unwrap();
-            assert_eq!(FrozenGraph::of(opened.graph()), expected);
-            assert_eq!(
-                FrozenGraph::of(&opened.graph_at(cutoff).unwrap()),
-                expected,
-                "unchanged qualified checkpoint agrees with receipt replay"
-            );
-            assert_eq!(stored_values(&store).await, before);
-
-            let mut changed_checkpoint = checkpoint.clone();
-            let claim = changed_checkpoint
-                .resource_edges
-                .iter_mut()
-                .flat_map(|edge| edge.retained_assertions_mut())
-                .next()
-                .expect("fixture has a migrated resource claim");
-            let original_claim = claim.clone();
-            claim.label = Some("changed valid checkpoint label".into());
-            claim.basis.note = claim.label.clone();
-            let changed_claim = claim.clone();
-            *claim = original_claim.clone();
-            assert_eq!(
-                *claim, original_claim,
-                "IDs, source, time and predicate stay exact"
-            );
-            assert_eq!(
-                serde_json::to_value(&changed_checkpoint).unwrap(),
-                serde_json::to_value(&checkpoint).unwrap(),
-                "no endpoints or other checkpoint truth were changed"
-            );
-            *changed_checkpoint
-                .resource_edges
-                .iter_mut()
-                .flat_map(|edge| edge.retained_assertions_mut())
-                .next()
-                .unwrap() = changed_claim;
-
-            let mut changed_facets = facets.clone();
-            changed_facets
-                .set(
-                    Uuid::from_u128(1),
-                    portolan::FacetId::new("extension.checkpoint-note"),
-                    serde_json::json!({"foreign": "valid but not in retained history"}),
-                    &portolan::AcceptAll,
-                )
-                .unwrap();
-            let changes = [
-                (
-                    keys.at(GRAPH),
-                    serde_json::to_vec(&changed_checkpoint).unwrap(),
-                    checkpoint_bytes,
-                    FrozenGraph {
-                        graph: changed_checkpoint,
-                        facets: facets.clone(),
-                    },
-                ),
-                (
-                    keys.at(NODE_FACETS_FILE),
-                    serde_json::to_vec(&changed_facets).unwrap(),
-                    facet_bytes,
-                    FrozenGraph {
-                        graph: checkpoint,
-                        facets: changed_facets,
-                    },
-                ),
-            ];
-            let mut refused = Vec::new();
-            for (key, changed, original, changed_truth) in changes {
-                let valid_changed = changed_truth.materialize().unwrap();
-                assert_ne!(FrozenGraph::of(&valid_changed), expected);
-                store.put(&key, &changed).await.unwrap();
-                let before_open = stored_values(&store).await;
-                refused.push(matches!(
-                    GraphSession::open(store.clone(), id).await,
-                    Err(SessionError::Corrupt(_))
-                ));
-                assert_eq!(
-                    stored_values(&store).await,
-                    before_open,
-                    "load writes nothing"
-                );
-                assert_eq!(FrozenGraph::of(session.graph()), expected);
-                store.put(&key, &original).await.unwrap();
-                let restored = GraphSession::open(store.clone(), id).await.unwrap();
-                assert_eq!(FrozenGraph::of(restored.graph()), expected);
-                assert_eq!(
-                    FrozenGraph::of(&restored.graph_at(cutoff).unwrap()),
-                    expected
-                );
-            }
-            assert_eq!(
-                refused,
-                vec![true, true],
-                "changed canonical note and foreign facet refuse"
-            );
-        });
-    }
-
-    #[test]
-    fn legacy_translation_qualification_rejects_a_changed_open_source_before_writing() {
-        pollster::block_on(async {
-            let (store, id, cutoff) = legacy_receipt_fixture().await;
-            let mut session = GraphSession::open(store.clone(), id).await.unwrap();
-            let expected = FrozenGraph::of(session.graph());
-            let keys = Keys::new(id);
-            let original = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
-            let mut changed = original.clone();
-            changed.push(b'\n');
-            store.put(&keys.at(BASELINE), &changed).await.unwrap();
-            assert!(matches!(
-                session.qualify_legacy(cutoff, vec![]).await,
-                Err(SessionError::Corrupt(_))
-            ));
-            assert_eq!(FrozenGraph::of(session.graph()), expected);
-            assert!(store.get(&keys.at(TRANSLATION)).await.unwrap().is_none());
-            assert!(store.get(&keys.at(PLACEMENT)).await.unwrap().is_none());
-            assert_eq!(
-                store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
-                changed
-            );
-            store.put(&keys.at(BASELINE), &original).await.unwrap();
-            session.qualify_legacy(cutoff, vec![]).await.unwrap();
-            let qualified = FrozenGraph::of(session.graph());
-            assert_eq!(
-                FrozenGraph::of(GraphSession::open(store.clone(), id).await.unwrap().graph()),
-                qualified
-            );
-            assert_eq!(
-                store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
-                original
-            );
-        });
-    }
-
-    #[derive(Clone)]
-    struct QualificationBackend {
-        store: MemoryBackend,
-        before_commit: Option<WriteOp>,
-        transactional: bool,
-    }
-
-    #[cfg_attr(not(target_arch = "wasm32"), async_trait::async_trait)]
-    #[cfg_attr(target_arch = "wasm32", async_trait::async_trait(?Send))]
-    impl Backend for QualificationBackend {
-        async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
-            self.store.get(key).await
-        }
-        async fn put(&self, key: &str, bytes: &[u8]) -> Result<(), StoreError> {
-            self.store.put(key, bytes).await
-        }
-        async fn delete(&self, key: &str) -> Result<(), StoreError> {
-            self.store.delete(key).await
-        }
-        async fn list(&self, prefix: &str) -> Result<Vec<String>, StoreError> {
-            self.store.list(prefix).await
-        }
-        async fn scan(&self, start: &str, end: &str) -> Result<Vec<String>, StoreError> {
-            self.store.scan(start, end).await
-        }
-        async fn apply(&self, ops: &[WriteOp]) -> Result<(), StoreError> {
-            self.store.apply(ops).await
-        }
-        async fn transact(&self, transaction: muniment::TransactFn) -> Result<(), StoreError> {
-            if !self.transactional {
-                return Err(StoreError::NotTransactional);
-            }
-            if let Some(op) = &self.before_commit {
-                self.store.apply(std::slice::from_ref(op)).await?;
-            }
-            self.store.transact(transaction).await
-        }
-    }
-
-    #[test]
-    fn qualification_commit_refuses_raced_source_and_unsupported_backend_atomically() {
-        pollster::block_on(async {
-            let (store, id, cutoff) = legacy_receipt_fixture().await;
-            let keys = Keys::new(id);
-            let baseline = store.get(&keys.at(BASELINE)).await.unwrap().unwrap();
-            let checkpoint = store.get(&keys.at(GRAPH)).await.unwrap().unwrap();
-            let mut changed = baseline.clone();
-            changed.push(b'\n');
-            for transactional in [true, false] {
-                let backend = QualificationBackend {
-                    store: store.clone(),
-                    before_commit: Some(WriteOp::Put {
-                        key: keys.at(BASELINE),
-                        value: changed.clone(),
-                    }),
-                    transactional,
-                };
-                let mut session = GraphSession::open(backend, id).await.unwrap();
-                let live = FrozenGraph::of(session.graph());
-                let result = session.qualify_legacy(cutoff, vec![]).await;
-                if transactional {
-                    assert!(matches!(result, Err(SessionError::Corrupt(_))));
-                    assert_eq!(
-                        store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
-                        changed
-                    );
-                } else {
-                    assert!(matches!(
-                        result,
-                        Err(SessionError::Store(StoreError::NotTransactional))
-                    ));
-                    assert_eq!(
-                        store.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
-                        baseline
-                    );
-                }
-                assert_eq!(FrozenGraph::of(session.graph()), live);
-                assert!(session.placement().is_none());
-                assert!(store.get(&keys.at(TRANSLATION)).await.unwrap().is_none());
-                assert!(store.get(&keys.at(PLACEMENT)).await.unwrap().is_none());
-                assert_eq!(
-                    store.get(&keys.at(GRAPH)).await.unwrap().unwrap(),
-                    checkpoint
-                );
-                store.put(&keys.at(BASELINE), &baseline).await.unwrap();
-            }
-            let qualified = GraphSession::open_legacy(store.clone(), id, cutoff, vec![])
-                .await
-                .unwrap();
-            assert!(qualified.placement().is_some());
-            assert_eq!(
-                FrozenGraph::of(qualified.graph()),
-                FrozenGraph::of(GraphSession::open(store, id).await.unwrap().graph())
-            );
-        });
-    }
-
-    #[test]
-    fn sealed_legacy_receipt_activation_history_undo_and_corruption_are_exact() {
-        pollster::block_on(async {
-            let (source, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
-            let raw = MemoryBackend::new();
-            let epoch = sporran::wallet_store::KeyEpochId(Uuid::from_bytes([7; 16]));
-            let sealed = sporran::WalletSealedBackend::new(
-                raw.clone(),
-                sporran::WalletEpochSealer::from_epoch(
-                    crate::PersonaId::new(),
-                    epoch,
-                    b"session secret",
-                ),
-            );
-            let mut ops = Vec::new();
-            for key in source.list("").await.unwrap() {
-                ops.push(WriteOp::Put {
-                    value: source.get(&key).await.unwrap().unwrap(),
-                    key,
-                });
-            }
-            sealed.apply(&ops).await.unwrap();
-            let keys = Keys::new(id);
-            let original_baseline = sealed.get(&keys.at(BASELINE)).await.unwrap().unwrap();
-            let original_entries = {
-                let mut entries = Vec::new();
-                for index in 0..cutoff.0 {
-                    let key = muniment::journal::entry_key(&keys.at(JOURNAL), Seq(index));
-                    entries.push((key.clone(), sealed.get(&key).await.unwrap().unwrap()));
-                }
-                entries
-            };
-            let mut session = GraphSession::open_legacy(sealed.clone(), id, cutoff, vec![])
-                .await
-                .unwrap();
-            let qualified = FrozenGraph::of(session.graph());
-            let histories: Vec<_> = (0..=cutoff.0)
-                .map(|cursor| FrozenGraph::of(&session.graph_at(Seq(cursor)).unwrap()))
-                .collect();
-            for _ in 0..2 {
-                let reopened = GraphSession::open(sealed.clone(), id).await.unwrap();
-                assert_eq!(FrozenGraph::of(reopened.graph()), qualified);
-                for (index, expected) in histories.iter().enumerate() {
-                    assert_eq!(
-                        FrozenGraph::of(&reopened.graph_at(Seq(index as u64)).unwrap()),
-                        *expected
-                    );
-                }
-                assert_eq!(reopened.journal().entries(), session.journal().entries());
-            }
-            assert!(session.undo(person()).await.unwrap().is_some());
-            assert_ne!(FrozenGraph::of(session.graph()), qualified);
-            assert!(session.redo(person()).await.unwrap().is_some());
-            assert_eq!(FrozenGraph::of(session.graph()), qualified);
-            session.flush(wall_clock_now()).await.unwrap();
-            session.checkpoint().await.unwrap();
-            assert_eq!(
-                FrozenGraph::of(
-                    GraphSession::open(sealed.clone(), id)
-                        .await
-                        .unwrap()
-                        .graph()
-                ),
-                qualified
-            );
-            // Without the checkpoint, the frozen receipt and retained Authors give the same graph.
-            sealed.delete(&keys.at(CHECKPOINT)).await.unwrap();
-            assert_eq!(
-                FrozenGraph::of(
-                    GraphSession::open(sealed.clone(), id)
-                        .await
-                        .unwrap()
-                        .graph()
-                ),
-                qualified
-            );
-            assert_eq!(
-                sealed.get(&keys.at(BASELINE)).await.unwrap().unwrap(),
-                original_baseline
-            );
-            for (key, value) in original_entries {
-                assert_eq!(sealed.get(&key).await.unwrap().unwrap(), value);
-            }
-            let receipt_key = keys.at(TRANSLATION);
-            let original_receipt = sealed.get(&receipt_key).await.unwrap().unwrap();
-            let mut corrupted: serde_json::Value =
-                serde_json::from_slice(&original_receipt).unwrap();
-            corrupted["translation_digest"] = serde_json::json!("damaged");
-            sealed
-                .put(&receipt_key, &serde_json::to_vec(&corrupted).unwrap())
-                .await
-                .unwrap();
-            let corrupted_ciphertext = raw.get(&receipt_key).await.unwrap().unwrap();
-            assert!(matches!(
-                GraphSession::open(sealed.clone(), id).await,
-                Err(SessionError::Corrupt(_))
-            ));
-            assert_eq!(
-                raw.get(&receipt_key).await.unwrap().unwrap(),
-                corrupted_ciphertext
-            );
-            assert_eq!(FrozenGraph::of(session.graph()), qualified);
-            sealed.put(&receipt_key, &original_receipt).await.unwrap();
-            assert_eq!(
-                FrozenGraph::of(
-                    GraphSession::open(sealed.clone(), id)
-                        .await
-                        .unwrap()
-                        .graph()
-                ),
-                qualified
-            );
-            let good_ciphertext = raw.get(&receipt_key).await.unwrap().unwrap();
-            raw.put(&receipt_key, b"unsealed receipt").await.unwrap();
-            assert!(GraphSession::open(sealed.clone(), id).await.is_err());
-            assert_eq!(
-                raw.get(&receipt_key).await.unwrap().unwrap(),
-                b"unsealed receipt"
-            );
-            raw.put(&receipt_key, &good_ciphertext).await.unwrap();
-            assert_eq!(
-                FrozenGraph::of(
-                    GraphSession::open(sealed.clone(), id)
-                        .await
-                        .unwrap()
-                        .graph()
-                ),
-                qualified
-            );
-            for key in raw.list("").await.unwrap() {
-                let ciphertext: serde_json::Value =
-                    serde_json::from_slice(&raw.get(&key).await.unwrap().unwrap()).unwrap();
-                assert_eq!(ciphertext["format"], "pandect-wallet-slot-v1");
-            }
-        });
-    }
-
+    /// Placement is explicit: `begin` names none and `begin_recorded` names
+    /// the recorded profile, both reopen the same graph, and an invalid
+    /// placement file is refused and left as it was.
     #[test]
     fn placement_is_explicit_and_recorded_sessions_keep_held_surface_claims() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
-            let mut baseline =
-                kernel::graph::replay_captured_deltas([add(1), add(2), relate(1, 2)]);
-            let predicate = "urn:mere:profile-test:custom";
-            replay_captured_deltas_onto(
-                &mut baseline,
-                [CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
-                    from_id: Uuid::from_u128(1).to_string(),
-                    to_id: Uuid::from_u128(2).to_string(),
-                    predicate: Some(predicate.into()),
-                }],
+            let mere = Sessions::new_with(store.clone());
+            let mut baseline = Surface::default();
+            baseline.show(Uuid::from_u128(1), "https://1.test/");
+            baseline.show(Uuid::from_u128(2), "https://2.test/");
+            baseline.assert(
+                Uuid::from_u128(1),
+                Uuid::from_u128(2),
+                "urn:mere:profile-test:custom",
             );
-            baseline
-                .write_as(person(), |graph| {
-                    graph.declare_predicate(predicate, kernel::graph::GraphStratum::Resource)
-                })
-                .unwrap();
-            assert!(baseline.to_snapshot().resource_edges.is_empty());
-            let edges = baseline.to_snapshot().edges;
-            let mut unqualified = mere.begin(person(), Some(baseline.clone()));
+            let snapshot = baseline.to_snapshot();
+            let mut unqualified = mere.begin_with(person(), Some(baseline.clone()));
             assert_eq!(unqualified.placement(), None);
             unqualified.flush(wall_clock_now()).await.unwrap();
             let id = unqualified.id();
-            let opened = mere.open(id).await.unwrap();
+            let opened = mere.open_with(id).await.unwrap();
             assert_eq!(
                 opened.placement(),
                 None,
                 "columns never qualify an arbitrary baseline"
             );
-            assert_eq!(opened.graph().to_snapshot().edges, edges);
+            assert_eq!(opened.graph().to_snapshot(), snapshot);
 
-            let mut recorded = mere.begin_recorded(person(), Some(baseline));
+            let mut recorded = mere.begin_recorded_with(person(), Some(baseline));
             assert_eq!(recorded.placement(), Some(&SessionPlacement::recorded()));
             let pending = recorded.pending(wall_clock_now()).unwrap();
             assert!(pending.ops().iter().any(
@@ -3874,20 +2451,15 @@ mod tests {
             ));
             recorded.flush(wall_clock_now()).await.unwrap();
             let recorded_id = recorded.id();
-            let opened = mere.open(recorded_id).await.unwrap();
+            let opened = mere.open_with(recorded_id).await.unwrap();
             assert_eq!(opened.placement(), Some(&SessionPlacement::recorded()));
             assert_eq!(
-                opened.graph().to_snapshot().edges,
-                edges,
-                "recorded placement does not relocate held claims"
-            );
-            assert!(opened.graph().to_snapshot().resource_edges.is_empty());
-            assert_eq!(
-                opened.graph().predicate_declarations(predicate).unwrap(),
-                recorded.graph().predicate_declarations(predicate).unwrap()
+                opened.graph().to_snapshot(),
+                snapshot,
+                "recorded placement keeps the held claims"
             );
 
-            let fresh = mere.begin(person(), None);
+            let fresh = mere.begin_with(person(), None);
             assert_eq!(fresh.placement(), Some(&SessionPlacement::recorded()));
             let key = Keys::new(recorded_id).at(PLACEMENT);
             for invalid in [
@@ -3905,7 +2477,7 @@ mod tests {
                     .await
                     .unwrap();
                 assert!(matches!(
-                    mere.open(recorded_id).await,
+                    mere.open_with(recorded_id).await,
                     Err(SessionError::Corrupt(_))
                 ));
                 let slots = JsonSlots::new(store.clone());
@@ -3921,13 +2493,12 @@ mod tests {
                     .await
                     .unwrap();
                 assert_eq!(
-                    mere.open(recorded_id)
+                    mere.open_with(recorded_id)
                         .await
                         .unwrap()
                         .graph()
-                        .to_snapshot()
-                        .edges,
-                    edges
+                        .to_snapshot(),
+                    snapshot
                 );
             }
         });
@@ -3941,62 +2512,38 @@ mod tests {
         Author::person("persona-a").via("knot-editor")
     }
 
-    fn add(id: u128) -> CapturedDelta {
-        CapturedDelta::ReplayAddNodeWithIdIfMissing {
-            id: Uuid::from_u128(id).to_string(),
-            url: format!("https://{id}.test/"),
-            position: [0.0, 0.0],
-        }
+    /// Surface `id` showing `https://{id}.test/`: the resource, then the surface.
+    fn add(id: u128) -> Vec<Delta> {
+        show_edits(Uuid::from_u128(id), &format!("https://{id}.test/")).1
     }
 
-    fn retitle(id: u128, title: &str) -> CapturedDelta {
-        CapturedDelta::ReplaySetNodeTitleById {
-            node_id: Uuid::from_u128(id).to_string(),
-            title: title.to_string(),
-        }
+    /// Surface `id` showing the resource named `title`.
+    fn retitle(id: u128, title: &str) -> Vec<Delta> {
+        show_edits(Uuid::from_u128(id), &format!("https://{title}.test/")).1
     }
 
-    fn tag(id: u128, tag: &str) -> CapturedDelta {
-        CapturedDelta::ReplayInsertNodeTagById {
-            node_id: Uuid::from_u128(id).to_string(),
-            tag: tag.to_string(),
-        }
+    /// The title surface `id` shows, read back from its resource's IRI.
+    fn title(graph: &Surface, id: u128) -> Option<String> {
+        let iri = graph.iri_of(Uuid::from_u128(id))?;
+        Some(
+            iri.trim_start_matches("https://")
+                .trim_end_matches(".test/")
+                .to_owned(),
+        )
     }
 
-    fn relate(from: u128, to: u128) -> CapturedDelta {
-        CapturedDelta::ReplayAssertRelationByIds {
-            from_id: Uuid::from_u128(from).to_string(),
-            to_id: Uuid::from_u128(to).to_string(),
-            assertion: kernel::graph::EdgeAssertion::Semantic {
-                sub_kind: kernel::graph::SemanticSubKind::Cites,
-                label: None,
-            },
-        }
+    /// The edit that relates the resources surfaces `from` and `to` show
+    /// once added.
+    fn relate(from: u128, to: u128) -> Delta {
+        let (a, b) = (Uuid::from_u128(from), Uuid::from_u128(to));
+        let mut scratch = Surface::default();
+        let ra = scratch.show(a, &format!("https://{from}.test/"));
+        let rb = scratch.show(b, &format!("https://{to}.test/"));
+        scratch.assert(a, b, "https://session.test/vocab#cites");
+        edges_edit(ra, rb, scratch.rows_between(a, b))
     }
 
-    /// Sorted node ids with titles, and sorted relation endpoints: equal
-    /// graphs regardless of petgraph keys.
-    type Pairs = Vec<(String, String)>;
-
-    fn fingerprint(graph: &Graph) -> (Pairs, Pairs) {
-        let mut nodes: Vec<_> = graph
-            .nodes()
-            .map(|(_, node)| (node.id.to_string(), node.title.clone()))
-            .collect();
-        nodes.sort();
-        let mut edges: Vec<_> = graph
-            .relations()
-            .map(|relation| {
-                let from = graph.get_node(relation.from).unwrap().id.to_string();
-                let to = graph.get_node(relation.to).unwrap().id.to_string();
-                (from, to)
-            })
-            .collect();
-        edges.sort();
-        (nodes, edges)
-    }
-
-    async fn stored_bytes(store: &muniment::MemoryBackend) -> Vec<(String, Vec<u8>)> {
+    async fn stored_bytes(store: &MemoryBackend) -> Vec<(String, Vec<u8>)> {
         let mut keys = store.list("").await.unwrap();
         keys.sort();
         let mut bytes = Vec::new();
@@ -4009,22 +2556,22 @@ mod tests {
     #[test]
     fn an_observer_reads_the_stored_session_and_refuses_every_edit() {
         pollster::block_on(async {
-            let store = muniment::MemoryBackend::default();
-            let sessions = MereSessions::new(store.clone());
+            let store = MemoryBackend::default();
+            let sessions = Sessions::new_with(store.clone());
             let id = sessions.mint(person(), None).await.unwrap().session_id;
-            let mut writer = sessions.open(id).await.unwrap();
-            writer.apply(person(), vec![add(1)]).await.unwrap();
+            let mut writer = sessions.open_with(id).await.unwrap();
+            writer.apply(person(), add(1)).await.unwrap();
             let key = ViewKey::new("graphshell", "panel").unwrap();
-            let mut observer = sessions.open(id).await.unwrap().observe();
+            let mut observer = sessions.open_with(id).await.unwrap().observe();
             assert!(observer.is_observing());
             assert_eq!(
-                observer.graph().nodes().count(),
+                observer.graph().surface_count(),
                 1,
                 "it reads what was committed"
             );
             let frozen = stored_bytes(&store).await;
             assert!(matches!(
-                observer.apply(person(), vec![add(2)]).await,
+                observer.apply(person(), add(2)).await,
                 Err(SessionError::Observing(_))
             ));
             assert!(matches!(
@@ -4045,12 +2592,12 @@ mod tests {
                 frozen,
                 "an observer writes nothing"
             );
-            assert_eq!(observer.graph().nodes().count(), 1);
+            assert_eq!(observer.graph().surface_count(), 1);
 
             // The writer keeps committing; a fresh observer sees it.
-            writer.apply(person(), vec![add(2)]).await.unwrap();
-            let reopened = sessions.open(id).await.unwrap().observe();
-            assert_eq!(reopened.graph().nodes().count(), 2);
+            writer.apply(person(), add(2)).await.unwrap();
+            let reopened = sessions.open_with(id).await.unwrap().observe();
+            assert_eq!(reopened.graph().surface_count(), 2);
         });
     }
 
@@ -4058,25 +2605,19 @@ mod tests {
     fn profiled_archive_retains_placement_and_redaction_omits_private_history() {
         pollster::block_on(async {
             use crate::graph_codicil::{
-                RedactionPolicy, load_profiled_graph_codicil_sealed,
-                save_profiled_graph_codicil_sealed,
+                RedactionPolicy, load_profiled_graph_codicil_sealed_with,
+                save_profiled_graph_codicil_sealed_with,
+                save_profiled_session_codicil_checked_with,
             };
-            let mut store = muniment::MemoryBackend::default();
-            let sessions = MereSessions::new(store.clone());
-            let graph = crate::graph_placement::placement_test_graph();
-            let mut snapshot = graph.to_snapshot();
-            let mut second = snapshot.edges[0].clone();
-            second.retained_assertions_mut()[0].statement_id = "held-profile-second".into();
-            snapshot.edges.push(second);
-            let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
-            graph
-                .overlay_facets(
-                    crate::graph_placement::placement_test_graph()
-                        .facets()
-                        .clone(),
-                )
-                .unwrap();
-            let mut live = sessions.begin_recorded(person(), Some(graph));
+            let mut store = MemoryBackend::default();
+            let sessions = Sessions::new_with(store.clone()).with_codicil(&CODICIL);
+            let mut graph = Surface::default();
+            let (one, two) = (Uuid::from_u128(1), Uuid::from_u128(2));
+            graph.show(one, "https://profile.test/");
+            graph.show(two, "https://profile.test/child");
+            graph.assert(one, two, "urn:mere:profile:held-custom");
+            graph.assert(one, two, "urn:mere:profile:held-second");
+            let mut live = sessions.begin_recorded_with(person(), Some(graph));
             live.set_view_now(
                 person(),
                 ViewKey::new("graphshell", "private").unwrap(),
@@ -4086,17 +2627,18 @@ mod tests {
                 ),
             )
             .unwrap();
-            let original = serde_json::to_value(live.graph().to_snapshot_at(0)).unwrap();
+            let original = serde_json::to_value(live.graph().to_snapshot()).unwrap();
             let input = live.profiled_codicil_payload();
             assert_eq!(input.placement, Some(PlacementProfile::RecordedStrataV1));
             assert!(!input.codicil.sessions.is_empty());
-            let id = crate::graph_codicil::save_profiled_session_codicil_checked(
+            let id = save_profiled_session_codicil_checked_with(
                 &mut store,
+                &CODICIL,
                 input.clone(),
                 eidetic::Timestamp(42),
                 |candidate| {
                     assert_eq!(
-                        serde_json::to_value(candidate.to_snapshot_at(0)).unwrap(),
+                        serde_json::to_value(candidate.to_snapshot()).unwrap(),
                         original
                     );
                     Ok(())
@@ -4104,7 +2646,7 @@ mod tests {
             )
             .await
             .unwrap();
-            let retained = load_profiled_graph_codicil_sealed(&mut store, None, id)
+            let retained = load_profiled_graph_codicil_sealed_with(&mut store, None, &CODICIL, id)
                 .await
                 .unwrap()
                 .unwrap();
@@ -4113,53 +2655,36 @@ mod tests {
                 serde_json::to_value(&input).unwrap()
             );
             let opened = sessions
-                .open_codicil_from_checked(&mut store, id, person(), |candidate| {
+                .open_codicil_from_checked_with(&mut store, id, person(), |candidate| {
                     assert_eq!(
-                        serde_json::to_value(candidate.to_snapshot_at(0)).unwrap(),
+                        serde_json::to_value(candidate.to_snapshot()).unwrap(),
                         original
                     );
                     Ok(())
                 })
                 .await
                 .unwrap();
-            let reopened = sessions.open(opened.session_id).await.unwrap();
+            let reopened = sessions.open_with(opened.session_id).await.unwrap();
             assert_eq!(
                 reopened.placement().unwrap().baseline,
                 PlacementProfile::RecordedStrataV1
             );
             assert_eq!(
-                serde_json::to_value(reopened.graph().to_snapshot_at(0)).unwrap(),
+                serde_json::to_value(reopened.graph().to_snapshot()).unwrap(),
                 original
             );
             assert!(reopened.manifest().codicil_read_only);
-            let composed = crate::graph_codicil::compose_graph_codicils_checked(
-                &mut store,
-                &[id, id],
-                eidetic::Timestamp(43),
-                |_| Ok(()),
-            )
-            .await
-            .unwrap()
-            .unwrap();
-            let composed = load_profiled_graph_codicil_sealed(&mut store, None, composed)
-                .await
-                .unwrap()
-                .unwrap();
-            assert_eq!(composed.placement, Some(PlacementProfile::RecordedStrataV1));
-            assert_eq!(
-                serde_json::to_value(composed.into_graph().unwrap().to_snapshot_at(0)).unwrap(),
-                original
-            );
-            let redacted = save_profiled_graph_codicil_sealed(
+            let redacted = save_profiled_graph_codicil_sealed_with(
                 &mut store,
                 None,
+                &CODICIL,
                 input,
                 RedactionPolicy::default(),
                 eidetic::Timestamp(43),
             )
             .await
             .unwrap();
-            let redacted = load_profiled_graph_codicil_sealed(&mut store, None, redacted)
+            let redacted = load_profiled_graph_codicil_sealed_with(&mut store, None, &CODICIL, redacted)
                 .await
                 .unwrap()
                 .unwrap();
@@ -4173,18 +2698,21 @@ mod tests {
     #[test]
     fn archive_reopens_exactly_and_public_writes_require_a_fork() {
         pollster::block_on(async {
-            use crate::graph_codicil::{load_graph_codicil, save_session_codicil_checked};
-            let mut store = muniment::MemoryBackend::default();
-            let sessions = MereSessions::new(store.clone());
+            use crate::graph_codicil::{
+                load_profiled_graph_codicil_sealed_with, save_profiled_session_codicil_checked_with,
+            };
+            let mut store = MemoryBackend::default();
+            let sessions = Sessions::new_with(store.clone()).with_codicil(&CODICIL);
             let id = sessions
                 .mint(person(), Some("Kept reading".into()))
                 .await
                 .unwrap()
                 .session_id;
-            let mut live = sessions.open(id).await.unwrap();
-            live.apply(person(), vec![add(1), add(2), relate(1, 2)])
-                .await
-                .unwrap();
+            let mut live = sessions.open_with(id).await.unwrap();
+            let mut edits = add(1);
+            edits.extend(add(2));
+            edits.push(relate(1, 2));
+            live.apply(person(), edits).await.unwrap();
             let key = ViewKey::new("cleromancy", "scene").unwrap();
             let view = ViewState::new(
                 "test.view/v1",
@@ -4196,9 +2724,10 @@ mod tests {
             live.set_view(person(), key.clone(), view.clone())
                 .await
                 .unwrap();
-            let payload = live.codicil_payload();
-            let archived = save_session_codicil_checked(
+            let payload = live.profiled_codicil_payload();
+            let archived = save_profiled_session_codicil_checked_with(
                 &mut store,
+                &CODICIL,
                 payload.clone(),
                 eidetic::Timestamp(42),
                 |_| Ok(()),
@@ -4206,7 +2735,7 @@ mod tests {
             .await
             .unwrap();
             let before_browse = stored_bytes(&store).await;
-            let kept = load_graph_codicil(&mut store, archived)
+            let kept = load_profiled_graph_codicil_sealed_with(&mut store, None, &CODICIL, archived)
                 .await
                 .unwrap()
                 .unwrap();
@@ -4220,12 +2749,12 @@ mod tests {
                 "browsing writes nothing"
             );
             let thaw_id = sessions
-                .open_codicil_checked(archived, knot(), |_| Ok(()))
+                .open_codicil_checked_with(archived, knot(), |_| Ok(()))
                 .await
                 .unwrap()
                 .session_id;
             assert_ne!(thaw_id, id);
-            let mut thaw = sessions.open(thaw_id).await.unwrap();
+            let mut thaw = sessions.open_with(thaw_id).await.unwrap();
             assert_eq!(
                 whole(live.graph()),
                 whole(thaw.graph()),
@@ -4247,7 +2776,7 @@ mod tests {
             assert!(thaw.manifest().codicil_read_only);
             let frozen = stored_bytes(&store).await;
             assert!(matches!(
-                thaw.apply(person(), vec![retitle(1, "bad")]).await,
+                thaw.apply(person(), retitle(1, "bad")).await,
                 Err(SessionError::ReadOnly(_))
             ));
             assert!(matches!(
@@ -4275,8 +2804,7 @@ mod tests {
             let mut fork = sessions
                 .begin_fork_at(&thaw, thaw.journal().live_cursor(), knot())
                 .unwrap();
-            fork.apply_now(knot(), vec![retitle(1, "Edited fork")])
-                .unwrap();
+            fork.apply_now(knot(), retitle(1, "edited-fork")).unwrap();
             fork.flush(wall_clock_now()).await.unwrap();
             assert_eq!(fork.manifest().parent_session, Some(thaw_id));
             assert_eq!(
@@ -4295,12 +2823,13 @@ mod tests {
             assert!(!fork.manifest().codicil_read_only);
             assert_eq!(
                 whole(live.graph()),
-                whole(sessions.open(thaw_id).await.unwrap().graph())
+                whole(sessions.open_with(thaw_id).await.unwrap().graph())
             );
             assert_ne!(whole(fork.graph()), whole(thaw.graph()));
-            let fork_codicil = save_session_codicil_checked(
+            let fork_codicil = save_profiled_session_codicil_checked_with(
                 &mut store,
-                fork.codicil_payload(),
+                &CODICIL,
+                fork.profiled_codicil_payload(),
                 eidetic::Timestamp(43),
                 |_| Ok(()),
             )
@@ -4321,13 +2850,13 @@ mod tests {
     #[test]
     fn admission_policy_checks_transitions_preserves_history_and_follows_forks() {
         pollster::block_on(async {
-            let store = muniment::MemoryBackend::default();
-            let sessions = MereSessions::new(store.clone());
+            let store = MemoryBackend::default();
+            let sessions = Sessions::new_with(store.clone());
             let id = sessions.mint(person(), None).await.unwrap().session_id;
             let available = Arc::new(std::sync::atomic::AtomicBool::new(true));
             let held = available.clone();
-            let policy: GraphAdmissionValidator = Arc::new(move |before, after| {
-                if after.nodes().count() > before.nodes().count()
+            let policy: GraphAdmissionValidator<Surface> = Arc::new(move |before, after| {
+                if after.surface_count() > before.surface_count()
                     && !held.load(std::sync::atomic::Ordering::SeqCst)
                 {
                     Err("new reference unavailable".into())
@@ -4336,14 +2865,14 @@ mod tests {
                 }
             });
             let mut session = sessions
-                .open(id)
+                .open_with(id)
                 .await
                 .unwrap()
                 .with_admission_validator(policy.clone());
-            session.apply(person(), vec![add(1)]).await.unwrap();
+            session.apply(person(), add(1)).await.unwrap();
             available.store(false, std::sync::atomic::Ordering::SeqCst);
             session
-                .apply(person(), vec![retitle(1, "Historical reference retained")])
+                .apply(person(), retitle(1, "historical-reference-retained"))
                 .await
                 .unwrap();
             let before = (
@@ -4353,7 +2882,7 @@ mod tests {
                 stored_bytes(&store).await,
             );
             assert!(matches!(
-                session.apply(person(), vec![add(2)]).await,
+                session.apply(person(), add(2)).await,
                 Err(SessionError::Validation(_))
             ));
             assert_eq!(
@@ -4369,12 +2898,12 @@ mod tests {
                 .begin_fork_at(&session, session.journal().live_cursor(), person())
                 .unwrap();
             assert!(matches!(
-                fork.apply_now(person(), vec![add(2)]),
+                fork.apply_now(person(), add(2)),
                 Err(SessionError::Validation(_))
             ));
             assert_eq!(whole(fork.graph()), whole(session.graph()));
             let mut reopened = sessions
-                .open(id)
+                .open_with(id)
                 .await
                 .unwrap()
                 .with_admission_validator(policy);
@@ -4386,23 +2915,24 @@ mod tests {
     #[test]
     fn whole_graph_validation_refuses_without_graph_history_or_storage_changes() {
         pollster::block_on(async {
-            let store = muniment::MemoryBackend::default();
-            let sessions = MereSessions::new(store.clone());
+            let store = MemoryBackend::default();
+            let sessions = Sessions::new_with(store.clone());
             let id = sessions.mint(person(), None).await.unwrap().session_id;
-            let validator: GraphValidator = Arc::new(|graph| {
-                if graph.nodes().any(|(_, node)| node.title == "Forbidden") {
+            let shows = |graph: &Surface, wanted: &str| title(graph, 1).as_deref() == Some(wanted);
+            let validator: GraphValidator<Surface> = Arc::new(move |graph| {
+                if shows(graph, "forbidden") {
                     Err("forbidden title".into())
                 } else {
                     Ok(())
                 }
             });
             let mut session = sessions
-                .open(id)
+                .open_with(id)
                 .await
                 .unwrap()
                 .with_validator(validator.clone())
                 .unwrap();
-            session.apply(person(), vec![add(1)]).await.unwrap();
+            session.apply(person(), add(1)).await.unwrap();
             let before = (
                 whole(session.graph()),
                 session.changes().to_vec(),
@@ -4410,30 +2940,18 @@ mod tests {
                 stored_bytes(&store).await,
             );
             assert!(matches!(
-                session.apply(person(), vec![retitle(1, "Forbidden")]).await,
+                session.apply(person(), retitle(1, "forbidden")).await,
                 Err(SessionError::Validation(_))
             ));
             assert!(matches!(
                 session.edit_now(person(), |graph| {
-                    let key = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
-                    apply_graph_delta(
-                        graph,
-                        GraphDelta::SetNodeTitle {
-                            key,
-                            title: "Forbidden".into(),
-                        },
-                    );
+                    graph.show(Uuid::from_u128(1), "https://forbidden.test/");
                 }),
                 Err(SessionError::Validation(_))
             ));
-            let observed = Arc::new(std::sync::atomic::AtomicUsize::new(0));
-            let counter = observed.clone();
-            kernel::graph::set_captured_delta_hook(Some(Arc::new(move |_| {
-                counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-            })));
             assert!(
                 session
-                    .apply_now(person(), vec![retitle(1, "Forbidden")])
+                    .apply_now(person(), retitle(1, "forbidden"))
                     .is_err()
             );
             assert!(matches!(
@@ -4442,7 +2960,7 @@ mod tests {
                         .facets_mut()
                         .set(
                             Uuid::from_u128(1),
-                            portolan::FacetId::new("unlogged.truth"),
+                            FacetId::new("unlogged.truth"),
                             serde_json::json!(true),
                             &portolan::AcceptAll,
                         )
@@ -4450,12 +2968,6 @@ mod tests {
                 }),
                 Err(SessionError::NotReplayable(_))
             ));
-            kernel::graph::set_captured_delta_hook(None);
-            assert_eq!(
-                observed.load(std::sync::atomic::Ordering::SeqCst),
-                0,
-                "candidate edits cannot reach source thread observers"
-            );
             assert_eq!(
                 (
                     whole(session.graph()),
@@ -4466,12 +2978,12 @@ mod tests {
                 before
             );
             session
-                .apply(person(), vec![retitle(1, "Allowed")])
+                .apply(person(), retitle(1, "allowed"))
                 .await
                 .unwrap();
             // A changed product authority can refuse undo and redo too.
-            let refuse_old: GraphValidator = Arc::new(|graph| {
-                if graph.nodes().any(|(_, n)| n.title != "Allowed") {
+            let refuse_old: GraphValidator<Surface> = Arc::new(move |graph| {
+                if !shows(graph, "allowed") {
                     Err("old state refused".into())
                 } else {
                     Ok(())
@@ -4498,8 +3010,8 @@ mod tests {
             session = session.with_validator(validator).unwrap();
             session.undo(person()).await.unwrap().unwrap();
             session = session
-                .with_validator(Arc::new(|graph| {
-                    if graph.nodes().any(|(_, n)| n.title == "Allowed") {
+                .with_validator(Arc::new(move |graph| {
+                    if shows(graph, "allowed") {
                         Err("redo state refused".into())
                     } else {
                         Ok(())
@@ -4527,94 +3039,24 @@ mod tests {
     }
 
     #[test]
-    fn archive_compose_retains_both_sources_and_checks_before_writing() {
-        pollster::block_on(async {
-            use crate::graph_codicil::{
-                compose_graph_codicils_checked, load_graph_codicil, save_session_codicil_checked,
-            };
-            let mut store = muniment::MemoryBackend::default();
-            let sessions = MereSessions::new(store.clone());
-            let mut ids = Vec::new();
-            for n in [1, 2] {
-                let mut s = sessions.begin(person(), None);
-                s.apply(person(), vec![add(n)]).await.unwrap();
-                ids.push(
-                    save_session_codicil_checked(
-                        &mut store,
-                        s.codicil_payload(),
-                        eidetic::Timestamp(n as u64),
-                        |_| Ok(()),
-                    )
-                    .await
-                    .unwrap(),
-                );
-            }
-            let before = stored_bytes(&store).await;
-            assert!(
-                compose_graph_codicils_checked(&mut store, &ids, eidetic::Timestamp(3), |_| Err(
-                    "no union".into()
-                ))
-                .await
-                .is_err()
-            );
-            assert!(
-                sessions
-                    .open_codicil_checked(ids[0], person(), |_| Err("no thaw".into()))
-                    .await
-                    .is_err()
-            );
-            assert_eq!(stored_bytes(&store).await, before);
-            let composed =
-                compose_graph_codicils_checked(&mut store, &ids, eidetic::Timestamp(3), |_| Ok(()))
-                    .await
-                    .unwrap()
-                    .unwrap();
-            let manifest = eidetic::manifest::load_manifest(&mut store, composed)
-                .await
-                .unwrap()
-                .unwrap();
-            assert_eq!(manifest.provenance.upstream, ids);
-            let payload = load_graph_codicil(&mut store, composed)
-                .await
-                .unwrap()
-                .unwrap();
-            assert_eq!(payload.sessions.len(), 2);
-            assert_eq!(payload.snapshot.nodes.len(), 2);
-            let thaw = sessions
-                .open_codicil_checked(composed, person(), |_| Ok(()))
-                .await
-                .unwrap();
-            assert_eq!(
-                sessions
-                    .open(thaw.session_id)
-                    .await
-                    .unwrap()
-                    .graph()
-                    .nodes()
-                    .count(),
-                2
-            );
-        });
-    }
-
-    #[test]
     fn a_session_journals_its_edits_under_their_authors_and_reopens() {
         pollster::block_on(async {
             let dir = tempfile::tempdir().unwrap();
             let store = DirectoryBackend::open(dir.path()).unwrap();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let manifest = mere.mint(person(), Some("readings".into())).await.unwrap();
             let id = manifest.session_id;
 
-            let mut session = mere.open(id).await.unwrap();
-            let first = session.apply(person(), vec![add(1), add(2)]).await.unwrap();
-            // Each new node journals its visit stamp beside the add.
+            let mut session = mere.open_with(id).await.unwrap();
+            let mut edits = add(1);
+            edits.extend(add(2));
+            let first = session.apply(person(), edits).await.unwrap();
+            // Each new surface journals its resource beside the binding.
             assert_eq!((first.first, first.end), (Seq(0), Seq(4)));
-            session
-                .apply(knot(), vec![relate(1, 2), retitle(1, "The Tower")])
-                .await
-                .unwrap();
-            let live = fingerprint(session.graph());
+            let mut edits = vec![relate(1, 2)];
+            edits.extend(retitle(1, "the-tower"));
+            session.apply(knot(), edits).await.unwrap();
+            let live = whole(session.graph());
             let authors: Vec<String> = session
                 .journal()
                 .entries()
@@ -4628,6 +3070,7 @@ mod tests {
                     "person persona-a via turnstone",
                     "person persona-a via turnstone",
                     "person persona-a via turnstone",
+                    "person persona-a via knot-editor",
                     "person persona-a via knot-editor",
                     "person persona-a via knot-editor",
                 ]
@@ -4645,12 +3088,12 @@ mod tests {
             let session_dir = dir.path().join("sessions").join(id.as_uuid().to_string());
             assert!(session_dir.join("manifest.json").is_file());
             let journal = std::fs::read_to_string(session_dir.join("journal.jsonl")).unwrap();
-            assert_eq!(journal.lines().count(), 6);
+            assert_eq!(journal.lines().count(), 7);
 
             let store = DirectoryBackend::open(dir.path()).unwrap();
-            let reopened = GraphSession::open(store, id).await.unwrap();
-            assert_eq!(fingerprint(reopened.graph()), live);
-            assert_eq!(reopened.journal().len(), 6);
+            let reopened = Session::open_with(store, id).await.unwrap();
+            assert_eq!(whole(reopened.graph()), live);
+            assert_eq!(reopened.journal().len(), 7);
             assert_eq!(reopened.changes().len(), 3);
             assert_eq!(
                 reopened.manifest().display_name.as_deref(),
@@ -4659,30 +3102,41 @@ mod tests {
         });
     }
 
+    /// The record of resource `iri` with one facet `value_json`, as a snapshot
+    /// stores it.
+    fn record(iri: &str, value_json: &str) -> ResourceDelta {
+        let resource = ResourceNode::for_term(iri);
+        ResourceDelta::ReplaySetResourceRecordById {
+            resource_id: resource.id().to_string(),
+            record: Some(mere::model::PersistedResourceRecord {
+                canonical_iri: resource.canonical_iri().to_owned(),
+                facets: vec![mere::model::PersistedResourceFacet {
+                    facet: "foreign.metadata".into(),
+                    value_json: value_json.into(),
+                }],
+            }),
+        }
+    }
+
     #[test]
     fn checked_snapshot_session_load_reports_baseline_and_checkpoint_corruption() {
-        use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
-
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
             let keys = Keys::new(id);
-            let graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut graph = Surface::default();
+            graph.show(Uuid::from_u128(1), "https://1.test/");
             let mut valid = graph.to_snapshot();
-            valid.resources.push(PersistedResourceRecord {
-                canonical_iri: "urn:mere:test:checked-session".into(),
-                facets: vec![PersistedResourceFacet {
-                    facet: "foreign.metadata".into(),
-                    value_json: "true".into(),
-                }],
-            });
-            let baseline = |snapshot: GraphSnapshot| Baseline {
+            valid
+                .resources
+                .push(record("urn:mere:test:checked-session", "true"));
+            let baseline = |snapshot: SurfaceSnapshot| Baseline {
                 graph: snapshot,
                 facets: NodeFacetStore::default(),
             };
             // The checkpoint record a writer would leave beside `graph` bytes.
-            let record = |graph: &[u8]| {
+            let checkpoint = |graph: &[u8]| {
                 pretty(
                     keys.at(CHECKPOINT),
                     &Checkpoint {
@@ -4690,7 +3144,7 @@ mod tests {
                         translated_receipt_digest: None,
                         journal_digest: journal_digest(
                             &Mutex::default(),
-                            &GraphJournal::default(),
+                            &SessionJournal::<Surface>::default(),
                             Seq(0),
                         )
                         .unwrap(),
@@ -4706,20 +3160,21 @@ mod tests {
                         .apply(&[
                             pretty(keys.at(BASELINE), &baseline(valid.clone())).unwrap(),
                             pretty(keys.at(GRAPH), &valid).unwrap(),
-                            record(&pretty_bytes(&valid).unwrap()),
+                            checkpoint(&pretty_bytes(&valid).unwrap()),
                         ])
                         .await
                         .unwrap();
-                    let opened = GraphSession::open(store.clone(), id).await.unwrap();
-                    assert_eq!(opened.graph().to_snapshot().resources, valid.resources);
-                    assert_eq!(opened.graph().node_count(), 1);
+                    let opened = Session::open_with(store.clone(), id).await.unwrap();
+                    assert_eq!(opened.graph().to_snapshot().resources.len(), valid.resources.len());
+                    assert_eq!(opened.graph().surface_count(), 1);
                     let mut invalid = valid.clone();
                     if conflict {
-                        let mut record = invalid.resources[0].clone();
-                        record.facets[0].value_json = "false".into();
-                        invalid.resources.push(record);
+                        invalid
+                            .resources
+                            .push(record("urn:mere:test:checked-session", "false"));
                     } else {
-                        invalid.resources[0].facets[0].value_json = "{".into();
+                        *invalid.resources.last_mut().unwrap() =
+                            record("urn:mere:test:checked-session", "{");
                     }
                     let op = if column == BASELINE {
                         pretty(keys.at(column), &baseline(invalid.clone())).unwrap()
@@ -4731,31 +3186,34 @@ mod tests {
                         // Written consistently, as a faulty writer would: the
                         // checkpoint names these bytes, so they are validated.
                         store
-                            .apply(&[record(&pretty_bytes(&invalid).unwrap())])
+                            .apply(&[checkpoint(&pretty_bytes(&invalid).unwrap())])
                             .await
                             .unwrap();
                     }
-                    match GraphSession::open(store.clone(), id).await {
+                    match Session::open_with(store.clone(), id).await {
                         Err(SessionError::Corrupt(error)) => {
-                            assert!(error.contains(&keys.at(column)));
-                            assert!(error.contains(if conflict {
-                                "conflicts"
-                            } else {
-                                "invalid JSON"
-                            }));
+                            assert!(error.contains(&keys.at(column)), "{error}");
+                            assert!(
+                                error.contains(if conflict {
+                                    "conflicts"
+                                } else {
+                                    "invalid JSON"
+                                }),
+                                "{error}"
+                            );
                         },
                         Err(error) => panic!("unexpected load error: {error}"),
                         Ok(_) => panic!("invalid resource snapshot was loaded"),
                     }
                     let slots = JsonSlots::new(store.clone());
                     let held = if column == BASELINE {
-                        read::<_, Baseline<GraphSnapshot>>(&slots, &keys.at(column))
+                        read::<_, Baseline<SurfaceSnapshot>>(&slots, &keys.at(column))
                             .await
                             .unwrap()
                             .unwrap()
                             .graph
                     } else {
-                        read::<_, GraphSnapshot>(&slots, &keys.at(column))
+                        read::<_, SurfaceSnapshot>(&slots, &keys.at(column))
                             .await
                             .unwrap()
                             .unwrap()
@@ -4763,116 +3221,50 @@ mod tests {
                     assert_eq!(held.resources, invalid.resources);
                 }
             }
-            let mut legacy = serde_json::to_value(&valid).unwrap();
-            for column in ["resources", "resource_edges", "shown_resources"] {
-                legacy.as_object_mut().unwrap().remove(column);
-            }
-            let legacy: GraphSnapshot = serde_json::from_value(legacy).unwrap();
-            store
-                .apply(&[
-                    pretty(keys.at(BASELINE), &baseline(legacy.clone())).unwrap(),
-                    pretty(keys.at(GRAPH), &legacy).unwrap(),
-                    record(&pretty_bytes(&legacy).unwrap()),
-                ])
-                .await
-                .unwrap();
-            let opened = GraphSession::open(store, id).await.unwrap();
-            assert_eq!(opened.graph().node_count(), 1);
-            assert!(opened.graph().to_snapshot().resources.is_empty());
         });
     }
 
-    #[test]
-    fn an_eight_field_baseline_qualifies_whatever_the_hash_order() {
-        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
-        use kernel::graph::{Field, FieldDefinition, FieldId, ScalarField};
-
-        pollster::block_on(async {
-            for _ in 0..8 {
-                let mut graph = Graph::new();
-                for n in 0..8u128 {
-                    let field = Field::new(
-                        FieldId::from_uuid(Uuid::from_u128(n + 1)),
-                        FieldDefinition::Scalar(ScalarField::Const(n as f32)),
-                    );
-                    apply_graph_delta(&mut graph, GraphDelta::AddField { field });
-                }
-                let expected = graph.to_snapshot().fields;
-                let sessions = MereSessions::new(MemoryBackend::new());
-                let mut session = sessions.begin(person(), Some(graph));
-                session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
-                let id = session.id();
-                let mut opened = sessions.open(id).await.unwrap();
-                assert_eq!(opened.graph().to_snapshot().fields, expected);
-                opened.qualify_legacy(Seq(0), vec![]).await.unwrap();
-                assert_eq!(
-                    sessions
-                        .open(id)
-                        .await
-                        .unwrap()
-                        .graph()
-                        .to_snapshot()
-                        .fields,
-                    expected
-                );
-            }
-        });
-    }
-
-    #[test]
-    fn qualifying_a_legacy_session_keeps_the_launch() {
-        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
-
-        pollster::block_on(async {
-            let sessions = MereSessions::new(MemoryBackend::new());
-            let graph = kernel::graph::replay_captured_deltas([add(1)]);
-            let mut session = sessions.begin(person(), Some(graph));
-            session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
-            let mut opened = sessions.open(session.id()).await.unwrap();
-            opened.set_current_session(7);
-            opened.qualify_legacy(Seq(0), vec![]).await.unwrap();
-            assert_eq!(opened.graph().current_session(), 7);
-
-            let node = Uuid::from_u128(1);
-            let key = opened.graph().get_node_key_by_id(node).unwrap();
-            opened
-                .edit_now(person(), |graph| {
-                    apply_graph_delta(
-                        graph,
-                        GraphDelta::NavigateNode {
-                            key,
-                            url: "https://1.test/next".into(),
-                        },
-                    );
-                })
-                .unwrap();
-            let key = opened.graph().get_node_key_by_id(node).unwrap();
-            assert_eq!(opened.graph().node_last_session_visited(key), Some(7));
-        });
+    /// A statement of a surface's own, with handle `handle`.
+    fn literal(handle: &str) -> NodeProperty {
+        NodeProperty {
+            statement_id: handle.into(),
+            predicate: "urn:test:predicate".into(),
+            value: "held".into(),
+            datatype: None,
+            lang: None,
+            graph_scope: Default::default(),
+            provenance_iri: None,
+            asserted_at_ms: None,
+        }
     }
 
     #[test]
     fn opening_a_session_whose_facets_steal_a_handle_is_refused() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
             let keys = Keys::new(id);
             let surface = Uuid::from_u128(1);
-            let mut graph = kernel::graph::replay_captured_deltas([add(1)]);
-            let mut held =
-                kernel::types::NodeProperty::new("urn:test:predicate".into(), "held".into());
-            held.statement_id = "owned-handle".into();
-            let key = graph.get_node_key_by_id(surface).unwrap();
-            assert!(graph.append_node_properties(key, vec![held.clone()]));
+            let mut graph = Surface::default();
+            let resource = graph.show(surface, "https://1.test/");
+            // The resource holds the handle as a literal of its own.
+            let mut owned = graph.resources().resource_record(resource).unwrap();
+            owned.facets.push(mere::model::PersistedResourceFacet {
+                facet: mere::model::RESOURCE_PROPERTIES.into(),
+                value_json: serde_json::to_string(&[literal("owned-handle")]).unwrap(),
+            });
+            graph
+                .write_resource_record(&person(), resource, Some(owned))
+                .unwrap();
             let snapshot = graph.to_snapshot();
             let honest = graph.facets().clone();
             let mut stolen = honest.clone();
             stolen
                 .set(
                     surface,
-                    portolan::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
-                    serde_json::to_value(vec![held]).unwrap(),
+                    FacetId::new(SURFACE_PROPERTIES),
+                    serde_json::to_value(vec![literal("owned-handle")]).unwrap(),
                     &portolan::AcceptAll,
                 )
                 .unwrap();
@@ -4886,7 +3278,7 @@ mod tests {
                     translated_receipt_digest: None,
                     journal_digest: journal_digest(
                         &Mutex::default(),
-                        &GraphJournal::default(),
+                        &SessionJournal::<Surface>::default(),
                         Seq(0),
                     )
                     .unwrap(),
@@ -4914,14 +3306,14 @@ mod tests {
                 ]
             };
             store.apply(&write(&honest, &honest)).await.unwrap();
-            let opened = GraphSession::open(store.clone(), id).await.unwrap();
+            let opened = Session::open_with(store.clone(), id).await.unwrap();
             assert_eq!(opened.graph().facets(), &honest);
 
             for (baseline, checkpoint, refused_at) in
                 [(&stolen, &honest, BASELINE), (&honest, &stolen, GRAPH)]
             {
                 store.apply(&write(baseline, checkpoint)).await.unwrap();
-                match GraphSession::open(store.clone(), id).await {
+                match Session::open_with(store.clone(), id).await {
                     Err(SessionError::Corrupt(error)) => {
                         assert!(error.contains(&keys.at(refused_at)), "{error}");
                         assert!(error.contains("facets refused"), "{error}");
@@ -4937,16 +3329,17 @@ mod tests {
     fn a_checkpoint_and_its_tail_load_the_same_graph_as_the_baseline_and_journal() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
+            let mut session = mere.open_with(id).await.unwrap();
             session.set_checkpoint_interval(4);
             for n in 0..3 {
-                session.apply(person(), vec![add(n)]).await.unwrap();
+                session.apply(person(), add(n)).await.unwrap();
             }
-            // The second node's entries reach the interval; the rest is the tail.
+            // Surface 2 shows surface 0's resource: one entry, in the tail.
+            let mut point = show_edits(Uuid::from_u128(2), "https://0.test/").1;
             session
-                .apply(person(), vec![retitle(2, "Three")])
+                .apply(person(), vec![point.pop().unwrap()])
                 .await
                 .unwrap();
             let checkpoint: Checkpoint = JsonSlots::new(store.clone())
@@ -4959,202 +3352,38 @@ mod tests {
             let live = whole(session.graph());
             drop(session);
 
-            // Whole graphs, facets and visit stamps included: replay is exact.
-            let reopened = GraphSession::open(store.clone(), id).await.unwrap();
+            // Whole graphs, facets included: replay is exact.
+            let reopened = Session::open_with(store.clone(), id).await.unwrap();
             assert_eq!(whole(reopened.graph()), live, "checkpoint plus tail");
             let replayed = reopened.graph_at(reopened.journal().live_cursor()).unwrap();
             assert_eq!(whole(&replayed), live, "baseline plus whole journal");
         });
     }
 
-    #[test]
-    fn legacy_exact_assertions_keep_minting_authors_across_checkpointed_withdrawals() {
-        pollster::block_on(async {
-            let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
-            let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
-            // This fixture models the old Surface capture grammar explicitly.
-            let mut template =
-                kernel::graph::replay_captured_deltas([add(1), add(2), relate(1, 2)]);
-            assert!(template.to_snapshot().resource_edges.is_empty());
-            let mut baseline_edges = template.to_snapshot().edges;
-            assert_eq!(baseline_edges.len(), 1);
-            let statements = baseline_edges[0].assertions.as_mut().unwrap();
-            statements[0].statement_id = "baseline-source".into();
-            statements[0].provenance_iri = Some("https://source.test/page".into());
-            statements[0].asserted_at_ms = Some(100);
-            let mut unknown = statements[0].clone();
-            unknown.statement_id = "baseline-unknown".into();
-            unknown.provenance_iri = None;
-            statements.push(unknown.clone());
-            let exact = |edges| CapturedDelta::ReplaySetEdgesByIds {
-                from_id: Uuid::from_u128(1).to_string(),
-                to_id: Uuid::from_u128(2).to_string(),
-                edges,
-            };
-            replay_captured_deltas_onto(&mut template, [exact(baseline_edges.clone())]);
-            session.baseline = template;
-            session.write_baseline = true;
-            session.head_stored = false;
-            let restorer = Author::person("persona-b").via("knot-editor");
-            let mut minted_edges = baseline_edges.clone();
-            unknown.statement_id = "journal-minted".into();
-            minted_edges[0].assertions.as_mut().unwrap().push(unknown);
-            session
-                .journal
-                .record_as(person(), exact(minted_edges.clone()));
-            session.graph = session.baseline.clone();
-            replay_captured_deltas_onto(&mut session.graph, [exact(minted_edges.clone())]);
-            session
-                .store(SystemTime::now(), Vec::new(), true)
-                .await
-                .unwrap();
-            let old_checkpoint = GraphSession::open(store.clone(), id).await.unwrap();
-            let old_checkpoint_snapshot = old_checkpoint.graph().to_snapshot();
-            let old_statements = old_checkpoint_snapshot.edges[0].retained_assertions();
-            let old_source_of = |id: &str| {
-                old_statements
-                    .iter()
-                    .find(|s| s.statement_id == id)
-                    .unwrap()
-                    .provenance_iri
-                    .as_deref()
-                    .unwrap()
-            };
-            assert_eq!(
-                old_source_of("baseline-source"),
-                "https://source.test/page",
-                "legacy checkpoint explicit-source control"
-            );
-            assert_eq!(
-                old_source_of("baseline-unknown"),
-                kernel::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI,
-                "legacy checkpoint baseline control"
-            );
-            assert_eq!(
-                old_source_of("journal-minted"),
-                person().asserter_iri(),
-                "an empty tail still repairs legacy checkpoint attribution"
-            );
-            assert_eq!(
-                whole(old_checkpoint.graph()),
-                whole(&old_checkpoint.graph_at(Seq(1)).unwrap())
-            );
-            drop(old_checkpoint);
-            session
-                .journal
-                .record_as(restorer.clone(), exact(baseline_edges));
-            session.graph = session
-                .journal
-                .snapshot_at_from(&session.baseline, Seq(2))
-                .unwrap()
-                .unwrap();
-            session
-                .store(SystemTime::now(), Vec::new(), true)
-                .await
-                .unwrap();
-            session
-                .journal
-                .record_as(restorer.clone(), exact(minted_edges));
-            session.graph = session
-                .journal
-                .snapshot_at_from(&session.baseline, Seq(3))
-                .unwrap()
-                .unwrap();
-            session.flush(SystemTime::now()).await.unwrap();
-            drop(session);
-
-            let reopened = GraphSession::open(store, id).await.unwrap();
-            let full = reopened.graph_at(Seq(3)).unwrap();
-            assert_eq!(
-                whole(reopened.graph()),
-                whole(&full),
-                "checkpoint plus tail equals full replay"
-            );
-            let edges = full.to_snapshot().edges;
-            let statements = edges[0].retained_assertions();
-            let source_of = |id: &str| {
-                statements
-                    .iter()
-                    .find(|s| s.statement_id == id)
-                    .unwrap()
-                    .provenance_iri
-                    .as_deref()
-                    .unwrap()
-            };
-            assert_eq!(
-                source_of("baseline-source"),
-                "https://source.test/page",
-                "explicit-source control"
-            );
-            assert_eq!(
-                source_of("baseline-unknown"),
-                kernel::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI,
-                "baseline control"
-            );
-            assert_eq!(
-                source_of("journal-minted"),
-                person().asserter_iri(),
-                "restoration keeps the minting Author"
-            );
-            assert_ne!(source_of("journal-minted"), restorer.asserter_iri());
-            assert_eq!(statements.len(), 3);
-            assert!(statements.iter().all(|s| s.asserted_at_ms == Some(100)));
-        });
-    }
-
-    /// A graph's whole persisted state: its snapshot, undated, and its facets.
-    fn whole(graph: &Graph) -> (serde_json::Value, serde_json::Value) {
-        let mut snapshot = graph.to_snapshot();
-        snapshot.timestamp_secs = 0;
+    /// A graph's whole persisted state: its snapshot and its facets.
+    fn whole(graph: &Surface) -> (serde_json::Value, serde_json::Value) {
         (
-            serde_json::to_value(&snapshot).unwrap(),
+            serde_json::to_value(graph.to_snapshot()).unwrap(),
             serde_json::to_value(graph.facets()).unwrap(),
         )
-    }
-
-    /// The replay check's state reads no clock, so one graph compares equal
-    /// across a wall-clock second. The control is the check's old form, a
-    /// clock-dated snapshot per side, which differs across the same tick
-    /// (reservoir plan ruling 47).
-    #[test]
-    fn the_replay_check_compares_equal_across_a_second_tick() {
-        let mut graph = Graph::new();
-        replay_captured_deltas_onto(&mut graph, [add(1), add(2)]);
-        let old_state =
-            |graph: &Graph| serde_json::to_value((graph.to_snapshot(), graph.facets())).unwrap();
-
-        let before = replay_state(&graph).unwrap();
-        let old_before = old_state(&graph);
-        let second = graph.to_snapshot().timestamp_secs;
-        while graph.to_snapshot().timestamp_secs == second {
-            std::thread::sleep(std::time::Duration::from_millis(5));
-        }
-
-        assert_ne!(
-            old_state(&graph),
-            old_before,
-            "control: two clock reads differ"
-        );
-        assert_eq!(replay_state(&graph).unwrap(), before);
     }
 
     #[test]
     fn a_fork_at_a_cursor_starts_from_the_parent_there_and_diverges() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let parent_id = mere
                 .mint(person(), Some("parent".into()))
                 .await
                 .unwrap()
                 .session_id;
-            let mut parent = mere.open(parent_id).await.unwrap();
-            parent.apply(person(), vec![add(1)]).await.unwrap();
-            parent.apply(person(), vec![add(2)]).await.unwrap();
+            let mut parent = mere.open_with(parent_id).await.unwrap();
+            parent.apply(person(), add(1)).await.unwrap();
+            parent.apply(person(), add(2)).await.unwrap();
 
-            let fork = mere.fork_at(&parent, Seq(1), knot()).await.unwrap();
+            // Cursor 2 lies after the first surface's two entries.
+            let fork = mere.fork_at(&parent, Seq(2), knot()).await.unwrap();
             assert_eq!(fork.parent_session, Some(parent_id));
             assert_eq!(
                 fork.display_name.as_deref(),
@@ -5162,7 +3391,7 @@ mod tests {
                 "a fork never reads as its parent"
             );
             let unnamed = mere.mint(person(), None).await.unwrap();
-            let unnamed = mere.open(unnamed.session_id).await.unwrap();
+            let unnamed = mere.open_with(unnamed.session_id).await.unwrap();
             let unnamed_fork = mere
                 .fork_at(&unnamed, unnamed.journal().live_cursor(), knot())
                 .await
@@ -5171,7 +3400,7 @@ mod tests {
                 unnamed_fork.display_name.as_deref(),
                 Some("Session (fork of Session)")
             );
-            let refork = mere.open(unnamed_fork.session_id).await.unwrap();
+            let refork = mere.open_with(unnamed_fork.session_id).await.unwrap();
             assert_eq!(
                 mere.fork_at(&refork, refork.journal().live_cursor(), knot())
                     .await
@@ -5181,31 +3410,31 @@ mod tests {
                 Some("Session (fork of Session (fork of Session))"),
                 "a fork of a fork keeps one base and names its own parent"
             );
-            assert_eq!(fork.forked_at, Some(1));
-            let mut fork = mere.open(fork.session_id).await.unwrap();
+            assert_eq!(fork.forked_at, Some(2));
+            let mut fork = mere.open_with(fork.session_id).await.unwrap();
             assert_eq!(
-                fork.graph().node_count(),
+                fork.graph().surface_count(),
                 1,
-                "the parent's graph at cursor 1"
+                "the parent's graph at cursor 2"
             );
             assert!(
                 fork.journal().is_empty(),
                 "the fork's journal starts at the fork point"
             );
             let provenance = fork.journal().provenance().unwrap().clone();
-            assert_eq!(provenance.at, Seq(1));
+            assert_eq!(provenance.at, Seq(2));
             assert_eq!(
                 fork.changes()[0].kind,
                 ChangeKind::Forked {
                     from: parent_id,
-                    at: Seq(1)
+                    at: Seq(2)
                 }
             );
 
-            fork.apply(knot(), vec![add(3)]).await.unwrap();
-            assert_eq!(fork.graph().node_count(), 2);
-            assert_eq!(parent.graph().node_count(), 2, "the parent is untouched");
-            assert!(parent.graph().get_node_by_id(Uuid::from_u128(3)).is_none());
+            fork.apply(knot(), add(3)).await.unwrap();
+            assert_eq!(fork.graph().surface_count(), 2);
+            assert_eq!(parent.graph().surface_count(), 2, "the parent is untouched");
+            assert!(parent.graph().shown(Uuid::from_u128(3)).is_none());
             assert!(mere.fork_at(&parent, Seq(9), knot()).await.is_err());
         });
     }
@@ -5213,29 +3442,20 @@ mod tests {
     #[test]
     fn undo_steps_back_through_an_author_s_own_changes_and_redo_returns() {
         pollster::block_on(async {
-            let mere = MereSessions::new(MemoryBackend::new());
+            let mere = Sessions::new_with(MemoryBackend::new());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
-            session.apply(person(), vec![add(1)]).await.unwrap();
-            session.apply(knot(), vec![add(2)]).await.unwrap();
-            session
-                .apply(person(), vec![retitle(1, "One")])
-                .await
-                .unwrap();
-            let title = |session: &GraphSession<MemoryBackend>| {
-                session
-                    .graph()
-                    .get_node_by_id(Uuid::from_u128(1))
-                    .map(|(_, node)| node.title.clone())
-            };
+            let mut session = mere.open_with(id).await.unwrap();
+            session.apply(person(), add(1)).await.unwrap();
+            session.apply(knot(), add(2)).await.unwrap();
+            session.apply(person(), retitle(1, "one")).await.unwrap();
 
             let undone = session.undo(person()).await.unwrap().unwrap();
             assert!(undone.kept.is_empty());
-            assert_ne!(title(&session).as_deref(), Some("One"));
+            assert_ne!(title(session.graph(), 1).as_deref(), Some("one"));
             session.undo(person()).await.unwrap().unwrap();
-            assert!(session.graph().get_node_by_id(Uuid::from_u128(1)).is_none());
+            assert!(session.graph().shown(Uuid::from_u128(1)).is_none());
             assert!(
-                session.graph().get_node_by_id(Uuid::from_u128(2)).is_some(),
+                session.graph().shown(Uuid::from_u128(2)).is_some(),
                 "the other author's change stays"
             );
             assert!(
@@ -5244,9 +3464,9 @@ mod tests {
             );
 
             session.redo(person()).await.unwrap().unwrap();
-            assert!(session.graph().get_node_by_id(Uuid::from_u128(1)).is_some());
+            assert!(session.graph().shown(Uuid::from_u128(1)).is_some());
             session.redo(person()).await.unwrap().unwrap();
-            assert_eq!(title(&session).as_deref(), Some("One"));
+            assert_eq!(title(session.graph(), 1).as_deref(), Some("one"));
             assert!(session.redo(person()).await.unwrap().is_none());
             assert!(
                 session.redo(knot()).await.unwrap().is_none(),
@@ -5258,34 +3478,32 @@ mod tests {
     #[test]
     fn undo_keeps_what_another_author_changed_and_says_who() {
         pollster::block_on(async {
-            let mere = MereSessions::new(MemoryBackend::new());
+            let mere = Sessions::new_with(MemoryBackend::new());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
-            session
-                .apply(person(), vec![add(1), retitle(1, "Start")])
-                .await
-                .unwrap();
-            session
-                .apply(person(), vec![retitle(1, "Mine"), tag(1, "mine")])
-                .await
-                .unwrap();
-            session
-                .apply(knot(), vec![retitle(1, "Theirs")])
-                .await
-                .unwrap();
+            let mut session = mere.open_with(id).await.unwrap();
+            let mut edits = add(1);
+            edits.extend(retitle(1, "start"));
+            session.apply(person(), edits).await.unwrap();
+            // Person's change: surface 1 shows "mine", a resource it writes.
+            let (mine, edits) = show_edits(Uuid::from_u128(1), "https://mine.test/");
+            session.apply(person(), edits).await.unwrap();
+            session.apply(knot(), retitle(1, "theirs")).await.unwrap();
 
             let undone = session.undo(person()).await.unwrap().unwrap();
             assert_eq!(
                 undone.kept,
                 [Kept {
-                    part: Part::Title(Uuid::from_u128(1)),
+                    part: crate::test_surface::Part::Surface(Uuid::from_u128(1)),
                     by: vec![knot()],
                 }]
             );
-            let (_, node) = session.graph().get_node_by_id(Uuid::from_u128(1)).unwrap();
-            assert_eq!(node.title, "Theirs", "their later edit stays");
+            assert_eq!(
+                title(session.graph(), 1).as_deref(),
+                Some("theirs"),
+                "their later edit stays"
+            );
             assert!(
-                !node.tags.contains("mine"),
+                session.graph().resources().resource(mine).is_none(),
                 "the rest of the change went back"
             );
             assert_eq!(
@@ -5299,27 +3517,17 @@ mod tests {
     fn undo_and_redo_order_survives_a_reopen() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
-            session.apply(person(), vec![add(1)]).await.unwrap();
+            let mut session = mere.open_with(id).await.unwrap();
+            session.apply(person(), add(1)).await.unwrap();
             session.undo(person()).await.unwrap().unwrap();
             drop(session);
 
-            let mut reopened = mere.open(id).await.unwrap();
-            assert!(
-                reopened
-                    .graph()
-                    .get_node_by_id(Uuid::from_u128(1))
-                    .is_none()
-            );
+            let mut reopened = mere.open_with(id).await.unwrap();
+            assert!(reopened.graph().shown(Uuid::from_u128(1)).is_none());
             reopened.redo(person()).await.unwrap().unwrap();
-            assert!(
-                reopened
-                    .graph()
-                    .get_node_by_id(Uuid::from_u128(1))
-                    .is_some()
-            );
+            assert!(reopened.graph().shown(Uuid::from_u128(1)).is_some());
         });
     }
 
@@ -5351,66 +3559,13 @@ mod tests {
         );
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn a_component_fork_takes_only_the_seed_s_component() {
-        pollster::block_on(async {
-            let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
-            let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut parent = mere.open(id).await.unwrap();
-            parent
-                .apply(person(), vec![add(1), add(2), add(3), relate(1, 2)])
-                .await
-                .unwrap();
-            let fork = mere
-                .fork_component(&parent, Uuid::from_u128(1), knot())
-                .await
-                .unwrap();
-            assert_eq!(
-                fork.display_name.as_deref(),
-                Some("Session (picked from Session)"),
-                "a picked-off part names where it was picked from"
-            );
-            // A pick records where it came from, and is not a fork.
-            assert_eq!(
-                fork.picked_from,
-                Some(crate::manifest::PickedFrom {
-                    session: id,
-                    at: parent.journal().live_cursor().0,
-                    container: *parent.manifest().root_graph_id.as_uuid(),
-                })
-            );
-            assert_eq!(fork.parent_session, None);
-            assert_eq!(fork.forked_at, None);
-            let fork = mere.open(fork.session_id).await.unwrap();
-            assert_eq!(
-                fork.changes()[0].kind,
-                ChangeKind::Picked {
-                    from: id,
-                    at: parent.journal().live_cursor()
-                }
-            );
-            assert_eq!(
-                fork.graph().node_count(),
-                2,
-                "nodes 1 and 2, not the lone 3"
-            );
-            assert!(
-                mere.fork_component(&parent, Uuid::from_u128(9), knot())
-                    .await
-                    .is_err()
-            );
-        });
-    }
-
     #[test]
     fn trash_marks_the_manifest_and_restore_clears_it() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
+            let mut session = mere.open_with(id).await.unwrap();
             let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
             session.trash(knot(), at).await.unwrap();
 
@@ -5432,7 +3587,7 @@ mod tests {
                 ]
             );
             // The session still opens: trash never moved its keys.
-            assert_eq!(mere.open(id).await.unwrap().changes().len(), 3);
+            assert_eq!(mere.open_with(id).await.unwrap().changes().len(), 3);
         });
     }
 
@@ -5440,28 +3595,23 @@ mod tests {
     fn a_session_begun_in_memory_is_stored_whole_by_its_first_flush() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mut baseline = Graph::new();
-            replay_captured_deltas_onto(&mut baseline, [add(1), retitle(1, "Kept")]);
+            let mut baseline = Surface::default();
+            baseline.show(Uuid::from_u128(1), "https://kept.test/");
             let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
             let id = manifest.session_id;
-            let mut session = GraphSession::new(
+            let mut session = Session::new_with(
                 store.clone(),
                 manifest,
                 Some(baseline),
                 person(),
                 ChangeKind::Minted,
             );
-            let (key, applied) = session
+            let (resource, applied) = session
                 .edit_now(person(), |graph| {
-                    kernel::graph::apply::add_node(
-                        graph,
-                        Some(Uuid::from_u128(2)),
-                        "https://2.test/".into(),
-                        Point2D::new(0.0, 0.0),
-                    )
+                    graph.show(Uuid::from_u128(2), "https://2.test/")
                 })
                 .unwrap();
-            assert!(session.graph().get_node(key).is_some());
+            assert_eq!(session.graph().shown(Uuid::from_u128(2)), Some(resource));
             assert_eq!(applied.first, Seq(0));
             assert!(
                 store.list(SESSIONS_PREFIX).await.unwrap().is_empty(),
@@ -5471,7 +3621,7 @@ mod tests {
 
             let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
             session.flush(at).await.unwrap();
-            let reopened = GraphSession::open(store, id).await.unwrap();
+            let reopened = Session::open_with(store, id).await.unwrap();
             assert_eq!(whole(reopened.graph()), whole(session.graph()));
             assert_eq!(reopened.changes(), session.changes());
             assert_eq!(reopened.manifest().updated_at, at);
@@ -5490,15 +3640,13 @@ mod tests {
             let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
             let id = manifest.session_id;
             let mut session =
-                GraphSession::new(store.clone(), manifest, None, person(), ChangeKind::Minted);
-            session.apply_now(person(), vec![add(1)]).unwrap();
+                Session::new_with(store.clone(), manifest, None, person(), ChangeKind::Minted);
+            session.apply_now(person(), add(1)).unwrap();
             let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
             // A host's batch took these writes and then failed to commit.
             let lost = session.pending(at).unwrap();
             assert!(!lost.is_empty());
-            session
-                .apply_now(knot(), vec![retitle(1, "Later")])
-                .unwrap();
+            session.apply_now(knot(), retitle(1, "later")).unwrap();
 
             let retry = session.pending(at).unwrap();
             assert!(
@@ -5509,7 +3657,7 @@ mod tests {
             session.stored(retry);
             assert!(session.pending(at).unwrap().is_empty());
 
-            let reopened = GraphSession::open(store, id).await.unwrap();
+            let reopened = Session::open_with(store, id).await.unwrap();
             assert_eq!(whole(reopened.graph()), whole(session.graph()));
             assert_eq!(reopened.journal().len(), session.journal().len());
         });
@@ -5519,22 +3667,22 @@ mod tests {
     fn the_latest_live_session_is_the_one_changed_last() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let first = mere.mint(person(), None).await.unwrap().session_id;
             let second = mere.mint(person(), None).await.unwrap().session_id;
             let latest = || async { mere.latest_live().await.unwrap().map(|m| m.session_id) };
             let base = wall_clock_now() + std::time::Duration::from_secs(60);
             let at = |seconds| base + std::time::Duration::from_secs(seconds);
 
-            let mut one = mere.open(first).await.unwrap();
-            one.apply_now(person(), vec![add(1)]).unwrap();
+            let mut one = mere.open_with(first).await.unwrap();
+            one.apply_now(person(), add(1)).unwrap();
             one.flush(at(0)).await.unwrap();
-            let mut two = mere.open(second).await.unwrap();
-            two.apply_now(person(), vec![add(2)]).unwrap();
+            let mut two = mere.open_with(second).await.unwrap();
+            two.apply_now(person(), add(2)).unwrap();
             two.flush(at(1)).await.unwrap();
             assert_eq!(latest().await, Some(second));
 
-            one.apply_now(person(), vec![retitle(1, "Again")]).unwrap();
+            one.apply_now(person(), retitle(1, "again")).unwrap();
             one.flush(at(2)).await.unwrap();
             assert_eq!(latest().await, Some(first), "a stored edit updates");
 
@@ -5558,9 +3706,9 @@ mod tests {
     fn a_view_keeps_its_own_stream_scrubbable_by_journal_cursor() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
+            let mut session = mere.open_with(id).await.unwrap();
             let key = ViewKey::new("knot-editor", "main").unwrap();
             let spectral =
                 ViewState::new("test.view/v1", serde_json::json!({"strategy": "spectral"}));
@@ -5568,7 +3716,7 @@ mod tests {
                 .set_view(knot(), key.clone(), spectral.clone())
                 .await
                 .unwrap();
-            session.apply(person(), vec![add(1)]).await.unwrap();
+            session.apply(person(), add(1)).await.unwrap();
             let focused = ViewState::new(
                 "test.view/v1",
                 serde_json::json!({"strategy": "spectral", "focus": Uuid::from_u128(1).to_string()}),
@@ -5588,7 +3736,7 @@ mod tests {
             );
             drop(session);
 
-            let reopened = mere.open(id).await.unwrap();
+            let reopened = mere.open_with(id).await.unwrap();
             assert_eq!(reopened.view(&key), Some(&focused));
             assert_eq!(reopened.view_at(&key, Seq(0)), Some(&spectral));
             assert!(ViewKey::new("Knot", "main").is_err());
@@ -5600,9 +3748,9 @@ mod tests {
     fn a_view_set_now_waits_for_the_next_batch() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
+            let mut session = mere.open_with(id).await.unwrap();
             assert!(!session.has_unstored());
             let key = ViewKey::new("graphshell", "commands").unwrap();
             let menu = ViewState::new(
@@ -5619,7 +3767,7 @@ mod tests {
             assert_eq!(session.view(&key), Some(&menu));
             assert!(session.has_unstored(), "the view waits for a batch");
             assert_eq!(
-                mere.open(id).await.unwrap().view(&key),
+                mere.open_with(id).await.unwrap().view(&key),
                 None,
                 "not stored yet"
             );
@@ -5629,7 +3777,7 @@ mod tests {
             session.stored(pending);
             assert!(!session.has_unstored());
             assert!(session.pending(wall_clock_now()).unwrap().is_empty());
-            assert_eq!(mere.open(id).await.unwrap().view(&key), Some(&menu));
+            assert_eq!(mere.open_with(id).await.unwrap().view(&key), Some(&menu));
             assert_eq!(session.journal().len(), 0, "a view is not graph truth");
         });
     }
@@ -5638,21 +3786,21 @@ mod tests {
     fn an_edit_without_a_replay_form_is_refused_whole() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
+            let mere = Sessions::new_with(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
-            let legacy = CapturedDelta::ReplaySetNodeThumbnailById {
-                node_id: Uuid::from_u128(1).to_string(),
-                png_bytes: Vec::new(),
-                width: 0,
-                height: 0,
-            };
-            assert!(session.apply(person(), vec![add(1), legacy]).await.is_err());
+            let mut session = mere.open_with(id).await.unwrap();
+            let retired = JournalDelta::Surface(SurfaceDelta::Retired {
+                note: "a thumbnail".into(),
+            });
+            let mut edits = add(1);
+            edits.push(retired);
+            assert!(session.apply(person(), edits).await.is_err());
             assert_eq!(
-                session.graph().node_count(),
+                session.graph().surface_count(),
                 0,
                 "nothing of the batch applied"
             );
+            assert!(session.graph().resources().resource_nodes().next().is_none());
             assert!(session.journal().is_empty());
         });
     }
@@ -5660,156 +3808,84 @@ mod tests {
     #[test]
     fn a_session_opens_only_if_its_mere_holds_it() {
         pollster::block_on(async {
-            let mere = MereSessions::new(MemoryBackend::new());
+            let mere = Sessions::new_with(MemoryBackend::new());
             let missing = SessionId::new();
             assert!(matches!(
-                mere.open(missing).await,
+                mere.open_with(missing).await,
                 Err(SessionError::Missing(id)) if id == missing
             ));
         });
     }
 
-    #[test]
-    fn in_process_hosts_apply_graph_deltas_by_key() {
-        pollster::block_on(async {
-            let mere = MereSessions::new(MemoryBackend::new());
-            let id = mere.mint(person(), None).await.unwrap().session_id;
-            let mut session = mere.open(id).await.unwrap();
-            session
-                .apply_deltas(
-                    person(),
-                    vec![GraphDelta::AddNode {
-                        id: Some(Uuid::from_u128(7)),
-                        url: "https://seven.test/".into(),
-                        position: Point2D::new(1.0, 2.0),
-                    }],
-                )
-                .await
-                .unwrap();
-            let (key, _) = session.graph().get_node_by_id(Uuid::from_u128(7)).unwrap();
-            let result = session
-                .apply_deltas(
-                    person(),
-                    vec![GraphDelta::SetNodeTitle {
-                        key,
-                        title: "Seven".into(),
-                    }],
-                )
-                .await
-                .unwrap();
-            assert_eq!(result.first, Seq(4));
-            assert_eq!(result.end, Seq(5));
-            assert_eq!(session.graph().get_node(key).unwrap().title, "Seven");
-            let resource_id = kernel::graph::ResourceNode::new("https://seven.test/").id();
-            assert_eq!(session.graph().shown_resource_id(key), Some(resource_id));
-            let [added, visit, resource, shown, title] = session.journal().entries() else {
-                panic!("expected surface, visit, resource, shown binding and title");
-            };
-            let surface_id = Uuid::from_u128(7).to_string();
-            let resource_id_text = resource_id.to_string();
-            assert!(
-                matches!(&added.delta, CapturedDelta::ReplayAddNodeWithIdIfMissing {
-                id, url, ..
-            } if id == &surface_id && url == "https://seven.test/")
-            );
-            assert!(
-                matches!(&visit.delta, CapturedDelta::ReplayTouchNodeLastVisitedById {
-                node_id, ..
-            } if node_id == &surface_id)
-            );
-            assert!(
-                matches!(&resource.delta, CapturedDelta::ReplaySetResourceRecordById {
-                resource_id, record: Some(record)
-            } if resource_id == &resource_id_text
-                && record.canonical_iri == "https://seven.test")
-            );
-            assert!(
-                matches!(&shown.delta, CapturedDelta::ReplaySetShownResourceById {
-                surface_id: captured_surface, resource_id: Some(captured_resource)
-            } if captured_surface == &surface_id && captured_resource == &resource_id_text)
-            );
-            assert!(
-                matches!(&title.delta, CapturedDelta::ReplaySetNodeTitleById {
-                node_id, title
-            } if node_id == &surface_id && title == "Seven")
-            );
-            assert!(
-                session
-                    .journal()
-                    .entries()
-                    .iter()
-                    .all(|entry| entry.author == person())
-            );
-            drop(session);
-            let reopened = mere.open(id).await.unwrap();
-            let (key, node) = reopened.graph().get_node_by_id(Uuid::from_u128(7)).unwrap();
-            assert_eq!(node.title, "Seven");
-            assert_eq!(reopened.graph().shown_resource_id(key), Some(resource_id));
-        });
+    /// One statement from surface 1 to 2 at `time`, its source `source` or,
+    /// when none, its author; an existing one of the same author is replaced.
+    fn claim(graph: &mut Surface, author: &Author, time: u64, source: Option<&str>) -> String {
+        let (one, two) = (Uuid::from_u128(1), Uuid::from_u128(2));
+        let asserter = source
+            .map(str::to_owned)
+            .unwrap_or_else(|| author.asserter_iri());
+        let mut rows = graph.rows_between(one, two);
+        let mut scratch = Surface::default();
+        scratch.show(one, "https://1.test/");
+        scratch.show(two, "https://2.test/");
+        scratch.assert(one, two, "https://session.test/vocab#cites");
+        let template = scratch.rows_between(one, two).remove(0);
+        let mut statement = template.retained_assertions()[0].clone();
+        statement.statement_id = match source {
+            Some(_) => format!("cites from {asserter}"),
+            None => format!("cites by {asserter}"),
+        };
+        statement.provenance_iri = source.map(str::to_owned);
+        statement.asserted_at_ms = Some(time);
+        let handle = statement.statement_id.clone();
+        match rows.first_mut() {
+            Some(row) => {
+                let held = row.assertions.get_or_insert_with(Vec::new);
+                held.retain(|row| row.statement_id != handle);
+                held.push(statement);
+            },
+            None => {
+                let mut row = template;
+                row.assertions = Some(vec![statement]);
+                rows.push(row);
+            },
+        }
+        let (from, to) = (graph.shown(one).unwrap(), graph.shown(two).unwrap());
+        let edit = Surface::edit_of(&edges_edit(from, to, rows), author).unwrap();
+        SessionGraph::apply(graph, edit).unwrap();
+        handle
     }
+
+    /// An engine's author identity names no version, so a new version updates
+    /// its own assertion; an explicit source keeps a row of its own.
     #[test]
     fn assertion_author_version_and_source_survive_session_replay() {
-        use kernel::graph::{SemanticStatementSpec, SemanticSubKind, predicate_iri};
         pollster::block_on(async {
-            let mere = MereSessions::new(MemoryBackend::default());
+            let mere = Sessions::new_with(MemoryBackend::default());
             let manifest = mere.mint(person(), None).await.unwrap();
-            let mut session = mere.open(manifest.session_id).await.unwrap();
-            session.apply(person(), vec![add(1), add(2)]).await.unwrap();
-            let claim = |graph: &mut Graph, time, source: Option<&str>| {
-                let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
-                let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
-                graph
-                    .assert_semantic_statement(
-                        from,
-                        to,
-                        SemanticStatementSpec {
-                            predicate: predicate_iri(SemanticSubKind::Cites).into(),
-                            recognized_sub_kind: Some(SemanticSubKind::Cites),
-                            provenance_iri: source.map(str::to_owned),
-                            asserted_at_ms: Some(time),
-                            ..Default::default()
-                        },
-                    )
-                    .unwrap()
-                    .1
-                    .statement_id
-            };
+            let mut session = mere.open_with(manifest.session_id).await.unwrap();
+            let mut edits = add(1);
+            edits.extend(add(2));
+            session.apply(person(), edits).await.unwrap();
+            let (v1, v2) = (Author::engine("extractor", "1"), Author::engine("extractor", "2"));
             let (first, _) = session
-                .edit_now(Author::engine("extractor", "1"), |graph| {
-                    claim(graph, 10, None)
-                })
+                .edit_now(v1.clone(), |graph| claim(graph, &v1, 10, None))
                 .unwrap();
             let (second, _) = session
-                .edit_now(Author::engine("extractor", "2"), |graph| {
-                    claim(graph, 20, None)
-                })
+                .edit_now(v2.clone(), |graph| claim(graph, &v2, 20, None))
                 .unwrap();
             assert_eq!(
                 first, second,
                 "new engine version updates its own assertion"
             );
             session
-                .edit_now(Author::engine("extractor", "2"), |graph| {
-                    claim(graph, 30, Some("https://page.test/"))
+                .edit_now(v2.clone(), |graph| {
+                    claim(graph, &v2, 30, Some("https://page.test/"))
                 })
                 .unwrap();
             let graph = session.graph();
-            let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
-            let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
-            assert!(
-                graph.find_edge_key(from, to).is_none(),
-                "live content has no duplicate Surface authority"
-            );
-            let resource_key = graph
-                .find_resource_edge_key(
-                    graph.shown_resource_id(from).unwrap(),
-                    graph.shown_resource_id(to).unwrap(),
-                )
-                .unwrap();
-            let statements = graph
-                .get_resource_edge(resource_key)
-                .unwrap()
-                .semantic_statements();
+            let rows = graph.rows_between(Uuid::from_u128(1), Uuid::from_u128(2));
+            let statements = rows[0].retained_assertions();
             assert_eq!(statements.len(), 2);
             assert_eq!(
                 statements[0].provenance_iri,
@@ -5825,50 +3901,49 @@ mod tests {
             assert_eq!(whole(&replayed), live);
         });
     }
+
     #[test]
     fn replayed_session_handles_are_checked_before_open_and_historical_publication() {
         pollster::block_on(async {
             let store = MemoryBackend::new();
-            let mere = MereSessions::new(store.clone());
-            let mut baseline = kernel::graph::replay_captured_deltas([add(1), add(2)]);
-            let surface = baseline.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
-            let mut property =
-                kernel::types::NodeProperty::new("urn:replay:literal".into(), "held".into());
-            property.statement_id = "shared replay handle".into();
-            assert!(baseline.append_node_properties(surface, vec![property]));
-            let held = baseline.node_properties(surface).unwrap()[0].clone();
-            assert!(
-                baseline
-                    .validate_active_resource_assertion_handles()
-                    .is_ok()
+            let mere = Sessions::new_with(store.clone());
+            let mut baseline = Surface::default();
+            let (one, two) = (Uuid::from_u128(1), Uuid::from_u128(2));
+            baseline.show(one, "https://1.test/");
+            baseline.show(two, "https://2.test/");
+            let mut held = literal("shared replay handle");
+            held.predicate = "urn:replay:literal".into();
+            baseline.set_facet(
+                one,
+                SURFACE_PROPERTIES,
+                serde_json::to_value(vec![held.clone()]).unwrap(),
             );
+            assert!(baseline.validate_handles().is_ok());
             let baseline_truth = whole(&baseline);
-            let mut session = mere.begin_recorded(person(), Some(baseline.clone()));
+            let mut session = mere.begin_recorded_with(person(), Some(baseline.clone()));
             let id = session.manifest().session_id;
             session.flush(wall_clock_now()).await.unwrap();
-            let opened = mere.open(id).await.unwrap();
+            let opened = mere.open_with(id).await.unwrap();
             assert_eq!(whole(opened.graph()), baseline_truth);
-            let facet = |property| CapturedDelta::ReplaySetNodeFacetById {
-                node_id: Uuid::from_u128(2).to_string(),
-                facet: kernel::graph::node_facets::SEMANTIC_PROPERTIES.into(),
-                value_json: serde_json::to_string(&vec![property]).unwrap(),
+            let facet = |property: NodeProperty| {
+                JournalDelta::Surface(SurfaceDelta::SetFacet {
+                    surface_id: two,
+                    facet: SURFACE_PROPERTIES.into(),
+                    value: serde_json::to_value(vec![property]).unwrap(),
+                })
             };
             let mut distinct = held.clone();
             distinct.statement_id = "distinct replay handle".into();
             session.journal.record_as(person(), facet(distinct.clone()));
             session.flush(wall_clock_now()).await.unwrap();
-            let mut valid = mere.open(id).await.unwrap();
+            let mut valid = mere.open_with(id).await.unwrap();
             assert_eq!(
                 valid
                     .graph()
-                    .legacy_node_properties(
-                        valid
-                            .graph()
-                            .get_node_key_by_id(Uuid::from_u128(2))
-                            .unwrap()
-                    )
-                    .unwrap(),
-                vec![distinct]
+                    .facets()
+                    .get(&two, &FacetId::new(SURFACE_PROPERTIES))
+                    .cloned(),
+                Some(serde_json::to_value(vec![distinct]).unwrap())
             );
             valid.checkpoint().await.unwrap();
             assert!(session.graph_at(Seq(1)).is_some());
@@ -5885,79 +3960,19 @@ mod tests {
                 baseline_truth,
                 "failed publication does not mutate the live graph"
             );
-            let retained = load_retained_source::<_, Graph>(
-                &session.slots,
-                &session.keys,
-                &session.manifest,
-                true,
-            )
-            .await
-            .unwrap()
-            .2;
-            match mere.open(id).await {
+            let retained = stored_bytes(&store).await;
+            match mere.open_with(id).await {
                 Err(SessionError::Corrupt(error)) => {
-                    assert!(error.contains(&session.keys.at(JOURNAL)));
-                    assert!(error.contains("shared replay handle"));
+                    assert!(error.contains(&session.keys.at(JOURNAL)), "{error}");
+                    assert!(error.contains("shared replay handle"), "{error}");
                 },
                 Err(error) => panic!("unexpected error: {error}"),
                 Ok(_) => panic!("colliding journal replay was published"),
             }
-            let after = load_retained_source::<_, Graph>(
-                &session.slots,
-                &session.keys,
-                &session.manifest,
-                true,
-            )
-            .await
-            .unwrap()
-            .2;
-            assert_eq!(after.baseline, retained.baseline);
-            assert_eq!(after.entries, retained.entries);
-            let receipt = LegacyTranslationReceipt::new(
-                "historical control".into(),
-                SessionPlacement::legacy(Seq(0), vec![]),
-                FrozenGraph::of(&baseline),
-                vec![],
-                FrozenGraph::of(&baseline),
-            )
-            .unwrap();
-            assert!(
-                receipt
-                    .graph_at(session.journal.entries(), Seq(1))
-                    .unwrap()
-                    .is_some()
-            );
-            assert!(receipt.graph_at(session.journal.entries(), Seq(2)).is_err());
-            session.translation = Some(receipt);
-            assert!(session.graph_at(Seq(1)).is_some());
-            assert!(
-                session.graph_at(Seq(2)).is_none(),
-                "translated session historical read also refuses collision"
-            );
-
-            let mut legacy = mere.begin(
-                person(),
-                Some(kernel::graph::replay_captured_deltas([add(1), add(2)])),
-            );
-            let mut legacy_property =
-                kernel::types::NodeProperty::new("urn:legacy:literal".into(), "held".into());
-            legacy_property.statement_id = "shared replay handle".into();
-            for node_id in [1, 2] {
-                legacy.journal.record_as(
-                    person(),
-                    CapturedDelta::ReplaySetNodeFacetById {
-                        node_id: Uuid::from_u128(node_id).to_string(),
-                        facet: kernel::graph::node_facets::SEMANTIC_PROPERTIES.into(),
-                        value_json: serde_json::to_string(&vec![legacy_property.clone()]).unwrap(),
-                    },
-                );
-            }
-            legacy.flush(wall_clock_now()).await.unwrap();
-            let legacy = mere.open(legacy.manifest().session_id).await.unwrap();
-            assert!(legacy.graph().to_snapshot().resources.is_empty());
-            assert!(
-                legacy.graph_at(Seq(2)).is_some(),
-                "Surface-only legacy handles retain their permissive grammar"
+            assert_eq!(
+                stored_bytes(&store).await,
+                retained,
+                "a refused open leaves the retained source as it was"
             );
         });
     }

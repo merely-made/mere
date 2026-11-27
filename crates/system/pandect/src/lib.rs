@@ -43,13 +43,16 @@
 // Application-scoped preferences live under the host's data root rather than
 // in one session's settings sidecar.
 // Portable address-access history (engine split D69, from the reference app).
+// The lib tests share the integration tests' surface and its hooks (engine
+// split D272), whose file names this crate `pandect`.
+#[cfg(test)]
+extern crate self as pandect;
+#[cfg(test)]
+#[path = "../tests/support/mod.rs"]
+mod test_surface;
+
 pub mod access;
-pub mod addressable_graph;
 pub mod application_settings_store;
-// Durable content-addressed store for node preview imagery (favicons, previews,
-// snapshots). Eidetic owns the content-addressed bytes; this adapter owns
-// ImageRef conversion and graph-aware retention decisions.
-pub mod image_store;
 // The family-shared root moved to catchment with the reservoir (engine split
 // P4); the module path stays for its callers.
 pub use catchment::shared_root;
@@ -58,8 +61,6 @@ pub use catchment::shared_root;
 // graph.json. The durable home the bespoke per-node sidecars (browser/participant/
 // arrangement) converge onto. Wraps chartulary's FacetStore.
 pub mod facet_store;
-#[cfg(feature = "furnace")]
-pub mod furnace;
 // The compare-and-replace over a muniment slot moved to catchment (engine
 // split D84); the module path stays for its callers.
 pub use catchment::slot_guard;
@@ -68,18 +69,8 @@ pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
 // session core and the lifecycle (reservoir plan V2).
 pub mod graph_session;
-// What the session's replay check compares, as bytes (engine split D156).
-mod replay_state;
-// Observed stable-ID live commands over the complete session writer.
-pub mod live_graph;
 // Producer-owned, content-addressed recipes for reopening a source at a
 // cursor with existing durable curation. Source resolution stays at the host.
-// Snapshot-level merge for codicil compose (Alembic tail B7): union two graph
-// snapshots by URL identity, retaining per-member provenance. Pure; the codicil
-// compose op (`graph_codicil::compose_graph_codicils`) layers on top.
-#[cfg(test)]
-mod resource_content_merge_tests;
-pub mod snapshot_merge;
 // The merge rules Compose and session merge-in share (session merge-in note, M8).
 pub mod merge_rules;
 // The frame.json pane-layout store moved OUT with the pane model at
@@ -87,7 +78,6 @@ pub mod merge_rules;
 // now — the pane-coupled half of this crate, split exactly as the
 // boundary-pass plan parked it.
 pub mod manifest;
-pub mod memory_levels;
 // The store-side memory program, now Eidetic's (engine split D45): no kernel or
 // pandect types.
 /// The retention passes live in Eidetic (engine split D45, D87); the path stays.
@@ -144,8 +134,6 @@ pub use facet_store::{
     NodeFacetStore, NodeFacets, copy_node_facets, load_node_facets, node_facets_path,
     read_expiring_facet, save_node_facets,
 };
-#[cfg(not(target_arch = "wasm32"))]
-pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, DroppedChoice,
     GraphAdmissionValidator, GraphRevision, GraphSession, GraphValidator, Kept, LegacyHook,
@@ -160,7 +148,7 @@ pub use identity::StartupUnlockMode;
 // The ids and author the session schema names, so a host can name them
 // through pandect.
 pub use catchment::{GraphId, SessionId};
-pub use kernel::graph::{Author, AuthorKind, CapturedDelta, Part};
+pub use mere::model::author::{Author, AuthorKind};
 pub use manifest::{
     CodicilId, GraphSessionManifest, LEGACY_HOST_KEYS, Lineage, MANIFEST_SCHEMA_VERSION,
     MergedMark, PersonaId, PickedFrom, TrashMark,

@@ -103,7 +103,7 @@ pub struct GraphRevision {
 /// indexed pin took about 0.4 s at 100k nodes and about 36 ms at 10k on the
 /// reference laptop (engine-split D166). A host that cannot wait drops it on a
 /// worker.
-pub struct PinnedView<G: SessionGraph = Graph> {
+pub struct PinnedView<G: SessionGraph> {
     session: SessionId,
     cursor: Seq,
     digest: String,

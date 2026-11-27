@@ -7,52 +7,37 @@
 //! Engine-split D163: `pin` returns an owned view at its cursor, named by the
 //! session's v2 chain digest there, released on drop.
 use super::*;
-use kernel::graph::SemanticStatementSpec;
+use crate::test_surface::{Delta, Surface, show_edits};
 use mere::dataset::View;
 use muniment::MemoryBackend;
 use std::collections::BTreeSet;
+
+type Session = GraphSession<MemoryBackend, Surface>;
 
 fn person() -> Author {
     Author::person("persona-a").via("turnstone")
 }
 
-fn add(id: u128) -> CapturedDelta {
-    CapturedDelta::ReplayAddNodeWithIdIfMissing {
-        id: Uuid::from_u128(id).to_string(),
-        url: format!("https://{id}.test/"),
-        position: [0.0, 0.0],
-    }
+fn add(id: u128) -> Vec<Delta> {
+    show_edits(Uuid::from_u128(id), &format!("https://{id}.test/")).1
 }
 
-/// Assert statement `predicate` from node `from` to node `to` as one edit.
-fn relate(session: &mut GraphSession<MemoryBackend>, from: u128, to: u128, predicate: &str) {
+/// Assert statement `predicate` from surface `from` to surface `to` as one edit.
+fn relate(session: &mut Session, from: u128, to: u128, predicate: &str) {
     session
         .edit_now(person(), |graph| {
-            let key = |id| graph.get_node_key_by_id(Uuid::from_u128(id)).unwrap();
-            let (from, to) = (key(from), key(to));
-            let spec = SemanticStatementSpec {
-                predicate: format!("https://pin.test/vocab#{predicate}"),
-                ..Default::default()
-            };
-            graph.assert_semantic_statement(from, to, spec).unwrap();
+            let predicate = format!("https://pin.test/vocab#{predicate}");
+            graph.assert(Uuid::from_u128(from), Uuid::from_u128(to), &predicate);
         })
         .unwrap();
 }
 
-/// A graph's persisted state, undated and without the visit clock, which a
-/// replay between a node's creation and its journaled stamp reads afresh.
-fn state(graph: &Graph) -> (serde_json::Value, serde_json::Value) {
-    let mut snapshot = graph.to_snapshot();
-    snapshot.timestamp_secs = 0;
-    let mut facets = serde_json::to_value(graph.facets()).unwrap();
-    if let Some(nodes) = facets.get_mut("nodes").and_then(|n| n.as_object_mut()) {
-        for node in nodes.values_mut() {
-            if let Some(visit) = node.get_mut("visit.history") {
-                visit["last_visited_ms"] = 0.into();
-            }
-        }
-    }
-    (serde_json::to_value(&snapshot).unwrap(), facets)
+/// A graph's persisted state: its snapshot and its facets.
+fn state(graph: &Surface) -> (serde_json::Value, serde_json::Value) {
+    (
+        serde_json::to_value(graph.to_snapshot()).unwrap(),
+        serde_json::to_value(graph.facets()).unwrap(),
+    )
 }
 
 /// Every row of `dataset`, live and withdrawn, as sortable text.
@@ -68,25 +53,25 @@ fn rows(dataset: &IndexedDataset) -> BTreeSet<String> {
 }
 
 /// `graph_at` as it read before D161: the baseline and the whole prefix.
-fn from_baseline(session: &GraphSession<MemoryBackend>, cursor: Seq) -> Graph {
+fn from_baseline(session: &Session, cursor: Seq) -> Surface {
     let mut graph = session
         .journal
         .snapshot_at_from(&session.baseline, cursor)
         .unwrap()
         .unwrap();
-    graph.validate_active_resource_assertion_handles().unwrap();
+    graph.validate_handles().unwrap();
     graph.set_known_coverage(session.graph.known_coverage().clone());
     graph
 }
 
-/// A session with nodes 1 to 4 and a chain of statements, stored, its live
-/// cursor checkpointed.
-async fn chained() -> GraphSession<MemoryBackend> {
-    let mere = MereSessions::new(MemoryBackend::new());
+/// A session with surfaces 1 to 4 and a chain of statements, stored, its
+/// live cursor checkpointed.
+async fn chained() -> Session {
+    let mere = MereSessions::<_, Surface>::new_with(MemoryBackend::new());
     let id = mere.mint(person(), None).await.unwrap().session_id;
-    let mut session = mere.open(id).await.unwrap();
+    let mut session = mere.open_with(id).await.unwrap();
     session
-        .apply(person(), (1..=4).map(add).collect())
+        .apply(person(), (1..=4).flat_map(add).collect())
         .await
         .unwrap();
     relate(&mut session, 1, 2, "next");
@@ -110,7 +95,7 @@ fn a_pin_reads_its_cursor_after_live_moves() {
         assert_eq!(pin.revision_identity(), revision);
 
         relate(&mut session, 3, 4, "later");
-        session.apply(person(), vec![add(5)]).await.unwrap();
+        session.apply(person(), add(5)).await.unwrap();
         assert_ne!(session.live_revision().unwrap(), revision);
         assert_eq!(pin.revision_identity(), revision);
         let live = rows(&IndexedDataset::for_graph(session.graph()));
@@ -247,7 +232,7 @@ fn a_pin_indexes_on_its_first_read() {
 }
 
 /// Every Resource-stratum quad's line, and every quad of the whole projection.
-fn resource_and_all(graph: &Graph) -> (BTreeSet<String>, BTreeSet<String>) {
+fn resource_and_all(graph: &Surface) -> (BTreeSet<String>, BTreeSet<String>) {
     let all = graph
         .held_quads()
         .chain(graph.withdrawn_reifier_quads())
@@ -326,22 +311,18 @@ fn the_resource_stratum_without_reifier_rows_reads_as_rdfc() {
     });
 }
 
+/// The surface stratum stands where the kernel's arrangements stood: an edit
+/// the projection shows and the Resource stratum does not.
 #[test]
 fn an_arrangement_edit_keeps_the_resource_digest_and_a_resource_edit_moves_it() {
-    use kernel::graph::apply::assert_relation;
-    use kernel::graph::{ArrangementSubKind, EdgeAssertion};
     pollster::block_on(async {
         let mut session = chained().await;
-        let before = session.pin(session.journal.live_cursor()).unwrap();
+        let before = session.pin(session.journal().live_cursor()).unwrap();
         let cursor = before.cursor();
         session
             .edit_now(person(), |graph| {
-                let key = |id| graph.get_node_key_by_id(Uuid::from_u128(id)).unwrap();
-                let (frame, member) = (key(1), key(3));
-                let arrangement = EdgeAssertion::Arrangement {
-                    sub_kind: ArrangementSubKind::FrameMember,
-                };
-                assert!(assert_relation(graph, frame, member, arrangement).is_some());
+                // A fifth surface shows surface 1's resource: no resource is new.
+                graph.show(Uuid::from_u128(5), "https://1.test/");
             })
             .unwrap();
         let arranged = session.pin(session.journal.live_cursor()).unwrap();
@@ -376,7 +357,7 @@ fn a_pin_computes_its_resource_digest_once_on_first_ask() {
         let pin = session.pin(session.journal.live_cursor()).unwrap();
         assert_eq!(pin.resource_digests_computed(), 0, "pinning computes none");
         relate(&mut session, 3, 4, "later");
-        session.apply(person(), vec![add(5)]).await.unwrap();
+        session.apply(person(), add(5)).await.unwrap();
         let _ = pin.dataset();
         assert_eq!(
             pin.resource_digests_computed(),

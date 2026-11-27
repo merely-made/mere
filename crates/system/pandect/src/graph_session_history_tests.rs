@@ -5,10 +5,15 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Engine-split D161: `graph_at` starts from the held checkpoint, and a
-//! session-level import with a refused edit commits nothing.
+//! session-level import with a refused edit commits nothing. Over the shared
+//! test surface (D272).
 use super::*;
-use kernel::graph::{EdgeAssertion, SemanticStatementSpec, SemanticSubKind};
+use crate::test_surface::{Delta, Surface, edges_edit, show_edits};
+use mere::session::ReplayPoint;
 use muniment::MemoryBackend;
+
+type Session = GraphSession<MemoryBackend, Surface>;
+type Sessions = MereSessions<MemoryBackend, Surface>;
 
 fn person() -> Author {
     Author::person("persona-a").via("turnstone")
@@ -18,71 +23,47 @@ fn restorer() -> Author {
     Author::person("persona-b").via("knot-editor")
 }
 
-fn add(id: u128) -> CapturedDelta {
-    CapturedDelta::ReplayAddNodeWithIdIfMissing {
-        id: Uuid::from_u128(id).to_string(),
-        url: format!("https://{id}.test/"),
-        position: [0.0, 0.0],
-    }
+/// Surface `id` showing `https://{id}.test/`: the resource, then the surface.
+fn add(id: u128) -> Vec<Delta> {
+    show_edits(Uuid::from_u128(id), &format!("https://{id}.test/")).1
 }
 
-fn retitle(id: u128, title: &str) -> CapturedDelta {
-    CapturedDelta::ReplaySetNodeTitleById {
-        node_id: Uuid::from_u128(id).to_string(),
-        title: title.to_string(),
-    }
+/// Surface `id` showing the resource named `title`.
+fn retitle(id: u128, title: &str) -> Vec<Delta> {
+    show_edits(Uuid::from_u128(id), &format!("https://{title}.test/")).1
 }
 
-/// A graph's whole persisted state: its snapshot, undated, and its facets.
-fn whole(graph: &Graph) -> (serde_json::Value, serde_json::Value) {
-    let mut snapshot = graph.to_snapshot();
-    snapshot.timestamp_secs = 0;
+/// A graph's whole persisted state: its snapshot and its facets.
+fn whole(graph: &Surface) -> (serde_json::Value, serde_json::Value) {
     (
-        serde_json::to_value(&snapshot).unwrap(),
+        serde_json::to_value(graph.to_snapshot()).unwrap(),
         serde_json::to_value(graph.facets()).unwrap(),
     )
 }
 
 /// `graph_at` as it read before D161: the baseline and the whole prefix.
-fn from_baseline(session: &GraphSession<MemoryBackend>, cursor: Seq) -> Graph {
+fn from_baseline(session: &Session, cursor: Seq) -> Surface {
     let mut graph = session
         .journal
         .snapshot_at_from(&session.baseline, cursor)
         .unwrap()
         .unwrap();
-    graph.validate_active_resource_assertion_handles().unwrap();
+    graph.validate_handles().unwrap();
     graph.set_known_coverage(session.graph.known_coverage().clone());
     graph
 }
 
 /// Where `graph_at(cursor)` starts: the held checkpoint's cursor, or the
 /// baseline's zero.
-fn start(session: &GraphSession<MemoryBackend>, cursor: Seq) -> Seq {
+fn start(session: &Session, cursor: Seq) -> Seq {
     session
         .replay_point_for(cursor)
         .map_or(Seq(0), |point| point.cursor())
 }
 
-/// `whole` without the visit clock: a cursor between a node's creation and
-/// its journaled stamp replays by reading the clock, so only there may two
-/// replays differ.
-fn unclocked(graph: &Graph) -> (serde_json::Value, serde_json::Value) {
-    let (snapshot, mut facets) = whole(graph);
-    if let Some(nodes) = facets.get_mut("nodes").and_then(|n| n.as_object_mut()) {
-        for node in nodes.values_mut() {
-            if let Some(visit) = node.get_mut("visit.history") {
-                visit["last_visited_ms"] = 0.into();
-            }
-        }
-    }
-    (snapshot, facets)
-}
-
 /// Every cursor's `graph_at` equals the from-baseline replay, and starts from
-/// the held checkpoint exactly when one lies at or before it. Whole at the
-/// held checkpoint and the live cursor, where every stamp is journaled; at
-/// the others, all but the visit clock.
-fn every_cursor_matches(session: &GraphSession<MemoryBackend>) {
+/// the held checkpoint exactly when one lies at or before it.
+fn every_cursor_matches(session: &Session) {
     let held = session
         .replay_point
         .as_ref()
@@ -94,30 +75,19 @@ fn every_cursor_matches(session: &GraphSession<MemoryBackend>) {
             _ => Seq(0),
         };
         assert_eq!(start(session, cursor), expected, "start at {at}");
-        let exact = cursor == session.journal.live_cursor() || Some(cursor) == held;
-        let state = if exact { whole } else { unclocked };
         assert_eq!(
-            state(&session.graph_at(cursor).unwrap()),
-            state(&from_baseline(session, cursor)),
+            whole(&session.graph_at(cursor).unwrap()),
+            whole(&from_baseline(session, cursor)),
             "graph_at({at}) equals the from-baseline replay"
         );
     }
 }
 
-/// Add node `id` as a live edit journals it: the node, then its visit stamp.
-fn add_stamped(session: &mut GraphSession<MemoryBackend>, author: Author, id: u128) {
-    record(session, author.clone(), add(id));
-    let delta = CapturedDelta::ReplayTouchNodeLastVisitedById {
-        node_id: Uuid::from_u128(id).to_string(),
-        timestamp_ms: 1_000 + id as u64,
-    };
-    record(session, author, delta);
-}
-
-/// The legacy Surface pair 1 -> 2 as one exact row carrying `statements`,
-/// each with the given source (`None` is a source the replay attributes).
-fn exact(template: &Graph, statements: &[(&str, Option<&str>)]) -> CapturedDelta {
-    let mut edges = template.to_snapshot().edges;
+/// The pair 1 -> 2 as one exact row carrying `statements`, each with the
+/// given source (`None` is a source the replay attributes).
+fn exact(template: &Surface, statements: &[(&str, Option<&str>)]) -> Vec<Delta> {
+    let (one, two) = (Uuid::from_u128(1), Uuid::from_u128(2));
+    let mut edges = template.rows_between(one, two);
     let rows = edges[0].assertions.as_mut().unwrap();
     let mut first = rows[0].clone();
     first.asserted_at_ms = Some(100);
@@ -130,20 +100,22 @@ fn exact(template: &Graph, statements: &[(&str, Option<&str>)]) -> CapturedDelta
             row
         })
         .collect();
-    CapturedDelta::ReplaySetEdgesByIds {
-        from_id: Uuid::from_u128(1).to_string(),
-        to_id: Uuid::from_u128(2).to_string(),
-        edges,
-    }
+    let (from, to) = (
+        template.shown(one).unwrap(),
+        template.shown(two).unwrap(),
+    );
+    vec![edges_edit(from, to, edges)]
 }
 
-/// Record `delta` under `author` and bring the live graph to the replay.
-fn record(session: &mut GraphSession<MemoryBackend>, author: Author, delta: CapturedDelta) {
-    session.journal.record_as(author, delta);
+/// Record `deltas` under `author` and bring the live graph to the replay.
+fn record(session: &mut Session, author: Author, deltas: Vec<Delta>) {
+    for delta in deltas {
+        session.journal.record_as(author.clone(), delta);
+    }
     session.graph = from_baseline(session, session.journal.live_cursor());
 }
 
-async fn checkpoint(session: &mut GraphSession<MemoryBackend>) {
+async fn checkpoint(session: &mut Session) {
     session
         .store(SystemTime::now(), Vec::new(), true)
         .await
@@ -153,22 +125,18 @@ async fn checkpoint(session: &mut GraphSession<MemoryBackend>) {
 /// A session whose journal mints a statement with no recorded source, drops
 /// it, and has another author restore it, with checkpoints between: replay
 /// keeps the minting author only if it carries attribution across them.
-async fn attributed_session(store: &MemoryBackend) -> (SessionId, Graph) {
-    let mere = MereSessions::new(store.clone());
+async fn attributed_session(store: &MemoryBackend) -> (SessionId, Surface) {
+    let mere = Sessions::new_with(store.clone());
     let id = mere.mint(person(), None).await.unwrap().session_id;
-    let mut session = mere.open(id).await.unwrap();
-    let template = kernel::graph::replay_captured_deltas([
-        add(1),
-        add(2),
-        CapturedDelta::ReplayAssertRelationByIds {
-            from_id: Uuid::from_u128(1).to_string(),
-            to_id: Uuid::from_u128(2).to_string(),
-            assertion: EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Cites,
-                label: None,
-            },
-        },
-    ]);
+    let mut session = mere.open_with(id).await.unwrap();
+    let mut template = Surface::default();
+    template.show(Uuid::from_u128(1), "https://1.test/");
+    template.show(Uuid::from_u128(2), "https://2.test/");
+    template.assert(
+        Uuid::from_u128(1),
+        Uuid::from_u128(2),
+        "https://history.test/vocab#cites",
+    );
     session.baseline = template.clone();
     session.write_baseline = true;
     session.head_stored = false;
@@ -178,7 +146,7 @@ async fn attributed_session(store: &MemoryBackend) -> (SessionId, Graph) {
     every_cursor_matches(&session);
 
     record(&mut session, person(), exact(&template, &minted));
-    add_stamped(&mut session, person(), 3);
+    record(&mut session, person(), add(3));
     checkpoint(&mut session).await;
     every_cursor_matches(&session);
     record(
@@ -186,7 +154,7 @@ async fn attributed_session(store: &MemoryBackend) -> (SessionId, Graph) {
         person(),
         exact(&template, &[("kept", source)]),
     );
-    record(&mut session, restorer(), retitle(3, "Three"));
+    record(&mut session, restorer(), retitle(3, "three"));
     checkpoint(&mut session).await;
     every_cursor_matches(&session);
     record(&mut session, restorer(), exact(&template, &minted));
@@ -195,18 +163,21 @@ async fn attributed_session(store: &MemoryBackend) -> (SessionId, Graph) {
     // Control: the checkpoint's graph replayed on without the attribution it
     // carried gives the restoring author, so the comparison above sees it.
     let point = session.replay_point.as_ref().unwrap().point.clone();
-    assert_eq!(point.cursor(), Seq(5));
+    assert_eq!(point.cursor(), Seq(6));
     let mut bare = point.graph().clone();
-    session.journal.replay_from(Seq(5), &mut bare).unwrap();
+    session.journal.replay_from(Seq(6), &mut bare).unwrap();
     assert_ne!(
         whole(&bare),
-        whole(&session.graph_at(Seq(6)).unwrap()),
+        whole(&session.graph_at(Seq(7)).unwrap()),
         "control: replay from the checkpoint without its attribution differs"
     );
-    let edges = session.graph_at(Seq(6)).unwrap().to_snapshot().edges;
+    let edges = session
+        .graph_at(Seq(7))
+        .unwrap()
+        .rows_between(Uuid::from_u128(1), Uuid::from_u128(2));
     let restored = edges[0]
         .retained_assertions()
-        .into_iter()
+        .iter()
         .find(|row| row.statement_id == "minted")
         .unwrap();
     assert_eq!(
@@ -215,9 +186,9 @@ async fn attributed_session(store: &MemoryBackend) -> (SessionId, Graph) {
         "restoration keeps the minting author"
     );
 
-    add_stamped(&mut session, restorer(), 4);
+    record(&mut session, restorer(), add(4));
     checkpoint(&mut session).await;
-    record(&mut session, person(), retitle(4, "Four"));
+    record(&mut session, person(), retitle(4, "four"));
     every_cursor_matches(&session);
     session.flush(SystemTime::now()).await.unwrap();
     (id, session.graph.clone())
@@ -231,14 +202,14 @@ fn graph_at_starts_from_the_held_checkpoint_and_equals_the_baseline_replay() {
 
         // Reopen holds the stored checkpoint's replay point, read beside the
         // prefix replay open already makes for attribution.
-        let reopened = GraphSession::open(store, id).await.unwrap();
+        let reopened = Session::open_with(store, id).await.unwrap();
         assert_eq!(whole(reopened.graph()), whole(&live));
         assert_eq!(
             reopened
                 .replay_point
                 .as_ref()
                 .map(|held| held.point.cursor()),
-            Some(Seq(8))
+            Some(Seq(9))
         );
         every_cursor_matches(&reopened);
     });
@@ -248,14 +219,14 @@ fn graph_at_starts_from_the_held_checkpoint_and_equals_the_baseline_replay() {
 fn a_cursor_before_the_held_checkpoint_replays_from_the_baseline() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let id = mere.mint(person(), None).await.unwrap().session_id;
-        let mut session = mere.open(id).await.unwrap();
+        let mut session = mere.open_with(id).await.unwrap();
         for n in 0..2 {
-            session.apply(person(), vec![add(n)]).await.unwrap();
+            session.apply(person(), add(n)).await.unwrap();
         }
         session.checkpoint().await.unwrap();
-        session.apply(person(), vec![add(2)]).await.unwrap();
+        session.apply(person(), add(2)).await.unwrap();
         let held = session.replay_point.as_ref().unwrap().point.cursor();
         assert!(
             held > Seq(1),
@@ -277,17 +248,14 @@ fn a_cursor_before_the_held_checkpoint_replays_from_the_baseline() {
 fn a_held_checkpoint_whose_digest_does_not_verify_is_skipped() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let id = mere.mint(person(), None).await.unwrap().session_id;
-        let mut session = mere.open(id).await.unwrap();
+        let mut session = mere.open_with(id).await.unwrap();
         for n in 1..=3 {
-            session.apply(person(), vec![add(n)]).await.unwrap();
+            session.apply(person(), add(n)).await.unwrap();
         }
         session.checkpoint().await.unwrap();
-        session
-            .apply(person(), vec![retitle(1, "One")])
-            .await
-            .unwrap();
+        session.apply(person(), retitle(1, "one")).await.unwrap();
         let live = session.journal.live_cursor();
         let good = session.replay_point.clone().unwrap();
         let at = good.point.cursor();
@@ -296,12 +264,14 @@ fn a_held_checkpoint_whose_digest_does_not_verify_is_skipped() {
 
         // A point at the same cursor built over another baseline: wrong
         // content, so whichever start graph_at takes shows in its result.
+        let mut other = Surface::default();
+        other.show(Uuid::from_u128(99), "https://99.test/");
         let wrong = session
             .journal
-            .replay_point_from(&kernel::graph::replay_captured_deltas([add(99)]), at)
+            .replay_point_from(&other, at)
             .unwrap()
             .unwrap();
-        let held = |point: kernel::graph::ReplayPoint, digest: Option<String>| {
+        let held = |point: ReplayPoint<Surface>, digest: Option<String>| {
             Some(Arc::new(HeldPoint { point, digest }))
         };
 
@@ -326,47 +296,37 @@ fn a_held_checkpoint_whose_digest_does_not_verify_is_skipped() {
     });
 }
 
-/// The live graph `a -> b` with one Resource statement, and its handle.
-fn related() -> (Graph, String) {
-    let mut graph = kernel::graph::replay_captured_deltas([add(1), add(2)]);
-    let key = |graph: &Graph, id| graph.get_node_key_by_id(Uuid::from_u128(id)).unwrap();
-    let (from, to) = (key(&graph, 1), key(&graph, 2));
-    let spec = SemanticStatementSpec {
-        predicate: "https://import.test/vocab#next".into(),
-        ..Default::default()
-    };
-    let (relation, _) = graph.assert_semantic_statement(from, to, spec).unwrap();
-    let handle = graph.get_relation(relation).unwrap().assertions()[0]
-        .statement_id
-        .clone();
+/// Surfaces 1 -> 2 with one statement between their resources, and its handle.
+fn related() -> (Surface, String) {
+    let mut graph = Surface::default();
+    let (one, two) = (Uuid::from_u128(1), Uuid::from_u128(2));
+    graph.show(one, "https://1.test/");
+    graph.show(two, "https://2.test/");
+    let handle = graph.assert(one, two, "https://import.test/vocab#next");
     (graph, handle)
 }
 
-/// An import of three edits whose middle one puts `handle` on a Surface
-/// relation 1 -> 2.
-fn import(graph: &Graph, handle: &str) -> Vec<CapturedDelta> {
-    let mut row = graph.to_snapshot().resource_edges[0].clone();
-    for statement in row.assertions.as_mut().unwrap() {
+/// An import of three edits whose middle one puts `handle` on the pair
+/// 2 -> 1: surface 7's resource, the relation, then surface 7.
+fn import(graph: &Surface, handle: &str) -> Vec<Delta> {
+    let (one, two) = (Uuid::from_u128(1), Uuid::from_u128(2));
+    let mut rows = graph.rows_between(one, two);
+    for statement in rows[0].assertions.as_mut().unwrap() {
         statement.statement_id = handle.into();
     }
-    vec![
-        add(7),
-        CapturedDelta::ReplaySetEdgesByIds {
-            from_id: Uuid::from_u128(1).to_string(),
-            to_id: Uuid::from_u128(2).to_string(),
-            edges: vec![row],
-        },
-        retitle(7, "Imported"),
-    ]
+    let relation = edges_edit(graph.shown(two).unwrap(), graph.shown(one).unwrap(), rows);
+    let (_, mut seven) = show_edits(Uuid::from_u128(7), "https://imported.test/");
+    let resource = seven.remove(0);
+    vec![resource, relation, seven.remove(0)]
 }
 
 #[test]
 fn an_import_with_a_refused_edit_commits_nothing_and_names_the_handle() {
     pollster::block_on(async {
         let store = MemoryBackend::new();
-        let mere = MereSessions::new(store.clone());
+        let mere = Sessions::new_with(store.clone());
         let (graph, handle) = related();
-        let mut session = mere.begin(person(), Some(graph));
+        let mut session = mere.begin_with(person(), Some(graph));
         session.flush(SystemTime::now()).await.unwrap();
         let before = (
             whole(session.graph()),
@@ -401,9 +361,11 @@ fn an_import_with_a_refused_edit_commits_nothing_and_names_the_handle() {
             .unwrap();
         assert!(applied.end > applied.first);
         let graph = session.graph();
-        let imported = graph.get_node_key_by_id(Uuid::from_u128(7)).unwrap();
-        assert_eq!(graph.get_node(imported).unwrap().title, "Imported");
-        assert!(graph.find_semantic_statement("fresh-import").is_some());
+        assert_eq!(
+            graph.iri_of(Uuid::from_u128(7)).as_deref(),
+            Some("https://imported.test/")
+        );
+        assert!(graph.statement("fresh-import").is_some());
     });
 }
 

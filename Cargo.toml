@@ -4,11 +4,11 @@ resolver = "2"
 # The engine (engine split D59, P3 slice 4): the toolkit went to Graphshell's host/,
 # the reference app to Turnstone, pictograph to emblem (D102 to D104).
 members = [
-    "crates/graph/graph-kernel",
     "crates/graph/engine",
     "crates/graph/ontology",
     "crates/graph/rdfc",
     "crates/graph/shacl",
+    "crates/graph/test-surface",
     "crates/system/catchment",
     "crates/system/pandect",
     "crates/domain/personal-facts",
@@ -37,7 +37,6 @@ prefixmap = { git = "https://github.com/mark-ik/rudof", rev = "b9ff1550" }
 
 murm-sync = { version = ">=0.0.1", git = "https://github.com/merely-made/murm.git", branch = "main" }
 
-kernel = { package = "mere-kernel", version = "0.0.3", path = "crates/graph/graph-kernel" }
 # Graph digest projections (djot outline, metrics) — `glossary` (was `mere-orrery`).
 
 # The remaining families absorbed 2026-07-23. Consumers keep using
@@ -50,7 +49,6 @@ kernel = { package = "mere-kernel", version = "0.0.3", path = "crates/graph/grap
 # local checkout.
 personae = { version = ">=0.3.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 notochord = { version = ">=0.1.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
-fieldbook = { version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 hodograph = { version = ">=0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 portolan = { version = ">=0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }
 quadstore = { version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", branch = "main" }

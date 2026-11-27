@@ -4,9 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use super::{EdgeAssertion, Graph, PersonalGraphError, PersonalGraphEvent, RelationSelector};
-use kernel::graph::{EdgeFamily, RelationKind, SemanticStatement};
-use kernel::types::{AssertionBasis, GraphScope};
+use super::{EdgeAssertion, PersonalGraphError, PersonalGraphEvent};
+use mere::model::{GraphScope, RelationKind, SemanticStatement};
 use std::collections::BTreeMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use stickleback::Reject;
@@ -232,102 +231,12 @@ impl IdentityIndex {
     }
 }
 
-pub(super) fn assert_statement(
-    graph: &mut Graph,
-    from: Uuid,
-    to: Uuid,
-    assertion: &EdgeAssertion,
-    asserter: &str,
-    id: &str,
-    at_ms: Option<u64>,
-    basis: Option<AssertionBasis>,
-) -> Result<(), PersonalGraphError> {
-    let Some((from, to)) = graph
-        .get_node_key_by_id(from)
-        .zip(graph.get_node_key_by_id(to))
-    else {
-        return Err(PersonalGraphError::Excluded(
-            "exact relation assertion references a missing endpoint".into(),
-        ));
-    };
-    let label = assertion_label(assertion);
-    let basis = basis.unwrap_or_else(|| AssertionBasis {
-        note: label.clone(),
-        ..Default::default()
-    });
-    let kind = relation_kind(assertion);
-    let predicate = kind
-        .predicate_iri()
-        .expect("assertion relation kinds have canonical predicates")
-        .to_owned();
-    let recognized_sub_kind = match kind {
-        RelationKind::Semantic(sub_kind) => Some(sub_kind),
-        _ => None,
-    };
-    let label = basis.note.clone().or(label);
-    let statement = SemanticStatement {
-        statement_id: id.to_owned(),
-        predicate,
-        recognized_sub_kind,
-        label,
-        basis,
-        graph_scope: GraphScope::Default,
-        provenance_iri: Some(asserter.to_owned()),
-        asserted_at_ms: at_ms,
-        first_asserted_ms: at_ms,
-        withdrawn: None,
-    };
-    // Personal event validation and IdentityIndex establish the complete
-    // exact-ID contract before this deterministic fold reaches the writer.
-    graph
-        .try_assert_persisted_relation_statement(from, to, statement)
-        .map_err(|error| PersonalGraphError::Excluded(error.to_string()))?;
-    Ok(())
-}
-
-pub(super) fn retract_legacy(
-    graph: &mut Graph,
-    from: Uuid,
-    to: Uuid,
-    selector: RelationSelector,
-    asserter: &str,
-) -> bool {
-    if selector == RelationSelector::Family(EdgeFamily::Traversal) {
-        return false;
-    }
-    if let Some((from, to)) = graph
-        .get_node_key_by_id(from)
-        .zip(graph.get_node_key_by_id(to))
-    {
-        let ids = graph
-            .projected_relations_between(from, to)
-            .flat_map(|(_, edge)| {
-                edge.held_assertions()
-                    .filter(|s| {
-                        s.provenance_iri.as_deref() == Some(asserter)
-                            && mere::model::selector_matches_kind(selector, s.relation_kind())
-                    })
-                    .map(|s| s.statement_id.clone())
-            })
-            .collect::<Vec<_>>();
-        for id in ids {
-            graph.apply_imported_semantic_withdrawal_for_pair(
-                from,
-                to,
-                &id,
-                None,
-                Some(asserter.to_owned()),
-            );
-        }
-    }
-    true
-}
-
 #[cfg(test)]
 mod lifecycle_tests {
     use super::*;
-    use kernel::graph::{
-        ArrangementSubKind, ContainmentSubKind, ImportedSubKind, ProvenanceSubKind, SemanticSubKind,
+    use mere::model::{
+        ArrangementSubKind, AssertionBasis, AssertionMethod, ContainmentSubKind, ImportedSubKind,
+        ProvenanceSubKind, SemanticSubKind,
     };
     use std::collections::HashSet;
 
@@ -561,7 +470,7 @@ mod lifecycle_tests {
             statement_id: Some("urn:assertion:same-reason".into()),
             asserted_at_ms: Some(10),
             basis: Some(AssertionBasis {
-                method: Some(kernel::types::AssertionMethod {
+                method: Some(AssertionMethod {
                     iri: "urn:method:extractor".into(),
                     version: Some(version.into()),
                 }),

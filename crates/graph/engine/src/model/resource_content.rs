@@ -6,7 +6,7 @@
 
 //! Typed content on shared resources: the facet names and the records they
 //! hold. Moved from the kernel (engine split P5 L3); admission and its checks
-//! stay with the kernel's recorded write path.
+//! stay with the surface graph's recorded write path.
 
 use super::{Author, NodeClassification};
 use serde::{Deserialize, Serialize};

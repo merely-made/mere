@@ -11,10 +11,10 @@
 //! a stale assert, and reason keys ([`AssertionBasis::same_reason_as`]).
 //! [`ResourceGraph`] holds resources, the edges between them and their facets.
 //!
-//! These types moved here from `mere-kernel`, which composes its surface graph
-//! over them and records every write to them through its journal. The kernel
-//! re-exports, at their old paths, the names other repositories use, until it
-//! moves at P8. Every serialized shape is unchanged.
+//! These types moved here from `mere-kernel` (engine split P5 L3), whose surface
+//! graph now lives in Graphshell as incipit-graph: it composes over them and
+//! records every write to them through its journal. Every serialized shape is
+//! unchanged.
 
 pub mod assertion_handles;
 pub mod author;

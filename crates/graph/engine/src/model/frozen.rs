@@ -6,7 +6,7 @@
 
 //! Frozen selections and links: immutable readings a resource bears. The
 //! types moved from the kernel (engine split P5 L3); their record validation
-//! stays with the kernel's snapshot code.
+//! stays with the surface graph's snapshot code.
 
 use super::{CoverageNote, GraphStratum, PersistedEdge};
 use serde::{Deserialize, Serialize};
