@@ -223,6 +223,66 @@ mod tests {
         assert_eq!(quads.len(), 10);
     }
 
+    /// The quads every export carries today, pinned so that moving the rows
+    /// into an embedded alignment pack (declared-lens D31 (3)) exports the
+    /// same ones.
+    #[test]
+    fn the_exported_alignment_quads_are_pinned() {
+        const REL: &str = "https://mere.computer/ns/rel#";
+        const CITO: &str = "http://purl.org/spar/cito/";
+        let expected = [
+            ("cites", OWL_EQUIVALENT_PROPERTY, format!("{CITO}cites")),
+            (
+                "quotes",
+                OWL_EQUIVALENT_PROPERTY,
+                format!("{CITO}includesQuotationFrom"),
+            ),
+            (
+                "supports",
+                OWL_EQUIVALENT_PROPERTY,
+                format!("{CITO}supports"),
+            ),
+            (
+                "contradicts",
+                OWL_EQUIVALENT_PROPERTY,
+                format!("{CITO}disputes"),
+            ),
+            (
+                "elaborates",
+                OWL_EQUIVALENT_PROPERTY,
+                format!("{CITO}extends"),
+            ),
+            (
+                "hyperlink",
+                OWL_EQUIVALENT_PROPERTY,
+                format!("{CITO}linksTo"),
+            ),
+            (
+                "same-entity-as",
+                OWL_EQUIVALENT_PROPERTY,
+                "http://www.w3.org/2002/07/owl#sameAs".to_string(),
+            ),
+            ("summarizes", RDFS_SUB_PROPERTY_OF, format!("{CITO}cites")),
+            ("questions", RDFS_SUB_PROPERTY_OF, format!("{CITO}cites")),
+            (
+                "depends-on",
+                RDFS_SUB_PROPERTY_OF,
+                "http://purl.org/dc/terms/requires".to_string(),
+            ),
+        ];
+        let mut want: Vec<String> = expected
+            .iter()
+            .map(|(local, p, o)| format!("<{REL}{local}> <{p}> <{o}> <{GRAPH_VOCABULARY}> ."))
+            .collect();
+        want.sort();
+        let mut got: Vec<String> = vocabulary_alignment_quads()
+            .iter()
+            .map(|q| format!("{q} ."))
+            .collect();
+        got.sort();
+        assert_eq!(got, want);
+    }
+
     #[test]
     fn alignment_is_deterministic() {
         assert_eq!(vocabulary_alignment_quads(), vocabulary_alignment_quads());
