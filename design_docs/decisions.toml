@@ -671,6 +671,38 @@ summary = "The pack row keeps a frozen parity table, alignment becomes pack rows
 draws_on = ["declared-lens D9", "declared-lens D15", "declared-lens D17"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D28"]
+title = "A record carries its predicate's UUIDv5, and the IRI too when the predicate is not a core term (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Records carry the predicate's UUIDv5 always and its IRI only when the pinned core pack lacks the term."
+draws_on = ["declared-lens D16", "declared-lens D24", "linked-data-platform-lessons D11"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D29"]
+title = "The labels users see come from the packs, inverse labels included, in L7 (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Display and inverse labels are pack data in L7; Graphshell holds no label table."
+draws_on = ["declared-lens D13", "declared-lens D20"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D30"]
+title = "Digests over unchanged history move once (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The v2 journal digest of unchanged history moves once under L7; checkpoints replay past once and write pins are re-pinned."
+draws_on = ["declared-lens D17", "engine-split D148", "engine-split D268"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D31"]
+title = "L7 lane 1's smaller forks take the recommendations (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Receipts checksum their stored payload, triggers get workspace-pack IRIs in L7, the alignment pack is embedded in the engine, and the lane's smaller choices stand."
+draws_on = ["declared-lens D17", "declared-lens D22", "declared-lens D27"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
