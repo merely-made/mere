@@ -158,6 +158,9 @@ pub(crate) struct LegacyTranslationReceipt<G: SessionGraph> {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub content_context: Option<LegacyContentContext>,
     legacy_final: FrozenGraph<G>,
+    /// The checksum of the payload as it was stored, when read from bytes.
+    #[serde(skip)]
+    stored_digest: Option<String>,
 }
 
 impl<G: SessionGraph> std::fmt::Debug for LegacyTranslationReceipt<G> {
@@ -176,7 +179,20 @@ impl<G: SessionGraph> std::fmt::Debug for LegacyTranslationReceipt<G> {
 }
 
 impl<G: SessionGraph> LegacyTranslationReceipt<G> {
+    /// Read a stored receipt, keeping the checksum of its payload as stored
+    /// (declared-lens D31 (1)): today's types read a receipt written before
+    /// L7 but re-encode it in another shape, so the checksum is taken over
+    /// the stored field text, insignificant whitespace removed.
+    pub fn from_stored(bytes: &[u8]) -> Result<Self, String> {
+        let mut receipt: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+        receipt.stored_digest = Some(stored_digest(bytes)?);
+        Ok(receipt)
+    }
+
     fn digest(&self) -> Result<String, String> {
+        if let Some(stored) = &self.stored_digest {
+            return Ok(stored.clone());
+        }
         let payload = (
             self.version,
             &self.source_digest,
@@ -279,6 +295,75 @@ impl<G: SessionGraph> LegacyTranslationReceipt<G> {
             .map(Vec::len)
             .sum::<usize>() as u64
             + cursor.0.saturating_sub(self.entry_effects.len() as u64))
+    }
+}
+
+/// A receipt's payload fields as stored text, in the order its checksum
+/// reads them.
+#[derive(Deserialize)]
+struct StoredPayload<'a> {
+    #[serde(borrow)]
+    version: &'a serde_json::value::RawValue,
+    #[serde(borrow)]
+    source_digest: &'a serde_json::value::RawValue,
+    #[serde(borrow)]
+    placement: &'a serde_json::value::RawValue,
+    #[serde(borrow)]
+    baseline: &'a serde_json::value::RawValue,
+    #[serde(borrow)]
+    entry_effects: &'a serde_json::value::RawValue,
+    #[serde(borrow)]
+    legacy_final: &'a serde_json::value::RawValue,
+    #[serde(borrow, default)]
+    content_context: Option<&'a serde_json::value::RawValue>,
+}
+
+/// The checksum a receipt's writer took, `serde_json::to_vec` of the payload
+/// tuple, recomputed from the stored text: each field compacted, joined as
+/// that tuple's JSON array.
+fn stored_digest(bytes: &[u8]) -> Result<String, String> {
+    let stored: StoredPayload<'_> = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+    let fields = [
+        stored.version,
+        stored.source_digest,
+        stored.placement,
+        stored.baseline,
+        stored.entry_effects,
+        stored.legacy_final,
+    ];
+    let mut payload = String::from("[");
+    for (i, field) in fields.iter().enumerate() {
+        if i > 0 {
+            payload.push(',');
+        }
+        compact_into(&mut payload, field.get());
+    }
+    payload.push(']');
+    if let Some(context) = stored.content_context {
+        payload = format!("[{payload},");
+        compact_into(&mut payload, context.get());
+        payload.push(']');
+    }
+    Ok(blake3::hash(payload.as_bytes()).to_hex().to_string())
+}
+
+/// Append `json` without the whitespace outside its strings.
+fn compact_into(out: &mut String, json: &str) {
+    let (mut in_string, mut escaped) = (false, false);
+    for c in json.chars() {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if c == '\\' {
+                escaped = true;
+            } else if c == '"' {
+                in_string = false;
+            }
+            out.push(c);
+        } else if !matches!(c, ' ' | '\t' | '\n' | '\r') {
+            in_string = c == '"';
+            out.push(c);
+        }
     }
 }
 

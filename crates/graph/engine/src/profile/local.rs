@@ -73,6 +73,7 @@ pub fn declarations_pack<'a>(
                 vec![stratum.iri().to_owned()],
             )]),
             labels: BTreeMap::new(),
+            inverse_labels: None,
         });
     }
     if terms.is_empty() {

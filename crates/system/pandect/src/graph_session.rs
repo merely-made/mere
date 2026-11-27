@@ -932,8 +932,12 @@ impl<B: Backend, G: SessionGraph> GraphSession<B, G> {
                 keys.at(TRANSLATION)
             )));
         }
-        let translation: Option<LegacyTranslationReceipt<G>> =
-            read(&slots, &keys.at(TRANSLATION)).await?;
+        let translation = match slots.backend().get(&keys.at(TRANSLATION)).await? {
+            Some(bytes) => Some(LegacyTranslationReceipt::<G>::from_stored(&bytes).map_err(
+                |error| SessionError::Corrupt(format!("{}: {error}", keys.at(TRANSLATION))),
+            )?),
+            None => None,
+        };
         let hook = legacy;
         match (&placement, &translation) {
             (Some(profile), Some(receipt))

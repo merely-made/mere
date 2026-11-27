@@ -16,6 +16,7 @@ use muniment::{Backend, MemoryBackend, Seq};
 use pandect::graph_placement::SessionPlacement;
 use pandect::{LegacyHook, MereSessions, NodeFacetStore, SessionError, SessionId};
 use serde::Serialize;
+use serde_json::{Value, json};
 use support::{Delta, Surface, SurfaceDelta, SurfaceSnapshot};
 use uuid::Uuid;
 
@@ -229,6 +230,129 @@ fn an_installed_legacy_hook_reads_the_translation_over_a_host_graph() {
             matches!(&forged, Err(SessionError::Corrupt(why)) if why.contains("checksum")),
             "{:?}",
             forged.err()
+        );
+    });
+}
+
+const BASELINE: &str = "https://p8.test/baseline";
+const CITES: &str = "https://mere.computer/ns/rel#cites";
+
+/// A cites edge from `TRANSLATED` to the baseline's resource, as the kernel
+/// wrote one before L7: the edge names its families and the record its
+/// sub-kind, fields today's types read and no longer write.
+fn pre_l7_cites() -> Value {
+    let (from, to) = (
+        ResourceNode::for_term(TRANSLATED).id().to_string(),
+        ResourceNode::for_term(BASELINE).id().to_string(),
+    );
+    let mut delta = serde_json::to_value(support::edges_edit(
+        ResourceNode::for_term(TRANSLATED).id(),
+        ResourceNode::for_term(BASELINE).id(),
+        Vec::new(),
+    ))
+    .unwrap();
+    let edges = delta
+        .pointer_mut("/ReplaySetResourceEdgesByIds/edges")
+        .expect("an edges write");
+    *edges = json!([{
+        "from_node_id": from,
+        "to_node_id": to,
+        "families": ["Semantic"],
+        "assertions": [{
+            "statement_id": "urn:uuid:9b0c7d3e-8f43-4e0a-9d5b-6f1e2a3b4c5d",
+            "predicate": CITES,
+            "recognized_sub_kind": "Cites",
+            "basis": { "evidence": [], "method": null, "note": null }
+        }]
+    }]);
+    delta
+}
+
+/// The session `legacy_session` stores, its receipt rewritten so that its
+/// second entry's effects also write `pre_l7_cites`, its checksum taken the
+/// way a pre-L7 writer took it (over the payload it serialized), and stored
+/// pretty-printed.
+async fn pre_l7_receipt_session(backend: &MemoryBackend) -> (SessionId, String) {
+    let id = legacy_session(backend).await;
+    let key = format!("sessions/{}/legacy-translation.json", id.as_uuid());
+    let mut receipt: Value =
+        serde_json::from_slice(&backend.get(&key).await.unwrap().unwrap()).unwrap();
+    receipt["entry_effects"][1]
+        .as_array_mut()
+        .unwrap()
+        .push(pre_l7_cites());
+    // The frozen result is what replaying those effects gives.
+    let effects: Vec<Vec<Delta>> =
+        serde_json::from_value(receipt["entry_effects"].clone()).unwrap();
+    let mut translated = Surface::default();
+    translated.show(Uuid::from_u128(0x5b), BASELINE);
+    translated.replay_as(&Author::person("p8-legacy"), &effects.concat());
+    receipt["legacy_final"] = serde_json::to_value(frozen(&translated)).unwrap();
+    let payload = json!([
+        receipt["version"],
+        receipt["source_digest"],
+        receipt["placement"],
+        receipt["baseline"],
+        receipt["entry_effects"],
+        receipt["legacy_final"],
+    ]);
+    let digest = blake3::hash(&serde_json::to_vec(&payload).unwrap())
+        .to_hex()
+        .to_string();
+    receipt["translation_digest"] = Value::from(digest);
+    backend
+        .put(&key, &serde_json::to_vec_pretty(&receipt).unwrap())
+        .await
+        .unwrap();
+    (id, key)
+}
+
+/// Declared-lens D31 (1): a receipt's checksum covers its payload as stored.
+/// A receipt written before L7 holds fields today's types drop, so a
+/// checksum over the re-encoded payload refused it and the session failed
+/// to open.
+#[test]
+fn a_receipt_written_before_l7_validates_over_its_stored_payload() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let (id, key) = pre_l7_receipt_session(&backend).await;
+        let stored = String::from_utf8(backend.get(&key).await.unwrap().unwrap()).unwrap();
+        assert!(stored.contains("recognized_sub_kind") && stored.contains("\n  "));
+
+        let session = Sessions::new_with(backend.clone())
+            .with_legacy(&CURRENT)
+            .open_with(id)
+            .await
+            .unwrap();
+        let cited = session.graph().resources().persisted_edges_between(
+            ResourceNode::for_term(TRANSLATED).id(),
+            ResourceNode::for_term(BASELINE).id(),
+        );
+        assert_eq!(cited.len(), 1, "the pre-L7 edge reads");
+        assert_eq!(cited[0].retained_assertions()[0].predicate, CITES);
+        drop(session);
+
+        // Control: a stored field today's types never read is still covered.
+        let tampered = stored.replacen("\"Cites\"", "\"Quotes\"", 1);
+        assert_ne!(tampered, stored);
+        backend.put(&key, tampered.as_bytes()).await.unwrap();
+        let forged = Sessions::new_with(backend.clone())
+            .with_legacy(&CURRENT)
+            .open_with(id)
+            .await;
+        assert!(
+            matches!(&forged, Err(SessionError::Corrupt(why)) if why.contains("checksum")),
+            "{:?}",
+            forged.err()
+        );
+        // And the untouched receipt, restored, opens again.
+        backend.put(&key, stored.as_bytes()).await.unwrap();
+        assert!(
+            Sessions::new_with(backend)
+                .with_legacy(&CURRENT)
+                .open_with(id)
+                .await
+                .is_ok()
         );
     });
 }
