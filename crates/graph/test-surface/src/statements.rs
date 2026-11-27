@@ -9,9 +9,10 @@
 //! graph writes (engine split D259).
 
 use mere::model::{
-    AssertionWithdrawal, EdgeAssertion, EdgePayload, JournalDelta, RelationSelector,
-    SemanticStatement, selector_matches_kind,
+    AssertionBasis, AssertionWithdrawal, EdgeAssertion, EdgePayload, GraphScope, JournalDelta,
+    RelationSelector, SemanticStatement, selector_matches_kind,
 };
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::Surface;
@@ -164,4 +165,48 @@ impl Surface {
             .flat_map(|payload| payload.assertions().to_vec())
             .find(|statement| statement.statement_id == id)
     }
+
+    /// Every retained statement, held or withdrawn, as declared-lens D18
+    /// compares them, in a stable order.
+    pub fn retained_statements(&self) -> Vec<HeldRow> {
+        let mut rows: Vec<HeldRow> = self
+            .resources
+            .resource_edges()
+            .flat_map(|(a, b, payload)| {
+                payload.assertions().iter().map(|s| HeldRow {
+                    from: a.canonical_iri().to_owned(),
+                    to: b.canonical_iri().to_owned(),
+                    statement_id: s.statement_id.clone(),
+                    predicate: s.predicate.clone(),
+                    label: s.label.clone(),
+                    basis: s.basis.clone(),
+                    graph_scope: s.graph_scope.clone(),
+                    provenance_iri: s.provenance_iri.clone(),
+                    first_asserted_ms: s.first_asserted_ms,
+                    asserted_at_ms: s.asserted_at_ms,
+                    withdrawn: s.withdrawn.clone(),
+                })
+            })
+            .collect();
+        rows.sort_by(|x, y| {
+            (&x.from, &x.to, &x.statement_id).cmp(&(&y.from, &y.to, &y.statement_id))
+        });
+        rows
+    }
+}
+
+/// One retained statement: the resource pair it joins and its record.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct HeldRow {
+    pub from: String,
+    pub to: String,
+    pub statement_id: String,
+    pub predicate: String,
+    pub label: Option<String>,
+    pub basis: AssertionBasis,
+    pub graph_scope: GraphScope,
+    pub provenance_iri: Option<String>,
+    pub first_asserted_ms: Option<u64>,
+    pub asserted_at_ms: Option<u64>,
+    pub withdrawn: Option<AssertionWithdrawal>,
 }

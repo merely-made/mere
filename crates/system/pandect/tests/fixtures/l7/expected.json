@@ -1,0 +1,282 @@
+{
+  "journal_held": [
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": "because"
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/a",
+      "graph_scope": "Default",
+      "label": "because",
+      "predicate": "https://mere.computer/ns/rel#cites",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01aac-23429d1d1bb4a050-0000000000000001",
+      "to": "https://l7.test/b",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/a",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#containment.user-folder",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01aac-23429d1d1bb4a050-0000000000000002",
+      "to": "https://l7.test/b",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/a",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://l7.test/open",
+      "provenance_iri": "urn:p8:probe",
+      "statement_id": "01a21ea01aac-23429d1d1bb4a050-0000000000000005",
+      "to": "https://l7.test/c",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/b",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#imported.bookmark-folder",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01aac-23429d1d1bb4a050-0000000000000003",
+      "to": "https://l7.test/c",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": 2000,
+      "basis": {
+        "evidence": [
+          "urn:l7:evidence"
+        ],
+        "method": {
+          "iri": "urn:l7:method",
+          "version": "2"
+        },
+        "note": "noted"
+      },
+      "first_asserted_ms": 1000,
+      "from": "https://l7.test/b",
+      "graph_scope": {
+        "Custom": "urn:l7:scope"
+      },
+      "label": "noted",
+      "predicate": "https://mere.computer/ns/rel#supports",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "urn:l7:exact",
+      "to": "https://l7.test/d",
+      "withdrawn": {
+        "at_ms": 3000,
+        "by": "urn:l7:asserter"
+      }
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/c",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#provenance.copied-from",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01aac-23429d1d1bb4a050-0000000000000004",
+      "to": "https://l7.test/a",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/c",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#imported.rss-membership",
+      "provenance_iri": "https://mere.computer/ns/agent#unknown-legacy",
+      "statement_id": "urn:mere:legacy-assertion:v1:1dc1b9c6-2d6d-5053-8275-3eaa4010cb8d",
+      "to": "https://l7.test/d",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": "old"
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/c",
+      "graph_scope": "Default",
+      "label": "old",
+      "predicate": "https://mere.computer/ns/rel#questions",
+      "provenance_iri": "https://mere.computer/ns/agent#unknown-legacy",
+      "statement_id": "urn:mere:legacy-assertion:v1:298fa30a-1892-5244-aada-a1af08d1c959",
+      "to": "https://l7.test/d",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/c",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#containment.notebook-section",
+      "provenance_iri": "https://mere.computer/ns/agent#unknown-legacy",
+      "statement_id": "urn:mere:legacy-assertion:v1:6573c057-2a9b-5b56-9723-a4ba0fcc76a9",
+      "to": "https://l7.test/d",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/c",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#provenance.translated-from",
+      "provenance_iri": "https://mere.computer/ns/agent#unknown-legacy",
+      "statement_id": "urn:mere:legacy-assertion:v1:f864aa91-1959-5b6d-b071-b24797b89041",
+      "to": "https://l7.test/d",
+      "withdrawn": null
+    }
+  ],
+  "pin_digest": "bb86cf2c7bdcb68e6323dbce85a074bee8a680889719fb8e9b52a88711c63b44",
+  "session_id": "a4c071f3-bad4-4445-a85c-0c7f426b4ae6",
+  "sync_held": [
+    {
+      "asserted_at_ms": 5000,
+      "basis": {
+        "evidence": [],
+        "method": {
+          "iri": "urn:l7:merge",
+          "version": null
+        },
+        "note": null
+      },
+      "first_asserted_ms": 5000,
+      "from": "https://l7.test/a",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#provenance.merged-from",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "urn:l7:sync-provenance",
+      "to": "https://l7.test/b",
+      "withdrawn": {
+        "at_ms": 6000,
+        "by": "urn:l7:asserter"
+      }
+    },
+    {
+      "asserted_at_ms": 4000,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": "sync"
+      },
+      "first_asserted_ms": 4000,
+      "from": "https://l7.test/a",
+      "graph_scope": "Default",
+      "label": "sync",
+      "predicate": "https://mere.computer/ns/rel#elaborates",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "urn:l7:sync-semantic",
+      "to": "https://l7.test/b",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/b",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#containment.clip-source",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01abd-23429d1d1bb4a050-0000000000000012",
+      "to": "https://l7.test/c",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/b",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#imported.shared-collection",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01abd-23429d1d1bb4a050-0000000000000013",
+      "to": "https://l7.test/c",
+      "withdrawn": null
+    },
+    {
+      "asserted_at_ms": null,
+      "basis": {
+        "evidence": [],
+        "method": null,
+        "note": null
+      },
+      "first_asserted_ms": null,
+      "from": "https://l7.test/c",
+      "graph_scope": "Default",
+      "label": null,
+      "predicate": "https://mere.computer/ns/rel#containment.user-folder",
+      "provenance_iri": "urn:l7:asserter",
+      "statement_id": "01a21ea01abd-23429d1d1bb4a050-0000000000000014",
+      "to": "https://l7.test/a",
+      "withdrawn": {
+        "at_ms": null,
+        "by": "urn:l7:asserter"
+      }
+    }
+  ]
+}

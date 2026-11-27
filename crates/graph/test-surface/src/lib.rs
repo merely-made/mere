@@ -33,6 +33,7 @@ mod statements;
 pub use held::{PendingLinks, Retention};
 pub use projection::{SHOWS, surface_iri};
 pub use replay::{Carry, edges_edit};
+pub use statements::HeldRow;
 /// The id type every surface, resource and edit names.
 pub use uuid::Uuid;
 

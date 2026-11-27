@@ -105,7 +105,8 @@ impl PersonalFold<Surface> for StatementFold {
                     || matches!(assertion, EdgeAssertion::Semantic { .. })
                 {
                     let id = statement_id.as_deref().unwrap_or(fallback_id);
-                    let exact = statement(assertion, asserter_iri, id, *asserted_at_ms, basis.clone());
+                    let exact =
+                        statement(assertion, asserter_iri, id, *asserted_at_ms, basis.clone());
                     graph
                         .upsert_statement(*from, *to, exact)
                         .map_err(PersonalGraphError::Excluded)?;
