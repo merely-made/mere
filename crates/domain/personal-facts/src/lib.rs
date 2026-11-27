@@ -7,21 +7,22 @@
 //! Content-addressed personal resources admitted by the resident's mere.
 //! This crate transforms candidates and validates complete graphs. Djinn owns
 //! files, grants, sessions, the journal and archives. References grant no access.
+//!
+//! Each record is one facet of the resource at its content-addressed IRI
+//! (engine split D216, D247), written through the recorded resource-record
+//! write. Nothing here places a surface node: a host that shows a record binds
+//! one itself. Records held as surface-node facets are refused (D246). Every
+//! function takes any [`SessionGraph`] (engine split D261).
 
-use portolan::FacetId;
 use dramatis::{
     birth::BirthFacts,
     resources::{ResourceRef, SubjectResourceAssociation},
     subject::SubjectRef,
 };
 use gaz::{Contact, LocalId, PersonaScope};
-use kernel::{
-    geometry::PortablePoint,
-    graph::{
-        Graph, NodeKey,
-        apply::{GraphDelta, add_node, apply_graph_delta},
-    },
-};
+use mere::model::{Author, PersistedResourceFacet, PersistedResourceRecord, ResourceNode};
+use mere::session::SessionGraph;
+use portolan::FacetId;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
@@ -29,6 +30,7 @@ pub const DOMAIN: &str = "personal-facts";
 pub const BIRTH_FACET: &str = "dramatis.birth-facts/v1";
 pub const ASSOCIATION_FACET: &str = "dramatis.subject-resource-association/v1";
 pub const CONTACT_FACET: &str = "dramatis.contact-resource/v1";
+const RECORD_FACETS: [&str; 3] = [BIRTH_FACET, CONTACT_FACET, ASSOCIATION_FACET];
 const PREFIX: &str = "mere://personal-facts/";
 const BIRTH_PREFIX: &str = "mere://personal-facts/birth/";
 const CONTACT_PREFIX: &str = "mere://personal-facts/contact/";
@@ -68,8 +70,8 @@ pub fn birth_resource(facts: &BirthFacts) -> Result<BirthResource, String> {
 
 /// Explicitly create a local Gaz contact in this persona's shared data domain.
 /// No key/login is minted and no other contact is merged or copied by name.
-pub fn create_contact(
-    graph: &mut Graph,
+pub fn create_contact<G: SessionGraph>(
+    graph: &mut G,
     scope: &str,
     id: LocalId,
     label: &str,
@@ -93,7 +95,7 @@ pub fn create_contact(
         id: format!("{CONTACT_PREFIX}{revision}"),
         revision,
     };
-    put(graph, &resource.id, label.trim(), CONTACT_FACET, &record)?;
+    put(graph, &resource.id, CONTACT_FACET, &record)?;
     put_association(
         graph,
         &SubjectResourceAssociation::about(subject.clone(), resource),
@@ -103,17 +105,14 @@ pub fn create_contact(
 }
 
 /// A correction creates a new revision. Existing records are unchanged.
-pub fn save_birth(graph: &mut Graph, facts: &BirthFacts) -> Result<BirthResource, String> {
+pub fn save_birth<G: SessionGraph>(
+    graph: &mut G,
+    facts: &BirthFacts,
+) -> Result<BirthResource, String> {
     validate(graph)?;
     let value = birth_resource(facts)?;
     require_contact(graph, &facts.subject)?;
-    put(
-        graph,
-        &value.resource.id,
-        "Birth facts",
-        BIRTH_FACET,
-        &value.facts,
-    )?;
+    put(graph, &value.resource.id, BIRTH_FACET, &value.facts)?;
     put_association(
         graph,
         &SubjectResourceAssociation::about(facts.subject.clone(), value.resource.clone()),
@@ -121,8 +120,8 @@ pub fn save_birth(graph: &mut Graph, facts: &BirthFacts) -> Result<BirthResource
     validate(graph)?;
     Ok(value)
 }
-pub fn save_association(
-    graph: &mut Graph,
+pub fn save_association<G: SessionGraph>(
+    graph: &mut G,
     value: &SubjectResourceAssociation,
 ) -> Result<(), String> {
     validate(graph)?;
@@ -132,20 +131,20 @@ pub fn save_association(
     put_association(graph, value)?;
     validate(graph)
 }
-pub fn births(graph: &Graph) -> Result<Vec<BirthResource>, String> {
+pub fn births<G: SessionGraph>(graph: &G) -> Result<Vec<BirthResource>, String> {
     validate(graph)?;
-    let mut result: Vec<_> = read_values::<BirthFacts>(graph, BIRTH_FACET)?
+    let mut result: Vec<_> = read_values::<BirthFacts, _>(graph, BIRTH_FACET)?
         .iter()
         .map(birth_resource)
         .collect::<Result<_, _>>()?;
     result.sort_by(|a, b| a.resource.id.cmp(&b.resource.id));
     Ok(result)
 }
-pub fn contacts(graph: &Graph) -> Result<Vec<ContactResource>, String> {
+pub fn contacts<G: SessionGraph>(graph: &G) -> Result<Vec<ContactResource>, String> {
     validate(graph)?;
     read_values(graph, CONTACT_FACET)
 }
-pub fn associations(graph: &Graph) -> Result<Vec<SubjectResourceAssociation>, String> {
+pub fn associations<G: SessionGraph>(graph: &G) -> Result<Vec<SubjectResourceAssociation>, String> {
     validate(graph)?;
     read_values(graph, ASSOCIATION_FACET)
 }
@@ -153,9 +152,9 @@ pub fn associations(graph: &Graph) -> Result<Vec<SubjectResourceAssociation>, St
 /// This additional owner-bound check prevents cross-persona contact insertion.
 /// Structural validation requires every contact association to resolve to one
 /// of these retained scoped contacts, including links to external domains.
-pub fn validate_for_persona(graph: &Graph, persona: &str) -> Result<(), String> {
+pub fn validate_for_persona<G: SessionGraph>(graph: &G, persona: &str) -> Result<(), String> {
     validate(graph)?;
-    for record in read_values::<ContactResource>(graph, CONTACT_FACET)? {
+    for record in read_values::<ContactResource, _>(graph, CONTACT_FACET)? {
         if let SubjectRef::Contact { scope, .. } = record.subject {
             if scope.as_str() != persona {
                 return Err("contact resource belongs to a different reservoir persona".into());
@@ -174,9 +173,9 @@ pub fn validate_for_persona(graph: &Graph, persona: &str) -> Result<(), String> 
 /// performs credential operations; lookup authority belongs to the resident.
 /// Pure cold replay must use structural validation, not introduce an empty
 /// `before` graph here as a substitute for its already admitted history.
-pub fn validate_new_profile_subjects(
-    before: &Graph,
-    after: &Graph,
+pub fn validate_new_profile_subjects<G: SessionGraph>(
+    before: &G,
+    after: &G,
     lookup: impl Fn(&personae::ProfileId) -> Result<bool, String>,
 ) -> Result<(), String> {
     validate(before)?;
@@ -191,13 +190,13 @@ pub fn validate_new_profile_subjects(
     Ok(())
 }
 
-fn profile_subjects(graph: &Graph) -> Result<BTreeSet<personae::ProfileId>, String> {
+fn profile_subjects<G: SessionGraph>(graph: &G) -> Result<BTreeSet<personae::ProfileId>, String> {
     let mut subjects = BTreeSet::new();
-    for subject in read_values::<BirthFacts>(graph, BIRTH_FACET)?
+    for subject in read_values::<BirthFacts, _>(graph, BIRTH_FACET)?
         .into_iter()
         .map(|facts| facts.subject)
         .chain(
-            read_values::<SubjectResourceAssociation>(graph, ASSOCIATION_FACET)?
+            read_values::<SubjectResourceAssociation, _>(graph, ASSOCIATION_FACET)?
                 .into_iter()
                 .map(|association| association.subject),
         )
@@ -209,33 +208,52 @@ fn profile_subjects(graph: &Graph) -> Result<BTreeSet<personae::ProfileId>, Stri
     Ok(subjects)
 }
 
-pub fn validate(graph: &Graph) -> Result<(), String> {
+pub fn validate<G: SessionGraph>(graph: &G) -> Result<(), String> {
+    // The node-facet form is refused outright, with no legacy reader (D246).
+    for (_, facets) in graph.facets().iter() {
+        if facets.iter().any(|(name, _)| is_personal(name.as_str())) {
+            return Err("personal records are resource facets, not node facets".into());
+        }
+    }
     let mut required = Vec::new();
-    let links = read_values::<SubjectResourceAssociation>(graph, ASSOCIATION_FACET)?;
-    for (key, node) in graph.nodes() {
-        let records = [BIRTH_FACET, CONTACT_FACET, ASSOCIATION_FACET]
+    let links = read_values::<SubjectResourceAssociation, _>(graph, ASSOCIATION_FACET)?;
+    for resource in graph.resources().resource_nodes() {
+        let iri = resource.canonical_iri();
+        let names: Vec<&str> = graph
+            .resources()
+            .facets()
+            .facets_of(&resource.id())
+            .map(|facets| facets.iter().map(|(name, _)| name.as_str()).collect())
+            .unwrap_or_default();
+        if names
             .iter()
-            .filter(|name| facet(graph, key, name).is_some())
+            .any(|name| is_personal(name) && !RECORD_FACETS.contains(name))
+        {
+            return Err("unsupported personal facet".into());
+        }
+        let records = names
+            .iter()
+            .filter(|name| RECORD_FACETS.contains(name))
             .count();
-        if !node.url().starts_with(PREFIX) {
+        if !iri.starts_with(PREFIX) {
             if records != 0 {
                 return Err("personal record has a noncanonical address".into());
             }
             continue;
         }
-        if records != 1 || node.id != Graph::node_namespace_id(node.url()) {
-            return Err("personal record needs canonical identity and one supported facet".into());
+        if records != 1 {
+            return Err("personal record needs one supported facet".into());
         }
-        if let Some(value) = facet(graph, key, BIRTH_FACET) {
+        if let Some(value) = facet(graph, iri, BIRTH_FACET) {
             let facts: BirthFacts = serde_json::from_value(value.clone()).map_err(err)?;
-            let resource = birth_resource(&facts)?;
-            if node.url() != resource.resource.id {
+            let birth = birth_resource(&facts)?;
+            if iri != birth.resource.id {
                 return Err("birth revision differs from its inputs".into());
             }
             require_contact(graph, &facts.subject)?;
-            required.push((facts.subject, resource.resource));
+            required.push((facts.subject, birth.resource));
         }
-        if let Some(value) = facet(graph, key, CONTACT_FACET) {
+        if let Some(value) = facet(graph, iri, CONTACT_FACET) {
             let record: ContactResource = serde_json::from_value(value.clone()).map_err(err)?;
             validate_subject(&record.subject)?;
             let SubjectRef::Contact { anchor, .. } = &record.subject else {
@@ -244,7 +262,7 @@ pub fn validate(graph: &Graph) -> Result<(), String> {
             let revision = digest(&record)?;
             if record.contact.petname.trim().is_empty()
                 || anchor != record.contact.anchor()
-                || node.url() != format!("{CONTACT_PREFIX}{revision}")
+                || iri != format!("{CONTACT_PREFIX}{revision}")
             {
                 return Err("contact identity/revision differs from its record".into());
             }
@@ -252,17 +270,17 @@ pub fn validate(graph: &Graph) -> Result<(), String> {
                 record.subject,
                 ResourceRef {
                     domain: DOMAIN.into(),
-                    id: node.url().into(),
+                    id: iri.into(),
                     revision,
                 },
             ));
         }
-        if let Some(value) = facet(graph, key, ASSOCIATION_FACET) {
+        if let Some(value) = facet(graph, iri, ASSOCIATION_FACET) {
             let value: SubjectResourceAssociation =
                 serde_json::from_value(value.clone()).map_err(err)?;
             value.validate().map_err(err)?;
             validate_subject(&value.subject)?;
-            if node.url() != format!("{ASSOCIATION_PREFIX}{}", digest(&value)?) {
+            if iri != format!("{ASSOCIATION_PREFIX}{}", digest(&value)?) {
                 return Err("association revision differs from its inputs".into());
             }
             check_binding(graph, &value)?;
@@ -276,21 +294,14 @@ pub fn validate(graph: &Graph) -> Result<(), String> {
             return Err("personal resource requires its matching subject association".into());
         }
     }
-    for (id, facets) in graph.facets().iter() {
-        for (name, _) in facets.iter() {
-            if name.as_str().starts_with("dramatis.")
-                && (![BIRTH_FACET, CONTACT_FACET, ASSOCIATION_FACET].contains(&name.as_str())
-                    || !graph.nodes().any(|(_, n)| &n.id == id))
-            {
-                return Err("unsupported or orphan personal facet".into());
-            }
-        }
-    }
     Ok(())
 }
-fn require_contact(graph: &Graph, subject: &SubjectRef) -> Result<(), String> {
+fn is_personal(facet: &str) -> bool {
+    facet.starts_with("dramatis.")
+}
+fn require_contact<G: SessionGraph>(graph: &G, subject: &SubjectRef) -> Result<(), String> {
     if matches!(subject, SubjectRef::Contact { .. })
-        && !read_values::<ContactResource>(graph, CONTACT_FACET)?
+        && !read_values::<ContactResource, _>(graph, CONTACT_FACET)?
             .iter()
             .any(|r| &r.subject == subject)
     {
@@ -309,94 +320,104 @@ fn validate_subject(subject: &SubjectRef) -> Result<(), String> {
         _ => Ok(()),
     }
 }
-fn check_binding(graph: &Graph, value: &SubjectResourceAssociation) -> Result<(), String> {
+fn check_binding<G: SessionGraph>(
+    graph: &G,
+    value: &SubjectResourceAssociation,
+) -> Result<(), String> {
     // Subject validity is independent of the target's owner. External links
     // skip local target binding, never retained-contact existence/scope checks.
     require_contact(graph, &value.subject)?;
     if value.resource.domain != DOMAIN {
         return Ok(());
     }
-    let (key, _) = graph
-        .get_node_by_url(&value.resource.id)
-        .ok_or("associated personal resource is absent")?;
-    let (subject, revision) = if let Some(facts) = facet(graph, key, BIRTH_FACET) {
+    let id = value.resource.id.as_str();
+    let (subject, revision) = if let Some(facts) = facet(graph, id, BIRTH_FACET) {
         let facts: BirthFacts = serde_json::from_value(facts.clone()).map_err(err)?;
         (facts.subject.clone(), digest(&facts)?)
-    } else if let Some(contact) = facet(graph, key, CONTACT_FACET) {
+    } else if let Some(contact) = facet(graph, id, CONTACT_FACET) {
         let contact: ContactResource = serde_json::from_value(contact.clone()).map_err(err)?;
         (contact.subject.clone(), digest(&contact)?)
-    } else {
+    } else if graph
+        .resources()
+        .resource(ResourceNode::for_term(id).id())
+        .is_some()
+    {
         return Err("unsupported personal association target".into());
+    } else {
+        return Err("associated personal resource is absent".into());
     };
     if subject != value.subject || revision != value.resource.revision {
         return Err("association subject/revision differs from its target".into());
     }
     Ok(())
 }
-fn read_values<T: serde::de::DeserializeOwned>(
-    graph: &Graph,
+fn read_values<T: serde::de::DeserializeOwned, G: SessionGraph>(
+    graph: &G,
     name: &str,
 ) -> Result<Vec<T>, String> {
     graph
-        .nodes()
-        .filter_map(|(key, _)| facet(graph, key, name))
+        .resources()
+        .resource_nodes()
+        .filter_map(|resource| facet(graph, resource.canonical_iri(), name))
         .map(|v| serde_json::from_value(v.clone()).map_err(err))
         .collect()
 }
-fn put_association(graph: &mut Graph, value: &SubjectResourceAssociation) -> Result<(), String> {
+fn put_association<G: SessionGraph>(
+    graph: &mut G,
+    value: &SubjectResourceAssociation,
+) -> Result<(), String> {
     put(
         graph,
         &format!("{ASSOCIATION_PREFIX}{}", digest(value)?),
-        "Subject resource",
         ASSOCIATION_FACET,
         value,
     )
 }
-fn facet<'a>(graph: &'a Graph, key: NodeKey, name: &str) -> Option<&'a serde_json::Value> {
-    let node = graph.get_node(key)?;
-    graph.facets().get(&node.id, &FacetId::new(name))
+/// The `name` facet of the resource at `iri`.
+fn facet<'a, G: SessionGraph>(
+    graph: &'a G,
+    iri: &str,
+    name: &str,
+) -> Option<&'a serde_json::Value> {
+    graph
+        .resources()
+        .facets()
+        .get(&ResourceNode::for_term(iri).id(), &FacetId::new(name))
 }
-fn put<T: Serialize>(
-    graph: &mut Graph,
+/// Writes `value` as the `name` facet of the resource at `address`, through
+/// the recorded resource-record write (the `page_claims` path).
+fn put<G: SessionGraph, T: Serialize>(
+    graph: &mut G,
     address: &str,
-    title: &str,
     name: &str,
     value: &T,
 ) -> Result<(), String> {
-    let key = graph
-        .get_node_by_url(address)
-        .map(|(key, _)| key)
-        .unwrap_or_else(|| {
-            add_node(
-                graph,
-                Some(Graph::node_namespace_id(address)),
-                address.into(),
-                PortablePoint::new(0., 0.),
-            )
-        });
     let value = serde_json::to_value(value).map_err(err)?;
-    if let Some(old) = facet(graph, key, name) {
+    if let Some(old) = facet(graph, address, name) {
         return if old == &value {
             Ok(())
         } else {
             Err("immutable personal resource cannot be overwritten".into())
         };
     }
-    apply_graph_delta(
-        graph,
-        GraphDelta::SetNodeTitle {
-            key,
-            title: title.into(),
-        },
-    );
-    apply_graph_delta(
-        graph,
-        GraphDelta::SetNodeFacet {
-            key,
-            facet: name.into(),
-            value,
-        },
-    );
+    let resource = ResourceNode::for_term(address);
+    let mut record = graph
+        .resources()
+        .resource_record(resource.id())
+        .unwrap_or_else(|| PersistedResourceRecord {
+            canonical_iri: resource.canonical_iri().to_owned(),
+            facets: Vec::new(),
+        });
+    record.facets.push(PersistedResourceFacet {
+        facet: name.to_owned(),
+        value_json: value.to_string(),
+    });
+    // A record write carries no attribution of its own: the session that
+    // journals it attributes the change.
+    let _ = graph.write_resource_record(&Author::user(), resource.id(), Some(record));
+    if facet(graph, address, name) != Some(&value) {
+        return Err("personal resource could not be written".into());
+    }
     Ok(())
 }
 fn err(e: impl std::fmt::Display) -> String {

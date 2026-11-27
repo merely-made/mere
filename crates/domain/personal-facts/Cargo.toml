@@ -12,11 +12,16 @@ blake3.workspace = true
 portolan.workspace = true
 gaz.workspace = true
 dramatis.workspace = true
-kernel.workspace = true
+# The session graph the records are written into (engine split D261).
+mere = { version = "0.1.0", path = "../../graph/engine", default-features = false }
 serde.workspace = true
 serde_json.workspace = true
 
 personae.workspace = true
+
+[dev-dependencies]
+# The tests write records into the kernel graph.
+kernel.workspace = true
 
 [lints]
 workspace = true
