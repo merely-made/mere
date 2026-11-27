@@ -35,151 +35,195 @@ derive = "https://mere.computer/ns/derivation#"
 "axis:presentation" = "present:generic"
 "axis:derivation" = "derive:not-derived"
 
+# Labels are the text users see (declared-lens D29): the forward label, and
+# the inverse read from object to subject, each row naming the Graphshell
+# table it reproduces. The containment, imported and provenance predicates
+# keep slugs until their old text is settled: the old UI named them per
+# family in one table and by short nouns in another.
+
 # The lens half: the core pack selects nothing beyond itself.
 [lens]
 
 # Families.
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:700 (D29).
 iri = "family:semantic"
 kind = "family"
-labels = { en = "semantic" }
+labels = { en = "Semantic" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:702 (D29).
 iri = "family:containment"
 kind = "family"
-labels = { en = "containment" }
+labels = { en = "Containment" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:704 (D29).
 iri = "family:imported"
 kind = "family"
-labels = { en = "imported" }
+labels = { en = "Imported" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:705 (D29).
 iri = "family:provenance"
 kind = "family"
-labels = { en = "provenance" }
+labels = { en = "Provenance" }
 
 # Semantic (edge_data.rs predicate_iri).
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:135 (D29).
 iri = "rel:hyperlink"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "hyperlink" }
+labels = { en = "Links to" }
+inverse-labels = { en = "Linked from" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:152 (D29).
 iri = "rel:user-grouped"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "user-grouped" }
+labels = { en = "Grouped with" }
+inverse-labels = { en = "Grouped with" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:153 (D29).
 iri = "rel:agent-derived"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "agent-derived" }
+labels = { en = "Derived relation to" }
+inverse-labels = { en = "Derived relation from" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:136 (D29).
 iri = "rel:cites"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "cites" }
+labels = { en = "Cites" }
+inverse-labels = { en = "Cited by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:137 (D29).
 iri = "rel:quotes"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "quotes" }
+labels = { en = "Quotes" }
+inverse-labels = { en = "Quoted by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:138 (D29).
 iri = "rel:summarizes"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "summarizes" }
+labels = { en = "Summarizes" }
+inverse-labels = { en = "Summarized by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:139 (D29).
 iri = "rel:elaborates"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "elaborates" }
+labels = { en = "Elaborates on" }
+inverse-labels = { en = "Elaborated by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:140 (D29).
 iri = "rel:example-of"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "example-of" }
+labels = { en = "Example of" }
+inverse-labels = { en = "Has example" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:141 (D29).
 iri = "rel:supports"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "supports" }
+labels = { en = "Supports" }
+inverse-labels = { en = "Supported by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:142 (D29).
 iri = "rel:contradicts"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "contradicts" }
+labels = { en = "Contradicts" }
+inverse-labels = { en = "Contradicted by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:143 (D29).
 iri = "rel:questions"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "questions" }
+labels = { en = "Questions" }
+inverse-labels = { en = "Questioned by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:144 (D29).
 iri = "rel:same-entity-as"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "same-entity-as" }
+labels = { en = "Same entity as" }
+inverse-labels = { en = "Same entity as" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:145 (D29).
 iri = "rel:duplicate-of"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "duplicate-of" }
+labels = { en = "Duplicate of" }
+inverse-labels = { en = "Has duplicate" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:146-147 (D29).
 iri = "rel:canonical-mirror-of"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "canonical-mirror-of" }
+labels = { en = "Canonical mirror of" }
+inverse-labels = { en = "Has canonical mirror" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:149 (D29).
 iri = "rel:depends-on"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "depends-on" }
+labels = { en = "Depends on" }
+inverse-labels = { en = "Required by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:150 (D29).
 iri = "rel:blocks"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "blocks" }
+labels = { en = "Blocks" }
+inverse-labels = { en = "Blocked by" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:151 (D29).
 iri = "rel:next-step"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "next-step" }
+labels = { en = "Next step" }
+inverse-labels = { en = "Previous step" }
 
 # Tags (resource.rs TAGGED_WITH_IRI).
 

@@ -21,9 +21,10 @@ fn record_digest(profile: &crate::profile::load::Profile) -> String {
 }
 
 // Recorded 2026-11-13 from the core pack and fixtures at this commit; a change
-// to either moves them, and that is the point.
-const CORE_RECORD: &str = "43b6017241b18dfe94fcec83f1332025047544f7e38b8f418d70fc8bdbc9d5f6";
-const WORKSPACE_RECORD: &str = "93d5e397d55682d091bb7045d696d10a41932453eec2a91d9a6fa7672d996fe0";
+// to either moves them, and that is the point. Moved 2026-11-27 when the
+// labels became display text with inverses (declared-lens D29).
+const CORE_RECORD: &str = "469d50a278c27e12f97f63bda355911181959ea07df54fe5cdb12c89b3a032c3";
+const WORKSPACE_RECORD: &str = "7239884823ac6cf6eeeab9cbfa69065ec9d03dfda83da79cd1a1d4cac0509d17";
 
 #[test]
 fn the_core_pack_alone_is_a_golden_record() {

@@ -19,21 +19,25 @@ stratum = "https://mere.computer/ns/stratum#"
 durability = "https://mere.computer/ns/durability#"
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:701 (D29).
 iri = "family:traversal"
 kind = "family"
-labels = { en = "traversal" }
+labels = { en = "Traversal" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:703 (D29).
 iri = "family:arrangement"
 kind = "family"
-labels = { en = "arrangement" }
+labels = { en = "Arrangement" }
 
 [[vocabulary.terms]]
+# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:134 (D29).
 iri = "ws:traversal"
 kind = "predicate"
 family = "family:traversal"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "traversal" }
+labels = { en = "Went to" }
+inverse-labels = { en = "Reached from" }
 
 [[vocabulary.terms]]
 iri = "rel:arrangement.frame-member"

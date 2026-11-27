@@ -11,5 +11,6 @@
 mod activation;
 mod cost;
 mod golden;
+mod labels;
 mod refusals;
 pub(crate) mod support;

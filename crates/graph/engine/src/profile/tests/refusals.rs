@@ -216,8 +216,8 @@ fn declare_and_verify_and_limits_refuse() {
     ));
     let handled = compiled(&edit(
         WORKSPACE,
-        "labels = { en = \"traversal\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
-        "handler = \"ws:trail\"\nlabels = { en = \"traversal\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
+        "inverse-labels = { en = \"Reached from\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
+        "handler = \"ws:trail\"\ninverse-labels = { en = \"Reached from\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
     ));
     let mut src = Source::of(vec![local(handled), local(compiled(WORKSPACE_LENS))]);
     assert!(matches!(

@@ -155,6 +155,9 @@ pub struct TermEntry {
     pub family_id: Option<TermId>,
     /// Language-tagged names supplied by the winning vocabulary.
     pub labels: BTreeMap<String, String>,
+    /// Language-tagged names read from object to subject ("Cited by" for
+    /// "Cites", declared-lens D29); empty when the row declares none.
+    pub inverse_labels: BTreeMap<String, String>,
     pub handler: Option<String>,
     /// The pack whose row this is, by id.
     pub pack: String,
@@ -164,22 +167,32 @@ pub struct TermEntry {
 impl TermEntry {
     /// Prefer the requested language, its parent tags, then English or the stable IRI.
     pub fn display_label(&self, language: &str) -> &str {
-        let mut tag = language;
-        while !tag.is_empty() {
-            if let Some((_, label)) = self
-                .labels
-                .iter()
-                .find(|(key, text)| key.eq_ignore_ascii_case(tag) && !text.trim().is_empty())
-            {
-                return label;
-            }
-            tag = tag.rsplit_once('-').map_or("", |(parent, _)| parent);
-        }
-        self.labels
-            .iter()
-            .find(|(key, text)| key.eq_ignore_ascii_case("en") && !text.trim().is_empty())
-            .map_or(&self.iri, |(_, label)| label)
+        pick_label(&self.labels, language).unwrap_or(&self.iri)
     }
+
+    /// The inverse label by [`display_label`](Self::display_label)'s
+    /// language fallback; `None` when the row declares no inverse.
+    pub fn display_inverse_label(&self, language: &str) -> Option<&str> {
+        pick_label(&self.inverse_labels, language)
+    }
+}
+
+/// The label for `language`, then its parent tags, then English.
+fn pick_label<'a>(labels: &'a BTreeMap<String, String>, language: &str) -> Option<&'a str> {
+    let find = |tag: &str| {
+        labels
+            .iter()
+            .find(|(key, text)| key.eq_ignore_ascii_case(tag) && !text.trim().is_empty())
+            .map(|(_, label)| label.as_str())
+    };
+    let mut tag = language;
+    while !tag.is_empty() {
+        if let Some(label) = find(tag) {
+            return Some(label);
+        }
+        tag = tag.rsplit_once('-').map_or("", |(parent, _)| parent);
+    }
+    find("en")
 }
 
 /// Dense id to term; IRI to id; the core defaults for unknown IRIs.
@@ -314,6 +327,7 @@ pub(crate) fn intern(
             family: term.family.clone(),
             family_id: term.family.as_ref().and_then(|f| by_iri.get(f).copied()),
             labels: term.labels.clone(),
+            inverse_labels: term.inverse_labels.clone().unwrap_or_default(),
             handler: term.handler.clone(),
             pack: pack.to_string(),
             row: row(term, pack, &defaults, diagnostics),
