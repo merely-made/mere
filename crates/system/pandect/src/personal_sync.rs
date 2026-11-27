@@ -268,6 +268,16 @@ pub struct BlobAvailabilityObservation {
     pub at_ms: u64,
 }
 
+/// One signed authoring turn.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PersonalGraphRecord {
+    pub events: Vec<PersonalGraphEvent>,
+    #[serde(default)]
+    pub parents: Vec<[u8; 32]>,
+    #[serde(default)]
+    pub writer_attestation: Option<DerivedKeyAttestation>,
+}
+
 /// Stable persona roots admitted to one personal graph pool.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SyncRoster {

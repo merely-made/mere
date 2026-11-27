@@ -70,13 +70,3 @@ impl<'de> Deserialize<'de> for RelationClaim {
         }
     }
 }
-
-/// One signed authoring turn.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PersonalGraphRecord {
-    pub events: Vec<PersonalGraphEvent>,
-    #[serde(default)]
-    pub parents: Vec<[u8; 32]>,
-    #[serde(default)]
-    pub writer_attestation: Option<DerivedKeyAttestation>,
-}
