@@ -20,6 +20,7 @@ use eidetic::{
 };
 use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
+use mere::session::SessionGraph;
 use serde::{Deserialize, Serialize};
 
 use crate::graph_placement::{PlacementProfile, materialize_snapshot_with};
@@ -90,45 +91,73 @@ impl TransferScope {
 }
 
 /// A graph selection, with a version-4 scene when it carries one (F159).
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ProductCodicilV3 {
+///
+/// Generic over the graph whose snapshot it carries (engine split D254); a
+/// consumer names its graph through its per-crate alias.
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(bound = "")]
+pub struct ProductCodicilV3<G: SessionGraph = Graph> {
     pub schema: String,
     pub scope: TransferScope,
     pub exported_at_ms: u64,
-    pub graph: GraphSnapshot,
+    pub graph: G::Snapshot,
     pub facets: NodeFacetStore,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scene: Option<SavedSceneV3>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ProfiledProductCodicil {
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(bound = "")]
+pub struct ProfiledProductCodicil<G: SessionGraph = Graph> {
     #[serde(flatten)]
-    pub product: ProductCodicilV3,
+    pub product: ProductCodicilV3<G>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub placement: Option<PlacementProfile>,
 }
 
-impl std::ops::Deref for ProfiledProductCodicil {
-    type Target = ProductCodicilV3;
+// Debug by hand, so it asks nothing of the graph type itself (D244).
+impl<G: SessionGraph> std::fmt::Debug for ProductCodicilV3<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ProductCodicilV3")
+            .field("schema", &self.schema)
+            .field("scope", &self.scope)
+            .field("exported_at_ms", &self.exported_at_ms)
+            .field("graph", &self.graph)
+            .field("facets", &self.facets)
+            .field("scene", &self.scene)
+            .finish()
+    }
+}
+
+impl<G: SessionGraph> std::fmt::Debug for ProfiledProductCodicil<G> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ProfiledProductCodicil")
+            .field("product", &self.product)
+            .field("placement", &self.placement)
+            .finish()
+    }
+}
+
+impl<G: SessionGraph> std::ops::Deref for ProfiledProductCodicil<G> {
+    type Target = ProductCodicilV3<G>;
     fn deref(&self) -> &Self::Target {
         &self.product
     }
 }
 
-impl std::ops::DerefMut for ProfiledProductCodicil {
+impl<G: SessionGraph> std::ops::DerefMut for ProfiledProductCodicil<G> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.product
     }
 }
 
-impl TypedPayload for ProductCodicilV3 {
+impl<G: SessionGraph> TypedPayload for ProductCodicilV3<G> {
     fn schema_ref() -> SchemaRef {
         *PRODUCT_CODICIL_SCHEMA_REF
     }
 }
 
-impl TypedPayload for ProfiledProductCodicil {
+impl<G: SessionGraph> TypedPayload for ProfiledProductCodicil<G> {
     fn schema_ref() -> SchemaRef {
         *PRODUCT_CODICIL_SCHEMA_REF
     }
@@ -156,7 +185,7 @@ pub fn profiled_codicil_graph(
 }
 
 /// [`profiled_codicil_graph`] over any graph (engine split D257).
-pub fn profiled_codicil_graph_with<G: mere::session::SessionGraph>(
+pub fn profiled_codicil_graph_with<G: SessionGraph>(
     snapshot: G::Snapshot,
     facets: NodeFacetStore,
     placement: Option<PlacementProfile>,
@@ -169,11 +198,34 @@ pub fn profiled_codicil_graph_with<G: mere::session::SessionGraph>(
 /// Decode a codicil's payload, refusing a foreign schema, a relation naming an
 /// object outside the selection, and a graph that does not materialize.
 pub fn decode_profiled_codicil(bytes: &[u8]) -> Result<ProfiledProductCodicil, InvalidCodicil> {
+    decode_profiled_codicil_with::<Graph>(bytes)
+}
+
+/// [`decode_profiled_codicil`] over any graph (engine split D254). The
+/// selection check reads node ids and relation ends from the snapshot's
+/// stored form, which every graph's snapshot keeps.
+pub fn decode_profiled_codicil_with<G: SessionGraph>(
+    bytes: &[u8],
+) -> Result<ProfiledProductCodicil<G>, InvalidCodicil> {
     #[derive(Deserialize)]
     struct Head {
         schema: String,
         #[serde(default)]
         placement: Option<PlacementProfile>,
+    }
+    #[derive(Deserialize)]
+    struct Selection {
+        nodes: Vec<SelectedNode>,
+        edges: Vec<SelectedEdge>,
+    }
+    #[derive(Deserialize)]
+    struct SelectedNode {
+        node_id: String,
+    }
+    #[derive(Deserialize)]
+    struct SelectedEdge {
+        from_node_id: String,
+        to_node_id: String,
     }
     let invalid = |error: serde_json::Error| InvalidCodicil(error.to_string());
     let Head { schema, placement } = serde_json::from_slice(bytes).map_err(invalid)?;
@@ -182,14 +234,16 @@ pub fn decode_profiled_codicil(bytes: &[u8]) -> Result<ProfiledProductCodicil, I
             "expected {PRODUCT_CODICIL_SCHEMA}, found {schema}"
         )));
     }
-    let codicil = serde_json::from_slice::<ProductCodicilV3>(bytes).map_err(invalid)?;
-    let ids: HashSet<_> = codicil
-        .graph
+    let codicil = serde_json::from_slice::<ProductCodicilV3<G>>(bytes).map_err(invalid)?;
+    let selection = serde_json::to_value(&codicil.graph)
+        .and_then(serde_json::from_value::<Selection>)
+        .map_err(invalid)?;
+    let ids: HashSet<_> = selection
         .nodes
         .iter()
         .map(|node| node.node_id.as_str())
         .collect();
-    if codicil.graph.edges.iter().any(|edge| {
+    if selection.edges.iter().any(|edge| {
         !ids.contains(edge.from_node_id.as_str()) || !ids.contains(edge.to_node_id.as_str())
     }) {
         return Err(InvalidCodicil(
@@ -200,6 +254,6 @@ pub fn decode_profiled_codicil(bytes: &[u8]) -> Result<ProfiledProductCodicil, I
         product: codicil,
         placement,
     };
-    profiled_codicil_graph(input.graph.clone(), input.facets.clone(), input.placement)?;
+    profiled_codicil_graph_with::<G>(input.graph.clone(), input.facets.clone(), input.placement)?;
     Ok(input)
 }
