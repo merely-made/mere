@@ -490,17 +490,25 @@ kind, and v1 is deleted.
   longer appears at Eidetic `origin/main`.
 
 ### L7. The core pack replaces the predicate enums
-This is the debt D6 and D8 name. The steps:
+This is the debt D6 and D8 name. The steps, as ruled at its assessment (D16 to D27,
+`Code/testing/engine-split/l7_assessment.md`):
 - `SemanticSubKind`, `EdgeFamily` and the other family enums give way to the generated constants
-  and axis rows;
-- stored data migrates by journal replay (D8; graph semantics ruling 11);
-- `predicate_declarations.rs` stays in the kernel until P8 moves it. Its per-mere declarations
-  become a local pack, read in the same record shape (lessons §5).
+  and axis rows; consumers write by IRI and match on generated ids (D20), and the traversal and
+  arrangement types leave the engine for incipit-graph (D22);
+- new writes store a relation as the UUIDv5 of its IRI with the core pack's digest in the version
+  header (D16), the enum-named stored fields stop being written, and old entries still replay
+  (D17); stored bytes need not be preserved;
+- the core profile is process-wide (D23); each mere's predicate declarations stay resource records
+  (types in the engine, graph half in incipit-graph, engine-split D213) and compile into a local
+  pack at session open (D24);
+- personal facts become statements under a dramatis pack, with D147's digest at v2 and no reader
+  for the old facets (D25, D26).
 
 - Needs: L3 passing, L2.
 - Done when:
   - no engine code matches on a predicate enum outside the generated constants;
-  - a replay test reopens a pre-migration journal with identical held assertions;
+  - a replay test reopens a pre-migration journal with identical held assertions (D18: a Mere
+    fixture written before any type change; relations only, the facts lane by D25);
   - the conformance rows hold.
 
 ### L8. P7's pack
@@ -755,6 +763,54 @@ removes it.
 
   Links: area The stack · draws on declared-lens D9, declared-lens D13 · plans engine-split P6 · summary L3 passes: the pack path costs at most 0.10% of the steady two-hop frame at 100k, and the migration reads a flat dense-id table.
 
+- **D16. A stored relation's identity is the UUIDv5 of its IRI, as lessons D11 ruled (Mark, 2026-11-27):** L7's assessment (`Code/testing/engine-split/l7_assessment.md`, F1) found canonical assertion records storing the predicate IRI as text (`persistence_edge.rs:176`; all seven in Graphshell's frozen journal) and offered keeping that text, missing lessons D11. Mark: "you have to do the uuid for logsync, no? you're presenting it like any of these can do it, what's the point of uuid if so". Lessons D11 had ruled "UUIDv5 of the IRI (Recommended)": the resource keys' scheme, 16 bytes, stable across pack versions, with lessons D8's pack digest in the version header. So new writes store the UUIDv5 of the predicate IRI and each journal and snapshot header carries the core pack's digest; the generated dense ids, which renumber when a core term is added, are never stored. Outcome: applies linked-data-platform-lessons D8 and D11.
+
+  Links: area The stack · draws on linked-data-platform-lessons D8, linked-data-platform-lessons D11 · plans engine-split P8 · summary Stored relation identity is the UUIDv5 of the predicate IRI, with the core pack's digest in the version header; dense ids are never stored.
+
+- **D17. Enum-named stored fields stop being written; old data is still read (Mark, 2026-11-27):** F2. `families`, `recognized_sub_kind`, the legacy sidecars, `PersistedNavigationTrigger`, Graphshell's surface journal entries (embedding `EdgeAssertion`, `RelationSelector`, `NavigationTrigger`) and pandect's signed sync events store enum variant names, and the v2 journal digest hashes them (`muniment/src/journal/digest.rs:135-138`). "New writes IRI-only, old read", and, asked mid-round, "stored bytes don't need preserving for a prototype!": new entries are written in the identity of D16 and old entries still replay through readers that map the stored names to IRIs. History and its digests stay; new entries differ; the snapshot schema bumps. Graphshell's byte-pinning wire fixtures are regenerated where a shape changes. Against frozen legacy wire types that keep every byte, and against rewriting stored data on open. Outcome: refines lessons D8's "migrated by replay".
+
+  Links: area The stack · draws on linked-data-platform-lessons D8, declared-lens D16 · plans engine-split P8 · summary New writes drop the enum-named fields and old entries still read; stored bytes need not be preserved in a prototype.
+
+- **D18. The replay test reopens a new Mere fixture (Mark, 2026-11-27):** F9. Mere has no frozen journal of its own; Graphshell's wire fixtures and incipit-session's stores were written by the old kernel. "New Mere fixture first (Recommended)": L7's first lane has today's engine write a journal and a sync record before any type changes, and "identical" means the same held assertions (pair, statement id, predicate IRI, scope, basis, times, withdrawal). Against reusing Graphshell's fixtures, and both. Outcome: applies L7's done-condition.
+
+  Links: area The stack · draws on declared-lens D17 · plans engine-split P8 · summary L7's replay test reopens a journal and sync record today's engine writes before any type changes, and compares held assertions.
+
+- **D19. Graphshell's hidden-relation view state moves to IRIs (Mark, 2026-11-27):** F13. `HiddenRelationRecord.relation_tag: u32` (`incipit/src/view.rs:64-73`) stores the family byte shifted left 24 plus the sub-kind ordinal, and legacy migration keys on it; nothing computes it once the enums go. "Move view state to IRIs": view state stores the IRI, old tags are read once and rewritten. Against a frozen tag table in incipit, and against the engine keeping the ordinal table. Outcome: applies D17.
+
+  Links: area The stack · draws on declared-lens D17 · plans engine-split P8 · summary Graphshell's hidden relations store IRIs; old ordinal tags are read once.
+
+- **D20. Consumers write by IRI and match on generated ids (Mark, 2026-11-27):** F3. Graphshell (95 production lines), Turnstone (28) and Cleromancy (66) build `EdgeAssertion`s from the enums, and Graphshell's cartography, roster and placement code match on them; an IRI-keyed write path exists (`SemanticStatementSpec`). "Generated ids + IRI constants only (Recommended)": consumers write by IRI and match on the core pack's generated ids, families and axis rows, and first-party code keeps no predicate enum. Against a host-side UI vocabulary in Graphshell, and against an engine names module. Outcome: applies linked-data-platform-lessons D8.
+
+  Links: area The stack · draws on linked-data-platform-lessons D8 · plans engine-split P8 · summary No first-party predicate enum survives: consumers write by IRI and match on the core pack's generated ids and axis rows.
+
+- **D21. "No engine code matches" means the Mere workspace (Mark, 2026-11-27):** F4. incipit-graph is Graphshell's (engine-split D211); pandect has 21 production lines on the sync wire; engine-split D145 read "the engine" in P8 as the Mere workspace. "The Mere workspace (Recommended)": the engine, pandect, catchment, mere-facts, ontology and shacl, with D17's old-name readers counted as conversion, not matching; Graphshell is held to D20 but not to the grep. Against the `mere` crate alone and against adding incipit-graph and incipit-session. Outcome: applies engine-split D145.
+
+  Links: area The stack · draws on engine-split D145, engine-split D211, declared-lens D20 · plans engine-split P8 · summary L7's no-enum check covers the Mere workspace; old-name readers are conversion.
+
+- **D22. The workspace types leave the engine in L7 (Mark, 2026-11-27):** F5. Engine-split D212 has traversal and arrangement "leave the engine through L7"; about 135 engine lines in 9 files name workspace terms (the lens plan said 22 in 2), `EdgePayload` holds traversal data and `PersistedEdge` carries surface fields for both strata. "Split them out in L7 (Recommended)": the engine's payload and persisted edge keep assertions only and incipit-graph owns its surface edge record, traversal and arrangement; stored shapes change under D17, and old ones still read. Against moving the runtime enums only, and against deferring to L8. Outcome: applies engine-split D212.
+
+  Links: area The stack · draws on engine-split D212, declared-lens D17 · plans engine-split P8 · summary Traversal and arrangement leave the engine in L7; incipit-graph owns the surface edge record.
+
+- **D23. The core profile is process-wide; each mere's declarations layer per session (Mark, 2026-11-27):** F6. No session, graph or store holds a `Profile`; placement routing calls `built_in_predicate_stratum` on every assert (`assertion_write.rs:136, 216`); D14 has scenes carry pins and D15 wants a flat table built at load. "Process-wide core, per-session declarations (Recommended)": a core profile built once from the embedded pack serves the built-ins, a mere's declarations layer per session from its stored records, there is no API change at open, and a per-session lens pin comes when P6 or P7 first needs a non-core lens. Against every session holding its Profile now. Outcome: applies D14 and D15.
+
+  Links: area The stack · draws on declared-lens D14, declared-lens D15 · plans engine-split P8 · summary One core profile per process with D15's flat table; per-mere declarations layer at session open.
+
+- **D24. Predicate declarations stay resource records and compile to a local pack at open (Mark, 2026-11-27):** F7. They are JSON facets (`semantic.predicate-declarations/v1`, `predicate_declarations.rs:18-37`), merged one by one by pandect's merge rules and replicated as resource records; engine-split D213 has them "become pack data under L7", lessons §5 "a local pack, read in the same record shape". "Records stay, compiled to a pack at open (Recommended)": at open the engine compiles them into an in-memory local vocabulary pack layered after core, refusing conflicting declarations as unsettled overlaps. Against storing them as a `mere.pack/2` blob, and both. Outcome: applies engine-split D213.
+
+  Links: area The stack · draws on engine-split D213, declared-lens D23 · plans engine-split P8 · summary Declarations keep merging as resource records and compile into a local pack at open.
+
+- **D25. Personal facts become statements under a dramatis pack (Mark, 2026-11-27):** F8. Associations are IRI to IRI; birth and contact facts are literals (`birth.rs:306-321`); the resource graph exports neither literals nor facets (`projection.rs:258-288`), and D147's digest covers exported quads only. "Dramatis pack, literals for declared terms (Recommended)": associations become resource edges, birth and contact fields literal statements on the record's IRI, the resource graph exports literals for declared terms only, and D147's resource digest goes to v2. Against exporting every literal and against associations alone. Outcome: applies engine-split D247.
+
+  Links: area The stack · draws on engine-split D247, engine-split D147 · plans engine-split P8 · summary Facts are statements under a dramatis vocabulary pack, literals exported for declared terms only, and the resource digest moves to v2.
+
+- **D26. Old facet-stored facts are a clean break (Mark, 2026-11-27):** mere-facts' three facets on `mere://personal-facts/...` IRIs. "Clean break, as D246 (Recommended)": old facet records are not read once facts are statements. Against reading them once and rewriting on open. Outcome: applies engine-split D246.
+
+  Links: area The stack · draws on engine-split D246, declared-lens D25 · plans engine-split P8 · summary Facts stored as facets before L7 are not read afterwards.
+
+- **D27. L7's smaller forks take the recommendations, and the stale L7 text is read against newer rulings (Mark, 2026-11-27):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) The `mere.pack/2` row keeps its parity half: the 44-row placement table, with Traversal and the open predicate, is frozen as test data once `built_in_relation_stratum` goes. (2) `profile::vocab::alignment`'s CiTO and PROV rows become `owl:equivalentProperty` and `rdfs:subPropertyOf` declarations in a first-party alignment pack beside `mere-ontology`'s citation pack. (3) `RelationDurability` goes; the encoder reads the pack's durability axis. Readings: L7's "stays in the kernel until P8 moves it" is stale, the kernel being gone (engine-split D213, D274); with D17 "migrates by journal replay" is old entries replaying through readers, checked by D18's test; lessons §5's rkyv migration no longer describes user data, since no production path writes rkyv; "identical held assertions" holds for relations only, so the facts lane is checked by D25's statements and D147 v2. Outcome: applies D9, D15, D17.
+
+  Links: area The stack · draws on declared-lens D9, declared-lens D15, declared-lens D17 · plans engine-split P8 · summary The pack row keeps a frozen parity table, alignment becomes pack rows, RelationDurability gives way to the durability axis, and L7's stale kernel wording is read against D213.
+
 ## Findings
 
 - 2026-11-12: read at Mere `origin/main` `48fbe3d8d`, Eidetic `1371574`, Graphshell `a377c352`,
@@ -793,3 +849,8 @@ removes it.
 - 2026-11-12: L1 landed on `eidetic` main `c96bea1`, "Pack header mere.pack/2 and its COSE_Sign1 envelope". `PackHeader` with its CDDL (`crates/eidetic-core/src/pack/mere-pack-2.cddl`), the strict canonical codec, multihash digests (BLAKE3, SHA-256), detached COSE_Sign1 sign and verify behind `pack-signing`, the verdict, and `TrustPolicy::admit` for D3; `mere.pack/1` unchanged. The cose-wg Examples are vendored at `Code/crates/cose-examples` (`53c9d63`); four Ed25519 Sign1 examples verify and `eddsa-sig-01` re-signs byte for byte. Costs and test counts are in the receipt file. Four muniment `redb_backend::upgrade_tests` fail on Windows with "Access is denied" identically at untouched `origin/main`, outside this work. D11 (RDFC's poison limit) and D12 (the header's open format details) recorded.
 - 2026-11-13: L2 built on branches `lens/l2`, not landed: `eidetic` `41ec454`, "Pack bodies for mere.pack/2" (typed vocabulary and lens bodies, their CDDL, and the authored compiler behind `pack-authoring`); Mere: `mere::profile::{pack, resolve, intern, lens, load}`, the core pack in `profile/core/pack.toml` compiled by build.rs with its id constants, a test-only workspace stand-in and fixture lens (D13), the pack-format ledger row, and the placement test run against the pack as well. Mere builds against the Eidetic branch through an uncommitted `--config` patch, so the Eidetic commit lands first. Evidence in the receipt file, "L2, bodies, loader and core pack".
 - 2026-11-13: L3 probe landed on Mere main (D15): `crates/graph/graph-kernel/examples/lens_dispatch.rs` times the enum match against dense-id axis-row lookup over 10k and 100k edges, with the empty loop, an equality check over all 46 kinds, a mutation proof and P5's headless frame rows in the same run. Pack minus enum is negative on a mixed column (-485 us per frame at 100k) and at worst +44.9 us at 100k on a uniform column through a per-edge call, 0.10% of the steady two-hop frame (45.0 ms); D9's denominator was a fork, ruled as the steady two-hop frame (D15). Receipts: the L3 section. No enum removed; L7 may now proceed when its other needs hold.
+- 2026-11-27: L2's correction: it landed after the entry above (Mere `47a2b976a`, `f23d3cb4d`; Eidetic `41ec454`).
+- 2026-11-27: L7 assessed (`Code/testing/engine-split/l7_assessment.md`) and its forks ruled in three rounds
+  (D16 to D27): about 1,150 production and 1,450 test lines name the predicate enums across Mere, Graphshell,
+  Turnstone and Cleromancy, 457 of them in the engine. Stored identity becomes the UUIDv5 of the IRI (lessons D11);
+  stored bytes need not be preserved, and old entries still read. Nothing built yet.

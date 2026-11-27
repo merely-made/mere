@@ -575,6 +575,102 @@ summary = "L3 passes: the pack path costs at most 0.10% of the steady two-hop fr
 draws_on = ["declared-lens D9", "declared-lens D13"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D16"]
+title = "A stored relation's identity is the UUIDv5 of its IRI, as lessons D11 ruled (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Stored relation identity is the UUIDv5 of the predicate IRI, with the core pack's digest in the version header; dense ids are never stored."
+draws_on = ["linked-data-platform-lessons D8", "linked-data-platform-lessons D11"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D17"]
+title = "Enum-named stored fields stop being written; old data is still read (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "New writes drop the enum-named fields and old entries still read; stored bytes need not be preserved in a prototype."
+draws_on = ["declared-lens D16", "linked-data-platform-lessons D8"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D18"]
+title = "The replay test reopens a new Mere fixture (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "L7's replay test reopens a journal and sync record today's engine writes before any type changes, and compares held assertions."
+draws_on = ["declared-lens D17"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D19"]
+title = "Graphshell's hidden-relation view state moves to IRIs (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Graphshell's hidden relations store IRIs; old ordinal tags are read once."
+draws_on = ["declared-lens D17"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D20"]
+title = "Consumers write by IRI and match on generated ids (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "No first-party predicate enum survives: consumers write by IRI and match on the core pack's generated ids and axis rows."
+draws_on = ["linked-data-platform-lessons D8"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D21"]
+title = "\"No engine code matches\" means the Mere workspace (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "L7's no-enum check covers the Mere workspace; old-name readers are conversion."
+draws_on = ["declared-lens D20", "engine-split D145", "engine-split D211"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D22"]
+title = "The workspace types leave the engine in L7 (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Traversal and arrangement leave the engine in L7; incipit-graph owns the surface edge record."
+draws_on = ["declared-lens D17", "engine-split D212"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D23"]
+title = "The core profile is process-wide; each mere's declarations layer per session (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "One core profile per process with D15's flat table; per-mere declarations layer at session open."
+draws_on = ["declared-lens D14", "declared-lens D15"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D24"]
+title = "Predicate declarations stay resource records and compile to a local pack at open (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Declarations keep merging as resource records and compile into a local pack at open."
+draws_on = ["declared-lens D23", "engine-split D213"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D25"]
+title = "Personal facts become statements under a dramatis pack (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Facts are statements under a dramatis vocabulary pack, literals exported for declared terms only, and the resource digest moves to v2."
+draws_on = ["engine-split D147", "engine-split D247"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D26"]
+title = "Old facet-stored facts are a clean break (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Facts stored as facets before L7 are not read afterwards."
+draws_on = ["declared-lens D25", "engine-split D246"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D27"]
+title = "L7's smaller forks take the recommendations, and the stale L7 text is read against newer rulings (Mark, 2026-11-27)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The pack row keeps a frozen parity table, alignment becomes pack rows, RelationDurability gives way to the durability axis, and L7's stale kernel wording is read against D213."
+draws_on = ["declared-lens D9", "declared-lens D15", "declared-lens D17"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"
