@@ -108,22 +108,25 @@ fetch I/O, cookies. A browser engine renders through a host and serves nothing; 
 
 Every non-probe crate in Mere today (62), by receiving home. "Split" names the seam.
 
-**Stay in Mere, the engine.** `graph-kernel` (resource half only; the surface half leaves,
-see Graphshell), `linked-data` (folds into the engine crate), the dataset WIT interface (new),
-the pack loader (new).
+**Stay in Mere, the engine.** `graph-kernel` retired at P8 lane 4: its resource half is the
+engine's `model` (P5 L3, D243; the stored legacy shapes, property merge and clock, D273), its
+surface half Graphshell's `incipit-graph` (D211). `linked-data` (folds into the engine crate),
+the dataset WIT interface (new), the pack loader (new), and `mere-test-surface` (unpublished,
+dev-only: the shared test graph, D272, D274).
 
 **Stay in Mere, beside the engine.** `pandect` (graph-domain revision lifecycle only: admission,
 fold, branch, merge, replay; its reservoir half becomes the reservoir service crate, its
 sessions, manifests, view sidecars, worker declarations, settings and furnace paths are traced
 to their owners in P4: D43 to D47, D77 to D79, D86, D87 and D134 to D136, with `facet_store` and
-the saved-scene wire types staying as graph state), the reservoir service (new crate from `pandect::reservoir`:
+the saved-scene wire types staying as graph state; generic over the engine's `SessionGraph`, D241,
+D244, D264, its surface readers `incipit-session`'s, D256, deleted from pandect at lane 4), the reservoir service (new crate from `pandect::reservoir`:
 persona and domain catalog, access, store lifetimes, sealing, and generic replication when the
 domain adoption plan's M4 builds it, D133), `mere-facts` (the persona's facts domain; its admission policy stays with
 the domain owner, as the contract says). The reservoir service crate is `catchment` (D9). `mere-framing` and `state-witness`
 moved to Eidetic under D12 and are no longer Mere's.
 
-**Graphshell: the host.** Workspace half of `graph-kernel` as the workspace kernel, which
-grows out of `incipit` and takes its name (D8: surfaces, trails, arrangements, bindings to
+**Graphshell: the host.** The surface half of `graph-kernel` as `incipit-graph` (D211) and
+pandect's surface readers as `incipit-session` (D256), both grown out of `incipit` (D8: surfaces, trails, arrangements, bindings to
 resource references by UUIDv5; the graph and session ids stay reachable behind a minimal
 default feature so Cleromancy and Fleece keep depending on ids alone),
 the `mere` facade's navigation, trail and roster logic (its visual and workbench APIs to the
@@ -3301,6 +3304,10 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
 
   Links: area The stack · draws on engine-split D213, engine-split D256, engine-split D269 · plans engine-split P8 · summary pandect picks a component part over any graph, the engine holds the stored legacy shapes, and kernel-written stores are frozen as postcard fixtures.
 
+- **D274. Lane 4b's smaller forks take the recommendations (Mark, 2026-11-27):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) The shared Surface is a new unpublished crate, `mere-test-surface` at `crates/graph/test-surface` (`publish = false`, dev-dependency only), because mere-facts depends only on `mere` and the crate, depending on no pandect, serves pandect's lib tests without duplicating its types; pandect's publication and codicil hooks and the sync fold stay in `pandect/tests/support`. (2) Four tests move to Graphshell, not onto the Surface, because what they test is Graphshell's now: `transact_live_refuses_a_change_whole`, `the_replay_check_compares_equal_across_a_second_tick`, `p1_sync_legacy_retraction_keeps_exact_claims_in_both_stores` (a unit test in incipit-session's `src`, so `retract_legacy` stays private) and `a_product_codicil_written_before_the_change_re_encodes_unchanged` (its fixture holds a kernel snapshot). (3) The Surface grows only as far as the ported tests need: a projected quad per surface, statement handles across resource pairs and surface facets, D251's attribution carry, pending links as held state, copied-from derivations, recorded surface facets, a retired edit with no live form, snapshot record checks, and a statement API for every relation family. (4) Kernel-specific halves of ported tests are dropped by name in the test map, the generic halves kept; with no receipt constructor after D269, the receipt collision check has no Mere test, and incipit-session's frozen receipts cover receipt reading. (5) The lane's `prettyplease@0.2.37` skip in Graphshell's `deny.toml` is not taken: bindgen 0.73.2 accepts prettyplease 0.3, so a fresh resolve holds one version and bans pass on main's `deny.toml`; the duplicate was a stale resolve (D137). Outcome: applies D137, D269, D272.
+
+  Links: area The stack · draws on engine-split D137, engine-split D269, engine-split D272 · plans engine-split P8 · summary The shared test graph is the unpublished mere-test-surface crate, four tests follow their code to Graphshell, and the stale prettyplease skip is dropped.
+
 ## Open questions
 
 - **Closed 2026-11-09 (Mark: "Close all five").** F7 is closed by D19: tinct is in the
@@ -4386,3 +4393,12 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   needed porting. From git with no patch config, Graphshell host and Turnstone check clean against the new Mere main and
   incipit-session passes 127 of 127; resolved notes were re-recorded. The graph-kernel deletion waits on lane 4b, which
   ports pandect's and mere-facts' kernel-graph tests onto the dev-only Surface (D272).
+- 2026-11-27: Lane 4 landed: graph-kernel is gone. Graphshell `f61ae5c9` carries pandect's 44 tests of the kernel code
+  it now holds; then Mere `a5baf7f3f` deleted graph-kernel and pandect's kernel copies (D269's qualification, the
+  `KERNEL` hooks, D244's default `G`, the `furnace` feature) and runs pandect's and mere-facts' tests on the unpublished
+  `mere-test-surface` (D272, D274): pandect 138 passed and 1 ignored (was 321 and 1), mere-facts 15, incipit-session 171
+  (was 127), with 13 break-and-restore controls across the ported tests and every move mapped in
+  `testing/engine-split/lane4b_test_map.md`. Mere's workspace is eight crates. From git with no patch config,
+  Graphshell host, Turnstone, Knot, Cleromancy and Distillery's athanor check clean against it, `cargo tree -i
+  mere-kernel` matches nothing in any root, and resolved notes were re-recorded. mere-kernel 0.0.3 stays on crates.io,
+  unyanked. L7 (D215) is next.
