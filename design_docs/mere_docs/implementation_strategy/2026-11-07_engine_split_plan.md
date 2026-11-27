@@ -4362,3 +4362,12 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   personal-sync projections and a stored `LegacySurfaceV1` receipt open through incipit-session unchanged, each with a tamper
   or wrong-schema control and a mutation check. Mere and Graphshell carry a `constant_time_eq@0.4.2` bans skip as a stopgap
   (Graphshell mod projects D58). Lane 3, the consumer flips, is next.
+- 2026-11-27: Lane 3 of the kernel move landed: every consumer's kernel is incipit-graph and its sessions incipit-session's.
+  Pushed back to back in 29 seconds (D263, D271): Mere `83357a9d8` (ProductCodicilV3 takes `G`, D254; the facts rewrite,
+  D246, D247, D261), Graphshell `f9179e1e` (aliases, D244; the tamper test, D248; the kernel's re-exports retire, D141;
+  legacy qualification dropped, D269), Distillery `dfb86e3`, Turnstone `ac0e720b`, Knot `be0ec6e` and Cleromancy `66e7f09`,
+  the last two after the `constant_time_eq@0.4.2` stopgap skip (D270). Callers keep pandect's method names (D267) and fold
+  through `projection_with(&IncipitFold)` (D268). Checks, tests and warnings match unpatched main root for root; stores,
+  journals and codicils written by the old main open unchanged, with tamper controls; `cargo tree -i mere-kernel` reaches
+  consumers only through pandect. After landing, each main checks green from git with no patch config and its resolved
+  notes were re-recorded. Lane 4, Mere dropping graph-kernel and pandect's kernel copies, is next.
