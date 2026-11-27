@@ -345,6 +345,26 @@ So, for each item:
 - **Last checked:** CubeCL 0.12.0-pre.2 (published 2026-11-09), the newest
   release; no later prerelease existed on 2026-11-20.
 
+### 16. iroh-blobs and blake2_simd: `constant_time_eq` held at 0.4 beside blake3's 0.6
+
+- **What happens:** blake3 1.8.8 takes `constant_time_eq` 0.6.2. iroh-blobs
+  0.103.1 holds 0.4.2, and its `main` (0.105.0) caps the requirement at
+  `"<0.6.2"` with the comment "pin to avoid MSRV bump". blake2b_simd and
+  blake2s_simd 1.0.5 ask for `0.4.2`, and their master reads the same. The
+  last two arrive through multihash-codetable and rust-unixfs. A fresh
+  resolve of Graphshell's host carries both versions and fails `cargo deny`
+  bans.
+- **Why it matters:** two copies of a constant-time compare in one binary,
+  and a bans failure on every fresh resolve of a workspace that links blake3
+  beside iroh-blobs or the blake2 crates.
+- **What we carry:** a `constant_time_eq@0.4.2` skip row in Graphshell
+  `host/deny.toml` (`90412d1d`, mod projects D58), a stopgap until patch-only
+  forks. Dramatis's own holders moved to 0.6 (`2e1c1a5`): personae and
+  castellan directly, and totp-rs through a patch row to its master, which
+  took 0.6 in PR #92 (`f1bccbb6`, unreleased after 6.0.0).
+- **Last checked:** iroh-blobs 0.104.1 (released 2026-11-04) and `main` at
+  0.105.0; blake2_simd 1.0.5 and master; 2026-11-26.
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
@@ -372,3 +392,7 @@ Not raised.
 **2026-11-22.** Item 15 (CubeCL 0.12.0-pre.2 does not compile for wasm)
 added from Distillery's models plan. Carried by the `mark-ik/cubecl` fork.
 Not raised.
+
+**2026-11-26.** Item 16 (`constant_time_eq` held at 0.4 by iroh-blobs and
+blake2_simd) added from Graphshell's mod projects plan, D58. Carried by a
+skip row. Not raised.
