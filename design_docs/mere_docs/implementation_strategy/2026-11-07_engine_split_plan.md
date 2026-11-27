@@ -4340,3 +4340,13 @@ D226 to D229 rule the app-door lane's forks (armillary `p8/app-door-cbor` `530a0
   dev-only surface through its own hook. Every consumer root, plus eidetic's typed-layer consumers (Distillery, gemot,
   inker), checks and tests as on main. Step 1 of the kernel move is complete apart from the held facts branch (D261); step
   2b, `incipit-session`, is next.
+- 2026-11-26: Step 2b of the kernel move landed: Graphshell has `incipit-session` at `host/crates/incipit/session` (D256),
+  taken by nothing yet (Graphshell `20bd571e`), and incipit-graph implements `MergeGraph` (D264). It copies pandect's surface
+  readers (addressable graph, live graph, memory levels, furnace, image store, snapshot merge and merge rules whole, with 65
+  commits of history; access, codicil redaction and compose, the personal-sync fold, `offers_in` and `fork_component_graph`
+  as partial copies) and installs incipit's publication, legacy and codicil hooks through `IncipitSessions::new`, whose
+  extension traits keep pandect's method names (D267). pandect hands out its backend (D268, Mere `22738956c`). 127 tests
+  pass, copied name for name where pandect's reach no privates. Kernel-written stores, journals, codicils (compose included),
+  personal-sync projections and a stored `LegacySurfaceV1` receipt open through incipit-session unchanged, each with a tamper
+  or wrong-schema control and a mutation check. Mere and Graphshell carry a `constant_time_eq@0.4.2` bans skip as a stopgap
+  (Graphshell mod projects D58). Lane 3, the consumer flips, is next.
