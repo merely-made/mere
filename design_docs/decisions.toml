@@ -815,6 +815,46 @@ summary = "Old graph next-step relations keep their direction, the ambient fixtu
 draws_on = ["declared-lens D28", "declared-lens D30", "declared-lens D42"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D46"]
+title = "Facts export as every resource literal does, and a personal record must declare its predicates (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The resource export keeps every literal; \"declared\" is mere-facts' validation rule for personal records."
+draws_on = ["declared-lens D25", "engine-split D247"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D47"]
+title = "D147's resource digest stays v1 (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Facts move the resource digest's value, not its version."
+draws_on = ["declared-lens D25", "engine-split D147"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D48"]
+title = "The dramatis pack lives in mere-facts under `https://mere.computer/ns/dramatis#` (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The dramatis vocabulary pack is mere-facts' own, in Mere's namespace."
+draws_on = ["declared-lens D25", "engine-split D216"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D49"]
+title = "A birth or contact field is one XSD-typed literal (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Facts are typed per-field literals; contact lists are JSON literals; record IRIs keep their content address."
+draws_on = ["declared-lens D25", "declared-lens D46"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D50"]
+title = "L7 lane 2's first minor forks take the recommendations (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Associations are single dramatis:about edges, subjects are bare resources, old facets are refused, and the engine gains a resource-edge write."
+draws_on = ["declared-lens D25", "declared-lens D26", "engine-split D246", "engine-split D257"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"

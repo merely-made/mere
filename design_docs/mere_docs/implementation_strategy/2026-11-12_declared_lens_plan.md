@@ -507,8 +507,9 @@ This is the debt D6 and D8 name. The steps, as ruled at its assessment (D16 to D
 - the core profile is process-wide (D23); each mere's predicate declarations stay resource records
   (types in the engine, graph half in incipit-graph, engine-split D213) and compile into a local
   pack at session open (D24);
-- personal facts become statements under a dramatis pack, with D147's digest at v2 and no reader
-  for the old facets (D25, D26).
+- personal facts become statements under a dramatis pack in mere-facts, one typed literal per
+  field, exported as every resource literal is, with predicates the pack must declare, D147's
+  digest still v1 and no reader for the old facets (D25, D26, D46 to D50).
 
 - Needs: L3 passing, L2.
 - Done when:
@@ -889,6 +890,26 @@ removes it.
 
   Links: area The stack · draws on declared-lens D28, declared-lens D30, declared-lens D42 · plans engine-split P8 · summary Old graph next-step relations keep their direction, the ambient fixture is restated as meant, and a strict-decode refusal counts as a refusal in the authority corpus.
 
+- **D46. Facts export as every resource literal does, and a personal record must declare its predicates (Mark, 2026-11-28):** L7 lane 2, F1. D25's "exports literals for declared terms only" rested on the assessment's reading that the resource graph exports no literals (§5, F8, C9, citing `projection.rs:258-288`); it has exported every `semantic.properties` literal since P5 L3 (`resource_metadata.rs:63-83`, called from `projection.rs:60` and `:172`), JSON-LD ingest's schema.org literals included, pinned by Graphshell's round-trip tests (`rdf/tests/projection/roundtrip.rs:10`, `:46`). "Keep export; facts must declare (Recommended)": the export is unchanged, facts are literals under dramatis-pack predicates, and mere-facts refuses a personal record holding a predicate the pack does not declare. Against narrowing the export to declared terms, which drops JSON-LD's literals from export, SPARQL and SHACL and needs the engine to see the dramatis pack, and against a second literal store for facts. Outcome: refines D25.
+
+  Links: area The stack · draws on declared-lens D25, engine-split D247 · plans engine-split P8 · summary The resource export keeps every literal; "declared" is mere-facts' validation rule for personal records.
+
+- **D47. D147's resource digest stays v1 (Mark, 2026-11-28):** L7 lane 2. D25 bumped it to v2 because facts entering the export change its value; the construction does not change, and `ResourceDigest` is never serialized, stored or sent, its one holder being Graphshell's in-memory pin (`mere_host_pin.rs:74`). "Keep v1 (Recommended)": a version marks a change of construction and there is none, so sessions holding facts take new digest values under v1. Against a v2 domain string and a version-aware comparison that nothing reads. Outcome: refines D25.
+
+  Links: area The stack · draws on declared-lens D25, engine-split D147 · plans engine-split P8 · summary Facts move the resource digest's value, not its version.
+
+- **D48. The dramatis pack lives in mere-facts under `https://mere.computer/ns/dramatis#` (Mark, 2026-11-28):** L7 lane 2, F2. Graphshell's workspace pack is TOML with build.rs ids in its own crate; the engine embeds only core and alignment, and Dramatis has no IRI namespace. "mere-facts, ns/dramatis# (Recommended)": `crates/domain/personal-facts/packs/dramatis.toml` with a build.rs, pack id `https://mere.computer/packs/dramatis`, terms under `https://mere.computer/ns/dramatis#`. Against a `ns/personal-facts#` namespace and against the Dramatis repo shipping the pack. Outcome: applies D25.
+
+  Links: area The stack · draws on declared-lens D25, engine-split D216 · plans engine-split P8 · summary The dramatis vocabulary pack is mere-facts' own, in Mere's namespace.
+
+- **D49. A birth or contact field is one XSD-typed literal (Mark, 2026-11-28):** L7 lane 2, F4 and F5. Birth facts hold a civil date, a time that is unknown, exact or approximate, an optional place with microdegree coordinates and a precision, a timezone and a source; contacts hold scalars and four lists. "Typed literal per field (Recommended)": `birthDate` is `xsd:date`, `birthTime` `xsd:time` with `uncertaintySeconds` only when approximate, the place, timezone and source fields each a literal (at most 11 per birth), a missing field meaning unknown; contact scalars are literals and each non-empty list one `rdf:JSON` literal; record IRIs stay blake3 over the record's JSON, rebuilt exactly from the statements, so Cleromancy's natal readings still validate. Against structured nodes, which need minted IRIs since the digest refuses blank nodes, and against one JSON literal per group, which SPARQL cannot read inside. Outcome: applies D25.
+
+  Links: area The stack · draws on declared-lens D25, declared-lens D46 · plans engine-split P8 · summary Facts are typed per-field literals; contact lists are JSON literals; record IRIs keep their content address.
+
+- **D50. L7 lane 2's first minor forks take the recommendations (Mark, 2026-11-28):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) F3: an association is one edge, `<target> dramatis:about <subject>`, the relationship its predicate and its statement id the association's content-addressed IRI; an external target is minted as `mere://personal-facts/external/<domain>/<id>/<revision>`, percent-encoded, since an id such as `household/address` is not an IRI and the export drops an edge whose endpoint is not one (`projection.rs:182-187`). (2) F6: subjects are bare resources at `mere://personal-facts/subject/profile/<id>` and `.../subject/contact/<scope>/<anchor>`, an edge needing both endpoints. (3) A record's class goes out as `rdf:type` through the classification variant the export already reads. (4) Old `dramatis.*` facet writes are refused, as D246 refused node facets (D26). (5) The edge write is a default `SessionGraph::write_resource_edges` method beside D257's record write. (6) No schema.org alignment triples now. Outcome: applies D25, D26.
+
+  Links: area The stack · draws on declared-lens D25, declared-lens D26, engine-split D246, engine-split D257 · plans engine-split P8 · summary Associations are single dramatis:about edges, subjects are bare resources, old facets are refused, and the engine gains a resource-edge write.
+
 ## Findings
 
 - 2026-11-12: read at Mere `origin/main` `48fbe3d8d`, Eidetic `1371574`, Graphshell `a377c352`,
@@ -945,3 +966,5 @@ removes it.
   D18's replay reopens the pre-L7 fixture with identical held assertions, and the conformance rows hold (Mere
   311/0/3 from 276/0/3; Graphshell, Turnstone, athanor at their main counts plus new tests; Cleromancy 221/1/2 from
   215/1/2). Its last forks were taken (D45). L7's facts lane (D25, D26) is next.
+- 2026-11-28: L7 lane 2 (facts) mapped the change; the resource graph already exports every literal, against
+  D25's evidence, and its forks were ruled (D46 to D50).
