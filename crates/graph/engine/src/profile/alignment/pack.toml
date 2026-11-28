@@ -1,0 +1,82 @@
+# The alignment pack (declared-lens D27 (2), D31 (3), D35): how the core
+# pack's semantic predicates align to standard vocabularies, as schema
+# triples. Embedded in the engine beside the core pack, which exports these
+# as quads in its vocabulary graph (profile::vocab). It declares no terms.
+#
+# Exact correspondences are owl:equivalentProperty, and a Mere relation
+# narrower than a standard one is rdfs:subPropertyOf it; a core semantic
+# predicate with no triple is Mere-only (Blocks, NextStep, UserGrouped,
+# AgentDerived, ExampleOf, DuplicateOf, CanonicalMirrorOf). The anchors are
+# the compliance audit's (2026-05-22_statements_over_schema_stance.md); the
+# evidence-sense rows (supports, disputes) were ruled 2026-09-15 from Knot's
+# consumer audit.
+
+id = "pack:alignment"
+version = "0.1.0"
+kind = ["vocabulary"]
+licence = "MPL-2.0"
+credit = ["Mark Alan Boykin"]
+
+[prefixes]
+pack = "https://mere.computer/packs/"
+rel = "https://mere.computer/ns/rel#"
+cito = "http://purl.org/spar/cito/"
+owl = "http://www.w3.org/2002/07/owl#"
+rdfs = "http://www.w3.org/2000/01/rdf-schema#"
+dcterms = "http://purl.org/dc/terms/"
+
+# Exact.
+
+[[vocabulary.triples]]
+subject = "rel:cites"
+predicate = "owl:equivalentProperty"
+object = "cito:cites"
+
+[[vocabulary.triples]]
+subject = "rel:quotes"
+predicate = "owl:equivalentProperty"
+object = "cito:includesQuotationFrom"
+
+[[vocabulary.triples]]
+subject = "rel:supports"
+predicate = "owl:equivalentProperty"
+object = "cito:supports"
+
+[[vocabulary.triples]]
+subject = "rel:contradicts"
+predicate = "owl:equivalentProperty"
+object = "cito:disputes"
+
+[[vocabulary.triples]]
+subject = "rel:elaborates"
+predicate = "owl:equivalentProperty"
+object = "cito:extends"
+
+# cito:linksTo is defined as providing a URL link to the cited entity.
+[[vocabulary.triples]]
+subject = "rel:hyperlink"
+predicate = "owl:equivalentProperty"
+object = "cito:linksTo"
+
+[[vocabulary.triples]]
+subject = "rel:same-entity-as"
+predicate = "owl:equivalentProperty"
+object = "owl:sameAs"
+
+# Approximate: summarizing or questioning a work entails referencing it, and
+# a dependency is a narrower "requires".
+
+[[vocabulary.triples]]
+subject = "rel:summarizes"
+predicate = "rdfs:subPropertyOf"
+object = "cito:cites"
+
+[[vocabulary.triples]]
+subject = "rel:questions"
+predicate = "rdfs:subPropertyOf"
+object = "cito:cites"
+
+[[vocabulary.triples]]
+subject = "rel:depends-on"
+predicate = "rdfs:subPropertyOf"
+object = "dcterms:requires"

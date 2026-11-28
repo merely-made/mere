@@ -29,27 +29,44 @@
 //! - **Mere-only** — no standard term is even a superproperty; the `mere:rel#`
 //!   IRI stands alone. `Blocks`, `NextStep`, `UserGrouped`.
 //!
-//! The alignment set is a deterministic constant (a function of the vocabulary,
-//! not of any graph's data), emitted into the [`GRAPH_VOCABULARY`] named graph so
+//! The rows are schema triples in the engine-embedded alignment pack
+//! (`alignment/pack.toml`, declared-lens D35). The alignment set is a
+//! deterministic constant (a function of the vocabulary, not of any graph's
+//! data), emitted into the [`GRAPH_VOCABULARY`] named graph so
 //! a consumer can query or ignore it independently of the instance data. Because
 //! it is re-derivable, the file-I/O ingest path treats this graph as schema and
 //! drops it ([`is_vocabulary_quad`]), keeping a round trip through a shared file
 //! lossless.
 
+use std::sync::LazyLock;
+
+use eidetic::pack::{OWL_EQUIVALENT_PROPERTY, PackHeader, RDFS_SUB_PROPERTY_OF, Triple};
+use oxrdf::{GraphName, NamedNode, Quad};
+
 use super::core::{self, ids};
 use super::intern::TermId;
-use oxrdf::{GraphName, NamedNode, Quad};
 
 /// The named graph carrying Mere's vocabulary alignment. Kept out of the default
 /// graph and the scope graphs so alignment (schema) never mixes with instance
 /// facts in a consumer's default-graph query.
 pub const GRAPH_VOCABULARY: &str = "https://mere.computer/ns/graph#vocabulary";
 
-/// `owl:equivalentProperty` — links an *exact* Mere/standard term pair.
-const OWL_EQUIVALENT_PROPERTY: &str = "http://www.w3.org/2002/07/owl#equivalentProperty";
-/// `rdfs:subPropertyOf` — links an *approximate* (Mere-more-specific) term to its
-/// standard superproperty.
-const RDFS_SUB_PROPERTY_OF: &str = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
+/// The alignment pack's id (declared-lens D35).
+pub const ALIGNMENT_PACK_ID: &str = "https://mere.computer/packs/alignment";
+
+/// The alignment pack's canonical CBOR, compiled by build.rs from
+/// `alignment/pack.toml` and embedded beside the core pack (D31 (3)).
+pub static ALIGNMENT_PACK: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/alignment_pack.cbor"));
+
+static TRIPLES: LazyLock<Vec<Triple>> =
+    LazyLock::new(|| triples_of(ALIGNMENT_PACK).expect("the embedded alignment pack reads"));
+
+/// The schema triples a pack's canonical bytes carry.
+fn triples_of(canonical: &[u8]) -> Result<Vec<Triple>, String> {
+    let header = PackHeader::from_canonical(canonical).map_err(|e| e.to_string())?;
+    let body = header.vocabulary().map_err(|e| e.to_string())?;
+    Ok(body.and_then(|v| v.triples).unwrap_or_default())
+}
 
 /// How a recognized Mere relation aligns to a standard-vocabulary term.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -62,84 +79,51 @@ pub enum Alignment {
     MereOnly,
 }
 
-/// The standard-vocabulary alignment for a recognized semantic sub-kind.
-///
-/// The exact/CiTO/OWL/PROV anchors are the compliance audit's
-/// (`statements_over_schema_stance`); the remainder are categorized
-/// conservatively — a relation is only mapped when a standard term genuinely is
-/// the same as, or a superproperty of, the Mere term, and is left `MereOnly`
-/// otherwise rather than forced onto an ill-fitting IRI. Keyed by the core
-/// pack's generated ids (D21); a test holds every core semantic predicate to
-/// a category, so a newly added one must be categorized here. `None` for a
+/// The standard-vocabulary alignment for a core semantic predicate, as the
+/// alignment pack's triples state it (D35): `owl:equivalentProperty` is
+/// [`Alignment::Exact`], `rdfs:subPropertyOf` [`Alignment::Approximate`], and
+/// a semantic predicate with no triple [`Alignment::MereOnly`]. `None` for a
 /// predicate outside the core semantic family.
 pub fn alignment(predicate: TermId) -> Option<Alignment> {
-    use Alignment::{Approximate, Exact, MereOnly};
+    alignment_in(&TRIPLES, predicate)
+}
 
-    // CiTO — the Citation Typing Ontology (`http://purl.org/spar/cito/`).
-    const CITO_CITES: &str = "http://purl.org/spar/cito/cites";
-    const CITO_INCLUDES_QUOTATION_FROM: &str = "http://purl.org/spar/cito/includesQuotationFrom";
-    // The evidence sense, ruled 2026-09-15 from Knot's consumer audit: CiTO
-    // separates agreeing with a statement (opinion) from supporting it with
-    // evidence, and disagreeing from disputing it. A writer's relation is the
-    // evidence sense. `cito:refutes` (disputing with evidence) is reached by a
-    // consumer's narrower predicate, not by this table.
-    const CITO_SUPPORTS: &str = "http://purl.org/spar/cito/supports";
-    const CITO_DISPUTES: &str = "http://purl.org/spar/cito/disputes";
-    const CITO_EXTENDS: &str = "http://purl.org/spar/cito/extends";
-    const CITO_LINKS_TO: &str = "http://purl.org/spar/cito/linksTo";
-    // OWL / Dublin Core Terms.
-    const OWL_SAME_AS: &str = "http://www.w3.org/2002/07/owl#sameAs";
-    const DCTERMS_REQUIRES: &str = "http://purl.org/dc/terms/requires";
-
-    Some(match predicate {
-        // Exact CiTO / OWL correspondences (stance-doc anchored; the four
-        // 2026-09-15 rows are recorded in the petgraph-RDF plan's progress).
-        ids::REL_CITES => Exact(CITO_CITES),
-        ids::REL_QUOTES => Exact(CITO_INCLUDES_QUOTATION_FROM),
-        ids::REL_SUPPORTS => Exact(CITO_SUPPORTS),
-        ids::REL_CONTRADICTS => Exact(CITO_DISPUTES),
-        ids::REL_ELABORATES => Exact(CITO_EXTENDS),
-        // `linksTo` is defined as providing a URL link to the cited entity.
-        ids::REL_HYPERLINK => Exact(CITO_LINKS_TO),
-        ids::REL_SAME_ENTITY_AS => Exact(OWL_SAME_AS),
-
-        // Approximate: the Mere relation is a narrower case of a standard term.
-        // Summarizing / questioning a work both entail referencing it, so each
-        // is a subproperty of `cito:cites`.
-        ids::REL_SUMMARIZES | ids::REL_QUESTIONS => Approximate(CITO_CITES),
-        // A dependency is a narrower "requires".
-        ids::REL_DEPENDS_ON => Approximate(DCTERMS_REQUIRES),
-
-        // Mere-only: no standard term is even a superproperty. Grouping and
-        // agent-derivation are experience/provenance flavored; example-of and
-        // the near-identity pair (duplicate / canonical-mirror) have no safe
-        // standard superproperty (subPropertyOf owl:sameAs would over-claim
-        // logical identity); Blocks / NextStep are workflow relations.
-        ids::REL_USER_GROUPED
-        | ids::REL_AGENT_DERIVED
-        | ids::REL_EXAMPLE_OF
-        | ids::REL_DUPLICATE_OF
-        | ids::REL_CANONICAL_MIRROR_OF
-        | ids::REL_BLOCKS
-        | ids::REL_NEXT_STEP => MereOnly,
-        _ => return None,
-    })
+fn alignment_in(triples: &'static [Triple], predicate: TermId) -> Option<Alignment> {
+    let terms = core::terms();
+    if terms.family_of(predicate) != Some(ids::FAMILY_SEMANTIC) {
+        return None;
+    }
+    let iri = terms.iri(predicate)?;
+    Some(
+        triples
+            .iter()
+            .find(|t| t.subject == iri)
+            .map_or(Alignment::MereOnly, |t| match t.predicate.as_str() {
+                OWL_EQUIVALENT_PROPERTY => Alignment::Exact(&t.object),
+                _ => Alignment::Approximate(&t.object),
+            }),
+    )
 }
 
 /// The vocabulary-alignment quads: for every recognized semantic relation with a
 /// standard correspondence, one quad linking its canonical `mere:rel#` IRI to a
 /// standard term (`owl:equivalentProperty` for [`Alignment::Exact`],
 /// `rdfs:subPropertyOf` for [`Alignment::Approximate`]), in the
-/// [`GRAPH_VOCABULARY`] named graph. [`Alignment::MereOnly`] relations contribute
-/// nothing. A deterministic constant, independent of any graph's data.
+/// [`GRAPH_VOCABULARY`] named graph, in core id order. [`Alignment::MereOnly`]
+/// relations contribute nothing. A deterministic constant, independent of any
+/// graph's data.
 pub fn vocabulary_alignment_quads() -> Vec<Quad> {
+    quads_in(&TRIPLES)
+}
+
+fn quads_in(triples: &'static [Triple]) -> Vec<Quad> {
     let Ok(graph) = NamedNode::new(GRAPH_VOCABULARY) else {
         return Vec::new();
     };
     let graph = GraphName::from(graph);
     let mut quads = Vec::new();
     for (_, id) in ids::TERMS {
-        let (alignment_predicate, standard) = match alignment(id) {
+        let (alignment_predicate, standard) = match alignment_in(triples, id) {
             Some(Alignment::Exact(iri)) => (OWL_EQUIVALENT_PROPERTY, iri),
             Some(Alignment::Approximate(iri)) => (RDFS_SUB_PROPERTY_OF, iri),
             Some(Alignment::MereOnly) | None => continue,
@@ -281,6 +265,51 @@ mod tests {
             .collect();
         got.sort();
         assert_eq!(got, want);
+    }
+
+    /// Break and restore (D35): a triple dropped from the pack is a quad
+    /// dropped from every export.
+    #[test]
+    fn dropping_a_triple_changes_the_exported_quads() {
+        let text = include_str!("alignment/pack.toml").replace("\r\n", "\n");
+        let hyperlink = "[[vocabulary.triples]]\nsubject = \"rel:hyperlink\"\npredicate = \"owl:equivalentProperty\"\nobject = \"cito:linksTo\"\n";
+        assert_eq!(text.matches(hyperlink).count(), 1);
+        let compile = |text: &str| {
+            let (_, bytes) = eidetic::pack::compile_authored(text).unwrap();
+            let triples: &'static [Triple] =
+                Box::leak(triples_of(&bytes).unwrap().into_boxed_slice());
+            quads_in(triples)
+        };
+        assert_eq!(
+            compile(&text),
+            vocabulary_alignment_quads(),
+            "control: the pack as embedded"
+        );
+        let dropped = compile(&text.replace(hyperlink, ""));
+        assert_eq!(dropped.len(), 9);
+        assert_ne!(dropped, vocabulary_alignment_quads());
+        assert!(
+            !dropped
+                .iter()
+                .any(|q| q.subject.to_string() == format!("<{}>", core::iri(ids::REL_HYPERLINK)))
+        );
+    }
+
+    #[test]
+    fn every_triple_is_about_a_core_semantic_predicate() {
+        let terms = core::terms();
+        for t in TRIPLES.iter() {
+            let id = terms
+                .id(&t.subject)
+                .unwrap_or_else(|| panic!("{} is not core", t.subject));
+            assert_eq!(
+                terms.family_of(id),
+                Some(ids::FAMILY_SEMANTIC),
+                "{}",
+                t.subject
+            );
+        }
+        assert_eq!(TRIPLES.len(), 10);
     }
 
     #[test]

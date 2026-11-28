@@ -5,7 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Compiles the core pack (`src/profile/core/pack.toml`) to its canonical
-//! CBOR and emits the engine's id constants (declared-lens D8, D13). A term's
+//! CBOR and emits the engine's id constants (declared-lens D8, D13), and the
+//! alignment pack (`src/profile/alignment/pack.toml`, D35) beside it. A term's
 //! dense id is its position in the core pack's canonical term order, which is
 //! the order `profile::intern` assigns, since the core pack loads first.
 
@@ -13,11 +14,13 @@ use std::fmt::Write as _;
 use std::path::PathBuf;
 
 const CORE: &str = "src/profile/core/pack.toml";
+const ALIGNMENT: &str = "src/profile/alignment/pack.toml";
 /// Every core term lives under this namespace; its constant is named for the rest.
 const NS: &str = "https://mere.computer/ns/";
 
 fn main() {
     println!("cargo:rerun-if-changed={CORE}");
+    println!("cargo:rerun-if-changed={ALIGNMENT}");
     let text = std::fs::read_to_string(CORE).expect("the core pack is readable");
     let (header, canonical) = eidetic::pack::compile_authored(&text)
         .unwrap_or_else(|e| panic!("{CORE} does not compile: {e}"));
@@ -60,4 +63,8 @@ fn main() {
     let out = PathBuf::from(std::env::var_os("OUT_DIR").expect("cargo sets OUT_DIR"));
     std::fs::write(out.join("core_pack.cbor"), canonical).expect("OUT_DIR is writable");
     std::fs::write(out.join("core_ids.rs"), ids).expect("OUT_DIR is writable");
+    let text = std::fs::read_to_string(ALIGNMENT).expect("the alignment pack is readable");
+    let (_, alignment) = eidetic::pack::compile_authored(&text)
+        .unwrap_or_else(|e| panic!("{ALIGNMENT} does not compile: {e}"));
+    std::fs::write(out.join("alignment_pack.cbor"), alignment).expect("OUT_DIR is writable");
 }
