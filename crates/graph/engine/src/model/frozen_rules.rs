@@ -88,6 +88,9 @@ pub fn normalize_statement_defaults(statements: &mut [serde_json::Value]) {
             .expect("serialized statement object");
         for field in [
             "recognized_sub_kind",
+            // A record before D28 names a core predicate by IRI; after, by UUID.
+            "predicate",
+            "predicate_uuid",
             "label",
             "graph_scope",
             "provenance_iri",
@@ -264,3 +267,7 @@ pub fn validate_frozen_link_record(
     }
     Ok(Some(link))
 }
+
+#[cfg(test)]
+#[path = "frozen_rules_tests.rs"]
+mod tests;
