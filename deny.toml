@@ -34,10 +34,6 @@ deny = [
 ]
 
 [[bans.skip]]
-crate = "constant_time_eq@0.4.2"
-reason = "held by personae (dramatis) and iroh-blobs 0.103.1 (through murm's mere-transport, a pandect dev-dependency; main caps <0.6.2 for MSRV); blake3 1.8.8 takes 0.6.2. Stopgap until patch-only forks (Graphshell mod projects D58, upstream ledger item 16)"
-
-[[bans.skip]]
 crate = "foldhash@0.1.5"
 reason = "hashbrown 0.15.5, held by petgraph 0.8.3 under portolan (eidetic, sibling); gone when petgraph moves to a current hashbrown"
 
