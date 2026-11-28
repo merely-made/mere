@@ -74,6 +74,7 @@ pub fn declarations_pack<'a>(
             )]),
             labels: BTreeMap::new(),
             inverse_labels: None,
+            short_labels: None,
         });
     }
     if terms.is_empty() {
@@ -83,6 +84,8 @@ pub fn declarations_pack<'a>(
     let vocabulary = VocabularyBody {
         terms,
         defaults: BTreeMap::new(),
+        triples: None,
+        label_defaults: None,
     };
     let header = PackHeader {
         format: PACK2_FORMAT.to_owned(),

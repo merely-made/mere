@@ -85,6 +85,10 @@ pub struct LegacyHook<G: SessionGraph> {
 pub(crate) struct FrozenGraph<G: SessionGraph> {
     pub graph: G::Snapshot,
     pub facets: NodeFacetStore,
+    /// The core pack's digest the snapshot was written under (declared-lens
+    /// D32); one frozen before D32 has none. Comparison ignores it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub core_pack: Option<String>,
 }
 
 impl<G: SessionGraph> std::fmt::Debug for FrozenGraph<G> {
@@ -122,6 +126,7 @@ impl<G: SessionGraph> FrozenGraph<G> {
         Self {
             graph: graph.to_snapshot(),
             facets: graph.facets().clone(),
+            core_pack: Some(mere::profile::core::digest().to_owned()),
         }
     }
 

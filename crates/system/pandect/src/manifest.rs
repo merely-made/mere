@@ -127,6 +127,13 @@ pub struct GraphSessionManifest {
     /// from then on; an edit makes a new branch from it.
     #[serde(default)]
     pub merged: Option<MergedMark>,
+    /// The digest of the core pack the session's journal was written under
+    /// (declared-lens D32), as [`mere::profile::core::digest`] gives it.
+    /// Manifests written before D32 carry none, and a digest other than the
+    /// embedded core's still reads: records resolve through the embedded
+    /// core, and only a UUID it cannot resolve is refused.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub core_pack: Option<String>,
 }
 
 /// Whether a whole-session copy goes its own way or is meant to merge back.
@@ -194,6 +201,7 @@ impl GraphSessionManifest {
             picked_from: None,
             lineage: Lineage::Fork,
             merged: None,
+            core_pack: Some(mere::profile::core::digest().to_owned()),
         }
     }
 

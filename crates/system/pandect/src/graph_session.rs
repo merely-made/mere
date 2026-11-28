@@ -392,6 +392,10 @@ impl<G: SessionGraph> PartialEq for Kept<G> {
 struct Baseline<S> {
     graph: S,
     facets: NodeFacetStore,
+    /// The core pack's digest the snapshot was written under (declared-lens
+    /// D32); a baseline written before D32 has none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    core_pack: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -416,6 +420,10 @@ struct Checkpoint {
     /// with a retained translation compares the files with it instead.)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     contents_digest: Option<String>,
+    /// The core pack's digest the checkpoint's graph was written under
+    /// (declared-lens D32); a checkpoint written before D32 has none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    core_pack: Option<String>,
 }
 
 /// The version of the journal digest a checkpoint writes.
@@ -484,6 +492,7 @@ fn checkpoint_ops<G: SessionGraph>(
         journal_digest: journal_digest(digests, journal, cursor)?,
         journal_digest_version: Some(JOURNAL_DIGEST_VERSION),
         contents_digest: Some(contents_digest(&graph_bytes, &facets_bytes)),
+        core_pack: Some(mere::profile::core::digest().to_owned()),
     };
     Ok([
         WriteOp::Put {
@@ -585,6 +594,7 @@ fn baseline_of<G: SessionGraph>(graph: &G) -> Baseline<G::Snapshot> {
     Baseline {
         graph: graph.to_snapshot(),
         facets: graph.facets().clone(),
+        core_pack: Some(mere::profile::core::digest().to_owned()),
     }
 }
 
@@ -3138,6 +3148,7 @@ mod tests {
             let baseline = |snapshot: SurfaceSnapshot| Baseline {
                 graph: snapshot,
                 facets: NodeFacetStore::default(),
+                core_pack: None,
             };
             // The checkpoint record a writer would leave beside `graph` bytes.
             let checkpoint = |graph: &[u8]| {
@@ -3154,6 +3165,7 @@ mod tests {
                         .unwrap(),
                         journal_digest_version: Some(JOURNAL_DIGEST_VERSION),
                         contents_digest: Some(contents_digest(graph, b"")),
+                        core_pack: None,
                     },
                 )
                 .unwrap()
@@ -3288,6 +3300,7 @@ mod tests {
                     .unwrap(),
                     journal_digest_version: Some(JOURNAL_DIGEST_VERSION),
                     contents_digest: Some(contents_digest(&graph_bytes, &facet_bytes)),
+                    core_pack: None,
                 };
                 [
                     pretty(
@@ -3295,6 +3308,7 @@ mod tests {
                         &Baseline {
                             graph: snapshot.clone(),
                             facets: baseline.clone(),
+                            core_pack: None,
                         },
                     )
                     .unwrap(),

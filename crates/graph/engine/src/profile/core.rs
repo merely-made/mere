@@ -46,6 +46,14 @@ pub fn terms() -> &'static TermTable {
     &CORE.terms
 }
 
+/// The core pack's digest as stores pin it (declared-lens D16, D32): the
+/// multihash of its canonical bytes, written `<function>:<hex>`.
+pub fn digest() -> &'static str {
+    static DIGEST: LazyLock<String> =
+        LazyLock::new(|| CORE.selection.pins[0].pin.digest.0.to_string());
+    &DIGEST
+}
+
 /// A core term's IRI.
 ///
 /// # Panics
