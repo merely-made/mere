@@ -24,6 +24,26 @@ pub const DECLARATIONS_PACK_ID: &str = "https://mere.computer/packs/declarations
 /// The core pack's canonical CBOR.
 pub static CORE_PACK: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/core_pack.cbor"));
 
+/// The core pack's authored prefixes (D41), which its canonical form drops,
+/// emitted by build.rs.
+pub mod prefixes {
+    include!(concat!(env!("OUT_DIR"), "/core_prefixes.rs"));
+}
+
+/// Expand a CURIE over the core pack's prefixes (declared-lens D41):
+/// `rel:supports` to `https://mere.computer/ns/rel#supports`. `None` for text
+/// that is not `prefix:reference` over a core prefix, a full IRI included.
+pub fn expand(curie: &str) -> Option<String> {
+    let (prefix, reference) = curie.split_once(':')?;
+    if reference.starts_with("//") {
+        return None;
+    }
+    prefixes::PREFIXES
+        .iter()
+        .find(|(name, _)| *name == prefix)
+        .map(|(_, namespace)| format!("{namespace}{reference}"))
+}
+
 /// The core terms' dense ids (D8), generated from the core pack.
 pub mod ids {
     use super::super::intern::TermId;

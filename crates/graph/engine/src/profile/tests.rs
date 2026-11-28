@@ -10,6 +10,7 @@
 
 mod activation;
 mod cost;
+mod expand;
 mod golden;
 mod labels;
 mod refusals;
