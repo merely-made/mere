@@ -807,6 +807,14 @@ summary = "NextStep is the core term, frame-member reads \"Arranged with\", trav
 draws_on = ["declared-lens D22", "declared-lens D33", "declared-lens D36"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D45"]
+title = "L7 lane 1's final-report minor forks take the recommendations (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Old graph next-step relations keep their direction, the ambient fixture is restated as meant, and a strict-decode refusal counts as a refusal in the authority corpus."
+draws_on = ["declared-lens D28", "declared-lens D30", "declared-lens D42"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"

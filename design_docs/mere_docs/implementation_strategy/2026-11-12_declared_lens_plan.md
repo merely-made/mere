@@ -885,6 +885,10 @@ removes it.
 
   Links: area The stack · draws on declared-lens D22, declared-lens D33, declared-lens D36 · plans engine-split P8 · summary NextStep is the core term, frame-member reads "Arranged with", traversal's row is rel:traversal, and pickers read short labels.
 
+- **D45. L7 lane 1's final-report minor forks take the recommendations (Mark, 2026-11-28):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) Next-step relations already stated in a graph before D42 keep their later-to-earlier direction; only layouts are re-read in the new one, and a sync export of an old three-card spread now emits the corrected direction, so its batch digest moves once, under "stored bytes don't need preserving for a prototype!" and D30. (2) Cleromancy's ambient fixture line "attention | next_step | next | a possible next step" contradicted the old later-to-earlier convention ("south | next_step | east | answers the east"); it is restated as its author meant, `attention | rel:next-step | next`, not by D42's mechanical reversal. (3) Cleromancy's authority-corpus test samples three tampers per fixture at a fixed step; D28 and D17 shortened every record (fixture leaf counts 232 to 219, 748 to 699), moving the sample off the two content leaves that refused at main, and a tampered predicate UUID is refused by the strict reader, which the test had counted as a skip. A tampered batch the strict reader refuses to decode now counts as refused, as strict decoding at a trust boundary is (data formats rule); panics stay skipped and the sample size is unchanged. Outcome: applies D28, D30, D42.
+
+  Links: area The stack · draws on declared-lens D28, declared-lens D30, declared-lens D42 · plans engine-split P8 · summary Old graph next-step relations keep their direction, the ambient fixture is restated as meant, and a strict-decode refusal counts as a refusal in the authority corpus.
+
 ## Findings
 
 - 2026-11-12: read at Mere `origin/main` `48fbe3d8d`, Eidetic `1371574`, Graphshell `a377c352`,
@@ -936,3 +940,8 @@ removes it.
   were ruled (D32 to D38); final counted runs wait on disk.
 - 2026-11-28: L7 lane 1's third round coded D32 to D38 across the repos, unbuilt while C: sat under 500 GB; its forks
   were ruled (D39 to D44).
+- 2026-11-28: L7 lane 1 landed, back to back: Eidetic 955c134, Mere b6b4a30d9, Graphshell 88c34950, Knot 7e23ac2,
+  Turnstone 33616bec, Cleromancy 7a18d49. The predicate enums are gone from the Mere workspace (D21 clean, controlled),
+  D18's replay reopens the pre-L7 fixture with identical held assertions, and the conformance rows hold (Mere
+  311/0/3 from 276/0/3; Graphshell, Turnstone, athanor at their main counts plus new tests; Cleromancy 221/1/2 from
+  215/1/2). Its last forks were taken (D45). L7's facts lane (D25, D26) is next.
