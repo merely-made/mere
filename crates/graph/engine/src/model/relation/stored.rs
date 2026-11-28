@@ -9,13 +9,17 @@
 //! namespace), the identity sync and comparison use, and by the IRI text too
 //! when the predicate is not a term of the core pack, since a UUIDv5 cannot
 //! be reversed. Records written before L7 carry the IRI text alone and still
-//! read. The core pack is the one the engine embeds.
+//! read. The core pack is the one the engine embeds. [`nested`] is the
+//! serde helper for a record that nests the pair as `{"uuid", "iri"}`.
 
 use std::fmt;
 
 use uuid::Uuid;
 
 use crate::profile::core;
+
+#[path = "stored_nested.rs"]
+pub mod nested;
 
 /// The UUIDv5 a stored record names `predicate` by.
 pub fn predicate_uuid(predicate: &str) -> Uuid {
