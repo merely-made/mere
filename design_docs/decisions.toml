@@ -703,6 +703,62 @@ summary = "Receipts checksum their stored payload, triggers get workspace-pack I
 draws_on = ["declared-lens D17", "declared-lens D22", "declared-lens D27"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D32"]
+title = "The core pack's digest lives in the session manifest and pandect's own records (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The core-pack digest is pinned in the session manifest and in pandect's Baseline, Checkpoint and FrozenGraph; a mismatch still reads through the embedded core."
+draws_on = ["declared-lens D16", "declared-lens D28", "linked-data-platform-lessons D8"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D33"]
+title = "A pack row carries a label, an inverse label and a short label (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Pack rows carry label, inverse label and short label; Graphshell keeps no label table."
+draws_on = ["declared-lens D29"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D34"]
+title = "Each navigation trigger is a class row in the workspace pack (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Triggers are class IRIs in Graphshell's workspace pack; traversal has a predicate row for its labels."
+draws_on = ["declared-lens D31", "linked-data-platform-lessons D7"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D35"]
+title = "A vocabulary body carries schema triples, and the alignment pack is made of them (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Vocabulary bodies carry schema-predicate IRI triples; the alignment pack is those triples."
+draws_on = ["declared-lens D27", "declared-lens D31"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D36"]
+title = "App relation enums give way to IRIs as D20 ruled (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Cleromancy's and Turnstone's relation enums go; they name IRIs and match on generated ids."
+draws_on = ["declared-lens D17", "declared-lens D20"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D37"]
+title = "App-minted predicates stay named constants until their packs at L8 (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "App-minted predicates are named constants in L7 and move into app packs at L8."
+draws_on = ["declared-lens D20", "declared-lens D28"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D38"]
+title = "L7 lane 1's second-report minor forks take the recommendations (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "The lane's smaller choices stand, the stored-predicate helper moves into the engine, and Knot's fix lands with L7."
+draws_on = ["declared-lens D28", "declared-lens D31"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"

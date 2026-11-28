@@ -496,11 +496,13 @@ This is the debt D6 and D8 name. The steps, as ruled at its assessment (D16 to D
   and axis rows; consumers write by IRI and match on generated ids (D20), and the traversal and
   arrangement types leave the engine for incipit-graph (D22);
 - new writes store a relation as the UUIDv5 of its IRI with the core pack's digest in the version
-  header (D16), and the IRI text too when the predicate is not a core term (D28); the enum-named
+  header (the session manifest and pandect's records, D32), and the IRI text too when the predicate
+  is not a core term (D28); the enum-named
   stored fields stop being written, triggers included, and old entries still replay (D17, D31);
   stored bytes need not be preserved, and digests over unchanged history move once (D30);
-- the labels users see, inverse labels included, are pack data, and Graphshell keeps no label
-  table (D29);
+- the labels users see are pack data, a label, an inverse and a short label per row (D29, D33);
+  triggers are workspace-pack classes (D34); alignment is schema triples in a vocabulary body
+  (D35); app relation enums go (D36) and app-minted predicates are constants until L8 (D37);
 - the core profile is process-wide (D23); each mere's predicate declarations stay resource records
   (types in the engine, graph half in incipit-graph, engine-split D213) and compile into a local
   pack at session open (D24);
@@ -830,6 +832,34 @@ removes it.
 
   Links: area The stack · draws on declared-lens D17, declared-lens D22, declared-lens D27 · plans engine-split P8 · summary Receipts checksum their stored payload, triggers get workspace-pack IRIs in L7, the alignment pack is embedded in the engine, and the lane's smaller choices stand.
 
+- **D32. The core pack's digest lives in the session manifest and pandect's own records (Mark, 2026-11-28):** L7 lane 1's second report. Records now carry the predicate's UUIDv5 and, off core, its IRI (D28); lessons D8 put the pack digest "in the version header" without naming which. "Manifest + pandect's records (Recommended)": the session manifest pins it for the journal, and pandect's Baseline, Checkpoint and FrozenGraph pin it for snapshots, so no host snapshot type changes; a stored digest that differs from the embedded core still reads through the embedded core, and only a UUID that resolves to nothing is refused. Against the manifest alone, a field in each host's snapshot type, and a digest per journal entry. Outcome: refines D16.
+
+  Links: area The stack · draws on declared-lens D16, declared-lens D28, linked-data-platform-lessons D8 · plans engine-split P8 · summary The core-pack digest is pinned in the session manifest and in pandect's Baseline, Checkpoint and FrozenGraph; a mismatch still reads through the embedded core.
+
+- **D33. A pack row carries a label, an inverse label and a short label (Mark, 2026-11-28):** Graphshell's relate picker, navigation's per-family phrases ("Cites", "Cited by") and the roster's short nouns name one predicate three ways, which one label per row cannot hold, and the lane's "File system" matched none. "Add a short label (Recommended)": the label is navigation's phrase, the inverse its reverse (D29), and a language-tagged short label, shaped like the inverse in Eidetic's body, serves the roster and picker; Graphshell's tables all go, traversal's "Went to" and "Reached from" included (D34). Against navigation's phrases everywhere and the roster nouns everywhere. Outcome: refines D29.
+
+  Links: area The stack · draws on declared-lens D29 · plans engine-split P8 · summary Pack rows carry label, inverse label and short label; Graphshell keeps no label table.
+
+- **D34. Each navigation trigger is a class row in the workspace pack (Mark, 2026-11-28):** A pack row is a family, a predicate or a class, and a trigger (a link click, a typed address, back or forward) is none of those, so triggers were still stored by name against D31 (2). "One class row per trigger (Recommended)": each trigger is a class IRI under `https://mere.computer/ns/trigger#` in Graphshell's workspace pack, new writes store it, old names still read, and traversal gains a predicate row whose labels are "Went to" and "Reached from". Against a new value row kind in Eidetic, and against a trigger family of predicate rows. Outcome: refines D31.
+
+  Links: area The stack · draws on declared-lens D31, linked-data-platform-lessons D7 · plans engine-split P8 · summary Triggers are class IRIs in Graphshell's workspace pack; traversal has a predicate row for its labels.
+
+- **D35. A vocabulary body carries schema triples, and the alignment pack is made of them (Mark, 2026-11-28):** A row cannot state a triple about a term, so the lane had only pinned today's ten exported alignment quads (D31 (3)); no PROV rows exist yet. "IRI triples in the body (Recommended)": a vocabulary body gains a set of IRI triples limited to schema predicates (`owl:equivalentProperty`, `rdfs:subPropertyOf`), an Eidetic addition; the engine-embedded alignment pack holds the CiTO rows as such triples and the engine exports them as today's quads. Against alignment axes on rows (axes are closed value sets) and against an RDF body parsed at load. Outcome: refines D27, D31.
+
+  Links: area The stack · draws on declared-lens D27, declared-lens D31 · plans engine-split P8 · summary Vocabulary bodies carry schema-predicate IRI triples; the alignment pack is those triples.
+
+- **D36. App relation enums give way to IRIs as D20 ruled (Mark, 2026-11-28):** Cleromancy's `SpreadRelationKind` and `ThreeCardRelationKind` name relations in authored, stored spread layouts (four of five are core predicates; NextStep is declared nowhere), and Turnstone's `EditableRelation` and `RelationFamilyFilter` mirror predicates and families. "Replace with IRIs, per D20 (Recommended)": layouts name relations by IRI or CURIE, code matches on generated ids, NextStep is a named Cleromancy IRI constant until a Cleromancy pack at L8, and old layouts still read their stored names; Turnstone's two enums go the same way. Against keeping them as a product vocabulary mapped to ids at the boundary. Outcome: applies D20.
+
+  Links: area The stack · draws on declared-lens D20, declared-lens D17 · plans engine-split P8 · summary Cleromancy's and Turnstone's relation enums go; they name IRIs and match on generated ids.
+
+- **D37. App-minted predicates stay named constants until their packs at L8 (Mark, 2026-11-28):** Turnstone's `promoted_links.rs` mints `https://mere.computer/ns/rel#reviewComment`, in Mere's namespace but not in the core pack, and `research_record_graph` has its own; under D28 they store their IRIs either way. "Constants now, app packs at L8 (Recommended)": they stay named IRI constants through L7; at L8 each app gets a pack and `reviewComment` moves to Turnstone's namespace, old IRIs still read. Against declaring `reviewComment` a core term, and against re-minting it now. Outcome: applies D20, D28.
+
+  Links: area The stack · draws on declared-lens D20, declared-lens D28 · plans engine-split P8 · summary App-minted predicates are named constants in L7 and move into app packs at L8.
+
+- **D38. L7 lane 1's second-report minor forks take the recommendations (Mark, 2026-11-28):** Under Mark's "i'll accept the recommendations unless there are significant forks". The link inspector shows pack labels for every declared predicate; Graphshell's stored predicate nests as `{uuid, iri}` while Mere's records are flat, until the shared serde helper moves to `mere::model::relation::stored` and Graphshell drops its two copies; `RelationSelector` stays IRI-only under D28; frozen links carry no traversal and binary captured deltas written before L7 no longer decode (D31); scenograph's two hardcoded `rel#` IRIs are reported, its crate having no mere dependency. Knot calls the removed `sub_kind_from_iri` and the old alignment signature, and Mark took it into L7: "Commit the fix, land with Graphshell (Recommended)". Outcome: applies D28, D31.
+
+  Links: area The stack · draws on declared-lens D28, declared-lens D31 · plans engine-split P8 · summary The lane's smaller choices stand, the stored-predicate helper moves into the engine, and Knot's fix lands with L7.
+
 ## Findings
 
 - 2026-11-12: read at Mere `origin/main` `48fbe3d8d`, Eidetic `1371574`, Graphshell `a377c352`,
@@ -876,3 +906,6 @@ removes it.
 - 2026-11-27: L7 lane 1 built Mere's conversion and Graphshell's on branches (`p8/l7-relations`): the D18 fixture first,
   then the predicate enums gone from the Mere workspace with the D21 check clean and controlled. Its forks were ruled
   (D28 to D31). Turnstone and Cleromancy are not yet converted; nothing has landed.
+- 2026-11-28: L7 lane 1's second report: Eidetic, Mere, Graphshell, Turnstone and Cleromancy carry D28 to D31 on
+  `p8/l7-relations` (Mere 301/0/3, from 276 at main; Graphshell 2040/0/27, from 2038/1/26); Knot needs a fix. Its forks
+  were ruled (D32 to D38); final counted runs wait on disk.
