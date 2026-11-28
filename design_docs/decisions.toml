@@ -759,6 +759,54 @@ summary = "The lane's smaller choices stand, the stored-predicate helper moves i
 draws_on = ["declared-lens D28", "declared-lens D31"]
 plans = ["engine-split"]
 
+[decisions."declared-lens D39"]
+title = "Fallback labels for undeclared predicates are core-pack defaults (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Undeclared predicates take their label, inverse and short label from the core pack's defaults."
+draws_on = ["declared-lens D13", "declared-lens D33"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D40"]
+title = "A spread layout's identity is computed over its relations' kinds as stored (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Spread layout ids stay digests over the stored kind text; a reader resolves old names, CURIEs and IRIs."
+draws_on = ["declared-lens D17", "declared-lens D31", "declared-lens D36"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D41"]
+title = "Layouts store CURIEs and the engine expands them (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Authored layouts name relations by CURIE; the engine expands core CURIEs."
+draws_on = ["declared-lens D36", "linked-data-platform-lessons D9"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D42"]
+title = "Narrative sentences read pack labels as verbs, and next-step's labels become verbs (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Narrative prose uses lowercased forward labels; next-step reads \"Leads to\" and points from the earlier card."
+draws_on = ["declared-lens D33", "declared-lens D36"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D43"]
+title = "Short labels name each predicate distinctly and serve as navigation's qualifier (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "Every short label is specific to its predicate and doubles as navigation's qualifier."
+draws_on = ["declared-lens D33"]
+plans = ["engine-split"]
+
+[decisions."declared-lens D44"]
+title = "L7 lane 1's third-round minor forks take the recommendations (Mark, 2026-11-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-11-12_declared_lens_plan.md"
+area = "The stack"
+summary = "NextStep is the core term, frame-member reads \"Arranged with\", traversal's row is rel:traversal, and pickers read short labels."
+draws_on = ["declared-lens D22", "declared-lens D33", "declared-lens D36"]
+plans = ["engine-split"]
+
 [decisions."engine-split D1"]
 title = "The split (Mark, 2026-11-07)"
 source = "design_docs/mere_docs/implementation_strategy/2026-11-07_engine_split_plan.md"

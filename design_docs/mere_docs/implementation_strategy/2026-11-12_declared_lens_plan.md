@@ -500,7 +500,8 @@ This is the debt D6 and D8 name. The steps, as ruled at its assessment (D16 to D
   is not a core term (D28); the enum-named
   stored fields stop being written, triggers included, and old entries still replay (D17, D31);
   stored bytes need not be preserved, and digests over unchanged history move once (D30);
-- the labels users see are pack data, a label, an inverse and a short label per row (D29, D33);
+- the labels users see are pack data, a label, an inverse and a distinct short label per row,
+  with core defaults for undeclared predicates (D29, D33, D39, D43);
   triggers are workspace-pack classes (D34); alignment is schema triples in a vocabulary body
   (D35); app relation enums go (D36) and app-minted predicates are constants until L8 (D37);
 - the core profile is process-wide (D23); each mere's predicate declarations stay resource records
@@ -848,7 +849,7 @@ removes it.
 
   Links: area The stack · draws on declared-lens D27, declared-lens D31 · plans engine-split P8 · summary Vocabulary bodies carry schema-predicate IRI triples; the alignment pack is those triples.
 
-- **D36. App relation enums give way to IRIs as D20 ruled (Mark, 2026-11-28):** Cleromancy's `SpreadRelationKind` and `ThreeCardRelationKind` name relations in authored, stored spread layouts (four of five are core predicates; NextStep is declared nowhere), and Turnstone's `EditableRelation` and `RelationFamilyFilter` mirror predicates and families. "Replace with IRIs, per D20 (Recommended)": layouts name relations by IRI or CURIE, code matches on generated ids, NextStep is a named Cleromancy IRI constant until a Cleromancy pack at L8, and old layouts still read their stored names; Turnstone's two enums go the same way. Against keeping them as a product vocabulary mapped to ids at the boundary. Outcome: applies D20.
+- **D36. App relation enums give way to IRIs as D20 ruled (Mark, 2026-11-28):** Cleromancy's `SpreadRelationKind` and `ThreeCardRelationKind` name relations in authored, stored spread layouts (all five are core predicates, NextStep as `rel:next-step`, D44), and Turnstone's `EditableRelation` and `RelationFamilyFilter` mirror predicates and families. "Replace with IRIs, per D20 (Recommended)": layouts name relations by IRI or CURIE, code matches on generated ids, and old layouts still read their stored names; Turnstone's two enums go the same way. Against keeping them as a product vocabulary mapped to ids at the boundary. Outcome: applies D20.
 
   Links: area The stack · draws on declared-lens D20, declared-lens D17 · plans engine-split P8 · summary Cleromancy's and Turnstone's relation enums go; they name IRIs and match on generated ids.
 
@@ -859,6 +860,30 @@ removes it.
 - **D38. L7 lane 1's second-report minor forks take the recommendations (Mark, 2026-11-28):** Under Mark's "i'll accept the recommendations unless there are significant forks". The link inspector shows pack labels for every declared predicate; Graphshell's stored predicate nests as `{uuid, iri}` while Mere's records are flat, until the shared serde helper moves to `mere::model::relation::stored` and Graphshell drops its two copies; `RelationSelector` stays IRI-only under D28; frozen links carry no traversal and binary captured deltas written before L7 no longer decode (D31); scenograph's two hardcoded `rel#` IRIs are reported, its crate having no mere dependency. Knot calls the removed `sub_kind_from_iri` and the old alignment signature, and Mark took it into L7: "Commit the fix, land with Graphshell (Recommended)". Outcome: applies D28, D31.
 
   Links: area The stack · draws on declared-lens D28, declared-lens D31 · plans engine-split P8 · summary The lane's smaller choices stand, the stored-predicate helper moves into the engine, and Knot's fix lands with L7.
+
+- **D39. Fallback labels for undeclared predicates are core-pack defaults (Mark, 2026-11-28):** With Graphshell's tables gone (D33), "Relation to" and "Relation from" (`navigation.rs:158`) and "Predicate" (`roster.rs:816`) had no row to move to; the core pack's `defaults` map already supplies each axis's value when a row names none. "Core pack defaults (Recommended)": the core pack's defaults also carry a label, an inverse and a short label, and a term with no labels falls back to them. Against a reserved core term that no relation is stated with, a fallback constant in Graphshell, and the undeclared IRI's local name. Outcome: refines D33.
+
+  Links: area The stack · draws on declared-lens D33, declared-lens D13 · plans engine-split P8 · summary Undeclared predicates take their label, inverse and short label from the core pack's defaults.
+
+- **D40. A spread layout's identity is computed over its relations' kinds as stored (Mark, 2026-11-28):** Cleromancy's `SpreadTemplate` and `ThreeCardSpread` ids are digests over their relations, stored kind text included, sorted in enum order, and spreads and sessions refer to them. "Digest the text as stored (Recommended)": each relation keeps the kind text it was written with, old layouts their names and new ones the CURIE (D41); identity and order are computed over that text, and a conversion reader resolves it to a term id, so every stored id validates. Against normalizing to IRIs and re-deriving ids once, which migrates templates, spreads and sessions, and against digesting a fixed old-name form. Outcome: applies D17, D31.
+
+  Links: area The stack · draws on declared-lens D17, declared-lens D31, declared-lens D36 · plans engine-split P8 · summary Spread layout ids stay digests over the stored kind text; a reader resolves old names, CURIEs and IRIs.
+
+- **D41. Layouts store CURIEs and the engine expands them (Mark, 2026-11-28):** Cleromancy's `drafts.rs` authors and stores "supports" and "next_step"; lessons D9 has pack authors write CURIEs, but a compiled pack drops its prefixes. "CURIE, engine expands (Recommended)": new layouts store `rel:supports`, authoring accepts a CURIE or a full IRI, and the engine gains `mere::profile::core::expand` over the core pack's prefixes. Against full IRIs and bare local names. Outcome: applies linked-data-platform-lessons D9.
+
+  Links: area The stack · draws on linked-data-platform-lessons D9, declared-lens D36 · plans engine-split P8 · summary Authored layouts name relations by CURIE; the engine expands core CURIEs.
+
+- **D42. Narrative sentences read pack labels as verbs, and next-step's labels become verbs (Mark, 2026-11-28):** Cleromancy's `narrative.rs` built "It supports “X”" from its own verbs; lowercased pack labels read as verbs for every predicate but next-step ("Next step", "Previous step"), and Cleromancy pointed next-step from the later card to the earlier one. "Labels as verbs; fix next-step (Recommended)": sentences use the lowercased forward label, `rel:next-step` is labelled "Leads to" and "Follows from" with short label "Next" (Graphshell's navigation text changes with it), and Cleromancy states next-step from the earlier card to the later. Against noun sentences ("Linked to “X” as: Next step") and against keeping Cleromancy's verbs until L8. Outcome: refines D33, applies D36.
+
+  Links: area The stack · draws on declared-lens D33, declared-lens D36 · plans engine-split P8 · summary Narrative prose uses lowercased forward labels; next-step reads "Leads to" and points from the earlier card.
+
+- **D43. Short labels name each predicate distinctly and serve as navigation's qualifier (Mark, 2026-11-28):** Navigation shows a family phrase and a word naming the predicate ("Contains · file system"); that word came from slug labels now replaced, and the lane rebuilt it from IRI local names with two hand-kept exceptions; every imported predicate's short label was "Imported". "Distinct short labels (Recommended)": each short label names its predicate ("File system", "File system import"), and the qualifier and the roster both read it. Against a fourth label field and against dropping the qualifier. Outcome: refines D33.
+
+  Links: area The stack · draws on declared-lens D33 · plans engine-split P8 · summary Every short label is specific to its predicate and doubles as navigation's qualifier.
+
+- **D44. L7 lane 1's third-round minor forks take the recommendations (Mark, 2026-11-28):** Under Mark's "i'll accept the recommendations unless there are significant forks". (1) NextStep is the core term `rel:next-step`, declared since L2; D36's "declared nowhere" was wrong, and no Cleromancy constant is minted. (2) Frame-member is labelled "Arranged with", navigation's phrase as D33 names, so Turnstone's "Shares scene" changes. (3) The traversal predicate row is `https://mere.computer/ns/rel#traversal`, minted as `rel:hyperlink` is. (4) Pickers read short labels as D33 rules, Turnstone's included, so "Example of" and "Same entity as" give way to the D43 short labels. (5) A claim in the traversal family is refused at admission, traversals being recorded as events (D22). (6) Family rows have no inverse; `rel:taggedWith` keeps "tagged with" with no inverse or short label; a manifest written before D32 is not backfilled with a pin. Outcome: applies D22, D33, D36.
+
+  Links: area The stack · draws on declared-lens D22, declared-lens D33, declared-lens D36 · plans engine-split P8 · summary NextStep is the core term, frame-member reads "Arranged with", traversal's row is rel:traversal, and pickers read short labels.
 
 ## Findings
 
@@ -909,3 +934,5 @@ removes it.
 - 2026-11-28: L7 lane 1's second report: Eidetic, Mere, Graphshell, Turnstone and Cleromancy carry D28 to D31 on
   `p8/l7-relations` (Mere 301/0/3, from 276 at main; Graphshell 2040/0/27, from 2038/1/26); Knot needs a fix. Its forks
   were ruled (D32 to D38); final counted runs wait on disk.
+- 2026-11-28: L7 lane 1's third round coded D32 to D38 across the repos, unbuilt while C: sat under 500 GB; its forks
+  were ruled (D39 to D44).
