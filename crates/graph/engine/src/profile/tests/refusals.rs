@@ -216,8 +216,8 @@ fn declare_and_verify_and_limits_refuse() {
     ));
     let handled = compiled(&edit(
         WORKSPACE,
-        "inverse-labels = { en = \"Reached from\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
-        "handler = \"ws:trail\"\ninverse-labels = { en = \"Reached from\" }\n\n[[vocabulary.terms]]\niri = \"rel:",
+        "inverse-labels = { en = \"Reached from\" }\n",
+        "handler = \"ws:trail\"\ninverse-labels = { en = \"Reached from\" }\n",
     ));
     let mut src = Source::of(vec![local(handled), local(compiled(WORKSPACE_LENS))]);
     assert!(matches!(
@@ -262,11 +262,11 @@ fn unobserved_values_fall_back_and_are_kept() {
     let text = edit(
         &edit(
             WORKSPACE,
-            "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"tile-group\" }",
-            "\"axis:durability\" = [\"durability:ephemeral\", \"durability:session\"] }\nlabels = { en = \"tile-group\" }",
+            "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"Arranged with\" }\ninverse-labels = { en = \"Arranged with\" }\nshort-labels = { en = \"Tile group\" }",
+            "\"axis:durability\" = [\"durability:ephemeral\", \"durability:session\"] }\nlabels = { en = \"Arranged with\" }\ninverse-labels = { en = \"Arranged with\" }\nshort-labels = { en = \"Tile group\" }",
         ),
-        "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"split-pair\" }",
-        "\"axis:durability\" = \"durability:ephemeral\", \"axis:bounce\" = \"ws:high\" }\nlabels = { en = \"split-pair\" }",
+        "\"axis:durability\" = \"durability:session\" }\nlabels = { en = \"Arranged with\" }\ninverse-labels = { en = \"Arranged with\" }\nshort-labels = { en = \"Split pair\" }",
+        "\"axis:durability\" = \"durability:ephemeral\", \"axis:bounce\" = \"ws:high\" }\nlabels = { en = \"Arranged with\" }\ninverse-labels = { en = \"Arranged with\" }\nshort-labels = { en = \"Split pair\" }",
     );
     let src = Source::of(vec![
         local(compiled(&text)),

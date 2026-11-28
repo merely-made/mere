@@ -19,43 +19,55 @@ stratum = "https://mere.computer/ns/stratum#"
 durability = "https://mere.computer/ns/durability#"
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:701 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and short roster.rs:701 edge_family_label; no table reads a family in reverse.
 iri = "family:traversal"
 kind = "family"
 labels = { en = "Traversal" }
+short-labels = { en = "Traversal" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:703 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and short roster.rs:703 edge_family_label; no table reads a family in reverse.
 iri = "family:arrangement"
 kind = "family"
 labels = { en = "Arrangement" }
+short-labels = { en = "Arrangement" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:134 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:134; short roster.rs:815.
 iri = "ws:traversal"
 kind = "predicate"
 family = "family:traversal"
 axes = { "axis:stratum" = "stratum:surface" }
 labels = { en = "Went to" }
 inverse-labels = { en = "Reached from" }
+short-labels = { en = "Traversal" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:155 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Arrangement' (roster.rs:841).
 iri = "rel:arrangement.frame-member"
 kind = "predicate"
 family = "family:arrangement"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "frame-member" }
+labels = { en = "Arranged with" }
+inverse-labels = { en = "Arranged with" }
+short-labels = { en = "Frame member" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:155 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Arrangement' (roster.rs:841).
 iri = "rel:arrangement.tile-group"
 kind = "predicate"
 family = "family:arrangement"
 axes = { "axis:stratum" = "stratum:surface", "axis:durability" = "durability:session" }
-labels = { en = "tile-group" }
+labels = { en = "Arranged with" }
+inverse-labels = { en = "Arranged with" }
+short-labels = { en = "Tile group" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:155 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Arrangement' (roster.rs:841).
 iri = "rel:arrangement.split-pair"
 kind = "predicate"
 family = "family:arrangement"
 axes = { "axis:stratum" = "stratum:surface", "axis:durability" = "durability:session" }
-labels = { en = "split-pair" }
+labels = { en = "Arranged with" }
+inverse-labels = { en = "Arranged with" }
+short-labels = { en = "Split pair" }

@@ -22,9 +22,10 @@ fn record_digest(profile: &crate::profile::load::Profile) -> String {
 
 // Recorded 2026-11-13 from the core pack and fixtures at this commit; a change
 // to either moves them, and that is the point. Moved 2026-11-27 when the
-// labels became display text with inverses (declared-lens D29).
-const CORE_RECORD: &str = "469d50a278c27e12f97f63bda355911181959ea07df54fe5cdb12c89b3a032c3";
-const WORKSPACE_RECORD: &str = "7239884823ac6cf6eeeab9cbfa69065ec9d03dfda83da79cd1a1d4cac0509d17";
+// labels became display text with inverses (declared-lens D29), and
+// 2026-11-28 with short labels and label defaults (D33, D39, D42, D43).
+const CORE_RECORD: &str = "1497667051e6785f98039629fdf23e3fe562a939252aaac7354568f4f628eeb8";
+const WORKSPACE_RECORD: &str = "439e85c2874035d51610b98425b704fd13d6aae8784c4bf66d21f3b7dea90471";
 
 #[test]
 fn the_core_pack_alone_is_a_golden_record() {

@@ -35,11 +35,21 @@ derive = "https://mere.computer/ns/derivation#"
 "axis:presentation" = "present:generic"
 "axis:derivation" = "derive:not-derived"
 
-# Labels are the text users see (declared-lens D29): the forward label, and
-# the inverse read from object to subject, each row naming the Graphshell
-# table it reproduces. The containment, imported and provenance predicates
-# keep slugs until their old text is settled: the old UI named them per
-# family in one table and by short nouns in another.
+# Labels are the text users see (declared-lens D29, D33, D42, D43): the label
+# is navigation's phrase, read as a verb, the inverse its reverse, read from
+# object to subject, and the short label names the predicate itself, for the
+# roster, the picker and navigation's qualifier ("Contains · file system").
+# Each row names the Graphshell f61ae5c9 lines it reproduces and, where two
+# tables disagree, which won. `taggedWith` has no old text: tags were never a
+# relation table.
+
+# D39: a term that declares no labels, and an IRI no pack declares, take
+# these, the text Graphshell f61ae5c9 gave an open predicate (incipit/src
+# navigation.rs:158, roster.rs:816).
+[vocabulary.label-defaults]
+labels = { en = "Relation to" }
+inverse-labels = { en = "Relation from" }
+short-labels = { en = "Predicate" }
 
 # The lens half: the core pack selects nothing beyond itself.
 [lens]
@@ -47,183 +57,204 @@ derive = "https://mere.computer/ns/derivation#"
 # Families.
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:700 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and short roster.rs:700 edge_family_label; no table reads a family in reverse.
 iri = "family:semantic"
 kind = "family"
 labels = { en = "Semantic" }
+short-labels = { en = "Semantic" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:702 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and short roster.rs:702 edge_family_label; no table reads a family in reverse.
 iri = "family:containment"
 kind = "family"
 labels = { en = "Containment" }
+short-labels = { en = "Containment" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:704 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and short roster.rs:704 edge_family_label; no table reads a family in reverse.
 iri = "family:imported"
 kind = "family"
 labels = { en = "Imported" }
+short-labels = { en = "Imported" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/roster.rs:705 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and short roster.rs:705 edge_family_label; no table reads a family in reverse.
 iri = "family:provenance"
 kind = "family"
 labels = { en = "Provenance" }
+short-labels = { en = "Provenance" }
 
 # Semantic (edge_data.rs predicate_iri).
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:135 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:135; short roster.rs:817, the picker (roster.rs:136) agrees.
 iri = "rel:hyperlink"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Links to" }
 inverse-labels = { en = "Linked from" }
+short-labels = { en = "Hyperlink" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:152 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:152; short roster.rs:818.
 iri = "rel:user-grouped"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:surface" }
 labels = { en = "Grouped with" }
 inverse-labels = { en = "Grouped with" }
+short-labels = { en = "Grouped" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:153 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:153; short roster.rs:819.
 iri = "rel:agent-derived"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Derived relation to" }
 inverse-labels = { en = "Derived relation from" }
+short-labels = { en = "Agent" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:136 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:136; short roster.rs:820, the picker (roster.rs:126) agrees.
 iri = "rel:cites"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Cites" }
 inverse-labels = { en = "Cited by" }
+short-labels = { en = "Cites" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:137 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:137; short roster.rs:821, the picker (roster.rs:127) agrees.
 iri = "rel:quotes"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Quotes" }
 inverse-labels = { en = "Quoted by" }
+short-labels = { en = "Quotes" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:138 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:138; short roster.rs:822, the picker (roster.rs:128) agrees.
 iri = "rel:summarizes"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Summarizes" }
 inverse-labels = { en = "Summarized by" }
+short-labels = { en = "Summarizes" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:139 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:139; short roster.rs:823, the picker (roster.rs:129) agrees.
 iri = "rel:elaborates"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Elaborates on" }
 inverse-labels = { en = "Elaborated by" }
+short-labels = { en = "Elaborates" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:140 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:140; short roster.rs:824, over the picker's 'Example of' (roster.rs:130), which is this row's label already, so every string the tables held is kept.
 iri = "rel:example-of"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Example of" }
 inverse-labels = { en = "Has example" }
+short-labels = { en = "Example" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:141 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:141; short roster.rs:825, the picker (roster.rs:131) agrees.
 iri = "rel:supports"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Supports" }
 inverse-labels = { en = "Supported by" }
+short-labels = { en = "Supports" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:142 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:142; short roster.rs:826, the picker (roster.rs:132) agrees.
 iri = "rel:contradicts"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Contradicts" }
 inverse-labels = { en = "Contradicted by" }
+short-labels = { en = "Contradicts" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:143 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:143; short roster.rs:827, the picker (roster.rs:133) agrees.
 iri = "rel:questions"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Questions" }
 inverse-labels = { en = "Questioned by" }
+short-labels = { en = "Questions" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:144 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:144; short roster.rs:828, over the picker's 'Same entity as' (roster.rs:134), which is this row's label already, so every string the tables held is kept.
 iri = "rel:same-entity-as"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Same entity as" }
 inverse-labels = { en = "Same entity as" }
+short-labels = { en = "Same As" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:145 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:145; short roster.rs:829, over the picker's 'Duplicate of' (roster.rs:135), which is this row's label already, so every string the tables held is kept.
 iri = "rel:duplicate-of"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Duplicate of" }
 inverse-labels = { en = "Has duplicate" }
+short-labels = { en = "Duplicate" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:146-147 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:146-147; short roster.rs:830.
 iri = "rel:canonical-mirror-of"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Canonical mirror of" }
 inverse-labels = { en = "Has canonical mirror" }
+short-labels = { en = "Mirror" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:149 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:149; short roster.rs:831.
 iri = "rel:depends-on"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Depends on" }
 inverse-labels = { en = "Required by" }
+short-labels = { en = "Depends" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:150 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:150; short roster.rs:832.
 iri = "rel:blocks"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
 labels = { en = "Blocks" }
 inverse-labels = { en = "Blocked by" }
+short-labels = { en = "Blocks" }
 
 [[vocabulary.terms]]
-# Labels: Graphshell f61ae5c9 incipit/src/navigation.rs:151 (D29).
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse declared-lens D42, over navigation.rs:151's "Next step" / "Previous step"; short roster.rs:833.
 iri = "rel:next-step"
 kind = "predicate"
 family = "family:semantic"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "Next step" }
-inverse-labels = { en = "Previous step" }
+labels = { en = "Leads to" }
+inverse-labels = { en = "Follows from" }
+short-labels = { en = "Next" }
 
 # Tags (resource.rs TAGGED_WITH_IRI).
 
@@ -236,173 +267,245 @@ labels = { en = "tagged with" }
 # Containment (relation_kind.rs predicate_iri).
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Path' (roster.rs:834).
 iri = "rel:containment.url-path"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "url-path" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "URL path" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Domain' (roster.rs:835).
 iri = "rel:containment.domain"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "domain" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "Domain" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Filesystem' (roster.rs:836).
 iri = "rel:containment.filesystem"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "filesystem" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "File system" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Folder' (roster.rs:837).
 iri = "rel:containment.user-folder"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "user-folder" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "User folder" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Clip' (roster.rs:838).
 iri = "rel:containment.clip-source"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "clip-source" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "Clip source" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Section' (roster.rs:839).
 iri = "rel:containment.notebook-section"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "notebook-section" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "Notebook section" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:154 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Collection' (roster.rs:840).
 iri = "rel:containment.collection-member"
 kind = "predicate"
 family = "family:containment"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "collection-member" }
+labels = { en = "Contains" }
+inverse-labels = { en = "Contained by" }
+short-labels = { en = "Collection member" }
 
 # Imported (relation_kind.rs predicate_iri).
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.bookmark-folder"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "bookmark-folder" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "Bookmark folder" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.history-import"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "history-import" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "History import" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.session-import"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "session-import" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "Session import" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.rss-membership"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "rss-membership" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "RSS membership" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.filesystem-import"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "filesystem-import" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "File system import" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.archive-membership"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "archive-membership" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "Archive membership" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:156 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:842).
 iri = "rel:imported.shared-collection"
 kind = "predicate"
 family = "family:imported"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "shared-collection" }
+labels = { en = "Import relation to" }
+inverse-labels = { en = "Import relation from" }
+short-labels = { en = "Shared collection" }
 
 # Provenance (relation_kind.rs predicate_iri).
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Clipped' (roster.rs:843).
 iri = "rel:provenance.clipped-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "clipped-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Clipped from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Excerpt' (roster.rs:844).
 iri = "rel:provenance.excerpted-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "excerpted-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Excerpted from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Summary' (roster.rs:845).
 iri = "rel:provenance.summarized-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "summarized-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Summarized from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Translation' (roster.rs:846).
 iri = "rel:provenance.translated-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "translated-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Translated from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Rewritten' (roster.rs:847).
 iri = "rel:provenance.rewritten-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "rewritten-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Rewritten from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Generated' (roster.rs:848).
 iri = "rel:provenance.generated-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "generated-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Generated from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Extracted' (roster.rs:849).
 iri = "rel:provenance.extracted-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "extracted-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Extracted from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Imported' (roster.rs:850).
 iri = "rel:provenance.imported-from-source"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:resource" }
-labels = { en = "imported-from-source" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Imported from source" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Copied' (roster.rs:851).
 iri = "rel:provenance.copied-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "copied-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Copied from" }
 
 [[vocabulary.terms]]
+# D33, Graphshell f61ae5c9 incipit/src: label and inverse navigation.rs:157 (one phrase for the family); short label the predicate's own name (D43), Graphshell's navigation qualifier capitalized, over the roster's 'Merged' (roster.rs:852).
 iri = "rel:provenance.merged-from"
 kind = "predicate"
 family = "family:provenance"
 axes = { "axis:stratum" = "stratum:surface" }
-labels = { en = "merged-from" }
+labels = { en = "Derived from" }
+inverse-labels = { en = "Source for" }
+short-labels = { en = "Merged from" }

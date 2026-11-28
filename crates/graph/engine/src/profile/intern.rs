@@ -158,6 +158,9 @@ pub struct TermEntry {
     /// Language-tagged names read from object to subject ("Cited by" for
     /// "Cites", declared-lens D29); empty when the row declares none.
     pub inverse_labels: BTreeMap<String, String>,
+    /// Language-tagged short names a list or picker shows ("Same As",
+    /// declared-lens D33); empty when the row declares none.
+    pub short_labels: BTreeMap<String, String>,
     pub handler: Option<String>,
     /// The pack whose row this is, by id.
     pub pack: String,
@@ -174,6 +177,32 @@ impl TermEntry {
     /// language fallback; `None` when the row declares no inverse.
     pub fn display_inverse_label(&self, language: &str) -> Option<&str> {
         pick_label(&self.inverse_labels, language)
+    }
+
+    /// The short label by the same language fallback, then the label: a row
+    /// without a short label shows its label.
+    pub fn display_short_label(&self, language: &str) -> &str {
+        pick_label(&self.short_labels, language).unwrap_or_else(|| self.display_label(language))
+    }
+}
+
+/// The labels a predicate that declares none takes, and an IRI no pack
+/// declares: the core pack's label defaults (declared-lens D39).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct LabelDefaults {
+    pub labels: BTreeMap<String, String>,
+    pub inverse_labels: BTreeMap<String, String>,
+    pub short_labels: BTreeMap<String, String>,
+}
+
+impl LabelDefaults {
+    fn of(defaults: Option<&eidetic::pack::LabelDefaults>) -> Self {
+        let map = |m: Option<&BTreeMap<String, String>>| m.cloned().unwrap_or_default();
+        defaults.map_or_else(Self::default, |d| Self {
+            labels: map(d.labels.as_ref()),
+            inverse_labels: map(d.inverse_labels.as_ref()),
+            short_labels: map(d.short_labels.as_ref()),
+        })
     }
 }
 
@@ -202,6 +231,7 @@ pub struct TermTable {
     by_iri: BTreeMap<String, TermId>,
     by_uuid: BTreeMap<Uuid, TermId>,
     defaults: AxisRow,
+    label_defaults: LabelDefaults,
 }
 
 impl TermTable {
@@ -251,6 +281,35 @@ impl TermTable {
     pub fn defaults(&self) -> &AxisRow {
         &self.defaults
     }
+    /// The core pack's label defaults (D39).
+    pub fn label_defaults(&self) -> &LabelDefaults {
+        &self.label_defaults
+    }
+    /// The label of `iri`: its entry's, or for an IRI not in the table the
+    /// core label default, else the IRI itself (D39).
+    pub fn display_label<'a>(&'a self, iri: &'a str, language: &str) -> &'a str {
+        match self.entry(iri) {
+            Some(entry) => entry.display_label(language),
+            None => pick_label(&self.label_defaults.labels, language).unwrap_or(iri),
+        }
+    }
+    /// The inverse label of `iri`, or the core default for an IRI not in the
+    /// table (D39).
+    pub fn display_inverse_label(&self, iri: &str, language: &str) -> Option<&str> {
+        match self.entry(iri) {
+            Some(entry) => entry.display_inverse_label(language),
+            None => pick_label(&self.label_defaults.inverse_labels, language),
+        }
+    }
+    /// The short label of `iri`, or the core default for an IRI not in the
+    /// table, then its label (D39).
+    pub fn display_short_label<'a>(&'a self, iri: &'a str, language: &str) -> &'a str {
+        match self.entry(iri) {
+            Some(entry) => entry.display_short_label(language),
+            None => pick_label(&self.label_defaults.short_labels, language)
+                .unwrap_or_else(|| self.display_label(iri, language)),
+        }
+    }
 }
 
 /// Intern the vocabularies of `packs` (in resolved order, core first) under
@@ -264,6 +323,11 @@ pub(crate) fn intern(
     let core = &packs[0];
     let core_defaults = core.vocabulary.as_ref().map(|v| &v.defaults);
     let defaults = default_row(core_defaults, &core.header.id)?;
+    let label_defaults = LabelDefaults::of(
+        core.vocabulary
+            .as_ref()
+            .and_then(|v| v.label_defaults.as_ref()),
+    );
     let mut winners: Vec<(&Term, &str)> = Vec::new();
     let mut by_iri = BTreeMap::new();
     let mut settled_terms = std::collections::BTreeSet::new();
@@ -272,7 +336,9 @@ pub(crate) fn intern(
             continue;
         };
         let id = pack.header.id.as_str();
-        if id != core.header.id && !vocabulary.defaults.is_empty() {
+        if id != core.header.id
+            && (!vocabulary.defaults.is_empty() || vocabulary.label_defaults.is_some())
+        {
             diagnostics.push(Diagnostic::DefaultsIgnored {
                 pack: id.to_string(),
             });
@@ -326,8 +392,17 @@ pub(crate) fn intern(
             kind: term.kind,
             family: term.family.clone(),
             family_id: term.family.as_ref().and_then(|f| by_iri.get(f).copied()),
-            labels: term.labels.clone(),
-            inverse_labels: term.inverse_labels.clone().unwrap_or_default(),
+            labels: labels_or_default(term, |t| Some(&t.labels), &label_defaults.labels),
+            inverse_labels: labels_or_default(
+                term,
+                |t| t.inverse_labels.as_ref(),
+                &label_defaults.inverse_labels,
+            ),
+            short_labels: labels_or_default(
+                term,
+                |t| t.short_labels.as_ref(),
+                &label_defaults.short_labels,
+            ),
             handler: term.handler.clone(),
             pack: pack.to_string(),
             row: row(term, pack, &defaults, diagnostics),
@@ -343,7 +418,25 @@ pub(crate) fn intern(
         by_iri,
         by_uuid,
         defaults,
+        label_defaults,
     })
+}
+
+/// A row's labels of one kind, or the core default when the row is a
+/// predicate that declares no labels of any kind (D39). A family, a class or
+/// a row with some labels keeps exactly what it declares.
+fn labels_or_default(
+    term: &Term,
+    field: fn(&Term) -> Option<&BTreeMap<String, String>>,
+    default: &BTreeMap<String, String>,
+) -> BTreeMap<String, String> {
+    let bare =
+        term.labels.is_empty() && term.inverse_labels.is_none() && term.short_labels.is_none();
+    if bare && term.kind == TermKind::Predicate {
+        default.clone()
+    } else {
+        field(term).cloned().unwrap_or_default()
+    }
 }
 
 /// The core pack's defaults as a row; each observed axis must have one (R2).
